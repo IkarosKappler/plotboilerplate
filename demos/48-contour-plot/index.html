@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html class="fullscreen">
+  <head>
+    <title>2D Plotting Boilerplate – Demonstrating 3D Voronoi generation with PlotBoilerplate and THREE.js</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
+    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, curve, 3d, three, three.js threejs, dildo, dong, toy">
+    <meta name="author" content="Ikaros Kappler">
+    <meta name="date" content="2021-01-10">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@humanearthpig">
+    <meta name="twitter:creator" content="@humanearthpig">
+    <meta property="og:url" content="https://www.plotboilerplate.de">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Demonstrating 3D Voronoi generation with PlotBoilerplate and THREE.js">
+    <meta property="og:description" content="Demonstrating 3D Voronoi generation with PlotBoilerplate and THREE.js">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20210111-0-threejs-voronoi.png">
+
+    <!-- Polyfills for IE -->
+    <script src="../../lib/globalthis-polyfill.min.js"></script> 
+    <script src="../../lib/path2d-polyfill.min.js"></script>
+
+    <script src="../../lib/dat.gui.min.js"></script>
+    <script src="../../lib/FileSaver.min.js"></script>
+    <script src="../../lib/Color.js"></script>
+    <script src="../../lib/alloy_finger.js"></script>
+    <script src="../../lib/three-r118.min.js"></script>
+
+    <script src="../../src/cjs/utils/dat.gui.title.polyfill.js"></script>
+    <script src="../../src/cjs/utils/dat.gui.arrowbounce.polyfill.js"></script>
+    <script src="../../src/cjs/utils/creategui.js"></script>
+    <script src="../../src/cjs/utils/module.js"></script>
+    <script src="../../src/cjs/utils/gup.js"></script>
+
+    <script src="../../src/cjs/utils/cloneVertexArray.js"></script>
+    <script src="../../src/cjs/utils/datastructures/VoronoiCell.js"></script>
+    <script src="../../src/cjs/utils/algorithms/sutherlandHodgman.js"></script>
+    <script src="../../src/cjs/utils/algorithms/delaunay.js"></script>
+    <script src="../../src/cjs/utils/algorithms/delaunay2voronoi.js"></script>
+    <script src="../../src/cjs/utils/algorithms/convexPolygonIncircle.js"></script>
+    <script src="../../src/cjs/utils/algorithms/sutherlandHodgman.js"></script>
+
+    <script src="OrbitControls.js"></script>
+    <script src="STLExporter.js"></script>
+    <script src="VertexNormalsHelper.js"></script>
+
+    <script src="TerrainGeneration.js"></script>
+    
+    <script src="../../dist/plotboilerplate.min.js"></script>
+    <script src="../../src/cjs/utils/helpers/BezierPathInteractionHelper.js"></script>
+    <script src="../modal.js"></script>
+    <script src="index.js"></script>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../modal.css">
+  </head>
+  <body class="fullscreen">
+    <div class="w-50 left">
+      <div class="h-50 left-top">
+        ...
+      </div>
+      <div class="h-50 left-bottom">
+        <canvas id="three-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
+      </div>
+    </div>
+    <div class="w-50 right">
+      <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
+    </div>
+
+  </body>
+  <style>
+    body {
+       display: flex;
+    }
+    .w-100 {
+      width: 100%;
+    }
+    .w-50 {
+       width : 50%;
+    }
+    .h-50 {
+      height : 50%;
+   }
+    .left {
+      /*  position : relative;
+       float : left; */
+    }
+    .right {
+     /*  position : relative;
+       float : right; */
+    }
+    .left-top {
+      /* position : relative;
+      float : left; */
+    }
+    .left-bottom {
+      /* position : relative;
+        float : right; */
+    }
+  </style>
+</html>
