@@ -1,5 +1,5 @@
 /**
- * A script for testing the lib with three.js.
+ * A script for calculating Contour Plots from a given rasterized value model (like a terrain, heat map, or so).
  *
  * @requires PlotBoilerplate
  * @requires Bounds
@@ -119,6 +119,46 @@
       );
     }
 
+    function areBothValuesOnRequiredPlaneSide(valueA, valueB, criticalValue, closeGapType) {
+      return (
+        (closeGapType == CLOSE_GAP_TYPE_BELOW && valueA <= criticalValue && valueB <= criticalValue) ||
+        (closeGapType == CLOSE_GAP_TYPE_ABOVE && valueA >= criticalValue && valueB >= criticalValue)
+      );
+    }
+
+    function detectAboveBelowLerpSegment(x, y, nextX, nextY, criticalHeightValue, closeGapType) {
+      var heightValueA = terrainGeneration.getHeightValueAt(x, y);
+      var heightValueB = terrainGeneration.getHeightValueAt(nextX, nextY);
+      //   if (heightValueA >= criticalHeightValue && heightValueB >= criticalHeightValue) {
+      if (areBothValuesOnRequiredPlaneSide(heightValueA, heightValueB, criticalHeightValue, closeGapType)) {
+        //  Both above
+        var line = new Line(new Vertex(x, y), new Vertex(nextX, nextY));
+        pathSegments.push(new GenericPath(line));
+      } else if (
+        (closeGapType === CLOSE_GAP_TYPE_ABOVE && heightValueA >= criticalHeightValue && heightValueB < criticalHeightValue) ||
+        (closeGapType === CLOSE_GAP_TYPE_BELOW && heightValueA <= criticalHeightValue && heightValueB > criticalHeightValue)
+      ) {
+        // Only one of both (first) is above -> interpolate to find exact intersection point
+        var lerpValueByHeight = getLerpRatio(heightValueA, heightValueB, criticalHeightValue);
+        var interpLine = new Line(
+          new Vertex(x, y),
+          new Vertex(lerp(x, nextX, lerpValueByHeight), lerp(y, nextY, lerpValueByHeight))
+        );
+        pathSegments.push(new GenericPath(interpLine));
+      } else if (
+        (closeGapType === CLOSE_GAP_TYPE_ABOVE && heightValueA < criticalHeightValue && heightValueB >= criticalHeightValue) ||
+        (closeGapType === CLOSE_GAP_TYPE_BELOW && heightValueA > criticalHeightValue && heightValueB <= criticalHeightValue)
+      ) {
+        // Only one of both (second) is above -> interpolate to find exact intersection point
+        var lerpValueByHeight = getLerpRatio(heightValueA, heightValueB, criticalHeightValue);
+        var interpLine = new Line(
+          new Vertex(lerp(x, nextX, lerpValueByHeight), lerp(y, nextY, lerpValueByHeight)),
+          new Vertex(nextX, nextY)
+        );
+        pathSegments.push(new GenericPath(interpLine));
+      }
+    }
+
     function findHeightFaceIntersectionLine(xIndex, yIndex, heightFace, heightValue) {
       var heightValueA = heightFace[0][0]; // value at (x,y)
       var heightValueB = heightFace[1][0];
@@ -197,37 +237,26 @@
       }
 
       // Collect value above/below on the y axis
-      var xExtremes = [0, terrainGeneration.xSegmentCount - 1];
-      for (var i = 0; i < xExtremes.length; i++) {
-        var x = xExtremes[i];
-        for (var y = 0; y + 1 < terrainGeneration.ySegmentCount; y++) {
-          var heightValueA = terrainGeneration.getHeightValueAt(x, y);
-          var heightValueB = terrainGeneration.getHeightValueAt(x, y + 1);
-
-          if (config.closeGapType === CLOSE_GAP_TYPE_ABOVE) {
-            if (heightValueA >= medianHeight && heightValueB >= medianHeight) {
-              //  Both above
-              var line = new Line(new Vertex(x, y), new Vertex(x, y + 1));
-              pathSegments.push(new GenericPath(line));
-            } else if (heightValueA >= medianHeight && heightValueB < medianHeight) {
-              // Only one of both (first) is above -> interpolate to find exact intersection point
-              var lerpValueByHeight = getLerpRatio(heightValueA, heightValueB, medianHeight);
-              var interpLine = new Line(new Vertex(x, y), new Vertex(x, lerp(y, y + 1, lerpValueByHeight)));
-              pathSegments.push(new GenericPath(interpLine));
-            } else if (heightValueA < medianHeight && heightValueB >= medianHeight) {
-              // Only one of both (second) is above -> interpolate to find exact intersection point
-              var lerpValueByHeight = getLerpRatio(heightValueA, heightValueB, medianHeight);
-              var interpLine = new Line(new Vertex(x, lerp(y, y + 1, lerpValueByHeight)), new Vertex(x, y + 1));
-              pathSegments.push(new GenericPath(interpLine));
-            }
-          } else if (config.closeGapType === CLOSE_GAP_TYPE_BELOW) {
-            if (heightValueA < medianHeight && heightValueB < medianHeight) {
-              // Both below
-            }
+      if (config.closeGapType === CLOSE_GAP_TYPE_ABOVE || config.closeGapType === CLOSE_GAP_TYPE_BELOW) {
+        var xExtremes = [0, terrainGeneration.xSegmentCount - 1];
+        for (var i = 0; i < xExtremes.length; i++) {
+          var x = xExtremes[i];
+          for (var y = 0; y + 1 < terrainGeneration.ySegmentCount; y++) {
+            var nextX = x;
+            var nextY = y + 1;
+            detectAboveBelowLerpSegment(x, y, nextX, nextY, medianHeight, config.closeGapType);
+          }
+        }
+        var yExtremes = [0, terrainGeneration.ySegmentCount - 1];
+        for (var j = 0; j < yExtremes.length; j++) {
+          var y = yExtremes[j];
+          for (var x = 0; x + 1 < terrainGeneration.xSegmentCount; x++) {
+            var nextX = x + 1;
+            var nextY = y;
+            detectAboveBelowLerpSegment(x, y, nextX, nextY, medianHeight, config.closeGapType);
           }
         }
       }
-      var yExtremes = [0, terrainGeneration.ySegmentCount - 1];
     };
 
     var terrainGeneration = new TerrainGeneration("three-canvas", 16, 16);
@@ -263,10 +292,7 @@
 
       for (var y = 0; y < terrainGeneration.ySegmentCount; y++) {
         for (var x = 0; x < terrainGeneration.xSegmentCount; x++) {
-          //   terrainGeneration.getHeightFace4At(x, y, heightFace);
-
           // Draw a point at (x,y) to indicate the height
-          //   var heightValueA = heightFace[0][0];
           var heightValueA = terrainGeneration.getHeightValueAt(x, y, false);
           var pointPosition = convertCoords2Pos(x, y);
           var heightRatio =
@@ -278,7 +304,6 @@
 
       for (var i in pathSegments) {
         var segment = pathSegments[i];
-        // draw.line(line.a, line.b, "orange", 2);
         for (var j in segment.segments) {
           // By construction we now this must be a line (cannot be a curve or so as we didn't add one)
           var line = segment.segments[j];
@@ -316,7 +341,6 @@
     }
 
     pb.config.postDraw = redraw;
-    // randomPoints(true, false, false); // clear ; no full cover ; do not redraw
     rebuild();
     pb.redraw();
   });
