@@ -62,6 +62,11 @@
     var CLOSE_GAP_TYPE_NONE = 0;
     var CLOSE_GAP_TYPE_ABOVE = 1;
     var CLOSE_GAP_TYPE_BELOW = 2;
+
+    var LO_COLOR = Color.parse("#0000ff");
+    var HI_COLOR = Color.parse("#ff0000");
+    //   console.log("LO_COLOR", LO_COLOR, "HI_COLOR", HI_COLOR);
+
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
         xSegmentCount: 16,
@@ -71,18 +76,23 @@
         useTextureImage: true,
         textureImagePath: "checkpattern-512x512.png",
         wireframe: false,
-        exportSTL: function () {
-          exportSTL();
-        },
 
         sliceHeight: params.getNumber("sliceHeight", 0.5),
         closeGapType: params.getNumber("closeGapType", 0), // { "NONE" : 0, "ABOVE" : 1, "BELOW" : 2 }
         shufflePathColors: params.getNumber("shufflePathColors", false),
+        drawSampleRaster: true,
 
         rebuild: function () {
           rebuild();
         },
 
+        countourLineSteps: 12,
+        collectContourLines: function () {
+          startCollectContourLines();
+        },
+        clearContourLines: function () {
+          clearAllContourLines();
+        },
         clearPathSegments: params.getNumber("clearPathSegments", true)
       },
       GUP
@@ -100,6 +110,8 @@
     var rawLinearPathSegments = [];
     // Array<GenericPath>
     var pathSegments = [];
+    // Array<{ color:string, pathSegments: GenericPath}>
+    var allContourLines = [];
 
     /**
      * Build the contour from the current terrain data.
@@ -108,38 +120,46 @@
       // Draw out stuff
       fill.rect(bounds2D.min, bounds2D.width, bounds2D.height, "rgba(0,0,0,0.75)");
       draw.rect(bounds2D.min, bounds2D.width, bounds2D.height, "green", 2);
+      if (config.drawSampleRaster) {
+        drawPointRaster(draw, fill);
+      }
+      //   var curPathColor = config.shufflePathColors ? randColor(i, 1.0) : "orange";
+      drawPaths(draw, fill, pathSegments, null);
+      drawAllContourLines(draw, fill);
+    };
 
-      //   var pathSegments = [];
-
-      // Find a level to "splice" the mesh, here at middle of Min/Max
-      //   var medianHeight =
-      //     terrainGeneration._minHeight + (terrainGeneration._maxHeight - terrainGeneration._minHeight) * config.sliceHeight;
-      //   console.log("[redraw] medianHeight", medianHeight, "config.sliceHeight", config.sliceHeight);
-
-      var LO_COLOR = Color.parse("#0000ff");
-      var HI_COLOR = Color.parse("#ff0000");
-      //   console.log("LO_COLOR", LO_COLOR, "HI_COLOR", HI_COLOR);
-
+    var drawPointRaster = function (draw, fill) {
       for (var y = 0; y < terrainGeneration.ySegmentCount; y++) {
         for (var x = 0; x < terrainGeneration.xSegmentCount; x++) {
           // Draw a point at (x,y) to indicate the height
           var heightValueA = terrainGeneration.getHeightValueAt(x, y, false);
           var pointPosition = convertCoords2Pos(x, y);
-          var heightRatio =
-            (heightValueA - terrainGeneration._minHeight) / (terrainGeneration._maxHeight - terrainGeneration._minHeight);
+          //   var heightRatio =
+          //     (heightValueA - terrainGeneration._minHeight) / (terrainGeneration._maxHeight - terrainGeneration._minHeight);
+          var heightRatio = getRatioByHeightValue(heightValueA);
           var color = LO_COLOR.clone().interpolate(HI_COLOR, heightRatio);
           fill.point(pointPosition, color.cssRGB(), 2);
         }
       }
+    };
 
+    var drawPaths = function (draw, fill, pathSegments, color) {
       for (var i in pathSegments) {
         var connectedPath = pathSegments[i];
         for (var j in connectedPath.segments) {
-          var color = config.shufflePathColors ? randColor(i, 1.0) : "orange";
+          var col = color === null ? (config.shufflePathColors ? randColor(i, 1.0) : "orange") : color;
           // By construction we now this must be a line (cannot be a curve or so as we didn't add one)
           var line = connectedPath.segments[j];
-          draw.line(convertCoords2Pos(line.a.x, line.a.y), convertCoords2Pos(line.b.x, line.b.y), color, 2);
+          draw.line(convertCoords2Pos(line.a.x, line.a.y), convertCoords2Pos(line.b.x, line.b.y), col, 2);
         }
+      }
+    };
+
+    var drawAllContourLines = function (draw, fill) {
+      for (var i in allContourLines) {
+        var contourLine = allContourLines[i];
+        // console.log("drawAllContourLines", i, contourLine);
+        drawPaths(draw, fill, contourLine.pathSegments, contourLine.color);
       }
     };
 
@@ -328,19 +348,39 @@
       }
     }
 
+    var getHeightValueByRatio = function (heightRatio) {
+      var heightValue =
+        terrainGeneration._minHeight + (terrainGeneration._maxHeight - terrainGeneration._minHeight) * heightRatio;
+      //console.log("[rebuild] heightValue", heightValue, "config.sliceHeight", config.sliceHeight);
+      return heightValue;
+    };
+
+    var getRatioByHeightValue = function (heightValue) {
+      var heightRatio =
+        (heightValue - terrainGeneration._minHeight) / (terrainGeneration._maxHeight - terrainGeneration._minHeight);
+      return heightRatio;
+    };
+
     /**
      * Rebuild the whole paths.
      */
-    var rebuildPlotPlane = function () {
-      //   var pathSegments = [];
+    var rebuildCurrentPlotPlane = function (medianHeight) {
+      // Find a level to "splice" the mesh, here at middle of Min/Max
+      //   var medianHeight =
+      //     terrainGeneration._minHeight + (terrainGeneration._maxHeight - terrainGeneration._minHeight) * config.sliceHeight;
+      var medianHeight = getHeightValueByRatio(config.sliceHeight);
+      //console.log("[rebuild] medianHeight", medianHeight, "config.sliceHeight", config.sliceHeight);
+      rebuildPlotPlane(medianHeight, { addTo3DPreview: true, addToContourLines: false });
+    };
+
+    /**
+     * Rebuild the whole paths.
+     */
+    var rebuildPlotPlane = function (criticalHeightValue, options) {
       if (config.clearPathSegments) {
         rawLinearPathSegments = [];
+        pathSegments = [];
       }
-
-      // Find a level to "splice" the mesh, here at middle of Min/Max
-      var medianHeight =
-        terrainGeneration._minHeight + (terrainGeneration._maxHeight - terrainGeneration._minHeight) * config.sliceHeight;
-      //console.log("[rebuild] medianHeight", medianHeight, "config.sliceHeight", config.sliceHeight);
 
       // A face element:
       // (x-1,y-1)      (x,y-1)
@@ -356,7 +396,7 @@
       for (var y = 0; y + 1 < terrainGeneration.ySegmentCount; y++) {
         for (var x = 0; x + 1 < terrainGeneration.xSegmentCount; x++) {
           terrainGeneration.getHeightFace4At(x, y, heightFace);
-          var line = findHeightFaceIntersectionLine(x, y, heightFace, medianHeight);
+          var line = findHeightFaceIntersectionLine(x, y, heightFace, criticalHeightValue);
           if (line) {
             // pathSegments.push(new GenericPath(line));
             rawLinearPathSegments.push(line);
@@ -372,7 +412,7 @@
           for (var y = 0; y + 1 < terrainGeneration.ySegmentCount; y++) {
             var nextX = x;
             var nextY = y + 1;
-            detectAboveBelowLerpSegment(x, y, nextX, nextY, medianHeight, config.closeGapType);
+            detectAboveBelowLerpSegment(x, y, nextX, nextY, criticalHeightValue, config.closeGapType);
           }
         }
         var yExtremes = [0, terrainGeneration.ySegmentCount - 1];
@@ -381,7 +421,7 @@
           for (var x = 0; x + 1 < terrainGeneration.xSegmentCount; x++) {
             var nextX = x + 1;
             var nextY = y;
-            detectAboveBelowLerpSegment(x, y, nextX, nextY, medianHeight, config.closeGapType);
+            detectAboveBelowLerpSegment(x, y, nextX, nextY, criticalHeightValue, config.closeGapType);
           }
         }
       }
@@ -391,16 +431,28 @@
       pathSegments = pathSegments.filter(function (pathSegment) {
         return pathSegment.segments.length != 1 || (pathSegment.segments.length === 1 && pathSegment.segments[0].length() > 0.1);
       });
-      console.log(pathSegments);
+      //   console.log(pathSegments);
+
+      if (options.addToContourLines) {
+        var heightRatio = getRatioByHeightValue(criticalHeightValue);
+        var color = LO_COLOR.clone().interpolate(HI_COLOR, heightRatio);
+        console.log("Adding color ");
+        allContourLines.push({ pathSegments: pathSegments, color: color.cssRGB() });
+      }
+      if (options.addTo3DPreview) {
+        console.log("Add contour");
+        contourScene.addContour(pathSegments);
+      }
     };
 
     var terrainGeneration = null;
-
-    var modal = new Modal();
+    // var modal = new Modal();
+    var contourScene = new ContourScene("three-canvas-result");
+    // contourScene.rebuild();
 
     var rebuild = function () {
       rebuildMesh();
-      rebuildPlotPlane();
+      rebuildCurrentPlotPlane();
     };
 
     var rebuildTerrain = function () {
@@ -409,6 +461,22 @@
 
     var rebuildMesh = function () {
       terrainGeneration.rebuild(Object.assign({}, config));
+    };
+
+    // Maybe better make this async?
+    var startCollectContourLines = function () {
+      allContourLines = [];
+      for (var i = 1; i <= config.countourLineSteps; i++) {
+        var heightValue = getHeightValueByRatio(i / config.countourLineSteps);
+        console.log("rebuildPlotPlane at height", heightValue);
+        rebuildPlotPlane(heightValue, { addTo3DPreview: false, addToContourLines: true });
+      }
+      pb.redraw();
+    };
+
+    var clearAllContourLines = function () {
+      allContourLines = [];
+      pb.redraw();
     };
 
     // +---------------------------------------------------------------------------------
@@ -432,14 +500,23 @@
       fold0.add(config, "wireframe").onChange( function() { rebuild(); } ).name('wireframe').title('Display the mesh as a wireframe model.');
 
       // prettier-ignore
-      gui.add(config, "sliceHeight").min(0.0).max(1.0).onChange( function() { rebuildPlotPlane(); pb.redraw(); } ).name('sliceHeight').title('Where to slice the current terrain model.');
+      gui.add(config, "drawSampleRaster").onChange( function() { pb.redraw(); } ).name('drawSampleRaster').title('Draw the sample raster to visualize the underlying data raster.');
       // prettier-ignore
-      gui.add(config, "closeGapType", { "None" : CLOSE_GAP_TYPE_NONE, "Above" : CLOSE_GAP_TYPE_ABOVE, "Below" : CLOSE_GAP_TYPE_BELOW } ).onChange( function() { rebuildPlotPlane(); pb.redraw(); } ).name('closeGapType').title('Close gap above, below or not at all.');
+      gui.add(config, "sliceHeight").min(0.0).max(1.0).onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('sliceHeight').title('Where to slice the current terrain model.');
+      // prettier-ignore
+      gui.add(config, "closeGapType", { "None" : CLOSE_GAP_TYPE_NONE, "Above" : CLOSE_GAP_TYPE_ABOVE, "Below" : CLOSE_GAP_TYPE_BELOW } ).onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('closeGapType').title('Close gap above, below or not at all.');
       // prettier-ignore
       gui.add(config, "shufflePathColors" ).name('shufflePathColors').onChange( function() { pb.redraw(); } ).title('Use different colors for different paths?');
 
       // prettier-ignore
-      gui.add(config, "clearPathSegments").onChange( function() { rebuildPlotPlane(); pb.redraw(); } ).name('clearPathSegments').title('Clear path buffer on each rebuild cycle (default=true).');
+      gui.add(config, "clearPathSegments").onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('clearPathSegments').title('Clear path buffer on each rebuild cycle (default=true).');
+      // prettier-ignore
+      gui.add(config, "countourLineSteps").name('countourLineSteps').title('The number of contour lines to calculate.');
+      // prettier-ignore
+
+      gui.add(config, "collectContourLines").name('collectContourLines').title('Start an iterating process to collect contour lines.');
+      // prettier-ignore
+      gui.add(config, "clearContourLines").name('clearContourLines').title('Clear the previously collected contour lines.');
     }
 
     pb.config.postDraw = redraw;
