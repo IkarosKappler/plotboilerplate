@@ -1,5 +1,8 @@
 # Changelog
 
+- 2023-10-28
+  - Added a new demo for calculating contour plots.
+  - Added the `utils/Params` class for retrieving URL params by their proper type.
 - 2023-10-07 [v1.21.0]
   - Adding the `BezierPath.fromCurve(CubicBezierCurve)` static function.
   - Adding the extended demo: Trimming Bézier curves.
