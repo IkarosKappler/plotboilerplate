@@ -36,16 +36,18 @@
     <script src="../../src/cjs/utils/cloneVertexArray.js"></script>
     <script src="../../src/cjs/utils/datastructures/Color.js"></script>
     <script src="../../src/cjs/utils/Params.js"></script> 
-
     <script src="../../src/cjs/utils/datastructures/GenericPath.js"></script> 
-
+    <script src="../../src/cjs/utils/algorithms/clearDuplicateVertices.js"></script> 
+    <script src="../../src/cjs/utils/algorithms/detectPaths.js"></script> 
+    <script src="../../src/cjs/utils/WebColors.js"></script>
+    <script src="../../src/cjs/utils/WebColorsContrast.js"></script>
 
     <script src="OrbitControls.js"></script>
     <script src="VertexNormalsHelper.js"></script>
     <script src="TerrainGeneration.js"></script>
     
     <script src="../../dist/plotboilerplate.min.js"></script>
-    <script src="../../src/cjs/utils/helpers/BezierPathInteractionHelper.js"></script>
+    <!-- <script src="../../src/cjs/utils/helpers/BezierPathInteractionHelper.js"></script> -->
     <script src="../modal.js"></script>
     <script src="index.js"></script>
     <link rel="stylesheet" href="../style.css">
@@ -53,7 +55,12 @@
   </head>
   <body class="fullscreen">
     <div class="w-50 left">
-        <canvas id="three-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
+        <div class="h-50 top">
+          <canvas id="three-canvas-input" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
+        </div>
+        <div class="h-50 top">
+          <canvas id="three-canvas-result" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
+        </div>
     </div>
     <div class="w-50 right">
       <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>

@@ -11,6 +11,7 @@
     this.parent = this.canvas.parentElement;
     this.xSegmentCount = xSegmentCount || 16;
     this.ySegmentCount = ySegmentCount || 16;
+    // console.log("xSegmentCount", xSegmentCount);
 
     // @private
     this._minHeight = 0;
@@ -140,13 +141,11 @@
   };
 
   /**
-   * @param {VoronoiCell[]}   options.voronoiDiagram
-   * @param {Polygon}         options.clipPolygon
    * @param {boolean}         options.useTextureImage
-   * @param {boolean?}        useTextureImage
-   * @param {string?}         textureImagePath
-   * @param {boolean?}        wireframe
-   * @param {boolean?}        showNormals
+   * @param {boolean?}        options.useTextureImage
+   * @param {string?}         options.textureImagePath
+   * @param {boolean?}        options.wireframe
+   * @param {boolean?}        options.showNormals
    **/
   TerrainGeneration.prototype.rebuild = function (options) {
     this.removeCachedGeometries();
@@ -169,25 +168,68 @@
       this._minHeight = Math.min(this._minHeight, this._planeGeometry.vertices[i].z);
     }
     // geometry.translate(30, 30, 0);
-    var material = new THREE.MeshPhongMaterial({
-      color: 0xdddddd,
-      wireframe: true
-    });
-    var terrain = new THREE.Mesh(this._planeGeometry, material);
+    var material = this.createMaterial(options);
+    this._planeGeometry.computeVertexNormals();
+    var terrainMesh = new THREE.Mesh(this._planeGeometry, material);
 
     // Assuming you already have your global scene, add the terrain to it
-    this.scene.add(terrain);
-    this.geometries.push(terrain);
+    this.scene.add(terrainMesh);
+    this.geometries.push(terrainMesh);
 
+    if (options.showNormals) {
+      var vnHelper = new VertexNormalsHelper(terrainMesh, options.normalsLength, 0x00ff00, 1);
+      this.scene.add(vnHelper);
+      this.geometries.push(vnHelper);
+    }
+  };
+
+  TerrainGeneration.prototype.createMaterial = function (options) {
     var useTextureImage = options.useTextureImage && typeof options.textureImagePath != "undefined";
-    var textureImagePath = typeof options.textureImagePath != "undefined" ? options.textureImagePath : null;
+    var textureImagePath = useTextureImage ? options.textureImagePath : null;
     var wireframe = typeof options.wireframe != "undefined" ? options.wireframe : null;
 
-    // if (options.showNormals) {
-    //   var vnHelper = new VertexNormalsHelper(latheMesh, options.normalsLength, 0x00ff00, 1);
-    //   this.scene.add(vnHelper);
-    //   this.geometries.push(vnHelper);
-    // }
+    if (wireframe) {
+      return new THREE.MeshPhongMaterial({
+        color: 0xdddddd,
+        wireframe: true
+      });
+    }
+
+    if (useTextureImage) {
+      var loader = new THREE.TextureLoader();
+      var texture = loader.load(textureImagePath);
+
+      return new THREE.MeshLambertMaterial({
+        color: 0xffffff,
+        wireframe: wireframe,
+        flatShading: false,
+        depthTest: true,
+        opacity: 1.0,
+        side: THREE.DoubleSide,
+        visible: true,
+        emissive: 0x0,
+        reflectivity: 1.0,
+        refractionRatio: 0.89,
+        // shading : THREE.LambertShading,
+        map: texture
+      });
+    }
+
+    return new THREE.MeshPhongMaterial({
+      color: 0x3838ff,
+      wireframe: wireframe,
+      flatShading: false,
+      depthTest: true,
+      opacity: 1.0,
+      side: THREE.DoubleSide,
+      visible: true,
+      emissive: 0x0,
+      reflectivity: 1.0,
+      refractionRatio: 0.89,
+      specular: 0x888888,
+      // shading : THREE.LambertShading,
+      map: null
+    });
   };
 
   TerrainGeneration.prototype.removeCachedGeometries = function () {
