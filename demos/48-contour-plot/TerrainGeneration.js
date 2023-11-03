@@ -129,6 +129,12 @@
     if (isDebug) {
       console.log("xIndex", xIndex, "yIndex", yIndex, "bufferIndex", bufferIndex);
     }
+    if (bufferIndex > this._planeGeometry.vertices) {
+      console.error("ERR buffer index is out of bounds! xIndex", xIndex, "yIndex", yIndex, "bufferIndex", bufferIndex);
+    }
+    if (!this._planeGeometry.vertices[bufferIndex]) {
+      console.error("ERR buffer element is null! xIndex", xIndex, "yIndex", yIndex, "bufferIndex", bufferIndex);
+    }
     return this._planeGeometry ? this._planeGeometry.vertices[bufferIndex].z : NaN;
   };
 

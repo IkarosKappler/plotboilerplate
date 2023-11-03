@@ -418,9 +418,9 @@
       var gui = pb.createGUI();
       var fold0 = gui.addFolder("Mesh");
       // prettier-ignore
-      fold0.add(config, "xSegmentCount").min(4).max(128).onChange( function() { rebuildTerrain(); rebuild(); } ).name('xSegmentCount').title("The number of vertices along the mesh's x axis.");
+      fold0.add(config, "xSegmentCount").min(4).max(128).step(1).onChange( function() { rebuildTerrain(); rebuild(); pb.redraw(); } ).name('xSegmentCount').title("The number of vertices along the mesh's x axis.");
       // prettier-ignore
-      fold0.add(config, "ySegmentCount").min(4).max(128).onChange( function() { rebuildTerrain(); rebuild(); } ).name('ySegmentCount').title("The number of vertices along the mesh's y axis.");
+      fold0.add(config, "ySegmentCount").min(4).max(128).step(1).onChange( function() { rebuildTerrain(); rebuild(); pb.redraw(); } ).name('ySegmentCount').title("The number of vertices along the mesh's y axis.");
 
       // prettier-ignore
       fold0.add(config, "showNormals").onChange( function() { rebuild(); } ).name('showNormals').title('Show the vertex normals.');
