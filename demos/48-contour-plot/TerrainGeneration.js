@@ -118,12 +118,25 @@
     return this._maxHeight;
   };
 
+  TerrainGeneration.prototype.coordinateIndicesToBufferIndex = function (xIndex, yIndex) {
+    return yIndex * this.xSegmentCount + xIndex;
+  };
+
   TerrainGeneration.prototype.getHeightValueAt = function (xIndex, yIndex, isDebug) {
-    var bufferIndex = yIndex * this.xSegmentCount + xIndex;
+    // var bufferIndex = yIndex * this.xSegmentCount + xIndex;
+    var bufferIndex = this.coordinateIndicesToBufferIndex(xIndex, yIndex);
     if (isDebug) {
       console.log("xIndex", xIndex, "yIndex", yIndex, "bufferIndex", bufferIndex);
     }
     return this._planeGeometry ? this._planeGeometry.vertices[bufferIndex].z : NaN;
+  };
+
+  // buffer: array[2][2]
+  TerrainGeneration.prototype.getHeightFace4At = function (xIndex, yIndex, buffer) {
+    buffer[0][0] = this.getHeightValueAt(xIndex, yIndex);
+    buffer[1][0] = this.getHeightValueAt(xIndex + 1, yIndex);
+    buffer[1][1] = this.getHeightValueAt(xIndex + 1, yIndex + 1);
+    buffer[0][1] = this.getHeightValueAt(xIndex, yIndex + 1);
   };
 
   /**
@@ -169,45 +182,6 @@
     var useTextureImage = options.useTextureImage && typeof options.textureImagePath != "undefined";
     var textureImagePath = typeof options.textureImagePath != "undefined" ? options.textureImagePath : null;
     var wireframe = typeof options.wireframe != "undefined" ? options.wireframe : null;
-
-    // var material = useTextureImage
-    //   ? new THREE.MeshLambertMaterial({
-    //       color: 0xffffff,
-    //       wireframe: wireframe,
-    //       flatShading: false,
-    //       depthTest: true,
-    //       opacity: 1.0,
-    //       side: THREE.DoubleSide,
-    //       visible: true,
-    //       emissive: 0x0,
-    //       reflectivity: 1.0,
-    //       refractionRatio: 0.89,
-    //       // shading : THREE.LambertShading,
-    //       map: this.loadTextureImage(options.textureImagePath)
-    //     })
-    //   : new THREE.MeshPhongMaterial({
-    //       color: 0x3838ff,
-    //       wireframe: wireframe,
-    //       flatShading: false,
-    //       depthTest: true,
-    //       opacity: 1.0,
-    //       side: THREE.DoubleSide,
-    //       visible: true,
-    //       emissive: 0x0,
-    //       reflectivity: 1.0,
-    //       refractionRatio: 0.89,
-    //       specular: 0x888888,
-    //       // shading : THREE.LambertShading,
-    //       map: null
-    //     });
-    // var bufferedGeometry = new THREE.BufferGeometry().fromGeometry(geometry);
-    // bufferedGeometry.computeVertexNormals();
-    // var latheMesh = new THREE.Mesh(bufferedGeometry, material);
-    // latheMesh.position.y = -100;
-    // latheMesh.rotation.x = Math.PI;
-    // this.camera.lookAt(new THREE.Vector3(20, 0, 150));
-    // this.scene.add(latheMesh);
-    // this.geometries.push(latheMesh);
 
     // if (options.showNormals) {
     //   var vnHelper = new VertexNormalsHelper(latheMesh, options.normalsLength, 0x00ff00, 1);
