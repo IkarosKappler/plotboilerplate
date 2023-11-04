@@ -9,9 +9,6 @@
   var TerrainGeneration = function (canvasId) {
     this.basicSceneSetup = new BasicSceneSetup(canvasId);
 
-    // this.xSegmentCount = xSegmentCount || 16;
-    // this.ySegmentCount = ySegmentCount || 16;
-
     // Private
     this._planeGeometry = null;
     // DataGrid2dListAdapter
@@ -28,30 +25,20 @@
     this._maxHeight = Number.MIN_VALUE;
     this._minHeight = Number.MAX_VALUE;
     // TODO: these are just needed for calculatin [0,PI] or so ...
-    this._minX = 0.0;
-    this._maxX = 2 * Math.PI;
-    this._minY = 0.0;
-    this._maxY = 2 * Math.PI;
+    var inputMinX = 0.0;
+    var inputMaxX = 2 * Math.PI;
+    var inputMinY = 0.0;
+    var inputMaxY = 2 * Math.PI;
     var minX = Number.MAX_VALUE;
     var maxX = Number.MIN_VALUE;
     var minY = Number.MAX_VALUE;
     var maxY = Number.MIN_VALUE;
-    this.dataGrid = new DataGrid2dListAdapter(
-      this._planeGeometry.vertices,
-      options.xSegmentCount,
-      options.ySegmentCount
-      // this._minHeight,
-      // this._maxHeight,
-      // minX,
-      // maxX,
-      // minY,
-      // maxY
-    );
+    this.dataGrid = new DataGrid2dListAdapter(this._planeGeometry.vertices, options.xSegmentCount, options.ySegmentCount);
     for (var i = 0, l = this._planeGeometry.vertices.length; i < l; i++) {
       var relPos = this.dataGrid.getCoordsFromBufferIndex(i);
       // console.log("relPos", relPos);
-      var xAbs = this._minX + (this._maxX - this._minX) * relPos.xRel;
-      var yAbs = this._minY + (this._maxY - this._minY) * relPos.yRel;
+      var xAbs = inputMinX + (inputMaxX - inputMinX) * relPos.xRel;
+      var yAbs = inputMinY + (inputMaxY - inputMinY) * relPos.yRel;
       // console.log("xAbs", xAbs, "yAbs", yAbs);
       this._planeGeometry.vertices[i].z = (Math.sin(xAbs) + Math.sin(yAbs)) * 10.0;
       this._maxHeight = Math.max(this._maxHeight, this._planeGeometry.vertices[i].z);
