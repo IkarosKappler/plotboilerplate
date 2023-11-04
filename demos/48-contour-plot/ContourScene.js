@@ -67,18 +67,20 @@
       shape.closePath();
     }
 
-    // prettier-ignore
-    const extrudeSettings = {
-        steps: 2,
-        depth: 1, // 16,
-        bevelEnabled: false, // true,
-        // bevelThickness: 1,
-        // bevelSize: 1,
-        // bevelOffset: 0,
-        // bevelSegments: 1
-    };
+    // // prettier-ignore
+    // const extrudeSettings = {
+    //     steps: 2,
+    //     depth: 1, // 16,
+    //     bevelEnabled: false, // true,
+    //     // bevelThickness: 1,
+    //     // bevelSize: 1,
+    //     // bevelOffset: 0,
+    //     // bevelSegments: 1
+    // };
 
-    const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    // const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    const geometry = new THREE.ShapeGeometry(shape);
+
     const material = this.basicSceneSetup.createMaterial(); // new THREE.MeshBasicMaterial({ color: 0x00ff00 });
     const mesh = new THREE.Mesh(geometry, material);
 

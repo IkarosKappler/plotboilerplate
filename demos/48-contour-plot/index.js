@@ -382,13 +382,16 @@
         pathSegments = [];
       }
 
-      // A face element:
-      // (x-1,y-1)      (x,y-1)
-      //        A-----B
-      //        |     |
-      //        |     |
-      //        D-----C
-      // (x-1,y)        (x,y)
+      // Imagine a face4 element like this
+      //    (x,y)       (x+1,y)
+      //         A-----B
+      //         |     |
+      //         |     |
+      //         D-----C
+      //  (x,y+1)        (x+1,y+1)
+      //	   then result in the buffer will be
+      //   [ [A,B],
+      //     [D,C] ]
       var heightFace = [
         [0, 0],
         [0, 0]
