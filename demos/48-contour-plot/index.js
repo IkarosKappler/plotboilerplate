@@ -516,7 +516,7 @@
       // prettier-ignore
       gui.add(config, "clearPathSegments").onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('clearPathSegments').title('Clear path buffer on each rebuild cycle (default=true).');
       // prettier-ignore
-      gui.add(config, "countourLineSteps").name('countourLineSteps').title('The number of contour lines to calculate.');
+      gui.add(config, "countourLineSteps").min(2).max(32).name('countourLineSteps').title('The number of contour lines to calculate.');
       // prettier-ignore
 
       gui.add(config, "collectContourLines").name('collectContourLines').title('Start an iterating process to collect contour lines.');
