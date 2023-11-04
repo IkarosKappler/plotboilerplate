@@ -59,9 +59,9 @@
     // +---------------------------------------------------------------------------------
     // | A global config that's attached to the dat.gui control interface.
     // +-------------------------------
-    var CLOSE_GAP_TYPE_NONE = 0;
-    var CLOSE_GAP_TYPE_ABOVE = 1;
-    var CLOSE_GAP_TYPE_BELOW = 2;
+    // var CLOSE_GAP_TYPE_NONE = 0;
+    // var CLOSE_GAP_TYPE_ABOVE = 1;
+    // var CLOSE_GAP_TYPE_BELOW = 2;
 
     var LO_COLOR = Color.parse("#0000ff");
     var HI_COLOR = Color.parse("#ff0000");
@@ -367,6 +367,7 @@
      * Rebuild the whole paths.
      */
     var rebuildCurrentPlotPlane = function (medianHeight) {
+      console.log("rebuildCurrentPlotPlane", medianHeight);
       // Find a level to "splice" the mesh, here at middle of Min/Max
       //   var medianHeight =
       //     terrainGeneration._minHeight + (terrainGeneration._maxHeight - terrainGeneration._minHeight) * config.sliceHeight;
@@ -384,59 +385,65 @@
         pathSegments = [];
       }
 
-      // Imagine a face4 element like this
-      //    (x,y)       (x+1,y)
-      //         A-----B
-      //         |     |
-      //         |     |
-      //         D-----C
-      //  (x,y+1)        (x+1,y+1)
-      //	   then result in the buffer will be
-      //   [ [A,B],
-      //     [D,C] ]
-      var heightFace = [
-        [0, 0],
-        [0, 0]
-      ];
-      for (var y = 0; y + 1 < terrainGeneration.dataGrid.ySegmentCount; y++) {
-        for (var x = 0; x + 1 < terrainGeneration.dataGrid.xSegmentCount; x++) {
-          terrainGeneration.dataGrid.getDataFace4At(x, y, heightFace);
-          var line = findHeightFaceIntersectionLine(x, y, heightFace, criticalHeightValue);
-          if (line) {
-            // pathSegments.push(new GenericPath(line));
-            rawLinearPathSegments.push(line);
-          }
-        }
-      }
+      console.log("rebuildPlotPlane", criticalHeightValue, options);
 
-      // Collect value above/below on the y axis
-      if (config.closeGapType === CLOSE_GAP_TYPE_ABOVE || config.closeGapType === CLOSE_GAP_TYPE_BELOW) {
-        var xExtremes = [0, terrainGeneration.dataGrid.xSegmentCount - 1];
-        for (var i = 0; i < xExtremes.length; i++) {
-          var x = xExtremes[i];
-          for (var y = 0; y + 1 < terrainGeneration.dataGrid.ySegmentCount; y++) {
-            var nextX = x;
-            var nextY = y + 1;
-            detectAboveBelowLerpSegment(x, y, nextX, nextY, criticalHeightValue, config.closeGapType);
-          }
-        }
-        var yExtremes = [0, terrainGeneration.dataGrid.ySegmentCount - 1];
-        for (var j = 0; j < yExtremes.length; j++) {
-          var y = yExtremes[j];
-          for (var x = 0; x + 1 < terrainGeneration.dataGrid.xSegmentCount; x++) {
-            var nextX = x + 1;
-            var nextY = y;
-            detectAboveBelowLerpSegment(x, y, nextX, nextY, criticalHeightValue, config.closeGapType);
-          }
-        }
-      }
-      // Detect connected paths
-      pathSegments = detectPaths(rawLinearPathSegments, 0.1); // Epsilon?
-      // Filter out segments with only a single line of length~=0
-      pathSegments = pathSegments.filter(function (pathSegment) {
-        return pathSegment.segments.length != 1 || (pathSegment.segments.length === 1 && pathSegment.segments[0].length() > 0.1);
-      });
-      //   console.log(pathSegments);
+      // // Imagine a face4 element like this
+      // //    (x,y)       (x+1,y)
+      // //         A-----B
+      // //         |     |
+      // //         |     |
+      // //         D-----C
+      // //  (x,y+1)        (x+1,y+1)
+      // //	   then result in the buffer will be
+      // //   [ [A,B],
+      // //     [D,C] ]
+      // var heightFace = [
+      //   [0, 0],
+      //   [0, 0]
+      // ];
+      // for (var y = 0; y + 1 < terrainGeneration.dataGrid.ySegmentCount; y++) {
+      //   for (var x = 0; x + 1 < terrainGeneration.dataGrid.xSegmentCount; x++) {
+      //     terrainGeneration.dataGrid.getDataFace4At(x, y, heightFace);
+      //     var line = findHeightFaceIntersectionLine(x, y, heightFace, criticalHeightValue);
+      //     if (line) {
+      //       // pathSegments.push(new GenericPath(line));
+      //       rawLinearPathSegments.push(line);
+      //     }
+      //   }
+      // }
+
+      // // Collect value above/below on the y axis
+      // if (config.closeGapType === CLOSE_GAP_TYPE_ABOVE || config.closeGapType === CLOSE_GAP_TYPE_BELOW) {
+      //   var xExtremes = [0, terrainGeneration.dataGrid.xSegmentCount - 1];
+      //   for (var i = 0; i < xExtremes.length; i++) {
+      //     var x = xExtremes[i];
+      //     for (var y = 0; y + 1 < terrainGeneration.dataGrid.ySegmentCount; y++) {
+      //       var nextX = x;
+      //       var nextY = y + 1;
+      //       detectAboveBelowLerpSegment(x, y, nextX, nextY, criticalHeightValue, config.closeGapType);
+      //     }
+      //   }
+      //   var yExtremes = [0, terrainGeneration.dataGrid.ySegmentCount - 1];
+      //   for (var j = 0; j < yExtremes.length; j++) {
+      //     var y = yExtremes[j];
+      //     for (var x = 0; x + 1 < terrainGeneration.dataGrid.xSegmentCount; x++) {
+      //       var nextX = x + 1;
+      //       var nextY = y;
+      //       detectAboveBelowLerpSegment(x, y, nextX, nextY, criticalHeightValue, config.closeGapType);
+      //     }
+      //   }
+      // }
+      // // Detect connected paths
+      // pathSegments = detectPaths(rawLinearPathSegments, 0.1); // Epsilon?
+      // // Filter out segments with only a single line of length~=0
+      // pathSegments = pathSegments.filter(function (pathSegment) {
+      //   return pathSegment.segments.length != 1 || (pathSegment.segments.length === 1 && pathSegment.segments[0].length() > 0.1);
+      // });
+      // //   console.log(pathSegments);
+
+      var contourDetection = new ContourLineDetection(terrainGeneration.dataGrid);
+      // Array<GenericPath>
+      pathSegments = contourDetection.detectContourPaths(criticalHeightValue, { closeGapType: config.closeGapType });
 
       if (options.addToContourLines) {
         var heightRatio = getRatioByHeightValue(criticalHeightValue);

@@ -42,7 +42,7 @@ export declare class DataGrid2dListAdapter<T> implements IDataGrid2d<T> {
      * @param xSegmentCount
      * @param ySegmentCount
      */
-    constructor(list: Array<Triplet<T>>, xSegmentCount: number, ySegmentCount: number, minDataValue: T, maxDataValue: T, minXValue: T, maxXValue: T, minYValue: T, maxYValue: T);
+    constructor(list: Array<Triplet<T>>, xSegmentCount: number, ySegmentCount: number);
     getIndicesFromBufferIndex(bufferIndex: number): RasterPosition;
     getCoordsFromBufferIndex(bufferIndex: number): RasterPosition;
     coordinateIndicesToBufferIndex(xIndex: number, yIndex: number): number;

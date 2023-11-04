@@ -1,5 +1,9 @@
 # Changelog
 
+- 2023-11-04
+  - Adding a new interface for read matrix like data: utils/datastructures/DataGrid2d.
+  - Adding an implementation for this working on linear arrays (like buffer or THREE vertex arrays): DataGrid2dListAdapter.
+  - Refatoring the contour calculation to a new class: utils/algorithms/ContourLineDetection.
 - 2023-10-28
   - Added a new demo for calculating contour plots.
   - Added the `utils/Params` class for retrieving URL params by their proper type.
