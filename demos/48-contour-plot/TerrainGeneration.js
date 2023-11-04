@@ -124,8 +124,19 @@
     var maxX = Number.MIN_VALUE;
     var minY = Number.MAX_VALUE;
     var maxY = Number.MIN_VALUE;
+    this.dataGrid = new DataGrid2dListAdapter(
+      this._planeGeometry.vertices,
+      this.xSegmentCount,
+      this.ySegmentCount
+      // this._minHeight,
+      // this._maxHeight,
+      // minX,
+      // maxX,
+      // minY,
+      // maxY
+    );
     for (var i = 0, l = this._planeGeometry.vertices.length; i < l; i++) {
-      var relPos = dataGrid.getCoordsFromBufferIndex(i);
+      var relPos = this.dataGrid.getCoordsFromBufferIndex(i);
       // console.log("relPos", relPos);
       var xAbs = this._minX + (this._maxX - this._minX) * relPos.xRel;
       var yAbs = this._minY + (this._maxY - this._minY) * relPos.yRel;
@@ -140,17 +151,13 @@
       minY = Math.min(minY, this._planeGeometry.vertices[i].y);
       maxY = Math.max(maxY, this._planeGeometry.vertices[i].y);
     }
-    this.dataGrid = new DataGrid2dListAdapter(
-      this._planeGeometry.vertices,
-      this.xSegmentCount,
-      this.ySegmentCount,
-      this._minHeight,
-      this._maxHeight,
-      minX,
-      maxX,
-      minY,
-      maxY
-    );
+    this.dataGrid.minDataValue = this._minHeight;
+    this.dataGrid.maxDataValue = this._maxHeight;
+    this.dataGrid.minX = minX;
+    this.dataGrid.maxX = maxX;
+    this.dataGrid.minY = minY;
+    this.dataGrid.minY = minY;
+
     // geometry.translate(30, 30, 0);
     var material = this.basicSceneSetup.createMaterial(options);
     this._planeGeometry.computeVertexNormals();

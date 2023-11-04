@@ -129,10 +129,10 @@
     };
 
     var drawPointRaster = function (draw, fill) {
-      for (var y = 0; y < terrainGeneration.ySegmentCount; y++) {
-        for (var x = 0; x < terrainGeneration.xSegmentCount; x++) {
+      for (var y = 0; y < terrainGeneration.dataGrid.ySegmentCount; y++) {
+        for (var x = 0; x < terrainGeneration.dataGrid.xSegmentCount; x++) {
           // Draw a point at (x,y) to indicate the height
-          var heightValueA = terrainGeneration.getHeightValueAt(x, y, false);
+          var heightValueA = terrainGeneration.dataGrid.getDataValueAt(x, y, false);
           var pointPosition = convertCoords2Pos(x, y);
           //   var heightRatio =
           //     (heightValueA - terrainGeneration._minHeight) / (terrainGeneration._maxHeight - terrainGeneration._minHeight);
@@ -211,8 +211,8 @@
      */
     function convertCoords2Pos(x, y) {
       return new Vertex(
-        bounds2D.min.x + (x / (terrainGeneration.xSegmentCount - 1)) * bounds2D.width,
-        bounds2D.min.y + (y / (terrainGeneration.ySegmentCount - 1)) * bounds2D.height
+        bounds2D.min.x + (x / (terrainGeneration.dataGrid.xSegmentCount - 1)) * bounds2D.width,
+        bounds2D.min.y + (y / (terrainGeneration.dataGrid.ySegmentCount - 1)) * bounds2D.height
       );
     }
 
@@ -252,8 +252,8 @@
      * @return {void}
      */
     function detectAboveBelowLerpSegment(x, y, nextX, nextY, criticalHeightValue, closeGapType) {
-      var heightValueA = terrainGeneration.getHeightValueAt(x, y);
-      var heightValueB = terrainGeneration.getHeightValueAt(nextX, nextY);
+      var heightValueA = terrainGeneration.dataGrid.getDataValueAt(x, y);
+      var heightValueB = terrainGeneration.dataGrid.getDataValueAt(nextX, nextY);
       //   if (heightValueA >= criticalHeightValue && heightValueB >= criticalHeightValue) {
       if (areBothValuesOnRequiredPlaneSide(heightValueA, heightValueB, criticalHeightValue, closeGapType)) {
         //  Both above
@@ -350,14 +350,16 @@
 
     var getHeightValueByRatio = function (heightRatio) {
       var heightValue =
-        terrainGeneration._minHeight + (terrainGeneration._maxHeight - terrainGeneration._minHeight) * heightRatio;
+        terrainGeneration.dataGrid.getMinDataValue() +
+        (terrainGeneration.dataGrid.getMaxDataValue() - terrainGeneration.dataGrid.getMinDataValue()) * heightRatio;
       //console.log("[rebuild] heightValue", heightValue, "config.sliceHeight", config.sliceHeight);
       return heightValue;
     };
 
     var getRatioByHeightValue = function (heightValue) {
       var heightRatio =
-        (heightValue - terrainGeneration._minHeight) / (terrainGeneration._maxHeight - terrainGeneration._minHeight);
+        (heightValue - terrainGeneration.dataGrid.getMinDataValue()) /
+        (terrainGeneration.dataGrid.getMaxDataValue() - terrainGeneration.dataGrid.getMinDataValue());
       return heightRatio;
     };
 
@@ -396,9 +398,9 @@
         [0, 0],
         [0, 0]
       ];
-      for (var y = 0; y + 1 < terrainGeneration.ySegmentCount; y++) {
-        for (var x = 0; x + 1 < terrainGeneration.xSegmentCount; x++) {
-          terrainGeneration.getHeightFace4At(x, y, heightFace);
+      for (var y = 0; y + 1 < terrainGeneration.dataGrid.ySegmentCount; y++) {
+        for (var x = 0; x + 1 < terrainGeneration.dataGrid.xSegmentCount; x++) {
+          terrainGeneration.dataGrid.getDataFace4At(x, y, heightFace);
           var line = findHeightFaceIntersectionLine(x, y, heightFace, criticalHeightValue);
           if (line) {
             // pathSegments.push(new GenericPath(line));
@@ -409,19 +411,19 @@
 
       // Collect value above/below on the y axis
       if (config.closeGapType === CLOSE_GAP_TYPE_ABOVE || config.closeGapType === CLOSE_GAP_TYPE_BELOW) {
-        var xExtremes = [0, terrainGeneration.xSegmentCount - 1];
+        var xExtremes = [0, terrainGeneration.dataGrid.xSegmentCount - 1];
         for (var i = 0; i < xExtremes.length; i++) {
           var x = xExtremes[i];
-          for (var y = 0; y + 1 < terrainGeneration.ySegmentCount; y++) {
+          for (var y = 0; y + 1 < terrainGeneration.dataGrid.ySegmentCount; y++) {
             var nextX = x;
             var nextY = y + 1;
             detectAboveBelowLerpSegment(x, y, nextX, nextY, criticalHeightValue, config.closeGapType);
           }
         }
-        var yExtremes = [0, terrainGeneration.ySegmentCount - 1];
+        var yExtremes = [0, terrainGeneration.dataGrid.ySegmentCount - 1];
         for (var j = 0; j < yExtremes.length; j++) {
           var y = yExtremes[j];
-          for (var x = 0; x + 1 < terrainGeneration.xSegmentCount; x++) {
+          for (var x = 0; x + 1 < terrainGeneration.dataGrid.xSegmentCount; x++) {
             var nextX = x + 1;
             var nextY = y;
             detectAboveBelowLerpSegment(x, y, nextX, nextY, criticalHeightValue, config.closeGapType);

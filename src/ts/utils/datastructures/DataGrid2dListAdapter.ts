@@ -52,13 +52,13 @@ export class DataGrid2dListAdapter<T> implements IDataGrid2d<T> {
   constructor(
     list: Array<Triplet<T>>,
     xSegmentCount: number,
-    ySegmentCount: number,
-    minDataValue: T,
-    maxDataValue: T,
-    minXValue: T,
-    maxXValue: T,
-    minYValue: T,
-    maxYValue: T
+    ySegmentCount: number
+    // minDataValue?: T,
+    // maxDataValue?: T,
+    // minXValue?: T,
+    // maxXValue?: T,
+    // minYValue?: T,
+    // maxYValue?: T
   ) {
     if (xSegmentCount * ySegmentCount > list.length) {
       throw `Cannot create DataGrid2dListAdapter, the list (length ${list.length}) does not provide enough items for ${xSegmentCount}x${ySegmentCount} required entries.`;
@@ -68,12 +68,12 @@ export class DataGrid2dListAdapter<T> implements IDataGrid2d<T> {
     this.xSegmentCount = xSegmentCount;
     this.ySegmentCount = ySegmentCount;
 
-    this.minDataValue = minDataValue;
-    this.maxDataValue = maxDataValue;
-    this.minXValue = minXValue;
-    this.maxXValue = maxXValue;
-    this.minYValue = minYValue;
-    this.maxYValue = maxYValue;
+    // this.minDataValue = minDataValue;
+    // this.maxDataValue = maxDataValue;
+    // this.minXValue = minXValue;
+    // this.maxXValue = maxXValue;
+    // this.minYValue = minYValue;
+    // this.maxYValue = maxYValue;
 
     this._dataList = list;
 
