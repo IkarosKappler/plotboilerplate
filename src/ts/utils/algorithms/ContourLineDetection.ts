@@ -1,8 +1,10 @@
 /**
  * A function to detect contour lines from 3D terrain data.
  *
+ * For usage see demo `./demos/48-contour-plot`.
+ *
  * @author  Ikaros Kappler
- * @date    2023-11-04
+ * @date    2023-11-05
  * @version 1.0.0
  */
 

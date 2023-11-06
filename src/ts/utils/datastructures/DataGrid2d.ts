@@ -50,5 +50,5 @@ export interface IDataGrid2d<T> {
    * @param {number} yIndex - The y index in `0 <= yIndex < ySegmentCount`.
    * @param {[[T,T],[T,T]]} buffer - The result buffer for four elements.
    */
-  getDataFace4At(xIndex: number, yIndex: number, buffer: DataGridFace4<T>);
+  getDataFace4At(xIndex: number, yIndex: number, buffer: DataGridFace4<T>): void;
 }

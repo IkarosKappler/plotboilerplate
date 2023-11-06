@@ -22,7 +22,7 @@ const EPS: number = 0.000001;
  * @param {number=EPS} epsilon
  * @return {Vertex[]}
  */
-export const clearDuplicateVertices = (vertices: Vertex[], epsilon) => {
+export const clearDuplicateVertices = (vertices: Vertex[], epsilon?: number) => {
   if (typeof epsilon === "undefined") {
     epsilon = EPS;
   }
