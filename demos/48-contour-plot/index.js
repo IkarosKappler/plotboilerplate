@@ -50,18 +50,13 @@
           enableMouse: true,
           enableKeys: true,
           enableTouch: true,
-          enableSVGExport: false
+          enableSVGExport: true
         },
         GUP
       )
     );
 
-    // +---------------------------------------------------------------------------------
-    // | A global config that's attached to the dat.gui control interface.
-    // +-------------------------------
-    // var CLOSE_GAP_TYPE_NONE = 0;
-    // var CLOSE_GAP_TYPE_ABOVE = 1;
-    // var CLOSE_GAP_TYPE_BELOW = 2;
+    // sin
 
     var LO_COLOR = Color.parse("#0000ff");
     var HI_COLOR = Color.parse("#ff0000");
@@ -77,10 +72,13 @@
         textureImagePath: "checkpattern-512x512.png",
         wireframe: false,
 
+        pattern: "sine", // { sine, cos }
         sliceHeight: params.getNumber("sliceHeight", 0.5),
         closeGapType: params.getNumber("closeGapType", 0), // { "NONE" : 0, "ABOVE" : 1, "BELOW" : 2 }
         shufflePathColors: params.getNumber("shufflePathColors", false),
         drawSampleRaster: true,
+        drawCurrentContour: true,
+        drawRawLineSegments: false,
 
         rebuild: function () {
           rebuild();
@@ -122,19 +120,38 @@
     // +-------------------------------
     var allContourLines = [];
 
+    var rawLinearSegments = [];
+
     // +---------------------------------------------------------------------------------
     // | Redraw everything. This function will be called by PB on re-renders.
     // +-------------------------------
     var redraw = function (draw, fill) {
       // Draw out stuff
       fill.rect(bounds2D.min, bounds2D.width, bounds2D.height, "rgba(0,0,0,0.75)");
-      draw.rect(bounds2D.min, bounds2D.width, bounds2D.height, "green", 2);
+      // draw.rect(bounds2D.min, bounds2D.width, bounds2D.height, "green", 2);
       if (config.drawSampleRaster) {
         drawPointRaster(draw, fill);
       }
       //   var curPathColor = config.shufflePathColors ? randColor(i, 1.0) : "orange";
-      drawPaths(draw, fill, pathSegments, null);
+      if (config.drawCurrentContour) {
+        drawPaths(draw, fill, pathSegments, null);
+      }
       drawAllContourLines(draw, fill);
+
+      if (config.drawRawLineSegments && rawLinearSegments.length > 0) {
+        console.log("rawLinearSegments", rawLinearSegments);
+        // var firstLineSegment = rawLinearSegments[0];
+        // draw.line(convertCoords2Pos(firstLineSegment.a.x), convertCoords2Pos(firstLineSegment.a.y), "purple", 2);
+        for (var i = 0; i < rawLinearSegments.length; i++) {
+          var lineSegment = rawLinearSegments[i];
+          draw.line(
+            convertCoords2Pos(lineSegment.a.x, lineSegment.a.y),
+            convertCoords2Pos(lineSegment.b.x, lineSegment.b.y),
+            "purple",
+            2
+          );
+        }
+      }
     };
 
     // +---------------------------------------------------------------------------------
@@ -230,8 +247,7 @@
     /**
      * Rebuild the whole paths.
      */
-    var rebuildCurrentPlotPlane = function (medianHeight) {
-      console.log("rebuildCurrentPlotPlane", medianHeight);
+    var rebuildCurrentPlotPlane = function () {
       // Find a level to "splice" the mesh, here at middle of Min/Max
       var medianHeight = getHeightValueByRatio(config.sliceHeight);
       //console.log("[rebuild] medianHeight", medianHeight, "config.sliceHeight", config.sliceHeight);
@@ -246,9 +262,22 @@
         pathSegments = [];
       }
 
+      // For debugging
+      var onRawSegmentsDetected = config.drawRawLineSegments
+        ? function (rawSegmentsDoNotModifiy) {
+            // Copy the array!
+            rawLinearSegments = rawSegmentsDoNotModifiy.map(function (segment) {
+              return segment;
+            });
+          }
+        : null;
+
       var contourDetection = new ContourLineDetection(terrainGeneration.dataGrid);
       // Array<GenericPath>
-      pathSegments = contourDetection.detectContourPaths(criticalHeightValue, { closeGapType: config.closeGapType });
+      pathSegments = contourDetection.detectContourPaths(criticalHeightValue, {
+        closeGapType: config.closeGapType,
+        onRawSegmentsDetected: onRawSegmentsDetected
+      });
 
       if (options.addToContourLines) {
         var heightRatio = getRatioByHeightValue(criticalHeightValue);
@@ -313,6 +342,8 @@
       fold0.add(config, "ySegmentCount").min(4).max(128).step(1).onChange( function() { rebuildTerrain(); rebuild(); pb.redraw(); } ).name('ySegmentCount').title("The number of vertices along the mesh's y axis.");
 
       // prettier-ignore
+      fold0.add(config, "pattern", { "Sine": "sine", "Cos" : "cos" }).onChange( function() { rebuild(); pb.redraw(); } ).name('pattern').title('Which pattern to use to shape the landscape.');
+      // prettier-ignore
       fold0.add(config, "showNormals").onChange( function() { rebuild(); } ).name('showNormals').title('Show the vertex normals.');
       // prettier-ignore
       fold0.add(config, "normalsLength").min(1.0).max(20.0).onChange( function() { rebuildMesh() } ).name('normalsLength').title('The length of rendered normals.');
@@ -326,9 +357,13 @@
       // prettier-ignore
       gui.add(config, "sliceHeight").min(0.0).max(1.0).onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('sliceHeight').title('Where to slice the current terrain model.');
       // prettier-ignore
-      gui.add(config, "closeGapType", { "None" : CLOSE_GAP_TYPE_NONE, "Above" : CLOSE_GAP_TYPE_ABOVE, "Below" : CLOSE_GAP_TYPE_BELOW } ).onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('closeGapType').title('Close gap above, below or not at all.');
+      gui.add(config, "closeGapType", { "None" : ContourLineDetection.CLOSE_GAP_TYPE_NONE, "Above" : ContourLineDetection.CLOSE_GAP_TYPE_ABOVE, "Below" : ContourLineDetection.CLOSE_GAP_TYPE_BELOW } ).onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('closeGapType').title('Close gap above, below or not at all.');
       // prettier-ignore
       gui.add(config, "shufflePathColors" ).name('shufflePathColors').onChange( function() { pb.redraw(); } ).title('Use different colors for different paths?');
+      // prettier-ignore
+      gui.add(config, "drawCurrentContour").onChange( function() { pb.redraw(); } ).name('drawCurrentContour').title('Draw the current single contour?');
+      // prettier-ignore
+      gui.add(config, "drawRawLineSegments").onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('drawRawLineSegments').title('Keep and draw raw linear segments?');
 
       // prettier-ignore
       gui.add(config, "clearPathSegments").onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('clearPathSegments').title('Clear path buffer on each rebuild cycle (default=true).');

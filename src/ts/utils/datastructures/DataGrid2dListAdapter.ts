@@ -11,8 +11,7 @@ import { DataGridFace4, IDataGrid2d } from "./DataGrid2d";
 
 type Triplet<T> = {
   x: T;
-  y;
-  T;
+  y: T;
   z: T;
 };
 
@@ -49,17 +48,7 @@ export class DataGrid2dListAdapter<T> implements IDataGrid2d<T> {
    * @param xSegmentCount
    * @param ySegmentCount
    */
-  constructor(
-    list: Array<Triplet<T>>,
-    xSegmentCount: number,
-    ySegmentCount: number
-    // minDataValue?: T,
-    // maxDataValue?: T,
-    // minXValue?: T,
-    // maxXValue?: T,
-    // minYValue?: T,
-    // maxYValue?: T
-  ) {
+  constructor(list: Array<Triplet<T>>, xSegmentCount: number, ySegmentCount: number) {
     if (xSegmentCount * ySegmentCount > list.length) {
       throw `Cannot create DataGrid2dListAdapter, the list (length ${list.length}) does not provide enough items for ${xSegmentCount}x${ySegmentCount} required entries.`;
     }
@@ -68,25 +57,7 @@ export class DataGrid2dListAdapter<T> implements IDataGrid2d<T> {
     this.xSegmentCount = xSegmentCount;
     this.ySegmentCount = ySegmentCount;
 
-    // this.minDataValue = minDataValue;
-    // this.maxDataValue = maxDataValue;
-    // this.minXValue = minXValue;
-    // this.maxXValue = maxXValue;
-    // this.minYValue = minYValue;
-    // this.maxYValue = maxYValue;
-
     this._dataList = list;
-
-    // @private
-    // this._minHeight = 0;
-    // this._maxHeight = 0;
-    // this._minX = 0;
-    // this._maxX = 0;
-    // this._minY = 0;
-    // this._maxY = 0;
-
-    // Private
-    // this._planeGeometry = null;
   }
 
   getIndicesFromBufferIndex(bufferIndex: number): RasterPosition {
@@ -147,40 +118,4 @@ export class DataGrid2dListAdapter<T> implements IDataGrid2d<T> {
     buffer[1][1] = this.getDataValueAt(xIndex + 1, yIndex + 1);
     buffer[0][1] = this.getDataValueAt(xIndex, yIndex + 1);
   }
-
-  // /**
-  //  * @param {boolean}         options.useTextureImage
-  //  * @param {boolean?}        options.useTextureImage
-  //  * @param {string?}         options.textureImagePath
-  //  * @param {boolean?}        options.wireframe
-  //  * @param {boolean?}        options.showNormals
-  //  **/
-  // rebuild () {
-  //   // this.basicSceneSetup.removeCachedMeshes();
-
-  //   // this._planeGeometry = new THREE.PlaneGeometry(60, 60, this.xSegmentCount - 1, this.ySegmentCount - 1);
-  //   this._maxHeight = Number.MIN_VALUE;
-  //   this._minHeight = Number.MAX_VALUE;
-  //   this._minX = 0.0;
-  //   this._maxX = 2 * Math.PI;
-  //   this._minY = 0.0;
-  //   this._maxY = 2 * Math.PI;
-  //   for (var i = 0, l = this._planeGeometry.vertices.length; i < l; i++) {
-  //     var relPos = this.getCoordsFromBufferIndex(i);
-  //     // console.log("relPos", relPos);
-  //     var xAbs = this._minX + (this._maxX - this._minX) * relPos.xRel;
-  //     var yAbs = this._minY + (this._maxY - this._minY) * relPos.yRel;
-  //     // console.log("xAbs", xAbs, "yAbs", yAbs);
-  //     this._planeGeometry.vertices[i].z = (Math.sin(xAbs) + Math.sin(yAbs)) * 10.0;
-  //     this._maxHeight = Math.max(this._maxHeight, this._planeGeometry.vertices[i].z);
-  //     this._minHeight = Math.min(this._minHeight, this._planeGeometry.vertices[i].z);
-  //   }
-  //   // geometry.translate(30, 30, 0);
-  //   // var material = this.basicSceneSetup.createMaterial(options);
-  //   // this._planeGeometry.computeVertexNormals();
-  //   // var terrainMesh = new THREE.Mesh(this._planeGeometry, material);
-
-  //   // // Assuming you already have your global scene, add the terrain to it
-  //   // this.basicSceneSetup.addMesh(terrainMesh, options);
-  // };
 }

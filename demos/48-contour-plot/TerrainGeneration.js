@@ -15,6 +15,7 @@
     this.dataGrid = null;
   };
 
+  // options.pattern = "sine" | "cos"
   TerrainGeneration.prototype.rebuild = function (options) {
     if (!options || !options.xSegmentCount || !options.ySegmentCount) {
       throw "Cannot rebuild the terrain. Options `xSegmentCount` and `ySegmentCount` are mandatory.";
@@ -40,7 +41,11 @@
       var xAbs = inputMinX + (inputMaxX - inputMinX) * relPos.xRel;
       var yAbs = inputMinY + (inputMaxY - inputMinY) * relPos.yRel;
       // console.log("xAbs", xAbs, "yAbs", yAbs);
-      this._planeGeometry.vertices[i].z = (Math.sin(xAbs) + Math.sin(yAbs)) * 10.0;
+      if (options.pattern === "sine") {
+        this._planeGeometry.vertices[i].z = (Math.sin(xAbs) + Math.sin(yAbs)) * 10.0;
+      } else {
+        this._planeGeometry.vertices[i].z = (Math.cos(xAbs) + Math.cos(yAbs)) * 10.0;
+      }
       this._maxHeight = Math.max(this._maxHeight, this._planeGeometry.vertices[i].z);
       this._minHeight = Math.min(this._minHeight, this._planeGeometry.vertices[i].z);
 

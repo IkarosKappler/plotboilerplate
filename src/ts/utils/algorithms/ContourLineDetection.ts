@@ -13,28 +13,32 @@ import { detectPaths } from "./detectPaths";
 import { clearDuplicateVertices } from "./clearDuplicateVertices";
 import { GenericPath } from "../datastructures/GenericPath";
 
-export const CLOSE_GAP_TYPE_NONE = 0;
-export const CLOSE_GAP_TYPE_ABOVE = 1;
-export const CLOSE_GAP_TYPE_BELOW = 2;
-
 export class ContourLineDetection {
   private dataGrid;
 
   private rawLinearPathSegments: Array<Line> = [];
+
+  static CLOSE_GAP_TYPE_NONE = 0;
+  static CLOSE_GAP_TYPE_ABOVE = 1;
+  static CLOSE_GAP_TYPE_BELOW = 2;
 
   constructor(dataGrid: IDataGrid2d<number>) {
     this.dataGrid = dataGrid;
   }
 
   /**
-   * Rebuild the whole paths.
+   * Detect contour paths from the underlying data source.
+   *
+   * @param {number} criticalHeightValue - The height value. If above data's maximum or below data's minimum then the result will be empty (no intersections).
+   * @param {number} options.closeGapType - `CLOSE_GAP_TYPE_NONE` or `CLOSE_GAP_TYPE_ABOVE` or `CLOSE_GAP_TYPE_BELOW`.
+   * @param {function?} onRawSegmentsDetected - (optional) Get the interim result of all detected single lines before path detection starts; DO NOT MODIFY the array.
+   * @returns {Array<GenericPath>} - A list of connected paths that resemble the contour lines of the data/terrain at the given height value.
    */
-  detectContourPaths(criticalHeightValue: number, options: { closeGapType: number }): Array<GenericPath> {
-    // if (config.clearPathSegments) {
-    //   rawLinearPathSegments = [];
-    //   pathSegments = [];
-    // }
-
+  detectContourPaths(
+    criticalHeightValue: number,
+    options: { closeGapType: number; onRawSegmentsDetected?: (rawSegmentsDoNotModifiy: Array<Line>) => void }
+  ): Array<GenericPath> {
+    // First: clear the buffer
     this.rawLinearPathSegments = [];
 
     // Imagine a face4 element like this
@@ -47,14 +51,14 @@ export class ContourLineDetection {
     //	   then result in the buffer will be
     //   [ [A,B],
     //     [D,C] ]
-    var heightFace: DataGridFace4<number> = [
+    const heightFace: DataGridFace4<number> = [
       [0, 0],
       [0, 0]
     ];
     for (var y = 0; y + 1 < this.dataGrid.ySegmentCount; y++) {
       for (var x = 0; x + 1 < this.dataGrid.xSegmentCount; x++) {
         this.dataGrid.getDataFace4At(x, y, heightFace);
-        var line = this.findHeightFaceIntersectionLine(x, y, heightFace, criticalHeightValue);
+        const line = this.findHeightFaceIntersectionLine(x, y, heightFace, criticalHeightValue);
         if (line) {
           // pathSegments.push(new GenericPath(line));
           this.rawLinearPathSegments.push(line);
@@ -63,26 +67,34 @@ export class ContourLineDetection {
     }
 
     // Collect value above/below on the y axis
-    if (options.closeGapType === CLOSE_GAP_TYPE_ABOVE || options.closeGapType === CLOSE_GAP_TYPE_BELOW) {
-      var xExtremes = [0, this.dataGrid.xSegmentCount - 1];
+    if (
+      options.closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_ABOVE ||
+      options.closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_BELOW
+    ) {
+      const xExtremes = [0, this.dataGrid.xSegmentCount - 1];
       for (var i = 0; i < xExtremes.length; i++) {
-        var x = xExtremes[i];
+        const x = xExtremes[i];
         for (var y = 0; y + 1 < this.dataGrid.ySegmentCount; y++) {
-          var nextX = x;
-          var nextY = y + 1;
+          const nextX = x;
+          const nextY = y + 1;
           this.detectAboveBelowLerpSegment(x, y, nextX, nextY, criticalHeightValue, options.closeGapType);
         }
       }
-      var yExtremes = [0, this.dataGrid.ySegmentCount - 1];
+      const yExtremes = [0, this.dataGrid.ySegmentCount - 1];
       for (var j = 0; j < yExtremes.length; j++) {
         var y = yExtremes[j];
         for (var x = 0; x + 1 < this.dataGrid.xSegmentCount; x++) {
-          var nextX = x + 1;
-          var nextY = y;
+          const nextX = x + 1;
+          const nextY = y;
           this.detectAboveBelowLerpSegment(x, y, nextX, nextY, criticalHeightValue, options.closeGapType);
         }
       }
     }
+
+    if (options.onRawSegmentsDetected) {
+      options.onRawSegmentsDetected(this.rawLinearPathSegments);
+    }
+
     // Detect connected paths
     let pathSegments: Array<GenericPath> = detectPaths(this.rawLinearPathSegments, 0.1); // Epsilon?
     // Filter out segments with only a single line of length~=0
@@ -92,19 +104,8 @@ export class ContourLineDetection {
         (pathSegment.segments.length === 1 && (pathSegment.segments[0] as Line).length() > 0.1)
       );
     });
+
     //   console.log(pathSegments);
-
-    // if (options.addToContourLines) {
-    //   var heightRatio = getRatioByHeightValue(criticalHeightValue);
-    //   var color = LO_COLOR.clone().interpolate(HI_COLOR, heightRatio);
-    //   console.log("Adding color ");
-    //   allContourLines.push({ pathSegments: pathSegments, color: color.cssRGB() });
-    // }
-    // if (options.addTo3DPreview) {
-    //   console.log("Add contour");
-    //   contourScene.addContour(pathSegments);
-    // }
-
     return pathSegments;
   }
 
@@ -120,30 +121,30 @@ export class ContourLineDetection {
    * @returns {Line|null}
    */
   private findHeightFaceIntersectionLine(xIndex: number, yIndex: number, heightFace: DataGridFace4<number>, heightValue: number) {
-    var heightValueA = heightFace[0][0]; // value at (x,y)
-    var heightValueB = heightFace[1][0];
-    var heightValueC = heightFace[1][1];
-    var heightValueD = heightFace[0][1];
+    const heightValueA = heightFace[0][0]; // value at (x,y)
+    const heightValueB = heightFace[1][0];
+    const heightValueC = heightFace[1][1];
+    const heightValueD = heightFace[0][1];
 
     if (heightValueA === null || heightValueB === null || heightValueC === null || heightValueD === null) {
       throw `[findHeightFaceIntersectionLine] Cannot extract data face at (${xIndex},${yIndex}). Some values are null.`;
     }
 
-    var points: Array<Vertex> = [];
+    let points: Array<Vertex> = [];
     if (this.isBetween(heightValueA, heightValueB, heightValue)) {
-      var lerpValueByHeight = this.getLerpRatio(heightValueA, heightValueB, heightValue);
+      const lerpValueByHeight = this.getLerpRatio(heightValueA, heightValueB, heightValue);
       points.push(new Vertex(this.lerp(xIndex, xIndex + 1, lerpValueByHeight), yIndex));
     }
     if (this.isBetween(heightValueB, heightValueC, heightValue)) {
-      var lerpValueByHeight = this.getLerpRatio(heightValueB, heightValueC, heightValue);
+      const lerpValueByHeight = this.getLerpRatio(heightValueB, heightValueC, heightValue);
       points.push(new Vertex(xIndex + 1, this.lerp(yIndex, yIndex + 1, lerpValueByHeight)));
     }
     if (this.isBetween(heightValueC, heightValueD, heightValue)) {
-      var lerpValueByHeight = this.getLerpRatio(heightValueC, heightValueD, heightValue);
+      const lerpValueByHeight = this.getLerpRatio(heightValueC, heightValueD, heightValue);
       points.push(new Vertex(this.lerp(xIndex + 1, xIndex, lerpValueByHeight), yIndex + 1));
     }
     if (this.isBetween(heightValueD, heightValueA, heightValue)) {
-      var lerpValueByHeight = this.getLerpRatio(heightValueD, heightValueA, heightValue);
+      const lerpValueByHeight = this.getLerpRatio(heightValueD, heightValueA, heightValue);
       points.push(new Vertex(xIndex, this.lerp(yIndex + 1, yIndex, lerpValueByHeight)));
     }
 
@@ -154,8 +155,8 @@ export class ContourLineDetection {
     points = clearDuplicateVertices(points, 0.000001);
 
     if (points.length >= 2) {
-      var startPoint = points[0];
-      var endPoint = points[1];
+      const startPoint = points[0];
+      const endPoint = points[1];
       if (points.length > 2) {
         console.warn(
           "[findHeightFaceIntersectionLine] Detected more than 2 points on one face whre only 0 or 2 should appear. At ",
@@ -199,37 +200,42 @@ export class ContourLineDetection {
     criticalHeightValue: number,
     closeGapType: number
   ) {
-    var heightValueA = this.dataGrid.getDataValueAt(x, y);
-    var heightValueB = this.dataGrid.getDataValueAt(nextX, nextY);
+    const heightValueA = this.dataGrid.getDataValueAt(x, y);
+    const heightValueB = this.dataGrid.getDataValueAt(nextX, nextY);
     //   if (heightValueA >= criticalHeightValue && heightValueB >= criticalHeightValue) {
     if (this.areBothValuesOnRequiredPlaneSide(heightValueA, heightValueB, criticalHeightValue, closeGapType)) {
       //  Both above
-      var line = new Line(new Vertex(x, y), new Vertex(nextX, nextY));
-      // pathSegments.push(new GenericPath(line));
+      const line = new Line(new Vertex(x, y), new Vertex(nextX, nextY));
       this.rawLinearPathSegments.push(line);
     } else if (
-      (closeGapType === CLOSE_GAP_TYPE_ABOVE && heightValueA >= criticalHeightValue && heightValueB < criticalHeightValue) ||
-      (closeGapType === CLOSE_GAP_TYPE_BELOW && heightValueA <= criticalHeightValue && heightValueB > criticalHeightValue)
+      (closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_ABOVE &&
+        heightValueA >= criticalHeightValue &&
+        heightValueB <= criticalHeightValue) ||
+      (closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_BELOW &&
+        heightValueA <= criticalHeightValue &&
+        heightValueB >= criticalHeightValue)
     ) {
       // Only one of both (first) is above -> interpolate to find exact intersection point
-      var lerpValueByHeight = this.getLerpRatio(heightValueA, heightValueB, criticalHeightValue);
-      var interpLine = new Line(
+      const lerpValueByHeight = this.getLerpRatio(heightValueA, heightValueB, criticalHeightValue);
+      const interpLine = new Line(
         new Vertex(x, y),
         new Vertex(this.lerp(x, nextX, lerpValueByHeight), this.lerp(y, nextY, lerpValueByHeight))
       );
-      // pathSegments.push(new GenericPath(interpLine));
       this.rawLinearPathSegments.push(interpLine);
     } else if (
-      (closeGapType === CLOSE_GAP_TYPE_ABOVE && heightValueA < criticalHeightValue && heightValueB >= criticalHeightValue) ||
-      (closeGapType === CLOSE_GAP_TYPE_BELOW && heightValueA > criticalHeightValue && heightValueB <= criticalHeightValue)
+      (closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_ABOVE &&
+        heightValueA <= criticalHeightValue &&
+        heightValueB >= criticalHeightValue) ||
+      (closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_BELOW &&
+        heightValueA >= criticalHeightValue &&
+        heightValueB <= criticalHeightValue)
     ) {
       // Only one of both (second) is above -> interpolate to find exact intersection point
-      var lerpValueByHeight = this.getLerpRatio(heightValueA, heightValueB, criticalHeightValue);
-      var interpLine = new Line(
+      const lerpValueByHeight = this.getLerpRatio(heightValueA, heightValueB, criticalHeightValue);
+      const interpLine = new Line(
         new Vertex(this.lerp(x, nextX, lerpValueByHeight), this.lerp(y, nextY, lerpValueByHeight)),
         new Vertex(nextX, nextY)
       );
-      // pathSegments.push(new GenericPath(interpLine));
       this.rawLinearPathSegments.push(interpLine);
     }
   }
@@ -246,8 +252,8 @@ export class ContourLineDetection {
    */
   private areBothValuesOnRequiredPlaneSide(valueA: number, valueB: number, criticalValue: number, closeGapType: number) {
     return (
-      (closeGapType == CLOSE_GAP_TYPE_BELOW && valueA <= criticalValue && valueB <= criticalValue) ||
-      (closeGapType == CLOSE_GAP_TYPE_ABOVE && valueA >= criticalValue && valueB >= criticalValue)
+      (closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_BELOW && valueA <= criticalValue && valueB <= criticalValue) ||
+      (closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_ABOVE && valueA >= criticalValue && valueB >= criticalValue)
     );
   }
 

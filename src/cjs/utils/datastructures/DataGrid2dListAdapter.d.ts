@@ -9,8 +9,7 @@
 import { DataGridFace4, IDataGrid2d } from "./DataGrid2d";
 declare type Triplet<T> = {
     x: T;
-    y: any;
-    T: any;
+    y: T;
     z: T;
 };
 declare type RasterPosition = {

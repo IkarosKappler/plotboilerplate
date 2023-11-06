@@ -5,20 +5,27 @@
  * @date    2023-11-04
  * @version 1.0.0
  */
+import { Line } from "../../Line";
 import { IDataGrid2d } from "../datastructures/DataGrid2d";
 import { GenericPath } from "../datastructures/GenericPath";
-export declare const CLOSE_GAP_TYPE_NONE = 0;
-export declare const CLOSE_GAP_TYPE_ABOVE = 1;
-export declare const CLOSE_GAP_TYPE_BELOW = 2;
 export declare class ContourLineDetection {
     private dataGrid;
     private rawLinearPathSegments;
+    static CLOSE_GAP_TYPE_NONE: number;
+    static CLOSE_GAP_TYPE_ABOVE: number;
+    static CLOSE_GAP_TYPE_BELOW: number;
     constructor(dataGrid: IDataGrid2d<number>);
     /**
-     * Rebuild the whole paths.
+     * Detect contour paths from the underlying data source.
+     *
+     * @param {number} criticalHeightValue - The height value. If above data's maximum or below data's minimum then the result will be empty (no intersections).
+     * @param {number} options.closeGapType - `CLOSE_GAP_TYPE_NONE` or `CLOSE_GAP_TYPE_ABOVE` or `CLOSE_GAP_TYPE_BELOW`.
+     * @param {function?} onRawSegmentsDetected - (optional) Get the interim result of all detected single lines before path detection starts; DO NOT MODIFY the array.
+     * @returns {Array<GenericPath>} - A list of connected paths that resemble the contour lines of the data/terrain at the given height value.
      */
     detectContourPaths(criticalHeightValue: number, options: {
         closeGapType: number;
+        onRawSegmentsDetected?: (rawSegmentsDoNotModifiy: Array<Line>) => void;
     }): Array<GenericPath>;
     /**
      * This function will calculate a single intersecion line of the given face4 data

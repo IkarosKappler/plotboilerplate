@@ -7,27 +7,26 @@
  * @version 1.0.0
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ContourLineDetection = exports.CLOSE_GAP_TYPE_BELOW = exports.CLOSE_GAP_TYPE_ABOVE = exports.CLOSE_GAP_TYPE_NONE = void 0;
+exports.ContourLineDetection = void 0;
 var Line_1 = require("../../Line");
 var Vertex_1 = require("../../Vertex");
 var detectPaths_1 = require("./detectPaths");
 var clearDuplicateVertices_1 = require("./clearDuplicateVertices");
-exports.CLOSE_GAP_TYPE_NONE = 0;
-exports.CLOSE_GAP_TYPE_ABOVE = 1;
-exports.CLOSE_GAP_TYPE_BELOW = 2;
 var ContourLineDetection = /** @class */ (function () {
     function ContourLineDetection(dataGrid) {
         this.rawLinearPathSegments = [];
         this.dataGrid = dataGrid;
     }
     /**
-     * Rebuild the whole paths.
+     * Detect contour paths from the underlying data source.
+     *
+     * @param {number} criticalHeightValue - The height value. If above data's maximum or below data's minimum then the result will be empty (no intersections).
+     * @param {number} options.closeGapType - `CLOSE_GAP_TYPE_NONE` or `CLOSE_GAP_TYPE_ABOVE` or `CLOSE_GAP_TYPE_BELOW`.
+     * @param {function?} onRawSegmentsDetected - (optional) Get the interim result of all detected single lines before path detection starts; DO NOT MODIFY the array.
+     * @returns {Array<GenericPath>} - A list of connected paths that resemble the contour lines of the data/terrain at the given height value.
      */
     ContourLineDetection.prototype.detectContourPaths = function (criticalHeightValue, options) {
-        // if (config.clearPathSegments) {
-        //   rawLinearPathSegments = [];
-        //   pathSegments = [];
-        // }
+        // First: clear the buffer
         this.rawLinearPathSegments = [];
         // Imagine a face4 element like this
         //    (x,y)       (x+1,y)
@@ -54,14 +53,15 @@ var ContourLineDetection = /** @class */ (function () {
             }
         }
         // Collect value above/below on the y axis
-        if (options.closeGapType === exports.CLOSE_GAP_TYPE_ABOVE || options.closeGapType === exports.CLOSE_GAP_TYPE_BELOW) {
+        if (options.closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_ABOVE ||
+            options.closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_BELOW) {
             var xExtremes = [0, this.dataGrid.xSegmentCount - 1];
             for (var i = 0; i < xExtremes.length; i++) {
-                var x = xExtremes[i];
+                var x_1 = xExtremes[i];
                 for (var y = 0; y + 1 < this.dataGrid.ySegmentCount; y++) {
-                    var nextX = x;
+                    var nextX = x_1;
                     var nextY = y + 1;
-                    this.detectAboveBelowLerpSegment(x, y, nextX, nextY, criticalHeightValue, options.closeGapType);
+                    this.detectAboveBelowLerpSegment(x_1, y, nextX, nextY, criticalHeightValue, options.closeGapType);
                 }
             }
             var yExtremes = [0, this.dataGrid.ySegmentCount - 1];
@@ -74,6 +74,9 @@ var ContourLineDetection = /** @class */ (function () {
                 }
             }
         }
+        if (options.onRawSegmentsDetected) {
+            options.onRawSegmentsDetected(this.rawLinearPathSegments);
+        }
         // Detect connected paths
         var pathSegments = detectPaths_1.detectPaths(this.rawLinearPathSegments, 0.1); // Epsilon?
         // Filter out segments with only a single line of length~=0
@@ -82,16 +85,6 @@ var ContourLineDetection = /** @class */ (function () {
                 (pathSegment.segments.length === 1 && pathSegment.segments[0].length() > 0.1));
         });
         //   console.log(pathSegments);
-        // if (options.addToContourLines) {
-        //   var heightRatio = getRatioByHeightValue(criticalHeightValue);
-        //   var color = LO_COLOR.clone().interpolate(HI_COLOR, heightRatio);
-        //   console.log("Adding color ");
-        //   allContourLines.push({ pathSegments: pathSegments, color: color.cssRGB() });
-        // }
-        // if (options.addTo3DPreview) {
-        //   console.log("Add contour");
-        //   contourScene.addContour(pathSegments);
-        // }
         return pathSegments;
     };
     /**
@@ -175,23 +168,28 @@ var ContourLineDetection = /** @class */ (function () {
         if (this.areBothValuesOnRequiredPlaneSide(heightValueA, heightValueB, criticalHeightValue, closeGapType)) {
             //  Both above
             var line = new Line_1.Line(new Vertex_1.Vertex(x, y), new Vertex_1.Vertex(nextX, nextY));
-            // pathSegments.push(new GenericPath(line));
             this.rawLinearPathSegments.push(line);
         }
-        else if ((closeGapType === exports.CLOSE_GAP_TYPE_ABOVE && heightValueA >= criticalHeightValue && heightValueB < criticalHeightValue) ||
-            (closeGapType === exports.CLOSE_GAP_TYPE_BELOW && heightValueA <= criticalHeightValue && heightValueB > criticalHeightValue)) {
+        else if ((closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_ABOVE &&
+            heightValueA >= criticalHeightValue &&
+            heightValueB <= criticalHeightValue) ||
+            (closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_BELOW &&
+                heightValueA <= criticalHeightValue &&
+                heightValueB >= criticalHeightValue)) {
             // Only one of both (first) is above -> interpolate to find exact intersection point
             var lerpValueByHeight = this.getLerpRatio(heightValueA, heightValueB, criticalHeightValue);
             var interpLine = new Line_1.Line(new Vertex_1.Vertex(x, y), new Vertex_1.Vertex(this.lerp(x, nextX, lerpValueByHeight), this.lerp(y, nextY, lerpValueByHeight)));
-            // pathSegments.push(new GenericPath(interpLine));
             this.rawLinearPathSegments.push(interpLine);
         }
-        else if ((closeGapType === exports.CLOSE_GAP_TYPE_ABOVE && heightValueA < criticalHeightValue && heightValueB >= criticalHeightValue) ||
-            (closeGapType === exports.CLOSE_GAP_TYPE_BELOW && heightValueA > criticalHeightValue && heightValueB <= criticalHeightValue)) {
+        else if ((closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_ABOVE &&
+            heightValueA <= criticalHeightValue &&
+            heightValueB >= criticalHeightValue) ||
+            (closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_BELOW &&
+                heightValueA >= criticalHeightValue &&
+                heightValueB <= criticalHeightValue)) {
             // Only one of both (second) is above -> interpolate to find exact intersection point
             var lerpValueByHeight = this.getLerpRatio(heightValueA, heightValueB, criticalHeightValue);
             var interpLine = new Line_1.Line(new Vertex_1.Vertex(this.lerp(x, nextX, lerpValueByHeight), this.lerp(y, nextY, lerpValueByHeight)), new Vertex_1.Vertex(nextX, nextY));
-            // pathSegments.push(new GenericPath(interpLine));
             this.rawLinearPathSegments.push(interpLine);
         }
     };
@@ -206,8 +204,8 @@ var ContourLineDetection = /** @class */ (function () {
      * @returns {boolean}
      */
     ContourLineDetection.prototype.areBothValuesOnRequiredPlaneSide = function (valueA, valueB, criticalValue, closeGapType) {
-        return ((closeGapType == exports.CLOSE_GAP_TYPE_BELOW && valueA <= criticalValue && valueB <= criticalValue) ||
-            (closeGapType == exports.CLOSE_GAP_TYPE_ABOVE && valueA >= criticalValue && valueB >= criticalValue));
+        return ((closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_BELOW && valueA <= criticalValue && valueB <= criticalValue) ||
+            (closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_ABOVE && valueA >= criticalValue && valueB >= criticalValue));
     };
     /**
      * Test if a given numeric value (`curValue`) is between the given values `valA` and `valB`.
@@ -244,6 +242,9 @@ var ContourLineDetection = /** @class */ (function () {
     ContourLineDetection.prototype.lerp = function (min, max, ratio) {
         return min + (max - min) * ratio;
     };
+    ContourLineDetection.CLOSE_GAP_TYPE_NONE = 0;
+    ContourLineDetection.CLOSE_GAP_TYPE_ABOVE = 1;
+    ContourLineDetection.CLOSE_GAP_TYPE_BELOW = 2;
     return ContourLineDetection;
 }());
 exports.ContourLineDetection = ContourLineDetection;

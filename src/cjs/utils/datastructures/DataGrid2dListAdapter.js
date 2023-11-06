@@ -17,36 +17,14 @@ var DataGrid2dListAdapter = /** @class */ (function () {
      * @param xSegmentCount
      * @param ySegmentCount
      */
-    function DataGrid2dListAdapter(list, xSegmentCount, ySegmentCount
-    // minDataValue?: T,
-    // maxDataValue?: T,
-    // minXValue?: T,
-    // maxXValue?: T,
-    // minYValue?: T,
-    // maxYValue?: T
-    ) {
+    function DataGrid2dListAdapter(list, xSegmentCount, ySegmentCount) {
         if (xSegmentCount * ySegmentCount > list.length) {
             throw "Cannot create DataGrid2dListAdapter, the list (length " + list.length + ") does not provide enough items for " + xSegmentCount + "x" + ySegmentCount + " required entries.";
         }
         // this.canvas = document.getElementById(canvasId);
         this.xSegmentCount = xSegmentCount;
         this.ySegmentCount = ySegmentCount;
-        // this.minDataValue = minDataValue;
-        // this.maxDataValue = maxDataValue;
-        // this.minXValue = minXValue;
-        // this.maxXValue = maxXValue;
-        // this.minYValue = minYValue;
-        // this.maxYValue = maxYValue;
         this._dataList = list;
-        // @private
-        // this._minHeight = 0;
-        // this._maxHeight = 0;
-        // this._minX = 0;
-        // this._maxX = 0;
-        // this._minY = 0;
-        // this._maxY = 0;
-        // Private
-        // this._planeGeometry = null;
     }
     DataGrid2dListAdapter.prototype.getIndicesFromBufferIndex = function (bufferIndex) {
         return { xIndex: Math.floor(bufferIndex % this.xSegmentCount), yIndex: Math.floor(bufferIndex / this.xSegmentCount) };
