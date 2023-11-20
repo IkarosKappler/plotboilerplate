@@ -38,17 +38,18 @@
   ContourScene.prototype.addContour = function (contourArray, options) {
     this.basicSceneSetup.removeCachedMeshes();
 
-    const shape = new THREE.Shape();
+    var shapes = [];
     for (var i = 0; i < contourArray.length; i++) {
       const path = contourArray[i];
-      console.log(
-        path.segments.map(function (line) {
-          return "[" + line.a.x + "," + line.a.y + "][" + line.b.x + "," + line.b.y + "]";
-        })
-      );
+      // console.log(
+      //   path.segments.map(function (line) {
+      //     return "[" + line.a.x + "," + line.a.y + "][" + line.b.x + "," + line.b.y + "]";
+      //   })
+      // );
       if (path.segments.length <= 1) {
         continue;
       }
+      const shape = new THREE.Shape();
       shape.moveTo(path.segments[0].a.x, path.segments[0].a.y);
       shape.lineTo(path.segments[0].b.x, path.segments[0].b.y);
       for (var j = 1; j < path.segments.length; j++) {
@@ -56,6 +57,7 @@
         shape.lineTo(lineSegment.b.x, lineSegment.b.y);
       }
       shape.closePath();
+      shapes.push(shape);
     }
 
     // Generade 3d extrusion or plain 2d shape?
@@ -70,9 +72,9 @@
     //     // bevelSegments: 1
     // };
     // const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-    const geometry = new THREE.ShapeGeometry(shape);
 
     const material = this.basicSceneSetup.createMaterial();
+    const geometry = new THREE.ShapeGeometry(shapes);
     const mesh = new THREE.Mesh(geometry, material);
     mesh.rotation.x = Math.PI / 2.0;
 
