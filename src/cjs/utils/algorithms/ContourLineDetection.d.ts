@@ -3,6 +3,8 @@
  *
  * For usage see demo `./demos/48-contour-plot`.
  *
+ * @requires detectPaths
+ * @requires GenericPath
  * @author  Ikaros Kappler
  * @date    2023-11-05
  * @version 1.0.0
@@ -22,11 +24,15 @@ export declare class ContourLineDetection {
      *
      * @param {number} criticalHeightValue - The height value. If above data's maximum or below data's minimum then the result will be empty (no intersections).
      * @param {number} options.closeGapType - `CLOSE_GAP_TYPE_NONE` or `CLOSE_GAP_TYPE_ABOVE` or `CLOSE_GAP_TYPE_BELOW`.
+     * @param {boolean=false} options.useTriangles - If set to true the detection will split each face3 quad into two triangle faces.
+     * @param {pathDetectEpsilon=0.000001} options.pathDetectEpsilon - (optional) The epsilon to tell if two points are located 'in the same place'. Used for connected path detection. If not specified the value `0.0000001` is used.
      * @param {function?} onRawSegmentsDetected - (optional) Get the interim result of all detected single lines before path detection starts; DO NOT MODIFY the array.
      * @returns {Array<GenericPath>} - A list of connected paths that resemble the contour lines of the data/terrain at the given height value.
      */
-    detectContourPaths(criticalHeightValue: number, options: {
+    detectContourPaths(criticalHeightValue: number, options?: {
         closeGapType: number;
+        useTriangles?: boolean;
+        pathDetectEpsilon?: number;
         onRawSegmentsDetected?: (rawSegmentsDoNotModifiy: Array<Line>) => void;
     }): Array<GenericPath>;
     /**
@@ -40,7 +46,31 @@ export declare class ContourLineDetection {
      * @param {number} heightValue - The height value of the intersection plane to check for.
      * @returns {Line|null}
      */
-    private findHeightFaceIntersectionLine;
+    private findHeight4FaceIntersectionLine;
+    /**
+     * This function will calculate a single intersecion line of the given face4 data
+     * segment. If the given face does not intersect with the plane at the given `heightValue`
+     * then `null` is returned.
+     *
+     * @param {number} xIndex - The x position (index) of the data face.
+     * @param {number} yIndex - The y position (index) of the data face.
+     * @param {[[number,number],[number,number]]} heightFace - The data sample that composes the face4 as a two-dimensional number array.
+     * @param {number} heightValue - The height value of the intersection plane to check for.
+     * @returns {Line|null}
+     */
+    private findHeightFaceIntersectionLines;
+    /**
+     * This function will calculate a single intersecion line of the given face4 data
+     * segment. If the given face does not intersect with the plane at the given `heightValue`
+     * then `null` is returned.
+     *
+     * @param {number} xIndex - The x position (index) of the data face.
+     * @param {number} yIndex - The y position (index) of the data face.
+     * @param {[[number,number],[number,number]]} heightFace - The data sample that composes the face4 as a two-dimensional number array.
+     * @param {number} heightValue - The height value of the intersection plane to check for.
+     * @returns {Line|null}
+     */
+    private findHeighteFace3IntersectionLine;
     /**
      * This procedure will look at the face4 at the ((x,y),(nextX,nextY)) position – which are four values –
      * and determines the local contour lines for these cases.

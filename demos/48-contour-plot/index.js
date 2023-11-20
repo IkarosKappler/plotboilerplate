@@ -75,6 +75,8 @@
         pattern: "sine", // { sine, cos }
         sliceHeight: params.getNumber("sliceHeight", 0.5),
         closeGapType: params.getNumber("closeGapType", 0), // { "NONE" : 0, "ABOVE" : 1, "BELOW" : 2 }
+        useTriangles: false,
+        pathDetectEpsilonExp: 6, // 10^(-6)
         shufflePathColors: params.getNumber("shufflePathColors", false),
         drawSampleRaster: true,
         drawCurrentContour: true,
@@ -276,6 +278,8 @@
       // Array<GenericPath>
       pathSegments = contourDetection.detectContourPaths(criticalHeightValue, {
         closeGapType: config.closeGapType,
+        useTriangles: config.useTriangles,
+        pathDetectEpsilon: 1 / Math.pow(10, config.pathDetectEpsilonExp),
         onRawSegmentsDetected: onRawSegmentsDetected
       });
 
@@ -358,6 +362,10 @@
       gui.add(config, "sliceHeight").min(0.0).max(1.0).onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('sliceHeight').title('Where to slice the current terrain model.');
       // prettier-ignore
       gui.add(config, "closeGapType", { "None" : ContourLineDetection.CLOSE_GAP_TYPE_NONE, "Above" : ContourLineDetection.CLOSE_GAP_TYPE_ABOVE, "Below" : ContourLineDetection.CLOSE_GAP_TYPE_BELOW } ).onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('closeGapType').title('Close gap above, below or not at all.');
+      // prettier-ignore
+      gui.add(config, "pathDetectEpsilonExp").min(1).max(10).onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('pathDetectEpsilonExp').title('The epsilon 10^-exp to use for path detection to tell "different" points apart. Useful for fine tuning.');
+      // prettier-ignore
+      gui.add(config, "useTriangles").onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('useTriangles').title('If checked then the algorithm will use triangle faces instead of quad faces.');
       // prettier-ignore
       gui.add(config, "shufflePathColors" ).name('shufflePathColors').onChange( function() { pb.redraw(); } ).title('Use different colors for different paths?');
       // prettier-ignore
