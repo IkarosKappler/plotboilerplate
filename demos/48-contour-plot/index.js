@@ -128,20 +128,16 @@
     var redraw = function (draw, fill) {
       // Draw out stuff
       fill.rect(bounds2D.min, bounds2D.width, bounds2D.height, "rgba(0,0,0,0.75)");
-      // draw.rect(bounds2D.min, bounds2D.width, bounds2D.height, "green", 2);
       if (config.drawSampleRaster) {
         drawPointRaster(draw, fill);
       }
-      //   var curPathColor = config.shufflePathColors ? randColor(i, 1.0) : "orange";
       if (config.drawCurrentContour) {
         drawPaths(draw, fill, pathSegments, null);
       }
       drawAllContourLines(draw, fill);
 
       if (config.drawRawLineSegments && rawLinearSegments.length > 0) {
-        console.log("rawLinearSegments", rawLinearSegments);
-        // var firstLineSegment = rawLinearSegments[0];
-        // draw.line(convertCoords2Pos(firstLineSegment.a.x), convertCoords2Pos(firstLineSegment.a.y), "purple", 2);
+        // console.log("rawLinearSegments", rawLinearSegments);
         for (var i = 0; i < rawLinearSegments.length; i++) {
           var lineSegment = rawLinearSegments[i];
           draw.line(
