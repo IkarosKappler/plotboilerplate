@@ -5,9 +5,10 @@
  *
  * @requires detectPaths
  * @requires GenericPath
- * @author  Ikaros Kappler
- * @date    2023-11-05
- * @version 1.0.0
+ * @author   Ikaros Kappler
+ * @date     2023-11-05
+ * @modified 2023-11-20 Addig path detection on a triangle based grid.
+ * @version  1.0.0
  */
 import { Line } from "../../Line";
 import { IDataGrid2d } from "../datastructures/DataGrid2d";
@@ -18,7 +19,13 @@ export declare class ContourLineDetection {
     static CLOSE_GAP_TYPE_NONE: number;
     static CLOSE_GAP_TYPE_ABOVE: number;
     static CLOSE_GAP_TYPE_BELOW: number;
-    constructor(dataGrid: IDataGrid2d<number>);
+    debugMode: boolean;
+    /**
+     * Creates a new instance for calculating contour lines from the given data grid.
+     * @param {IDataGrid2d<number>} dataGrid - The data grid to use. Must not contain any NaN or null values.
+     * @param {boolean=?} debugMode - (optional) Pass `true` to log warnings on (rare) critical edge cases where the algorithm might fail.
+     */
+    constructor(dataGrid: IDataGrid2d<number>, debugMode?: boolean);
     /**
      * Detect contour paths from the underlying data source.
      *
@@ -26,19 +33,21 @@ export declare class ContourLineDetection {
      * @param {number} options.closeGapType - `CLOSE_GAP_TYPE_NONE` or `CLOSE_GAP_TYPE_ABOVE` or `CLOSE_GAP_TYPE_BELOW`.
      * @param {boolean=false} options.useTriangles - If set to true the detection will split each face3 quad into two triangle faces.
      * @param {pathDetectEpsilon=0.000001} options.pathDetectEpsilon - (optional) The epsilon to tell if two points are located 'in the same place'. Used for connected path detection. If not specified the value `0.0000001` is used.
+     * @param {pointEliminationEpsilon=0.0000001} options.pointEliminationEpsilon - (optional) The epsilon for duplicate point elimination (default is 0.000001).
      * @param {function?} onRawSegmentsDetected - (optional) Get the interim result of all detected single lines before path detection starts; DO NOT MODIFY the array.
      * @returns {Array<GenericPath>} - A list of connected paths that resemble the contour lines of the data/terrain at the given height value.
      */
     detectContourPaths(criticalHeightValue: number, options?: {
         closeGapType: number;
         useTriangles?: boolean;
+        pointEliminationEpsilon?: number;
         pathDetectEpsilon?: number;
         onRawSegmentsDetected?: (rawSegmentsDoNotModifiy: Array<Line>) => void;
     }): Array<GenericPath>;
     /**
      * This function will calculate a single intersecion line of the given face4 data
      * segment. If the given face does not intersect with the plane at the given `heightValue`
-     * then `null` is returned.
+     * then no segments will be stored.
      *
      * @param {number} xIndex - The x position (index) of the data face.
      * @param {number} yIndex - The y position (index) of the data face.
@@ -50,7 +59,7 @@ export declare class ContourLineDetection {
     /**
      * This function will calculate a single intersecion line of the given face4 data
      * segment. If the given face does not intersect with the plane at the given `heightValue`
-     * then `null` is returned.
+     * then no segments will be stored.
      *
      * @param {number} xIndex - The x position (index) of the data face.
      * @param {number} yIndex - The y position (index) of the data face.
@@ -60,12 +69,12 @@ export declare class ContourLineDetection {
      */
     private findHeightFaceIntersectionLines;
     /**
-     * This function will calculate a single intersecion line of the given face4 data
+     * This function will calculate a single intersecion line of the given face3 data
      * segment. If the given face does not intersect with the plane at the given `heightValue`
-     * then `null` is returned.
+     * then no segments will be stored.
      *
-     * @param {number} xIndex - The x position (index) of the data face.
-     * @param {number} yIndex - The y position (index) of the data face.
+     * @param {number} xIndexA - The x position (index) of the first triangle data point.
+     * @param {number} yIndexA - The y position (index) of the first triangle data point.
      * @param {[[number,number],[number,number]]} heightFace - The data sample that composes the face4 as a two-dimensional number array.
      * @param {number} heightValue - The height value of the intersection plane to check for.
      * @returns {Line|null}
@@ -79,7 +88,7 @@ export declare class ContourLineDetection {
      *  * left and right border (x=0, x=data.xSegmentCount)
      *  * top and bottom border (x=y, x=data.ySegmentCount)
      *
-     * Resulting path segments will be stored in the global `segments` array.
+     * Resulting path segments will be stored in the global `rawLinearPathSegments` array for further processing.
      *
      * @param {number} x
      * @param {number} y
@@ -129,5 +138,13 @@ export declare class ContourLineDetection {
      * @returns
      */
     private getLerpRatio;
+    /**
+     * Helper function to lerp a numeric value.
+     *
+     * @param {number} min - The min (start) value. Doesn't necesarily need to be the smaller one.
+     * @param {number} max - The max (end) value. Doesn't necesarily need to be the larger one.
+     * @param {number} ratio - The lerp ratio; usually a value between 0.0 and 1.0, but other values a valid for linear interpolation, too.
+     * @returns {number}
+     */
     private lerp;
 }

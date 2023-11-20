@@ -56,11 +56,8 @@
       )
     );
 
-    // sin
-
     var LO_COLOR = Color.parse("#0000ff");
     var HI_COLOR = Color.parse("#ff0000");
-    //   console.log("LO_COLOR", LO_COLOR, "HI_COLOR", HI_COLOR);
 
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
@@ -73,9 +70,10 @@
         wireframe: false,
 
         pattern: "sine", // { sine, cos }
-        sliceHeight: params.getNumber("sliceHeight", 0.5),
+        sliceHeight: params.getNumber("sliceHeight", 0.4),
         closeGapType: params.getNumber("closeGapType", 0), // { "NONE" : 0, "ABOVE" : 1, "BELOW" : 2 }
         useTriangles: false,
+        pointEliminationEpsilonExp: 6, // 10^(-6)
         pathDetectEpsilonExp: 6, // 10^(-6)
         shufflePathColors: params.getNumber("shufflePathColors", false),
         drawSampleRaster: true,
@@ -279,6 +277,7 @@
       pathSegments = contourDetection.detectContourPaths(criticalHeightValue, {
         closeGapType: config.closeGapType,
         useTriangles: config.useTriangles,
+        pointEliminationEpsilon: 1 / Math.pow(10, config.pointEliminationEpsilonExp),
         pathDetectEpsilon: 1 / Math.pow(10, config.pathDetectEpsilonExp),
         onRawSegmentsDetected: onRawSegmentsDetected
       });
@@ -286,11 +285,11 @@
       if (options.addToContourLines) {
         var heightRatio = getRatioByHeightValue(criticalHeightValue);
         var color = LO_COLOR.clone().interpolate(HI_COLOR, heightRatio);
-        console.log("Adding color ");
+        // console.log("Adding color ");
         allContourLines.push({ pathSegments: pathSegments, color: color.cssRGB() });
       }
       if (options.addTo3DPreview) {
-        console.log("Add contour");
+        // console.log("Add contour");
         contourScene.addContour(pathSegments);
       }
     };
@@ -362,6 +361,8 @@
       gui.add(config, "sliceHeight").min(0.0).max(1.0).onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('sliceHeight').title('Where to slice the current terrain model.');
       // prettier-ignore
       gui.add(config, "closeGapType", { "None" : ContourLineDetection.CLOSE_GAP_TYPE_NONE, "Above" : ContourLineDetection.CLOSE_GAP_TYPE_ABOVE, "Below" : ContourLineDetection.CLOSE_GAP_TYPE_BELOW } ).onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('closeGapType').title('Close gap above, below or not at all.');
+      // prettier-ignore
+      gui.add(config, "pointEliminationEpsilonExp").min(1).max(10).onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('pointEliminationEpsilonExp').title('The epsilon 10^-exp to use for detecting "equal" points (multiple points considered equal will be removed to clear duplicates).');
       // prettier-ignore
       gui.add(config, "pathDetectEpsilonExp").min(1).max(10).onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('pathDetectEpsilonExp').title('The epsilon 10^-exp to use for path detection to tell "different" points apart. Useful for fine tuning.');
       // prettier-ignore

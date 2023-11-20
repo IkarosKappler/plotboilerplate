@@ -1,6 +1,6 @@
 "use strict";
 /**
- * Some basix THREEJS scene setup for reuse.
+ * Some basic THREEJS scene setup for reuse.
  *
  * @author   Ikaros Kappler
  * @date     2023-10-28
@@ -96,8 +96,7 @@
     }
 
     if (useTextureImage) {
-      //   var loader = new THREE.TextureLoader();
-      var texture = this.loadTextureImage(textureImagePath); //  loader.load(textureImagePath);
+      var texture = this.loadTextureImage(textureImagePath);
 
       return new THREE.MeshLambertMaterial({
         color: 0xffffff,
@@ -113,23 +112,23 @@
         // shading : THREE.LambertShading,
         map: texture
       });
+    } else {
+      return new THREE.MeshPhongMaterial({
+        color: 0x3838ff,
+        wireframe: false,
+        flatShading: false,
+        depthTest: true,
+        opacity: 1.0,
+        side: THREE.DoubleSide,
+        visible: true,
+        emissive: 0x0,
+        reflectivity: 1.0,
+        refractionRatio: 0.89,
+        specular: 0x888888,
+        // shading : THREE.LambertShading,
+        map: null
+      });
     }
-
-    return new THREE.MeshPhongMaterial({
-      color: 0x3838ff,
-      wireframe: false,
-      flatShading: false,
-      depthTest: true,
-      opacity: 1.0,
-      side: THREE.DoubleSide,
-      visible: true,
-      emissive: 0x0,
-      reflectivity: 1.0,
-      refractionRatio: 0.89,
-      specular: 0x888888,
-      // shading : THREE.LambertShading,
-      map: null
-    });
   };
 
   BasicSceneSetup.prototype.addMesh = function (mesh, options) {
@@ -137,7 +136,7 @@
     this.scene.add(mesh);
 
     if (options.showNormals) {
-      var vnHelper = new VertexNormalsHelper(terrainMesh, options.normalsLength, 0x00ff00, 1);
+      var vnHelper = new VertexNormalsHelper(mesh, options.normalsLength, 0x00ff00, 1);
       this.scene.add(vnHelper);
       this.geometries.push(vnHelper);
     }
