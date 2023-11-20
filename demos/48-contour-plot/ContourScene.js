@@ -21,8 +21,7 @@
     this.basicSceneSetup.removeCachedMeshes();
 
     var testGeometry = new THREE.BoxGeometry(10, 10, 10);
-    var material = this.basicSceneSetup.createMaterial({}); //options);
-    // testGeometry.computeVertexNormals();
+    var material = this.basicSceneSetup.createMaterial({}); // options
     var testMesh = new THREE.Mesh(testGeometry, material);
 
     // Assuming you already have your global scene, add the terrain to it
@@ -39,22 +38,14 @@
   ContourScene.prototype.addContour = function (contourArray, options) {
     this.basicSceneSetup.removeCachedMeshes();
 
-    // var testGeometry = new THREE.BoxGeometry(10, 10, 10);
-    // // testGeometry.computeVertexNormals();
-
-    const length = 12,
-      width = 8;
-
-    // const shape = new THREE.Shape();
-    // shape.moveTo(0, 0);
-    // shape.lineTo(0, width);
-    // shape.lineTo(length, width);
-    // shape.lineTo(length, 0);
-    // shape.lineTo(0, 0);
-
     const shape = new THREE.Shape();
     for (var i = 0; i < contourArray.length; i++) {
       const path = contourArray[i];
+      console.log(
+        path.segments.map(function (line) {
+          return "[" + line.a.x + "," + line.a.y + "][" + line.b.x + "," + line.b.y + "]";
+        })
+      );
       if (path.segments.length <= 1) {
         continue;
       }
@@ -67,6 +58,7 @@
       shape.closePath();
     }
 
+    // Generade 3d extrusion or plain 2d shape?
     // // prettier-ignore
     // const extrudeSettings = {
     //     steps: 2,
@@ -77,15 +69,15 @@
     //     // bevelOffset: 0,
     //     // bevelSegments: 1
     // };
-
     // const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
     const geometry = new THREE.ShapeGeometry(shape);
 
-    const material = this.basicSceneSetup.createMaterial(); // new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const material = this.basicSceneSetup.createMaterial();
     const mesh = new THREE.Mesh(geometry, material);
+    mesh.rotation.x = Math.PI / 2.0;
 
-    // Assuming you already have your global scene, add the terrain to it
-    this.basicSceneSetup.addMesh(mesh, {}); // options);
+    // Assuming you already have your global scene, add the 2d shape to it
+    this.basicSceneSetup.addMesh(mesh, {}); // No options here
   };
 
   _context.ContourScene = ContourScene;
