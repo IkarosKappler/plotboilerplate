@@ -1,5 +1,8 @@
 # Changelog
 
+- 2023-11-24
+  - Added the `Polygon.containsPolygon(Polygon)' function.
+  - Added a new demo 49 for testing the polygon.containsPolygon function and some ngon generation fun.
 - 2023-11-04
   - Adding a new interface for read matrix like data: utils/datastructures/DataGrid2d.
   - Adding an implementation for this working on linear arrays (like buffer or THREE vertex arrays): DataGrid2dListAdapter.

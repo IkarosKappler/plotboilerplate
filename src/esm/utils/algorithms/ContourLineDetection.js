@@ -3,40 +3,57 @@
  *
  * For usage see demo `./demos/48-contour-plot`.
  *
- * @author  Ikaros Kappler
- * @date    2023-11-05
- * @version 1.0.0
+ * @requires detectPaths
+ * @requires GenericPath
+ * @author   Ikaros Kappler
+ * @date     2023-11-05
+ * @modified 2023-11-20 Addig path detection on a triangle based grid.
+ * @version  1.0.0
  */
 import { Line } from "../../Line";
 import { Vertex } from "../../Vertex";
 import { detectPaths } from "./detectPaths";
 import { clearDuplicateVertices } from "./clearDuplicateVertices";
 export class ContourLineDetection {
-    constructor(dataGrid) {
+    /**
+     * Creates a new instance for calculating contour lines from the given data grid.
+     * @param {IDataGrid2d<number>} dataGrid - The data grid to use. Must not contain any NaN or null values.
+     * @param {boolean=?} debugMode - (optional) Pass `true` to log warnings on (rare) critical edge cases where the algorithm might fail.
+     */
+    constructor(dataGrid, debugMode) {
         this.rawLinearPathSegments = [];
+        // Activates/deactivates warning messages on rare edge cases where local path detection fails.
+        this.debugMode = false;
         this.dataGrid = dataGrid;
+        this.debugMode = Boolean(debugMode);
     }
     /**
      * Detect contour paths from the underlying data source.
      *
      * @param {number} criticalHeightValue - The height value. If above data's maximum or below data's minimum then the result will be empty (no intersections).
      * @param {number} options.closeGapType - `CLOSE_GAP_TYPE_NONE` or `CLOSE_GAP_TYPE_ABOVE` or `CLOSE_GAP_TYPE_BELOW`.
+     * @param {boolean=false} options.useTriangles - If set to true the detection will split each face3 quad into two triangle faces.
+     * @param {pathDetectEpsilon=0.000001} options.pathDetectEpsilon - (optional) The epsilon to tell if two points are located 'in the same place'. Used for connected path detection. If not specified the value `0.0000001` is used.
+     * @param {pointEliminationEpsilon=0.0000001} options.pointEliminationEpsilon - (optional) The epsilon for duplicate point elimination (default is 0.000001).
      * @param {function?} onRawSegmentsDetected - (optional) Get the interim result of all detected single lines before path detection starts; DO NOT MODIFY the array.
      * @returns {Array<GenericPath>} - A list of connected paths that resemble the contour lines of the data/terrain at the given height value.
      */
     detectContourPaths(criticalHeightValue, options) {
+        var _a, _b;
+        options = options || { closeGapType: ContourLineDetection.CLOSE_GAP_TYPE_NONE };
         // First: clear the buffer
         this.rawLinearPathSegments = [];
         // Imagine a face4 element like this
         //    (x,y)       (x+1,y)
         //         A-----B
-        //         |     |
-        //         |     |
+        //         |   / |
+        //         | /   |
         //         D-----C
         //  (x,y+1)        (x+1,y+1)
         //	   then result in the buffer will be
         //   [ [A,B],
         //     [D,C] ]
+        // Note that the diagonal line (used for triangles) is optional; depends on `options.useTriangles`.
         const heightFace = [
             [0, 0],
             [0, 0]
@@ -44,11 +61,7 @@ export class ContourLineDetection {
         for (var y = 0; y + 1 < this.dataGrid.ySegmentCount; y++) {
             for (var x = 0; x + 1 < this.dataGrid.xSegmentCount; x++) {
                 this.dataGrid.getDataFace4At(x, y, heightFace);
-                const line = this.findHeightFaceIntersectionLine(x, y, heightFace, criticalHeightValue);
-                if (line) {
-                    // pathSegments.push(new GenericPath(line));
-                    this.rawLinearPathSegments.push(line);
-                }
+                this.findHeightFaceIntersectionLines(x, y, heightFace, criticalHeightValue, (_a = options.pointEliminationEpsilon) !== null && _a !== void 0 ? _a : 0.0000001, options.useTriangles);
             }
         }
         // Collect value above/below on the y axis
@@ -77,19 +90,18 @@ export class ContourLineDetection {
             options.onRawSegmentsDetected(this.rawLinearPathSegments);
         }
         // Detect connected paths
-        let pathSegments = detectPaths(this.rawLinearPathSegments, 0.1); // Epsilon?
+        let pathSegments = detectPaths(this.rawLinearPathSegments, (_b = options.pathDetectEpsilon) !== null && _b !== void 0 ? _b : 0.0000001); // Epsilon
         // Filter out segments with only a single line of length~=0
         pathSegments = pathSegments.filter(function (pathSegment) {
             return (pathSegment.segments.length != 1 ||
                 (pathSegment.segments.length === 1 && pathSegment.segments[0].length() > 0.1));
         });
-        //   console.log(pathSegments);
         return pathSegments;
     }
     /**
      * This function will calculate a single intersecion line of the given face4 data
      * segment. If the given face does not intersect with the plane at the given `heightValue`
-     * then `null` is returned.
+     * then no segments will be stored.
      *
      * @param {number} xIndex - The x position (index) of the data face.
      * @param {number} yIndex - The y position (index) of the data face.
@@ -97,15 +109,16 @@ export class ContourLineDetection {
      * @param {number} heightValue - The height value of the intersection plane to check for.
      * @returns {Line|null}
      */
-    findHeightFaceIntersectionLine(xIndex, yIndex, heightFace, heightValue) {
+    findHeight4FaceIntersectionLine(xIndex, yIndex, heightFace, heightValue, pointEliminationEpsilon) {
         const heightValueA = heightFace[0][0]; // value at (x,y)
         const heightValueB = heightFace[1][0];
         const heightValueC = heightFace[1][1];
         const heightValueD = heightFace[0][1];
         if (heightValueA === null || heightValueB === null || heightValueC === null || heightValueD === null) {
-            throw `[findHeightFaceIntersectionLine] Cannot extract data face at (${xIndex},${yIndex}). Some values are null.`;
+            throw `[findHeightFace4IntersectionLine] Cannot extract data face at (${xIndex},${yIndex}). Some values are null.`;
         }
         let points = [];
+        // Case A: use full quad face
         if (this.isBetween(heightValueA, heightValueB, heightValue)) {
             const lerpValueByHeight = this.getLerpRatio(heightValueA, heightValueB, heightValue);
             points.push(new Vertex(this.lerp(xIndex, xIndex + 1, lerpValueByHeight), yIndex));
@@ -126,18 +139,111 @@ export class ContourLineDetection {
         // edge of a face, then the two adjacent edges will result in 2x the same
         // intersecion point. This must be handled as one, so filter the point list
         // by an epsilon.
-        points = clearDuplicateVertices(points, 0.000001);
+        points = clearDuplicateVertices(points, pointEliminationEpsilon); // 0.000001);
         if (points.length >= 2) {
             const startPoint = points[0];
             const endPoint = points[1];
-            if (points.length > 2) {
-                console.warn("[findHeightFaceIntersectionLine] Detected more than 2 points on one face whre only 0 or 2 should appear. At ", xIndex, yIndex, points);
+            if (this.debugMode && points.length > 2) {
+                console.warn("[findHeightFace4IntersectionLine] Detected more than 2 points on one face whre only 0 or 2 should appear. At ", xIndex, yIndex, points);
             }
             return new Line(startPoint, endPoint);
         }
         else {
-            if (points.length === 1) {
-                console.warn("[findHeightFaceIntersectionLine] Point list has only one point (should not happen).");
+            if (this.debugMode && points.length === 1) {
+                console.warn("[findHeightFace4IntersectionLine] Point list has only one point (should not happen).");
+            }
+            return null;
+        }
+    }
+    /**
+     * This function will calculate a single intersecion line of the given face4 data
+     * segment. If the given face does not intersect with the plane at the given `heightValue`
+     * then no segments will be stored.
+     *
+     * @param {number} xIndex - The x position (index) of the data face.
+     * @param {number} yIndex - The y position (index) of the data face.
+     * @param {[[number,number],[number,number]]} heightFace - The data sample that composes the face4 as a two-dimensional number array.
+     * @param {number} heightValue - The height value of the intersection plane to check for.
+     * @returns {Line|null}
+     */
+    findHeightFaceIntersectionLines(xIndex, yIndex, heightFace, criticalHeightValue, pointEliminationEpsilon, useTriangles) {
+        // Imagine a face4 element like this
+        //    (x,y)       (x+1,y)
+        //         A-----B
+        //         |   / |
+        //         | /   |
+        //         D-----C
+        //  (x,y+1)        (x+1,y+1)
+        //	   then result in the buffer will be
+        //   [ [A,B],
+        //     [D,C] ]
+        if (useTriangles) {
+            const lineA = this.findHeighteFace3IntersectionLine(xIndex, yIndex, xIndex, yIndex + 1, xIndex + 1, yIndex, [heightFace[0][0], heightFace[0][1], heightFace[1][0]], criticalHeightValue, pointEliminationEpsilon);
+            if (lineA) {
+                this.rawLinearPathSegments.push(lineA);
+            }
+            const lineB = this.findHeighteFace3IntersectionLine(xIndex, yIndex + 1, xIndex + 1, yIndex + 1, xIndex + 1, yIndex, [heightFace[0][1], heightFace[1][1], heightFace[1][0]], criticalHeightValue, pointEliminationEpsilon);
+            if (lineB) {
+                this.rawLinearPathSegments.push(lineB);
+            }
+        }
+        else {
+            const line = this.findHeight4FaceIntersectionLine(xIndex, yIndex, heightFace, criticalHeightValue, pointEliminationEpsilon);
+            if (line) {
+                this.rawLinearPathSegments.push(line);
+            }
+        }
+    }
+    /**
+     * This function will calculate a single intersecion line of the given face3 data
+     * segment. If the given face does not intersect with the plane at the given `heightValue`
+     * then no segments will be stored.
+     *
+     * @param {number} xIndexA - The x position (index) of the first triangle data point.
+     * @param {number} yIndexA - The y position (index) of the first triangle data point.
+     * @param {[[number,number],[number,number]]} heightFace - The data sample that composes the face4 as a two-dimensional number array.
+     * @param {number} heightValue - The height value of the intersection plane to check for.
+     * @returns {Line|null}
+     */
+    findHeighteFace3IntersectionLine(xIndexA, yIndexA, xIndexB, yIndexB, xIndexC, yIndexC, heightFace, heightValue, pointEliminationEpsilon) {
+        const heightValueA = heightFace[0]; // value at (x,y)
+        const heightValueB = heightFace[1];
+        const heightValueC = heightFace[2];
+        if (heightValueA === null || heightValueB === null || heightValueC === null) {
+            throw `[findHeightFace3IntersectionLine] Cannot extract data face at (${xIndexA},${yIndexA}). Some values are null.`;
+        }
+        let points = [];
+        // Case A: use full quad face
+        if (this.isBetween(heightValueA, heightValueB, heightValue)) {
+            const lerpValueByHeight = this.getLerpRatio(heightValueA, heightValueB, heightValue);
+            points.push(new Vertex(this.lerp(xIndexA, xIndexB, lerpValueByHeight), this.lerp(yIndexA, yIndexB, lerpValueByHeight)));
+        }
+        if (this.isBetween(heightValueB, heightValueC, heightValue)) {
+            const lerpValueByHeight = this.getLerpRatio(heightValueB, heightValueC, heightValue);
+            // points.push(new Vertex(xIndex + 1, this.lerp(yIndex, yIndex + 1, lerpValueByHeight)));
+            points.push(new Vertex(this.lerp(xIndexB, xIndexC, lerpValueByHeight), this.lerp(yIndexB, yIndexC, lerpValueByHeight)));
+        }
+        if (this.isBetween(heightValueC, heightValueA, heightValue)) {
+            const lerpValueByHeight = this.getLerpRatio(heightValueC, heightValueA, heightValue);
+            // points.push(new Vertex(this.lerp(xIndex + 1, xIndex, lerpValueByHeight), yIndex + 1));
+            points.push(new Vertex(this.lerp(xIndexC, xIndexA, lerpValueByHeight), this.lerp(yIndexC, yIndexA, lerpValueByHeight)));
+        }
+        // Warning: if a plane intersection point is located EXACTLY on the corner
+        // edge of a face, then the two adjacent edges will result in 2x the same
+        // intersecion point. This must be handled as one, so filter the point list
+        // by an epsilon.
+        points = clearDuplicateVertices(points, pointEliminationEpsilon); // 0.0000001);
+        if (points.length >= 2) {
+            const startPoint = points[0];
+            const endPoint = points[1];
+            if (this.debugMode && points.length > 2) {
+                console.warn("[findHeightFace3IntersectionLine] Detected more than 2 points on one face whre only 0 or 2 should appear. At ", xIndexA, yIndexA, points);
+            }
+            return new Line(startPoint, endPoint);
+        }
+        else {
+            if (this.debugMode && points.length === 1) {
+                console.warn("[findHeightFace3IntersectionLine] Point list has only one point (should not happen).");
             }
             return null;
         }
@@ -150,7 +256,7 @@ export class ContourLineDetection {
      *  * left and right border (x=0, x=data.xSegmentCount)
      *  * top and bottom border (x=y, x=data.ySegmentCount)
      *
-     * Resulting path segments will be stored in the global `segments` array.
+     * Resulting path segments will be stored in the global `rawLinearPathSegments` array for further processing.
      *
      * @param {number} x
      * @param {number} y
@@ -238,6 +344,14 @@ export class ContourLineDetection {
     getLerpRatio(valA, valB, curValue) {
         return (curValue - valA) / (valB - valA);
     }
+    /**
+     * Helper function to lerp a numeric value.
+     *
+     * @param {number} min - The min (start) value. Doesn't necesarily need to be the smaller one.
+     * @param {number} max - The max (end) value. Doesn't necesarily need to be the larger one.
+     * @param {number} ratio - The lerp ratio; usually a value between 0.0 and 1.0, but other values a valid for linear interpolation, too.
+     * @returns {number}
+     */
     lerp(min, max, ratio) {
         return min + (max - min) * ratio;
     }

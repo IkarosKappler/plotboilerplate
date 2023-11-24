@@ -27,7 +27,8 @@
  * @modified 2023-09-25 Added the `Polygon.getInterpolationPolygon(number)` function.
  * @modified 2023-09-25 Added the `Polygon.lineIntersections(Line,boolean)` function.
  * @modified 2023-09-29 Added the `Polygon.closestLineIntersection(Line,boolean)` function.
- * @version 1.11.0
+ * @modified 2023-11-24 Added the `Polygon.containsPolygon(Polygon)' function.
+ * @version 1.12.0
  *
  * @file Polygon
  * @public
@@ -140,6 +141,34 @@ export class Polygon {
                 inside = !inside;
         }
         return inside;
+    }
+    /**
+     * Check if the passed polygon is completly contained inside this polygon.
+     *
+     * This means:
+     *  - all polygon's vertices must be inside this polygon.
+     *  - the polygon has no edge intersections with this polygon.
+     *
+     * @param polygon
+     * @return {boolean}
+     */
+    containsPolygon(polygon) {
+        for (var i = 0; i < polygon.vertices.length; i++) {
+            if (!this.containsVert(polygon.vertices[i])) {
+                return false;
+            }
+        }
+        // All vertices are inside; check for intersections
+        const lineSegment = new Line(new Vertex(), new Vertex());
+        for (var i = 0; i < polygon.vertices.length; i++) {
+            lineSegment.a.set(polygon.vertices[i]);
+            lineSegment.b.set(polygon.vertices[(i + 1) % polygon.vertices.length]);
+            if (this.lineIntersections(lineSegment, true).length > 0) {
+                // Current segment has intersection(s) with this polygon.
+                return false;
+            }
+        }
+        return true;
     }
     /**
      * Calculate the area of the given polygon (unsigned).
