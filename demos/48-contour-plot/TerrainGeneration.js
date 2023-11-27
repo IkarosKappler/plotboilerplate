@@ -43,6 +43,12 @@
       // console.log("xAbs", xAbs, "yAbs", yAbs);
       if (options.pattern === "sine") {
         this._planeGeometry.vertices[i].z = (Math.sin(xAbs) + Math.sin(yAbs)) * 10.0;
+      } else if (options.pattern === "ripple") {
+        var dist = Math.sqrt(Math.pow(xAbs, 2) + Math.pow(yAbs, 2)) * 4;
+        this._planeGeometry.vertices[i].z = (Math.sin(dist) + Math.sin(dist)) * 4.0;
+      } else if (options.pattern === "ripplefull") {
+        var dist = Math.sqrt(Math.pow(xAbs - Math.PI, 2) + Math.pow(yAbs - Math.PI, 2)) * 4;
+        this._planeGeometry.vertices[i].z = (Math.sin(dist) + Math.sin(dist)) * 4.0;
       } else {
         this._planeGeometry.vertices[i].z = (Math.cos(xAbs) + Math.cos(yAbs)) * 10.0;
       }

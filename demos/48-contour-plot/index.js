@@ -69,7 +69,7 @@
         textureImagePath: "checkpattern-512x512.png",
         wireframe: false,
 
-        pattern: "sine", // { sine, cos }
+        pattern: "sine", // { sine, cos, ripple, ripplefull }
         sliceHeight: params.getNumber("sliceHeight", 0.4),
         closeGapType: params.getNumber("closeGapType", 0), // { "NONE" : 0, "ABOVE" : 1, "BELOW" : 2 }
         useTriangles: false,
@@ -278,6 +278,9 @@
         onRawSegmentsDetected: onRawSegmentsDetected
       });
 
+      var polyonHierarchyTree = computePolygonHierarchy(pathSegments);
+      console.log("polyonHierarchyTree", polyonHierarchyTree);
+
       if (options.addToContourLines) {
         var heightRatio = getRatioByHeightValue(criticalHeightValue);
         var color = LO_COLOR.clone().interpolate(HI_COLOR, heightRatio);
@@ -294,6 +297,24 @@
     // | Each time the terrain parameters change (segment count, function for terrain, etc)
     // +-------------------------------
     var terrainGeneration = null;
+
+    // +---------------------------------------------------------------------------------
+    // | Compute a polygon hierarchy tree from the path segments.
+    // | Each segment must represent a closed polygon to make this work!
+    // +-------------------------------
+    var computePolygonHierarchy = function (paths) {
+      // pathSegments: Array<GenericPath>
+
+      // Convert paths to polygons
+      var polygons = paths.map(function (path) {
+        var polyVerts = path.getAllStartEndPoints();
+        return new Polygon(polyVerts, false); // Don't use open polygons here
+      });
+
+      var polyContainmentLevels = new PolygonContainmentLevel(polygons);
+      var hierarchy = polyContainmentLevels.findContainmentTree();
+      return hierarchy;
+    };
 
     // +---------------------------------------------------------------------------------
     // | This renders the computed contour(s) in a 3D mesh
@@ -341,7 +362,7 @@
       fold0.add(config, "ySegmentCount").min(4).max(128).step(1).onChange( function() { rebuildTerrain(); rebuild(); pb.redraw(); } ).name('ySegmentCount').title("The number of vertices along the mesh's y axis.");
 
       // prettier-ignore
-      fold0.add(config, "pattern", { "Sine": "sine", "Cos" : "cos" }).onChange( function() { rebuild(); pb.redraw(); } ).name('pattern').title('Which pattern to use to shape the landscape.');
+      fold0.add(config, "pattern", { "Sine": "sine", "Cos" : "cos", "Ripple": "ripple", "RippleFull": "ripplefull" }).onChange( function() { rebuild(); pb.redraw(); } ).name('pattern').title('Which pattern to use to shape the landscape.');
       // prettier-ignore
       fold0.add(config, "showNormals").onChange( function() { rebuild(); } ).name('showNormals').title('Show the vertex normals.');
       // prettier-ignore
