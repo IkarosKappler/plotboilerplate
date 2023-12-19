@@ -15,4 +15,9 @@ echo "Compiling files in ${demopath}/src/ts/"
 pwd
 
 # npx tsc --outDir demos/46-simple-audio-control/src/js/ demos/46-simple-audio-control/src/ts/*.ts
-npx tsc --target es5 --sourceMap --declaration --module commonjs --outDir "$demopath"/src/js/ "${demopath}/src/ts/"*.ts
+# npx tsc --target es5 --sourceMap --declaration --module commonjs --outDir "${demopath}/src/js/" "${demopath}/src/ts/"*.ts
+npx tsc --target es5 --sourceMap --declaration --module commonjs --outDir "${demopath}/src/js/" "${demopath}/src/ts/"*.ts
+
+# cd "${demopath}/src/ts/"
+# pwd
+# npx tsc --target es5 --sourceMap --declaration --module commonjs --outDir "../js/" "${demopath}/src/ts/"*.ts

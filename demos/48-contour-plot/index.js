@@ -79,6 +79,7 @@
         drawSampleRaster: true,
         drawCurrentContour: true,
         drawRawLineSegments: false,
+        drawPolygonNumbers: false,
 
         rebuild: function () {
           rebuild();
@@ -123,6 +124,12 @@
     var rawLinearSegments = [];
 
     // +---------------------------------------------------------------------------------
+    // | A buffer to store all computed polygons.
+    // | Used to calculated the polygon-containment-hierarchy.
+    // +-------------------------------
+    var polygons = [];
+
+    // +---------------------------------------------------------------------------------
     // | Redraw everything. This function will be called by PB on re-renders.
     // +-------------------------------
     var redraw = function (draw, fill) {
@@ -135,6 +142,9 @@
         drawPaths(draw, fill, pathSegments, null);
       }
       drawAllContourLines(draw, fill);
+      if (config.drawPolygonNumbers) {
+        drawPolygonNumbers(draw, fill);
+      }
 
       if (config.drawRawLineSegments && rawLinearSegments.length > 0) {
         // console.log("rawLinearSegments", rawLinearSegments);
@@ -191,6 +201,20 @@
         var contourLine = allContourLines[i];
         // console.log("drawAllContourLines", i, contourLine);
         drawPaths(draw, fill, contourLine.pathSegments, contourLine.color);
+      }
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | A helper function for drawing polygon numbers to each detected path point.
+    // +-------------------------------
+    var drawPolygonNumbers = function (draw, fill) {
+      for (var i = 0; i < polygons.length; i++) {
+        var poly = polygons[i];
+        // console.log("poly[i].vertices.length", poly.vertices.length);
+        for (var j = 0; j < poly.vertices.length; j++) {
+          const coords = convertCoords2Pos(poly.vertices[j].x, poly.vertices[j].y);
+          fill.text("" + i, coords.x, coords.y, { color: "orange", fontFamily: "Arial", fontSize: 9 });
+        }
       }
     };
 
@@ -278,7 +302,13 @@
         onRawSegmentsDetected: onRawSegmentsDetected
       });
 
-      var polyonHierarchyTree = computePolygonHierarchy(pathSegments);
+      // Convert paths to polygons
+      polygons = pathSegments.map(function (path) {
+        var polyVerts = path.getAllStartEndPoints();
+        return new Polygon(polyVerts, false); // Don't use open polygons here
+      });
+
+      var polyonHierarchyTree = computePolygonHierarchy(polygons);
       console.log("polyonHierarchyTree", polyonHierarchyTree);
 
       if (options.addToContourLines) {
@@ -302,17 +332,18 @@
     // | Compute a polygon hierarchy tree from the path segments.
     // | Each segment must represent a closed polygon to make this work!
     // +-------------------------------
-    var computePolygonHierarchy = function (paths) {
+    var computePolygonHierarchy = function (polygons) {
       // pathSegments: Array<GenericPath>
 
-      // Convert paths to polygons
-      var polygons = paths.map(function (path) {
-        var polyVerts = path.getAllStartEndPoints();
-        return new Polygon(polyVerts, false); // Don't use open polygons here
-      });
+      // // Convert paths to polygons
+      // polygons = paths.map(function (path) {
+      //   var polyVerts = path.getAllStartEndPoints();
+      //   return new Polygon(polyVerts, false); // Don't use open polygons here
+      // });
 
       var polyContainmentLevels = new PolygonContainmentLevel(polygons);
       var hierarchy = polyContainmentLevels.findContainmentTree();
+      console.log(polyContainmentLevels.toString());
       return hierarchy;
     };
 
@@ -390,6 +421,9 @@
       gui.add(config, "drawCurrentContour").onChange( function() { pb.redraw(); } ).name('drawCurrentContour').title('Draw the current single contour?');
       // prettier-ignore
       gui.add(config, "drawRawLineSegments").onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('drawRawLineSegments').title('Keep and draw raw linear segments?');
+
+      // prettier-ignore
+      gui.add(config, "drawPolygonNumbers").onChange( function() { pb.redraw(); } ).name('drawPolygonNumbers').title('Draw the assigned polygon number to each detected path point?');
 
       // prettier-ignore
       gui.add(config, "clearPathSegments").onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('clearPathSegments').title('Clear path buffer on each rebuild cycle (default=true).');

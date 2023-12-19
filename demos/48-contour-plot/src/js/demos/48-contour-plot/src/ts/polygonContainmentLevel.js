@@ -16,6 +16,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PolygonContainmentLevel = void 0;
+var matrixFill_1 = require("../../../../src/ts/utils/algorithms/matrixFill");
 var PolygonContainmentLevel = /** @class */ (function () {
     function PolygonContainmentLevel(polygons) {
         var _this = this;
@@ -24,15 +25,18 @@ var PolygonContainmentLevel = /** @class */ (function () {
             _this.unvisitedSet.add(index);
             return { polygon: poly, polygonIndex: index, isVisited: false, parentPolygon: null, childPolygons: [] };
         });
+        this.containmentMatrix = matrixFill_1.matrixFill(polygons.length, polygons.length, false);
         this.visitedCount = 0;
     }
     // static?
     PolygonContainmentLevel.prototype.findContainmentTree = function () {
+        this.buildContainmentMatrix();
         var count = 0; // Just for safety -> terminate after n polygons were visited
         // First: build mapping to remember all visited polygons
         while (this.visitedCount < this.poylgonStatus.length && count < this.poylgonStatus.length) {
             // Pick a polygon that was not visited yet
             var curPolyIndex = this.locateNonVisitedPolygon();
+            console.log("Next unvisited polygon", curPolyIndex);
             if (curPolyIndex == -1) {
                 return null; // This should not happen, but better be safe than sorry
             }
@@ -41,63 +45,112 @@ var PolygonContainmentLevel = /** @class */ (function () {
         }
         return this.poylgonStatus;
     };
+    PolygonContainmentLevel.prototype.buildContainmentMatrix = function () {
+        for (var i = 0; i < this.containmentMatrix.length; i++) {
+            var polyStatI = this.poylgonStatus[i];
+            // It's a square matrix
+            for (var j = 0; j < this.containmentMatrix.length; j++) {
+                var polyStatJ = this.poylgonStatus[j];
+                if (polyStatI.polygon.containsPolygon(polyStatJ.polygon)) {
+                    this.containmentMatrix[i][j] = true;
+                }
+            }
+        }
+    };
     PolygonContainmentLevel.prototype.processPolygonAt = function (curPolyIndex) {
+        console.log("processPolygonAt curPolyIndex", curPolyIndex);
         // Check all other polygons if they contain that polygon
         var curPolyStatus = this.poylgonStatus[curPolyIndex];
         // Mark as visited!
-        this.markVisited(curPolyStatus.polygonIndex);
-        var parentIndex = this.findAnyContainigPoly(curPolyStatus.polygonIndex);
+        this.markVisited(curPolyIndex); // curPolyStatus.polygonIndex);
+        var parentIndex = this.findMinContainigPoly(curPolyStatus.polygonIndex);
         if (parentIndex == -1) {
             // Huh? meaning? No parent found
+            console.log("No parent polygon found.", curPolyIndex);
         }
         else {
+            console.log("Parent polygon for " + curPolyIndex + " found.", parentIndex);
             // We found a parent candidate :)
             var parentPolyStatus = this.poylgonStatus[parentIndex];
-            curPolyStatus.parentPolygon = parentPolyStatus;
             // If the found candidate already has ...
             var i = 0;
-            // for( var i = 0; i < parentPolyStatus.childPolygons.length; i++ ) {
-            while (i < parentPolyStatus.childPolygons.length) {
-                if (curPolyStatus.polygon.containsPolygon(parentPolyStatus.childPolygons[i].polygon)) {
-                    var tmpChild = parentPolyStatus.childPolygons[i];
-                    // Remove child.
-                    parentPolyStatus.childPolygons.splice(i, 1);
-                    // And add it to ourselves :)
-                    curPolyStatus.childPolygons.push(tmpChild);
-                    tmpChild.parentPolygon = curPolyStatus;
-                }
-                else {
-                    // Local relation looks good. Just skip this child.
-                    i++;
-                }
-            }
+            // while (i < parentPolyStatus.childPolygons.length) {
+            //   if (curPolyIndex == parentPolyStatus.childPolygons[i].polygonIndex) {
+            //     continue;
+            //   }
+            //   // if (parentPolyStatus.childPolygons[i].polygon.containsPolygon(curPolyStatus.polygon)) {
+            //   if (this.containsPoly(i, curPolyIndex)) {
+            //     const tmpChild = parentPolyStatus.childPolygons[i];
+            //     // Remove child.
+            //     parentPolyStatus.childPolygons.splice(i, 1);
+            //     // And add it to ourselves :)
+            //     curPolyStatus.childPolygons.push(tmpChild);
+            //     tmpChild.parentPolygon = curPolyStatus;
+            //   } else {
+            //     // Local relation looks good. Just skip this child.
+            //     i++;
+            //   }
+            // }
             parentPolyStatus.childPolygons.push(curPolyStatus);
             curPolyStatus.parentPolygon = parentPolyStatus;
             // Note: this relation might not be final if any polygons between are found
         }
     };
+    PolygonContainmentLevel.prototype.findMinContainigPoly = function (polyIndex) {
+        var minIndex = this.findAnyContainigPoly(polyIndex);
+        for (var i = 0; i < this.poylgonStatus.length; i++) {
+            if (i == polyIndex) {
+                continue;
+            }
+            if (this.containsPoly(i, polyIndex) && this.containsPoly(minIndex, i)) {
+                minIndex = i;
+            }
+        }
+        return minIndex;
+    };
     PolygonContainmentLevel.prototype.findAnyContainigPoly = function (polyIndex) {
-        var curPolyStatus = this.poylgonStatus[polyIndex];
-        var unvisitedIter = this.unvisitedSet.entries();
-        var nextEntry;
-        while ((nextEntry = unvisitedIter.next())) {
-            var tempPolyIndex = nextEntry.value;
-            var tempPolyStatus = this.poylgonStatus[tempPolyIndex];
-            if (tempPolyStatus.polygon.containsPolygon(curPolyStatus.polygon)) {
+        // const curPolyStatus = this.poylgonStatus[polyIndex];
+        for (var tempPolyIndex = 0; tempPolyIndex < this.poylgonStatus.length; tempPolyIndex++) {
+            if (polyIndex == tempPolyIndex) {
+                continue;
+            }
+            if (this.containmentMatrix[tempPolyIndex][polyIndex]) {
+                console.log("Contains!", tempPolyIndex, "contains", polyIndex);
                 return tempPolyIndex;
+            }
+            else {
+                console.log("Does not contain.", tempPolyIndex, polyIndex);
             }
         }
         return -1;
     };
+    PolygonContainmentLevel.prototype.containsPoly = function (indexA, indexB) {
+        return this.containmentMatrix[indexA][indexB];
+    };
     PolygonContainmentLevel.prototype.markVisited = function (polyIndex) {
         this.unvisitedSet.delete(polyIndex);
+        this.poylgonStatus[polyIndex].isVisited = true;
         this.visitedCount++;
     };
     PolygonContainmentLevel.prototype.locateNonVisitedPolygon = function () {
         if (this.unvisitedSet.size == 0) {
             return -1;
         }
-        return this.unvisitedSet.entries().next().value;
+        return this.unvisitedSet.entries().next().value[1];
+    };
+    PolygonContainmentLevel.prototype.toString = function () {
+        var buffer = [];
+        this.toStringBuffer(buffer);
+        return buffer.join("\n");
+    };
+    PolygonContainmentLevel.prototype.toStringBuffer = function (buffer) {
+        for (var curIndex = 0; curIndex < this.poylgonStatus.length; curIndex++) {
+            buffer.push(curIndex + " children: " + this.poylgonStatus[curIndex].childPolygons
+                .map(function (child) {
+                return child.polygonIndex;
+            })
+                .join(", "));
+        }
     };
     return PolygonContainmentLevel;
 }());

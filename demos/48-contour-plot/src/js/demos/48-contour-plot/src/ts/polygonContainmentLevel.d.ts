@@ -25,11 +25,17 @@ export declare class PolygonContainmentLevel {
     private poylgonStatus;
     private unvisitedSet;
     private visitedCount;
+    private containmentMatrix;
     constructor(polygons: Polygon[]);
     findContainmentTree(): PolygonContainmentTree[] | null;
+    private buildContainmentMatrix;
     private processPolygonAt;
+    private findMinContainigPoly;
     private findAnyContainigPoly;
+    private containsPoly;
     private markVisited;
     private locateNonVisitedPolygon;
+    toString(): string;
+    toStringBuffer(buffer: string[]): void;
 }
 export {};
