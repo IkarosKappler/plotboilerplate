@@ -22,7 +22,7 @@ interface PolygonContainmentTree {
   polygon: Polygon;
   polygonIndex: number;
   isVisited: boolean;
-  childPolygons: Array<PolygonContainmentTree>;
+  children: Array<PolygonContainmentTree>;
 }
 
 export class PolygonContainmentLevel {
@@ -36,7 +36,7 @@ export class PolygonContainmentLevel {
     this.unvisitedSet = new Set<number>();
     this.poylgonStatus = polygons.map((poly: Polygon, index: number) => {
       this.unvisitedSet.add(index);
-      return { polygon: poly, polygonIndex: index, isVisited: false, parentPolygon: null, childPolygons: [] };
+      return { polygon: poly, polygonIndex: index, isVisited: false, parentPolygon: null, children: [] };
     });
     this.containmentMatrix = matrixFill(polygons.length, polygons.length, false);
     this.visitedCount = 0;
@@ -56,7 +56,7 @@ export class PolygonContainmentLevel {
     while (this.visitedCount < this.poylgonStatus.length && count < this.poylgonStatus.length) {
       // Pick a polygon that was not visited yet
       const curPolyIndex = this.locateNonVisitedPolygon();
-      console.log("Next unvisited polygon", curPolyIndex);
+      // console.log("Next unvisited polygon", curPolyIndex);
       if (curPolyIndex == -1) {
         return null; // This should not happen, but better be safe than sorry
       }
@@ -81,7 +81,7 @@ export class PolygonContainmentLevel {
   }
 
   private processPolygonAt(curPolyIndex: number) {
-    console.log("processPolygonAt curPolyIndex", curPolyIndex);
+    // console.log("processPolygonAt curPolyIndex", curPolyIndex);
     // Check all other polygons if they contain that polygon
     const curPolyStatus: PolygonContainmentTree = this.poylgonStatus[curPolyIndex];
     // Mark as visited!
@@ -90,32 +90,14 @@ export class PolygonContainmentLevel {
     const parentIndex = this.findMinContainigPoly(curPolyStatus.polygonIndex);
     if (parentIndex == -1) {
       // Huh? meaning? No parent found
-      console.log("No parent polygon found.", curPolyIndex);
+      // console.log("No parent polygon found.", curPolyIndex);
     } else {
-      console.log("Parent polygon for " + curPolyIndex + " found.", parentIndex);
+      // console.log("Parent polygon for " + curPolyIndex + " found.", parentIndex);
       // We found a parent candidate :)
       const parentPolyStatus = this.poylgonStatus[parentIndex];
       // If the found candidate already has ...
       var i: number = 0;
-      // while (i < parentPolyStatus.childPolygons.length) {
-      //   if (curPolyIndex == parentPolyStatus.childPolygons[i].polygonIndex) {
-      //     continue;
-      //   }
-      //   // if (parentPolyStatus.childPolygons[i].polygon.containsPolygon(curPolyStatus.polygon)) {
-      //   if (this.containsPoly(i, curPolyIndex)) {
-      //     const tmpChild = parentPolyStatus.childPolygons[i];
-      //     // Remove child.
-      //     parentPolyStatus.childPolygons.splice(i, 1);
-      //     // And add it to ourselves :)
-      //     curPolyStatus.childPolygons.push(tmpChild);
-      //     tmpChild.parentPolygon = curPolyStatus;
-      //   } else {
-      //     // Local relation looks good. Just skip this child.
-      //     i++;
-      //   }
-      // }
-
-      parentPolyStatus.childPolygons.push(curPolyStatus);
+      parentPolyStatus.children.push(curPolyStatus);
       curPolyStatus.parentPolygon = parentPolyStatus;
       // Note: this relation might not be final if any polygons between are found
     }
@@ -141,10 +123,10 @@ export class PolygonContainmentLevel {
         continue;
       }
       if (this.containmentMatrix[tempPolyIndex][polyIndex]) {
-        console.log("Contains!", tempPolyIndex, "contains", polyIndex);
+        // console.log("Contains!", tempPolyIndex, "contains", polyIndex);
         return tempPolyIndex;
       } else {
-        console.log("Does not contain.", tempPolyIndex, polyIndex);
+        // console.log("Does not contain.", tempPolyIndex, polyIndex);
       }
     }
     return -1;
@@ -176,7 +158,7 @@ export class PolygonContainmentLevel {
   public toStringBuffer(buffer: string[]): void {
     for (var curIndex = 0; curIndex < this.poylgonStatus.length; curIndex++) {
       buffer.push(
-        `${curIndex} children: ${this.poylgonStatus[curIndex].childPolygons
+        `${curIndex} children: ${this.poylgonStatus[curIndex].children
           .map((child: PolygonContainmentTree) => {
             return child.polygonIndex;
           })

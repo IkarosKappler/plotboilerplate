@@ -70,6 +70,7 @@
         wireframe: false,
 
         pattern: "sine", // { sine, cos, ripple, ripplefull }
+        pathDetecEpsilonExp: params.getNumber("pathDetecEpsilon", -1),
         sliceHeight: params.getNumber("sliceHeight", 0.4),
         closeGapType: params.getNumber("closeGapType", 0), // { "NONE" : 0, "ABOVE" : 1, "BELOW" : 2 }
         useTriangles: false,
@@ -308,8 +309,9 @@
         return new Polygon(polyVerts, false); // Don't use open polygons here
       });
 
-      var polyonHierarchyTree = computePolygonHierarchy(polygons);
-      console.log("polyonHierarchyTree", polyonHierarchyTree);
+      // Array<PolygonContainmentTree>
+      var polygonContainmentTrees = computePolygonHierarchy(polygons);
+      console.log("polygonContainmentTrees", polygonContainmentTrees);
 
       if (options.addToContourLines) {
         var heightRatio = getRatioByHeightValue(criticalHeightValue);
@@ -317,9 +319,14 @@
         // console.log("Adding color ");
         allContourLines.push({ pathSegments: pathSegments, color: color.cssRGB() });
       }
+      // if (options.addTo3DPreview) {
+      //   // console.log("Add contour");
+      //   contourScene.addContour(pathSegments);
+      // }
       if (options.addTo3DPreview) {
         // console.log("Add contour");
-        contourScene.addContour(pathSegments);
+        // contourScene.addContour(polyonHierarchyTree);
+        contourScene.addAllPolygonContainmentTrees(polygonContainmentTrees);
       }
     };
 
@@ -333,14 +340,6 @@
     // | Each segment must represent a closed polygon to make this work!
     // +-------------------------------
     var computePolygonHierarchy = function (polygons) {
-      // pathSegments: Array<GenericPath>
-
-      // // Convert paths to polygons
-      // polygons = paths.map(function (path) {
-      //   var polyVerts = path.getAllStartEndPoints();
-      //   return new Polygon(polyVerts, false); // Don't use open polygons here
-      // });
-
       var polyContainmentLevels = new PolygonContainmentLevel(polygons);
       var hierarchy = polyContainmentLevels.findContainmentTree();
       console.log(polyContainmentLevels.toString());
@@ -405,6 +404,8 @@
 
       // prettier-ignore
       gui.add(config, "drawSampleRaster").onChange( function() { pb.redraw(); } ).name('drawSampleRaster').title('Draw the sample raster to visualize the underlying data raster.');
+      // prettier-ignore
+      gui.add(config, "pathDetecEpsilonExp").min(-10).max(0).onChange( function() { pb.redraw(); } ).name('pathDetecEpsilonExp').title('Detection to use with this epsislon (exponent e^x).');
       // prettier-ignore
       gui.add(config, "sliceHeight").min(0.0).max(1.0).onChange( function() { rebuildCurrentPlotPlane(); pb.redraw(); } ).name('sliceHeight').title('Where to slice the current terrain model.');
       // prettier-ignore

@@ -19,7 +19,7 @@ interface PolygonContainmentTree {
     polygon: Polygon;
     polygonIndex: number;
     isVisited: boolean;
-    childPolygons: Array<PolygonContainmentTree>;
+    children: Array<PolygonContainmentTree>;
 }
 export declare class PolygonContainmentLevel {
     private poylgonStatus;
@@ -27,6 +27,12 @@ export declare class PolygonContainmentLevel {
     private visitedCount;
     private containmentMatrix;
     constructor(polygons: Polygon[]);
+    /**
+     * This method expects to be one great parent polyon to be present.
+     * If it's not present please create it.
+     *
+     * @returns
+     */
     findContainmentTree(): PolygonContainmentTree[] | null;
     private buildContainmentMatrix;
     private processPolygonAt;
