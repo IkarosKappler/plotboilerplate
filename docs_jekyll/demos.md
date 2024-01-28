@@ -257,7 +257,7 @@ date: 2024-01-29
 </div>
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/49-polygon-inside-polygon/index.html' | prepend: site.url }}">
-      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/NA.png');"></div>
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-202311240-0-polygon-inside-polygon-check.png');"></div>
    </a>
 </div>
 <div class="demo-box">
