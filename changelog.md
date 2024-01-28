@@ -1,5 +1,7 @@
 # Changelog
 
+- 2024-01-29
+  - Finalizing a first usable version of the contour plot calculation.
 - 2023-11-27
   - Added the `GenericPath.getAllStartEndPoints()` function.
 - 2023-11-24
