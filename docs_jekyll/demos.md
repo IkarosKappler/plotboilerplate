@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2023-10-10
+date: 2024-01-29
 ---
 
 <h3>Basics</h3>
@@ -248,6 +248,16 @@ date: 2023-10-10
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/47-closest-vector-projection-on-polygon/index.html' | prepend: site.url }}">
       <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20230926-0-polygon-line-intersections.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/48-contour-plot/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20231103-0-contour-plot.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/49-polygon-inside-polygon/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/NA.png');"></div>
    </a>
 </div>
 <div class="demo-box">
