@@ -1561,7 +1561,7 @@ class Polygon {
      *  - all polygon's vertices must be inside this polygon.
      *  - the polygon has no edge intersections with this polygon.
      *
-     * @param polygon
+     * @param {Polygon} polygon - The polygon to check if contained.
      * @return {boolean}
      */
     containsPolygon(polygon) {

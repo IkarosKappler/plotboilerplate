@@ -14,7 +14,7 @@ while true; do
     read -p "webpack and jekyll will be run again in this process. (y/n)? " yn
     case $yn in
         [Yy]* ) echo "Failsafe."; break;;
-        [Nn]* ) break;; # exit;;
+        [Nn]* ) exit;;
         * ) echo "Please answer yes or no.";;
     esac
 done

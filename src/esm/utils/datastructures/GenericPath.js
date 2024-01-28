@@ -1,7 +1,8 @@
 /**
- * @author  Ikaros Kappler
- * @version 1.0.0
- * @date    2022-10-17
+ * @author   Ikaros Kappler
+ * @version  1.1.0
+ * @date     2022-10-17
+ * @modified 2023-11-27 Added the `GenericPath.getAllStartEndPoints()` function.
  */
 export class GenericPath {
     constructor(startSegment) {
@@ -95,6 +96,22 @@ export class GenericPath {
      */
     getEndTangent() {
         return this.segments[this.segments.length - 1].getEndTangent();
+    }
+    /**
+     * Get the sequence of all start/end points of this path.
+     * Assumption is: each path segment's end point is located on the next segment's start point
+     * to shape a full connected path.
+     *
+     * No arcs are considered here, just plain linear segments.
+     *
+     * @returns {Array<Vertex>}
+     */
+    getAllStartEndPoints() {
+        const verts = [this.segments[0].getStartPoint()];
+        this.segments.forEach((segment) => {
+            verts.push(segment.getEndPoint());
+        });
+        return verts;
     }
 }
 //# sourceMappingURL=GenericPath.js.map
