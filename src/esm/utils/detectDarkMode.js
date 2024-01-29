@@ -17,6 +17,7 @@ export const detectDarkMode = (GUP) => {
         }
     }
     if (globalThis.matchMedia && globalThis.matchMedia("(prefers-color-scheme: dark)").matches) {
+        console.log("matchMedia darkmode");
         // dark mode by system
         return true;
     }

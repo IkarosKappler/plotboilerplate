@@ -1,6 +1,10 @@
 # Changelog
 
-- 2024-01-29 [v1.22.1]
+- 2024-01-29
+  - Adding new demo 50-reuleaux-polygons.
+  - Refactoring the NGons helper and porting it to Typescript.
+  - Updating the demo 49-polygon-inside-polygon with the new NGons path.
+- 2024-01-28 [v1.22.1]
   - Finalizing a first usable version of the contour plot calculation.
 - 2023-11-27
   - Added the `GenericPath.getAllStartEndPoints()` function.
