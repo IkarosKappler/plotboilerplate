@@ -21,7 +21,6 @@
 
   window.addEventListener("load", function () {
     var isDarkmode = detectDarkMode(GUP);
-    console.log("isDarkmode", isDarkmode);
     var params = new Params(GUP);
 
     // All config params are optional.
@@ -59,8 +58,6 @@
     // globalThis.pb = pb;
     pb.drawConfig.circleSector.lineWidth = 3;
     pb.drawConfig.circleSector.color = "rgba(255,64,0,0.75)";
-
-    console.log(pb.drawConfig);
 
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
@@ -141,7 +138,6 @@
     // +-------------------------------
     {
       var gui = pb.createGUI();
-      // var fold0 = gui.addFolder("Mesh");
       // prettier-ignore
       gui.add(config, "cardinality").min(1).max(10).step(1).onChange( function() { rebuild(); pb.redraw(); } ).name('cardinality').title("How many vertices on the polygon (measured in 2n+1).");
       // prettier-ignore
