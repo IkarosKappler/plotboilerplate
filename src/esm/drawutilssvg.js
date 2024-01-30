@@ -44,8 +44,8 @@
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-10-04 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
- *
- * @version  1.6.7
+ * @modified 2024-01-30 Fixing an issue with immutable style sets; changes to the global draw config did not reflect here (do now).
+ * @version  1.6.8
  **/
 import { CircleSector } from "./CircleSector";
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -131,8 +131,8 @@ export class drawutilssvg {
         // Which default styles to add? -> All from the DrawConfig.
         // Compare with DrawConfig interface
         const keys = {
-            // "bezier": "CubicBezierCurve", // TODO: is this correct?
-            "bezierPath": "BezierPath",
+            "bezier": "CubicBezierCurve",
+            //"bezierPath": "BezierPath", // TODO: is this correct?
             "polygon": "Polygon",
             "triangle": "Triangle",
             "ellipse": "Ellipse",

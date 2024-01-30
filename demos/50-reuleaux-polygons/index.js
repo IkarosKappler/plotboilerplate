@@ -58,12 +58,16 @@
     );
     // globalThis.pb = pb;
     pb.drawConfig.circleSector.lineWidth = 3;
+    pb.drawConfig.circleSector.color = "rgba(255,64,0,0.75)";
+
     console.log(pb.drawConfig);
 
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
         cardinality: params.getNumber("cardinality", 1),
-        radius: params.getNumber("radius", 100)
+        radius: params.getNumber("radius", 100),
+        drawCircles: false,
+        drawVertNumbers: false
       },
       GUP
     );
@@ -73,7 +77,7 @@
     var circleSectors = [];
 
     var rebuild = function () {
-      // circleSectors = [];
+      circleSectors = [];
       ngon = new NGons.ngon(config.cardinality * 2 + 1, config.radius);
       ngon.move(ngonCenter);
 
@@ -118,25 +122,18 @@
       if (ngon == null) {
         return;
       }
-      // Draw our stuff
 
-      for (var i = 0; i < circleSectors.length; i++) {
-        var sector = circleSectors[i];
-        draw.circle(sector.circle.center, sector.circle.radius, "rgba(0,192,0,0.5)", 1);
-
-        // Draw circle arc
-        // draw.circleArc(
-        //   sector.circle.center, // center: XYCoords,
-        //   sector.circle.radius, // radius: number,
-        //   sector.startAngle,
-        //   sector.endAngle,
-        //   "red",
-        //   2, // lineWidth?: number,
-        //   { asSegment: false } // options?: { asSegment?: boolean } & StrokeOptions
-        // );
+      // Draw circles before anything else is drawn
+      if (config.drawCircles) {
+        for (var i = 0; i < circleSectors.length; i++) {
+          var sector = circleSectors[i];
+          draw.circle(sector.circle.center, sector.circle.radius, "rgba(0,192,0,0.25)", 3);
+        }
       }
 
-      drawVertLabels(draw, fill);
+      if (config.drawVertNumbers) {
+        drawVertLabels(draw, fill);
+      }
     };
 
     // +---------------------------------------------------------------------------------
@@ -149,6 +146,11 @@
       gui.add(config, "cardinality").min(1).max(10).step(1).onChange( function() { rebuild(); pb.redraw(); } ).name('cardinality').title("How many vertices on the polygon (measured in 2n+1).");
       // prettier-ignore
       gui.add(config, "radius").min(0).max(200).step(1).onChange( function() { rebuild(); pb.redraw(); } ).name('radius').title("The radius of the polygon.");
+      // prettier-ignore
+      gui.add(config, "drawCircles").onChange( function() { pb.redraw(); } ).name('drawCircles').title("Draw circles?");
+
+      // prettier-ignore
+      gui.add(config, "drawVertNumbers").onChange( function() { pb.redraw(); } ).name('drawVertNumbers').title("Draw vertex numbers?");
     }
 
     pb.config.preDraw = redraw;

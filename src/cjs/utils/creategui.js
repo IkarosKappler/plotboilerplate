@@ -186,6 +186,7 @@ globalThis.utils.createGUI = function (pb, props) {
         // console.log("basePath", basePath, i, conf[i], conf[i].hasOwnProperty("lineWidth"));
         if (conf[i].hasOwnProperty("lineWidth")) {
           try {
+            // console.log("adding ", basePath, i);
             fold
               .add(conf[i], "lineWidth")
               .min(1)
@@ -197,6 +198,7 @@ globalThis.utils.createGUI = function (pb, props) {
               .name(basePath + i + ".lineWidth")
               .title(basePath + i + ".lineWidth")
               .listen();
+            // console.log("adding 2", basePath, i);
           } catch (e) {
             console.error("[createGUI] Invalid lineWidth value, gui library cannot recognize.", conf[i]["lineWidth"]);
           }
