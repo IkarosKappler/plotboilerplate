@@ -118,7 +118,7 @@ var drawutilssvg = /** @class */ (function () {
         // Which default styles to add? -> All from the DrawConfig.
         // Compare with DrawConfig interface
         var keys = {
-            // "bezier": "CubicBezierCurve", // TODO: is this correct?
+            "bezier": "CubicBezierCurve",
             "bezierPath": "BezierPath",
             "polygon": "Polygon",
             "triangle": "Triangle",

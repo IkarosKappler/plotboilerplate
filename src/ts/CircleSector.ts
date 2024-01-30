@@ -3,7 +3,8 @@
  * @date     2020-12-17
  * @modified 2021-01-20 Added UID.
  * @modified 2021-02-26 Fixed an error in the svg-arc-calculation (case angle<90deg and anti-clockwise).
- * @version  1.1.1
+ * @modified 2024-01-30 Added a missing type in the `describeSVGArc` function.
+ * @version  1.1.2
  **/
 
 import { Circle } from "./Circle";
@@ -161,7 +162,7 @@ export class CircleSector implements SVGSerializable {
         sweepFlag = 1;
       }
 
-      const pathData = [];
+      const pathData: SVGPathParams = [];
       if (options.moveToStart) {
         pathData.push("M", start.x, start.y);
       }

@@ -389,7 +389,7 @@ export class PlotBoilerplate {
    *                                                   Note that changes from the postDraw hook might not be visible in the export.
    * @param {string=} [config.title=null] - Specify any hover tile here. It will be attached as a `title` attribute to the most elevated element.
    */
-  constructor(config: PBParams) {
+  constructor(config: PBParams, drawConfig: DrawConfig) {
     // This should be in some static block ...
     VertexAttr.model = {
       bezierAutoAdjust: false,

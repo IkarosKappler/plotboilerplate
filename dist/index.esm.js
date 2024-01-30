@@ -4440,7 +4440,8 @@ Circle.circleUtils = {
  * @date     2020-12-17
  * @modified 2021-01-20 Added UID.
  * @modified 2021-02-26 Fixed an error in the svg-arc-calculation (case angle<90deg and anti-clockwise).
- * @version  1.1.1
+ * @modified 2024-01-30 Added a missing type in the `describeSVGArc` function.
+ * @version  1.1.2
  **/
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
@@ -4649,7 +4650,7 @@ class drawutilssvg {
         // Which default styles to add? -> All from the DrawConfig.
         // Compare with DrawConfig interface
         const keys = {
-            // "bezier": "CubicBezierCurve", // TODO: is this correct?
+            "bezier": "CubicBezierCurve",
             "bezierPath": "BezierPath",
             "polygon": "Polygon",
             "triangle": "Triangle",
@@ -8556,14 +8557,14 @@ const geomutils = {
         if (insideAngle < 0)
             insideAngle = 2 * Math.PI + insideAngle;
         if (!clockwise)
-            insideAngle = (2 * Math.PI - insideAngle) * (-1);
+            insideAngle = (2 * Math.PI - insideAngle) * -1;
         // Scale the rotated lines to the max leg length (looks better)
         const lineLength = Math.max(lineAB.length(), lineAC.length());
         const scaleFactor = lineLength / lineAB.length();
         var result = [];
         for (var i = 1; i < n; i++) {
             // Compute the i-th inner sector line
-            result.push(new Line(pA, pB.clone().rotate((-i * (insideAngle / n)), pA)).scale(scaleFactor));
+            result.push(new Line(pA, pB.clone().rotate(-i * (insideAngle / n), pA)).scale(scaleFactor));
         }
         return result;
     },

@@ -183,18 +183,24 @@ globalThis.utils.createGUI = function (pb, props) {
             console.error("[createGUI] Invalid color value, gui library cannot recognize.", conf[i]["color"]);
           }
         }
-        if (conf[i].hasOwnProperty("lineWidth"))
-          fold
-            .add(conf[i], "lineWidth")
-            .min(1)
-            .max(10)
-            .step(1)
-            .onChange(function () {
-              _self.redraw();
-            })
-            .name(basePath + i + ".lineWidth")
-            .title(basePath + i + ".lineWidth")
-            .listen();
+        // console.log("basePath", basePath, i, conf[i], conf[i].hasOwnProperty("lineWidth"));
+        if (conf[i].hasOwnProperty("lineWidth")) {
+          try {
+            fold
+              .add(conf[i], "lineWidth")
+              .min(1)
+              .max(10)
+              .step(1)
+              .onChange(function () {
+                _self.redraw();
+              })
+              .name(basePath + i + ".lineWidth")
+              .title(basePath + i + ".lineWidth")
+              .listen();
+          } catch (e) {
+            console.error("[createGUI] Invalid lineWidth value, gui library cannot recognize.", conf[i]["lineWidth"]);
+          }
+        }
         for (var e in conf[i]) {
           if (conf[i].hasOwnProperty(e) && typeof conf[i][e] == "object") {
             // console.log(e);

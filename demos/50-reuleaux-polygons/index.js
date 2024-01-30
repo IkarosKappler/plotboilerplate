@@ -56,6 +56,9 @@
         GUP
       )
     );
+    // globalThis.pb = pb;
+    pb.drawConfig.circleSector.lineWidth = 3;
+    console.log(pb.drawConfig);
 
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
@@ -67,13 +70,29 @@
 
     var ngonCenter = new Vertex();
     var ngon = null;
+    var circleSectors = [];
 
     var rebuild = function () {
+      // circleSectors = [];
       ngon = new NGons.ngon(config.cardinality * 2 + 1, config.radius);
       ngon.move(ngonCenter);
 
       pb.removeAll();
       pb.add([ngonCenter, ngon]);
+
+      const n = ngon.vertices.length;
+      for (var i = 0; i < n; i++) {
+        var curVert = ngon.vertices[i];
+        var center = ngon.vertices[(i + Math.floor(n / 2)) % n];
+        var dist = curVert.distance(center);
+
+        // Make circle and circle arc
+        var startAngle = curVert.angle(center);
+        var endAngle = startAngle + Math.PI / n;
+        var circle = new Circle(ngon.vertices[i], dist);
+        circleSectors.push(new CircleSector(circle, startAngle, endAngle));
+      }
+      pb.add(circleSectors);
     };
 
     var init = function () {
@@ -100,28 +119,21 @@
         return;
       }
       // Draw our stuff
-      // fill.polygon(ngon, nstar.containsPolygon(ngon) ? "rgba(0,192,0,0.5)" : "rgba(192,0,0,0.5)");
-      const n = ngon.vertices.length;
-      for (var i = 0; i < n; i++) {
-        var curVert = ngon.vertices[i];
-        // var nextVert = ngon.vertices[(i + 1) % n];
-        var center = ngon.vertices[(i + Math.floor(n / 2)) % n];
-        var dist = curVert.distance(center);
-        draw.circle(ngon.vertices[i], dist, "rgba(0,192,0,0.5)", 1);
+
+      for (var i = 0; i < circleSectors.length; i++) {
+        var sector = circleSectors[i];
+        draw.circle(sector.circle.center, sector.circle.radius, "rgba(0,192,0,0.5)", 1);
 
         // Draw circle arc
-        var startAngle = curVert.angle(center);
-        var endAngle = startAngle + Math.PI / n;
-        // var endAngle = nextVert.angle(center);
-        draw.circleArc(
-          curVert, // curVert, // center: XYCoords,
-          dist, // radius: number,
-          startAngle,
-          endAngle,
-          "red",
-          2, // lineWidth?: number,
-          { asSegment: true } // options?: { asSegment?: boolean } & StrokeOptions
-        );
+        // draw.circleArc(
+        //   sector.circle.center, // center: XYCoords,
+        //   sector.circle.radius, // radius: number,
+        //   sector.startAngle,
+        //   sector.endAngle,
+        //   "red",
+        //   2, // lineWidth?: number,
+        //   { asSegment: false } // options?: { asSegment?: boolean } & StrokeOptions
+        // );
       }
 
       drawVertLabels(draw, fill);
@@ -139,7 +151,7 @@
       gui.add(config, "radius").min(0).max(200).step(1).onChange( function() { rebuild(); pb.redraw(); } ).name('radius').title("The radius of the polygon.");
     }
 
-    pb.config.postDraw = redraw;
+    pb.config.preDraw = redraw;
     init();
     pb.redraw();
   });

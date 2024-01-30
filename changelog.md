@@ -1,5 +1,7 @@
 # Changelog
 
+- 2024-01-30
+  - Added a missing type in the `drawutilssvg.describeSVGArc` function.
 - 2024-01-29
   - Adding new demo 50-reuleaux-polygons.
   - Refactoring the NGons helper and porting it to Typescript.
