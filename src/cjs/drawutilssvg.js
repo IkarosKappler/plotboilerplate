@@ -67,6 +67,10 @@ var RAD_TO_DEG = 180 / Math.PI;
  */
 var drawutilssvg = /** @class */ (function () {
     /**
+     * Passed from primary to secondary instance.
+     */
+    //private nodeStyle: SVGStyleElement;
+    /**
      * The constructor.
      *
      * @constructor
@@ -80,12 +84,13 @@ var drawutilssvg = /** @class */ (function () {
      * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
      * @param {SVGGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
-    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode, bufferGNode, nodeDefs, bufferNodeDefs) {
+    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode, bufferGNode, nodeDefs, bufferNodeDefs, nodeStyle) {
         this.svgNode = svgNode;
         this.offset = new Vertex_1.Vertex(0, 0).set(offset);
         this.scale = new Vertex_1.Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
         this.isSecondary = Boolean(isSecondary);
+        this.drawConfig = drawConfig;
         this.drawlibConfiguration = {};
         this.cache = new Map();
         this.setSize(canvasSize);
@@ -97,6 +102,9 @@ var drawutilssvg = /** @class */ (function () {
             this.bufferGNode = bufferGNode;
             this.nodeDefs = nodeDefs;
             this.bufferedNodeDefs = bufferNodeDefs;
+            if (nodeStyle) {
+                this.nodeStyle = nodeStyle;
+            }
         }
         else {
             this.addStyleDefs(drawConfig);
@@ -115,10 +123,18 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.addStyleDefs = function (drawConfig) {
         this.nodeStyle = this.createSVGNode("style");
         this.svgNode.appendChild(this.nodeStyle);
+        this.rebuildStyleDefs(drawConfig);
+    };
+    /**
+     * This method is required to re-define the global style defs. It is needed
+     * if any value in the DrawConfig changed in the meantime.
+     * @param drawConfig
+     */
+    drawutilssvg.prototype.rebuildStyleDefs = function (drawConfig) {
         // Which default styles to add? -> All from the DrawConfig.
         // Compare with DrawConfig interface
         var keys = {
-            "bezier": "CubicBezierCurve",
+            // "bezier": "CubicBezierCurve", // TODO: is this correct?
             "bezierPath": "BezierPath",
             "polygon": "Polygon",
             "triangle": "Triangle",
@@ -134,6 +150,7 @@ var drawutilssvg = /** @class */ (function () {
         };
         // Question: why isn't this working if the svgNode is created dynamically? (nodeStyle.sheet is null)
         var rules = [];
+        // console.log("drawConfig", drawConfig);
         for (var k in keys) {
             var className = keys[k];
             var drawSettings = drawConfig[k];
@@ -331,9 +348,9 @@ var drawutilssvg = /** @class */ (function () {
      * that under the hood the same gl context and gl program will be used.
      */
     drawutilssvg.prototype.copyInstance = function (fillShapes) {
-        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, null, // no DrawConfig – this will work as long as `isSecondary===true`
+        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, this.drawConfig, // null as any as DrawConfig, // no DrawConfig – this will work as long as `isSecondary===true`
         true, // isSecondary
-        this.gNode, this.bufferGNode, this.nodeDefs, this.bufferedNodeDefs);
+        this.gNode, this.bufferGNode, this.nodeDefs, this.bufferedNodeDefs, this.nodeStyle);
         return copy;
     };
     /**
@@ -346,20 +363,6 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.setConfiguration = function (configuration) {
         this.drawlibConfiguration = configuration;
     };
-    // /**
-    //  * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
-    //  *
-    //  * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
-    //  * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
-    //  * for how line dashes work.
-    //  *
-    //  * @method
-    //  * @param {Array<number> lineDashes - The line-dash array configuration.
-    //  * @returns {void}
-    //  */
-    // setLineDash(lineDashes: Array<number>) {
-    //   this.lineDash = lineDashes;
-    // }
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
@@ -419,6 +422,7 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      **/
     drawutilssvg.prototype.endDrawCycle = function (renderTime) {
+        this.rebuildStyleDefs(this.drawConfig);
         if (!this.isSecondary) {
             // All elements are drawn into the buffer; they are NOT yet visible, not did the browser perform any
             // layout updates.

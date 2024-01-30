@@ -44,7 +44,7 @@
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-10-04 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
- *
+ * @modified 2024-01-30 Fixing an issue with immutable style sets; changes to the global draw config did not reflect here (do now).
  * @version  1.6.7
  **/
 
@@ -197,6 +197,16 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   private isSecondary: boolean;
 
   /**
+   * Keep the initial draw config to rebuild styles on each render loop.
+   */
+  private drawConfig: DrawConfig;
+
+  /**
+   * Passed from primary to secondary instance.
+   */
+  //private nodeStyle: SVGStyleElement;
+
+  /**
    * The constructor.
    *
    * @constructor
@@ -221,13 +231,15 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     gNode?: SVGGElement,
     bufferGNode?: SVGGElement,
     nodeDefs?: SVGDefsElement,
-    bufferNodeDefs?: SVGDefsElement
+    bufferNodeDefs?: SVGDefsElement,
+    nodeStyle?: SVGStyleElement
   ) {
     this.svgNode = svgNode;
     this.offset = new Vertex(0, 0).set(offset);
     this.scale = new Vertex(1, 1).set(scale);
     this.fillShapes = fillShapes;
     this.isSecondary = Boolean(isSecondary);
+    this.drawConfig = drawConfig;
 
     this.drawlibConfiguration = {} as DrawLibConfiguration;
     this.cache = new Map<UID, SVGElement>();
@@ -240,6 +252,9 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       this.bufferGNode = bufferGNode;
       this.nodeDefs = nodeDefs;
       this.bufferedNodeDefs = bufferNodeDefs;
+      if (nodeStyle) {
+        this.nodeStyle = nodeStyle;
+      }
     } else {
       this.addStyleDefs(drawConfig);
       this.addDefsNode();
@@ -258,7 +273,15 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   private addStyleDefs(drawConfig: DrawConfig) {
     this.nodeStyle = this.createSVGNode("style") as SVGStyleElement;
     this.svgNode.appendChild(this.nodeStyle);
+    this.rebuildStyleDefs(drawConfig);
+  }
 
+  /**
+   * This method is required to re-define the global style defs. It is needed
+   * if any value in the DrawConfig changed in the meantime.
+   * @param drawConfig
+   */
+  private rebuildStyleDefs(drawConfig: DrawConfig) {
     // Which default styles to add? -> All from the DrawConfig.
     // Compare with DrawConfig interface
     const keys = {
@@ -278,6 +301,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     };
     // Question: why isn't this working if the svgNode is created dynamically? (nodeStyle.sheet is null)
     const rules: Array<string> = [];
+    // console.log("drawConfig", drawConfig);
     for (var k in keys) {
       const className: string = keys[k];
       const drawSettings: DrawSettings | undefined = drawConfig[k];
@@ -504,12 +528,13 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       this.scale,
       this.canvasSize,
       fillShapes,
-      null as any as DrawConfig, // no DrawConfig – this will work as long as `isSecondary===true`
+      this.drawConfig, // null as any as DrawConfig, // no DrawConfig – this will work as long as `isSecondary===true`
       true, // isSecondary
       this.gNode,
       this.bufferGNode,
       this.nodeDefs,
-      this.bufferedNodeDefs
+      this.bufferedNodeDefs,
+      this.nodeStyle
     );
     return copy;
   }
@@ -524,21 +549,6 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   setConfiguration(configuration: DrawLibConfiguration): void {
     this.drawlibConfiguration = configuration;
   }
-
-  // /**
-  //  * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
-  //  *
-  //  * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
-  //  * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
-  //  * for how line dashes work.
-  //  *
-  //  * @method
-  //  * @param {Array<number> lineDashes - The line-dash array configuration.
-  //  * @returns {void}
-  //  */
-  // setLineDash(lineDashes: Array<number>) {
-  //   this.lineDash = lineDashes;
-  // }
 
   /**
    * This method shouled be called each time the currently drawn `Drawable` changes.
@@ -603,6 +613,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @instance
    **/
   endDrawCycle(renderTime: number) {
+    this.rebuildStyleDefs(this.drawConfig);
     if (!this.isSecondary) {
       // All elements are drawn into the buffer; they are NOT yet visible, not did the browser perform any
       // layout updates.

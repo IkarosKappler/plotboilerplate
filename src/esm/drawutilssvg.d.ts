@@ -156,6 +156,13 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      */
     private isSecondary;
     /**
+     * Keep the initial draw config to rebuild styles on each render loop.
+     */
+    private drawConfig;
+    /**
+     * Passed from primary to secondary instance.
+     */
+    /**
      * The constructor.
      *
      * @constructor
@@ -169,7 +176,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
      * @param {SVGGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
-    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, drawConfig: DrawConfig, isSecondary?: boolean, gNode?: SVGGElement, bufferGNode?: SVGGElement, nodeDefs?: SVGDefsElement, bufferNodeDefs?: SVGDefsElement);
+    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, drawConfig: DrawConfig, isSecondary?: boolean, gNode?: SVGGElement, bufferGNode?: SVGGElement, nodeDefs?: SVGDefsElement, bufferNodeDefs?: SVGDefsElement, nodeStyle?: SVGStyleElement);
     /**
      * Adds a default style defintion based on the passed DrawConfig.
      * Twaek the draw config to change default colors or line thicknesses.
@@ -177,6 +184,12 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {DrawConfig} drawConfig
      */
     private addStyleDefs;
+    /**
+     * This method is required to re-define the global style defs. It is needed
+     * if any value in the DrawConfig changed in the meantime.
+     * @param drawConfig
+     */
+    private rebuildStyleDefs;
     /**
      * Adds the internal <defs> node.
      */
