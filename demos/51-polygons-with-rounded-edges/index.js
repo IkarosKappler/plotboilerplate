@@ -61,7 +61,7 @@
 
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
-        cardinality: params.getNumber("cardinality", 1),
+        cardinality: params.getNumber("cardinality", 2),
         // radius: params.getNumber("radius", 100),
         drawCircles: false,
         drawRadii: false,
@@ -71,17 +71,18 @@
     );
 
     var rebuildPolygon = function () {
-      // if (polygon != null) {
-      //   // Remove old listeners before dropping the old polygon.
-      //   // Let's be kind to the browser.
-      //   for (var i = 0; i < polygon.vertices.length; i++) {
-      //     polygon.vertices[i].listeners.removeDragListener(rebuild);
-      //   }
-      // }
-      polygon = pb.viewport().toPolygon().getInterpolationPolygon(config.cardinality);
+      if (polygon != null) {
+        // Remove old listeners before dropping the old polygon.
+        // Let's be kind to the browser.
+        for (var i = 0; i < polygon.vertices.length; i++) {
+          polygon.vertices[i].listeners.removeDragListener(rebuild);
+        }
+      }
+      var vp = pb.viewport();
+      polygon = NGons.ngon(config.cardinality * 2 + 1, Math.min(vp.width, vp.height) / 2);
+
       polygon.vertices.forEach(function (vertex, index) {
-        // We added one point to each edge; scale them a bit up to get a nice
-        // convex polygon.
+        // The current polygon is very regular. Add some asymmetry.
         if (index % 2 === 1) {
           vertex.scale(1.3, pb.viewport().getCenter());
         }
@@ -187,8 +188,6 @@
       var gui = pb.createGUI();
       // prettier-ignore
       gui.add(config, "cardinality").min(1).max(10).step(1).onChange( function() { rebuildPolygon(); rebuild(); pb.redraw(); } ).name('cardinality').title("How many vertices on the polygon (measured in 2n+1).");
-      // prettier-ignore
-      // gui.add(config, "radius").min(0).max(200).step(1).onChange( function() { rebuild(); pb.redraw(); } ).name('radius').title("The radius of the polygon.");
       // prettier-ignore
       gui.add(config, "drawCircles").onChange( function() { pb.redraw(); } ).name('drawCircles').title("Draw circles?");
       // prettier-ignore
