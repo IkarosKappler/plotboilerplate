@@ -1,5 +1,8 @@
 # Changelog
 
+- 2024-02-06
+  - Finilaizing the demo: polygons with round edges.
+  - Adding new demo 52: metaballs 2d.
 - 2024-01-30
   - Added a missing type in the `drawutilssvg.describeSVGArc` function.
   - Fixing an issue with `drawutilssvg` immutable style sets; changes to the global draw config did not reflect here (do now).
