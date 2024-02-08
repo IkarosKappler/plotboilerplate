@@ -72,18 +72,21 @@
 
     var circles = [];
     var containingCircles = [];
-    // Array< { circleA, circleB, doIntersect } >
+    // Array< { circleA, circleB, outerCircleA, outerCircleB, doIntersect, circlePointsA:[], circlePointsB:[] } >
     var inverseCirclesPairs = [];
 
     var rebuildMetaballs = function () {
       inverseCirclesPairs = [];
       for (var i = 0; i < containingCircles.length; i++) {
         var circleA = containingCircles[i];
+        var centerCircleA = circles[i];
         for (var j = 0; j < containingCircles.length; j++) {
           if (i == j) {
             continue;
           }
           var circleB = containingCircles[j];
+          var centerCircleB = circles[j];
+
           // We have two different circles here
           // Find intersection line of these two circles
           var radicalLine = circleA.circleIntersection(circleB);
@@ -97,8 +100,21 @@
           var outerCircle1 = new Circle(radicalLine.a, config.metaRadiusAddon);
           var outerCircle2 = new Circle(radicalLine.b, config.metaRadiusAddon);
           var doIntersect = outerCircle1.circleIntersection(outerCircle2) != null;
-          console.log("doIntersect", doIntersect);
-          inverseCirclesPairs.push({ circleA: outerCircle1, circleB: outerCircle2, doIntersect: doIntersect });
+          // console.log("doIntersect", doIntersect);
+          // Now find the intersection points between inner and outer circles.
+          // We will need them later.
+          var circlePointsA = [centerCircleA.closestPoint(outerCircle1.center), centerCircleA.closestPoint(outerCircle2.center)];
+          var circlePointsB = [centerCircleB.closestPoint(outerCircle1.center), centerCircleB.closestPoint(outerCircle2.center)];
+
+          inverseCirclesPairs.push({
+            circleA: circleA,
+            outerCircleA: outerCircle1,
+            circleB: circleB,
+            outerCircleB: outerCircle2,
+            doIntersect: doIntersect,
+            circlePointsA: circlePointsA,
+            circlePointsB: circlePointsB
+          });
         }
       }
     };
@@ -111,14 +127,28 @@
       }
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Generate a random circle.
+    // +-------------------------------
+    var getRandomCircle = function () {
+      var vp = pb.viewport();
+      var circle = new Circle(vp.randomPoint(0.35, 0.35), (Math.random() * Math.min(vp.width, vp.height)) / 5);
+      // circles.push(circle);
+
+      // Install a circle helper: change radius via a second control point.
+      var radiusPoint = circle.vertAt(Math.PI * 1.75);
+      pb.add(radiusPoint);
+      new CircleHelper(circle, radiusPoint, pb);
+      radiusPoint.listeners.addDragListener(function (e) {
+        rebuildContainingCircles();
+        rebuildMetaballs();
+      });
+      return circle;
+    };
+
     var reinit = function () {
-      circles = [];
       pb.removeAll();
-      for (var i = 0; i < config.numCircles; i++) {
-        var vp = pb.viewport();
-        var circle = new Circle(vp.randomPoint(0.35, 0.35), (Math.random() * Math.min(vp.width, vp.height)) / 5);
-        circles.push(circle);
-      }
+      arrayResize(circles, config.numCircles, getRandomCircle);
       pb.add(circles);
       // Install move listeners
       for (var i = 0; i < config.numCircles; i++) {
@@ -162,8 +192,13 @@
         var circlePair = inverseCirclesPairs[i];
         var color = circlePair.doIntersect ? "rgba(192,192,192,0.5)" : "orange";
         var lineWidth = circlePair.doIntersect ? 1.0 : 2.0;
-        draw.circle(circlePair.circleA.center, circlePair.circleA.radius, color, lineWidth);
-        draw.circle(circlePair.circleB.center, circlePair.circleB.radius, color, lineWidth);
+        draw.circle(circlePair.outerCircleA.center, circlePair.outerCircleA.radius, color, lineWidth);
+        draw.circle(circlePair.outerCircleB.center, circlePair.outerCircleB.radius, color, lineWidth);
+
+        draw.diamondHandle(circlePair.circlePointsA[0], 5, "red");
+        draw.diamondHandle(circlePair.circlePointsA[1], 5, "red");
+        draw.diamondHandle(circlePair.circlePointsB[0], 5, "red");
+        draw.diamondHandle(circlePair.circlePointsB[1], 5, "red");
       }
     };
 
@@ -186,7 +221,7 @@
       // gui.add(config, "drawVertNumbers").onChange( function() { pb.redraw(); } ).name('drawVertNumbers').title("Draw vertex numbers?");
     }
 
-    pb.config.preDraw = redraw;
+    pb.config.postDraw = redraw;
     init();
     rebuildMetaballs();
     pb.redraw();

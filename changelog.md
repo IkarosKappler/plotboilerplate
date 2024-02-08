@@ -1,5 +1,7 @@
 # Changelog
 
+- 2024-02-07
+  - Added the `src/ts/utils/algorithms/arrayResize` utility function.
 - 2024-02-06
   - Finilaizing the demo: polygons with round edges.
   - Adding new demo 52: metaballs 2d.
