@@ -77,24 +77,20 @@
 
     var rebuildMetaballs = function () {
       inverseCirclesPairs = [];
+
+      var radicalLineMatrix = CircleIntersections.buildRadicalLineMatrix(containingCircles);
       for (var i = 0; i < containingCircles.length; i++) {
         var circleA = containingCircles[i];
         var centerCircleA = circles[i];
-        for (var j = 0; j < containingCircles.length; j++) {
-          if (i == j) {
-            continue;
-          }
-          var circleB = containingCircles[j];
-          var centerCircleB = circles[j];
-
-          // We have two different circles here
-          // Find intersection line of these two circles
-          var radicalLine = circleA.circleIntersection(circleB);
+        for (var j = i + 1; j < containingCircles.length; j++) {
+          var radicalLine = radicalLineMatrix[i][j];
           if (radicalLine == null) {
             // The two circles do not have an intersection.
             // console.log("Circles", i, j, "do not have any intersections");
             continue;
           }
+          var circleB = containingCircles[j];
+          var centerCircleB = circles[j];
           // But if they have -> compute. outer circle(s).
           // They are symmetrical.
           var outerCircle1 = new Circle(radicalLine.a, config.metaRadiusAddon);
@@ -195,10 +191,18 @@
         draw.circle(circlePair.outerCircleA.center, circlePair.outerCircleA.radius, color, lineWidth);
         draw.circle(circlePair.outerCircleB.center, circlePair.outerCircleB.radius, color, lineWidth);
 
+        // And draw intersection points
         draw.diamondHandle(circlePair.circlePointsA[0], 5, "red");
         draw.diamondHandle(circlePair.circlePointsA[1], 5, "red");
         draw.diamondHandle(circlePair.circlePointsB[0], 5, "red");
         draw.diamondHandle(circlePair.circlePointsB[1], 5, "red");
+      }
+
+      // Draw partial arcs.
+      for (var i = 0; i < circles.length; i++) {
+        var innerCircle = circles[i];
+        // var outerCircle = containingCircles[i];
+        // Collect all points on this circle
       }
     };
 
