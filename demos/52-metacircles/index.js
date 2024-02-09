@@ -204,7 +204,94 @@
         // var outerCircle = containingCircles[i];
         // Collect all points on this circle
       }
+
+      // Find intersections, radical lines and interval
+      var innerCircleIndices = CircleIntersections.findInnerCircles(containingCircles);
+      var radicalLineMatrix = CircleIntersections.buildRadicalLineMatrix(containingCircles);
+      var intervalSets = CircleIntersections.findOuterCircleIntervals(containingCircles, radicalLineMatrix);
+      var pathListSectors = CircleIntersections.findOuterPartitionsAsSectors(containingCircles, intervalSets);
+
+      // Draw connected paths?
+      var iteration = 0;
+      for (var i = 0; i < pathListSectors.length; i++) {
+        drawConnectedPath(draw, fill, pathListSectors[i], iteration, i);
+      }
     };
+
+    // ===ZZZ START
+
+    // +---------------------------------------------------------------------------------
+    // | Pick a color from the WebColors array.
+    // +-------------------------------
+    var randomWebColor = function (index) {
+      switch (config.colorSet) {
+        case "Malachite":
+          return WebColorsMalachite[index % WebColorsMalachite.length].cssRGB();
+        case "Mixed":
+          return WebColorsContrast[index % WebColorsContrast.length].cssRGB();
+        case "WebColors":
+        default:
+          return WebColors[index % WebColors.length].cssRGB();
+      }
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | This is kind of a hack to draw connected arc paths (which is currently not directly
+    // | supported by the `draw` library).
+    // |
+    // | The function switches between canvas.ellipse draw or SVG path draw.
+    // |
+    // | @param {CircleSector[]} path
+    // | @param {number} iteration
+    // | @param {number} pathNumber
+    // +-------------------------------
+    var drawConnectedPath = function (draw, fill, path, iteration, pathNumber) {
+      var color = randomWebColor(iteration + pathNumber);
+
+      // This might be optimized
+      if (config.drawAsSVGArcs || draw instanceof drawutilssvg) drawConnectedPathAsSVGArcs(draw, fill, path, color);
+      else drawConnectedPathAsEllipses(path, color, config.fillNestedCircles ? fill : draw);
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Draw the given path as ellipses (using canvs.ellipse function).
+    // |
+    // | @param {CircleSector[]} path
+    // | @param {string} color
+    // | @param {drawutils} draw
+    // +-------------------------------
+    var drawConnectedPathAsEllipses = function (path, color, draw) {
+      draw.ctx.save();
+      draw.ctx.beginPath();
+      for (var i = 0; i < path.length; i++) {
+        var sector = path[i];
+        draw.circleArc(sector.circle.center, sector.circle.radius, sector.startAngle, sector.endAngle, color, config.lineWidth, {
+          asSegment: true
+        });
+      }
+      draw.ctx.closePath();
+      draw.ctx.lineWidth = config.lineWidth;
+      draw.ctx.lineJoin = config.lineJoin;
+      draw._fillOrDraw(color);
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Draw the given path as ellipses (using canvs.ellipse function).
+    // |
+    // | @param {CircleSector[]} path
+    // | @param {string} color
+    // | @param {drawutils} draw
+    // +-------------------------------
+    var drawConnectedPathAsSVGArcs = function (draw, fill, path, color) {
+      var svgData = pathToSVGData(path, { x: 0, y: 0 }, { x: 1, y: 1 });
+      if (draw.ctx) draw.ctx.lineJoin = config.lineJoin;
+      if (config.fillNestedCircles) {
+        fill.path(svgData, color, config.lineWidth);
+      } else {
+        draw.path(svgData, color, config.lineWidth);
+      }
+    };
+    // ===ZZZ END
 
     // +---------------------------------------------------------------------------------
     // | Initialize dat.gui

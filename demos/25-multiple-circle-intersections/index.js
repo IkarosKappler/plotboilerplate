@@ -191,7 +191,9 @@
 
       var affectedCircles = [];
       for (var i = 0; i < circles.length; i++) {
-        if (!innerCircleIndices.includes(i)) affectedCircles.push(circles[i]);
+        if (!innerCircleIndices.includes(i)) {
+          affectedCircles.push(circles[i]);
+        }
       }
       return affectedCircles;
     };
