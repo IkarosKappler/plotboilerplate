@@ -60,7 +60,6 @@ var CircleIntersections = /** @class */ (function () {
         }
         return pathList;
     };
-    ;
     /**
      * Find all connected outer path partitions (as CircleSectors).
      *
@@ -88,7 +87,6 @@ var CircleIntersections = /** @class */ (function () {
         } // END for
         return partitionsAsArcs;
     };
-    ;
     /**
      * Build the n*n intersection matrix: contains the radical line at (i,j) if circle i and circle j do intersect;
      * conatins null at (i,j) otherwise.
@@ -126,7 +124,6 @@ var CircleIntersections = /** @class */ (function () {
         }
         return radicalLines;
     };
-    ;
     /**
      * Find all circles (indices) which are completely located inside another circle.
      *
@@ -151,7 +148,6 @@ var CircleIntersections = /** @class */ (function () {
         }
         return innerCircleIndices;
     };
-    ;
     /**
      * Calculate all outer circle intervals (sections that belong to the outermost line), dermined by the given
      * circles and their radical lines.
@@ -183,7 +179,6 @@ var CircleIntersections = /** @class */ (function () {
         }
         return intervalSets;
     };
-    ;
     /**
      * Calculate the next connected partition from the given set of circles and outer path intervals. The function
      * will pick a random unused circle interval and detect all adjacent intervals until a closed partition
@@ -210,10 +205,8 @@ var CircleIntersections = /** @class */ (function () {
             usedIntervals[intLocation.i][intLocation.j] = true;
             intLocation = CircleIntersections.findAdjacentInterval(circles, intLocation, intervalSets, usedIntervals, 0.001);
         }
-        ;
         return path.length == 0 ? null : path;
     };
-    ;
     /**
      * Convert a radical line (belonging to a circle) into an interval: start angle and end angle.
      *
@@ -239,7 +232,6 @@ var CircleIntersections = /** @class */ (function () {
             angleB = Math.PI * 2 + angleB;
         return [angleA, angleB];
     };
-    ;
     /**
      * This is a helper fuction used by `findOuterCircleIntervals`.
      *
@@ -258,7 +250,6 @@ var CircleIntersections = /** @class */ (function () {
         var interval = CircleIntersections.radicalLineToInterval(circle, radicalLine);
         intervalSet.intersect(interval[1], interval[0]);
     };
-    ;
     /**
      * Pick a random unused circle interval. This function is used by the `findOuterPartition` function, which
      * starts the detection with any random section.
@@ -281,7 +272,6 @@ var CircleIntersections = /** @class */ (function () {
         }
         return null;
     };
-    ;
     /**
      * Find the next adjacent circle interval for the given interval.
      * starts the detection with any random section.
@@ -310,9 +300,7 @@ var CircleIntersections = /** @class */ (function () {
         }
         return null;
     };
-    ;
     return CircleIntersections;
 }());
 exports.CircleIntersections = CircleIntersections;
-;
 //# sourceMappingURL=CircleIntersections.js.map

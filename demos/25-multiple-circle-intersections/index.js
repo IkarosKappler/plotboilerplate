@@ -31,7 +31,8 @@
  * @date     2020-10-05
  * @modified 2020-11-13 Fixed the drawing of sector lines.
  * @modified 2020-12-17 Added basic SVG export (experimental).
- * @version  1.2.0
+ * @modified 2024-02-09 Replacing the canvas/svg specific draw functions for arc by the new generic draw lib method.
+ * @version  1.3.0
  **/
 
 (function (_context) {
@@ -78,21 +79,6 @@
         GUP
       )
     );
-
-    // +---------------------------------------------------------------------------------
-    // | Pick a color from the WebColors array.
-    // +-------------------------------
-    var randomWebColor = function (index) {
-      switch (config.colorSet) {
-        case "Malachite":
-          return WebColorsMalachite[index % WebColorsMalachite.length].cssRGB();
-        case "Mixed":
-          return WebColorsContrast[index % WebColorsContrast.length].cssRGB();
-        case "WebColors":
-        default:
-          return WebColors[index % WebColors.length].cssRGB();
-      }
-    };
 
     // +---------------------------------------------------------------------------------
     // | Create a random vertex inside the canvas viewport.
@@ -265,6 +251,60 @@
         draw.path(svgData, color, config.lineWidth);
       }
     };
+
+    // // +---------------------------------------------------------------------------------
+    // // | This is kind of a hack to draw connected arc paths (which is currently not directly
+    // // | supported by the `draw` library).
+    // // |
+    // // | The function switches between canvas.ellipse draw or SVG path draw.
+    // // |
+    // // | @param {CircleSector[]} path
+    // // | @param {number} iteration
+    // // | @param {number} pathNumber
+    // // +-------------------------------
+    // var drawConnectedPath = function (draw, fill, path, iteration, pathNumber) {
+    //   var color = randomWebColor(iteration + pathNumber, config.colorSet);
+    //   // console.log("color", color);
+    //   drawConnectedPathArcs(path, color, config.fillNestedCircles ? fill : draw);
+    // };
+
+    // // +---------------------------------------------------------------------------------
+    // // | Draw the given path as ellipses (using canvs.ellipse function).
+    // // |
+    // // | @param {CircleSector[]} path
+    // // | @param {string} color
+    // // | @param {drawutils} draw
+    // // +-------------------------------
+    // var drawConnectedPathArcs = function (path, color, draw) {
+    //   if (draw instanceof drawutilssvg) {
+    //     console.log("svg");
+    //     for (var i = 0; i + 1 < path.length; i++) {
+    //       var sector = path[i];
+    //       // prettier-ignore
+    //       draw.circleArc(sector.circle.center, sector.circle.radius, sector.startAngle, sector.endAngle, color, config.lineWidth, {
+    //       asSegment: true
+    //     });
+    //     }
+    //     var i = path.length - 1;
+    //     if (i >= 0) {
+    //       var sector = path[i];
+    //       // prettier-ignore
+    //       draw.circleArc(sector.circle.center, sector.circle.radius, sector.startAngle, sector.endAngle, color, config.lineWidth, {
+    //       asSegment: false
+    //     });
+    //     }
+    //   } else {
+    //     // console.log("canvas");
+    //     // draw.ctx.beginPath();
+    //     for (var i = 0; i < path.length; i++) {
+    //       var sector = path[i];
+    //       // prettier-ignore
+    //       draw.circleArc(sector.circle.center, sector.circle.radius, sector.startAngle, sector.endAngle, color, config.lineWidth, {
+    //         asSegment: false
+    //       });
+    //     }
+    //   }
+    // };
 
     // +---------------------------------------------------------------------------------
     // | Draw the outer circle sectors of intersections (as separate segments).

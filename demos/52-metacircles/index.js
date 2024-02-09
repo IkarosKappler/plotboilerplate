@@ -223,17 +223,17 @@
     // +---------------------------------------------------------------------------------
     // | Pick a color from the WebColors array.
     // +-------------------------------
-    var randomWebColor = function (index) {
-      switch (config.colorSet) {
-        case "Malachite":
-          return WebColorsMalachite[index % WebColorsMalachite.length].cssRGB();
-        case "Mixed":
-          return WebColorsContrast[index % WebColorsContrast.length].cssRGB();
-        case "WebColors":
-        default:
-          return WebColors[index % WebColors.length].cssRGB();
-      }
-    };
+    // var randomWebColor = function (index) {
+    //   switch (config.colorSet) {
+    //     case "Malachite":
+    //       return WebColorsMalachite[index % WebColorsMalachite.length].cssRGB();
+    //     case "Mixed":
+    //       return WebColorsContrast[index % WebColorsContrast.length].cssRGB();
+    //     case "WebColors":
+    //     default:
+    //       return WebColors[index % WebColors.length].cssRGB();
+    //   }
+    // };
 
     // +---------------------------------------------------------------------------------
     // | This is kind of a hack to draw connected arc paths (which is currently not directly
@@ -246,7 +246,7 @@
     // | @param {number} pathNumber
     // +-------------------------------
     var drawConnectedPath = function (draw, fill, path, iteration, pathNumber) {
-      var color = randomWebColor(iteration + pathNumber);
+      var color = randomWebColor(iteration + pathNumber, null);
 
       // This might be optimized
       if (config.drawAsSVGArcs || draw instanceof drawutilssvg) drawConnectedPathAsSVGArcs(draw, fill, path, color);
