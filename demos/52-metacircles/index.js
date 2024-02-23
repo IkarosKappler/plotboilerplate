@@ -62,10 +62,12 @@
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
         numCircles: params.getNumber("numCircles", 2),
-        metaRadiusAddon: params.getNumber("metaRadiusAddon", 20),
-        drawCircles: false,
-        drawRadii: false,
-        drawVertNumbers: false
+        metaRadiusAddon: params.getNumber("metaRadiusAddon", 40),
+        drawCircles: params.getBoolean("drawCircles", true),
+        drawCircleNumbers: params.getBoolean("drawCircleNumber", true),
+        drawContainingCircles: params.getBoolean("drawContainingCircle", true),
+        drawInverseCircles: params.getBoolean("drawInverseCircles", true),
+        drawOuterHull: params.getBoolean("drawOuterHull", true)
       },
       GUP
     );
@@ -160,6 +162,16 @@
       reinit();
     };
 
+    // TODO: global function?
+    var cloneCircle = function (circle) {
+      return new Circle(circle.center.clone(), circle.radius);
+    };
+
+    // TODO: global function?
+    var cloneCircleSector = function (circleSector) {
+      return new CircleSector(cloneCircle(circleSector.circle), circleSector.startAngle, circleSector.endAngle);
+    };
+
     var drawCircleLabels = function (draw, fill) {
       for (var i = 0; i < circles.length; i++) {
         const vert = circles[i].center;
@@ -171,69 +183,130 @@
     // | Redraw everything. This function will be called by PB on re-renders.
     // +-------------------------------
     var redraw = function (draw, fill) {
-      drawCircleLabels(draw, fill);
-
-      for (var i = 0; i < containingCircles.length; i++) {
-        // var metaball = new Circle(circles[i].center, circles[i].radius * config.metalballFactor);
-        // var metaball = new Circle(circles[i].center, circles[i].radius + config.metaRadiusAddon);
-        var metaball = containingCircles[i];
-
-        // dashOffset?: number;
-        // dashArray?: Array<number>;
-        draw.circle(metaball.center, metaball.radius, "grey", 1.0, { dashOffset: 0, dashArray: [5, 4] });
+      if (config.drawCircleNumbers) {
+        drawCircleLabels(draw, fill);
       }
 
-      // Draw outer circles
-      for (var i = 0; i < inverseCirclesPairs.length; i++) {
-        var circlePair = inverseCirclesPairs[i];
-        var color = circlePair.doIntersect ? "rgba(192,192,192,0.5)" : "orange";
-        var lineWidth = circlePair.doIntersect ? 1.0 : 2.0;
-        draw.circle(circlePair.outerCircleA.center, circlePair.outerCircleA.radius, color, lineWidth);
-        draw.circle(circlePair.outerCircleB.center, circlePair.outerCircleB.radius, color, lineWidth);
+      // Draw outer containing circles?
+      if (config.drawContainingCircles) {
+        for (var i = 0; i < containingCircles.length; i++) {
+          // var metaball = new Circle(circles[i].center, circles[i].radius * config.metalballFactor);
+          // var metaball = new Circle(circles[i].center, circles[i].radius + config.metaRadiusAddon);
+          var metaball = containingCircles[i];
 
-        // And draw intersection points
-        draw.diamondHandle(circlePair.circlePointsA[0], 5, "red");
-        draw.diamondHandle(circlePair.circlePointsA[1], 5, "red");
-        draw.diamondHandle(circlePair.circlePointsB[0], 5, "red");
-        draw.diamondHandle(circlePair.circlePointsB[1], 5, "red");
+          // dashOffset?: number;
+          // dashArray?: Array<number>;
+          draw.circle(metaball.center, metaball.radius, "grey", 1.0, { dashOffset: 0, dashArray: [5, 4] });
+        }
+      }
+
+      // Draw circles at intersection points (inverse circles)
+      if (config.drawInverseCircles) {
+        for (var i = 0; i < inverseCirclesPairs.length; i++) {
+          var circlePair = inverseCirclesPairs[i];
+          var color = circlePair.doIntersect ? "rgba(192,192,192,0.5)" : "orange";
+          var lineWidth = circlePair.doIntersect ? 1.0 : 2.0;
+          draw.circle(circlePair.outerCircleA.center, circlePair.outerCircleA.radius, color, lineWidth);
+          draw.circle(circlePair.outerCircleB.center, circlePair.outerCircleB.radius, color, lineWidth);
+
+          // And draw intersection points
+          draw.diamondHandle(circlePair.circlePointsA[0], 5, "red");
+          draw.diamondHandle(circlePair.circlePointsA[1], 5, "red");
+          draw.diamondHandle(circlePair.circlePointsB[0], 5, "red");
+          draw.diamondHandle(circlePair.circlePointsB[1], 5, "red");
+        }
       }
 
       // Draw partial arcs.
-      for (var i = 0; i < circles.length; i++) {
-        var innerCircle = circles[i];
-        // var outerCircle = containingCircles[i];
-        // Collect all points on this circle
-      }
+      // for (var i = 0; i < circles.length; i++) {
+      //   var innerCircle = circles[i];
+      //   // var outerCircle = containingCircles[i];
+      //   // Collect all points on this circle
+      // }
 
       // Find intersections, radical lines and interval
       var innerCircleIndices = CircleIntersections.findInnerCircles(containingCircles);
       var radicalLineMatrix = CircleIntersections.buildRadicalLineMatrix(containingCircles);
       var intervalSets = CircleIntersections.findOuterCircleIntervals(containingCircles, radicalLineMatrix);
-      var pathListSectors = CircleIntersections.findOuterPartitionsAsSectors(containingCircles, intervalSets);
+      // Array<Array<CircleSector>>
+      var outerPathListSectors = CircleIntersections.findOuterPartitionsAsSectors(containingCircles, intervalSets);
 
       // Draw connected paths?
-      var iteration = 0;
-      for (var i = 0; i < pathListSectors.length; i++) {
-        drawConnectedPath(draw, fill, pathListSectors[i], iteration, i);
+      if (config.drawOuterHull) {
+        var iteration = 0;
+        for (var i = 0; i < outerPathListSectors.length; i++) {
+          drawConnectedPath(draw, fill, outerPathListSectors[i], iteration, i);
+        }
+      }
+
+      // Array<Array<CircleSector>>
+      // Note: These path sectors are NOT CONNECTED with each others any more.
+      var innerPathListSectors = outerPathListSectors.map(function (sectorList) {
+        return sectorList.map(function (outerSector) {
+          var innerSector = cloneCircleSector(outerSector);
+          // Scale down to original radius
+          innerSector.circle.radius -= config.metaRadiusAddon;
+          return innerSector;
+        });
+      });
+
+      var iteration = 1;
+      // Draw circle sectors that need to be kept
+      for (var i = 0; i < innerPathListSectors.length; i++) {
+        for (var j = 0; j < innerPathListSectors[i].length; j++) {
+          // console.log(i, j, innerPathListSectors[i][j], outerPathListSectors[i][j]);
+          const tmpSect = innerPathListSectors[i][j];
+          draw.circleArc(
+            tmpSect.circle.center,
+            tmpSect.circle.radius,
+            tmpSect.startAngle,
+            tmpSect.endAngle,
+            "rgba(0,255,0,0.333)",
+            7
+          );
+        }
+      }
+
+      // Draw inverse circle sectors.
+      // Array< { circleA, circleB, outerCircleA, outerCircleB, doIntersect, circlePointsA:[], circlePointsB:[] } >
+      for (var i = 0; i < inverseCirclesPairs.length; i++) {
+        var pair = inverseCirclesPairs[i];
+        if (pair.doIntersect) {
+          continue;
+        }
+        drawInverseCircleArcs(draw, pair);
       }
     };
 
-    // ===ZZZ START
+    var drawInverseCircleArcs = function (draw, circlePair) {
+      // var outerCircleA = cloneCircle(circlePair.outerCircleA);
+      // var angleDifference = -Math.PI; // 0.0; // outerCircleA.center.angle(pair.circleA);
+      // // var circleB = cloneCircle(pair.outerCircleA);
+      // var intersectionAngleA0 = circlePair.circlePointsA[0].angle(outerCircleA.center) + angleDifference;
+      // var intersectionAngleB0 = circlePair.circlePointsB[0].angle(outerCircleA.center) + angleDifference;
 
-    // +---------------------------------------------------------------------------------
-    // | Pick a color from the WebColors array.
-    // +-------------------------------
-    // var randomWebColor = function (index) {
-    //   switch (config.colorSet) {
-    //     case "Malachite":
-    //       return WebColorsMalachite[index % WebColorsMalachite.length].cssRGB();
-    //     case "Mixed":
-    //       return WebColorsContrast[index % WebColorsContrast.length].cssRGB();
-    //     case "WebColors":
-    //     default:
-    //       return WebColors[index % WebColors.length].cssRGB();
-    //   }
-    // };
+      // draw.circleArc(
+      //   outerCircleA.center,
+      //   outerCircleA.radius,
+      //   intersectionAngleB0,
+      //   intersectionAngleA0,
+      //   "rgba(0,255,0,0.333)",
+      //   7
+      // );
+      drawInvserseCircleArc(draw, circlePair.outerCircleA, circlePair.circlePointsA[0], circlePair.circlePointsB[0]);
+      drawInvserseCircleArc(draw, circlePair.outerCircleB, circlePair.circlePointsB[1], circlePair.circlePointsA[1]);
+    };
+
+    var drawInvserseCircleArc = function (draw, outerCircle, intersectionPoint0, intersectionPoint1) {
+      // var outerCircle = cloneCircle(pair.outerCircleA);
+      var angleDifference = -Math.PI; // 0.0; // outerCircleA.center.angle(pair.circleA);
+      // var circleB = cloneCircle(pair.outerCircleA);
+      var intersectionAngleA0 = intersectionPoint0.angle(outerCircle.center) + angleDifference;
+      var intersectionAngleB0 = intersectionPoint1.angle(outerCircle.center) + angleDifference;
+      draw.circleArc(outerCircle.center, outerCircle.radius, intersectionAngleB0, intersectionAngleA0, "rgba(0,255,0,0.333)", 7);
+    };
+
+    // ===ZZZ START
 
     // +---------------------------------------------------------------------------------
     // | This is kind of a hack to draw connected arc paths (which is currently not directly
@@ -293,6 +366,14 @@
     };
     // ===ZZZ END
 
+    var toggleCircleVisibility = function () {
+      if (config.drawCircles) {
+        pb.drawConfig.circle.color = "#22a8a8";
+      } else {
+        pb.drawConfig.circle.color = "rgba(0,0,0,0)";
+      }
+    };
+
     // +---------------------------------------------------------------------------------
     // | Initialize dat.gui
     // +-------------------------------
@@ -306,10 +387,16 @@
         rebuildMetaballs();
         pb.redraw();
       }).name("metaRadiusAddon").title("The metaball connection factor.");
-      // // prettier-ignore
-      // gui.add(config, "drawRadii").onChange( function() { pb.redraw(); } ).name('drawRadii').title("Draw Radii?");
-      // // prettier-ignore
-      // gui.add(config, "drawVertNumbers").onChange( function() { pb.redraw(); } ).name('drawVertNumbers').title("Draw vertex numbers?");
+      // prettier-ignore
+      gui.add(config, "drawCircles").onChange( function() { toggleCircleVisibility(); pb.redraw(); } ).name('drawCircles').title("Draw circles?");
+      // prettier-ignore
+      gui.add(config, "drawContainingCircles").onChange( function() { pb.redraw(); } ).name('drawContainingCircles').title("Draw containing circles?");
+      // prettier-ignore
+      gui.add(config, "drawInverseCircles").onChange( function() { pb.redraw(); } ).name('drawInverseCircles').title("Draw inverse circles at intersection points?");
+      // prettier-ignore
+      gui.add(config, "drawCircleNumbers").onChange( function() { pb.redraw(); } ).name('drawCircleNumbers').title("Draw circle numbers?");
+      // prettier-ignore
+      gui.add(config, "drawOuterHull").onChange( function() { pb.redraw(); } ).name('drawOuterHull').title("Draw outer hull?");
     }
 
     pb.config.postDraw = redraw;

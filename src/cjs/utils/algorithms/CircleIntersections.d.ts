@@ -67,7 +67,7 @@ export declare class CircleIntersections {
      * @param {Array<Circle>} circles - The circles to find intersections for.
      * @return {Array<Array<Line>>} A 2d-matrix containing the radical lines where circles intersect.
      **/
-    static buildRadicalLineMatrix(circles: Array<Circle>): Matrix<Line>;
+    static buildRadicalLineMatrix(circles: Array<Circle>): Matrix<Line | null>;
     /**
      * Find all circles (indices) which are completely located inside another circle.
      *

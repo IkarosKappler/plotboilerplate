@@ -105,8 +105,9 @@ var CircleIntersections = /** @class */ (function () {
     CircleIntersections.buildRadicalLineMatrix = function (circles) {
         var radicalLines = [];
         for (var i = 0; i < circles.length; i++) {
-            if (!radicalLines[i])
-                radicalLines[i] = arrayFill_1.arrayFill(circles.length, null); // Array<Line>( circles.length );
+            if (!radicalLines[i]) {
+                radicalLines[i] = arrayFill_1.arrayFill(circles.length, null);
+            }
             for (var j = 0; j < circles.length; j++) {
                 if (i == j)
                     continue;
@@ -114,11 +115,13 @@ var CircleIntersections = /** @class */ (function () {
                     continue;
                 radicalLines[i][j] = circles[i].circleIntersection(circles[j]);
                 // Build symmetrical matrix
-                if (radicalLines[i][j]) {
-                    if (!radicalLines[j])
-                        radicalLines[j] = arrayFill_1.arrayFill(circles.length, null); // Array<Line>( circles.length );
+                var tmpRadLine = radicalLines[i][j];
+                if (tmpRadLine) {
+                    if (!radicalLines[j]) {
+                        radicalLines[j] = arrayFill_1.arrayFill(circles.length, null);
+                    }
                     // Use reverse line
-                    radicalLines[j][i] = new Line_1.Line(radicalLines[i][j].b, radicalLines[i][j].a);
+                    radicalLines[j][i] = new Line_1.Line(tmpRadLine.b, tmpRadLine.a);
                 }
             }
         }

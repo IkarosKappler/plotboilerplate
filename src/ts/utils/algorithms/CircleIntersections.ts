@@ -2,7 +2,8 @@
  * @author   Ikaros Kappler
  * @date     2020-10-05
  * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
- * @version  1.0.1
+ * @modified 2024-02-23 Fixed some null-type conflicts.
+ * @version  1.0.2
  * @file CircleIntersections
  * @public
  **/
@@ -109,19 +110,24 @@ export class CircleIntersections {
    * @param {Array<Circle>} circles - The circles to find intersections for.
    * @return {Array<Array<Line>>} A 2d-matrix containing the radical lines where circles intersect.
    **/
-  static buildRadicalLineMatrix(circles: Array<Circle>): Matrix<Line> {
-    var radicalLines: Array<Array<Line>> = [];
+  static buildRadicalLineMatrix(circles: Array<Circle>): Matrix<Line | null> {
+    var radicalLines: Array<Array<Line | null>> = [];
     for (var i = 0; i < circles.length; i++) {
-      if (!radicalLines[i]) radicalLines[i] = arrayFill<Line>(circles.length, null); // Array<Line>( circles.length );
+      if (!radicalLines[i]) {
+        radicalLines[i] = arrayFill<Line | null>(circles.length, null);
+      }
       for (var j = 0; j < circles.length; j++) {
         if (i == j) continue;
         if (radicalLines[i][j]) continue;
         radicalLines[i][j] = circles[i].circleIntersection(circles[j]);
         // Build symmetrical matrix
-        if (radicalLines[i][j]) {
-          if (!radicalLines[j]) radicalLines[j] = arrayFill<Line>(circles.length, null); // Array<Line>( circles.length );
+        var tmpRadLine = radicalLines[i][j];
+        if (tmpRadLine) {
+          if (!radicalLines[j]) {
+            radicalLines[j] = arrayFill<Line | null>(circles.length, null);
+          }
           // Use reverse line
-          radicalLines[j][i] = new Line(radicalLines[i][j].b, radicalLines[i][j].a);
+          radicalLines[j][i] = new Line(tmpRadLine.b, tmpRadLine.a);
         }
       }
     }
@@ -205,7 +211,7 @@ export class CircleIntersections {
     intervalSets: Array<CircularIntervalSet>,
     usedIntervals: Matrix<boolean>
   ): Array<IndexPair> | null {
-    let intLocation: IndexPair = CircleIntersections.randomUnusedInterval(intervalSets, usedIntervals);
+    let intLocation: IndexPair | null = CircleIntersections.randomUnusedInterval(intervalSets, usedIntervals);
     const path: Array<IndexPair> = [];
     while (intLocation != null) {
       path.push(intLocation);

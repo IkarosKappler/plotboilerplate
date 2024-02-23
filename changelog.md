@@ -1,5 +1,7 @@
 # Changelog
 
+- 2024-02-23
+  - Fixed some minor null-type conflicts in the CircleIntersections algorithms.
 - 2024-02-09
   - Demo 25 Multiple Circle Sections: replacing the canvas/svg specific draw functions for arc by the new generic draw lib method.
 - 2024-02-07

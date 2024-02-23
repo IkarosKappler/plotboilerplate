@@ -55,7 +55,6 @@ export class CircleIntersections {
         }
         return pathList;
     }
-    ;
     /**
      * Find all connected outer path partitions (as CircleSectors).
      *
@@ -83,7 +82,6 @@ export class CircleIntersections {
         } // END for
         return partitionsAsArcs;
     }
-    ;
     /**
      * Build the n*n intersection matrix: contains the radical line at (i,j) if circle i and circle j do intersect;
      * conatins null at (i,j) otherwise.
@@ -102,8 +100,9 @@ export class CircleIntersections {
     static buildRadicalLineMatrix(circles) {
         var radicalLines = [];
         for (var i = 0; i < circles.length; i++) {
-            if (!radicalLines[i])
-                radicalLines[i] = arrayFill(circles.length, null); // Array<Line>( circles.length );
+            if (!radicalLines[i]) {
+                radicalLines[i] = arrayFill(circles.length, null);
+            }
             for (var j = 0; j < circles.length; j++) {
                 if (i == j)
                     continue;
@@ -111,17 +110,18 @@ export class CircleIntersections {
                     continue;
                 radicalLines[i][j] = circles[i].circleIntersection(circles[j]);
                 // Build symmetrical matrix
-                if (radicalLines[i][j]) {
-                    if (!radicalLines[j])
-                        radicalLines[j] = arrayFill(circles.length, null); // Array<Line>( circles.length );
+                var tmpRadLine = radicalLines[i][j];
+                if (tmpRadLine) {
+                    if (!radicalLines[j]) {
+                        radicalLines[j] = arrayFill(circles.length, null);
+                    }
                     // Use reverse line
-                    radicalLines[j][i] = new Line(radicalLines[i][j].b, radicalLines[i][j].a);
+                    radicalLines[j][i] = new Line(tmpRadLine.b, tmpRadLine.a);
                 }
             }
         }
         return radicalLines;
     }
-    ;
     /**
      * Find all circles (indices) which are completely located inside another circle.
      *
@@ -146,7 +146,6 @@ export class CircleIntersections {
         }
         return innerCircleIndices;
     }
-    ;
     /**
      * Calculate all outer circle intervals (sections that belong to the outermost line), dermined by the given
      * circles and their radical lines.
@@ -178,7 +177,6 @@ export class CircleIntersections {
         }
         return intervalSets;
     }
-    ;
     /**
      * Calculate the next connected partition from the given set of circles and outer path intervals. The function
      * will pick a random unused circle interval and detect all adjacent intervals until a closed partition
@@ -205,10 +203,8 @@ export class CircleIntersections {
             usedIntervals[intLocation.i][intLocation.j] = true;
             intLocation = CircleIntersections.findAdjacentInterval(circles, intLocation, intervalSets, usedIntervals, 0.001);
         }
-        ;
         return path.length == 0 ? null : path;
     }
-    ;
     /**
      * Convert a radical line (belonging to a circle) into an interval: start angle and end angle.
      *
@@ -234,7 +230,6 @@ export class CircleIntersections {
             angleB = Math.PI * 2 + angleB;
         return [angleA, angleB];
     }
-    ;
     /**
      * This is a helper fuction used by `findOuterCircleIntervals`.
      *
@@ -253,7 +248,6 @@ export class CircleIntersections {
         const interval = CircleIntersections.radicalLineToInterval(circle, radicalLine);
         intervalSet.intersect(interval[1], interval[0]);
     }
-    ;
     /**
      * Pick a random unused circle interval. This function is used by the `findOuterPartition` function, which
      * starts the detection with any random section.
@@ -276,7 +270,6 @@ export class CircleIntersections {
         }
         return null;
     }
-    ;
     /**
      * Find the next adjacent circle interval for the given interval.
      * starts the detection with any random section.
@@ -305,7 +298,5 @@ export class CircleIntersections {
         }
         return null;
     }
-    ;
 }
-;
 //# sourceMappingURL=CircleIntersections.js.map
