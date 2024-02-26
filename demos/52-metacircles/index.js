@@ -105,6 +105,8 @@
           var circlePointsB = [centerCircleB.closestPoint(outerCircle1.center), centerCircleB.closestPoint(outerCircle2.center)];
 
           inverseCirclesPairs.push({
+            baseCircleIndexA: i,
+            baseCircleIndexB: j,
             circleA: circleA,
             outerCircleA: outerCircle1,
             circleB: circleB,
@@ -271,10 +273,21 @@
       // Array< { circleA, circleB, outerCircleA, outerCircleB, doIntersect, circlePointsA:[], circlePointsB:[] } >
       for (var i = 0; i < inverseCirclesPairs.length; i++) {
         var pair = inverseCirclesPairs[i];
-        if (pair.doIntersect) {
-          continue;
+        // if (pair.doIntersect && !pair.circleB.containsPoint(pair.circleA.center)) {
+        //   continue;
+        // }
+        if (!pair.doIntersect || pair.circleB.containsPoint(pair.circleA.center)) {
+          // TODO: do not only draw, also collect for connected path detection
+          // Step 1: draw inverse circle arcs (these two connect circleA and circleB)
+          drawInverseCircleArcs(draw, pair);
         }
-        drawInverseCircleArcs(draw, pair);
+
+        // Step 2: draw rest of original circles if intersection is not enough for meta connection.
+        if (pair.doIntersect && !pair.circleB.containsPoint(pair.circleA.center)) {
+          // drawInvserseCircleArc(draw, circlePair.outerCircleA, circlePair.circlePointsA[0], circlePair.circlePointsB[0]);
+          // drawInvserseCircleArc(draw, circlePair.outerCircleB, circlePair.circlePointsB[1], circlePair.circlePointsA[1]);
+          drawInvserseCircleArc(draw, circlePair.circleB, circlePair.circlePointsA[1], circlePair.circlePointsA[0]);
+        }
       }
     };
 
@@ -366,6 +379,10 @@
     };
     // ===ZZZ END
 
+    // +---------------------------------------------------------------------------------
+    // | Changes the color of the original circles from transparent to opaque depending
+    // | on selected visibility.
+    // +-------------------------------
     var toggleCircleVisibility = function () {
       if (config.drawCircles) {
         pb.drawConfig.circle.color = "#22a8a8";
