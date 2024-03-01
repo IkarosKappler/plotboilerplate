@@ -55,9 +55,10 @@
         GUP
       )
     );
-    // globalThis.pb = pb;
+    pb.drawConfig.circle.lineWidth = 1;
+    pb.drawConfig.circle.color = "rgba(32,192,192,0.5)";
     pb.drawConfig.circleSector.lineWidth = 3;
-    pb.drawConfig.circleSector.color = "rgba(255,64,0,0.75)";
+    pb.drawConfig.circleSector.color = "rgba(255,64,0,0.333)";
 
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
@@ -72,72 +73,12 @@
       GUP
     );
 
-    var circles = [];
+    // var inputCircles = [];
     var circleHelpers = [];
-    var containingCircles = [];
-    // Array< { baseCircleIndexA, baseCircleIndexB,
-    //          baseCircleA, baseCircleB,
-    //          circleA, circleB,
-    //          inverseCircleA, inverseCircleB,
-    //          doIntersect, circlePointsA:[], circlePointsB:[] } >
-    var inverseCirclesPairs = [];
+    var metaballs = new Metaballs([]);
 
     var rebuildMetaballs = function () {
-      inverseCirclesPairs = [];
-
-      var radicalLineMatrix = CircleIntersections.buildRadicalLineMatrix(containingCircles);
-      for (var i = 0; i < containingCircles.length; i++) {
-        var circleA = containingCircles[i];
-        var centerCircleA = circles[i];
-        for (var j = i + 1; j < containingCircles.length; j++) {
-          var radicalLine = radicalLineMatrix[i][j];
-          if (radicalLine == null) {
-            // The two circles do not have an intersection.
-            // console.log("Circles", i, j, "do not have any intersections");
-            continue;
-          }
-          var circleB = containingCircles[j];
-          var centerCircleB = circles[j];
-          // But if they have -> compute. outer circle(s).
-          // They are symmetrical.
-          var inverseCircle1 = new Circle(radicalLine.a, config.metaRadiusAddon);
-          var inverseCircle2 = new Circle(radicalLine.b, config.metaRadiusAddon);
-          var doIntersect = inverseCircle1.circleIntersection(inverseCircle2) != null;
-          // console.log("doIntersect", doIntersect);
-          // Now find the intersection points between inner and outer circles.
-          // We will need them later.
-          var circlePointsA = [
-            centerCircleA.closestPoint(inverseCircle1.center),
-            centerCircleA.closestPoint(inverseCircle2.center)
-          ];
-          var circlePointsB = [
-            centerCircleB.closestPoint(inverseCircle1.center),
-            centerCircleB.closestPoint(inverseCircle2.center)
-          ];
-
-          inverseCirclesPairs.push({
-            baseCircleIndexA: i,
-            baseCircleIndexB: j,
-            baseCircleA: circles[i],
-            baseCircleB: circles[j],
-            circleA: circleA,
-            inverseCircleA: inverseCircle1,
-            circleB: circleB,
-            inverseCircleB: inverseCircle2,
-            doIntersect: doIntersect,
-            circlePointsA: circlePointsA,
-            circlePointsB: circlePointsB
-          });
-        }
-      }
-    };
-
-    var rebuildContainingCircles = function () {
-      containingCircles = [];
-      for (var i = 0; i < config.numCircles; i++) {
-        var metaball = new Circle(circles[i].center, circles[i].radius + config.metaRadiusAddon);
-        containingCircles.push(metaball);
-      }
+      metaballs.rebuild({ metaRadiusAddon: config.metaRadiusAddon });
     };
 
     // +---------------------------------------------------------------------------------
@@ -156,31 +97,30 @@
       });
       circleHelpers = [];
       // Install a circle helper: change radius via a second control point.
-      for (var i = 0; i < circles.length; i++) {
-        var circle = circles[i];
+      for (var i = 0; i < metaballs.inputCircles.length; i++) {
+        var circle = metaballs.inputCircles[i];
         var radiusPoint = circle.vertAt(Math.PI * 1.75);
         pb.add(radiusPoint);
         circleHelpers.push(new CircleHelper(circle, radiusPoint));
         radiusPoint.listeners.addDragListener(function (_evt) {
-          rebuildContainingCircles();
           rebuildMetaballs();
         });
       }
     };
 
     var reinit = function () {
-      pb.removeAll();
-      arrayResize(circles, config.numCircles, getRandomCircle);
-      pb.add(circles);
+      arrayResize(metaballs.inputCircles, config.numCircles, getRandomCircle);
       installCircleHelpers();
+      rebuildMetaballs();
       // Install move listeners
-      for (var i = 0; i < config.numCircles; i++) {
-        circles[i].center.listeners.addDragListener(function (e) {
+      for (var i = 0; i < metaballs.inputCircles.length; i++) {
+        metaballs.inputCircles[i].center.listeners.addDragListener(function (e) {
           rebuildMetaballs();
         });
       }
 
-      rebuildContainingCircles();
+      pb.removeAll();
+      pb.add(metaballs.inputCircles);
     };
 
     var init = function () {
@@ -198,9 +138,19 @@
     };
 
     var drawCircleLabels = function (draw, fill) {
-      for (var i = 0; i < circles.length; i++) {
-        const vert = circles[i].center;
+      for (var i = 0; i < metaballs.circlesOfInterest.length; i++) {
+        const vert = metaballs.circlesOfInterest[i].center;
         fill.text("" + i, vert.x, vert.y, { color: "white", fontFamily: "Arial", fontSize: 9 });
+      }
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | A hole can be found this way: a group of inverse circles with mutually contained centers.
+    // +-------------------------------
+    var detectHoles = function () {
+      var isInverseCircleVisited;
+      for (var i = 0; i < metaballs.inverseCirclesPairs; i++) {
+        // ...
       }
     };
 
@@ -214,10 +164,10 @@
 
       // Draw outer containing circles?
       if (config.drawContainingCircles) {
-        for (var i = 0; i < containingCircles.length; i++) {
+        for (var i = 0; i < metaballs.containingCircles.length; i++) {
           // var metaball = new Circle(circles[i].center, circles[i].radius * config.metalballFactor);
           // var metaball = new Circle(circles[i].center, circles[i].radius + config.metaRadiusAddon);
-          var metaball = containingCircles[i];
+          var metaball = metaballs.containingCircles[i];
 
           // dashOffset?: number;
           // dashArray?: Array<number>;
@@ -227,10 +177,10 @@
 
       // Draw circles at intersection points (inverse circles)
       if (config.drawInverseCircles) {
-        for (var i = 0; i < inverseCirclesPairs.length; i++) {
-          var circlePair = inverseCirclesPairs[i];
-          var color = circlePair.doIntersect ? "rgba(192,192,192,0.5)" : "orange";
-          var lineWidth = circlePair.doIntersect ? 1.0 : 2.0;
+        for (var i = 0; i < metaballs.inverseCirclesPairs.length; i++) {
+          var circlePair = metaballs.inverseCirclesPairs[i];
+          var color = circlePair.doIntersect ? "rgba(192,192,192,0.333)" : "rgba(255,192,0,0.5)";
+          var lineWidth = circlePair.doIntersect ? 1.0 : 3.0;
           draw.circle(circlePair.inverseCircleA.center, circlePair.inverseCircleA.radius, color, lineWidth);
           draw.circle(circlePair.inverseCircleB.center, circlePair.inverseCircleB.radius, color, lineWidth);
 
@@ -250,17 +200,23 @@
       // }
 
       // Find intersections, radical lines and interval
-      var innerCircleIndices = CircleIntersections.findInnerCircles(containingCircles);
-      var radicalLineMatrix = CircleIntersections.buildRadicalLineMatrix(containingCircles);
-      var intervalSets = CircleIntersections.findOuterCircleIntervals(containingCircles, radicalLineMatrix);
+      var innerCircleIndices = CircleIntersections.findInnerCircles(metaballs.containingCircles);
+      var radicalLineMatrix = CircleIntersections.buildRadicalLineMatrix(metaballs.containingCircles);
+      var intervalSets = CircleIntersections.findOuterCircleIntervals(metaballs.containingCircles, radicalLineMatrix);
       // Array<Array<CircleSector>>
-      var outerPathListSectors = CircleIntersections.findOuterPartitionsAsSectors(containingCircles, intervalSets);
+      var outerPathListSectors = CircleIntersections.findOuterPartitionsAsSectors(metaballs.containingCircles, intervalSets);
 
       // Draw connected paths?
       if (config.drawOuterHull) {
         var iteration = 0;
         for (var i = 0; i < outerPathListSectors.length; i++) {
-          drawConnectedPath(draw, fill, outerPathListSectors[i], iteration, i);
+          drawConnectedPath(
+            draw,
+            fill,
+            outerPathListSectors[i],
+            pb.drawConfig.circleSector.color,
+            pb.drawConfig.circleSector.lineWidth
+          ); //iteration, i);
         }
       }
 
@@ -294,8 +250,8 @@
 
       // Draw inverse circle sectors.
       // Array< { circleA, circleB, inverseCircleA, inverseCircleB, doIntersect, circlePointsA:[], circlePointsB:[] } >
-      for (var i = 0; i < inverseCirclesPairs.length; i++) {
-        var pair = inverseCirclesPairs[i];
+      for (var i = 0; i < metaballs.inverseCirclesPairs.length; i++) {
+        var pair = metaballs.inverseCirclesPairs[i];
         // if (pair.doIntersect && !pair.circleB.containsPoint(pair.circleA.center)) {
         //   continue;
         // }
@@ -307,8 +263,6 @@
 
         // Step 2: draw rest of original circles if intersection is not enough for meta connection.
         if (pair.doIntersect && !pair.circleB.containsPoint(pair.circleA.center)) {
-          // drawInvserseCircleArc(draw, circlePair.inverseCircleA, circlePair.circlePointsA[0], circlePair.circlePointsB[0]);
-          // drawInvserseCircleArc(draw, circlePair.inverseCircleB, circlePair.circlePointsB[1], circlePair.circlePointsA[1]);
           drawInvserseCircleArc(draw, pair.baseCircleA, pair.circlePointsA[1], pair.circlePointsA[0]);
           drawInvserseCircleArc(draw, pair.baseCircleB, pair.circlePointsB[0], pair.circlePointsB[1]);
         }
@@ -316,28 +270,12 @@
     };
 
     var drawInverseCircleArcs = function (draw, circlePair) {
-      // var inverseCircleA = cloneCircle(circlePair.inverseCircleA);
-      // var angleDifference = -Math.PI; // 0.0; // inverseCircleA.center.angle(pair.circleA);
-      // // var circleB = cloneCircle(pair.inverseCircleA);
-      // var intersectionAngleA0 = circlePair.circlePointsA[0].angle(inverseCircleA.center) + angleDifference;
-      // var intersectionAngleB0 = circlePair.circlePointsB[0].angle(inverseCircleA.center) + angleDifference;
-
-      // draw.circleArc(
-      //   inverseCircleA.center,
-      //   inverseCircleA.radius,
-      //   intersectionAngleB0,
-      //   intersectionAngleA0,
-      //   "rgba(0,255,0,0.333)",
-      //   7
-      // );
       drawInvserseCircleArc(draw, circlePair.inverseCircleA, circlePair.circlePointsA[0], circlePair.circlePointsB[0]);
       drawInvserseCircleArc(draw, circlePair.inverseCircleB, circlePair.circlePointsB[1], circlePair.circlePointsA[1]);
     };
 
     var drawInvserseCircleArc = function (draw, outerCircle, intersectionPoint0, intersectionPoint1) {
-      // var outerCircle = cloneCircle(pair.inverseCircleA);
-      var angleDifference = -Math.PI; // 0.0; // inverseCircleA.center.angle(pair.circleA);
-      // var circleB = cloneCircle(pair.inverseCircleA);
+      var angleDifference = -Math.PI;
       var intersectionAngleA0 = intersectionPoint0.angle(outerCircle.center) + angleDifference;
       var intersectionAngleB0 = intersectionPoint1.angle(outerCircle.center) + angleDifference;
       draw.circleArc(outerCircle.center, outerCircle.radius, intersectionAngleB0, intersectionAngleA0, "rgba(0,255,0,0.333)", 7);
@@ -355,12 +293,10 @@
     // | @param {number} iteration
     // | @param {number} pathNumber
     // +-------------------------------
-    var drawConnectedPath = function (draw, fill, path, iteration, pathNumber) {
-      var color = randomWebColor(iteration + pathNumber, null);
-
+    var drawConnectedPath = function (draw, fill, path, color, lineWidth) {
       // This might be optimized
-      if (config.drawAsSVGArcs || draw instanceof drawutilssvg) drawConnectedPathAsSVGArcs(draw, fill, path, color);
-      else drawConnectedPathAsEllipses(path, color, config.fillNestedCircles ? fill : draw);
+      if (config.drawAsSVGArcs || draw instanceof drawutilssvg) drawConnectedPathAsSVGArcs(draw, fill, path, color, lineWidth);
+      else drawConnectedPathAsEllipses(path, color, lineWidth, config.fillNestedCircles ? fill : draw);
     };
 
     // +---------------------------------------------------------------------------------
@@ -370,7 +306,7 @@
     // | @param {string} color
     // | @param {drawutils} draw
     // +-------------------------------
-    var drawConnectedPathAsEllipses = function (path, color, draw) {
+    var drawConnectedPathAsEllipses = function (path, color, lineWidth, draw) {
       draw.ctx.save();
       draw.ctx.beginPath();
       for (var i = 0; i < path.length; i++) {
@@ -380,7 +316,7 @@
         });
       }
       draw.ctx.closePath();
-      draw.ctx.lineWidth = config.lineWidth;
+      draw.ctx.lineWidth = lineWidth;
       draw.ctx.lineJoin = config.lineJoin;
       draw._fillOrDraw(color);
     };
@@ -392,13 +328,13 @@
     // | @param {string} color
     // | @param {drawutils} draw
     // +-------------------------------
-    var drawConnectedPathAsSVGArcs = function (draw, fill, path, color) {
+    var drawConnectedPathAsSVGArcs = function (draw, fill, path, color, lineWidth) {
       var svgData = pathToSVGData(path, { x: 0, y: 0 }, { x: 1, y: 1 });
       if (draw.ctx) draw.ctx.lineJoin = config.lineJoin;
       if (config.fillNestedCircles) {
-        fill.path(svgData, color, config.lineWidth);
+        fill.path(svgData, color, lineWidth);
       } else {
-        draw.path(svgData, color, config.lineWidth);
+        draw.path(svgData, color, lineWidth);
       }
     };
     // ===ZZZ END

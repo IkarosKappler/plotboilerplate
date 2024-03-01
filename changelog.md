@@ -1,5 +1,7 @@
 # Changelog
 
+- 2024-03-01
+  - Refactoring the current metaballs calculation to a Typescript class.
 - 2024-02-26
   - CircleHelper: Removed the constructor param `pb` (unused).
   - CircleHelper: Added `circle` and `radiusPoint` attributes.
