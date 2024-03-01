@@ -110,7 +110,6 @@
 
     var reinit = function () {
       arrayResize(metaballs.inputCircles, config.numCircles, getRandomCircle);
-      installCircleHelpers();
       rebuildMetaballs();
       // Install move listeners
       for (var i = 0; i < metaballs.inputCircles.length; i++) {
@@ -120,6 +119,7 @@
       }
 
       pb.removeAll();
+      installCircleHelpers();
       pb.add(metaballs.inputCircles);
     };
 
@@ -144,15 +144,48 @@
       }
     };
 
-    // +---------------------------------------------------------------------------------
-    // | A hole can be found this way: a group of inverse circles with mutually contained centers.
-    // +-------------------------------
-    var detectHoles = function () {
-      var isInverseCircleVisited;
-      for (var i = 0; i < metaballs.inverseCirclesPairs; i++) {
-        // ...
-      }
-    };
+    // // +---------------------------------------------------------------------------------
+    // // | A hole can be found this way: a group of inverse circles with mutually contained centers.
+    // // +-------------------------------
+    // var detectHoles = function (circles) {
+    //   var n = circles.length;
+    //   console.log("circles", circles);
+    //   // var isInverseCircleVisited = arrayFill(n, false); // Array<number>
+    //   var visitedCount = 0;
+    //   var nonVisitedSet = new Set();
+    //   var holeGroups = []; // Array<number[]>
+    //   for (var i = 0; i < n; i++) {
+    //     nonVisitedSet.add(i);
+    //   }
+    //   var iteration = 0;
+    //   while (visitedCount < n && iteration++ < n * n) {
+    //     var curIndex = Array.from(nonVisitedSet)[Math.floor(Math.random() * nonVisitedSet.size)];
+    //     var holeGroupIndices = detectHoleGroup(circles, nonVisitedSet, curIndex);
+    //     visitedCount += holeGroupIndices.length;
+    //     holeGroups.push(holeGroupIndices);
+    //   }
+    //   return holeGroups;
+    // };
+
+    // var detectHoleGroup = function (circles, nonVisitedSet, index) {
+    //   var holeGroupIndices = [index];
+    //   // Mark as visited
+    //   nonVisitedSet.delete(index);
+    //   for (var i = 0; i < circles.length; i++) {
+    //     if (!nonVisitedSet.has(i)) {
+    //       // Already visited
+    //       continue;
+    //     }
+    //     // Circles mutually contain their centers?
+    //     var circleA = circles[index];
+    //     var circleB = circles[i];
+    //     if (circleA.containsPoint(circleB.center) && circleB.containsPoint(circleA.center)) {
+    //       holeGroupIndices.push(i);
+    //       nonVisitedSet.delete(i);
+    //     }
+    //   }
+    //   return holeGroupIndices;
+    // };
 
     // +---------------------------------------------------------------------------------
     // | Redraw everything. This function will be called by PB on re-renders.
@@ -193,11 +226,6 @@
       }
 
       // Draw partial arcs.
-      // for (var i = 0; i < circles.length; i++) {
-      //   var innerCircle = circles[i];
-      //   // var outerCircle = containingCircles[i];
-      //   // Collect all points on this circle
-      // }
 
       // Find intersections, radical lines and interval
       var innerCircleIndices = CircleIntersections.findInnerCircles(metaballs.containingCircles);
@@ -231,12 +259,23 @@
         });
       });
 
-      var iteration = 1;
       // Draw circle sectors that need to be kept
       for (var i = 0; i < innerPathListSectors.length; i++) {
         for (var j = 0; j < innerPathListSectors[i].length; j++) {
           // console.log(i, j, innerPathListSectors[i][j], outerPathListSectors[i][j]);
-          const tmpSect = innerPathListSectors[i][j];
+          var tmpSect = innerPathListSectors[i][j];
+          var sectorStart = tmpSect.getStartPoint();
+          var sectorEnd = tmpSect.getEndPoint();
+          draw.diamondHandle(sectorStart, 10, "red");
+          draw.diamondHandle(sectorEnd, 10, "red");
+
+          if (
+            Metaballs.metaballsUtils.anyCircleContainsPoint(metaballs.circlesOfInterest, sectorStart, i) &&
+            Metaballs.metaballsUtils.anyCircleContainsPoint(metaballs.circlesOfInterest, sectorEnd, i)
+          ) {
+            // Do not draw sectors that are fully contained inside any other circle
+            continue;
+          }
           draw.circleArc(
             tmpSect.circle.center,
             tmpSect.circle.radius,
@@ -266,8 +305,8 @@
           drawInvserseCircleArc(draw, pair.baseCircleA, pair.circlePointsA[1], pair.circlePointsA[0]);
           drawInvserseCircleArc(draw, pair.baseCircleB, pair.circlePointsB[0], pair.circlePointsB[1]);
         }
-      }
-    };
+      } // END for
+    }; // END redraw
 
     var drawInverseCircleArcs = function (draw, circlePair) {
       drawInvserseCircleArc(draw, circlePair.inverseCircleA, circlePair.circlePointsA[0], circlePair.circlePointsB[0]);

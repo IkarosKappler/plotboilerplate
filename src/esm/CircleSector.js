@@ -4,7 +4,8 @@
  * @modified 2021-01-20 Added UID.
  * @modified 2021-02-26 Fixed an error in the svg-arc-calculation (case angle<90deg and anti-clockwise).
  * @modified 2024-01-30 Added a missing type in the `describeSVGArc` function.
- * @version  1.1.2
+ * @modified 2024-03-01 Added the `getStartPoint` and `getEndPoint` methods.
+ * @version  1.2.0
  **/
 import { UIDGenerator } from "./UIDGenerator";
 /**
@@ -37,9 +38,36 @@ export class CircleSector {
         this.endAngle = endAngle;
     }
     /**
+     * Get the sectors starting point (on the underlying circle, located at the start angle).
+     *
+     * @method getStartPoint
+     * @instance
+     * @memberof CircleSector
+     * @return {Vertex} The sector's stating point.
+     */
+    getStartPoint() {
+        return this.circle.vertAt(this.startAngle);
+    }
+    /**
+     * Get the sectors ending point (on the underlying circle, located at the end angle).
+     *
+     * @method getEndPoint
+     * @instance
+     * @memberof CircleSector
+     * @return {Vertex} The sector's ending point.
+     */
+    getEndPoint() {
+        return this.circle.vertAt(this.endAngle);
+    }
+    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.
+     *
+     * @method destroy
+     * @instance
+     * @memberof CircleSector
+     * @return {void}
      */
     destroy() {
         this.circle.destroy();

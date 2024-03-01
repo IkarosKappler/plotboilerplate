@@ -2,6 +2,7 @@
 
 - 2024-03-01
   - Refactoring the current metaballs calculation to a Typescript class.
+  - Added the `CircleSector.getStartPoint` and `CircleSector.getEndPoint` methods.
 - 2024-02-26
   - CircleHelper: Removed the constructor param `pb` (unused).
   - CircleHelper: Added `circle` and `radiusPoint` attributes.
