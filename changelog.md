@@ -1,5 +1,9 @@
 # Changelog
 
+- 2024-02-26
+  - CircleHelper: Removed the constructor param `pb` (unused).
+  - CircleHelper: Added `circle` and `radiusPoint` attributes.
+  - CircleHelper: Added the `destroy` method.
 - 2024-02-23
   - Fixed some minor null-type conflicts in the CircleIntersections algorithms.
 - 2024-02-09
