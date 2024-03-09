@@ -1,5 +1,8 @@
 # Changelog
 
+- 2024-03-09
+  - Added the `CircleSector.circleSectorIntersection` method to find coherent sector intersections.
+  - Added the `CircleSector.angleAt` method to determine any angle at some ratio.
 - 2024-03-08
   - Added the optional `precision` param to the `Vertex.toString` method.
   - Added the `CircleSector.containsAngle` method.

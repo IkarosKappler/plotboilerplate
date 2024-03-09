@@ -5,8 +5,12 @@
  * @modified 2021-02-26 Fixed an error in the svg-arc-calculation (case angle<90deg and anti-clockwise).
  * @modified 2024-01-30 Added a missing type in the `describeSVGArc` function.
  * @modified 2024-03-01 Added the `getStartPoint` and `getEndPoint` methods.
+ * @modified 2024-03-08 Added the `containsAngle` method.
+ * @modified 2024-03-09 Added the `circleSectorIntersection` method to find coherent sector intersections..
+ * @modified 2024-03-09 Added the `angleAt` method to determine any angle at some ratio.
  * @version  1.2.0
  **/
+import { Circle } from "./Circle";
 import { UIDGenerator } from "./UIDGenerator";
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
@@ -37,6 +41,15 @@ export class CircleSector {
         this.startAngle = startAngle;
         this.endAngle = endAngle;
     }
+    /**
+     * Checks wether the given angle (must be inside 0 and PI*2) is contained inside this sector.
+     *
+     * @param {number} angle - The numeric angle to check.
+     * @method containsAngle
+     * @instance
+     * @memberof CircleSector
+     * @return {boolean} True if (and only if) this sector contains the given angle.
+     */
     containsAngle(angle) {
         if (this.startAngle <= this.endAngle) {
             return angle >= this.startAngle && angle < this.endAngle;
@@ -44,6 +57,26 @@ export class CircleSector {
         else {
             // startAngle > endAngle
             return angle >= this.startAngle || angle < this.endAngle;
+        }
+    }
+    /**
+     * Get the geometric intersection sector of this and some other sector.
+     *
+     * @param {number} angle - The numeric angle to check.
+     * @method containsAngle
+     * @instance
+     * @memberof CircleSector
+     * @return {boolean} True if (and only if) this sector contains the given angle.
+     */
+    angleAt(t) {
+        if (this.startAngle <= this.endAngle) {
+            const angleAtRatio = this.startAngle + (this.endAngle - this.startAngle) * t;
+            return angleAtRatio % (Math.PI * 2.0);
+        }
+        else {
+            // startAngle > endAngle
+            const angleAtRatio = this.startAngle + (Math.PI * 2 - this.startAngle + this.endAngle) * t;
+            return angleAtRatio % (Math.PI * 2.0);
         }
     }
     /**
@@ -68,24 +101,43 @@ export class CircleSector {
     getEndPoint() {
         return this.circle.vertAt(this.endAngle);
     }
-    // circleSectorIntersection(sector: CircleSector): CircleSector | null {
-    //   const radicalLine: Line | null = this.circle.circleIntersection(sector.circle);
-    //   if (!radicalLine) {
-    //     // The circles to not intersect at all.
-    //     return null;
-    //   }
-    //   // Circles intersect. Check if sector intervals intersect, too.
-    //   const thisIntersectionAngleA = this.circle.center.angle(radicalLine.a);
-    //   const thisIntersectionAngleB = this.circle.center.angle(radicalLine.b);
-    //   // Is intersection inside this sector?
-    //   const thisIntervals: CircularIntervalSet = new CircularIntervalSet(0, Math.PI * 2.0);
-    //   thisIntervals.intersect(thisIntersectionAngleA, thisIntersectionAngleB);
-    //   const intersectionSector = new CircleSector(
-    //     new Circle(this.circle.center.clone(), this.circle.radius),
-    //     this.startAngle,
-    //     this.endAngle
-    //   );
-    // }
+    // TODO: docs
+    circleSectorIntersection(sector) {
+        const radicalLine = this.circle.circleIntersection(sector.circle);
+        if (!radicalLine) {
+            // The circles to not intersect at all.
+            return null;
+        }
+        // Circles intersect. Check if this sector interval intersects, too.
+        const thisIntersectionAngleA = this.circle.center.angle(radicalLine.a);
+        const thisIntersectionAngleB = this.circle.center.angle(radicalLine.b);
+        // Is intersection inside this sector?
+        if (!this.containsAngle(thisIntersectionAngleA) || !this.containsAngle(thisIntersectionAngleB)) {
+            // At least one circle intersection point is not located in this sector.
+            //  -> no valid intersection at all
+            return null;
+        }
+        // Circles intersect. Check if the passed sector interval intersects, too.
+        const thatIntersectionAngleA = sector.circle.center.angle(radicalLine.a);
+        const thatIntersectionAngleB = sector.circle.center.angle(radicalLine.b);
+        // Is intersection inside this sector?
+        if (!sector.containsAngle(thatIntersectionAngleA) || !sector.containsAngle(thatIntersectionAngleB)) {
+            // At least one circle intersection point is not located in this sector.
+            //  -> no valid intersection at all
+            return null;
+        }
+        // The radical line has no direction. Thus the resulting sector might be in reverse order.
+        // Make a quick logical check: the center of the gap must still be located outside the original sector.
+        // If not: reverse result.
+        var gapSector = new CircleSector(this.circle, this.endAngle, this.startAngle);
+        var centerOfOriginalGap = gapSector.angleAt(0.5);
+        if (this.containsAngle(centerOfOriginalGap)) {
+            return new CircleSector(new Circle(this.circle.center.clone(), this.circle.radius), thisIntersectionAngleB, thisIntersectionAngleA);
+        }
+        else {
+            return new CircleSector(new Circle(this.circle.center.clone(), this.circle.radius), thisIntersectionAngleA, thisIntersectionAngleB);
+        }
+    }
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and

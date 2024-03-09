@@ -5,6 +5,9 @@
  * @modified 2021-02-26 Fixed an error in the svg-arc-calculation (case angle<90deg and anti-clockwise).
  * @modified 2024-01-30 Added a missing type in the `describeSVGArc` function.
  * @modified 2024-03-01 Added the `getStartPoint` and `getEndPoint` methods.
+ * @modified 2024-03-08 Added the `containsAngle` method.
+ * @modified 2024-03-09 Added the `circleSectorIntersection` method to find coherent sector intersections..
+ * @modified 2024-03-09 Added the `angleAt` method to determine any angle at some ratio.
  * @version  1.2.0
  **/
 import { Circle } from "./Circle";
@@ -68,7 +71,26 @@ export declare class CircleSector implements SVGSerializable {
      * @param {number} endAngle - The end angle of the sector.
      */
     constructor(circle: Circle, startAngle: number, endAngle: number);
+    /**
+     * Checks wether the given angle (must be inside 0 and PI*2) is contained inside this sector.
+     *
+     * @param {number} angle - The numeric angle to check.
+     * @method containsAngle
+     * @instance
+     * @memberof CircleSector
+     * @return {boolean} True if (and only if) this sector contains the given angle.
+     */
     containsAngle(angle: number): boolean;
+    /**
+     * Get the geometric intersection sector of this and some other sector.
+     *
+     * @param {number} angle - The numeric angle to check.
+     * @method containsAngle
+     * @instance
+     * @memberof CircleSector
+     * @return {boolean} True if (and only if) this sector contains the given angle.
+     */
+    angleAt(t: number): number;
     /**
      * Get the sectors starting point (on the underlying circle, located at the start angle).
      *
@@ -87,6 +109,7 @@ export declare class CircleSector implements SVGSerializable {
      * @return {Vertex} The sector's ending point.
      */
     getEndPoint(): Vertex;
+    circleSectorIntersection(sector: CircleSector): CircleSector | null;
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and

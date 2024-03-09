@@ -101,15 +101,8 @@
       // Install a circle helper: change radius via a second control point.
       for (var i = 0; i < circleSectors.length; i++) {
         var circleSector = circleSectors[i];
-        // Now create a sector from the circle
-        // var startAngle = (34 / 180) * Math.PI; // in radians
-        // var endAngle = (330 / 180) * Math.PI;
-        // var circleSector = new CircleSector(circle, startAngle, endAngle);
-
-        // Now add the sector to your canvas
+        // Add the sector to your canvas
         pb.add(circleSector);
-
-        // Note: the center point is draggable now :)
 
         // Further: add a circle sector helper to edit angles and radius manually (mouse or touch)
         var controlPointA = circleSector.circle.vertAt(circleSector.startAngle);
@@ -138,24 +131,20 @@
       reinit();
     };
 
-    // TODO: global function?
-    var cloneCircle = function (circle) {
-      return new Circle(circle.center.clone(), circle.radius);
-    };
-
-    // TODO: global function?
-    var cloneCircleSector = function (circleSector) {
-      return new CircleSector(cloneCircle(circleSector.circle), circleSector.startAngle, circleSector.endAngle);
-    };
-
-    var drawCircleLabels = function (draw, fill) {
+    // +---------------------------------------------------------------------------------
+    // | For drawing circle labels.
+    // +-------------------------------
+    var drawCircleLabels = function (draw, fill, contrastColor) {
       for (var i = 0; i < circleSectors.length; i++) {
         const vert = circleSectors[i].circle.center;
         // TODO: use contrast color here
-        fill.text("" + i, vert.x, vert.y, { color: "white", fontFamily: "Arial", fontSize: 9 });
+        fill.text("" + i, vert.x, vert.y, { color: contrastColor, fontFamily: "Arial", fontSize: 9 });
       }
     };
 
+    // +---------------------------------------------------------------------------------
+    // | For drawing circle labels.
+    // +-------------------------------
     var drawAnglePointInfo = function (draw, fill) {
       for (var i = 0; i < circleSectors.length; i++) {
         const sector = circleSectors[i];
@@ -167,18 +156,40 @@
       }
     };
 
-    var drawAngleLabels = function (draw, fill) {
+    var drawAngleLabels = function (draw, fill, contrastColor) {
       for (var i in circleSectors) {
-        var circleSector = circleSectors[i];
-        draw.line(anglePoint, circleSector.circle.center, "rgba(192,192,192,0.5)", 1, { dashOffset: 0, dashArray: [5, 4] });
-        var controlPointA = circleSector.circle.vertAt(circleSector.startAngle);
-        var controlPointB = circleSector.circle.vertAt(circleSector.endAngle);
-        draw.line(circleSector.circle.center, controlPointA, "rgba(192,192,192,0.5)", 1.0);
-        draw.line(circleSector.circle.center, controlPointB, "rgba(192,192,192,0.5)", 1.0);
+        var sector = circleSectors[i];
+        draw.line(anglePoint, sector.circle.center, "rgba(192,192,192,0.5)", 1, { dashOffset: 0, dashArray: [5, 4] });
+        var controlPointA = sector.circle.vertAt(sector.startAngle);
+        var controlPointB = sector.circle.vertAt(sector.endAngle);
+        draw.line(sector.circle.center, controlPointA, "rgba(128,128,128,0.5)", 2.0);
+        draw.line(sector.circle.center, controlPointB, "rgba(128,128,128,0.5)", 2.0);
         // prettier-ignore
-        fill.text("" + (circleSector.startAngle*RAD_TO_DEG).toFixed(1) + "°", controlPointA.x, controlPointA.y, { color: "white", fontFamily: "Arial", fontSize: 9 });
+        fill.text("" + (sector.startAngle*RAD_TO_DEG).toFixed(1) + "°", controlPointA.x, controlPointA.y, { color: contrastColor, fontFamily: "Arial", fontSize: 9 });
         // prettier-ignore
-        fill.text("" + (circleSector.endAngle*RAD_TO_DEG).toFixed(1) + "°", controlPointB.x, controlPointB.y, { color: "white", fontFamily: "Arial", fontSize: 9 });
+        fill.text("" + (sector.endAngle*RAD_TO_DEG).toFixed(1) + "°", controlPointB.x, controlPointB.y, { color: contrastColor, fontFamily: "Arial", fontSize: 9 });
+      }
+    };
+
+    var drawSectorIntersections = function (draw, fill) {
+      for (var i = 0; i < circleSectors.length; i++) {
+        var sector = circleSectors[i];
+        for (var j = 0; j < circleSectors.length; j++) {
+          if (i === j) {
+            continue;
+          }
+          var intersection = sector.circleSectorIntersection(circleSectors[j]);
+          if (intersection) {
+            draw.circleArc(
+              intersection.circle.center,
+              intersection.circle.radius,
+              intersection.startAngle,
+              intersection.endAngle,
+              "rgba(0,128,255,0.5)",
+              7
+            );
+          }
+        }
       }
     };
 
@@ -186,85 +197,17 @@
     // | Redraw everything. This function will be called by PB on re-renders.
     // +-------------------------------
     var redraw = function (draw, fill) {
-      fill.text("<Move me>", anglePoint.x, anglePoint.y, { color: "white", fontFamily: "Arial", fontSize: 9 });
+      var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor)).cssRGB();
+      fill.text("<Move me>", anglePoint.x, anglePoint.y, { color: contrastColor, fontFamily: "Arial", fontSize: 9 });
 
       if (config.drawCircleNumbers) {
-        drawCircleLabels(draw, fill);
+        drawCircleLabels(draw, fill, contrastColor);
       }
 
-      drawAngleLabels(draw, fill);
+      drawAngleLabels(draw, fill, contrastColor);
       drawAnglePointInfo(draw, fill);
+      drawSectorIntersections(draw, fill);
     }; // END redraw
-
-    // var drawInverseCircleArcs = function (draw, circlePair) {
-    //   drawInvserseCircleArc(draw, circlePair.inverseCircleA, circlePair.circlePointsA[0], circlePair.circlePointsB[0]);
-    //   drawInvserseCircleArc(draw, circlePair.inverseCircleB, circlePair.circlePointsB[1], circlePair.circlePointsA[1]);
-    // };
-
-    // var drawInvserseCircleArc = function (draw, outerCircle, intersectionPoint0, intersectionPoint1) {
-    //   var angleDifference = -Math.PI;
-    //   var intersectionAngleA0 = intersectionPoint0.angle(outerCircle.center) + angleDifference;
-    //   var intersectionAngleB0 = intersectionPoint1.angle(outerCircle.center) + angleDifference;
-    //   draw.circleArc(outerCircle.center, outerCircle.radius, intersectionAngleB0, intersectionAngleA0, "rgba(0,255,0,0.333)", 7);
-    // };
-
-    // ===ZZZ START
-
-    // +---------------------------------------------------------------------------------
-    // | This is kind of a hack to draw connected arc paths (which is currently not directly
-    // | supported by the `draw` library).
-    // |
-    // | The function switches between canvas.ellipse draw or SVG path draw.
-    // |
-    // | @param {CircleSector[]} path
-    // | @param {number} iteration
-    // | @param {number} pathNumber
-    // +-------------------------------
-    // var drawConnectedPath = function (draw, fill, path, color, lineWidth) {
-    //   // This might be optimized
-    //   if (config.drawAsSVGArcs || draw instanceof drawutilssvg) drawConnectedPathAsSVGArcs(draw, fill, path, color, lineWidth);
-    //   else drawConnectedPathAsEllipses(path, color, lineWidth, config.fillNestedCircles ? fill : draw);
-    // };
-
-    // +---------------------------------------------------------------------------------
-    // | Draw the given path as ellipses (using canvs.ellipse function).
-    // |
-    // | @param {CircleSector[]} path
-    // | @param {string} color
-    // | @param {drawutils} draw
-    // +-------------------------------
-    // var drawConnectedPathAsEllipses = function (path, color, lineWidth, draw) {
-    //   draw.ctx.save();
-    //   draw.ctx.beginPath();
-    //   for (var i = 0; i < path.length; i++) {
-    //     var sector = path[i];
-    //     draw.circleArc(sector.circle.center, sector.circle.radius, sector.startAngle, sector.endAngle, color, config.lineWidth, {
-    //       asSegment: true
-    //     });
-    //   }
-    //   draw.ctx.closePath();
-    //   draw.ctx.lineWidth = lineWidth;
-    //   draw.ctx.lineJoin = config.lineJoin;
-    //   draw._fillOrDraw(color);
-    // };
-
-    // +---------------------------------------------------------------------------------
-    // | Draw the given path as ellipses (using canvs.ellipse function).
-    // |
-    // | @param {CircleSector[]} path
-    // | @param {string} color
-    // | @param {drawutils} draw
-    // +-------------------------------
-    // var drawConnectedPathAsSVGArcs = function (draw, fill, path, color, lineWidth) {
-    //   var svgData = pathToSVGData(path, { x: 0, y: 0 }, { x: 1, y: 1 });
-    //   if (draw.ctx) draw.ctx.lineJoin = config.lineJoin;
-    //   if (config.fillNestedCircles) {
-    //     fill.path(svgData, color, lineWidth);
-    //   } else {
-    //     draw.path(svgData, color, lineWidth);
-    //   }
-    // };
-    // ===ZZZ END
 
     // +---------------------------------------------------------------------------------
     // | Initialize dat.gui
