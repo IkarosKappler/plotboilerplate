@@ -89,6 +89,10 @@
  * @fileoverview The main class.
  * @public
  **/
+var __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {
+    if (typeof name === "symbol") name = name.description ? "[".concat(name.description, "]") : "";
+    return Object.defineProperty(f, "name", { configurable: true, value: prefix ? "".concat(prefix, " ", name) : name });
+};
 var _a;
 import AlloyFinger from "alloyfinger-typescript";
 import { drawutils } from "./draw";
@@ -202,7 +206,7 @@ export class PlotBoilerplate {
      * @param {string=} [config.title=null] - Specify any hover tile here. It will be attached as a `title` attribute to the most elevated element.
      */
     constructor(config, drawConfig) {
-        var _a, _b;
+        var _b, _c;
         /**
          * A discrete timestamp to identify single render cycles.
          * Note that using system time milliseconds is not a safe way to identify render frames, as on modern powerful machines
@@ -276,8 +280,8 @@ export class PlotBoilerplate {
             enableTouch: f.bool(config, "enableTouch", true),
             enableKeys: f.bool(config, "enableKeys", true),
             enableMouseWheel: f.bool(config, "enableMouseWheel", true),
-            enableZoom: f.bool(config, "enableZoom", true),
-            enablePan: f.bool(config, "enablePan", true),
+            enableZoom: f.bool(config, "enableZoom", true), // default=true
+            enablePan: f.bool(config, "enablePan", true), // default=true
             // Experimental (and unfinished)
             enableGL: f.bool(config, "enableGL", false)
         }; // END confog
@@ -437,8 +441,8 @@ export class PlotBoilerplate {
         if (config.title) {
             this.eventCatcher.setAttribute("title", config.title);
         }
-        this.draw.scale.set((_a = this.config.scaleX) !== null && _a !== void 0 ? _a : 1.0, this.config.scaleY);
-        this.fill.scale.set((_b = this.config.scaleX) !== null && _b !== void 0 ? _b : 1.0, this.config.scaleY);
+        this.draw.scale.set((_b = this.config.scaleX) !== null && _b !== void 0 ? _b : 1.0, this.config.scaleY);
+        this.fill.scale.set((_c = this.config.scaleX) !== null && _c !== void 0 ? _c : 1.0, this.config.scaleY);
         this.vertices = [];
         this.selectPolygon = null;
         this.draggedElements = [];
@@ -576,12 +580,12 @@ export class PlotBoilerplate {
      * @private
      **/
     updateCSSscale() {
-        var _a, _b, _c, _d;
+        var _b, _c, _d, _e;
         if (this.config.cssUniformScale) {
-            PlotBoilerplate.utils.setCSSscale(this.canvas, (_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0, (_b = this.config.cssScaleX) !== null && _b !== void 0 ? _b : 1.0);
+            PlotBoilerplate.utils.setCSSscale(this.canvas, (_b = this.config.cssScaleX) !== null && _b !== void 0 ? _b : 1.0, (_c = this.config.cssScaleX) !== null && _c !== void 0 ? _c : 1.0);
         }
         else {
-            PlotBoilerplate.utils.setCSSscale(this.canvas, (_c = this.config.cssScaleX) !== null && _c !== void 0 ? _c : 1.0, (_d = this.config.cssScaleY) !== null && _d !== void 0 ? _d : 1.0);
+            PlotBoilerplate.utils.setCSSscale(this.canvas, (_d = this.config.cssScaleX) !== null && _d !== void 0 ? _d : 1.0, (_e = this.config.cssScaleY) !== null && _e !== void 0 ? _e : 1.0);
         }
     }
     /**
@@ -854,8 +858,8 @@ export class PlotBoilerplate {
      * @return The vertex near the given position or undefined if none was found there.
      **/
     getVertexNear(pixelPosition, pixelTolerance) {
-        var _a, _b;
-        const p = this.locatePointNear(this.transformMousePosition(pixelPosition.x, pixelPosition.y), pixelTolerance / Math.min((_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0, (_b = this.config.cssScaleY) !== null && _b !== void 0 ? _b : 1.0));
+        var _b, _c;
+        const p = this.locatePointNear(this.transformMousePosition(pixelPosition.x, pixelPosition.y), pixelTolerance / Math.min((_b = this.config.cssScaleX) !== null && _b !== void 0 ? _b : 1.0, (_c = this.config.cssScaleY) !== null && _c !== void 0 ? _c : 1.0));
         if (p && p.typeName == "vertex") {
             return this.vertices[p.vindex];
         }
@@ -1284,8 +1288,8 @@ export class PlotBoilerplate {
      * @return {Bounds} The current viewport.
      **/
     viewport() {
-        var _a, _b;
-        return new Bounds(this.transformMousePosition(0, 0), this.transformMousePosition(this.canvasSize.width * ((_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0), this.canvasSize.height * ((_b = this.config.cssScaleY) !== null && _b !== void 0 ? _b : 1.0)));
+        var _b, _c;
+        return new Bounds(this.transformMousePosition(0, 0), this.transformMousePosition(this.canvasSize.width * ((_b = this.config.cssScaleX) !== null && _b !== void 0 ? _b : 1.0), this.canvasSize.height * ((_c = this.config.cssScaleY) !== null && _c !== void 0 ? _c : 1.0)));
     }
     /**
      * Trigger the saveFile.hook.
@@ -1333,12 +1337,12 @@ export class PlotBoilerplate {
      * @return {void}
      **/
     resizeCanvas() {
-        var _a, _b, _c, _d, _e, _f;
+        var _b, _c, _d, _e, _f, _g;
         const _self = this;
         const _setSize = (w, h) => {
-            var _a, _b;
-            w *= (_a = _self.config.canvasWidthFactor) !== null && _a !== void 0 ? _a : 1.0;
-            h *= (_b = _self.config.canvasHeightFactor) !== null && _b !== void 0 ? _b : 1.0;
+            var _b, _c;
+            w *= (_b = _self.config.canvasWidthFactor) !== null && _b !== void 0 ? _b : 1.0;
+            h *= (_c = _self.config.canvasHeightFactor) !== null && _c !== void 0 ? _c : 1.0;
             _self.canvasSize.width = w;
             _self.canvasSize.height = h;
             if (_self.canvas instanceof HTMLCanvasElement) {
@@ -1367,8 +1371,8 @@ export class PlotBoilerplate {
             var width = globalThis.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
             var height = globalThis.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
             _self.canvas.style.position = "absolute";
-            _self.canvas.style.width = ((_a = _self.config.canvasWidthFactor) !== null && _a !== void 0 ? _a : 1.0) * width + "px";
-            _self.canvas.style.height = ((_b = _self.config.canvasWidthFactor) !== null && _b !== void 0 ? _b : 1.0) * height + "px";
+            _self.canvas.style.width = ((_b = _self.config.canvasWidthFactor) !== null && _b !== void 0 ? _b : 1.0) * width + "px";
+            _self.canvas.style.height = ((_c = _self.config.canvasWidthFactor) !== null && _c !== void 0 ? _c : 1.0) * height + "px";
             _self.canvas.style.top = "0px";
             _self.canvas.style.left = "0px";
             _setSize(width, height);
@@ -1377,8 +1381,8 @@ export class PlotBoilerplate {
             // Set editor size
             _self.canvas.style.position = "static";
             const space = this.getAvailableContainerSpace();
-            _self.canvas.style.width = ((_c = _self.config.canvasWidthFactor) !== null && _c !== void 0 ? _c : 1.0) * space.width + "px";
-            _self.canvas.style.height = ((_d = _self.config.canvasHeightFactor) !== null && _d !== void 0 ? _d : 1.0) * space.height + "px";
+            _self.canvas.style.width = ((_d = _self.config.canvasWidthFactor) !== null && _d !== void 0 ? _d : 1.0) * space.width + "px";
+            _self.canvas.style.height = ((_e = _self.config.canvasHeightFactor) !== null && _e !== void 0 ? _e : 1.0) * space.height + "px";
             _self.canvas.style.top = "";
             _self.canvas.style.left = "";
             _setSize(space.width, space.height);
@@ -1386,7 +1390,7 @@ export class PlotBoilerplate {
         else {
             _self.canvas.style.width = "";
             _self.canvas.style.height = "";
-            _setSize((_e = _self.config.defaultCanvasWidth) !== null && _e !== void 0 ? _e : 1024, (_f = _self.config.defaultCanvasHeight) !== null && _f !== void 0 ? _f : 768);
+            _setSize((_f = _self.config.defaultCanvasWidth) !== null && _f !== void 0 ? _f : 1024, (_g = _self.config.defaultCanvasHeight) !== null && _g !== void 0 ? _g : 768);
         }
         if (_self.config.redrawOnResize)
             _self.redraw();
@@ -1978,6 +1982,7 @@ PlotBoilerplate.Draggable = (_a = class {
             return this;
         }
     },
+    __setFunctionName(_a, "Draggable"),
     _a.VERTEX = "vertex",
     _a);
 /**
@@ -2150,7 +2155,7 @@ PlotBoilerplate.utils = {
                 return fallback;
             return obj[key];
         }
-    },
+    }, // END fetch
     /**
      * Installs vertex listeners to the path's vertices so that controlpoints
      * move with their path points when dragged.

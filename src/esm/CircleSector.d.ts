@@ -109,6 +109,19 @@ export declare class CircleSector implements SVGSerializable {
      * @return {Vertex} The sector's ending point.
      */
     getEndPoint(): Vertex;
+    /**
+     * Calculate the intersection of this circle sector and some other sector.
+     *
+     * If the two sectors do not corerently intersect (when not both points of the
+     * radical line are containted in both source sectors) then null is returned.
+     *
+     * See demo/53-circle-sector-intersections for a geometric visualisation.
+     *
+     * @method circleSectorIntersection
+     * @instance
+     * @memberof CircleSector
+     * @return {CircleSector | null} The intersecion of both sectors or null if they don't intersect.
+     */
     circleSectorIntersection(sector: CircleSector): CircleSector | null;
     /**
      * This function should invalidate any installed listeners and invalidate this object.

@@ -16,9 +16,9 @@
  * @modified 2023-01-03 Fixing some minor type issues and adding SVG reading capabilities.
  * @version  2.1.0
  */
-declare type IDroppedCallbackJSON = (jsonData: object) => void;
-declare type IDroppedCallbackText = (textData: string) => void;
-declare type IDroppedCallbackSVG = (svgDocument: Document) => void;
+type IDroppedCallbackJSON = (jsonData: object) => void;
+type IDroppedCallbackText = (textData: string) => void;
+type IDroppedCallbackSVG = (svgDocument: Document) => void;
 export declare class FileDrop {
     /**
      * The 'dropzone' element.

@@ -47,7 +47,7 @@ export class GirihPenroseRhombus extends GirihTile {
         this.addVertex(pointB);
         const angles = [
             0.0,
-            36.0,
+            36.0, // 72.0,
             144.0 // 108.0
         ];
         let theta = 0.0;

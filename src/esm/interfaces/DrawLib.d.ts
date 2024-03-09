@@ -33,8 +33,8 @@ import { SVGPathParams, UID, XYCoords } from "./core";
 export interface DrawLibConfiguration {
     blendMode?: 'source-over' | 'source-in' | 'source-out' | 'source-atop' | 'destination-over' | 'destination-in' | 'destination-out' | 'destination-atop' | 'lighter' | 'copy' | 'xor' | 'multiply' | 'screen' | 'overlay' | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' | 'hue' | 'saturation' | 'color' | 'luminosity' | null;
 }
-export declare type FontWeight = "normal" | "bold" | "bolder" | "lighter" | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
-export declare type FontStyle = "normal" | "italic" | "oblique";
+export type FontWeight = "normal" | "bold" | "bolder" | "lighter" | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
+export type FontStyle = "normal" | "italic" | "oblique";
 export interface FontOptions {
     color?: string;
     fontFamily?: string;

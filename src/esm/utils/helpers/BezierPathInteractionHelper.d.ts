@@ -33,19 +33,19 @@ import { Vertex } from "../../Vertex";
 /**
  * Handler type for mouse-pointer-moved listeners.
  */
-declare type OnPointerMoved = (pathIndex: number, pathPoint: Vertex, pointerPos: Vertex, t: number) => void;
+type OnPointerMoved = (pathIndex: number, pathPoint: Vertex, pointerPos: Vertex, t: number) => void;
 /**
  * Handler type for vertex-inserted listeners.
  */
-declare type OnVertexInserted = (pathIndex: number, insertIndex: number, newPath: BezierPath, oldPath: BezierPath) => void;
+type OnVertexInserted = (pathIndex: number, insertIndex: number, newPath: BezierPath, oldPath: BezierPath) => void;
 /**
  * Handler type for vertex-removed listeners.
  */
-declare type OnVerticesDeleted = (pathIndex: number, removedVertexIndices: Array<number>, newPath: BezierPath, oldPath: BezierPath) => void;
+type OnVerticesDeleted = (pathIndex: number, removedVertexIndices: Array<number>, newPath: BezierPath, oldPath: BezierPath) => void;
 /**
  * Handler type for path-removed listeners.
  */
-declare type OnPathRemoved = (pathIndex: number, oldPath: BezierPath) => void;
+type OnPathRemoved = (pathIndex: number, oldPath: BezierPath) => void;
 /**
  * Options passed to the constructor.
  */

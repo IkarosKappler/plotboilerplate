@@ -6,8 +6,9 @@
  *
  * Refactored by Ikaros Kappler
  *
- * @date 2021-04-16
- * @version 0.0.1
+ * @date     2021-04-16
+ * @modified 2024-03-09 Added type checks for Typescript 5 compatibility.
+ * @version  0.0.2
  */
 
 /**
@@ -30,9 +31,9 @@ class Vertex {
 
 // Vertex Holder
 class VertexHolder {
-  vert1: Vert3;
-  vert2: Vert3;
-  vert3: Vert3;
+  vert1: Vert3 | undefined;
+  vert2: Vert3 | undefined;
+  vert3: Vert3 | undefined;
   constructor(vertex1?: Vertex, vertex2?: Vertex, vertex3?: Vertex) {
     this.vert1 = vertex1;
     this.vert2 = vertex2;
@@ -78,22 +79,36 @@ export class STLParser {
     // yes, this is the regular expression, matching the vertexes
     // it was kind of tricky but it is fast and does the job
     const vertexes = stl.match(
-      /facet\s+normal\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+outer\s+loop\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+endloop\s+endfacet/g
+      /facet\s+normal\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+outer\s+loop\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+endloop\s+endfacet/gS
     );
 
+    if( !vertexes ) {
+      throw "[STLParser] Failed to parse STL input; regex could not match."
+    };
+
     const _handleFacet: FacetHandler = this.handleFacet;
-    vertexes.forEach(function (vert) {
+    vertexes.forEach( (vert:string) => {
       const preVertexHolder = new VertexHolder();
-      vert
+      const vertValues = vert
         .match(
           /vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s/g
-        )
-        .forEach(function (vertex, i) {
-          var tempVertex = vertex.replace("vertex", "").match(/[-+]?[0-9]*\.?[0-9]+/g);
-          var preVertex = new Vertex(Number(tempVertex[0]), Number(tempVertex[1]), Number(tempVertex[2]));
-          preVertexHolder["vert" + (i + 1)] = preVertex;
-        });
-      _handleFacet(preVertexHolder.vert1, preVertexHolder.vert2, preVertexHolder.vert3);
+        );
+        if( !vertValues ) {
+          console.warn("[STLParser] Could not parse vertex values.", vertValues);
+        } else {
+          vertValues.forEach( (vertex:string, i:number) => {
+            const tempVertex = vertex.replace("vertex", "").match(/[-+]?[0-9]*\.?[0-9]+/g);
+            if( !tempVertex ) {
+              console.warn("[STLParser] Failed to parse vertex value.", tempVertex);
+            } else {
+              const preVertex = new Vertex(Number(tempVertex[0]), Number(tempVertex[1]), Number(tempVertex[2]));
+              preVertexHolder["vert" + (i + 1)] = preVertex;
+            }
+          });
+        }
+        if( preVertexHolder.vert1 && preVertexHolder.vert2 && preVertexHolder.vert3) {
+          _handleFacet(preVertexHolder.vert1, preVertexHolder.vert2, preVertexHolder.vert3);
+        }
     });
   }
 
@@ -120,7 +135,9 @@ export class STLParser {
         var vert = new Vertex(dv.getFloat32(v * 4, le), dv.getFloat32((v + 1) * 4, le), dv.getFloat32((v + 2) * 4, le));
         vertHolder["vert" + v / 3] = vert;
       }
-      this.handleFacet(vertHolder.vert1, vertHolder.vert2, vertHolder.vert3, normal);
+      if( vertHolder.vert1 && vertHolder.vert2 && vertHolder.vert3 ) {
+        this.handleFacet(vertHolder.vert1, vertHolder.vert2, vertHolder.vert3, normal);
+      }
     }
   }
 

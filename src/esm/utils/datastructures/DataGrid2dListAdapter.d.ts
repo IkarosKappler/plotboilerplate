@@ -7,12 +7,12 @@
  * @version  1.0.0
  **/
 import { DataGridFace4, IDataGrid2d } from "./DataGrid2d";
-declare type Triplet<T> = {
+type Triplet<T> = {
     x: T;
     y: T;
     z: T;
 };
-declare type RasterPosition = {
+type RasterPosition = {
     xIndex: number;
     yIndex: number;
     xRel?: number;
