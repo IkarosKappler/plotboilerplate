@@ -1,5 +1,9 @@
 # Changelog
 
+- 2024-03-08
+  - Added the optional `precision` param to the `Vertex.toString` method.
+  - Added the `CircleSector.containsAngle` method.
+  - Adding the demo 53 (circle sector intersections). Sector intersections are required for the metaballs demo.
 - 2024-03-01
   - Refactoring the current metaballs calculation to a Typescript class.
   - Added the `CircleSector.getStartPoint` and `CircleSector.getEndPoint` methods.

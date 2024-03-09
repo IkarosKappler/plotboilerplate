@@ -37,6 +37,15 @@ export class CircleSector {
         this.startAngle = startAngle;
         this.endAngle = endAngle;
     }
+    containsAngle(angle) {
+        if (this.startAngle <= this.endAngle) {
+            return angle >= this.startAngle && angle < this.endAngle;
+        }
+        else {
+            // startAngle > endAngle
+            return angle >= this.startAngle || angle < this.endAngle;
+        }
+    }
     /**
      * Get the sectors starting point (on the underlying circle, located at the start angle).
      *
@@ -59,6 +68,24 @@ export class CircleSector {
     getEndPoint() {
         return this.circle.vertAt(this.endAngle);
     }
+    // circleSectorIntersection(sector: CircleSector): CircleSector | null {
+    //   const radicalLine: Line | null = this.circle.circleIntersection(sector.circle);
+    //   if (!radicalLine) {
+    //     // The circles to not intersect at all.
+    //     return null;
+    //   }
+    //   // Circles intersect. Check if sector intervals intersect, too.
+    //   const thisIntersectionAngleA = this.circle.center.angle(radicalLine.a);
+    //   const thisIntersectionAngleB = this.circle.center.angle(radicalLine.b);
+    //   // Is intersection inside this sector?
+    //   const thisIntervals: CircularIntervalSet = new CircularIntervalSet(0, Math.PI * 2.0);
+    //   thisIntervals.intersect(thisIntersectionAngleA, thisIntersectionAngleB);
+    //   const intersectionSector = new CircleSector(
+    //     new Circle(this.circle.center.clone(), this.circle.radius),
+    //     this.startAngle,
+    //     this.endAngle
+    //   );
+    // }
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and

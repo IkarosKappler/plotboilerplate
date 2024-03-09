@@ -360,7 +360,8 @@ class VertexListeners {
  * @modified 2022-11-28 Added the `subXY`, `subX` and `subY` methods to the `Vertex` class.
  * @modified 2023-09-29 Downgraded types for the `Vertex.utils.buildArrowHead` function (replacing Vertex params by more generic XYCoords type).
  * @modified 2023-09-29 Added the `Vertex.abs()` method as it seems useful.
- * @version  2.8.0
+ * @modified 2024-03-08 Added the optional `precision` param to the `toString` method.
+ * @version  2.9.0
  *
  * @file Vertex
  * @public
@@ -897,8 +898,13 @@ class Vertex {
      * @instance
      * @memberof Vertex
      **/
-    toString() {
-        return "(" + this.x + "," + this.y + ")";
+    toString(precision) {
+        if (typeof precision === "undefined") {
+            return "(" + this.x + "," + this.y + ")";
+        }
+        else {
+            return "(" + this.x.toFixed(precision) + "," + this.y.toFixed(precision) + ")";
+        }
     }
     /**
      * This function should invalidate any installed listeners and invalidate this object.
@@ -4473,6 +4479,15 @@ class CircleSector {
         this.startAngle = startAngle;
         this.endAngle = endAngle;
     }
+    containsAngle(angle) {
+        if (this.startAngle <= this.endAngle) {
+            return angle >= this.startAngle && angle < this.endAngle;
+        }
+        else {
+            // startAngle > endAngle
+            return angle >= this.startAngle || angle < this.endAngle;
+        }
+    }
     /**
      * Get the sectors starting point (on the underlying circle, located at the start angle).
      *
@@ -4495,6 +4510,24 @@ class CircleSector {
     getEndPoint() {
         return this.circle.vertAt(this.endAngle);
     }
+    // circleSectorIntersection(sector: CircleSector): CircleSector | null {
+    //   const radicalLine: Line | null = this.circle.circleIntersection(sector.circle);
+    //   if (!radicalLine) {
+    //     // The circles to not intersect at all.
+    //     return null;
+    //   }
+    //   // Circles intersect. Check if sector intervals intersect, too.
+    //   const thisIntersectionAngleA = this.circle.center.angle(radicalLine.a);
+    //   const thisIntersectionAngleB = this.circle.center.angle(radicalLine.b);
+    //   // Is intersection inside this sector?
+    //   const thisIntervals: CircularIntervalSet = new CircularIntervalSet(0, Math.PI * 2.0);
+    //   thisIntervals.intersect(thisIntersectionAngleA, thisIntersectionAngleB);
+    //   const intersectionSector = new CircleSector(
+    //     new Circle(this.circle.center.clone(), this.circle.radius),
+    //     this.startAngle,
+    //     this.endAngle
+    //   );
+    // }
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and

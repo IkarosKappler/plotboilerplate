@@ -1,12 +1,11 @@
 /**
- * A script to demonstrate how to construct irregular Reuleaux polygons with PlotBoilerplate.
+ * A script to demonstrate how to construct 2D metaballs with PlotBoilerplate.
  *
  * @requires PlotBoilerplate
  * @requires Bounds
  * @requires MouseHandler
  * @requires gup
  * @requires dat.gui
- * @requires three.js
  *
  * @author   Ikaros Kappler
  * @date     2024-02-06
@@ -140,6 +139,7 @@
     var drawCircleLabels = function (draw, fill) {
       for (var i = 0; i < metaballs.circlesOfInterest.length; i++) {
         const vert = metaballs.circlesOfInterest[i].center;
+        // TODO: use contrast color here
         fill.text("" + i, vert.x, vert.y, { color: "white", fontFamily: "Arial", fontSize: 9 });
       }
     };
@@ -259,6 +259,15 @@
         });
       });
 
+      console.log(
+        "outerPathListSectors.length",
+        outerPathListSectors.length,
+        "innerPathListSectors.length",
+        innerPathListSectors.length,
+        "metaballs.circlesOfInterest.length",
+        metaballs.circlesOfInterest.length
+      );
+
       // Draw circle sectors that need to be kept
       for (var i = 0; i < innerPathListSectors.length; i++) {
         for (var j = 0; j < innerPathListSectors[i].length; j++) {
@@ -269,13 +278,10 @@
           draw.diamondHandle(sectorStart, 10, "red");
           draw.diamondHandle(sectorEnd, 10, "red");
 
-          if (
-            Metaballs.metaballsUtils.anyCircleContainsPoint(metaballs.circlesOfInterest, sectorStart, i) &&
-            Metaballs.metaballsUtils.anyCircleContainsPoint(metaballs.circlesOfInterest, sectorEnd, i)
-          ) {
-            // Do not draw sectors that are fully contained inside any other circle
-            continue;
-          }
+          // if (Metaballs.metaballsUtils.anyCircleContainsAllPoints(metaballs.circlesOfInterest, [sectorStart, sectorEnd], i)) {
+          //   // Do not draw sectors that are fully contained inside any other circle
+          //   continue;
+          // }
           draw.circleArc(
             tmpSect.circle.center,
             tmpSect.circle.radius,

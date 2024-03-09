@@ -68,6 +68,7 @@ export declare class CircleSector implements SVGSerializable {
      * @param {number} endAngle - The end angle of the sector.
      */
     constructor(circle: Circle, startAngle: number, endAngle: number);
+    containsAngle(angle: number): boolean;
     /**
      * Get the sectors starting point (on the underlying circle, located at the start angle).
      *

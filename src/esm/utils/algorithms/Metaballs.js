@@ -162,14 +162,30 @@ Metaballs.metaballsUtils = {
             }
         }
         return holeGroupIndices;
-    },
-    anyCircleContainsPoint: (circles, point, ignoreCircleIndex) => {
-        for (var i = 0; i < circles.length; i++) {
-            if (i != ignoreCircleIndex && circles[i].containsPoint(point)) {
-                return true;
-            }
-        }
-        return false;
     }
+    // anyCircleContainsPoint: (circles: Array<Circle>, point: XYCoords, ignoreCircleIndex: number): boolean => {
+    //   for (var i = 0; i < circles.length; i++) {
+    //     if (i != ignoreCircleIndex && circles[i].containsPoint(point)) {
+    //       return true;
+    //     }
+    //   }
+    //   return false;
+    // },
+    // circleContainsAllPoints: (circle: Circle, points: XYCoords[]): boolean => {
+    //   for (var i = 0; i < points.length; i++) {
+    //     if (!circle.containsPoint(points[i])) {
+    //       return false;
+    //     }
+    //   }
+    //   return true;
+    // },
+    // anyCircleContainsAllPoints: (circles: Array<Circle>, points: XYCoords[], ignoreCircleIndex: number): boolean => {
+    //   for (var i = 0; i < circles.length; i++) {
+    //     if (i != ignoreCircleIndex && Metaballs.metaballsUtils.circleContainsAllPoints(circles[i], points)) {
+    //       return true;
+    //     }
+    //   }
+    //   return false;
+    // }
 };
 //# sourceMappingURL=Metaballs.js.map
