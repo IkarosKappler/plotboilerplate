@@ -64,7 +64,10 @@
       {
         numCircles: params.getNumber("numCircles", 2),
         drawCircles: params.getBoolean("drawCircles", true),
-        drawCircleNumbers: params.getBoolean("drawCircleNumber", true)
+        drawCircleNumbers: params.getBoolean("drawCircleNumber", true),
+        readme: function () {
+          globalThis.displayDemoMeta();
+        }
       },
       GUP
     );
@@ -213,6 +216,9 @@
       gui.add(config, "numCircles").min(1).max(10).step(1).onChange( function() { reinit(); pb.redraw(); } ).name('numCircles').title("Number of circles.");
       // prettier-ignore
       gui.add(config, "drawCircleNumbers").onChange( function() { pb.redraw(); } ).name('drawCircleNumbers').title("Draw circle numbers?");
+      // prettier-ignore
+      gui.add(config, "readme").name('readme').title("Display this demo's readme.");
+    
     }
 
     pb.config.postDraw = redraw;

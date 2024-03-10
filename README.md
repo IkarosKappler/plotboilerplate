@@ -556,6 +556,8 @@ new MouseHandler(document.getElementById("mycanvas"))
 - [girih-tiles-spatial.jpg from Lund University, Architecture, Spatial Experiments, 2016.](https://spatialexperiments.wordpress.com/2016/09/19/islamic-geometry/girih-tiles-4/)
 - [Josh Frank's regular expression for parsing SVG path data.](https://javascript.plainenglish.io/june-3-parsing-and-validating-svg-paths-with-regex-7bd0e245115)
 - [Rick Moore for the useful javascript-synthesizer howto](https://medium.com/geekculture/building-a-modular-synth-with-web-audio-api-and-javascript-d38ccdeca9ea)
+- [marked Markdown compiler](https://marked.js.org/) by Christopher Jeffrey.
+- [Interactive Visualization of Molecular Surface Dynamics](https://www.computer.org/csdl/journal/tg/2009/06/ttg2009061391/13rRUwInvsI) for the illustration image which inspired the metaballs demo.
 
 ## Todos
 

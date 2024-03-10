@@ -15,8 +15,9 @@
 * --- #2164: createAlloyFinger still working?
 * --- #709: saveAs still working?
 * Girih import stil working?
+* Jekyll & Docs look still good?
 
 # TODO:
 * elemen.style is now accessible via numeric index now:
     https://github.com/microsoft/TypeScript/issues/11914
-* 
+* extended-vertexset: Replace HELPME button with a proper readme dialog (old function is removed!)

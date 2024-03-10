@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2024-01-29
+date: 2024-03-10
 ---
 
 <h3>Basics</h3>
@@ -257,7 +257,27 @@ date: 2024-01-29
 </div>
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/49-polygon-inside-polygon/index.html' | prepend: site.url }}">
-      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-202311240-0-polygon-inside-polygon-check.png');"></div>
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20231124-0-polygon-inside-polygon-check.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/50-reuleaux-polygons/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20240130-0-reuleaux.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/51-polygons-with-rounded-edges/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20240206-0-polygons-with-round-edges.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/52-metacircles/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/na.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/53-circle-sector-intersections/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20240309-0-circle-sector-intersections.png');"></div>
    </a>
 </div>
 <div class="demo-box">

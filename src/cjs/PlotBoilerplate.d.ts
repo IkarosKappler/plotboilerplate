@@ -797,7 +797,7 @@ export declare class PlotBoilerplate {
          * @param {Object} extension
          * @return {Object} base extended by the new attributes.
          **/
-        safeMergeByKeys: <KeyType extends string | number | symbol, ValueType>(base: Record<KeyType, ValueType>, extension: Record<KeyType, ValueType>) => Record<KeyType, ValueType>;
+        safeMergeByKeys: <KeyType_1 extends string | number | symbol, ValueType>(base: Record<KeyType_1, ValueType>, extension: Record<KeyType_1, ValueType>) => Record<KeyType_1, ValueType>;
         setCSSscale: (element: HTMLElement | SVGElement, scaleX: number, scaleY: number) => void;
         fetch: {
             /**
