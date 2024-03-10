@@ -58,7 +58,7 @@ export class STLParser {
     _parseSTLString(stl) {
         // yes, this is the regular expression, matching the vertexes
         // it was kind of tricky but it is fast and does the job
-        const vertexes = stl.match(/facet\s+normal\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+outer\s+loop\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+endloop\s+endfacet/gS);
+        const vertexes = stl.match(/facet\s+normal\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+outer\s+loop\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+endloop\s+endfacet/g);
         if (!vertexes) {
             throw "[STLParser] Failed to parse STL input; regex could not match.";
         }
@@ -90,12 +90,16 @@ export class STLParser {
                             case 2:
                                 preVertexHolder.vert3 = preVertex;
                                 break;
+                            default: console.warn("[STLParse] Warning, vertex component index unexpeced.", i);
                         }
                     }
                 });
             }
             if (preVertexHolder.vert1 && preVertexHolder.vert2 && preVertexHolder.vert3) {
                 _handleFacet(preVertexHolder.vert1, preVertexHolder.vert2, preVertexHolder.vert3);
+            }
+            else {
+                console.warn("[STLParse] Warning, cannot add vertex to mesh. vertex not fully defined.");
             }
         });
     }
@@ -119,20 +123,25 @@ export class STLParser {
             for (var v = 3; v < 12; v += 3) {
                 var vert = new Vertex(dv.getFloat32(v * 4, le), dv.getFloat32((v + 1) * 4, le), dv.getFloat32((v + 2) * 4, le));
                 // vertHolder["vert" + v / 3] = vert;
-                switch (i) {
-                    case 3:
+                const vIndex = v / 3;
+                switch (vIndex) {
+                    case 1:
                         vertHolder.vert1 = vert;
                         break;
-                    case 6:
+                    case 2:
                         vertHolder.vert2 = vert;
                         break;
-                    case 9:
+                    case 3:
                         vertHolder.vert3 = vert;
                         break;
+                    default: console.warn("[STLParser] Warning, binary vertex component index unexpeced.", vIndex);
                 }
             }
             if (vertHolder.vert1 && vertHolder.vert2 && vertHolder.vert3) {
                 this.handleFacet(vertHolder.vert1, vertHolder.vert2, vertHolder.vert3, normal);
+            }
+            else {
+                console.warn("[STLParser] Warning, cannot add binary vertex to mesh. vertex not fully defined.");
             }
         }
     }
