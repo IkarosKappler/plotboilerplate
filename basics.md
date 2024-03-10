@@ -67,19 +67,19 @@ pb.add(triangle);
 
 ```
    // Create center vertex and radius (a non-negative number)
-      var center = new Vertex( 10, 10 );
-      var radius = 150;
+   var center = new Vertex( 10, 10 );
+   var radius = 150;
 
-      // Create the circle
-      var circle = new Circle( center, radius );
+   // Create the circle
+   var circle = new Circle( center, radius );
 
-      // Now create a sector from the circle
-      var startAngle   = 34 / 180 * Math.PI; // in radians
-      var endAngle     = 330 / 180 * Math.PI;
-      var circleSector = new CircleSector( circle, startAngle, endAngle );
+   // Now create a sector from the circle
+   var startAngle   = 34 / 180 * Math.PI; // in radians
+   var endAngle     = 330 / 180 * Math.PI;
+   var circleSector = new CircleSector( circle, startAngle, endAngle );
 
-      // Now add the sector to your canvas
-      pb.add( circleSector );
+   // Now add the sector to your canvas
+   pb.add( circleSector );
 ```
 
 [Demo](https://plotboilerplate.io/repo/demos/basic-CircleSector/ "Demo")
