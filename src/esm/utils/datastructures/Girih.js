@@ -2,7 +2,8 @@
  * @author   Ikaros Kappler
  * @date     2020-11-24
  * @modified 2020-11-25 Ported to TypeScript from vanilla JS.
- * @version  1.0.1
+ * @modified 2024-03-10 Fixed some types for Typescript 5 compatibility.
+ * @version  1.0.2
  * @file     Girih
  **/
 import { Vertex } from "../../Vertex";

@@ -21,7 +21,8 @@
  * @modified 2021-01-03 Added following new functions: `addPathVertexDragStartListeners`, `removePathVertexDragStartListeners`, `addPathVertexDragEndListeners` and `removePathVertexDragEndListeners`.
  * @modified 2021-03-31 Fixed the issue with the new AlloyFinger (Typescript).
  * @modified 2022-02-03 Changing the element to catch events (eventCatcher instead of canvas).
- * @version  1.1.2
+ * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
+ * @version  1.1.3
  *
  * @file BezierPathInteractionHelper
  * @public
@@ -44,7 +45,7 @@ import { XYCoords } from "../../interfaces";
 /**
  * Handler type for mouse-pointer-moved listeners.
  */
-type OnPointerMoved = (pathIndex: number, pathPoint: Vertex, pointerPos: Vertex, t: number) => void;
+type OnPointerMoved = (pathIndex: number, pathPoint: Vertex | null, pointerPos: Vertex | null, t: number) => void;
 /**
  * Handler type for vertex-inserted listeners.
  */
@@ -152,7 +153,7 @@ export class BezierPathInteractionHelper {
     this.pb = pb;
     this.paths = [];
     this.onPointerMoved =
-      typeof options.onPointerMoved === "function" ? options.onPointerMoved : (i: number, a: Vertex, b: Vertex, t: number) => {};
+      typeof options.onPointerMoved === "function" ? options.onPointerMoved : (i: number, a: Vertex | null, b: Vertex | null, t: number) => {};
     this.onVertexInserted =
       typeof options.onVertexInserted === "function"
         ? options.onVertexInserted
@@ -451,8 +452,8 @@ export class BezierPathInteractionHelper {
         _self._clearMoveEvent();
       }
     };
-    if (window["createAlloyFinger"]) {
-      return window["createAlloyFinger"](this.pb.eventCatcher ? this.pb.eventCatcher : this.pb.eventCatcher, afProps);
+    if (window["createAlloyFinger" as keyof Object]) {
+      return (window["createAlloyFinger" as keyof Object] as any)(this.pb.eventCatcher ? this.pb.eventCatcher : this.pb.eventCatcher, afProps);
     } else {
       return new AlloyFinger(this.pb.eventCatcher ? this.pb.eventCatcher : this.pb.eventCatcher, afProps);
     }
@@ -469,11 +470,11 @@ export class BezierPathInteractionHelper {
         if (_self._keyHandler.isDown("shift")) return;
         if (_self.currentDistance > _self.maxDetectDistance || !_self.mouseIsOver) return;
         const path: BezierPath = _self.paths[_self.currentPathIndex];
-        const vertex: Vertex = _self.pb.getVertexNear(e.params.pos, PlotBoilerplate.DEFAULT_CLICK_TOLERANCE);
+        const vertex: Vertex | undefined = _self.pb.getVertexNear(e.params.pos, PlotBoilerplate.DEFAULT_CLICK_TOLERANCE);
         if (vertex) return;
         // Check if there is already a path point at the given split position
         const pathPoint: Vertex = path.getPointAt(_self.currentT);
-        const pointNear: Vertex = _self.pb.getVertexNear(_self.pb.revertMousePosition(pathPoint.x, pathPoint.y), 6.0);
+        const pointNear: Vertex | undefined = _self.pb.getVertexNear(_self.pb.revertMousePosition(pathPoint.x, pathPoint.y), 6.0);
         if (pointNear) {
           for (var i = 0; i < path.bezierCurves.length; i++) {
             if (
@@ -556,7 +557,7 @@ export class BezierPathInteractionHelper {
     this.currentT = closestT;
     this.currentPathIndex = pathIndex;
     this.currentDistance = minDist;
-    this.currentA.set(closestPoint);
+    closestPoint && this.currentA.set(closestPoint);
   }
 
   // +---------------------------------------------------------------------------------

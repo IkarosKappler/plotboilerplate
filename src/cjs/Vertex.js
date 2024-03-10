@@ -220,11 +220,11 @@ var Vertex = /** @class */ (function () {
                 if (typeof x == "number")
                     this.x += x;
                 else
-                    throw "Cannot add " + typeof x + " to numeric x component!";
+                    throw "Cannot add ".concat(typeof x, " to numeric x component!");
                 if (typeof y == "number")
                     this.y += y;
                 else
-                    throw "Cannot add " + typeof y + " to numeric y component!";
+                    throw "Cannot add ".concat(typeof y, " to numeric y component!");
             }
         }
         return this;
@@ -298,11 +298,11 @@ var Vertex = /** @class */ (function () {
                 if (typeof x == "number")
                     this.x -= x;
                 else
-                    throw "Cannot add " + typeof x + " to numeric x component!";
+                    throw "Cannot add ".concat(typeof x, " to numeric x component!");
                 if (typeof y == "number")
                     this.y -= y;
                 else
-                    throw "Cannot add " + typeof y + " to numeric y component!";
+                    throw "Cannot add ".concat(typeof y, " to numeric y component!");
             }
         }
         return this;

@@ -110,7 +110,7 @@ var CubicBezierCurve = /** @class */ (function () {
                 this.getEndControlPoint().add(moveAmount);
         }
         else {
-            console.log("[CubicBezierCurve.moveCurvePoint] pointID '" + pointID + "' invalid.");
+            console.log("[CubicBezierCurve.moveCurvePoint] pointID '".concat(pointID, "' invalid."));
         }
         if (updateArcLengths)
             this.updateArcLengths();
@@ -351,7 +351,7 @@ var CubicBezierCurve = /** @class */ (function () {
             return this.startControlPoint;
         if (id == this.END_CONTROL_POINT)
             return this.endControlPoint;
-        throw new Error("Invalid point ID '" + id + "'.");
+        throw new Error("Invalid point ID '".concat(id, "'."));
     };
     /**
      * Get the curve point at a given position t, where t is in [0,1].<br>

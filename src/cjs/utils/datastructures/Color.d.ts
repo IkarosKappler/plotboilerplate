@@ -17,7 +17,8 @@
  * @modified 2022-05-11 Modified the `clone` function by just copying the numeric calues, not re-calculating the whole color.
  * @modified 2022-05-11 Fixed the `interpolate` function.
  * @modified 2023-01-23 Added `Color.set(Color)` function to set all values (r,g,b,h,s,l,a) simultanoeusly.
- * @version 0.0.12
+ * @modified 2024-03-10 Fixed some NaN type check for Typescript 5 compatibility.
+ * @version 0.0.13
  **/
 /**
  * @classdesc A color class, inspired by neolitec's Javascript class.

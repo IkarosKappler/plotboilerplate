@@ -7,8 +7,9 @@
  *
  * Refactored by Ikaros Kappler
  *
- * @date 2021-04-16
- * @version 0.0.1
+ * @date     2021-04-16
+ * @modified 2024-03-09 Added type checks for Typescript 5 compatibility.
+ * @version  0.0.2
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.STLParser = void 0;
@@ -62,18 +63,45 @@ var STLParser = /** @class */ (function () {
     STLParser.prototype._parseSTLString = function (stl) {
         // yes, this is the regular expression, matching the vertexes
         // it was kind of tricky but it is fast and does the job
-        var vertexes = stl.match(/facet\s+normal\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+outer\s+loop\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+endloop\s+endfacet/g);
+        var vertexes = stl.match(/facet\s+normal\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+outer\s+loop\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+endloop\s+endfacet/gS);
+        if (!vertexes) {
+            throw "[STLParser] Failed to parse STL input; regex could not match.";
+        }
+        ;
         var _handleFacet = this.handleFacet;
         vertexes.forEach(function (vert) {
             var preVertexHolder = new VertexHolder();
-            vert
-                .match(/vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s/g)
-                .forEach(function (vertex, i) {
-                var tempVertex = vertex.replace("vertex", "").match(/[-+]?[0-9]*\.?[0-9]+/g);
-                var preVertex = new Vertex(Number(tempVertex[0]), Number(tempVertex[1]), Number(tempVertex[2]));
-                preVertexHolder["vert" + (i + 1)] = preVertex;
-            });
-            _handleFacet(preVertexHolder.vert1, preVertexHolder.vert2, preVertexHolder.vert3);
+            var vertValues = vert
+                .match(/vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s/g);
+            if (!vertValues) {
+                console.warn("[STLParser] Could not parse vertex values.", vertValues);
+            }
+            else {
+                vertValues.forEach(function (vertex, i) {
+                    var tempVertex = vertex.replace("vertex", "").match(/[-+]?[0-9]*\.?[0-9]+/g);
+                    if (!tempVertex) {
+                        console.warn("[STLParser] Failed to parse vertex value.", tempVertex);
+                    }
+                    else {
+                        var preVertex = new Vertex(Number(tempVertex[0]), Number(tempVertex[1]), Number(tempVertex[2]));
+                        // preVertexHolder["vert" + (i + 1)] = preVertex;
+                        switch (i) {
+                            case 0:
+                                preVertexHolder.vert1 = preVertex;
+                                break;
+                            case 1:
+                                preVertexHolder.vert2 = preVertex;
+                                break;
+                            case 2:
+                                preVertexHolder.vert3 = preVertex;
+                                break;
+                        }
+                    }
+                });
+            }
+            if (preVertexHolder.vert1 && preVertexHolder.vert2 && preVertexHolder.vert3) {
+                _handleFacet(preVertexHolder.vert1, preVertexHolder.vert2, preVertexHolder.vert3);
+            }
         });
     };
     /**
@@ -95,9 +123,22 @@ var STLParser = /** @class */ (function () {
             var vertHolder = new VertexHolder();
             for (var v = 3; v < 12; v += 3) {
                 var vert = new Vertex(dv.getFloat32(v * 4, le), dv.getFloat32((v + 1) * 4, le), dv.getFloat32((v + 2) * 4, le));
-                vertHolder["vert" + v / 3] = vert;
+                // vertHolder["vert" + v / 3] = vert;
+                switch (i) {
+                    case 3:
+                        vertHolder.vert1 = vert;
+                        break;
+                    case 6:
+                        vertHolder.vert2 = vert;
+                        break;
+                    case 9:
+                        vertHolder.vert3 = vert;
+                        break;
+                }
             }
-            this.handleFacet(vertHolder.vert1, vertHolder.vert2, vertHolder.vert3, normal);
+            if (vertHolder.vert1 && vertHolder.vert2 && vertHolder.vert3) {
+                this.handleFacet(vertHolder.vert1, vertHolder.vert2, vertHolder.vert3, normal);
+            }
         }
     };
     /**

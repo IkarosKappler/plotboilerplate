@@ -102,7 +102,13 @@ export class STLParser {
               console.warn("[STLParser] Failed to parse vertex value.", tempVertex);
             } else {
               const preVertex = new Vertex(Number(tempVertex[0]), Number(tempVertex[1]), Number(tempVertex[2]));
-              preVertexHolder["vert" + (i + 1)] = preVertex;
+              // preVertexHolder["vert" + (i + 1)] = preVertex;
+              switch( i ) {
+                case 0: preVertexHolder.vert1 = preVertex; break;
+                case 1: preVertexHolder.vert2 = preVertex; break;
+                case 2: preVertexHolder.vert3 = preVertex; break;
+
+              }
             }
           });
         }
@@ -133,7 +139,13 @@ export class STLParser {
       const vertHolder = new VertexHolder();
       for (var v = 3; v < 12; v += 3) {
         var vert = new Vertex(dv.getFloat32(v * 4, le), dv.getFloat32((v + 1) * 4, le), dv.getFloat32((v + 2) * 4, le));
-        vertHolder["vert" + v / 3] = vert;
+        // vertHolder["vert" + v / 3] = vert;
+        switch( i ) {
+          case 3: vertHolder.vert1 = vert; break;
+          case 6: vertHolder.vert2 = vert; break;
+          case 9: vertHolder.vert3 = vert; break;
+
+        }
       }
       if( vertHolder.vert1 && vertHolder.vert2 && vertHolder.vert3 ) {
         this.handleFacet(vertHolder.vert1, vertHolder.vert2, vertHolder.vert3, normal);

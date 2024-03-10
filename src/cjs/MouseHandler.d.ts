@@ -55,8 +55,8 @@ export declare class XMouseEvent extends MouseEvent {
 export declare class XWheelEvent extends WheelEvent {
     params: XMouseParams;
 }
-export declare type XMouseCallback = (e: XMouseEvent) => void;
-export declare type XWheelCallback = (e: XWheelEvent) => void;
+export type XMouseCallback = (e: XMouseEvent) => void;
+export type XWheelCallback = (e: XWheelEvent) => void;
 /**
  * @classdesc A simple mouse handler for demos.
  * Use to avoid load massive libraries like jQuery.

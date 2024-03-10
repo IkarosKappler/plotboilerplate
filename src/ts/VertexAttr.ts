@@ -6,7 +6,8 @@
  * @modified 2019-03-20 Added JSDoc tags.
  * @modified 2020-02-29 Added the 'selectable' attribute.
  * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  1.1.1
+ * @modified 2024-03-10 Fixed some types for Typescript 5 compatibility.
+ * @version  1.1.2
  *
  * @file VertexAttr
  * @public
@@ -76,7 +77,7 @@ export class VertexAttr implements IVertexAttr {
 	this.visible = true;
 
 	for( var key in VertexAttr.model ) 
-	    this[key] = VertexAttr.model[key];
+	    this[key as keyof VertexAttr] = VertexAttr.model[key as keyof IVertexAttr] as any as boolean;
     };
 
 

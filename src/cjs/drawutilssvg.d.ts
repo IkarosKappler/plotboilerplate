@@ -45,7 +45,8 @@
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-10-04 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
  * @modified 2024-01-30 Fixing an issue with immutable style sets; changes to the global draw config did not reflect here (do now).
- * @version  1.6.8
+ * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
+ * @version  1.6.9
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";

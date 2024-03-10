@@ -45,7 +45,8 @@
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-10-04 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
  * @modified 2024-01-30 Fixing an issue with immutable style sets; changes to the global draw config did not reflect here (do now).
- * @version  1.6.8
+ * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
+ * @version  1.6.9
  **/
 import { CircleSector } from "./CircleSector";
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -245,7 +246,8 @@ export class drawutilssvg {
             node = this.createSVGNode(nodeName);
         }
         if (this.drawlibConfiguration.blendMode) {
-            node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
+            // node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
+            node.style["mix-blend-mode"](this.drawlibConfiguration.blendMode);
         }
         // if (this.lineDashEnabled && this.lineDash && this.lineDash.length > 0 && drawutilssvg.nodeSupportsLineDash(nodeName)) {
         //   node.setAttribute("stroke-dasharray", this.lineDash.join(" "));

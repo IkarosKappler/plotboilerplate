@@ -53,7 +53,7 @@ var CircleIntersections = /** @class */ (function () {
         for (var i = 0; i < intervalSets.length; i++) {
             maxSetLength = Math.max(maxSetLength, intervalSets[i].intervals.length);
         }
-        var usedIntervals = matrixFill_1.matrixFill(intervalSets.length, maxSetLength, false);
+        var usedIntervals = (0, matrixFill_1.matrixFill)(intervalSets.length, maxSetLength, false);
         var path = null;
         var pathList = [];
         while ((path = CircleIntersections.findOuterPartition(circles, intervalSets, usedIntervals)) != null) {
@@ -107,7 +107,7 @@ var CircleIntersections = /** @class */ (function () {
         var radicalLines = [];
         for (var i = 0; i < circles.length; i++) {
             if (!radicalLines[i]) {
-                radicalLines[i] = arrayFill_1.arrayFill(circles.length, null);
+                radicalLines[i] = (0, arrayFill_1.arrayFill)(circles.length, null);
             }
             for (var j = 0; j < circles.length; j++) {
                 if (i == j)
@@ -119,7 +119,7 @@ var CircleIntersections = /** @class */ (function () {
                 var tmpRadLine = radicalLines[i][j];
                 if (tmpRadLine) {
                     if (!radicalLines[j]) {
-                        radicalLines[j] = arrayFill_1.arrayFill(circles.length, null);
+                        radicalLines[j] = (0, arrayFill_1.arrayFill)(circles.length, null);
                     }
                     // Use reverse line
                     radicalLines[j][i] = new Line_1.Line(tmpRadLine.b, tmpRadLine.a);

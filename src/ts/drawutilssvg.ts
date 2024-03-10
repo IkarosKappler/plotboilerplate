@@ -45,7 +45,8 @@
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-10-04 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
  * @modified 2024-01-30 Fixing an issue with immutable style sets; changes to the global draw config did not reflect here (do now).
- * @version  1.6.8
+ * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
+ * @version  1.6.9
  **/
 
 import { CircleSector } from "./CircleSector";
@@ -303,8 +304,8 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     const rules: Array<string> = [];
     // console.log("drawConfig", drawConfig);
     for (var k in keys) {
-      const className: string = keys[k];
-      const drawSettings: DrawSettings | undefined = drawConfig[k];
+      const className: string = keys[k as keyof Object] as any as string;
+      const drawSettings: DrawSettings | undefined = drawConfig[k as keyof Object] as any as DrawSettings | undefined;
       if (drawSettings) {
         rules.push(`.${className} { fill : none; stroke: ${drawSettings.color}; stroke-width: ${drawSettings.lineWidth}px }`);
       } else {
@@ -404,7 +405,8 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       node = this.createSVGNode(nodeName);
     }
     if (this.drawlibConfiguration.blendMode) {
-      node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
+      // node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
+      node.style["mix-blend-mode" as keyof Object](this.drawlibConfiguration.blendMode);
     }
     // if (this.lineDashEnabled && this.lineDash && this.lineDash.length > 0 && drawutilssvg.nodeSupportsLineDash(nodeName)) {
     //   node.setAttribute("stroke-dasharray", this.lineDash.join(" "));

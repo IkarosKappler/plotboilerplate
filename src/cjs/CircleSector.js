@@ -104,7 +104,19 @@ var CircleSector = /** @class */ (function () {
     CircleSector.prototype.getEndPoint = function () {
         return this.circle.vertAt(this.endAngle);
     };
-    // TODO: docs
+    /**
+     * Calculate the intersection of this circle sector and some other sector.
+     *
+     * If the two sectors do not corerently intersect (when not both points of the
+     * radical line are containted in both source sectors) then null is returned.
+     *
+     * See demo/53-circle-sector-intersections for a geometric visualisation.
+     *
+     * @method circleSectorIntersection
+     * @instance
+     * @memberof CircleSector
+     * @return {CircleSector | null} The intersecion of both sectors or null if they don't intersect.
+     */
     CircleSector.prototype.circleSectorIntersection = function (sector) {
         var radicalLine = this.circle.circleIntersection(sector.circle);
         if (!radicalLine) {

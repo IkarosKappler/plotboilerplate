@@ -12,7 +12,7 @@ var UIDGenerator = /** @class */ (function () {
     function UIDGenerator() {
     }
     UIDGenerator.next = function () {
-        return "" + UIDGenerator.current++;
+        return "".concat(UIDGenerator.current++);
     };
     UIDGenerator.current = 0;
     return UIDGenerator;

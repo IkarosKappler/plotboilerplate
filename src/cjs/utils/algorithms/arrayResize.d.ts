@@ -5,4 +5,4 @@
  * @date    2024-02-07
  * @version 1.0.0
  */
-export declare const arrayResize: <T>(arr: T[], desiredSize: number, factoryFn: () => T) => void;
+export declare const arrayResize: <T>(arr: Array<T>, desiredSize: number, factoryFn: () => T) => void;

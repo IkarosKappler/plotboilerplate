@@ -508,8 +508,9 @@ export class PlotBoilerplate {
         var blob = new Blob(['<?xml version="1.0" encoding="utf-8"?>\n' + svgCode], { type: "image/svg;charset=utf-8" });
         // See documentation for FileSaver.js for usage.
         //    https://github.com/eligrey/FileSaver.js
-        if (typeof globalThis["saveAs"] !== "function")
+        if (typeof globalThis["saveAs"] !== "function") {
             throw "Cannot save file; did you load the ./utils/savefile helper function and the eligrey/SaveFile library?";
+        }
         var _saveAs = globalThis["saveAs"];
         _saveAs(blob, "plotboilerplate.svg");
     }
@@ -1893,7 +1894,9 @@ export class PlotBoilerplate {
                         }
                     }; // END afProps
                     if (window["createAlloyFinger"]) {
-                        window["createAlloyFinger"](this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
+                        // window["createAlloyFinger"](this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
+                        const createAlloyFinger = window["createAlloyFinger"];
+                        createAlloyFinger(this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
                     }
                     else {
                         /* tslint:disable-next-line */
@@ -1951,10 +1954,15 @@ export class PlotBoilerplate {
     createGUI(props) {
         // This function moved to the helper utils.
         // We do not want to include the whole dat.GUI package.
-        if (globalThis["utils"] && typeof globalThis["utils"].createGUI == "function")
-            return globalThis["utils"].createGUI(this, props);
-        else
+        const utils = globalThis["utils"];
+        // if (globalThis["utils"] && typeof globalThis["utils"].createGUI == "function") {
+        //   return (globalThis["utils" as keyof Object] as any as ({createGUI : (pb:PlotBoilerplate,props:DatGuiProps|undefined)=>GUI })).createGUI(this, props);
+        if (utils && typeof utils.createGUI === "function") {
+            return utils.createGUI(this, props);
+        }
+        else {
             throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an the dat.GUI library?";
+        }
     }
 } // END class PlotBoilerplate
 /** @constant {number} */
@@ -2072,7 +2080,8 @@ PlotBoilerplate.utils = {
      * @return {void}
      **/
     setCSSscale: (element, scaleX, scaleY) => {
-        element.style["transform-origin"] = "0 0";
+        // element.style["transform-origin"] = "0 0";
+        element.style.transformOrigin = "0 0";
         if (scaleX == 1.0 && scaleY == 1.0) {
             // element.style.transform = null;
             element.style.removeProperty("transform");

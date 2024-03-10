@@ -6,7 +6,8 @@
  * @modified 2019-03-20 Added JSDoc tags.
  * @modified 2020-02-29 Added the 'selectable' attribute.
  * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  1.1.1
+ * @modified 2024-03-10 Fixed some types for Typescript 5 compatibility.
+ * @version  1.1.2
  *
  * @file VertexAttr
  * @public
@@ -4542,7 +4543,19 @@ class CircleSector {
     getEndPoint() {
         return this.circle.vertAt(this.endAngle);
     }
-    // TODO: docs
+    /**
+     * Calculate the intersection of this circle sector and some other sector.
+     *
+     * If the two sectors do not corerently intersect (when not both points of the
+     * radical line are containted in both source sectors) then null is returned.
+     *
+     * See demo/53-circle-sector-intersections for a geometric visualisation.
+     *
+     * @method circleSectorIntersection
+     * @instance
+     * @memberof CircleSector
+     * @return {CircleSector | null} The intersecion of both sectors or null if they don't intersect.
+     */
     circleSectorIntersection(sector) {
         const radicalLine = this.circle.circleIntersection(sector.circle);
         if (!radicalLine) {
@@ -4697,7 +4710,8 @@ CircleSector.circleSectorUtils = {
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-10-04 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
  * @modified 2024-01-30 Fixing an issue with immutable style sets; changes to the global draw config did not reflect here (do now).
- * @version  1.6.8
+ * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
+ * @version  1.6.9
  **/
 const RAD_TO_DEG = 180 / Math.PI;
 /**
@@ -4892,7 +4906,8 @@ class drawutilssvg {
             node = this.createSVGNode(nodeName);
         }
         if (this.drawlibConfiguration.blendMode) {
-            node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
+            // node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
+            node.style["mix-blend-mode"](this.drawlibConfiguration.blendMode);
         }
         // if (this.lineDashEnabled && this.lineDash && this.lineDash.length > 0 && drawutilssvg.nodeSupportsLineDash(nodeName)) {
         //   node.setAttribute("stroke-dasharray", this.lineDash.join(" "));
@@ -9035,7 +9050,7 @@ class KeyHandler {
  */
 // prettier-ignore
 KeyHandler.KEY_CODES = {
-    'break': 3,
+    'break': 3, // alternate: 19
     'backspace': 8,
     // 'delete'	 : 8, // alternate: 46
     'tab': 9,
@@ -9051,12 +9066,12 @@ KeyHandler.KEY_CODES = {
     'hanja': 25,
     'escape': 27,
     'conversion': 28,
-    'non-conversion': 29,
+    'non-conversion': 29, // alternate: 235?
     'spacebar': 32,
     'pageup': 33,
     'pagedown': 34,
     'end': 35,
-    'home': 36,
+    'home': 36, // alternate: 172?
     'leftarrow': 37,
     'uparrow': 38,
     'rightarrow': 39,
@@ -9066,7 +9081,7 @@ KeyHandler.KEY_CODES = {
     'execute': 43,
     'printscreen': 44,
     'insert': 45,
-    'delete': 46,
+    'delete': 46, // alternate: 8
     'help': 47,
     '0': 48,
     '1': 49,
@@ -9112,11 +9127,11 @@ KeyHandler.KEY_CODES = {
     'y': 89,
     'z': 90,
     'windows': 91,
-    'leftcommand': 91,
+    'leftcommand': 91, // left ⌘
     'chromebooksearch': 91,
     'rightwindowkey': 92,
     'windowsmenu': 93,
-    'rightcommant': 93,
+    'rightcommant': 93, // right ⌘
     'sleep': 95,
     'numpad0': 96,
     'numpad1': 97,
@@ -9130,7 +9145,7 @@ KeyHandler.KEY_CODES = {
     'numpad9': 105,
     'multiply': 106,
     'add': 107,
-    'numpadperiod': 108,
+    'numpadperiod': 108, // firefox, 194 on chrome
     'subtract': 109,
     'decimalpoint': 110,
     'divide': 111,
@@ -9169,11 +9184,11 @@ KeyHandler.KEY_CODES = {
     'pagebackward': 166,
     'pageforward': 167,
     'refresh': 168,
-    'closingparen': 169,
+    'closingparen': 169, // (AZERTY)
     '*': 170,
     '~+*': 171,
     // 'home'	         : 172,
-    'minus': 173,
+    'minus': 173, // firefox
     // 'mute'           : 173,
     // 'unmute'	 : 173,
     'decreasevolumelevel': 174,
@@ -9183,8 +9198,8 @@ KeyHandler.KEY_CODES = {
     'stop': 178,
     'play/pause': 179,
     'email': 180,
-    'mute': 181,
-    'unmute': 181,
+    'mute': 181, // firefox, alternate: 173
+    'unmute': 181, // alternate: 173?
     //'decreasevolumelevel'	182 // firefox
     //'increasevolumelevel'	183 // firefox
     'semicolon': 186,
@@ -9194,7 +9209,7 @@ KeyHandler.KEY_CODES = {
     'dash': 189,
     'period': 190,
     'forwardslash': 191,
-    'ç': 191,
+    'ç': 191, // 231 alternate?
     'grave accent': 192,
     //'ñ' 192,
     'æ': 192,
@@ -9223,7 +9238,7 @@ KeyHandler.KEY_CODES = {
     'half-width': 243,
     'full-width': 243,
     'kanji': 244,
-    'unlocktrackpad': 251,
+    'unlocktrackpad': 251, // Chrome/Edge
     'toggletouchpad': 255
 };
 
@@ -9420,10 +9435,10 @@ class MouseHandler {
             name: eventName,
             isTouchEvent: false,
             pos: rel,
-            button: event.button,
-            leftButton: event.button === 0,
-            middleButton: event.button === 1,
-            rightButton: event.button === 2,
+            button: event.button, // this.mouseButton,
+            leftButton: event.button === 0, // this.mouseButton === 0,
+            middleButton: event.button === 1, // this.mouseButton === 1,
+            rightButton: event.button === 2, // this.mouseButton === 2,
             mouseDownPos: (_a = this.mouseDownPos) !== null && _a !== void 0 ? _a : { x: NaN, y: NaN },
             draggedFrom: (_b = this.mouseDragPos) !== null && _b !== void 0 ? _b : { x: NaN, y: NaN },
             wasDragged: this.mouseDownPos != null && (this.mouseDownPos.x != rel.x || this.mouseDownPos.y != rel.y),
@@ -10671,7 +10686,7 @@ VEllipseSector.ellipseSectorUtils = {
         const r2d = 180 / Math.PI;
         pathData.push("A", radiusH, radiusV, rotation * r2d, largeArcFlag, sweepFlag, end.x, end.y);
         return pathData;
-    },
+    }, // END function describeSVGArc
     /**
      * Helper function to find second-kind elliptic angles, so that the euclidean distance along the the
      * elliptic sector is the same for all.
@@ -10883,6 +10898,10 @@ VEllipseSector.ellipseSectorUtils = {
  * @fileoverview The main class.
  * @public
  **/
+var __setFunctionName = (undefined && undefined.__setFunctionName) || function (f, name, prefix) {
+    if (typeof name === "symbol") name = name.description ? "[".concat(name.description, "]") : "";
+    return Object.defineProperty(f, "name", { configurable: true, value: prefix ? "".concat(prefix, " ", name) : name });
+};
 var _a;
 /**
  * @classdesc The main class of the PlotBoilerplate.
@@ -10975,7 +10994,7 @@ class PlotBoilerplate {
      * @param {string=} [config.title=null] - Specify any hover tile here. It will be attached as a `title` attribute to the most elevated element.
      */
     constructor(config, drawConfig) {
-        var _a, _b;
+        var _b, _c;
         /**
          * A discrete timestamp to identify single render cycles.
          * Note that using system time milliseconds is not a safe way to identify render frames, as on modern powerful machines
@@ -11049,8 +11068,8 @@ class PlotBoilerplate {
             enableTouch: f.bool(config, "enableTouch", true),
             enableKeys: f.bool(config, "enableKeys", true),
             enableMouseWheel: f.bool(config, "enableMouseWheel", true),
-            enableZoom: f.bool(config, "enableZoom", true),
-            enablePan: f.bool(config, "enablePan", true),
+            enableZoom: f.bool(config, "enableZoom", true), // default=true
+            enablePan: f.bool(config, "enablePan", true), // default=true
             // Experimental (and unfinished)
             enableGL: f.bool(config, "enableGL", false)
         }; // END confog
@@ -11210,8 +11229,8 @@ class PlotBoilerplate {
         if (config.title) {
             this.eventCatcher.setAttribute("title", config.title);
         }
-        this.draw.scale.set((_a = this.config.scaleX) !== null && _a !== void 0 ? _a : 1.0, this.config.scaleY);
-        this.fill.scale.set((_b = this.config.scaleX) !== null && _b !== void 0 ? _b : 1.0, this.config.scaleY);
+        this.draw.scale.set((_b = this.config.scaleX) !== null && _b !== void 0 ? _b : 1.0, this.config.scaleY);
+        this.fill.scale.set((_c = this.config.scaleX) !== null && _c !== void 0 ? _c : 1.0, this.config.scaleY);
         this.vertices = [];
         this.selectPolygon = null;
         this.draggedElements = [];
@@ -11277,8 +11296,9 @@ class PlotBoilerplate {
         var blob = new Blob(['<?xml version="1.0" encoding="utf-8"?>\n' + svgCode], { type: "image/svg;charset=utf-8" });
         // See documentation for FileSaver.js for usage.
         //    https://github.com/eligrey/FileSaver.js
-        if (typeof globalThis["saveAs"] !== "function")
+        if (typeof globalThis["saveAs"] !== "function") {
             throw "Cannot save file; did you load the ./utils/savefile helper function and the eligrey/SaveFile library?";
+        }
         var _saveAs = globalThis["saveAs"];
         _saveAs(blob, "plotboilerplate.svg");
     }
@@ -11349,12 +11369,12 @@ class PlotBoilerplate {
      * @private
      **/
     updateCSSscale() {
-        var _a, _b, _c, _d;
+        var _b, _c, _d, _e;
         if (this.config.cssUniformScale) {
-            PlotBoilerplate.utils.setCSSscale(this.canvas, (_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0, (_b = this.config.cssScaleX) !== null && _b !== void 0 ? _b : 1.0);
+            PlotBoilerplate.utils.setCSSscale(this.canvas, (_b = this.config.cssScaleX) !== null && _b !== void 0 ? _b : 1.0, (_c = this.config.cssScaleX) !== null && _c !== void 0 ? _c : 1.0);
         }
         else {
-            PlotBoilerplate.utils.setCSSscale(this.canvas, (_c = this.config.cssScaleX) !== null && _c !== void 0 ? _c : 1.0, (_d = this.config.cssScaleY) !== null && _d !== void 0 ? _d : 1.0);
+            PlotBoilerplate.utils.setCSSscale(this.canvas, (_d = this.config.cssScaleX) !== null && _d !== void 0 ? _d : 1.0, (_e = this.config.cssScaleY) !== null && _e !== void 0 ? _e : 1.0);
         }
     }
     /**
@@ -11627,8 +11647,8 @@ class PlotBoilerplate {
      * @return The vertex near the given position or undefined if none was found there.
      **/
     getVertexNear(pixelPosition, pixelTolerance) {
-        var _a, _b;
-        const p = this.locatePointNear(this.transformMousePosition(pixelPosition.x, pixelPosition.y), pixelTolerance / Math.min((_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0, (_b = this.config.cssScaleY) !== null && _b !== void 0 ? _b : 1.0));
+        var _b, _c;
+        const p = this.locatePointNear(this.transformMousePosition(pixelPosition.x, pixelPosition.y), pixelTolerance / Math.min((_b = this.config.cssScaleX) !== null && _b !== void 0 ? _b : 1.0, (_c = this.config.cssScaleY) !== null && _c !== void 0 ? _c : 1.0));
         if (p && p.typeName == "vertex") {
             return this.vertices[p.vindex];
         }
@@ -12057,8 +12077,8 @@ class PlotBoilerplate {
      * @return {Bounds} The current viewport.
      **/
     viewport() {
-        var _a, _b;
-        return new Bounds(this.transformMousePosition(0, 0), this.transformMousePosition(this.canvasSize.width * ((_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0), this.canvasSize.height * ((_b = this.config.cssScaleY) !== null && _b !== void 0 ? _b : 1.0)));
+        var _b, _c;
+        return new Bounds(this.transformMousePosition(0, 0), this.transformMousePosition(this.canvasSize.width * ((_b = this.config.cssScaleX) !== null && _b !== void 0 ? _b : 1.0), this.canvasSize.height * ((_c = this.config.cssScaleY) !== null && _c !== void 0 ? _c : 1.0)));
     }
     /**
      * Trigger the saveFile.hook.
@@ -12106,12 +12126,12 @@ class PlotBoilerplate {
      * @return {void}
      **/
     resizeCanvas() {
-        var _a, _b, _c, _d, _e, _f;
+        var _b, _c, _d, _e, _f, _g;
         const _self = this;
         const _setSize = (w, h) => {
-            var _a, _b;
-            w *= (_a = _self.config.canvasWidthFactor) !== null && _a !== void 0 ? _a : 1.0;
-            h *= (_b = _self.config.canvasHeightFactor) !== null && _b !== void 0 ? _b : 1.0;
+            var _b, _c;
+            w *= (_b = _self.config.canvasWidthFactor) !== null && _b !== void 0 ? _b : 1.0;
+            h *= (_c = _self.config.canvasHeightFactor) !== null && _c !== void 0 ? _c : 1.0;
             _self.canvasSize.width = w;
             _self.canvasSize.height = h;
             if (_self.canvas instanceof HTMLCanvasElement) {
@@ -12140,8 +12160,8 @@ class PlotBoilerplate {
             var width = globalThis.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
             var height = globalThis.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
             _self.canvas.style.position = "absolute";
-            _self.canvas.style.width = ((_a = _self.config.canvasWidthFactor) !== null && _a !== void 0 ? _a : 1.0) * width + "px";
-            _self.canvas.style.height = ((_b = _self.config.canvasWidthFactor) !== null && _b !== void 0 ? _b : 1.0) * height + "px";
+            _self.canvas.style.width = ((_b = _self.config.canvasWidthFactor) !== null && _b !== void 0 ? _b : 1.0) * width + "px";
+            _self.canvas.style.height = ((_c = _self.config.canvasWidthFactor) !== null && _c !== void 0 ? _c : 1.0) * height + "px";
             _self.canvas.style.top = "0px";
             _self.canvas.style.left = "0px";
             _setSize(width, height);
@@ -12150,8 +12170,8 @@ class PlotBoilerplate {
             // Set editor size
             _self.canvas.style.position = "static";
             const space = this.getAvailableContainerSpace();
-            _self.canvas.style.width = ((_c = _self.config.canvasWidthFactor) !== null && _c !== void 0 ? _c : 1.0) * space.width + "px";
-            _self.canvas.style.height = ((_d = _self.config.canvasHeightFactor) !== null && _d !== void 0 ? _d : 1.0) * space.height + "px";
+            _self.canvas.style.width = ((_d = _self.config.canvasWidthFactor) !== null && _d !== void 0 ? _d : 1.0) * space.width + "px";
+            _self.canvas.style.height = ((_e = _self.config.canvasHeightFactor) !== null && _e !== void 0 ? _e : 1.0) * space.height + "px";
             _self.canvas.style.top = "";
             _self.canvas.style.left = "";
             _setSize(space.width, space.height);
@@ -12159,7 +12179,7 @@ class PlotBoilerplate {
         else {
             _self.canvas.style.width = "";
             _self.canvas.style.height = "";
-            _setSize((_e = _self.config.defaultCanvasWidth) !== null && _e !== void 0 ? _e : 1024, (_f = _self.config.defaultCanvasHeight) !== null && _f !== void 0 ? _f : 768);
+            _setSize((_f = _self.config.defaultCanvasWidth) !== null && _f !== void 0 ? _f : 1024, (_g = _self.config.defaultCanvasHeight) !== null && _g !== void 0 ? _g : 768);
         }
         if (_self.config.redrawOnResize)
             _self.redraw();
@@ -12662,7 +12682,9 @@ class PlotBoilerplate {
                         }
                     }; // END afProps
                     if (window["createAlloyFinger"]) {
-                        window["createAlloyFinger"](this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
+                        // window["createAlloyFinger"](this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
+                        const createAlloyFinger = window["createAlloyFinger"];
+                        createAlloyFinger(this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
                     }
                     else {
                         /* tslint:disable-next-line */
@@ -12720,10 +12742,15 @@ class PlotBoilerplate {
     createGUI(props) {
         // This function moved to the helper utils.
         // We do not want to include the whole dat.GUI package.
-        if (globalThis["utils"] && typeof globalThis["utils"].createGUI == "function")
-            return globalThis["utils"].createGUI(this, props);
-        else
+        const utils = globalThis["utils"];
+        // if (globalThis["utils"] && typeof globalThis["utils"].createGUI == "function") {
+        //   return (globalThis["utils" as keyof Object] as any as ({createGUI : (pb:PlotBoilerplate,props:DatGuiProps|undefined)=>GUI })).createGUI(this, props);
+        if (utils && typeof utils.createGUI === "function") {
+            return utils.createGUI(this, props);
+        }
+        else {
             throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an the dat.GUI library?";
+        }
     }
 } // END class PlotBoilerplate
 /** @constant {number} */
@@ -12751,6 +12778,7 @@ PlotBoilerplate.Draggable = (_a = class {
             return this;
         }
     },
+    __setFunctionName(_a, "Draggable"),
     _a.VERTEX = "vertex",
     _a);
 /**
@@ -12840,7 +12868,8 @@ PlotBoilerplate.utils = {
      * @return {void}
      **/
     setCSSscale: (element, scaleX, scaleY) => {
-        element.style["transform-origin"] = "0 0";
+        // element.style["transform-origin"] = "0 0";
+        element.style.transformOrigin = "0 0";
         if (scaleX == 1.0 && scaleY == 1.0) {
             // element.style.transform = null;
             element.style.removeProperty("transform");
@@ -12923,7 +12952,7 @@ PlotBoilerplate.utils = {
                 return fallback;
             return obj[key];
         }
-    },
+    }, // END fetch
     /**
      * Installs vertex listeners to the path's vertices so that controlpoints
      * move with their path points when dragged.
