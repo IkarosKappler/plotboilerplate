@@ -9,7 +9,8 @@
  * @modified 2021-01-22 Removed `pb.redraw()` call from update handlers (changed vertices already triggered redraw).
  * @modified 2024-02-26 Removed the constructor param `pb` (unused).
  * @modified 2024-02-25 Added `circle` and `radiusPoint` attributes.
- * @version  1.2.0
+ * @modified 2024-03-10 Fixed some issues in the `destroy` method; listeners were not properly removed.
+ * @version  1.2.1
  **/
 import { Circle } from "../../Circle";
 import { Vertex } from "../../Vertex";
@@ -19,6 +20,8 @@ import { Vertex } from "../../Vertex";
 export declare class CircleHelper {
     circle: Circle;
     radiusPoint: Vertex;
+    private centerHandler;
+    private radiusHandler;
     /**
      * The constructor.
      *
@@ -42,20 +45,20 @@ export declare class CircleHelper {
      * Creates a new drag handler for the circle's center point.
      *
      * @private
-     * @method handleDragCenter
+     * @method _handleDragCenter
      * @instance
      * @memberof CircleHelper
      * @returns A new event handler.
      */
-    private handleDragCenter;
+    private _handleDragCenter;
     /**
      * Creates a new drag handler for the circle's radius control point.
      *
      * @private
-     * @method handleDragCenter
+     * @method _handleDragCenter
      * @instance
      * @memberof CircleHelper
      * @returns A new event handler.
      */
-    private handleDragRadiusPoint;
+    private _handleDragRadiusPoint;
 }

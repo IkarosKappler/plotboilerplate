@@ -9,7 +9,8 @@
  * @modified 2021-01-22 Removed `pb.redraw()` call from update handlers (changed vertices already triggered redraw).
  * @modified 2024-02-26 Removed the constructor param `pb` (unused).
  * @modified 2024-02-25 Added `circle` and `radiusPoint` attributes.
- * @version  1.2.0
+ * @modified 2024-03-10 Fixed some issues in the `destroy` method; listeners were not properly removed.
+ * @version  1.2.1
  **/
 /**
  * @classdesc A helper for handling circles with an additional radius-control-point.
@@ -27,8 +28,8 @@ export class CircleHelper {
     constructor(circle, radiusPoint) {
         this.circle = circle;
         this.radiusPoint = radiusPoint;
-        circle.center.listeners.addDragListener(this.handleDragCenter());
-        radiusPoint.listeners.addDragListener(this.handleDragRadiusPoint());
+        circle.center.listeners.addDragListener(this.centerHandler = this._handleDragCenter());
+        radiusPoint.listeners.addDragListener(this.radiusHandler = this._handleDragRadiusPoint());
     }
     /**
      * Destroy this circle helper.
@@ -39,19 +40,19 @@ export class CircleHelper {
      * @memberof CircleHelper
      */
     destroy() {
-        this.circle.center.listeners.removeDragListener(this.handleDragCenter);
-        this.radiusPoint.listeners.removeDragListener(this.handleDragRadiusPoint);
+        this.circle.center.listeners.removeDragListener(this.centerHandler);
+        this.radiusPoint.listeners.removeDragListener(this.radiusHandler);
     }
     /**
      * Creates a new drag handler for the circle's center point.
      *
      * @private
-     * @method handleDragCenter
+     * @method _handleDragCenter
      * @instance
      * @memberof CircleHelper
      * @returns A new event handler.
      */
-    handleDragCenter() {
+    _handleDragCenter() {
         const _self = this;
         return (evt) => {
             _self.radiusPoint.add(evt.params.dragAmount);
@@ -61,12 +62,12 @@ export class CircleHelper {
      * Creates a new drag handler for the circle's radius control point.
      *
      * @private
-     * @method handleDragCenter
+     * @method _handleDragCenter
      * @instance
      * @memberof CircleHelper
      * @returns A new event handler.
      */
-    handleDragRadiusPoint() {
+    _handleDragRadiusPoint() {
         const _self = this;
         return (_evt) => {
             _self.circle.radius = _self.circle.center.distance(_self.radiusPoint);

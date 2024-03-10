@@ -1,5 +1,10 @@
 # Changelog
 
+- 2024-03-10
+  - Upgraded to Typescript 5.
+  - Fixed 35 minor type issues in some classes to obtain Typescript 5 compatibility.
+  - Fixed some issues in the `CircleHandler.destroy` method; listeners were not properly removed.
+  - Adding the `CircleSectorHandler.destory` method for properly removing installed listeners.
 - 2024-03-09
   - Added the `CircleSector.circleSectorIntersection` method to find coherent sector intersections.
   - Added the `CircleSector.angleAt` method to determine any angle at some ratio.

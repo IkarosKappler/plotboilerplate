@@ -14,6 +14,7 @@
 * --- #2172 ff: Touchy still working?
 * --- #2164: createAlloyFinger still working?
 * --- #709: saveAs still working?
+* Girih import stil working?
 
 # TODO:
 * elemen.style is now accessible via numeric index now:

@@ -63,17 +63,12 @@
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
         numCircles: params.getNumber("numCircles", 2),
-        metaRadiusAddon: params.getNumber("metaRadiusAddon", 40),
         drawCircles: params.getBoolean("drawCircles", true),
-        drawCircleNumbers: params.getBoolean("drawCircleNumber", true),
-        drawContainingCircles: params.getBoolean("drawContainingCircle", true),
-        drawInverseCircles: params.getBoolean("drawInverseCircles", true),
-        drawOuterHull: params.getBoolean("drawOuterHull", true)
+        drawCircleNumbers: params.getBoolean("drawCircleNumber", true)
       },
       GUP
     );
 
-    // var inputCircles = [];
     var circleSectors = [];
     var circleSectorHelpers = [];
     var anglePoint = pb.viewport().randomPoint(0.35, 0.35);
@@ -215,7 +210,7 @@
     {
       var gui = pb.createGUI();
       // prettier-ignore
-      gui.add(config, "numCircles").min(1).max(10).step(1).onChange( function() { reinit(); rebuildMetaballs(); pb.redraw(); } ).name('numCircles').title("Number of circles.");
+      gui.add(config, "numCircles").min(1).max(10).step(1).onChange( function() { reinit(); pb.redraw(); } ).name('numCircles').title("Number of circles.");
       // prettier-ignore
       gui.add(config, "drawCircleNumbers").onChange( function() { pb.redraw(); } ).name('drawCircleNumbers').title("Draw circle numbers?");
     }

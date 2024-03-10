@@ -10,7 +10,8 @@
  * @modified 2021-01-22 Removed `pb.redraw()` call from update handlers (changed vertices already triggered redraw).
  * @modified 2024-02-26 Removed the constructor param `pb` (unused).
  * @modified 2024-02-25 Added `circle` and `radiusPoint` attributes.
- * @version  1.2.0
+ * @modified 2024-03-10 Fixed some issues in the `destroy` method; listeners were not properly removed.
+ * @version  1.2.1
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CircleHelper = void 0;
@@ -30,8 +31,8 @@ var CircleHelper = /** @class */ (function () {
     function CircleHelper(circle, radiusPoint) {
         this.circle = circle;
         this.radiusPoint = radiusPoint;
-        circle.center.listeners.addDragListener(this.handleDragCenter());
-        radiusPoint.listeners.addDragListener(this.handleDragRadiusPoint());
+        circle.center.listeners.addDragListener(this.centerHandler = this._handleDragCenter());
+        radiusPoint.listeners.addDragListener(this.radiusHandler = this._handleDragRadiusPoint());
     }
     /**
      * Destroy this circle helper.
@@ -42,19 +43,19 @@ var CircleHelper = /** @class */ (function () {
      * @memberof CircleHelper
      */
     CircleHelper.prototype.destroy = function () {
-        this.circle.center.listeners.removeDragListener(this.handleDragCenter);
-        this.radiusPoint.listeners.removeDragListener(this.handleDragRadiusPoint);
+        this.circle.center.listeners.removeDragListener(this.centerHandler);
+        this.radiusPoint.listeners.removeDragListener(this.radiusHandler);
     };
     /**
      * Creates a new drag handler for the circle's center point.
      *
      * @private
-     * @method handleDragCenter
+     * @method _handleDragCenter
      * @instance
      * @memberof CircleHelper
      * @returns A new event handler.
      */
-    CircleHelper.prototype.handleDragCenter = function () {
+    CircleHelper.prototype._handleDragCenter = function () {
         var _self = this;
         return function (evt) {
             _self.radiusPoint.add(evt.params.dragAmount);
@@ -64,12 +65,12 @@ var CircleHelper = /** @class */ (function () {
      * Creates a new drag handler for the circle's radius control point.
      *
      * @private
-     * @method handleDragCenter
+     * @method _handleDragCenter
      * @instance
      * @memberof CircleHelper
      * @returns A new event handler.
      */
-    CircleHelper.prototype.handleDragRadiusPoint = function () {
+    CircleHelper.prototype._handleDragRadiusPoint = function () {
         var _self = this;
         return function (_evt) {
             _self.circle.radius = _self.circle.center.distance(_self.radiusPoint);

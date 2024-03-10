@@ -9,11 +9,12 @@
  * @modified 2021-01-22 Removed `pb.redraw()` call from update handlers (changed vertices already triggered redraw).
  * @modified 2024-02-26 Removed the constructor param `pb` (unused).
  * @modified 2024-02-25 Added `circle` and `radiusPoint` attributes.
- * @version  1.2.0
+ * @modified 2024-03-10 Fixed some issues in the `destroy` method; listeners were not properly removed.
+ * @version  1.2.1
  **/
 
 import { Circle } from "../../Circle";
-import { VertEvent } from "../../VertexListeners";
+import { VertEvent, VertListener } from "../../VertexListeners";
 import { Vertex } from "../../Vertex";
 
 /**
@@ -22,6 +23,9 @@ import { Vertex } from "../../Vertex";
 export class CircleHelper {
   circle: Circle;
   radiusPoint: Vertex;
+
+  private centerHandler: VertListener;
+  private radiusHandler: VertListener;
 
   /**
    * The constructor.
@@ -36,8 +40,8 @@ export class CircleHelper {
     this.circle = circle;
     this.radiusPoint = radiusPoint;
 
-    circle.center.listeners.addDragListener(this.handleDragCenter());
-    radiusPoint.listeners.addDragListener(this.handleDragRadiusPoint());
+    circle.center.listeners.addDragListener( this.centerHandler = this._handleDragCenter());
+    radiusPoint.listeners.addDragListener(this.radiusHandler = this._handleDragRadiusPoint());
   }
 
   /**
@@ -49,20 +53,20 @@ export class CircleHelper {
    * @memberof CircleHelper
    */
   destroy() {
-    this.circle.center.listeners.removeDragListener(this.handleDragCenter);
-    this.radiusPoint.listeners.removeDragListener(this.handleDragRadiusPoint);
+    this.circle.center.listeners.removeDragListener(this.centerHandler);
+    this.radiusPoint.listeners.removeDragListener(this.radiusHandler);
   }
 
   /**
    * Creates a new drag handler for the circle's center point.
    *
    * @private
-   * @method handleDragCenter
+   * @method _handleDragCenter
    * @instance
    * @memberof CircleHelper
    * @returns A new event handler.
    */
-  private handleDragCenter(): (evt: VertEvent) => void {
+  private _handleDragCenter(): VertListener {
     const _self = this;
     return (evt: VertEvent) => {
       _self.radiusPoint.add(evt.params.dragAmount);
@@ -73,12 +77,12 @@ export class CircleHelper {
    * Creates a new drag handler for the circle's radius control point.
    *
    * @private
-   * @method handleDragCenter
+   * @method _handleDragCenter
    * @instance
    * @memberof CircleHelper
    * @returns A new event handler.
    */
-  private handleDragRadiusPoint(): (evt: VertEvent) => void {
+  private _handleDragRadiusPoint(): VertListener {
     const _self = this;
     return (_evt: VertEvent) => {
       _self.circle.radius = _self.circle.center.distance(_self.radiusPoint);
