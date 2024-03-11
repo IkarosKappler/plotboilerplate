@@ -141,17 +141,25 @@ var CircleSector = /** @class */ (function () {
             //  -> no valid intersection at all
             return null;
         }
-        // The radical line has no direction. Thus the resulting sector might be in reverse order.
-        // Make a quick logical check: the center of the gap must still be located outside the original sector.
+        // The radical line has no direction. Thus the resulting sector _might_ be in reverse order.
+        // Make a quick logical check: the center of the gap must still be located inside the result sector.
         // If not: reverse result.
         var gapSector = new CircleSector(this.circle, this.endAngle, this.startAngle);
         var centerOfOriginalGap = gapSector.angleAt(0.5);
-        if (this.containsAngle(centerOfOriginalGap)) {
-            return new CircleSector(new Circle_1.Circle(this.circle.center.clone(), this.circle.radius), thisIntersectionAngleB, thisIntersectionAngleA);
+        // console.log(
+        //   "Circle",
+        //   this.uid,
+        //   "centerOfOriginalGap",
+        //   centerOfOriginalGap,
+        //   "contains?",
+        //   this.containsAngle(centerOfOriginalGap)
+        // );
+        var resultSector = new CircleSector(new Circle_1.Circle(this.circle.center.clone(), this.circle.radius), thisIntersectionAngleA, thisIntersectionAngleB);
+        if (resultSector.containsAngle(centerOfOriginalGap)) {
+            resultSector.startAngle = thisIntersectionAngleB;
+            resultSector.endAngle = thisIntersectionAngleA;
         }
-        else {
-            return new CircleSector(new Circle_1.Circle(this.circle.center.clone(), this.circle.radius), thisIntersectionAngleA, thisIntersectionAngleB);
-        }
+        return resultSector;
     };
     /**
      * This function should invalidate any installed listeners and invalidate this object.

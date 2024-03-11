@@ -188,25 +188,31 @@ export class CircleSector implements SVGSerializable {
       return null;
     }
 
-    // The radical line has no direction. Thus the resulting sector might be in reverse order.
-    // Make a quick logical check: the center of the gap must still be located outside the original sector.
+    // The radical line has no direction. Thus the resulting sector _might_ be in reverse order.
+    // Make a quick logical check: the center of the gap must still be located inside the result sector.
     // If not: reverse result.
     var gapSector = new CircleSector(this.circle, this.endAngle, this.startAngle);
     var centerOfOriginalGap = gapSector.angleAt(0.5);
 
-    if (this.containsAngle(centerOfOriginalGap)) {
-      return new CircleSector(
-        new Circle(this.circle.center.clone(), this.circle.radius),
-        thisIntersectionAngleB,
-        thisIntersectionAngleA
-      );
-    } else {
-      return new CircleSector(
-        new Circle(this.circle.center.clone(), this.circle.radius),
-        thisIntersectionAngleA,
-        thisIntersectionAngleB
-      );
+    // console.log(
+    //   "Circle",
+    //   this.uid,
+    //   "centerOfOriginalGap",
+    //   centerOfOriginalGap,
+    //   "contains?",
+    //   this.containsAngle(centerOfOriginalGap)
+    // );
+
+    const resultSector = new CircleSector(
+      new Circle(this.circle.center.clone(), this.circle.radius),
+      thisIntersectionAngleA,
+      thisIntersectionAngleB
+    );
+    if (resultSector.containsAngle(centerOfOriginalGap)) {
+      resultSector.startAngle = thisIntersectionAngleB;
+      resultSector.endAngle = thisIntersectionAngleA;
     }
+    return resultSector;
   }
 
   /**

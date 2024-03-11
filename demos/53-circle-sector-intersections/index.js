@@ -136,7 +136,11 @@
       for (var i = 0; i < circleSectors.length; i++) {
         const vert = circleSectors[i].circle.center;
         // TODO: use contrast color here
-        fill.text("" + i, vert.x, vert.y, { color: contrastColor, fontFamily: "Arial", fontSize: 9 });
+        fill.text("[" + i + "][" + circleSectors[i].uid + "]", vert.x, vert.y, {
+          color: contrastColor,
+          fontFamily: "Arial",
+          fontSize: 9
+        });
       }
     };
 
@@ -218,7 +222,6 @@
       gui.add(config, "drawCircleNumbers").onChange( function() { pb.redraw(); } ).name('drawCircleNumbers').title("Draw circle numbers?");
       // prettier-ignore
       gui.add(config, "readme").name('readme').title("Display this demo's readme.");
-    
     }
 
     pb.config.postDraw = redraw;
