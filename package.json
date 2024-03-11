@@ -72,6 +72,7 @@
     "eslint": "^7.13.0",
     "file-saver": "^2.0.2",
     "git-revision-webpack-plugin": "^3.0.4",
+    "jsdoc-to-markdown": "^8.0.1",
     "marked": "^12.0.1",
     "path": "^0.12.7",
     "rollup": "^2.38.5",

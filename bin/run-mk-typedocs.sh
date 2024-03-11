@@ -5,7 +5,7 @@
 # npx typedoc --out ../docs_jekyll/docs_typedoc_md --mode file ../src/ts --plugin typedoc-plugin-markdown --hideProjectName=false --hideBreadcrumbs=false --publicPath=https:\/\/plotboilerplate.io\/ --namedAnchors=false
 
 # So just generate HTML output and display it in an iframe (see ../docs_jekyll/_layouts/docs.html)
-npx typedoc --options typedoc-config.json
+npx typedoc --options typedoc-config.json ../src/ts/*.ts ../src/ts/**/*.ts ../src/ts/**/**/*.ts
 
 
 # The code below would generate markdown output
