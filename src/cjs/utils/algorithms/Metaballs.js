@@ -164,15 +164,15 @@ var Metaballs = /** @class */ (function () {
                 }
             }
             return holeGroupIndices;
+        },
+        anyCircleContainsPoint: function (circles, point, ignoreCircleIndex) {
+            for (var i = 0; i < circles.length; i++) {
+                if (i != ignoreCircleIndex && circles[i].containsPoint(point)) {
+                    return true;
+                }
+            }
+            return false;
         }
-        // anyCircleContainsPoint: (circles: Array<Circle>, point: XYCoords, ignoreCircleIndex: number): boolean => {
-        //   for (var i = 0; i < circles.length; i++) {
-        //     if (i != ignoreCircleIndex && circles[i].containsPoint(point)) {
-        //       return true;
-        //     }
-        //   }
-        //   return false;
-        // },
         // circleContainsAllPoints: (circle: Circle, points: XYCoords[]): boolean => {
         //   for (var i = 0; i < points.length; i++) {
         //     if (!circle.containsPoint(points[i])) {

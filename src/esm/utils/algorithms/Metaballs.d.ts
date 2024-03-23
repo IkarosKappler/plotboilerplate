@@ -10,6 +10,7 @@
  * @date    2024-03-01
  */
 import { Circle } from "../../Circle";
+import { XYCoords } from "../../interfaces";
 interface MetaballsOptions {
     metaRadiusAddon: number;
 }
@@ -35,6 +36,7 @@ export declare class Metaballs {
          * @returns
          */
         detectHoleGroup: (circles: Array<Circle>, nonVisitedSet: Set<number>, index: number) => Array<number>;
+        anyCircleContainsPoint: (circles: Array<Circle>, point: XYCoords, ignoreCircleIndex: number) => boolean;
     };
 }
 export {};

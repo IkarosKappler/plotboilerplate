@@ -213,7 +213,7 @@
         for (var i = 0; i < metaballs.inverseCirclesPairs.length; i++) {
           var circlePair = metaballs.inverseCirclesPairs[i];
           var color = circlePair.doIntersect ? "rgba(192,192,192,0.333)" : "rgba(255,192,0,0.5)";
-          var lineWidth = circlePair.doIntersect ? 1.0 : 3.0;
+          var lineWidth = circlePair.doIntersect ? 1.0 : 2.0;
           draw.circle(circlePair.inverseCircleA.center, circlePair.inverseCircleA.radius, color, lineWidth);
           draw.circle(circlePair.inverseCircleB.center, circlePair.inverseCircleB.radius, color, lineWidth);
 
@@ -291,7 +291,7 @@
             7
           );
         }
-      }
+      } // END for
 
       // Draw inverse circle sectors.
       // Array< { circleA, circleB, inverseCircleA, inverseCircleB, doIntersect, circlePointsA:[], circlePointsB:[] } >
@@ -303,27 +303,61 @@
         if (!pair.doIntersect || pair.circleB.containsPoint(pair.circleA.center)) {
           // TODO: do not only draw, also collect for connected path detection
           // Step 1: draw inverse circle arcs (these two connect circleA and circleB)
-          drawInverseCircleArcs(draw, pair);
+          drawInverseCircleArcs(draw, fill, pair);
         }
 
         // Step 2: draw rest of original circles if intersection is not enough for meta connection.
         if (pair.doIntersect && !pair.circleB.containsPoint(pair.circleA.center)) {
-          drawInvserseCircleArc(draw, pair.baseCircleA, pair.circlePointsA[1], pair.circlePointsA[0]);
-          drawInvserseCircleArc(draw, pair.baseCircleB, pair.circlePointsB[0], pair.circlePointsB[1]);
+          drawInvserseCircleArc(draw, fill, pair.baseCircleA, pair.circlePointsA[1], pair.circlePointsA[0]);
+          drawInvserseCircleArc(draw, fill, pair.baseCircleB, pair.circlePointsB[0], pair.circlePointsB[1]);
         }
+
+        // Detect ...
+        // if (Metaballs.metaballsUtils.anyCircleContainsPoint(metaballs.circlesOfInterest, pair.inverseCircleA, -1)) {
+        //   // Do not draw sectors that are fully contained inside any other circle
+        //   fill.circleArc(
+        //     pair.inverseCircleA.center,
+        //     pair.inverseCircleA.radius,
+        //     tmpSect.startAngle,
+        //     tmpSect.endAngle,
+        //     "rgba(255,255,0,0.133)",
+        //     7
+        //   );
+        // }
       } // END for
     }; // END redraw
 
-    var drawInverseCircleArcs = function (draw, circlePair) {
-      drawInvserseCircleArc(draw, circlePair.inverseCircleA, circlePair.circlePointsA[0], circlePair.circlePointsB[0]);
-      drawInvserseCircleArc(draw, circlePair.inverseCircleB, circlePair.circlePointsB[1], circlePair.circlePointsA[1]);
+    var drawInverseCircleArcs = function (draw, fill, circlePair) {
+      drawInvserseCircleArc(draw, fill, circlePair.inverseCircleA, circlePair.circlePointsA[0], circlePair.circlePointsB[0]);
+      drawInvserseCircleArc(draw, fill, circlePair.inverseCircleB, circlePair.circlePointsB[1], circlePair.circlePointsA[1]);
     };
 
-    var drawInvserseCircleArc = function (draw, outerCircle, intersectionPoint0, intersectionPoint1) {
+    var drawInvserseCircleArc = function (draw, fill, inverseCircle, intersectionPoint0, intersectionPoint1) {
       var angleDifference = -Math.PI;
-      var intersectionAngleA0 = intersectionPoint0.angle(outerCircle.center) + angleDifference;
-      var intersectionAngleB0 = intersectionPoint1.angle(outerCircle.center) + angleDifference;
-      draw.circleArc(outerCircle.center, outerCircle.radius, intersectionAngleB0, intersectionAngleA0, "rgba(0,255,0,0.333)", 7);
+      var intersectionAngleA0 = intersectionPoint0.angle(inverseCircle.center) + angleDifference;
+      var intersectionAngleB0 = intersectionPoint1.angle(inverseCircle.center) + angleDifference;
+      draw.circleArc(
+        inverseCircle.center,
+        inverseCircle.radius,
+        intersectionAngleB0,
+        intersectionAngleA0,
+        "rgba(0,255,0,0.333)",
+        7
+      );
+
+      // TEST: fill suspicious arcs ...
+      if (
+        Metaballs.metaballsUtils.anyCircleContainsPoint(metaballs.circlesOfInterest, inverseCircle.center, -1) ||
+        Metaballs.metaballsUtils.anyCircleContainsPoint(metaballs.circlesOfInterest, inverseCircle.center, -1)
+      ) {
+        fill.circleArc(
+          inverseCircle.center,
+          inverseCircle.radius,
+          intersectionAngleB0,
+          intersectionAngleA0,
+          "rgba(255,255,0,0.133)"
+        );
+      }
     };
 
     // ===ZZZ START
