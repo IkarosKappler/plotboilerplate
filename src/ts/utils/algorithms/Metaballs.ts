@@ -5,6 +5,8 @@
  *      -> build outer containing circles (given by detect radius)
  *      -> find radical lines
  *
+ * This implementation currently does not detect any holes.
+ *
  * @author  Ikaros Kappler
  * @version 1.0.0
  * @date    2024-03-01
@@ -12,7 +14,6 @@
 
 import { Circle } from "../../Circle";
 import { Vertex } from "../../Vertex";
-import { XYCoords } from "../../interfaces";
 import { CircleIntersections } from "./CircleIntersections";
 
 type Pair<T> = [T, T];
@@ -103,7 +104,6 @@ export class Metaballs {
         });
       } // END for j
     } // END for i
-    this.detectInverseCircleHoles();
   }
 
   //   public getInnerPath;
@@ -141,93 +141,4 @@ export class Metaballs {
       this.containingCircles.push(containingCircle);
     }
   }
-
-  private detectInverseCircleHoles() {
-    const inverseCircles: Array<Circle> = this.inverseCirclesPairs.reduce((accu: Circle[], pair: InverseCirclePair) => {
-      accu.push(pair.inverseCircleA, pair.inverseCircleB);
-      return accu;
-    }, []);
-    console.log("inverseCircles", inverseCircles);
-    var holeGroupIndices = Metaballs.metaballsUtils.detectHoles(inverseCircles);
-    console.log("holeGroupIndices", holeGroupIndices);
-  }
-
-  static metaballsUtils = {
-    // +---------------------------------------------------------------------------------
-    // | A hole can be found this way: a group of inverse circles with mutually contained centers.
-    // +-------------------------------
-    detectHoles: (circles: Array<Circle>): Array<number[]> => {
-      const n = circles.length;
-      console.log("circles", circles);
-      // var isInverseCircleVisited = arrayFill(n, false); // Array<number>
-      var visitedCount: number = 0;
-      const nonVisitedSet = new Set<number>();
-      const holeGroups: Array<number[]> = [];
-      for (var i = 0; i < n; i++) {
-        nonVisitedSet.add(i);
-      }
-      var iteration = 0; // A safety stop
-      while (visitedCount < n && iteration++ < n + 1) {
-        const curIndex = Array.from(nonVisitedSet)[Math.floor(Math.random() * nonVisitedSet.size)];
-        const holeGroupIndices = Metaballs.metaballsUtils.detectHoleGroup(circles, nonVisitedSet, curIndex);
-        visitedCount += holeGroupIndices.length;
-        holeGroups.push(holeGroupIndices);
-      }
-      return holeGroups;
-    },
-
-    /**
-     * Find a single hole group belonging to the circle at the given index.
-     * @param circles
-     * @param nonVisitedSet
-     * @param index
-     * @returns
-     */
-    detectHoleGroup: (circles: Array<Circle>, nonVisitedSet: Set<number>, index: number): Array<number> => {
-      const holeGroupIndices: Array<number> = [index];
-      // Mark as visited
-      nonVisitedSet.delete(index);
-      for (var i = 0; i < circles.length; i++) {
-        if (!nonVisitedSet.has(i)) {
-          // Already visited
-          continue;
-        }
-        // Circles mutually contain their centers?
-        const circleA = circles[index];
-        const circleB = circles[i];
-        if (circleA.containsPoint(circleB.center) && circleB.containsPoint(circleA.center)) {
-          holeGroupIndices.push(i);
-          nonVisitedSet.delete(i);
-        }
-      }
-      return holeGroupIndices;
-    },
-
-    anyCircleContainsPoint: (circles: Array<Circle>, point: XYCoords, ignoreCircleIndex: number): boolean => {
-      for (var i = 0; i < circles.length; i++) {
-        if (i != ignoreCircleIndex && circles[i].containsPoint(point)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    // circleContainsAllPoints: (circle: Circle, points: XYCoords[]): boolean => {
-    //   for (var i = 0; i < points.length; i++) {
-    //     if (!circle.containsPoint(points[i])) {
-    //       return false;
-    //     }
-    //   }
-    //   return true;
-    // },
-
-    // anyCircleContainsAllPoints: (circles: Array<Circle>, points: XYCoords[], ignoreCircleIndex: number): boolean => {
-    //   for (var i = 0; i < circles.length; i++) {
-    //     if (i != ignoreCircleIndex && Metaballs.metaballsUtils.circleContainsAllPoints(circles[i], points)) {
-    //       return true;
-    //     }
-    //   }
-    //   return false;
-    // }
-  };
 }
