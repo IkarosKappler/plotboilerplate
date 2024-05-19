@@ -1,6 +1,8 @@
 /**
  * A script to demonstrate how to construct 2D metaballs with PlotBoilerplate.
  *
+ * Note there are some edge cases where the calculation is locally not working correctly.
+ *
  * @requires PlotBoilerplate
  * @requires Bounds
  * @requires MouseHandler
