@@ -2,7 +2,7 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 318:
+/***/ 597:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 // ESM COMPAT FLAG
@@ -10,11 +10,11 @@ __webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "AlloyFinger": () => /* reexport */ AlloyFinger,
-  "default": () => /* binding */ esm
+  AlloyFinger: () => (/* reexport */ AlloyFinger),
+  "default": () => (/* binding */ esm)
 });
 
-// CONCATENATED MODULE: ./node_modules/alloyfinger-typescript/src/esm/alloy_finger.js
+;// CONCATENATED MODULE: ./node_modules/alloyfinger-typescript/src/esm/alloy_finger.js
 /* Port from AlloyFinger v0.1.15
  * Original by dntzhang
  * Typescript port by Ikaros Kappler
@@ -404,7 +404,7 @@ class AlloyFinger {
 ;
 /* harmony default export */ const alloy_finger = ((/* unused pure expression or super */ null && (AlloyFinger)));
 //# sourceMappingURL=alloy_finger.js.map
-// CONCATENATED MODULE: ./node_modules/alloyfinger-typescript/src/esm/index.js
+;// CONCATENATED MODULE: ./node_modules/alloyfinger-typescript/src/esm/index.js
 /**
  * TypeScript port by Ikaros Kappler.
  *
@@ -419,7 +419,7 @@ class AlloyFinger {
 
 /***/ }),
 
-/***/ 126:
+/***/ 733:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -457,10 +457,10 @@ class AlloyFinger {
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BezierPath = void 0;
-var Bounds_1 = __webpack_require__(262);
-var CubicBezierCurve_1 = __webpack_require__(510);
-var UIDGenerator_1 = __webpack_require__(197);
-var Vertex_1 = __webpack_require__(421);
+var Bounds_1 = __webpack_require__(76);
+var CubicBezierCurve_1 = __webpack_require__(973);
+var UIDGenerator_1 = __webpack_require__(938);
+var Vertex_1 = __webpack_require__(787);
 /**
  * @classdesc A BezierPath class.
  *
@@ -1502,7 +1502,7 @@ exports.BezierPath = BezierPath;
 
 /***/ }),
 
-/***/ 262:
+/***/ 76:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -1521,8 +1521,8 @@ exports.BezierPath = BezierPath;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Bounds = void 0;
-var Polygon_1 = __webpack_require__(661);
-var Vertex_1 = __webpack_require__(421);
+var Polygon_1 = __webpack_require__(687);
+var Vertex_1 = __webpack_require__(787);
 /**
  * @classdesc A bounds class with min and max values. Implementing IBounds.
  *
@@ -1598,7 +1598,7 @@ var Bounds = /** @class */ (function () {
      * @returns {string} Get these bounds in a human readable form.
      */
     Bounds.prototype.toString = function () {
-        return "{ min: " + this.min.toString() + ", max : " + this.max.toString() + ", width: " + this.width + ", height : " + this.height + " }";
+        return "{ min: ".concat(this.min.toString(), ", max : ").concat(this.max.toString(), ", width: ").concat(this.width, ", height : ").concat(this.height, " }");
     };
     /**
      * Clone this bounds object (create a deep clone).
@@ -1657,7 +1657,7 @@ exports.Bounds = Bounds;
 
 /***/ }),
 
-/***/ 913:
+/***/ 118:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -1679,10 +1679,10 @@ exports.Bounds = Bounds;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Circle = void 0;
-var Line_1 = __webpack_require__(831);
-var UIDGenerator_1 = __webpack_require__(197);
-var Vector_1 = __webpack_require__(73);
-var Vertex_1 = __webpack_require__(421);
+var Line_1 = __webpack_require__(939);
+var UIDGenerator_1 = __webpack_require__(938);
+var Vector_1 = __webpack_require__(30);
+var Vertex_1 = __webpack_require__(787);
 /**
  * @classdesc A simple circle: center point and radius.
  *
@@ -1923,7 +1923,7 @@ exports.Circle = Circle;
 
 /***/ }),
 
-/***/ 946:
+/***/ 135:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -1932,11 +1932,17 @@ exports.Circle = Circle;
  * @date     2020-12-17
  * @modified 2021-01-20 Added UID.
  * @modified 2021-02-26 Fixed an error in the svg-arc-calculation (case angle<90deg and anti-clockwise).
- * @version  1.1.1
+ * @modified 2024-01-30 Added a missing type in the `describeSVGArc` function.
+ * @modified 2024-03-01 Added the `getStartPoint` and `getEndPoint` methods.
+ * @modified 2024-03-08 Added the `containsAngle` method.
+ * @modified 2024-03-09 Added the `circleSectorIntersection` method to find coherent sector intersections..
+ * @modified 2024-03-09 Added the `angleAt` method to determine any angle at some ratio.
+ * @version  1.2.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CircleSector = void 0;
-var UIDGenerator_1 = __webpack_require__(197);
+var Circle_1 = __webpack_require__(118);
+var UIDGenerator_1 = __webpack_require__(938);
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
  *
@@ -1967,9 +1973,123 @@ var CircleSector = /** @class */ (function () {
         this.endAngle = endAngle;
     }
     /**
+     * Checks wether the given angle (must be inside 0 and PI*2) is contained inside this sector.
+     *
+     * @param {number} angle - The numeric angle to check.
+     * @method containsAngle
+     * @instance
+     * @memberof CircleSector
+     * @return {boolean} True if (and only if) this sector contains the given angle.
+     */
+    CircleSector.prototype.containsAngle = function (angle) {
+        if (this.startAngle <= this.endAngle) {
+            return angle >= this.startAngle && angle < this.endAngle;
+        }
+        else {
+            // startAngle > endAngle
+            return angle >= this.startAngle || angle < this.endAngle;
+        }
+    };
+    /**
+     * Get the angle inside this sector for a given ratio. 0.0 means startAngle, and 1.0 means endAngle.
+     *
+     * @param {number} t - The ratio inside [0..1].
+     * @method angleAt
+     * @instance
+     * @memberof CircleSector
+     * @return {number} The angle inside this sector at a given ratio.
+     */
+    CircleSector.prototype.angleAt = function (t) {
+        if (this.startAngle <= this.endAngle) {
+            var angleAtRatio = this.startAngle + (this.endAngle - this.startAngle) * t;
+            return angleAtRatio % (Math.PI * 2.0);
+        }
+        else {
+            // startAngle > endAngle
+            var angleAtRatio = this.startAngle + (Math.PI * 2 - this.startAngle + this.endAngle) * t;
+            return angleAtRatio % (Math.PI * 2.0);
+        }
+    };
+    /**
+     * Get the sectors starting point (on the underlying circle, located at the start angle).
+     *
+     * @method getStartPoint
+     * @instance
+     * @memberof CircleSector
+     * @return {Vertex} The sector's stating point.
+     */
+    CircleSector.prototype.getStartPoint = function () {
+        return this.circle.vertAt(this.startAngle);
+    };
+    /**
+     * Get the sectors ending point (on the underlying circle, located at the end angle).
+     *
+     * @method getEndPoint
+     * @instance
+     * @memberof CircleSector
+     * @return {Vertex} The sector's ending point.
+     */
+    CircleSector.prototype.getEndPoint = function () {
+        return this.circle.vertAt(this.endAngle);
+    };
+    /**
+     * Calculate the intersection of this circle sector and some other sector.
+     *
+     * If the two sectors do not corerently intersect (when not both points of the
+     * radical line are containted in both source sectors) then null is returned.
+     *
+     * See demo/53-circle-sector-intersections for a geometric visualisation.
+     *
+     * @method circleSectorIntersection
+     * @instance
+     * @memberof CircleSector
+     * @return {CircleSector | null} The intersecion of both sectors or null if they don't intersect.
+     */
+    CircleSector.prototype.circleSectorIntersection = function (sector) {
+        var radicalLine = this.circle.circleIntersection(sector.circle);
+        if (!radicalLine) {
+            // The circles to not intersect at all.
+            return null;
+        }
+        // Circles intersect. Check if this sector interval intersects, too.
+        var thisIntersectionAngleA = this.circle.center.angle(radicalLine.a);
+        var thisIntersectionAngleB = this.circle.center.angle(radicalLine.b);
+        // Is intersection inside this sector?
+        if (!this.containsAngle(thisIntersectionAngleA) || !this.containsAngle(thisIntersectionAngleB)) {
+            // At least one circle intersection point is not located in this sector.
+            //  -> no valid intersection at all
+            return null;
+        }
+        // Circles intersect. Check if the passed sector interval intersects, too.
+        var thatIntersectionAngleA = sector.circle.center.angle(radicalLine.a);
+        var thatIntersectionAngleB = sector.circle.center.angle(radicalLine.b);
+        // Is intersection inside this sector?
+        if (!sector.containsAngle(thatIntersectionAngleA) || !sector.containsAngle(thatIntersectionAngleB)) {
+            // At least one circle intersection point is not located in this sector.
+            //  -> no valid intersection at all
+            return null;
+        }
+        // The radical line has no direction. Thus the resulting sector _might_ be in reverse order.
+        // Make a quick logical check: the center of the gap must still be located inside the result sector.
+        // If not: reverse result.
+        var gapSector = new CircleSector(this.circle, this.endAngle, this.startAngle);
+        var centerOfOriginalGap = gapSector.angleAt(0.5);
+        var resultSector = new CircleSector(new Circle_1.Circle(this.circle.center.clone(), this.circle.radius), thisIntersectionAngleA, thisIntersectionAngleB);
+        if (resultSector.containsAngle(centerOfOriginalGap)) {
+            resultSector.startAngle = thisIntersectionAngleB;
+            resultSector.endAngle = thisIntersectionAngleA;
+        }
+        return resultSector;
+    };
+    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.
+     *
+     * @method destroy
+     * @instance
+     * @memberof CircleSector
+     * @return {void}
      */
     CircleSector.prototype.destroy = function () {
         this.circle.destroy();
@@ -2037,7 +2157,7 @@ exports.CircleSector = CircleSector;
 
 /***/ }),
 
-/***/ 510:
+/***/ 973:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -2073,10 +2193,10 @@ exports.CircleSector = CircleSector;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CubicBezierCurve = void 0;
-var Bounds_1 = __webpack_require__(262);
-var UIDGenerator_1 = __webpack_require__(197);
-var Vertex_1 = __webpack_require__(421);
-var Vector_1 = __webpack_require__(73);
+var Bounds_1 = __webpack_require__(76);
+var UIDGenerator_1 = __webpack_require__(938);
+var Vertex_1 = __webpack_require__(787);
+var Vector_1 = __webpack_require__(30);
 /**
  * @classdesc A refactored cubic bezier curve class.
  *
@@ -2152,7 +2272,7 @@ var CubicBezierCurve = /** @class */ (function () {
                 this.getEndControlPoint().add(moveAmount);
         }
         else {
-            console.log("[CubicBezierCurve.moveCurvePoint] pointID '" + pointID + "' invalid.");
+            console.log("[CubicBezierCurve.moveCurvePoint] pointID '".concat(pointID, "' invalid."));
         }
         if (updateArcLengths)
             this.updateArcLengths();
@@ -2393,7 +2513,7 @@ var CubicBezierCurve = /** @class */ (function () {
             return this.startControlPoint;
         if (id == this.END_CONTROL_POINT)
             return this.endControlPoint;
-        throw new Error("Invalid point ID '" + id + "'.");
+        throw new Error("Invalid point ID '".concat(id, "'."));
     };
     /**
      * Get the curve point at a given position t, where t is in [0,1].<br>
@@ -2857,7 +2977,7 @@ exports.CubicBezierCurve = CubicBezierCurve;
 
 /***/ }),
 
-/***/ 843:
+/***/ 289:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -2953,7 +3073,7 @@ exports.Grid = Grid;
 
 /***/ }),
 
-/***/ 909:
+/***/ 531:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -3196,7 +3316,7 @@ var KeyHandler = /** @class */ (function () {
      */
     // prettier-ignore
     KeyHandler.KEY_CODES = {
-        'break': 3,
+        'break': 3, // alternate: 19
         'backspace': 8,
         // 'delete'	 : 8, // alternate: 46
         'tab': 9,
@@ -3212,12 +3332,12 @@ var KeyHandler = /** @class */ (function () {
         'hanja': 25,
         'escape': 27,
         'conversion': 28,
-        'non-conversion': 29,
+        'non-conversion': 29, // alternate: 235?
         'spacebar': 32,
         'pageup': 33,
         'pagedown': 34,
         'end': 35,
-        'home': 36,
+        'home': 36, // alternate: 172?
         'leftarrow': 37,
         'uparrow': 38,
         'rightarrow': 39,
@@ -3227,7 +3347,7 @@ var KeyHandler = /** @class */ (function () {
         'execute': 43,
         'printscreen': 44,
         'insert': 45,
-        'delete': 46,
+        'delete': 46, // alternate: 8
         'help': 47,
         '0': 48,
         '1': 49,
@@ -3273,11 +3393,11 @@ var KeyHandler = /** @class */ (function () {
         'y': 89,
         'z': 90,
         'windows': 91,
-        'leftcommand': 91,
+        'leftcommand': 91, // left ⌘
         'chromebooksearch': 91,
         'rightwindowkey': 92,
         'windowsmenu': 93,
-        'rightcommant': 93,
+        'rightcommant': 93, // right ⌘
         'sleep': 95,
         'numpad0': 96,
         'numpad1': 97,
@@ -3291,7 +3411,7 @@ var KeyHandler = /** @class */ (function () {
         'numpad9': 105,
         'multiply': 106,
         'add': 107,
-        'numpadperiod': 108,
+        'numpadperiod': 108, // firefox, 194 on chrome
         'subtract': 109,
         'decimalpoint': 110,
         'divide': 111,
@@ -3330,11 +3450,11 @@ var KeyHandler = /** @class */ (function () {
         'pagebackward': 166,
         'pageforward': 167,
         'refresh': 168,
-        'closingparen': 169,
+        'closingparen': 169, // (AZERTY)
         '*': 170,
         '~+*': 171,
         // 'home'	         : 172,
-        'minus': 173,
+        'minus': 173, // firefox
         // 'mute'           : 173,
         // 'unmute'	 : 173,
         'decreasevolumelevel': 174,
@@ -3344,8 +3464,8 @@ var KeyHandler = /** @class */ (function () {
         'stop': 178,
         'play/pause': 179,
         'email': 180,
-        'mute': 181,
-        'unmute': 181,
+        'mute': 181, // firefox, alternate: 173
+        'unmute': 181, // alternate: 173?
         //'decreasevolumelevel'	182 // firefox
         //'increasevolumelevel'	183 // firefox
         'semicolon': 186,
@@ -3355,7 +3475,7 @@ var KeyHandler = /** @class */ (function () {
         'dash': 189,
         'period': 190,
         'forwardslash': 191,
-        'ç': 191,
+        'ç': 191, // 231 alternate?
         'grave accent': 192,
         //'ñ' 192,
         'æ': 192,
@@ -3384,7 +3504,7 @@ var KeyHandler = /** @class */ (function () {
         'half-width': 243,
         'full-width': 243,
         'kanji': 244,
-        'unlocktrackpad': 251,
+        'unlocktrackpad': 251, // Chrome/Edge
         'toggletouchpad': 255
     };
     return KeyHandler;
@@ -3394,7 +3514,7 @@ exports.KeyHandler = KeyHandler;
 
 /***/ }),
 
-/***/ 831:
+/***/ 939:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3429,6 +3549,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -3436,8 +3558,8 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Line = void 0;
-var VertTuple_1 = __webpack_require__(72);
-var Vertex_1 = __webpack_require__(421);
+var VertTuple_1 = __webpack_require__(590);
+var Vertex_1 = __webpack_require__(787);
 /**
  * @classdesc A line consists of two vertices a and b.<br>
  * <br>
@@ -3555,7 +3677,7 @@ exports.Line = Line;
 
 /***/ }),
 
-/***/ 293:
+/***/ 912:
 /***/ (function(__unused_webpack_module, exports) {
 
 
@@ -3592,6 +3714,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -3779,10 +3903,10 @@ var MouseHandler = /** @class */ (function () {
             name: eventName,
             isTouchEvent: false,
             pos: rel,
-            button: event.button,
-            leftButton: event.button === 0,
-            middleButton: event.button === 1,
-            rightButton: event.button === 2,
+            button: event.button, // this.mouseButton,
+            leftButton: event.button === 0, // this.mouseButton === 0,
+            middleButton: event.button === 1, // this.mouseButton === 1,
+            rightButton: event.button === 2, // this.mouseButton === 2,
             mouseDownPos: (_a = this.mouseDownPos) !== null && _a !== void 0 ? _a : { x: NaN, y: NaN },
             draggedFrom: (_b = this.mouseDragPos) !== null && _b !== void 0 ? _b : { x: NaN, y: NaN },
             wasDragged: this.mouseDownPos != null && (this.mouseDownPos.x != rel.x || this.mouseDownPos.y != rel.y),
@@ -3950,7 +4074,7 @@ var MouseHandler = /** @class */ (function () {
      * @return {void}
      */
     MouseHandler.prototype.throwAlreadyInstalled = function (name) {
-        throw "This MouseHandler already has a '" + name + "' callback. To keep the code simple there is only room for one.";
+        throw "This MouseHandler already has a '".concat(name, "' callback. To keep the code simple there is only room for one.");
     };
     /**
      * Call this when your work is done.
@@ -3982,7 +4106,7 @@ exports.MouseHandler = MouseHandler;
 
 /***/ }),
 
-/***/ 699:
+/***/ 862:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -4003,7 +4127,7 @@ exports.MouseHandler = MouseHandler;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.PBImage = void 0;
-var UIDGenerator_1 = __webpack_require__(197);
+var UIDGenerator_1 = __webpack_require__(938);
 /**
  * @classdesc A wrapper for image objects. Has an upper left and a lower right corner point.
  *
@@ -4049,7 +4173,7 @@ exports.PBImage = PBImage;
 
 /***/ }),
 
-/***/ 196:
+/***/ 628:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -4062,8 +4186,8 @@ exports.PBImage = PBImage;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.PBText = void 0;
-var UIDGenerator_1 = __webpack_require__(197);
-var Vertex_1 = __webpack_require__(421);
+var UIDGenerator_1 = __webpack_require__(938);
+var Vertex_1 = __webpack_require__(787);
 /**
  * @classdesc A simple text element: position, fontSize, fontFamily, color, textAlign, lineHeight and rotation.
  *
@@ -4118,10 +4242,9 @@ exports.PBText = PBText;
 
 /***/ }),
 
-/***/ 919:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 559:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-var __webpack_unused_export__;
 
 /**
  * @author   Ikaros Kappler
@@ -4214,29 +4337,33 @@ var __webpack_unused_export__;
  * @fileoverview The main class.
  * @public
  **/
-__webpack_unused_export__ = ({ value: true });
-exports.H4 = void 0;
-var alloyfinger_typescript_1 = __webpack_require__(318);
-var draw_1 = __webpack_require__(149);
-var drawgl_1 = __webpack_require__(349);
-var drawutilssvg_1 = __webpack_require__(829);
-var BezierPath_1 = __webpack_require__(126);
-var Bounds_1 = __webpack_require__(262);
-var Circle_1 = __webpack_require__(913);
-var CircleSector_1 = __webpack_require__(946);
-var Grid_1 = __webpack_require__(843);
-var KeyHandler_1 = __webpack_require__(909);
-var Line_1 = __webpack_require__(831);
-var MouseHandler_1 = __webpack_require__(293);
-var PBImage_1 = __webpack_require__(699);
-var Polygon_1 = __webpack_require__(661);
-var Triangle_1 = __webpack_require__(212);
-var VEllipse_1 = __webpack_require__(112);
-var VEllipseSector_1 = __webpack_require__(965);
-var Vector_1 = __webpack_require__(73);
-var Vertex_1 = __webpack_require__(421);
-var VertexAttr_1 = __webpack_require__(861);
-var PBText_1 = __webpack_require__(196);
+var __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {
+    if (typeof name === "symbol") name = name.description ? "[".concat(name.description, "]") : "";
+    return Object.defineProperty(f, "name", { configurable: true, value: prefix ? "".concat(prefix, " ", name) : name });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PlotBoilerplate = void 0;
+var alloyfinger_typescript_1 = __webpack_require__(597);
+var draw_1 = __webpack_require__(39);
+var drawgl_1 = __webpack_require__(264);
+var drawutilssvg_1 = __webpack_require__(378);
+var BezierPath_1 = __webpack_require__(733);
+var Bounds_1 = __webpack_require__(76);
+var Circle_1 = __webpack_require__(118);
+var CircleSector_1 = __webpack_require__(135);
+var Grid_1 = __webpack_require__(289);
+var KeyHandler_1 = __webpack_require__(531);
+var Line_1 = __webpack_require__(939);
+var MouseHandler_1 = __webpack_require__(912);
+var PBImage_1 = __webpack_require__(862);
+var Polygon_1 = __webpack_require__(687);
+var Triangle_1 = __webpack_require__(737);
+var VEllipse_1 = __webpack_require__(881);
+var VEllipseSector_1 = __webpack_require__(719);
+var Vector_1 = __webpack_require__(30);
+var Vertex_1 = __webpack_require__(787);
+var VertexAttr_1 = __webpack_require__(476);
+var PBText_1 = __webpack_require__(628);
 /**
  * @classdesc The main class of the PlotBoilerplate.
  *
@@ -4327,8 +4454,8 @@ var PlotBoilerplate = /** @class */ (function () {
      *                                                   Note that changes from the postDraw hook might not be visible in the export.
      * @param {string=} [config.title=null] - Specify any hover tile here. It will be attached as a `title` attribute to the most elevated element.
      */
-    function PlotBoilerplate(config) {
-        var _a, _b;
+    function PlotBoilerplate(config, drawConfig) {
+        var _b, _c;
         /**
          * A discrete timestamp to identify single render cycles.
          * Note that using system time milliseconds is not a safe way to identify render frames, as on modern powerful machines
@@ -4402,8 +4529,8 @@ var PlotBoilerplate = /** @class */ (function () {
             enableTouch: f.bool(config, "enableTouch", true),
             enableKeys: f.bool(config, "enableKeys", true),
             enableMouseWheel: f.bool(config, "enableMouseWheel", true),
-            enableZoom: f.bool(config, "enableZoom", true),
-            enablePan: f.bool(config, "enablePan", true),
+            enableZoom: f.bool(config, "enableZoom", true), // default=true
+            enablePan: f.bool(config, "enablePan", true), // default=true
             // Experimental (and unfinished)
             enableGL: f.bool(config, "enableGL", false)
         }; // END confog
@@ -4505,7 +4632,7 @@ var PlotBoilerplate = /** @class */ (function () {
         this.canvasSize = { width: PlotBoilerplate.DEFAULT_CANVAS_WIDTH, height: PlotBoilerplate.DEFAULT_CANVAS_HEIGHT };
         var canvasElement = typeof config.canvas === "string" ? document.querySelector(config.canvas) : config.canvas;
         if (typeof canvasElement === "undefined") {
-            throw "Cannot initialize PlotBoilerplate with a null canvas (element \"" + config.canvas + " not found).";
+            throw "Cannot initialize PlotBoilerplate with a null canvas (element \"".concat(config.canvas, " not found).");
         }
         // Which renderer to use: Canvas2D, WebGL (experimental) or SVG?
         if (canvasElement.tagName.toLowerCase() === "canvas") {
@@ -4563,8 +4690,8 @@ var PlotBoilerplate = /** @class */ (function () {
         if (config.title) {
             this.eventCatcher.setAttribute("title", config.title);
         }
-        this.draw.scale.set((_a = this.config.scaleX) !== null && _a !== void 0 ? _a : 1.0, this.config.scaleY);
-        this.fill.scale.set((_b = this.config.scaleX) !== null && _b !== void 0 ? _b : 1.0, this.config.scaleY);
+        this.draw.scale.set((_b = this.config.scaleX) !== null && _b !== void 0 ? _b : 1.0, this.config.scaleY);
+        this.fill.scale.set((_c = this.config.scaleX) !== null && _c !== void 0 ? _c : 1.0, this.config.scaleY);
         this.vertices = [];
         this.selectPolygon = null;
         this.draggedElements = [];
@@ -4630,8 +4757,9 @@ var PlotBoilerplate = /** @class */ (function () {
         var blob = new Blob(['<?xml version="1.0" encoding="utf-8"?>\n' + svgCode], { type: "image/svg;charset=utf-8" });
         // See documentation for FileSaver.js for usage.
         //    https://github.com/eligrey/FileSaver.js
-        if (typeof globalThis["saveAs"] !== "function")
+        if (typeof globalThis["saveAs"] !== "function") {
             throw "Cannot save file; did you load the ./utils/savefile helper function and the eligrey/SaveFile library?";
+        }
         var _saveAs = globalThis["saveAs"];
         _saveAs(blob, "plotboilerplate.svg");
     };
@@ -4702,12 +4830,12 @@ var PlotBoilerplate = /** @class */ (function () {
      * @private
      **/
     PlotBoilerplate.prototype.updateCSSscale = function () {
-        var _a, _b, _c, _d;
+        var _b, _c, _d, _e;
         if (this.config.cssUniformScale) {
-            PlotBoilerplate.utils.setCSSscale(this.canvas, (_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0, (_b = this.config.cssScaleX) !== null && _b !== void 0 ? _b : 1.0);
+            PlotBoilerplate.utils.setCSSscale(this.canvas, (_b = this.config.cssScaleX) !== null && _b !== void 0 ? _b : 1.0, (_c = this.config.cssScaleX) !== null && _c !== void 0 ? _c : 1.0);
         }
         else {
-            PlotBoilerplate.utils.setCSSscale(this.canvas, (_c = this.config.cssScaleX) !== null && _c !== void 0 ? _c : 1.0, (_d = this.config.cssScaleY) !== null && _d !== void 0 ? _d : 1.0);
+            PlotBoilerplate.utils.setCSSscale(this.canvas, (_d = this.config.cssScaleX) !== null && _d !== void 0 ? _d : 1.0, (_e = this.config.cssScaleY) !== null && _e !== void 0 ? _e : 1.0);
         }
     };
     /**
@@ -4980,8 +5108,8 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return The vertex near the given position or undefined if none was found there.
      **/
     PlotBoilerplate.prototype.getVertexNear = function (pixelPosition, pixelTolerance) {
-        var _a, _b;
-        var p = this.locatePointNear(this.transformMousePosition(pixelPosition.x, pixelPosition.y), pixelTolerance / Math.min((_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0, (_b = this.config.cssScaleY) !== null && _b !== void 0 ? _b : 1.0));
+        var _b, _c;
+        var p = this.locatePointNear(this.transformMousePosition(pixelPosition.x, pixelPosition.y), pixelTolerance / Math.min((_b = this.config.cssScaleX) !== null && _b !== void 0 ? _b : 1.0, (_c = this.config.cssScaleY) !== null && _c !== void 0 ? _c : 1.0));
         if (p && p.typeName == "vertex") {
             return this.vertices[p.vindex];
         }
@@ -5099,16 +5227,16 @@ var PlotBoilerplate = /** @class */ (function () {
             var curveIndex = 0;
             for (var c in d.bezierCurves) {
                 // Restore these settings again in each loop (will be overwritten)
-                this.draw.setCurrentId(d.uid + "-" + curveIndex);
-                this.fill.setCurrentId(d.uid + "-" + curveIndex);
+                this.draw.setCurrentId("".concat(d.uid, "-").concat(curveIndex));
+                this.fill.setCurrentId("".concat(d.uid, "-").concat(curveIndex));
                 this.draw.setCurrentClassName(d.className);
                 this.fill.setCurrentClassName(d.className);
                 draw.cubicBezier(d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth);
                 if (this.drawConfig.drawBezierHandlePoints && this.drawConfig.drawHandlePoints) {
                     if (d.bezierCurves[c].startPoint.attr.visible) {
                         var df = this.drawConfig.bezier.pathVertex.fill ? fill : draw;
-                        df.setCurrentId(d.uid + "_h0");
-                        df.setCurrentClassName(d.className + "-start-handle");
+                        df.setCurrentId("".concat(d.uid, "_h0"));
+                        df.setCurrentClassName("".concat(d.className, "-start-handle"));
                         if (d.bezierCurves[c].startPoint.attr.bezierAutoAdjust) {
                             df.squareHandle(d.bezierCurves[c].startPoint, 5, this._handleColor(d.bezierCurves[c].startPoint, this.drawConfig.bezier.pathVertex.color));
                         }
@@ -5119,8 +5247,8 @@ var PlotBoilerplate = /** @class */ (function () {
                     d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
                     if (d.bezierCurves[c].endPoint.attr.visible) {
                         var df = this.drawConfig.bezier.pathVertex.fill ? fill : draw;
-                        df.setCurrentId(d.uid + "_h0");
-                        df.setCurrentClassName(d.className + "-start-handle");
+                        df.setCurrentId("".concat(d.uid, "_h0"));
+                        df.setCurrentClassName("".concat(d.className, "-start-handle"));
                         if (d.bezierCurves[c].endPoint.attr.bezierAutoAdjust) {
                             df.squareHandle(d.bezierCurves[c].endPoint, 5, this._handleColor(d.bezierCurves[c].endPoint, this.drawConfig.bezier.pathVertex.color));
                         }
@@ -5130,14 +5258,14 @@ var PlotBoilerplate = /** @class */ (function () {
                     }
                     if (d.bezierCurves[c].startControlPoint.attr.visible) {
                         var df = this.drawConfig.bezier.controlVertex.fill ? fill : draw;
-                        df.setCurrentId(d.uid + "_h2");
-                        df.setCurrentClassName(d.className + "-start-control-handle");
+                        df.setCurrentId("".concat(d.uid, "_h2"));
+                        df.setCurrentClassName("".concat(d.className, "-start-control-handle"));
                         df.circleHandle(d.bezierCurves[c].startControlPoint, 3, this._handleColor(d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.controlVertex.color));
                     }
                     if (d.bezierCurves[c].endControlPoint.attr.visible) {
                         var df = this.drawConfig.bezier.controlVertex.fill ? fill : draw;
-                        df.setCurrentId(d.uid + "_h3");
-                        df.setCurrentClassName(d.className + "-end-control-handle");
+                        df.setCurrentId("".concat(d.uid, "_h3"));
+                        df.setCurrentClassName("".concat(d.className, "-end-control-handle"));
                         df.circleHandle(d.bezierCurves[c].endControlPoint, 3, this._handleColor(d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.controlVertex.color));
                     }
                     d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
@@ -5152,11 +5280,11 @@ var PlotBoilerplate = /** @class */ (function () {
                     d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
                 }
                 if (this.drawConfig.drawBezierHandleLines && this.drawConfig.drawHandleLines) {
-                    draw.setCurrentId(d.uid + "_l0");
-                    draw.setCurrentClassName(d.className + "-start-line");
+                    draw.setCurrentId("".concat(d.uid, "_l0"));
+                    draw.setCurrentClassName("".concat(d.className, "-start-line"));
                     draw.handleLine(d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint);
-                    draw.setCurrentId(d.uid + "_l1");
-                    draw.setCurrentClassName(d.className + "-end-line");
+                    draw.setCurrentId("".concat(d.uid, "_l1"));
+                    draw.setCurrentClassName("".concat(d.className, "-end-line"));
                     draw.handleLine(d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint);
                 }
                 curveIndex++;
@@ -5177,17 +5305,17 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         else if (d instanceof VEllipse_1.VEllipse) {
             if (this.drawConfig.drawHandleLines) {
-                draw.setCurrentId(d.uid + "_e0");
-                draw.setCurrentClassName(d.className + "-v-line");
+                draw.setCurrentId("".concat(d.uid, "_e0"));
+                draw.setCurrentClassName("".concat(d.className, "-v-line"));
                 // draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
                 draw.handleLine(d.center.clone().add(0, d.signedRadiusV()).rotate(d.rotation, d.center), d.axis); // , "#c8c8c8");
-                draw.setCurrentId(d.uid + "_e1");
-                draw.setCurrentClassName(d.className + "-h-line");
+                draw.setCurrentId("".concat(d.uid, "_e1"));
+                draw.setCurrentClassName("".concat(d.className, "-h-line"));
                 // draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
                 draw.handleLine(d.center.clone().add(d.signedRadiusH(), 0).rotate(d.rotation, d.center), d.axis); // , "#c8c8c8");
             }
             draw.setCurrentId(d.uid);
-            draw.setCurrentClassName("" + d.className);
+            draw.setCurrentClassName("".concat(d.className));
             draw.ellipse(d.center, 
             // Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y),
             d.radiusH(), d.radiusV(), this.drawConfig.ellipse.color, this.drawConfig.ellipse.lineWidth, d.rotation);
@@ -5198,7 +5326,7 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         else if (d instanceof VEllipseSector_1.VEllipseSector) {
             draw.setCurrentId(d.uid);
-            draw.setCurrentClassName("" + d.className);
+            draw.setCurrentClassName("".concat(d.className));
             /* draw.ellipse( d.center,
                     // Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y),
                     d.radiusH(), d.radiusV(),
@@ -5231,8 +5359,8 @@ var PlotBoilerplate = /** @class */ (function () {
         else if (d instanceof Vector_1.Vector) {
             draw.arrow(d.a, d.b, this.drawConfig.vector.color);
             if (this.drawConfig.drawHandlePoints && d.b.attr.selectable && d.b.attr.visible) {
-                draw.setCurrentId(d.uid + "_h0");
-                draw.setCurrentClassName(d.className + "-handle");
+                draw.setCurrentId("".concat(d.uid, "_h0"));
+                draw.setCurrentClassName("".concat(d.className, "-handle"));
                 draw.circleHandle(d.b, 3, "#a8a8a8");
             }
             else {
@@ -5245,15 +5373,15 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         else if (d instanceof PBImage_1.PBImage) {
             if (this.drawConfig.drawHandleLines) {
-                draw.setCurrentId(d.uid + "_l0");
-                draw.setCurrentClassName(d.className + "-line");
+                draw.setCurrentId("".concat(d.uid, "_l0"));
+                draw.setCurrentClassName("".concat(d.className, "-line"));
                 draw.line(d.upperLeft, d.lowerRight, this.drawConfig.image.color, this.drawConfig.image.lineWidth);
             }
             fill.setCurrentId(d.uid);
             fill.image(d.image, d.upperLeft, d.lowerRight.clone().sub(d.upperLeft));
             if (this.drawConfig.drawHandlePoints) {
-                draw.setCurrentId(d.uid + "_h0");
-                draw.setCurrentClassName(d.className + "-lower-right");
+                draw.setCurrentId("".concat(d.uid, "_h0"));
+                draw.setCurrentClassName("".concat(d.className, "-lower-right"));
                 draw.circleHandle(d.lowerRight, 3, this.drawConfig.image.color);
                 d.lowerRight.attr.renderTime = renderTime;
             }
@@ -5262,8 +5390,8 @@ var PlotBoilerplate = /** @class */ (function () {
             fill.setCurrentId(d.uid);
             fill.text(d.text, d.anchor.x, d.anchor.y, d);
             if (this.drawConfig.text.anchor) {
-                draw.setCurrentId(d.uid + "_a0");
-                draw.setCurrentClassName(d.className + "-anchor");
+                draw.setCurrentId("".concat(d.uid, "_a0"));
+                draw.setCurrentClassName("".concat(d.className, "-anchor"));
                 (this.drawConfig.text.fill ? fill : draw).point(d.anchor, this.drawConfig.text.color);
             }
             d.anchor.attr.renderTime = renderTime;
@@ -5410,8 +5538,8 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {Bounds} The current viewport.
      **/
     PlotBoilerplate.prototype.viewport = function () {
-        var _a, _b;
-        return new Bounds_1.Bounds(this.transformMousePosition(0, 0), this.transformMousePosition(this.canvasSize.width * ((_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0), this.canvasSize.height * ((_b = this.config.cssScaleY) !== null && _b !== void 0 ? _b : 1.0)));
+        var _b, _c;
+        return new Bounds_1.Bounds(this.transformMousePosition(0, 0), this.transformMousePosition(this.canvasSize.width * ((_b = this.config.cssScaleX) !== null && _b !== void 0 ? _b : 1.0), this.canvasSize.height * ((_c = this.config.cssScaleY) !== null && _c !== void 0 ? _c : 1.0)));
     };
     /**
      * Trigger the saveFile.hook.
@@ -5460,12 +5588,12 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.resizeCanvas = function () {
         var _this = this;
-        var _a, _b, _c, _d, _e, _f;
+        var _b, _c, _d, _e, _f, _g;
         var _self = this;
         var _setSize = function (w, h) {
-            var _a, _b;
-            w *= (_a = _self.config.canvasWidthFactor) !== null && _a !== void 0 ? _a : 1.0;
-            h *= (_b = _self.config.canvasHeightFactor) !== null && _b !== void 0 ? _b : 1.0;
+            var _b, _c;
+            w *= (_b = _self.config.canvasWidthFactor) !== null && _b !== void 0 ? _b : 1.0;
+            h *= (_c = _self.config.canvasHeightFactor) !== null && _c !== void 0 ? _c : 1.0;
             _self.canvasSize.width = w;
             _self.canvasSize.height = h;
             if (_self.canvas instanceof HTMLCanvasElement) {
@@ -5473,12 +5601,12 @@ var PlotBoilerplate = /** @class */ (function () {
                 _self.canvas.height = h;
             }
             else if (_self.canvas instanceof SVGElement) {
-                _this.canvas.setAttribute("viewBox", "0 0 " + w + " " + h);
-                _this.canvas.setAttribute("width", "" + w);
-                _this.canvas.setAttribute("height", "" + h);
+                _this.canvas.setAttribute("viewBox", "0 0 ".concat(w, " ").concat(h));
+                _this.canvas.setAttribute("width", "".concat(w));
+                _this.canvas.setAttribute("height", "".concat(h));
                 _this.draw.setSize(_self.canvasSize); // No need to set size to this.fill (instance copy)
-                _this.eventCatcher.style.width = w + "px";
-                _this.eventCatcher.style.height = h + "px";
+                _this.eventCatcher.style.width = "".concat(w, "px");
+                _this.eventCatcher.style.height = "".concat(h, "px");
             }
             else {
                 console.error("Error: cannot resize canvas element because it seems neither be a HTMLCanvasElement nor an SVGElement.");
@@ -5494,8 +5622,8 @@ var PlotBoilerplate = /** @class */ (function () {
             var width = globalThis.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
             var height = globalThis.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
             _self.canvas.style.position = "absolute";
-            _self.canvas.style.width = ((_a = _self.config.canvasWidthFactor) !== null && _a !== void 0 ? _a : 1.0) * width + "px";
-            _self.canvas.style.height = ((_b = _self.config.canvasWidthFactor) !== null && _b !== void 0 ? _b : 1.0) * height + "px";
+            _self.canvas.style.width = ((_b = _self.config.canvasWidthFactor) !== null && _b !== void 0 ? _b : 1.0) * width + "px";
+            _self.canvas.style.height = ((_c = _self.config.canvasWidthFactor) !== null && _c !== void 0 ? _c : 1.0) * height + "px";
             _self.canvas.style.top = "0px";
             _self.canvas.style.left = "0px";
             _setSize(width, height);
@@ -5504,8 +5632,8 @@ var PlotBoilerplate = /** @class */ (function () {
             // Set editor size
             _self.canvas.style.position = "static";
             var space = this.getAvailableContainerSpace();
-            _self.canvas.style.width = ((_c = _self.config.canvasWidthFactor) !== null && _c !== void 0 ? _c : 1.0) * space.width + "px";
-            _self.canvas.style.height = ((_d = _self.config.canvasHeightFactor) !== null && _d !== void 0 ? _d : 1.0) * space.height + "px";
+            _self.canvas.style.width = ((_d = _self.config.canvasWidthFactor) !== null && _d !== void 0 ? _d : 1.0) * space.width + "px";
+            _self.canvas.style.height = ((_e = _self.config.canvasHeightFactor) !== null && _e !== void 0 ? _e : 1.0) * space.height + "px";
             _self.canvas.style.top = "";
             _self.canvas.style.left = "";
             _setSize(space.width, space.height);
@@ -5513,7 +5641,7 @@ var PlotBoilerplate = /** @class */ (function () {
         else {
             _self.canvas.style.width = "";
             _self.canvas.style.height = "";
-            _setSize((_e = _self.config.defaultCanvasWidth) !== null && _e !== void 0 ? _e : 1024, (_f = _self.config.defaultCanvasHeight) !== null && _f !== void 0 ? _f : 768);
+            _setSize((_f = _self.config.defaultCanvasWidth) !== null && _f !== void 0 ? _f : 1024, (_g = _self.config.defaultCanvasHeight) !== null && _g !== void 0 ? _g : 768);
         }
         if (_self.config.redrawOnResize)
             _self.redraw();
@@ -6017,7 +6145,9 @@ var PlotBoilerplate = /** @class */ (function () {
                         }
                     }; // END afProps
                     if (window["createAlloyFinger"]) {
-                        window["createAlloyFinger"](this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
+                        // window["createAlloyFinger"](this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
+                        var createAlloyFinger = window["createAlloyFinger"];
+                        createAlloyFinger(this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
                     }
                     else {
                         /* tslint:disable-next-line */
@@ -6075,10 +6205,15 @@ var PlotBoilerplate = /** @class */ (function () {
     PlotBoilerplate.prototype.createGUI = function (props) {
         // This function moved to the helper utils.
         // We do not want to include the whole dat.GUI package.
-        if (globalThis["utils"] && typeof globalThis["utils"].createGUI == "function")
-            return globalThis["utils"].createGUI(this, props);
-        else
+        var utils = globalThis["utils"];
+        // if (globalThis["utils"] && typeof globalThis["utils"].createGUI == "function") {
+        //   return (globalThis["utils" as keyof Object] as any as ({createGUI : (pb:PlotBoilerplate,props:DatGuiProps|undefined)=>GUI })).createGUI(this, props);
+        if (utils && typeof utils.createGUI === "function") {
+            return utils.createGUI(this, props);
+        }
+        else {
             throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an the dat.GUI library?";
+        }
     };
     var _a;
     /** @constant {number} */
@@ -6107,6 +6242,7 @@ var PlotBoilerplate = /** @class */ (function () {
             };
             return class_1;
         }()),
+        __setFunctionName(_a, "Draggable"),
         _a.VERTEX = "vertex",
         _a);
     /**
@@ -6196,7 +6332,8 @@ var PlotBoilerplate = /** @class */ (function () {
          * @return {void}
          **/
         setCSSscale: function (element, scaleX, scaleY) {
-            element.style["transform-origin"] = "0 0";
+            // element.style["transform-origin"] = "0 0";
+            element.style.transformOrigin = "0 0";
             if (scaleX == 1.0 && scaleY == 1.0) {
                 // element.style.transform = null;
                 element.style.removeProperty("transform");
@@ -6279,7 +6416,7 @@ var PlotBoilerplate = /** @class */ (function () {
                     return fallback;
                 return obj[key];
             }
-        },
+        }, // END fetch
         /**
          * Installs vertex listeners to the path's vertices so that controlpoints
          * move with their path points when dragged.
@@ -6332,13 +6469,13 @@ var PlotBoilerplate = /** @class */ (function () {
     }; // END utils
     return PlotBoilerplate;
 }()); // END class PlotBoilerplate
-exports.H4 = PlotBoilerplate;
-__webpack_unused_export__ = PlotBoilerplate;
+exports.PlotBoilerplate = PlotBoilerplate;
+exports["default"] = PlotBoilerplate;
 //# sourceMappingURL=PlotBoilerplate.js.map
 
 /***/ }),
 
-/***/ 661:
+/***/ 687:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -6379,11 +6516,11 @@ __webpack_unused_export__ = PlotBoilerplate;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Polygon = void 0;
-var BezierPath_1 = __webpack_require__(126);
-var Bounds_1 = __webpack_require__(262);
-var Line_1 = __webpack_require__(831);
-var UIDGenerator_1 = __webpack_require__(197);
-var Vertex_1 = __webpack_require__(421);
+var BezierPath_1 = __webpack_require__(733);
+var Bounds_1 = __webpack_require__(76);
+var Line_1 = __webpack_require__(939);
+var UIDGenerator_1 = __webpack_require__(938);
+var Vertex_1 = __webpack_require__(787);
 /**
  * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
  *
@@ -6950,7 +7087,7 @@ exports.Polygon = Polygon;
 
 /***/ }),
 
-/***/ 212:
+/***/ 737:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -6985,13 +7122,13 @@ exports.Polygon = Polygon;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Triangle = void 0;
-var Bounds_1 = __webpack_require__(262);
-var Circle_1 = __webpack_require__(913);
-var Line_1 = __webpack_require__(831);
-var Polygon_1 = __webpack_require__(661);
-var UIDGenerator_1 = __webpack_require__(197);
-var Vertex_1 = __webpack_require__(421);
-var geomutils_1 = __webpack_require__(22);
+var Bounds_1 = __webpack_require__(76);
+var Circle_1 = __webpack_require__(118);
+var Line_1 = __webpack_require__(939);
+var Polygon_1 = __webpack_require__(687);
+var UIDGenerator_1 = __webpack_require__(938);
+var Vertex_1 = __webpack_require__(787);
+var geomutils_1 = __webpack_require__(328);
 /**
  * @classdesc A triangle class for triangulations.
  *
@@ -7044,7 +7181,7 @@ var Triangle = /** @class */ (function () {
      **/
     Triangle.fromArray = function (arr) {
         if (arr.length < 3)
-            throw "Cannot create triangle from array with less than three vertices (" + arr.length + ")";
+            throw "Cannot create triangle from array with less than three vertices (".concat(arr.length, ")");
         return new Triangle(arr[0], arr[1], arr[2]);
     };
     /**
@@ -7361,7 +7498,7 @@ exports.Triangle = Triangle;
 
 /***/ }),
 
-/***/ 197:
+/***/ 938:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -7378,7 +7515,7 @@ var UIDGenerator = /** @class */ (function () {
     function UIDGenerator() {
     }
     UIDGenerator.next = function () {
-        return "" + UIDGenerator.current++;
+        return "".concat(UIDGenerator.current++);
     };
     UIDGenerator.current = 0;
     return UIDGenerator;
@@ -7388,7 +7525,7 @@ exports.UIDGenerator = UIDGenerator;
 
 /***/ }),
 
-/***/ 112:
+/***/ 881:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -7416,11 +7553,11 @@ exports.UIDGenerator = UIDGenerator;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VEllipse = void 0;
-var Line_1 = __webpack_require__(831);
-var Vector_1 = __webpack_require__(73);
-var Vertex_1 = __webpack_require__(421);
-var UIDGenerator_1 = __webpack_require__(197);
-var CubicBezierCurve_1 = __webpack_require__(510);
+var Line_1 = __webpack_require__(939);
+var Vector_1 = __webpack_require__(30);
+var Vertex_1 = __webpack_require__(787);
+var UIDGenerator_1 = __webpack_require__(938);
+var CubicBezierCurve_1 = __webpack_require__(973);
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -7808,7 +7945,7 @@ exports.VEllipse = VEllipse;
 
 /***/ }),
 
-/***/ 965:
+/***/ 719:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -7824,12 +7961,12 @@ exports.VEllipse = VEllipse;
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VEllipseSector = void 0;
-var CubicBezierCurve_1 = __webpack_require__(510);
-var geomutils_1 = __webpack_require__(22);
-var Line_1 = __webpack_require__(831);
-var UIDGenerator_1 = __webpack_require__(197);
-var VEllipse_1 = __webpack_require__(112);
-var Vertex_1 = __webpack_require__(421);
+var CubicBezierCurve_1 = __webpack_require__(973);
+var geomutils_1 = __webpack_require__(328);
+var Line_1 = __webpack_require__(939);
+var UIDGenerator_1 = __webpack_require__(938);
+var VEllipse_1 = __webpack_require__(881);
+var Vertex_1 = __webpack_require__(787);
 /**
  * @classdesc A class for elliptic sectors.
  *
@@ -7971,7 +8108,7 @@ var VEllipseSector = /** @class */ (function () {
             var r2d = 180 / Math.PI;
             pathData.push("A", radiusH, radiusV, rotation * r2d, largeArcFlag, sweepFlag, end.x, end.y);
             return pathData;
-        },
+        }, // END function describeSVGArc
         /**
          * Helper function to find second-kind elliptic angles, so that the euclidean distance along the the
          * elliptic sector is the same for all.
@@ -8098,7 +8235,7 @@ exports.VEllipseSector = VEllipseSector;
 
 /***/ }),
 
-/***/ 73:
+/***/ 30:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -8129,6 +8266,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -8136,8 +8275,8 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Vector = void 0;
-var VertTuple_1 = __webpack_require__(72);
-var Vertex_1 = __webpack_require__(421);
+var VertTuple_1 = __webpack_require__(590);
+var Vertex_1 = __webpack_require__(787);
 /**
  * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
  *            <br>
@@ -8288,7 +8427,7 @@ exports.Vector = Vector;
 
 /***/ }),
 
-/***/ 72:
+/***/ 590:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -8308,8 +8447,8 @@ exports.Vector = Vector;
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VertTuple = void 0;
-var Vertex_1 = __webpack_require__(421);
-var UIDGenerator_1 = __webpack_require__(197);
+var Vertex_1 = __webpack_require__(787);
+var UIDGenerator_1 = __webpack_require__(938);
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
  * @abstract
@@ -8604,7 +8743,7 @@ exports.VertTuple = VertTuple;
 
 /***/ }),
 
-/***/ 421:
+/***/ 787:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -8641,16 +8780,17 @@ exports.VertTuple = VertTuple;
  * @modified 2022-11-28 Added the `subXY`, `subX` and `subY` methods to the `Vertex` class.
  * @modified 2023-09-29 Downgraded types for the `Vertex.utils.buildArrowHead` function (replacing Vertex params by more generic XYCoords type).
  * @modified 2023-09-29 Added the `Vertex.abs()` method as it seems useful.
- * @version  2.8.0
+ * @modified 2024-03-08 Added the optional `precision` param to the `toString` method.
+ * @version  2.9.0
  *
  * @file Vertex
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Vertex = void 0;
-var VertexAttr_1 = __webpack_require__(861);
-var UIDGenerator_1 = __webpack_require__(197);
-var VertexListeners_1 = __webpack_require__(76);
+var VertexAttr_1 = __webpack_require__(476);
+var UIDGenerator_1 = __webpack_require__(938);
+var VertexListeners_1 = __webpack_require__(934);
 /**
  * @classdesc A vertex is a pair of two numbers.<br>
  * <br>
@@ -8828,11 +8968,11 @@ var Vertex = /** @class */ (function () {
                 if (typeof x == "number")
                     this.x += x;
                 else
-                    throw "Cannot add " + typeof x + " to numeric x component!";
+                    throw "Cannot add ".concat(typeof x, " to numeric x component!");
                 if (typeof y == "number")
                     this.y += y;
                 else
-                    throw "Cannot add " + typeof y + " to numeric y component!";
+                    throw "Cannot add ".concat(typeof y, " to numeric y component!");
             }
         }
         return this;
@@ -8906,11 +9046,11 @@ var Vertex = /** @class */ (function () {
                 if (typeof x == "number")
                     this.x -= x;
                 else
-                    throw "Cannot add " + typeof x + " to numeric x component!";
+                    throw "Cannot add ".concat(typeof x, " to numeric x component!");
                 if (typeof y == "number")
                     this.y -= y;
                 else
-                    throw "Cannot add " + typeof y + " to numeric y component!";
+                    throw "Cannot add ".concat(typeof y, " to numeric y component!");
             }
         }
         return this;
@@ -9183,8 +9323,13 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.toString = function () {
-        return "(" + this.x + "," + this.y + ")";
+    Vertex.prototype.toString = function (precision) {
+        if (typeof precision === "undefined") {
+            return "(" + this.x + "," + this.y + ")";
+        }
+        else {
+            return "(" + this.x.toFixed(precision) + "," + this.y.toFixed(precision) + ")";
+        }
     };
     /**
      * This function should invalidate any installed listeners and invalidate this object.
@@ -9270,7 +9415,7 @@ exports.Vertex = Vertex;
 
 /***/ }),
 
-/***/ 861:
+/***/ 476:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -9282,7 +9427,8 @@ exports.Vertex = Vertex;
  * @modified 2019-03-20 Added JSDoc tags.
  * @modified 2020-02-29 Added the 'selectable' attribute.
  * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  1.1.1
+ * @modified 2024-03-10 Fixed some types for Typescript 5 compatibility.
+ * @version  1.1.2
  *
  * @file VertexAttr
  * @public
@@ -9334,7 +9480,7 @@ exports.VertexAttr = VertexAttr;
 
 /***/ }),
 
-/***/ 76:
+/***/ 934:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -9607,7 +9753,7 @@ exports.VertexListeners = VertexListeners;
 
 /***/ }),
 
-/***/ 149:
+/***/ 39:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -9673,10 +9819,10 @@ exports.VertexListeners = VertexListeners;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
-var CubicBezierCurve_1 = __webpack_require__(510);
-var Vertex_1 = __webpack_require__(421);
-var drawutilssvg_1 = __webpack_require__(829);
-var Vector_1 = __webpack_require__(73);
+var CubicBezierCurve_1 = __webpack_require__(973);
+var Vertex_1 = __webpack_require__(787);
+var drawutilssvg_1 = __webpack_require__(378);
+var Vector_1 = __webpack_require__(30);
 // Todo: rename this class to Drawutils?
 /**
  * @classdesc A wrapper class for basic drawing operations.
@@ -10648,7 +10794,7 @@ var drawutils = /** @class */ (function () {
                     (options.fontFamily
                         ? options.fontFamily.indexOf(" ") === -1
                             ? options.fontFamily
-                            : "\"" + options.fontFamily + "\""
+                            : "\"".concat(options.fontFamily, "\"")
                         : "Arial");
         }
         if (options.textAlign) {
@@ -10771,7 +10917,7 @@ exports.drawutils = drawutils;
 
 /***/ }),
 
-/***/ 349:
+/***/ 264:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -10797,7 +10943,7 @@ exports.drawutils = drawutils;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilsgl = void 0;
-var Vertex_1 = __webpack_require__(421);
+var Vertex_1 = __webpack_require__(787);
 /**
  * @classdesc A wrapper class for basic drawing operations. This is the WebGL
  * implementation whih sould work with shaders.
@@ -11570,7 +11716,7 @@ var GLU = /** @class */ (function () {
 
 /***/ }),
 
-/***/ 829:
+/***/ 378:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -11620,16 +11766,17 @@ var GLU = /** @class */ (function () {
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-10-04 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
- *
- * @version  1.6.7
+ * @modified 2024-01-30 Fixing an issue with immutable style sets; changes to the global draw config did not reflect here (do now).
+ * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
+ * @version  1.6.9
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilssvg = void 0;
-var CircleSector_1 = __webpack_require__(946);
-var CubicBezierCurve_1 = __webpack_require__(510);
-var Vertex_1 = __webpack_require__(421);
-var UIDGenerator_1 = __webpack_require__(197);
-var Vector_1 = __webpack_require__(73);
+var CircleSector_1 = __webpack_require__(135);
+var CubicBezierCurve_1 = __webpack_require__(973);
+var Vertex_1 = __webpack_require__(787);
+var UIDGenerator_1 = __webpack_require__(938);
+var Vector_1 = __webpack_require__(30);
 var RAD_TO_DEG = 180 / Math.PI;
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
@@ -11641,6 +11788,10 @@ var RAD_TO_DEG = 180 / Math.PI;
  * @requires XYCoords
  */
 var drawutilssvg = /** @class */ (function () {
+    /**
+     * Passed from primary to secondary instance.
+     */
+    //private nodeStyle: SVGStyleElement;
     /**
      * The constructor.
      *
@@ -11655,12 +11806,13 @@ var drawutilssvg = /** @class */ (function () {
      * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
      * @param {SVGGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
-    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode, bufferGNode, nodeDefs, bufferNodeDefs) {
+    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode, bufferGNode, nodeDefs, bufferNodeDefs, nodeStyle) {
         this.svgNode = svgNode;
         this.offset = new Vertex_1.Vertex(0, 0).set(offset);
         this.scale = new Vertex_1.Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
         this.isSecondary = Boolean(isSecondary);
+        this.drawConfig = drawConfig;
         this.drawlibConfiguration = {};
         this.cache = new Map();
         this.setSize(canvasSize);
@@ -11672,6 +11824,9 @@ var drawutilssvg = /** @class */ (function () {
             this.bufferGNode = bufferGNode;
             this.nodeDefs = nodeDefs;
             this.bufferedNodeDefs = bufferNodeDefs;
+            if (nodeStyle) {
+                this.nodeStyle = nodeStyle;
+            }
         }
         else {
             this.addStyleDefs(drawConfig);
@@ -11690,11 +11845,19 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.addStyleDefs = function (drawConfig) {
         this.nodeStyle = this.createSVGNode("style");
         this.svgNode.appendChild(this.nodeStyle);
+        this.rebuildStyleDefs(drawConfig);
+    };
+    /**
+     * This method is required to re-define the global style defs. It is needed
+     * if any value in the DrawConfig changed in the meantime.
+     * @param drawConfig
+     */
+    drawutilssvg.prototype.rebuildStyleDefs = function (drawConfig) {
         // Which default styles to add? -> All from the DrawConfig.
         // Compare with DrawConfig interface
         var keys = {
-            // "bezier": "CubicBezierCurve", // TODO: is this correct?
-            "bezierPath": "BezierPath",
+            "bezier": "CubicBezierCurve",
+            //"bezierPath": "BezierPath", // TODO: is this correct?
             "polygon": "Polygon",
             "triangle": "Triangle",
             "ellipse": "Ellipse",
@@ -11709,14 +11872,15 @@ var drawutilssvg = /** @class */ (function () {
         };
         // Question: why isn't this working if the svgNode is created dynamically? (nodeStyle.sheet is null)
         var rules = [];
+        // console.log("drawConfig", drawConfig);
         for (var k in keys) {
             var className = keys[k];
             var drawSettings = drawConfig[k];
             if (drawSettings) {
-                rules.push("." + className + " { fill : none; stroke: " + drawSettings.color + "; stroke-width: " + drawSettings.lineWidth + "px }");
+                rules.push(".".concat(className, " { fill : none; stroke: ").concat(drawSettings.color, "; stroke-width: ").concat(drawSettings.lineWidth, "px }"));
             }
             else {
-                console.warn("Warning: your draw config is missing the key '" + k + "' which is required.");
+                console.warn("Warning: your draw config is missing the key '".concat(k, "' which is required."));
             }
         }
         this.nodeStyle.innerHTML = rules.join("\n");
@@ -11806,7 +11970,8 @@ var drawutilssvg = /** @class */ (function () {
             node = this.createSVGNode(nodeName);
         }
         if (this.drawlibConfiguration.blendMode) {
-            node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
+            // node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
+            node.style["mix-blend-mode"](this.drawlibConfiguration.blendMode);
         }
         // if (this.lineDashEnabled && this.lineDash && this.lineDash.length > 0 && drawutilssvg.nodeSupportsLineDash(nodeName)) {
         //   node.setAttribute("stroke-dasharray", this.lineDash.join(" "));
@@ -11870,7 +12035,7 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype._addCSSClasses = function (node, className) {
         if (this.curClassName) {
-            node.setAttribute("class", className + " " + this.curClassName);
+            node.setAttribute("class", "".concat(className, " ").concat(this.curClassName));
         }
         else {
             node.setAttribute("class", className);
@@ -11880,9 +12045,9 @@ var drawutilssvg = /** @class */ (function () {
         this._addCSSClasses(node, className);
         node.setAttribute("fill", fillMode && color ? color : "none");
         node.setAttribute("stroke", fillMode ? "none" : color || "none");
-        node.setAttribute("stroke-width", "" + (lineWidth || 1));
+        node.setAttribute("stroke-width", "".concat(lineWidth || 1));
         if (this.curId) {
-            node.setAttribute("id", "" + this.curId); // Maybe React-style 'key' would be better?
+            node.setAttribute("id", "".concat(this.curId)); // Maybe React-style 'key' would be better?
         }
         this.applyStrokeOpts(node, strokeOptions);
         return node;
@@ -11897,18 +12062,18 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.setSize = function (canvasSize) {
         this.canvasSize = canvasSize;
-        this.svgNode.setAttribute("viewBox", "0 0 " + this.canvasSize.width + " " + this.canvasSize.height);
-        this.svgNode.setAttribute("width", "" + this.canvasSize.width);
-        this.svgNode.setAttribute("height", "" + this.canvasSize.height);
+        this.svgNode.setAttribute("viewBox", "0 0 ".concat(this.canvasSize.width, " ").concat(this.canvasSize.height));
+        this.svgNode.setAttribute("width", "".concat(this.canvasSize.width));
+        this.svgNode.setAttribute("height", "".concat(this.canvasSize.height));
     };
     /**
      * Creates a 'shallow' (non deep) copy of this instance. This implies
      * that under the hood the same gl context and gl program will be used.
      */
     drawutilssvg.prototype.copyInstance = function (fillShapes) {
-        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, null, // no DrawConfig – this will work as long as `isSecondary===true`
+        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, this.drawConfig, // null as any as DrawConfig, // no DrawConfig – this will work as long as `isSecondary===true`
         true, // isSecondary
-        this.gNode, this.bufferGNode, this.nodeDefs, this.bufferedNodeDefs);
+        this.gNode, this.bufferGNode, this.nodeDefs, this.bufferedNodeDefs, this.nodeStyle);
         return copy;
     };
     /**
@@ -11921,20 +12086,6 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.setConfiguration = function (configuration) {
         this.drawlibConfiguration = configuration;
     };
-    // /**
-    //  * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
-    //  *
-    //  * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
-    //  * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
-    //  * for how line dashes work.
-    //  *
-    //  * @method
-    //  * @param {Array<number> lineDashes - The line-dash array configuration.
-    //  * @returns {void}
-    //  */
-    // setLineDash(lineDashes: Array<number>) {
-    //   this.lineDash = lineDashes;
-    // }
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
@@ -11994,6 +12145,7 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      **/
     drawutilssvg.prototype.endDrawCycle = function (renderTime) {
+        this.rebuildStyleDefs(this.drawConfig);
         if (!this.isSecondary) {
             // All elements are drawn into the buffer; they are NOT yet visible, not did the browser perform any
             // layout updates.
@@ -12026,7 +12178,7 @@ var drawutilssvg = /** @class */ (function () {
             })
                 .join(" "));
             if (strokeOptions.dashOffset) {
-                node.setAttribute("stroke-dashoffset", "" + strokeOptions.dashOffset * this.scale.x);
+                node.setAttribute("stroke-dashoffset", "".concat(strokeOptions.dashOffset * this.scale.x));
             }
         }
     };
@@ -12162,13 +12314,13 @@ var drawutilssvg = /** @class */ (function () {
             if (image.naturalWidth) {
                 var ratioX = size.x / image.naturalWidth;
                 var ratioY = size.y / image.naturalHeight;
-                node.setAttribute("width", "" + image.naturalWidth * _this.scale.x);
-                node.setAttribute("height", "" + image.naturalHeight * _this.scale.y);
+                node.setAttribute("width", "".concat(image.naturalWidth * _this.scale.x));
+                node.setAttribute("height", "".concat(image.naturalHeight * _this.scale.y));
                 node.setAttribute("display", null); // Dislay when loaded
                 // if (alpha) {
-                node.setAttribute("opacity", "" + alpha);
+                node.setAttribute("opacity", "".concat(alpha));
                 // }
-                node.setAttribute("transform", "translate(" + _this._x(position.x) + " " + _this._y(position.y) + ") scale(" + ratioX + " " + ratioY + ")");
+                node.setAttribute("transform", "translate(".concat(_this._x(position.x), " ").concat(_this._y(position.y), ") scale(").concat(ratioX, " ").concat(ratioY, ")"));
             }
         };
         image.addEventListener("load", function (event) {
@@ -12176,8 +12328,8 @@ var drawutilssvg = /** @class */ (function () {
         });
         // Safari has a transform-origin bug.
         // Use x=0, y=0 and translate/scale instead (see above)
-        node.setAttribute("x", "" + 0);
-        node.setAttribute("y", "" + 0);
+        node.setAttribute("x", "".concat(0));
+        node.setAttribute("y", "".concat(0));
         node.setAttribute("display", "none"); // Hide before loaded
         setImageSize(image);
         node.setAttribute("href", image.src);
@@ -12218,36 +12370,36 @@ var drawutilssvg = /** @class */ (function () {
         //    </image>
         // ...
         var clipPathNode = this.makeNode("clipPath");
-        var clipPathId = "clippath_" + UIDGenerator_1.UIDGenerator.next(); // TODO: use a better UUID generator here?
+        var clipPathId = "clippath_".concat(UIDGenerator_1.UIDGenerator.next()); // TODO: use a better UUID generator here?
         clipPathNode.setAttribute("id", clipPathId);
         var gNode = this.makeNode("g");
         var imageNode = this.makeNode("image");
-        imageNode.setAttribute("x", "" + this._x(rotatedScalingOrigin.x));
-        imageNode.setAttribute("y", "" + this._y(rotatedScalingOrigin.y));
-        imageNode.setAttribute("width", "" + textureSize.width);
-        imageNode.setAttribute("height", "" + textureSize.height);
+        imageNode.setAttribute("x", "".concat(this._x(rotatedScalingOrigin.x)));
+        imageNode.setAttribute("y", "".concat(this._y(rotatedScalingOrigin.y)));
+        imageNode.setAttribute("width", "".concat(textureSize.width));
+        imageNode.setAttribute("height", "".concat(textureSize.height));
         imageNode.setAttribute("href", textureImage.src);
         // imageNode.setAttribute("opacity", "0.5");
         // SVG rotations in degrees
-        imageNode.setAttribute("transform", "rotate(" + rotation * RAD_TO_DEG + ", " + this._x(rotatedScalingOrigin.x) + ", " + this._y(rotatedScalingOrigin.y) + ")");
+        imageNode.setAttribute("transform", "rotate(".concat(rotation * RAD_TO_DEG, ", ").concat(this._x(rotatedScalingOrigin.x), ", ").concat(this._y(rotatedScalingOrigin.y), ")"));
         var pathNode = this.makeNode("path");
         var pathData = [];
         if (polygon.vertices.length > 0) {
             var self_1 = this;
-            pathData.push("M", "" + this._x(polygon.vertices[0].x), "" + this._y(polygon.vertices[0].y));
+            pathData.push("M", "".concat(this._x(polygon.vertices[0].x)), "".concat(this._y(polygon.vertices[0].y)));
             for (var i = 1; i < polygon.vertices.length; i++) {
-                pathData.push("L", "" + this._x(polygon.vertices[i].x), "" + this._y(polygon.vertices[i].y));
+                pathData.push("L", "".concat(this._x(polygon.vertices[i].x)), "".concat(this._y(polygon.vertices[i].y)));
             }
         }
         pathNode.setAttribute("d", pathData.join(" "));
         clipPathNode.appendChild(pathNode);
         this.bufferedNodeDefs.appendChild(clipPathNode);
         gNode.appendChild(imageNode);
-        gNode.setAttribute("transform-origin", this._x(rotatedScalingOrigin.x) + " " + this._y(rotatedScalingOrigin.y));
-        gNode.setAttribute("transform", "scale(" + this.scale.x + ", " + this.scale.y + ")");
+        gNode.setAttribute("transform-origin", "".concat(this._x(rotatedScalingOrigin.x), " ").concat(this._y(rotatedScalingOrigin.y)));
+        gNode.setAttribute("transform", "scale(".concat(this.scale.x, ", ").concat(this.scale.y, ")"));
         var clipNode = this.makeNode("g");
         clipNode.appendChild(gNode);
-        clipNode.setAttribute("clip-path", "url(#" + clipPathId + ")");
+        clipNode.setAttribute("clip-path", "url(#".concat(clipPathId, ")"));
         // TODO: check if the image class is correct here or if we should use a 'clippedImage' class here
         this._bindFillDraw(clipNode, "image", null, null); // No color, no lineWidth
         return clipNode;
@@ -12352,10 +12504,10 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.dot = function (p, color) {
         var node = this.makeNode("line");
-        node.setAttribute("x1", "" + this._x(p.x));
-        node.setAttribute("y1", "" + this._y(p.y));
-        node.setAttribute("x2", "" + this._x(p.x));
-        node.setAttribute("y2", "" + this._y(p.y));
+        node.setAttribute("x1", "".concat(this._x(p.x)));
+        node.setAttribute("y1", "".concat(this._y(p.y)));
+        node.setAttribute("x2", "".concat(this._x(p.x)));
+        node.setAttribute("y2", "".concat(this._y(p.y)));
         return this._bindFillDraw(node, "dot", color, 1);
     };
     /**
@@ -12371,9 +12523,9 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.point = function (p, color) {
         var radius = 3;
         var node = this.makeNode("circle");
-        node.setAttribute("cx", "" + this._x(p.x));
-        node.setAttribute("cy", "" + this._y(p.y));
-        node.setAttribute("r", "" + radius);
+        node.setAttribute("cx", "".concat(this._x(p.x)));
+        node.setAttribute("cy", "".concat(this._y(p.y)));
+        node.setAttribute("r", "".concat(radius));
         return this._bindFillDraw(node, "point", color, 1);
     };
     /**
@@ -12396,9 +12548,9 @@ var drawutilssvg = /** @class */ (function () {
         // Todo: draw ellipse when scalex!=scaley
         var node = this.makeNode("circle");
         this.applyStrokeOpts(node, strokeOptions);
-        node.setAttribute("cx", "" + this._x(center.x));
-        node.setAttribute("cy", "" + this._y(center.y));
-        node.setAttribute("r", "" + radius * this.scale.x); // y?
+        node.setAttribute("cx", "".concat(this._x(center.x)));
+        node.setAttribute("cy", "".concat(this._y(center.y)));
+        node.setAttribute("r", "".concat(radius * this.scale.x)); // y?
         return this._bindFillDraw(node, "circle", color, lineWidth || 1);
     };
     /**
@@ -12446,12 +12598,12 @@ var drawutilssvg = /** @class */ (function () {
         }
         var node = this.makeNode("ellipse");
         this.applyStrokeOpts(node, strokeOptions);
-        node.setAttribute("cx", "" + this._x(center.x));
-        node.setAttribute("cy", "" + this._y(center.y));
-        node.setAttribute("rx", "" + radiusX * this.scale.x);
-        node.setAttribute("ry", "" + radiusY * this.scale.y);
+        node.setAttribute("cx", "".concat(this._x(center.x)));
+        node.setAttribute("cy", "".concat(this._y(center.y)));
+        node.setAttribute("rx", "".concat(radiusX * this.scale.x));
+        node.setAttribute("ry", "".concat(radiusY * this.scale.y));
         // node.setAttribute( 'style', `transform: rotate(${rotation} ${center.x} ${center.y})` );
-        node.setAttribute("transform", "rotate(" + (rotation * 180) / Math.PI + " " + this._x(center.x) + " " + this._y(center.y) + ")");
+        node.setAttribute("transform", "rotate(".concat((rotation * 180) / Math.PI, " ").concat(this._x(center.x), " ").concat(this._y(center.y), ")"));
         return this._bindFillDraw(node, "ellipse", color, lineWidth || 1);
     };
     /**
@@ -12473,10 +12625,10 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.square = function (center, size, color, lineWidth, strokeOptions) {
         var node = this.makeNode("rectangle");
         this.applyStrokeOpts(node, strokeOptions);
-        node.setAttribute("x", "" + this._x(center.x - size / 2.0));
-        node.setAttribute("y", "" + this._y(center.y - size / 2.0));
-        node.setAttribute("width", "" + size * this.scale.x);
-        node.setAttribute("height", "" + size * this.scale.y);
+        node.setAttribute("x", "".concat(this._x(center.x - size / 2.0)));
+        node.setAttribute("y", "".concat(this._y(center.y - size / 2.0)));
+        node.setAttribute("width", "".concat(size * this.scale.x));
+        node.setAttribute("height", "".concat(size * this.scale.y));
         return this._bindFillDraw(node, "square", color, lineWidth || 1);
     };
     /**
@@ -12496,10 +12648,10 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.rect = function (position, width, height, color, lineWidth, strokeOptions) {
         var node = this.makeNode("rect");
         this.applyStrokeOpts(node, strokeOptions);
-        node.setAttribute("x", "" + this._x(position.x));
-        node.setAttribute("y", "" + this._y(position.y));
-        node.setAttribute("width", "" + width * this.scale.x);
-        node.setAttribute("height", "" + height * this.scale.y);
+        node.setAttribute("x", "".concat(this._x(position.x)));
+        node.setAttribute("y", "".concat(this._y(position.y)));
+        node.setAttribute("width", "".concat(width * this.scale.x));
+        node.setAttribute("height", "".concat(height * this.scale.y));
         return this._bindFillDraw(node, "rect", color, lineWidth || 1);
     };
     /**
@@ -12617,10 +12769,10 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.squareHandle = function (center, size, color) {
         var node = this.makeNode("rect");
-        node.setAttribute("x", "" + (this._x(center.x) - size / 2.0));
-        node.setAttribute("y", "" + (this._y(center.y) - size / 2.0));
-        node.setAttribute("width", "" + size);
-        node.setAttribute("height", "" + size);
+        node.setAttribute("x", "".concat(this._x(center.x) - size / 2.0));
+        node.setAttribute("y", "".concat(this._y(center.y) - size / 2.0));
+        node.setAttribute("width", "".concat(size));
+        node.setAttribute("height", "".concat(size));
         return this._bindFillDraw(node, "squareHandle", color, 1);
     };
     /**
@@ -12641,9 +12793,9 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.circleHandle = function (center, radius, color) {
         radius = radius || 3;
         var node = this.makeNode("circle");
-        node.setAttribute("cx", "" + this._x(center.x));
-        node.setAttribute("cy", "" + this._y(center.y));
-        node.setAttribute("r", "" + radius);
+        node.setAttribute("cx", "".concat(this._x(center.x)));
+        node.setAttribute("cy", "".concat(this._y(center.y)));
+        node.setAttribute("r", "".concat(radius));
         return this._bindFillDraw(node, "circleHandle", color, 1);
     };
     /**
@@ -12790,22 +12942,22 @@ var drawutilssvg = /** @class */ (function () {
                 : options.textAlign === "right" || options.textAlign === "end"
                     ? "end"
                     : "start";
-        var transformOrigin = this._x(x) + "px " + this._y(y) + "px";
-        var translate = "translate(" + this._x(x) + " " + (this._y(y) + lineHeight / 2) + ")";
+        var transformOrigin = "".concat(this._x(x), "px ").concat(this._y(y), "px");
+        var translate = "translate(".concat(this._x(x), " ").concat(this._y(y) + lineHeight / 2, ")");
         // Safari has a transform-origin/rotation bug.
         // It's essential to use rotate(r,x,y) here. "rotate(r)"" with transform-origin(x,y) won't do the job.
         // And rotate and translate cannot be used is combination on a text object.
         // So wrap the text inside a <g>, translate the <g>, and rotate the text inside.
-        var rotate = options.rotation ? "rotate(" + options.rotation * RAD_TO_DEG + " 0 0)" : "";
+        var rotate = options.rotation ? "rotate(".concat(options.rotation * RAD_TO_DEG, " 0 0)") : "";
         var node = this.makeNode("g");
         var curId = this.curId;
         this.curId = curId + "_text";
         var textNode = this.makeNode("text");
         node.appendChild(textNode);
         textNode.setAttribute("font-family", (_c = options.fontFamily) !== null && _c !== void 0 ? _c : ""); // May be undefined
-        textNode.setAttribute("font-size", options.fontSize ? "" + options.fontSize * this.scale.x : "");
-        textNode.setAttribute("font-style", options.fontStyle ? "" + options.fontStyle : "");
-        textNode.setAttribute("font-weight", options.fontWeight ? "" + options.fontWeight : "");
+        textNode.setAttribute("font-size", options.fontSize ? "".concat(options.fontSize * this.scale.x) : "");
+        textNode.setAttribute("font-style", options.fontStyle ? "".concat(options.fontStyle) : "");
+        textNode.setAttribute("font-weight", options.fontWeight ? "".concat(options.fontWeight) : "");
         textNode.setAttribute("text-anchor", textAlign);
         textNode.setAttribute("transform-origin", "0 0");
         textNode.setAttribute("transform", rotate);
@@ -12832,7 +12984,7 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.label = function (text, x, y, rotation, color) {
         var node = this.makeNode("text");
         // For some strange reason SVG rotation transforms use degrees instead of radians
-        node.setAttribute("transform", "translate(" + x + "," + y + "), rotate(" + ((rotation || 0) / Math.PI) * 180 + ")");
+        node.setAttribute("transform", "translate(".concat(x, ",").concat(y, "), rotate(").concat(((rotation || 0) / Math.PI) * 180, ")"));
         node.setAttribute("font-family", "Arial");
         node.setAttribute("font-size", "9pt");
         node.setAttribute("font-style", "normal");
@@ -12889,8 +13041,8 @@ var drawutilssvg = /** @class */ (function () {
         // Note that the background does not scale with the zoom level (always covers full element)
         node.setAttribute("x", "0");
         node.setAttribute("y", "0");
-        node.setAttribute("width", "" + this.canvasSize.width);
-        node.setAttribute("height", "" + this.canvasSize.height);
+        node.setAttribute("width", "".concat(this.canvasSize.width));
+        node.setAttribute("height", "".concat(this.canvasSize.height));
         // Bind this special element into the document
         this._bindFillDraw(node, this.curId, null, null);
         node.setAttribute("fill", typeof color === "undefined" ? "none" : color);
@@ -13121,10 +13273,10 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.makeLineNode = function (zA, zB, color, lineWidth, strokeOptions, classNameOverride) {
         var line = this.makeNode("line");
-        line.setAttribute("x1", "" + this._x(zA.x));
-        line.setAttribute("y1", "" + this._y(zA.y));
-        line.setAttribute("x2", "" + this._x(zB.x));
-        line.setAttribute("y2", "" + this._y(zB.y));
+        line.setAttribute("x1", "".concat(this._x(zA.x)));
+        line.setAttribute("y1", "".concat(this._y(zA.y)));
+        line.setAttribute("x2", "".concat(this._x(zB.x)));
+        line.setAttribute("y2", "".concat(this._y(zB.y)));
         this._configureNode(line, classNameOverride !== null && classNameOverride !== void 0 ? classNameOverride : "line", this.fillShapes, color, lineWidth || 1, strokeOptions);
         return line;
     };
@@ -13234,7 +13386,7 @@ exports.drawutilssvg = drawutilssvg;
 
 /***/ }),
 
-/***/ 22:
+/***/ 328:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -13246,8 +13398,8 @@ exports.drawutilssvg = drawutilssvg;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.geomutils = void 0;
-var Line_1 = __webpack_require__(831);
-var Triangle_1 = __webpack_require__(212);
+var Line_1 = __webpack_require__(939);
+var Triangle_1 = __webpack_require__(737);
 /**
  * A collection of usefull geometry utilities.
  *
@@ -13278,14 +13430,14 @@ exports.geomutils = {
         if (insideAngle < 0)
             insideAngle = 2 * Math.PI + insideAngle;
         if (!clockwise)
-            insideAngle = (2 * Math.PI - insideAngle) * (-1);
+            insideAngle = (2 * Math.PI - insideAngle) * -1;
         // Scale the rotated lines to the max leg length (looks better)
         var lineLength = Math.max(lineAB.length(), lineAC.length());
         var scaleFactor = lineLength / lineAB.length();
         var result = [];
         for (var i = 1; i < n; i++) {
             // Compute the i-th inner sector line
-            result.push(new Line_1.Line(pA, pB.clone().rotate((-i * (insideAngle / n)), pA)).scale(scaleFactor));
+            result.push(new Line_1.Line(pA, pB.clone().rotate(-i * (insideAngle / n), pA)).scale(scaleFactor));
         }
         return result;
     },
@@ -13328,8 +13480,9 @@ exports.geomutils = {
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
-/******/ 		if(__webpack_module_cache__[moduleId]) {
-/******/ 			return __webpack_module_cache__[moduleId].exports;
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
@@ -13360,7 +13513,7 @@ exports.geomutils = {
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop)
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
@@ -13375,36 +13528,38 @@ exports.geomutils = {
 /******/ 	})();
 /******/ 	
 /************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 
 /* Imports for webpack */
 
-globalThis.UIDGenerator = __webpack_require__(197).UIDGenerator;
-globalThis.VertexAttr = __webpack_require__(861).VertexAttr;
-globalThis.VertexListeners = __webpack_require__(76).VertexListeners;
-globalThis.Vertex = __webpack_require__(421).Vertex;
+globalThis.UIDGenerator = (__webpack_require__(938).UIDGenerator);
+globalThis.VertexAttr = (__webpack_require__(476).VertexAttr);
+globalThis.VertexListeners = (__webpack_require__(934).VertexListeners);
+globalThis.Vertex = (__webpack_require__(787).Vertex);
 
-globalThis.Bounds = __webpack_require__(262).Bounds;
-globalThis.Grid = __webpack_require__(843).Grid;
-globalThis.Line = __webpack_require__(831).Line;
-globalThis.Vector = __webpack_require__(73).Vector;
-globalThis.CubicBezierCurve = __webpack_require__(510).CubicBezierCurve;
-globalThis.BezierPath = __webpack_require__(126).BezierPath;
-globalThis.Polygon = __webpack_require__(661).Polygon;
-globalThis.Triangle = __webpack_require__(212).Triangle;
-globalThis.VEllipse = __webpack_require__(112).VEllipse;
-globalThis.VEllipseSector = __webpack_require__(965).VEllipseSector;
-globalThis.Circle = __webpack_require__(913).Circle;
-globalThis.CircleSector = __webpack_require__(946).CircleSector;
-globalThis.PBImage = __webpack_require__(699).PBImage;
-globalThis.PBText = __webpack_require__(196).PBText;
-globalThis.MouseHandler = __webpack_require__(293).MouseHandler;
-globalThis.KeyHandler = __webpack_require__(909).KeyHandler;
-globalThis.drawutils = __webpack_require__(149).drawutils;
+globalThis.Bounds = (__webpack_require__(76).Bounds);
+globalThis.Grid = (__webpack_require__(289).Grid);
+globalThis.Line = (__webpack_require__(939).Line);
+globalThis.Vector = (__webpack_require__(30).Vector);
+globalThis.CubicBezierCurve = (__webpack_require__(973).CubicBezierCurve);
+globalThis.BezierPath = (__webpack_require__(733).BezierPath);
+globalThis.Polygon = (__webpack_require__(687).Polygon);
+globalThis.Triangle = (__webpack_require__(737).Triangle);
+globalThis.VEllipse = (__webpack_require__(881).VEllipse);
+globalThis.VEllipseSector = (__webpack_require__(719).VEllipseSector);
+globalThis.Circle = (__webpack_require__(118).Circle);
+globalThis.CircleSector = (__webpack_require__(135).CircleSector);
+globalThis.PBImage = (__webpack_require__(862).PBImage);
+globalThis.PBText = (__webpack_require__(628).PBText);
+globalThis.MouseHandler = (__webpack_require__(912).MouseHandler);
+globalThis.KeyHandler = (__webpack_require__(531).KeyHandler);
+globalThis.drawutils = (__webpack_require__(39).drawutils);
 // globalThis.drawutilsgl = require("./drawgl.js").drawutilsgl;  // Unfinished
-globalThis.drawutilssvg = __webpack_require__(829).drawutilssvg;
-globalThis.geomutils = __webpack_require__(22).geomutils;
-globalThis.PlotBoilerplate = __webpack_require__(919)/* .PlotBoilerplate */ .H4;
+globalThis.drawutilssvg = (__webpack_require__(378).drawutilssvg);
+globalThis.geomutils = (__webpack_require__(328).geomutils);
+globalThis.PlotBoilerplate = (__webpack_require__(559).PlotBoilerplate);
 
 })();
 

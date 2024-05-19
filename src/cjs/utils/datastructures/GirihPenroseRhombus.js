@@ -30,6 +30,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -64,7 +66,7 @@ var GirihPenroseRhombus = /** @class */ (function (_super) {
         _this.addVertex(pointB);
         var angles = [
             0.0,
-            36.0,
+            36.0, // 72.0,
             144.0 // 108.0
         ];
         var theta = 0.0;

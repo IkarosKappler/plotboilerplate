@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html class="fullscreen">
+  <head>
+    <title>2D Plotting Boilerplate – Intersection paths of multiple circles</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
+    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, curve, outline, hull, circle intersection, algorithm, svg, ellipse, arc">
+    <meta name="author" content="Ikaros Kappler">
+    <meta name="date" content="2020-09-04">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@humanearthpig">
+    <meta name="twitter:creator" content="@humanearthpig">
+    <meta property="og:url" content="https://www.plotboilerplate.de">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Demonstrating the intersection points of multiple circles and their outer intersection path with PlotBoilerplate.js.">
+    <meta property="og:description" content="Demonstrating the intersection points of multiple circles and their outer intersection path with PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20201029-0-multiple-circle-intersections-rainbow.png">
+
+    <!-- Polyfills for IE -->
+    <script src="../../lib/globalthis-polyfill.min.js"></script> 
+    <script src="../../lib/path2d-polyfill.min.js"></script>
+
+    <script src="../../lib/dat.gui.min.js"></script>
+    <script src="../../lib/FileSaver.min.js"></script>
+    <script src="../../lib/Color.js"></script>
+    <script src="../../lib/alloy_finger.js"></script>
+
+    <script src="../../src/cjs/utils/dat.gui.title.polyfill.js"></script>
+    <script src="../../src/cjs/utils/dat.gui.arrowbounce.polyfill.js"></script>
+    <script src="../../src/cjs/utils/creategui.js"></script>
+    <script src="../../src/cjs/utils/module.js"></script>
+    <script src="../../src/cjs/utils/gup.js"></script>
+
+    <!-- For development -->
+    
+    <script src="../../src/cjs/UIDGenerator.js"></script>
+    <script src="../../src/cjs/VertexAttr.js"></script>
+    <script src="../../src/cjs/VertexListeners.js"></script>
+    <script src="../../src/cjs/VertTuple.js"></script>
+    <script src="../../src/cjs/Vertex.js"></script>
+    <script src="../../src/cjs/Bounds.js"></script>
+    <script src="../../src/cjs/Grid.js"></script>
+    <script src="../../src/cjs/Line.js"></script>
+    <script src="../../src/cjs/Vector.js"></script>
+    <script src="../../src/cjs/CubicBezierCurve.js"></script>
+    <script src="../../src/cjs/BezierPath.js"></script>
+    <script src="../../src/cjs/Polygon.js"></script>
+    <script src="../../src/cjs/Triangle.js"></script>
+    <script src="../../src/cjs/VEllipse.js"></script>
+    <script src="../../src/cjs/VEllipseSector.js"></script>
+    <script src="../../src/cjs/Circle.js"></script>
+    <script src="../../src/cjs/CircleSector.js"></script>
+    <script src="../../src/cjs/PBImage.js"></script>
+    <script src="../../src/cjs/PBText.js"></script>
+    <script src="../../src/cjs/MouseHandler.js"></script>
+    <script src="../../src/cjs/KeyHandler.js"></script>
+    <script src="../../src/cjs/draw.js"></script>
+    <script src="../../src/cjs/drawutilssvg.js"></script>
+    <script src="../../src/cjs/geomutils.js"></script>
+    <script src="../../src/cjs/PlotBoilerplate.js"></script>
+    
+    <!-- END for development -->
+
+    <!-- For production -->
+    <!-- <script src="../../dist/plotboilerplate.min.js"></script> -->
+    <!-- END For production -->
+
+    <script src="../../src/cjs/utils/datastructures/Color.js"></script>
+    <script src="../../src/cjs/utils/WebColors.js"></script>
+    <script src="../../src/cjs/utils/WebColorsContrast.js"></script>
+    <script src="../../src/cjs/utils/WebColorsMalachite.js"></script>
+    <script src="../../src/cjs/utils/helpers/CircleHelper.js"></script>
+    <script src="../../src/cjs/utils/datastructures/CircularIntervalSet.js"></script>
+    <script src="../../src/cjs/utils/algorithms/CircleIntersections.js"></script>
+    <script src="../../src/cjs/utils/algorithms/arrayFill.js"></script>
+    <script src="../../src/cjs/utils/algorithms/matrixFill.js"></script>
+
+    <script src="../getFormattedTime.js"></script>
+    <script src="../VertexAnimator.Linear.js"></script>
+    <script src="../VertexAnimator.Circular.js"></script>
+    <script src="../randomWebColor.js"></script>
+    
+    <script src="pathToSVGData.js"></script>
+    <script src="index.js"></script>
+    <link rel="stylesheet" href="../style.css"> 
+  </head>
+  <body class="fullscreen">
+    <svg id="my-canvas" width="1024" height="768"></svg>      
+    <div class="info monospace">
+      [<span id="cx">-</span>,<span id="cy">-</span>]
+    </div>
+
+  </body>
+</html>

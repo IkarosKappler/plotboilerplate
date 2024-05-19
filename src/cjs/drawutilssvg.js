@@ -45,8 +45,9 @@
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-10-04 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
- *
- * @version  1.6.7
+ * @modified 2024-01-30 Fixing an issue with immutable style sets; changes to the global draw config did not reflect here (do now).
+ * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
+ * @version  1.6.9
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilssvg = void 0;
@@ -67,6 +68,10 @@ var RAD_TO_DEG = 180 / Math.PI;
  */
 var drawutilssvg = /** @class */ (function () {
     /**
+     * Passed from primary to secondary instance.
+     */
+    //private nodeStyle: SVGStyleElement;
+    /**
      * The constructor.
      *
      * @constructor
@@ -80,12 +85,13 @@ var drawutilssvg = /** @class */ (function () {
      * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
      * @param {SVGGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
-    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode, bufferGNode, nodeDefs, bufferNodeDefs) {
+    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode, bufferGNode, nodeDefs, bufferNodeDefs, nodeStyle) {
         this.svgNode = svgNode;
         this.offset = new Vertex_1.Vertex(0, 0).set(offset);
         this.scale = new Vertex_1.Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
         this.isSecondary = Boolean(isSecondary);
+        this.drawConfig = drawConfig;
         this.drawlibConfiguration = {};
         this.cache = new Map();
         this.setSize(canvasSize);
@@ -97,6 +103,9 @@ var drawutilssvg = /** @class */ (function () {
             this.bufferGNode = bufferGNode;
             this.nodeDefs = nodeDefs;
             this.bufferedNodeDefs = bufferNodeDefs;
+            if (nodeStyle) {
+                this.nodeStyle = nodeStyle;
+            }
         }
         else {
             this.addStyleDefs(drawConfig);
@@ -115,11 +124,19 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.addStyleDefs = function (drawConfig) {
         this.nodeStyle = this.createSVGNode("style");
         this.svgNode.appendChild(this.nodeStyle);
+        this.rebuildStyleDefs(drawConfig);
+    };
+    /**
+     * This method is required to re-define the global style defs. It is needed
+     * if any value in the DrawConfig changed in the meantime.
+     * @param drawConfig
+     */
+    drawutilssvg.prototype.rebuildStyleDefs = function (drawConfig) {
         // Which default styles to add? -> All from the DrawConfig.
         // Compare with DrawConfig interface
         var keys = {
-            // "bezier": "CubicBezierCurve", // TODO: is this correct?
-            "bezierPath": "BezierPath",
+            "bezier": "CubicBezierCurve",
+            //"bezierPath": "BezierPath", // TODO: is this correct?
             "polygon": "Polygon",
             "triangle": "Triangle",
             "ellipse": "Ellipse",
@@ -134,14 +151,15 @@ var drawutilssvg = /** @class */ (function () {
         };
         // Question: why isn't this working if the svgNode is created dynamically? (nodeStyle.sheet is null)
         var rules = [];
+        // console.log("drawConfig", drawConfig);
         for (var k in keys) {
             var className = keys[k];
             var drawSettings = drawConfig[k];
             if (drawSettings) {
-                rules.push("." + className + " { fill : none; stroke: " + drawSettings.color + "; stroke-width: " + drawSettings.lineWidth + "px }");
+                rules.push(".".concat(className, " { fill : none; stroke: ").concat(drawSettings.color, "; stroke-width: ").concat(drawSettings.lineWidth, "px }"));
             }
             else {
-                console.warn("Warning: your draw config is missing the key '" + k + "' which is required.");
+                console.warn("Warning: your draw config is missing the key '".concat(k, "' which is required."));
             }
         }
         this.nodeStyle.innerHTML = rules.join("\n");
@@ -231,7 +249,8 @@ var drawutilssvg = /** @class */ (function () {
             node = this.createSVGNode(nodeName);
         }
         if (this.drawlibConfiguration.blendMode) {
-            node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
+            // node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
+            node.style["mix-blend-mode"](this.drawlibConfiguration.blendMode);
         }
         // if (this.lineDashEnabled && this.lineDash && this.lineDash.length > 0 && drawutilssvg.nodeSupportsLineDash(nodeName)) {
         //   node.setAttribute("stroke-dasharray", this.lineDash.join(" "));
@@ -295,7 +314,7 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype._addCSSClasses = function (node, className) {
         if (this.curClassName) {
-            node.setAttribute("class", className + " " + this.curClassName);
+            node.setAttribute("class", "".concat(className, " ").concat(this.curClassName));
         }
         else {
             node.setAttribute("class", className);
@@ -305,9 +324,9 @@ var drawutilssvg = /** @class */ (function () {
         this._addCSSClasses(node, className);
         node.setAttribute("fill", fillMode && color ? color : "none");
         node.setAttribute("stroke", fillMode ? "none" : color || "none");
-        node.setAttribute("stroke-width", "" + (lineWidth || 1));
+        node.setAttribute("stroke-width", "".concat(lineWidth || 1));
         if (this.curId) {
-            node.setAttribute("id", "" + this.curId); // Maybe React-style 'key' would be better?
+            node.setAttribute("id", "".concat(this.curId)); // Maybe React-style 'key' would be better?
         }
         this.applyStrokeOpts(node, strokeOptions);
         return node;
@@ -322,18 +341,18 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.setSize = function (canvasSize) {
         this.canvasSize = canvasSize;
-        this.svgNode.setAttribute("viewBox", "0 0 " + this.canvasSize.width + " " + this.canvasSize.height);
-        this.svgNode.setAttribute("width", "" + this.canvasSize.width);
-        this.svgNode.setAttribute("height", "" + this.canvasSize.height);
+        this.svgNode.setAttribute("viewBox", "0 0 ".concat(this.canvasSize.width, " ").concat(this.canvasSize.height));
+        this.svgNode.setAttribute("width", "".concat(this.canvasSize.width));
+        this.svgNode.setAttribute("height", "".concat(this.canvasSize.height));
     };
     /**
      * Creates a 'shallow' (non deep) copy of this instance. This implies
      * that under the hood the same gl context and gl program will be used.
      */
     drawutilssvg.prototype.copyInstance = function (fillShapes) {
-        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, null, // no DrawConfig – this will work as long as `isSecondary===true`
+        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, this.drawConfig, // null as any as DrawConfig, // no DrawConfig – this will work as long as `isSecondary===true`
         true, // isSecondary
-        this.gNode, this.bufferGNode, this.nodeDefs, this.bufferedNodeDefs);
+        this.gNode, this.bufferGNode, this.nodeDefs, this.bufferedNodeDefs, this.nodeStyle);
         return copy;
     };
     /**
@@ -346,20 +365,6 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.setConfiguration = function (configuration) {
         this.drawlibConfiguration = configuration;
     };
-    // /**
-    //  * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
-    //  *
-    //  * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
-    //  * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
-    //  * for how line dashes work.
-    //  *
-    //  * @method
-    //  * @param {Array<number> lineDashes - The line-dash array configuration.
-    //  * @returns {void}
-    //  */
-    // setLineDash(lineDashes: Array<number>) {
-    //   this.lineDash = lineDashes;
-    // }
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
@@ -419,6 +424,7 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      **/
     drawutilssvg.prototype.endDrawCycle = function (renderTime) {
+        this.rebuildStyleDefs(this.drawConfig);
         if (!this.isSecondary) {
             // All elements are drawn into the buffer; they are NOT yet visible, not did the browser perform any
             // layout updates.
@@ -451,7 +457,7 @@ var drawutilssvg = /** @class */ (function () {
             })
                 .join(" "));
             if (strokeOptions.dashOffset) {
-                node.setAttribute("stroke-dashoffset", "" + strokeOptions.dashOffset * this.scale.x);
+                node.setAttribute("stroke-dashoffset", "".concat(strokeOptions.dashOffset * this.scale.x));
             }
         }
     };
@@ -587,13 +593,13 @@ var drawutilssvg = /** @class */ (function () {
             if (image.naturalWidth) {
                 var ratioX = size.x / image.naturalWidth;
                 var ratioY = size.y / image.naturalHeight;
-                node.setAttribute("width", "" + image.naturalWidth * _this.scale.x);
-                node.setAttribute("height", "" + image.naturalHeight * _this.scale.y);
+                node.setAttribute("width", "".concat(image.naturalWidth * _this.scale.x));
+                node.setAttribute("height", "".concat(image.naturalHeight * _this.scale.y));
                 node.setAttribute("display", null); // Dislay when loaded
                 // if (alpha) {
-                node.setAttribute("opacity", "" + alpha);
+                node.setAttribute("opacity", "".concat(alpha));
                 // }
-                node.setAttribute("transform", "translate(" + _this._x(position.x) + " " + _this._y(position.y) + ") scale(" + ratioX + " " + ratioY + ")");
+                node.setAttribute("transform", "translate(".concat(_this._x(position.x), " ").concat(_this._y(position.y), ") scale(").concat(ratioX, " ").concat(ratioY, ")"));
             }
         };
         image.addEventListener("load", function (event) {
@@ -601,8 +607,8 @@ var drawutilssvg = /** @class */ (function () {
         });
         // Safari has a transform-origin bug.
         // Use x=0, y=0 and translate/scale instead (see above)
-        node.setAttribute("x", "" + 0);
-        node.setAttribute("y", "" + 0);
+        node.setAttribute("x", "".concat(0));
+        node.setAttribute("y", "".concat(0));
         node.setAttribute("display", "none"); // Hide before loaded
         setImageSize(image);
         node.setAttribute("href", image.src);
@@ -643,36 +649,36 @@ var drawutilssvg = /** @class */ (function () {
         //    </image>
         // ...
         var clipPathNode = this.makeNode("clipPath");
-        var clipPathId = "clippath_" + UIDGenerator_1.UIDGenerator.next(); // TODO: use a better UUID generator here?
+        var clipPathId = "clippath_".concat(UIDGenerator_1.UIDGenerator.next()); // TODO: use a better UUID generator here?
         clipPathNode.setAttribute("id", clipPathId);
         var gNode = this.makeNode("g");
         var imageNode = this.makeNode("image");
-        imageNode.setAttribute("x", "" + this._x(rotatedScalingOrigin.x));
-        imageNode.setAttribute("y", "" + this._y(rotatedScalingOrigin.y));
-        imageNode.setAttribute("width", "" + textureSize.width);
-        imageNode.setAttribute("height", "" + textureSize.height);
+        imageNode.setAttribute("x", "".concat(this._x(rotatedScalingOrigin.x)));
+        imageNode.setAttribute("y", "".concat(this._y(rotatedScalingOrigin.y)));
+        imageNode.setAttribute("width", "".concat(textureSize.width));
+        imageNode.setAttribute("height", "".concat(textureSize.height));
         imageNode.setAttribute("href", textureImage.src);
         // imageNode.setAttribute("opacity", "0.5");
         // SVG rotations in degrees
-        imageNode.setAttribute("transform", "rotate(" + rotation * RAD_TO_DEG + ", " + this._x(rotatedScalingOrigin.x) + ", " + this._y(rotatedScalingOrigin.y) + ")");
+        imageNode.setAttribute("transform", "rotate(".concat(rotation * RAD_TO_DEG, ", ").concat(this._x(rotatedScalingOrigin.x), ", ").concat(this._y(rotatedScalingOrigin.y), ")"));
         var pathNode = this.makeNode("path");
         var pathData = [];
         if (polygon.vertices.length > 0) {
             var self_1 = this;
-            pathData.push("M", "" + this._x(polygon.vertices[0].x), "" + this._y(polygon.vertices[0].y));
+            pathData.push("M", "".concat(this._x(polygon.vertices[0].x)), "".concat(this._y(polygon.vertices[0].y)));
             for (var i = 1; i < polygon.vertices.length; i++) {
-                pathData.push("L", "" + this._x(polygon.vertices[i].x), "" + this._y(polygon.vertices[i].y));
+                pathData.push("L", "".concat(this._x(polygon.vertices[i].x)), "".concat(this._y(polygon.vertices[i].y)));
             }
         }
         pathNode.setAttribute("d", pathData.join(" "));
         clipPathNode.appendChild(pathNode);
         this.bufferedNodeDefs.appendChild(clipPathNode);
         gNode.appendChild(imageNode);
-        gNode.setAttribute("transform-origin", this._x(rotatedScalingOrigin.x) + " " + this._y(rotatedScalingOrigin.y));
-        gNode.setAttribute("transform", "scale(" + this.scale.x + ", " + this.scale.y + ")");
+        gNode.setAttribute("transform-origin", "".concat(this._x(rotatedScalingOrigin.x), " ").concat(this._y(rotatedScalingOrigin.y)));
+        gNode.setAttribute("transform", "scale(".concat(this.scale.x, ", ").concat(this.scale.y, ")"));
         var clipNode = this.makeNode("g");
         clipNode.appendChild(gNode);
-        clipNode.setAttribute("clip-path", "url(#" + clipPathId + ")");
+        clipNode.setAttribute("clip-path", "url(#".concat(clipPathId, ")"));
         // TODO: check if the image class is correct here or if we should use a 'clippedImage' class here
         this._bindFillDraw(clipNode, "image", null, null); // No color, no lineWidth
         return clipNode;
@@ -777,10 +783,10 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.dot = function (p, color) {
         var node = this.makeNode("line");
-        node.setAttribute("x1", "" + this._x(p.x));
-        node.setAttribute("y1", "" + this._y(p.y));
-        node.setAttribute("x2", "" + this._x(p.x));
-        node.setAttribute("y2", "" + this._y(p.y));
+        node.setAttribute("x1", "".concat(this._x(p.x)));
+        node.setAttribute("y1", "".concat(this._y(p.y)));
+        node.setAttribute("x2", "".concat(this._x(p.x)));
+        node.setAttribute("y2", "".concat(this._y(p.y)));
         return this._bindFillDraw(node, "dot", color, 1);
     };
     /**
@@ -796,9 +802,9 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.point = function (p, color) {
         var radius = 3;
         var node = this.makeNode("circle");
-        node.setAttribute("cx", "" + this._x(p.x));
-        node.setAttribute("cy", "" + this._y(p.y));
-        node.setAttribute("r", "" + radius);
+        node.setAttribute("cx", "".concat(this._x(p.x)));
+        node.setAttribute("cy", "".concat(this._y(p.y)));
+        node.setAttribute("r", "".concat(radius));
         return this._bindFillDraw(node, "point", color, 1);
     };
     /**
@@ -821,9 +827,9 @@ var drawutilssvg = /** @class */ (function () {
         // Todo: draw ellipse when scalex!=scaley
         var node = this.makeNode("circle");
         this.applyStrokeOpts(node, strokeOptions);
-        node.setAttribute("cx", "" + this._x(center.x));
-        node.setAttribute("cy", "" + this._y(center.y));
-        node.setAttribute("r", "" + radius * this.scale.x); // y?
+        node.setAttribute("cx", "".concat(this._x(center.x)));
+        node.setAttribute("cy", "".concat(this._y(center.y)));
+        node.setAttribute("r", "".concat(radius * this.scale.x)); // y?
         return this._bindFillDraw(node, "circle", color, lineWidth || 1);
     };
     /**
@@ -871,12 +877,12 @@ var drawutilssvg = /** @class */ (function () {
         }
         var node = this.makeNode("ellipse");
         this.applyStrokeOpts(node, strokeOptions);
-        node.setAttribute("cx", "" + this._x(center.x));
-        node.setAttribute("cy", "" + this._y(center.y));
-        node.setAttribute("rx", "" + radiusX * this.scale.x);
-        node.setAttribute("ry", "" + radiusY * this.scale.y);
+        node.setAttribute("cx", "".concat(this._x(center.x)));
+        node.setAttribute("cy", "".concat(this._y(center.y)));
+        node.setAttribute("rx", "".concat(radiusX * this.scale.x));
+        node.setAttribute("ry", "".concat(radiusY * this.scale.y));
         // node.setAttribute( 'style', `transform: rotate(${rotation} ${center.x} ${center.y})` );
-        node.setAttribute("transform", "rotate(" + (rotation * 180) / Math.PI + " " + this._x(center.x) + " " + this._y(center.y) + ")");
+        node.setAttribute("transform", "rotate(".concat((rotation * 180) / Math.PI, " ").concat(this._x(center.x), " ").concat(this._y(center.y), ")"));
         return this._bindFillDraw(node, "ellipse", color, lineWidth || 1);
     };
     /**
@@ -898,10 +904,10 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.square = function (center, size, color, lineWidth, strokeOptions) {
         var node = this.makeNode("rectangle");
         this.applyStrokeOpts(node, strokeOptions);
-        node.setAttribute("x", "" + this._x(center.x - size / 2.0));
-        node.setAttribute("y", "" + this._y(center.y - size / 2.0));
-        node.setAttribute("width", "" + size * this.scale.x);
-        node.setAttribute("height", "" + size * this.scale.y);
+        node.setAttribute("x", "".concat(this._x(center.x - size / 2.0)));
+        node.setAttribute("y", "".concat(this._y(center.y - size / 2.0)));
+        node.setAttribute("width", "".concat(size * this.scale.x));
+        node.setAttribute("height", "".concat(size * this.scale.y));
         return this._bindFillDraw(node, "square", color, lineWidth || 1);
     };
     /**
@@ -921,10 +927,10 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.rect = function (position, width, height, color, lineWidth, strokeOptions) {
         var node = this.makeNode("rect");
         this.applyStrokeOpts(node, strokeOptions);
-        node.setAttribute("x", "" + this._x(position.x));
-        node.setAttribute("y", "" + this._y(position.y));
-        node.setAttribute("width", "" + width * this.scale.x);
-        node.setAttribute("height", "" + height * this.scale.y);
+        node.setAttribute("x", "".concat(this._x(position.x)));
+        node.setAttribute("y", "".concat(this._y(position.y)));
+        node.setAttribute("width", "".concat(width * this.scale.x));
+        node.setAttribute("height", "".concat(height * this.scale.y));
         return this._bindFillDraw(node, "rect", color, lineWidth || 1);
     };
     /**
@@ -1042,10 +1048,10 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.squareHandle = function (center, size, color) {
         var node = this.makeNode("rect");
-        node.setAttribute("x", "" + (this._x(center.x) - size / 2.0));
-        node.setAttribute("y", "" + (this._y(center.y) - size / 2.0));
-        node.setAttribute("width", "" + size);
-        node.setAttribute("height", "" + size);
+        node.setAttribute("x", "".concat(this._x(center.x) - size / 2.0));
+        node.setAttribute("y", "".concat(this._y(center.y) - size / 2.0));
+        node.setAttribute("width", "".concat(size));
+        node.setAttribute("height", "".concat(size));
         return this._bindFillDraw(node, "squareHandle", color, 1);
     };
     /**
@@ -1066,9 +1072,9 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.circleHandle = function (center, radius, color) {
         radius = radius || 3;
         var node = this.makeNode("circle");
-        node.setAttribute("cx", "" + this._x(center.x));
-        node.setAttribute("cy", "" + this._y(center.y));
-        node.setAttribute("r", "" + radius);
+        node.setAttribute("cx", "".concat(this._x(center.x)));
+        node.setAttribute("cy", "".concat(this._y(center.y)));
+        node.setAttribute("r", "".concat(radius));
         return this._bindFillDraw(node, "circleHandle", color, 1);
     };
     /**
@@ -1215,22 +1221,22 @@ var drawutilssvg = /** @class */ (function () {
                 : options.textAlign === "right" || options.textAlign === "end"
                     ? "end"
                     : "start";
-        var transformOrigin = this._x(x) + "px " + this._y(y) + "px";
-        var translate = "translate(" + this._x(x) + " " + (this._y(y) + lineHeight / 2) + ")";
+        var transformOrigin = "".concat(this._x(x), "px ").concat(this._y(y), "px");
+        var translate = "translate(".concat(this._x(x), " ").concat(this._y(y) + lineHeight / 2, ")");
         // Safari has a transform-origin/rotation bug.
         // It's essential to use rotate(r,x,y) here. "rotate(r)"" with transform-origin(x,y) won't do the job.
         // And rotate and translate cannot be used is combination on a text object.
         // So wrap the text inside a <g>, translate the <g>, and rotate the text inside.
-        var rotate = options.rotation ? "rotate(" + options.rotation * RAD_TO_DEG + " 0 0)" : "";
+        var rotate = options.rotation ? "rotate(".concat(options.rotation * RAD_TO_DEG, " 0 0)") : "";
         var node = this.makeNode("g");
         var curId = this.curId;
         this.curId = curId + "_text";
         var textNode = this.makeNode("text");
         node.appendChild(textNode);
         textNode.setAttribute("font-family", (_c = options.fontFamily) !== null && _c !== void 0 ? _c : ""); // May be undefined
-        textNode.setAttribute("font-size", options.fontSize ? "" + options.fontSize * this.scale.x : "");
-        textNode.setAttribute("font-style", options.fontStyle ? "" + options.fontStyle : "");
-        textNode.setAttribute("font-weight", options.fontWeight ? "" + options.fontWeight : "");
+        textNode.setAttribute("font-size", options.fontSize ? "".concat(options.fontSize * this.scale.x) : "");
+        textNode.setAttribute("font-style", options.fontStyle ? "".concat(options.fontStyle) : "");
+        textNode.setAttribute("font-weight", options.fontWeight ? "".concat(options.fontWeight) : "");
         textNode.setAttribute("text-anchor", textAlign);
         textNode.setAttribute("transform-origin", "0 0");
         textNode.setAttribute("transform", rotate);
@@ -1257,7 +1263,7 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.label = function (text, x, y, rotation, color) {
         var node = this.makeNode("text");
         // For some strange reason SVG rotation transforms use degrees instead of radians
-        node.setAttribute("transform", "translate(" + x + "," + y + "), rotate(" + ((rotation || 0) / Math.PI) * 180 + ")");
+        node.setAttribute("transform", "translate(".concat(x, ",").concat(y, "), rotate(").concat(((rotation || 0) / Math.PI) * 180, ")"));
         node.setAttribute("font-family", "Arial");
         node.setAttribute("font-size", "9pt");
         node.setAttribute("font-style", "normal");
@@ -1314,8 +1320,8 @@ var drawutilssvg = /** @class */ (function () {
         // Note that the background does not scale with the zoom level (always covers full element)
         node.setAttribute("x", "0");
         node.setAttribute("y", "0");
-        node.setAttribute("width", "" + this.canvasSize.width);
-        node.setAttribute("height", "" + this.canvasSize.height);
+        node.setAttribute("width", "".concat(this.canvasSize.width));
+        node.setAttribute("height", "".concat(this.canvasSize.height));
         // Bind this special element into the document
         this._bindFillDraw(node, this.curId, null, null);
         node.setAttribute("fill", typeof color === "undefined" ? "none" : color);
@@ -1546,10 +1552,10 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.makeLineNode = function (zA, zB, color, lineWidth, strokeOptions, classNameOverride) {
         var line = this.makeNode("line");
-        line.setAttribute("x1", "" + this._x(zA.x));
-        line.setAttribute("y1", "" + this._y(zA.y));
-        line.setAttribute("x2", "" + this._x(zB.x));
-        line.setAttribute("y2", "" + this._y(zB.y));
+        line.setAttribute("x1", "".concat(this._x(zA.x)));
+        line.setAttribute("y1", "".concat(this._y(zA.y)));
+        line.setAttribute("x2", "".concat(this._x(zB.x)));
+        line.setAttribute("y2", "".concat(this._y(zB.y)));
         this._configureNode(line, classNameOverride !== null && classNameOverride !== void 0 ? classNameOverride : "line", this.fillShapes, color, lineWidth || 1, strokeOptions);
         return line;
     };

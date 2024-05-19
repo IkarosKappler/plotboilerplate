@@ -78,11 +78,11 @@ export interface IBounds {
 /**
  * The types that can be drawn and thus added to the draw queue.
  */
-export declare type Drawable = Vertex | Vector | Triangle | Circle | CircleSector | PBImage | PBText | VEllipse | VEllipseSector | Polygon | BezierPath | Line;
+export type Drawable = Vertex | Vector | Triangle | Circle | CircleSector | PBImage | PBText | VEllipse | VEllipseSector | Polygon | BezierPath | Line;
 /**
  * A unique identifier (UID) to tell drawables apart in a performant manner.
  */
-export declare type UID = string;
+export type UID = string;
 /**
  * This is used to wrap 2d/gl/svg canvas elements together.
  */
@@ -197,7 +197,7 @@ export interface SVGSerializable {
  * A type for SVG &lt;path d="..." /> params.
  * Example: [ 'A':string, radiusx:number, radiusy:number, rotation:number, largeArcFlag=1|0, sweepFlag=1|0, endx:number, endy:number ]
  */
-export declare type SVGPathParams = Array<string | number>;
+export type SVGPathParams = Array<string | number>;
 export interface IHooks {
     saveFile: (pb: PlotBoilerplate) => void;
 }

@@ -389,7 +389,7 @@ export class PlotBoilerplate {
    *                                                   Note that changes from the postDraw hook might not be visible in the export.
    * @param {string=} [config.title=null] - Specify any hover tile here. It will be attached as a `title` attribute to the most elevated element.
    */
-  constructor(config: PBParams) {
+  constructor(config: PBParams, drawConfig: DrawConfig) {
     // This should be in some static block ...
     VertexAttr.model = {
       bezierAutoAdjust: false,
@@ -703,9 +703,10 @@ export class PlotBoilerplate {
     var blob = new Blob(['<?xml version="1.0" encoding="utf-8"?>\n' + svgCode], { type: "image/svg;charset=utf-8" });
     // See documentation for FileSaver.js for usage.
     //    https://github.com/eligrey/FileSaver.js
-    if (typeof globalThis["saveAs"] !== "function")
+    if (typeof globalThis["saveAs" as keyof Object] !== "function") {
       throw "Cannot save file; did you load the ./utils/savefile helper function and the eligrey/SaveFile library?";
-    var _saveAs = globalThis["saveAs"];
+    }
+    var _saveAs : (blob:Blob, filename:string) => void = globalThis["saveAs" as keyof Object] as (blob:Blob, filename:string) => void;
     _saveAs(blob, "plotboilerplate.svg");
   }
 
@@ -2023,7 +2024,7 @@ export class PlotBoilerplate {
       };
 
       // Make PB work together with both, AlloyFinger as a esm module or a commonjs function.
-      if (typeof globalThis["AlloyFinger"] === "function" || typeof globalThis["createAlloyFinger"] === "function") {
+      if (typeof globalThis["AlloyFinger" as keyof Object] === "function" || typeof globalThis["createAlloyFinger" as keyof Object] === "function") {
         try {
           var touchMovePos: Vertex | undefined | null = null;
           var touchDownPos: Vertex | undefined | null = null;
@@ -2159,8 +2160,10 @@ export class PlotBoilerplate {
               _self.redraw();
             }
           } as unknown as AlloyFingerOptions; // END afProps
-          if (window["createAlloyFinger"]) {
-            window["createAlloyFinger"](this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
+          if (window["createAlloyFinger" as keyof Object]) {
+            // window["createAlloyFinger"](this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
+            const createAlloyFinger = window["createAlloyFinger" as keyof Object] as (elem:HTMLElement|SVGElement, afProps:AlloyFingerOptions ) => void;
+            createAlloyFinger(this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
           } else {
             /* tslint:disable-next-line */
             new AlloyFinger(this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
@@ -2169,7 +2172,7 @@ export class PlotBoilerplate {
           console.error("Failed to initialize AlloyFinger!");
           console.error(e);
         }
-      } else if (globalThis["Touchy"] && typeof globalThis["Touchy"] == "function") {
+      } else if (globalThis["Touchy" as keyof Object] && typeof globalThis["Touchy" as keyof Object] == "function") {
         console.error("[Deprecation] Found Touchy which is not supported any more. Please use AlloyFinger instead.");
         // Convert absolute touch positions to relative DOM element position (relative to canvas)
       } else {
@@ -2214,9 +2217,14 @@ export class PlotBoilerplate {
   createGUI(props?: DatGuiProps): GUI {
     // This function moved to the helper utils.
     // We do not want to include the whole dat.GUI package.
-    if (globalThis["utils"] && typeof globalThis["utils"].createGUI == "function")
-      return globalThis["utils"].createGUI(this, props);
-    else throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an the dat.GUI library?";
+    const utils: {createGUI? : (pb:PlotBoilerplate,props:DatGuiProps|undefined)=>GUI } | undefined = globalThis["utils" as keyof Object] as any as {createGUI? : (pb:PlotBoilerplate,props:DatGuiProps|undefined)=>GUI } | undefined;
+    // if (globalThis["utils"] && typeof globalThis["utils"].createGUI == "function") {
+    //   return (globalThis["utils" as keyof Object] as any as ({createGUI : (pb:PlotBoilerplate,props:DatGuiProps|undefined)=>GUI })).createGUI(this, props);
+    if (utils && typeof utils.createGUI === "function") {
+      return utils.createGUI(this, props);
+    } else { 
+      throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an the dat.GUI library?";
+    }
   }
 
   /**
@@ -2301,7 +2309,8 @@ export class PlotBoilerplate {
      * @return {void}
      **/
     setCSSscale: (element: HTMLElement | SVGElement, scaleX: number, scaleY: number): void => {
-      element.style["transform-origin"] = "0 0";
+      // element.style["transform-origin"] = "0 0";
+      element.style.transformOrigin = "0 0";
       if (scaleX == 1.0 && scaleY == 1.0) {
         // element.style.transform = null;
         element.style.removeProperty("transform");

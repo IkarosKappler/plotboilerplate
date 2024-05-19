@@ -44,8 +44,9 @@
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-10-04 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
- *
- * @version  1.6.7
+ * @modified 2024-01-30 Fixing an issue with immutable style sets; changes to the global draw config did not reflect here (do now).
+ * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
+ * @version  1.6.9
  **/
 import { CircleSector } from "./CircleSector";
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -64,6 +65,10 @@ const RAD_TO_DEG = 180 / Math.PI;
  */
 export class drawutilssvg {
     /**
+     * Passed from primary to secondary instance.
+     */
+    //private nodeStyle: SVGStyleElement;
+    /**
      * The constructor.
      *
      * @constructor
@@ -77,12 +82,13 @@ export class drawutilssvg {
      * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
      * @param {SVGGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
-    constructor(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode, bufferGNode, nodeDefs, bufferNodeDefs) {
+    constructor(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode, bufferGNode, nodeDefs, bufferNodeDefs, nodeStyle) {
         this.svgNode = svgNode;
         this.offset = new Vertex(0, 0).set(offset);
         this.scale = new Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
         this.isSecondary = Boolean(isSecondary);
+        this.drawConfig = drawConfig;
         this.drawlibConfiguration = {};
         this.cache = new Map();
         this.setSize(canvasSize);
@@ -94,6 +100,9 @@ export class drawutilssvg {
             this.bufferGNode = bufferGNode;
             this.nodeDefs = nodeDefs;
             this.bufferedNodeDefs = bufferNodeDefs;
+            if (nodeStyle) {
+                this.nodeStyle = nodeStyle;
+            }
         }
         else {
             this.addStyleDefs(drawConfig);
@@ -112,11 +121,19 @@ export class drawutilssvg {
     addStyleDefs(drawConfig) {
         this.nodeStyle = this.createSVGNode("style");
         this.svgNode.appendChild(this.nodeStyle);
+        this.rebuildStyleDefs(drawConfig);
+    }
+    /**
+     * This method is required to re-define the global style defs. It is needed
+     * if any value in the DrawConfig changed in the meantime.
+     * @param drawConfig
+     */
+    rebuildStyleDefs(drawConfig) {
         // Which default styles to add? -> All from the DrawConfig.
         // Compare with DrawConfig interface
         const keys = {
-            // "bezier": "CubicBezierCurve", // TODO: is this correct?
-            "bezierPath": "BezierPath",
+            "bezier": "CubicBezierCurve",
+            //"bezierPath": "BezierPath", // TODO: is this correct?
             "polygon": "Polygon",
             "triangle": "Triangle",
             "ellipse": "Ellipse",
@@ -131,6 +148,7 @@ export class drawutilssvg {
         };
         // Question: why isn't this working if the svgNode is created dynamically? (nodeStyle.sheet is null)
         const rules = [];
+        // console.log("drawConfig", drawConfig);
         for (var k in keys) {
             const className = keys[k];
             const drawSettings = drawConfig[k];
@@ -228,7 +246,8 @@ export class drawutilssvg {
             node = this.createSVGNode(nodeName);
         }
         if (this.drawlibConfiguration.blendMode) {
-            node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
+            // node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
+            node.style["mix-blend-mode"](this.drawlibConfiguration.blendMode);
         }
         // if (this.lineDashEnabled && this.lineDash && this.lineDash.length > 0 && drawutilssvg.nodeSupportsLineDash(nodeName)) {
         //   node.setAttribute("stroke-dasharray", this.lineDash.join(" "));
@@ -328,9 +347,9 @@ export class drawutilssvg {
      * that under the hood the same gl context and gl program will be used.
      */
     copyInstance(fillShapes) {
-        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, null, // no DrawConfig – this will work as long as `isSecondary===true`
+        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, this.drawConfig, // null as any as DrawConfig, // no DrawConfig – this will work as long as `isSecondary===true`
         true, // isSecondary
-        this.gNode, this.bufferGNode, this.nodeDefs, this.bufferedNodeDefs);
+        this.gNode, this.bufferGNode, this.nodeDefs, this.bufferedNodeDefs, this.nodeStyle);
         return copy;
     }
     /**
@@ -343,20 +362,6 @@ export class drawutilssvg {
     setConfiguration(configuration) {
         this.drawlibConfiguration = configuration;
     }
-    // /**
-    //  * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
-    //  *
-    //  * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
-    //  * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
-    //  * for how line dashes work.
-    //  *
-    //  * @method
-    //  * @param {Array<number> lineDashes - The line-dash array configuration.
-    //  * @returns {void}
-    //  */
-    // setLineDash(lineDashes: Array<number>) {
-    //   this.lineDash = lineDashes;
-    // }
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
@@ -416,6 +421,7 @@ export class drawutilssvg {
      * @instance
      **/
     endDrawCycle(renderTime) {
+        this.rebuildStyleDefs(this.drawConfig);
         if (!this.isSecondary) {
             // All elements are drawn into the buffer; they are NOT yet visible, not did the browser perform any
             // layout updates.

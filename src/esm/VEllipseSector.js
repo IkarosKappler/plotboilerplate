@@ -156,7 +156,7 @@ VEllipseSector.ellipseSectorUtils = {
         const r2d = 180 / Math.PI;
         pathData.push("A", radiusH, radiusV, rotation * r2d, largeArcFlag, sweepFlag, end.x, end.y);
         return pathData;
-    },
+    }, // END function describeSVGArc
     /**
      * Helper function to find second-kind elliptic angles, so that the euclidean distance along the the
      * elliptic sector is the same for all.

@@ -2,7 +2,8 @@
  * @author   Ikaros Kappler
  * @date     2020-11-24
  * @modified 2020-11-25 Ported to TypeScript from vanilla JS.
- * @version  1.0.1
+ * @modified 2024-03-10 Fixed some types for Typescript 5 compatibility.
+ * @version  1.0.2
  * @file     Girih
  **/
 
@@ -100,11 +101,11 @@ export class Girih {
 
     // Add tiles to array and put them in the correct adjacency position.
     this.TILE_TEMPLATES.push(decagon);
-    this.TILE_TEMPLATES.push(decagon.transformTilePositionToAdjacency(2, pentagon));
-    this.TILE_TEMPLATES.push(pentagon.transformTilePositionToAdjacency(1, penrose));
-    this.TILE_TEMPLATES.push(penrose.transformTilePositionToAdjacency(3, hexagon));
-    this.TILE_TEMPLATES.push(decagon.transformTilePositionToAdjacency(5, bowtie));
-    this.TILE_TEMPLATES.push(pentagon.transformTilePositionToAdjacency(4, rhombus));
+    this.TILE_TEMPLATES.push(decagon.transformTilePositionToAdjacency(2, pentagon) as any as GirihTile);
+    this.TILE_TEMPLATES.push(pentagon.transformTilePositionToAdjacency(1, penrose) as any as GirihTile);
+    this.TILE_TEMPLATES.push(penrose.transformTilePositionToAdjacency(3, hexagon) as any as GirihTile);
+    this.TILE_TEMPLATES.push(decagon.transformTilePositionToAdjacency(5, bowtie) as any as GirihTile);
+    this.TILE_TEMPLATES.push(pentagon.transformTilePositionToAdjacency(4, rhombus) as any as GirihTile);
   }
 
   /**
@@ -137,7 +138,7 @@ export class Girih {
    *
    * @param tiles
    */
-  replaceTiles(tiles: GirihTile): void {
+  replaceTiles(tiles: GirihTile[]): void {
     this.tiles.splice(0, this.tiles.length);
     for (var i in tiles) {
       this.addTile(tiles[i]);
@@ -218,7 +219,7 @@ export class Girih {
       // TODO: still required?
       return [];
 
-    let template: GirihTile = null;
+    let template: GirihTile | null = null;
     for (var i in this.TILE_TEMPLATES) {
       template = this.TILE_TEMPLATES[i].clone();
       // Find all rotations and positions for that tile to match

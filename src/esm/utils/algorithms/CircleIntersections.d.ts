@@ -2,7 +2,8 @@
  * @author   Ikaros Kappler
  * @date     2020-10-05
  * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
- * @version  1.0.1
+ * @modified 2024-02-23 Fixed some null-type conflicts.
+ * @version  1.0.2
  * @file CircleIntersections
  * @public
  **/
@@ -67,7 +68,7 @@ export declare class CircleIntersections {
      * @param {Array<Circle>} circles - The circles to find intersections for.
      * @return {Array<Array<Line>>} A 2d-matrix containing the radical lines where circles intersect.
      **/
-    static buildRadicalLineMatrix(circles: Array<Circle>): Matrix<Line>;
+    static buildRadicalLineMatrix(circles: Array<Circle>): Matrix<Line | null>;
     /**
      * Find all circles (indices) which are completely located inside another circle.
      *

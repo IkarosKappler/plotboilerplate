@@ -7,7 +7,10 @@
  * @author   Ikaros Kappler
  * @date     2020-09-14
  * @modified 2022-01-31 Added `showDocumentInfo`.
- * @version  1.1.0
+ * @modified 2024-03-10 Added a backdrop element for closing by click outside the visible modal.
+ * @modified 2024-03-10 Added the construtor option `closeOnBackdropClick`.
+ * @modified 2024-03-10 Removed the `showDocumentInfo` method because it was crap. Use reame modal instead.
+ * @version  1.2.0
  **/
 
 (function () {
@@ -17,26 +20,30 @@
       <!-- The Modal -->
       <div id="myModal" class="modal">
 
-      <!-- Modal content -->
-      <div class="modal-content">
-      <div class="modal-header">
-      <span class="close">&times;</span>
-      <h2>Modal Header</h2>
-      </div>
-      <div class="modal-body">
-      <p>Some text in the Modal Body</p>
-      <p>Some other text...</p>
-      </div>
-      <div class="modal-footer">
-      <h3>Modal Footer</h3>
-      </div>
-      </div>
+        <!-- Modal backdrop -->
+        <div class="modal-backdrop"></div>
+
+        <!-- Modal content -->
+        <div class="modal-content">
+          <div class="modal-header">
+            <span class="close">&times;</span>
+            <h2>Modal Header</h2>
+          </div>
+          <div class="modal-body">
+            <p>Some text in the Modal Body</p>
+            <p>Some other text...</p>
+          </div>
+          <div class="modal-footer">
+            <h3>Modal Footer</h3>
+          </div>
+        </div>
 
       </div>
     */
 
-  var Modal = function () {
+  var Modal = function ( options ) {
     this.modalElements = this.buildDOMNode("myModal-" + modalCounter++);
+    this.closeOnBackdropClick = typeof options !== "undefined" && Boolean(options.closeOnBackdropClick);
   };
 
   Modal.prototype.setTitle = function (title) {
@@ -83,26 +90,13 @@
   };
 
   Modal.prototype.close = function () {
-    // this.modalElements.modal.parent.style.display = "none";
     this.modalElements.modal.parent.classList.remove("modal-opened");
     this.modalElements.modal.parent.classList.add("modal-closed");
   };
 
   Modal.prototype.open = function () {
-    // console.log( this.modalElements.modal.parent );
-    // this.modalElements.modal.parent.style.display = "block";
-    // document.getElementById( this.modalElements.modal.id ).style.display = "block";
     this.modalElements.modal.parent.classList.remove("modal-closed");
     this.modalElements.modal.parent.classList.add("modal-opened");
-  };
-
-  Modal.prototype.showDocumentInfo = function () {
-    this.setTitle("Info");
-    this.setFooter("");
-    this.setActions([Modal.ACTION_CLOSE]);
-    var infoText = document.head.querySelector("meta[name~=docinfo][content]").content;
-    this.setBody(infoText);
-    this.open();
   };
 
   Modal.prototype.buildDOMNode = function (id) {
@@ -112,6 +106,9 @@
     modal.setAttribute("id", id);
     modal.classList.add("modal");
     modal.classList.add("modal-closed");
+
+    var backdrop = document.createElement("div");
+    backdrop.classList.add("modal-backdrop");
 
     var content = document.createElement("div");
     content.classList.add("modal-content");
@@ -149,12 +146,19 @@
     body.appendChild(bodyContent);
     content.appendChild(body);
     content.appendChild(footer);
+    modal.appendChild(backdrop);
     modal.appendChild(content);
 
     // When the user clicks on <span> (x), close the modal
     closeBtn.onclick = function () {
       _self.close();
     };
+
+    backdrop.addEventListener("click", function() {
+      if( _self.closeOnBackdropClick ) {
+        _self.close();
+      }
+    });
 
     // Append new modal to body
     document.getElementsByTagName("body")[0].appendChild(modal);
@@ -163,6 +167,7 @@
       modal: {
         id: id,
         parent: modal,
+        backdrop: backdrop,
         header: {
           closeBtn: closeBtn,
           content: h2
@@ -179,12 +184,12 @@
   // https://stackoverflow.com/questions/384286/how-do-you-check-if-a-javascript-object-is-a-dom-object
   function isDOMNode(obj) {
     try {
-      //Using W3 DOM2 (works for FF, Opera and Chrome)
+      // Using W3 DOM2 (works for FF, Opera and Chrome)
       return obj instanceof HTMLElement;
     } catch (e) {
-      //Browsers not supporting W3 DOM2 don't have HTMLElement and
-      //an exception is thrown and we end up here. Testing some
-      //properties that all elements have (works on IE7)
+      // Browsers not supporting W3 DOM2 don't have HTMLElement and
+      // an exception is thrown and we end up here. Testing some
+      // properties that all elements have (works on IE7)
       return (
         typeof obj === "object" && obj.nodeType === 1 && typeof obj.style === "object" && typeof obj.ownerDocument === "object"
       );

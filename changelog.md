@@ -1,6 +1,44 @@
 # Changelog
 
-- 2024-01-29 [v1.22.1]
+- 2024-05-19
+  - Finalizing the Metaballs demo (demo 52).
+  - Adding circle sector helpers and elipse sector helpers to the default demo.
+- 2024-03-10
+  - Upgraded to Typescript 5.
+  - Fixed 35 minor type issues in some classes to obtain Typescript 5 compatibility.
+  - Fixed some issues in the `CircleHandler.destroy` method; listeners were not properly removed.
+  - Adding the `CircleSectorHandler.destory` method for properly removing installed listeners.
+- 2024-03-09
+  - Added the `CircleSector.circleSectorIntersection` method to find coherent sector intersections.
+  - Added the `CircleSector.angleAt` method to determine any angle at some ratio.
+- 2024-03-08
+  - Added the optional `precision` param to the `Vertex.toString` method.
+  - Added the `CircleSector.containsAngle` method.
+  - Adding the demo 53 (circle sector intersections). Sector intersections are required for the metaballs demo.
+- 2024-03-01
+  - Refactoring the current metaballs calculation to a Typescript class.
+  - Added the `CircleSector.getStartPoint` and `CircleSector.getEndPoint` methods.
+- 2024-02-26
+  - CircleHelper: Removed the constructor param `pb` (unused).
+  - CircleHelper: Added `circle` and `radiusPoint` attributes.
+  - CircleHelper: Added the `destroy` method.
+- 2024-02-23
+  - Fixed some minor null-type conflicts in the CircleIntersections algorithms.
+- 2024-02-09
+  - Demo 25 Multiple Circle Sections: replacing the canvas/svg specific draw functions for arc by the new generic draw lib method.
+- 2024-02-07
+  - Added the `src/ts/utils/algorithms/arrayResize` utility function.
+- 2024-02-06
+  - Finilaizing the demo: polygons with round edges.
+  - Adding new demo 52: metaballs 2d.
+- 2024-01-30
+  - Added a missing type in the `drawutilssvg.describeSVGArc` function.
+  - Fixing an issue with `drawutilssvg` immutable style sets; changes to the global draw config did not reflect here (do now).
+- 2024-01-29
+  - Adding new demo 50-reuleaux-polygons.
+  - Refactoring the NGons helper and porting it to Typescript.
+  - Updating the demo 49-polygon-inside-polygon with the new NGons path.
+- 2024-01-28 [v1.22.1]
   - Finalizing a first usable version of the contour plot calculation.
 - 2023-11-27
   - Added the `GenericPath.getAllStartEndPoints()` function.

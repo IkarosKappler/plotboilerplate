@@ -1036,7 +1036,7 @@ var drawutils = /** @class */ (function () {
                     (options.fontFamily
                         ? options.fontFamily.indexOf(" ") === -1
                             ? options.fontFamily
-                            : "\"" + options.fontFamily + "\""
+                            : "\"".concat(options.fontFamily, "\"")
                         : "Arial");
         }
         if (options.textAlign) {

@@ -1,16 +1,19 @@
 /**
  * @date 2018-10-23
  * @modified 2021-01-04 Placed into a function.
+ * @modified 2024-05-19 Adding circle sectors helpers.
  */
 
 /**
- * @param {Bounds} canvasSize
+ * @param {PlotBoilerplate} pb
+ * @param {string} imagePath
+ * @param {function} drawCallback
  */
-function createDemoDrawables(canvasSize, imagePath, drawCallback) {
+function createDemoDrawables(pb, imagePath, drawCallback) {
   // +---------------------------------------------------------------------------------
   // | Add some elements to draw (demo).
   // +-------------------------------
-  var diameter = Math.min(canvasSize.width, canvasSize.height) / 4.5;
+  var diameter = Math.min(pb.canvasSize.width, pb.canvasSize.height) / 4.5;
   var radius = diameter * 0.5;
   var hypo = Math.sqrt(radius * radius * 2);
   var D2R = Math.PI / 180.0;
@@ -78,6 +81,19 @@ function createDemoDrawables(canvasSize, imagePath, drawCallback) {
   drawables.push(csectorB);
   drawables.push(csectorC);
   drawables.push(csectorD);
+
+  var installCircleSectorHelper = function (circleSector) {
+    // Further: add a circle sector helper to edit angles and radius manually (mouse or touch)
+    var controlPointA = circleSector.circle.vertAt(circleSector.startAngle);
+    var controlPointB = circleSector.circle.vertAt(circleSector.endAngle);
+    new CircleSectorHelper(circleSector, controlPointA, controlPointB, pb);
+    pb.add(controlPointA);
+    pb.add(controlPointB);
+  };
+  installCircleSectorHelper(csectorA);
+  installCircleSectorHelper(csectorB);
+  installCircleSectorHelper(csectorC);
+  installCircleSectorHelper(csectorD);
 
   // +---------------------------------------------------------------------------------
   // | Add a circular connected bezier path.
@@ -200,6 +216,35 @@ function createDemoDrawables(canvasSize, imagePath, drawCallback) {
   }
   // pb.add( path2 );
   drawables.push(path2);
+
+  // +---------------------------------------------------------------------------------
+  // | Add elliptic sectors.
+  // +-------------------------------
+  var verticalBaseEllipse = new VEllipse(new Vertex(0, 0), new Vertex(radius * 4, radius * 0.8));
+  var horizontalBaseEllipse = new VEllipse(new Vertex(0, 0), new Vertex(radius * 0.8, radius * 4));
+  var ellipticSectorA = new VEllipseSector(verticalBaseEllipse, Math.PI - Math.PI / 4, Math.PI + Math.PI / 4);
+  var ellipticSectorB = new VEllipseSector(verticalBaseEllipse, -Math.PI / 4, Math.PI / 4);
+  var ellipticSectorC = new VEllipseSector(horizontalBaseEllipse, Math.PI / 4, Math.PI - Math.PI / 4);
+  var ellipticSectorD = new VEllipseSector(horizontalBaseEllipse, Math.PI + Math.PI / 4, -Math.PI / 4);
+
+  drawables.push(ellipticSectorA);
+  drawables.push(ellipticSectorB);
+  drawables.push(ellipticSectorC);
+  drawables.push(ellipticSectorD);
+
+  var addEllipticSectorHelper = function (ellipticSector) {
+    var startControlPoint = ellipticSector.ellipse.vertAt(ellipticSector.startAngle);
+    var endControlPoint = ellipticSector.ellipse.vertAt(ellipticSector.endAngle);
+    var rotationControlPoint = ellipticSector.ellipse.vertAt(ellipticSector.rotation).scale(1.2, ellipticSector.ellipse.center);
+    new VEllipseSectorHelper(ellipticSector, startControlPoint, endControlPoint, rotationControlPoint);
+    pb.add(startControlPoint);
+    pb.add(endControlPoint);
+    pb.add(rotationControlPoint);
+  };
+  addEllipticSectorHelper(ellipticSectorA);
+  addEllipticSectorHelper(ellipticSectorB);
+  addEllipticSectorHelper(ellipticSectorC);
+  addEllipticSectorHelper(ellipticSectorD);
 
   // +---------------------------------------------------------------------------------
   // | Finally load an image.

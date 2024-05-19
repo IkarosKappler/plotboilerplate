@@ -6,13 +6,14 @@
  *
  * Refactored by Ikaros Kappler
  *
- * @date 2021-04-16
- * @version 0.0.1
+ * @date     2021-04-16
+ * @modified 2024-03-09 Added type checks for Typescript 5 compatibility.
+ * @version  0.0.2
  */
 /**
  * Process a facet. Normals are not guaranteed to be present (binary yes, ascii no).
  */
-declare type FacetHandler = (v1: Vertex, v2: Vertex, v3: Vertex, normal?: Vertex) => void;
+type FacetHandler = (v1: Vertex, v2: Vertex, v3: Vertex, normal?: Vertex) => void;
 declare class Vertex {
     x: number;
     y: number;

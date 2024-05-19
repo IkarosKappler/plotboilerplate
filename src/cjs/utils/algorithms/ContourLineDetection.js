@@ -93,7 +93,7 @@ var ContourLineDetection = /** @class */ (function () {
             options.onRawSegmentsDetected(this.rawLinearPathSegments);
         }
         // Detect connected paths
-        var pathSegments = detectPaths_1.detectPaths(this.rawLinearPathSegments, (_b = options.pathDetectEpsilon) !== null && _b !== void 0 ? _b : 0.0000001); // Epsilon
+        var pathSegments = (0, detectPaths_1.detectPaths)(this.rawLinearPathSegments, (_b = options.pathDetectEpsilon) !== null && _b !== void 0 ? _b : 0.0000001); // Epsilon
         // Filter out segments with only a single line of length~=0
         pathSegments = pathSegments.filter(function (pathSegment) {
             return (pathSegment.segments.length != 1 ||
@@ -118,7 +118,7 @@ var ContourLineDetection = /** @class */ (function () {
         var heightValueC = heightFace[1][1];
         var heightValueD = heightFace[0][1];
         if (heightValueA === null || heightValueB === null || heightValueC === null || heightValueD === null) {
-            throw "[findHeightFace4IntersectionLine] Cannot extract data face at (" + xIndex + "," + yIndex + "). Some values are null.";
+            throw "[findHeightFace4IntersectionLine] Cannot extract data face at (".concat(xIndex, ",").concat(yIndex, "). Some values are null.");
         }
         var points = [];
         // Case A: use full quad face
@@ -142,7 +142,7 @@ var ContourLineDetection = /** @class */ (function () {
         // edge of a face, then the two adjacent edges will result in 2x the same
         // intersecion point. This must be handled as one, so filter the point list
         // by an epsilon.
-        points = clearDuplicateVertices_1.clearDuplicateVertices(points, pointEliminationEpsilon); // 0.000001);
+        points = (0, clearDuplicateVertices_1.clearDuplicateVertices)(points, pointEliminationEpsilon); // 0.000001);
         if (points.length >= 2) {
             var startPoint = points[0];
             var endPoint = points[1];
@@ -213,7 +213,7 @@ var ContourLineDetection = /** @class */ (function () {
         var heightValueB = heightFace[1];
         var heightValueC = heightFace[2];
         if (heightValueA === null || heightValueB === null || heightValueC === null) {
-            throw "[findHeightFace3IntersectionLine] Cannot extract data face at (" + xIndexA + "," + yIndexA + "). Some values are null.";
+            throw "[findHeightFace3IntersectionLine] Cannot extract data face at (".concat(xIndexA, ",").concat(yIndexA, "). Some values are null.");
         }
         var points = [];
         // Case A: use full quad face
@@ -235,7 +235,7 @@ var ContourLineDetection = /** @class */ (function () {
         // edge of a face, then the two adjacent edges will result in 2x the same
         // intersecion point. This must be handled as one, so filter the point list
         // by an epsilon.
-        points = clearDuplicateVertices_1.clearDuplicateVertices(points, pointEliminationEpsilon); // 0.0000001);
+        points = (0, clearDuplicateVertices_1.clearDuplicateVertices)(points, pointEliminationEpsilon); // 0.0000001);
         if (points.length >= 2) {
             var startPoint = points[0];
             var endPoint = points[1];

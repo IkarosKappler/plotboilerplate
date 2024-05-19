@@ -3,9 +3,15 @@
  * @date     2020-12-17
  * @modified 2021-01-20 Added UID.
  * @modified 2021-02-26 Fixed an error in the svg-arc-calculation (case angle<90deg and anti-clockwise).
- * @version  1.1.1
+ * @modified 2024-01-30 Added a missing type in the `describeSVGArc` function.
+ * @modified 2024-03-01 Added the `getStartPoint` and `getEndPoint` methods.
+ * @modified 2024-03-08 Added the `containsAngle` method.
+ * @modified 2024-03-09 Added the `circleSectorIntersection` method to find coherent sector intersections..
+ * @modified 2024-03-09 Added the `angleAt` method to determine any angle at some ratio.
+ * @version  1.2.0
  **/
 import { Circle } from "./Circle";
+import { Vertex } from "./Vertex";
 import { SVGPathParams, SVGSerializable, UID, XYCoords } from "./interfaces";
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
@@ -66,9 +72,66 @@ export declare class CircleSector implements SVGSerializable {
      */
     constructor(circle: Circle, startAngle: number, endAngle: number);
     /**
+     * Checks wether the given angle (must be inside 0 and PI*2) is contained inside this sector.
+     *
+     * @param {number} angle - The numeric angle to check.
+     * @method containsAngle
+     * @instance
+     * @memberof CircleSector
+     * @return {boolean} True if (and only if) this sector contains the given angle.
+     */
+    containsAngle(angle: number): boolean;
+    /**
+     * Get the angle inside this sector for a given ratio. 0.0 means startAngle, and 1.0 means endAngle.
+     *
+     * @param {number} t - The ratio inside [0..1].
+     * @method angleAt
+     * @instance
+     * @memberof CircleSector
+     * @return {number} The angle inside this sector at a given ratio.
+     */
+    angleAt(t: number): number;
+    /**
+     * Get the sectors starting point (on the underlying circle, located at the start angle).
+     *
+     * @method getStartPoint
+     * @instance
+     * @memberof CircleSector
+     * @return {Vertex} The sector's stating point.
+     */
+    getStartPoint(): Vertex;
+    /**
+     * Get the sectors ending point (on the underlying circle, located at the end angle).
+     *
+     * @method getEndPoint
+     * @instance
+     * @memberof CircleSector
+     * @return {Vertex} The sector's ending point.
+     */
+    getEndPoint(): Vertex;
+    /**
+     * Calculate the intersection of this circle sector and some other sector.
+     *
+     * If the two sectors do not corerently intersect (when not both points of the
+     * radical line are containted in both source sectors) then null is returned.
+     *
+     * See demo/53-circle-sector-intersections for a geometric visualisation.
+     *
+     * @method circleSectorIntersection
+     * @instance
+     * @memberof CircleSector
+     * @return {CircleSector | null} The intersecion of both sectors or null if they don't intersect.
+     */
+    circleSectorIntersection(sector: CircleSector): CircleSector | null;
+    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.
+     *
+     * @method destroy
+     * @instance
+     * @memberof CircleSector
+     * @return {void}
      */
     destroy(): void;
     static circleSectorUtils: {

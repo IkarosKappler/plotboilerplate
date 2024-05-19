@@ -21,7 +21,8 @@
  * @modified 2021-01-03 Added following new functions: `addPathVertexDragStartListeners`, `removePathVertexDragStartListeners`, `addPathVertexDragEndListeners` and `removePathVertexDragEndListeners`.
  * @modified 2021-03-31 Fixed the issue with the new AlloyFinger (Typescript).
  * @modified 2022-02-03 Changing the element to catch events (eventCatcher instead of canvas).
- * @version  1.1.2
+ * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
+ * @version  1.1.3
  *
  * @file BezierPathInteractionHelper
  * @public
@@ -33,19 +34,19 @@ import { Vertex } from "../../Vertex";
 /**
  * Handler type for mouse-pointer-moved listeners.
  */
-declare type OnPointerMoved = (pathIndex: number, pathPoint: Vertex, pointerPos: Vertex, t: number) => void;
+type OnPointerMoved = (pathIndex: number, pathPoint: Vertex | null, pointerPos: Vertex | null, t: number) => void;
 /**
  * Handler type for vertex-inserted listeners.
  */
-declare type OnVertexInserted = (pathIndex: number, insertIndex: number, newPath: BezierPath, oldPath: BezierPath) => void;
+type OnVertexInserted = (pathIndex: number, insertIndex: number, newPath: BezierPath, oldPath: BezierPath) => void;
 /**
  * Handler type for vertex-removed listeners.
  */
-declare type OnVerticesDeleted = (pathIndex: number, removedVertexIndices: Array<number>, newPath: BezierPath, oldPath: BezierPath) => void;
+type OnVerticesDeleted = (pathIndex: number, removedVertexIndices: Array<number>, newPath: BezierPath, oldPath: BezierPath) => void;
 /**
  * Handler type for path-removed listeners.
  */
-declare type OnPathRemoved = (pathIndex: number, oldPath: BezierPath) => void;
+type OnPathRemoved = (pathIndex: number, oldPath: BezierPath) => void;
 /**
  * Options passed to the constructor.
  */

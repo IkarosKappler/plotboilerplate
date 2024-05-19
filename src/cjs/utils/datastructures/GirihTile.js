@@ -17,6 +17,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -38,7 +40,7 @@ var TileType;
     TileType["BOW_TIE"] = "BOW_TIE";
     // This is not part of the actual girih tile set!
     TileType["PENROSE_RHOMBUS"] = "PENROSE_RHOMBUS";
-})(TileType = exports.TileType || (exports.TileType = {}));
+})(TileType || (exports.TileType = TileType = {}));
 /**
  * @classdesc This is a general tile superclass. All other tile classes extends this one.
  *
@@ -61,7 +63,7 @@ var GirihTile = /** @class */ (function (_super) {
      * @param {TileType} tileType - One of `TileType.*` enum members.
      **/
     function GirihTile(position, edgeLength, tileType) {
-        var _this = _super.call(this, [], false) || this;
+        var _this = _super.call(this, [], false) || this; // vertices, isOpen
         if (typeof edgeLength === "undefined")
             edgeLength = GirihTile.DEFAULT_EDGE_LENGTH;
         if (typeof tileType == "undefined")
