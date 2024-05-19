@@ -1,9 +1,11 @@
 ---
 layout: page
-title: Changelog
 ---
 # Changelog
 
+- 2024-05-19
+  - Finalizing the Metaballs demo (demo 52).
+  - Adding circle sector helpers and elipse sector helpers to the default demo.
 - 2024-03-10
   - Upgraded to Typescript 5.
   - Fixed 35 minor type issues in some classes to obtain Typescript 5 compatibility.

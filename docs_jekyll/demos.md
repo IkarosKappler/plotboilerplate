@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2024-03-11
+date: 2024-05-19
 ---
 
 <h3>Basics</h3>
@@ -272,7 +272,7 @@ date: 2024-03-11
 </div>
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/52-metacircles/index.html' | prepend: site.url }}">
-      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/na.png');"></div>
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20240226-1-metaballs.png');"></div>
    </a>
 </div>
 <div class="demo-box">
