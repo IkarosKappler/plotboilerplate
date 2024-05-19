@@ -174,4 +174,4 @@ export interface XKeyListener {
     keyCode: number;
     listener: (event: KeyboardEvent) => void;
 }
-export declare type XKeyCallback = (e: KeyboardEvent) => void;
+export type XKeyCallback = (e: KeyboardEvent) => void;

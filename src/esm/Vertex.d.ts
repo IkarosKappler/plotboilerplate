@@ -31,7 +31,8 @@
  * @modified 2022-11-28 Added the `subXY`, `subX` and `subY` methods to the `Vertex` class.
  * @modified 2023-09-29 Downgraded types for the `Vertex.utils.buildArrowHead` function (replacing Vertex params by more generic XYCoords type).
  * @modified 2023-09-29 Added the `Vertex.abs()` method as it seems useful.
- * @version  2.8.0
+ * @modified 2024-03-08 Added the optional `precision` param to the `toString` method.
+ * @version  2.9.0
  *
  * @file Vertex
  * @public
@@ -414,7 +415,7 @@ export declare class Vertex implements XYCoords, SVGSerializable {
      * @instance
      * @memberof Vertex
      **/
-    toString(): string;
+    toString(precision?: number): string;
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and

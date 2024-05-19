@@ -32,8 +32,9 @@
       exportJSON: function () {
         exportVertexData();
       },
-      helpme: function () {
-        modal.showDocumentInfo();
+      readme: function () {
+        // modal.showDocumentInfo();
+        globalThis.displayDemoMeta();
       }
     };
 
@@ -96,7 +97,7 @@
       gui.add(config, "pointCount").min(3).max(100).step(1).listen().onChange( updatePointCount );
       gui.add(config, "makeCircle");
       gui.add(config, "exportJSON");
-      gui.add(config, "helpme");
+      gui.add(config, "readme");
     }
   });
 })(globalThis);

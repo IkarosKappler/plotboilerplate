@@ -91,7 +91,7 @@ var Bounds = /** @class */ (function () {
      * @returns {string} Get these bounds in a human readable form.
      */
     Bounds.prototype.toString = function () {
-        return "{ min: " + this.min.toString() + ", max : " + this.max.toString() + ", width: " + this.width + ", height : " + this.height + " }";
+        return "{ min: ".concat(this.min.toString(), ", max : ").concat(this.max.toString(), ", width: ").concat(this.width, ", height : ").concat(this.height, " }");
     };
     /**
      * Clone this bounds object (create a deep clone).

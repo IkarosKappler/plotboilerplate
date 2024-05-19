@@ -4,8 +4,6 @@ import external from "rollup-plugin-peer-deps-external";
 import resolve from "rollup-plugin-node-resolve";
 import {terser} from 'rollup-plugin-terser';
 
-import pkg from "./package.json";
-
 const moduleName = "plotboilerplate";
 
 export default {

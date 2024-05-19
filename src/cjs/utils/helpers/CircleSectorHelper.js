@@ -21,21 +21,92 @@ var CircleSectorHelper = /** @class */ (function () {
      * @param {PlotBoilerplate} pb - The PlotBoilerplate which contains the circle sector and both points.
      **/
     function CircleSectorHelper(circleSector, controlPointStart, controlPointEnd, pb) {
-        circleSector.circle.center.listeners.addDragListener(function (e) {
-            controlPointStart.add(e.params.dragAmount);
-            controlPointEnd.add(e.params.dragAmount);
-        });
-        controlPointStart.listeners.addDragListener(function (e) {
-            circleSector.circle.radius = circleSector.circle.center.distance(controlPointStart);
-            controlPointEnd.set(circleSector.circle.vertAt(circleSector.endAngle));
-            circleSector.startAngle = circleSector.circle.center.angle(controlPointStart);
-        });
-        controlPointEnd.listeners.addDragListener(function (e) {
-            circleSector.circle.radius = circleSector.circle.center.distance(controlPointEnd);
-            controlPointStart.set(circleSector.circle.vertAt(circleSector.startAngle));
-            circleSector.endAngle = circleSector.circle.center.angle(controlPointEnd);
-        });
+        this.circleSector = circleSector;
+        this.controlPointStart = controlPointStart;
+        this.controlPointEnd = controlPointEnd;
+        this.circleSector.circle.center.listeners.addDragListener(this.centerListener = this._handleDragCenter());
+        this.controlPointStart.listeners.addDragListener(this.radiusStartListener = this._handleDragStartControlPoint());
+        this.controlPointEnd.listeners.addDragListener(this.radiusEndListener = this._handleDragEndControlPoint());
+        // circleSector.circle.center.listeners.addDragListener( (e:VertEvent) => {
+        //     controlPointStart.add( e.params.dragAmount );
+        //     controlPointEnd.add( e.params.dragAmount );
+        // } );
+        // controlPointStart.listeners.addDragListener( (e:VertEvent) => {
+        //     circleSector.circle.radius = circleSector.circle.center.distance(controlPointStart);
+        //     controlPointEnd.set( circleSector.circle.vertAt(circleSector.endAngle) );
+        //     circleSector.startAngle = circleSector.circle.center.angle( controlPointStart );
+        // } );
+        // controlPointEnd.listeners.addDragListener( (e:VertEvent) => {
+        //     circleSector.circle.radius = circleSector.circle.center.distance(controlPointEnd);
+        //     controlPointStart.set( circleSector.circle.vertAt(circleSector.startAngle) );
+        //     circleSector.endAngle = circleSector.circle.center.angle( controlPointEnd );
+        // } );
     }
+    /**
+     * Creates a new drag handler for the circle sector's center point.
+     *
+     * @private
+     * @method handleDragCenter
+     * @instance
+     * @memberof CircleSectorHelper
+     * @returns A new event handler.
+     */
+    CircleSectorHelper.prototype._handleDragCenter = function () {
+        var _self = this;
+        return function (e) {
+            _self.controlPointStart.add(e.params.dragAmount);
+            _self.controlPointEnd.add(e.params.dragAmount);
+        };
+    };
+    /**
+     * Creates a new drag handler for the circle sector's start control point.
+     *
+     * @private
+     * @method _handleDragStartControlPoint
+     * @instance
+     * @memberof CircleSectorHelper
+     * @returns A new event handler.
+     */
+    CircleSectorHelper.prototype._handleDragStartControlPoint = function () {
+        var _self = this;
+        return function (e) {
+            _self.circleSector.circle.radius = _self.circleSector.circle.center.distance(_self.controlPointStart);
+            _self.controlPointEnd.set(_self.circleSector.circle.vertAt(_self.circleSector.endAngle));
+            _self.circleSector.startAngle = _self.circleSector.circle.center.angle(_self.controlPointStart);
+        };
+    };
+    ;
+    /**
+     * Creates a new drag handler for the circle sector's end control point.
+     *
+     * @private
+     * @method _handleDragEndControlPoint
+     * @instance
+     * @memberof CircleSectorHelper
+     * @returns A new event handler.
+     */
+    CircleSectorHelper.prototype._handleDragEndControlPoint = function () {
+        var _self = this;
+        return function (e) {
+            _self.circleSector.circle.radius = _self.circleSector.circle.center.distance(_self.controlPointEnd);
+            _self.controlPointStart.set(_self.circleSector.circle.vertAt(_self.circleSector.startAngle));
+            _self.circleSector.endAngle = _self.circleSector.circle.center.angle(_self.controlPointEnd);
+        };
+    };
+    ;
+    /**
+     * Destroy this circle helper.
+     * The listeners will be removed from the circle sector's points.
+     *
+     * @method destroy
+     * @instance
+     * @memberof CircleSectorHelper
+     */
+    CircleSectorHelper.prototype.destroy = function () {
+        this.circleSector.circle.center.listeners.removeDragListener(this.centerListener);
+        this.controlPointStart.listeners.removeDragListener(this.radiusStartListener);
+        this.controlPointEnd.listeners.removeDragListener(this.radiusEndListener);
+    };
     return CircleSectorHelper;
 }());
 exports.CircleSectorHelper = CircleSectorHelper;

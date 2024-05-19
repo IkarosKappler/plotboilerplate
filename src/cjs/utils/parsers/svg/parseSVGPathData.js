@@ -32,7 +32,7 @@ var DEG_TO_RAD = Math.PI / 180;
  * @return An array of straight line segments (Line) or curve segments (CubicBezierCurve) representing the path.
  */
 var parseSVGPathData = function (dataString) {
-    var dataElements = splitSVGPathData_1.splitSVGPathData(dataString);
+    var dataElements = (0, splitSVGPathData_1.splitSVGPathData)(dataString);
     if (!dataElements) {
         return null;
     }

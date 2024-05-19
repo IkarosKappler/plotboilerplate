@@ -238,7 +238,7 @@ var KeyHandler = /** @class */ (function () {
      */
     // prettier-ignore
     KeyHandler.KEY_CODES = {
-        'break': 3,
+        'break': 3, // alternate: 19
         'backspace': 8,
         // 'delete'	 : 8, // alternate: 46
         'tab': 9,
@@ -254,12 +254,12 @@ var KeyHandler = /** @class */ (function () {
         'hanja': 25,
         'escape': 27,
         'conversion': 28,
-        'non-conversion': 29,
+        'non-conversion': 29, // alternate: 235?
         'spacebar': 32,
         'pageup': 33,
         'pagedown': 34,
         'end': 35,
-        'home': 36,
+        'home': 36, // alternate: 172?
         'leftarrow': 37,
         'uparrow': 38,
         'rightarrow': 39,
@@ -269,7 +269,7 @@ var KeyHandler = /** @class */ (function () {
         'execute': 43,
         'printscreen': 44,
         'insert': 45,
-        'delete': 46,
+        'delete': 46, // alternate: 8
         'help': 47,
         '0': 48,
         '1': 49,
@@ -315,11 +315,11 @@ var KeyHandler = /** @class */ (function () {
         'y': 89,
         'z': 90,
         'windows': 91,
-        'leftcommand': 91,
+        'leftcommand': 91, // left ⌘
         'chromebooksearch': 91,
         'rightwindowkey': 92,
         'windowsmenu': 93,
-        'rightcommant': 93,
+        'rightcommant': 93, // right ⌘
         'sleep': 95,
         'numpad0': 96,
         'numpad1': 97,
@@ -333,7 +333,7 @@ var KeyHandler = /** @class */ (function () {
         'numpad9': 105,
         'multiply': 106,
         'add': 107,
-        'numpadperiod': 108,
+        'numpadperiod': 108, // firefox, 194 on chrome
         'subtract': 109,
         'decimalpoint': 110,
         'divide': 111,
@@ -372,11 +372,11 @@ var KeyHandler = /** @class */ (function () {
         'pagebackward': 166,
         'pageforward': 167,
         'refresh': 168,
-        'closingparen': 169,
+        'closingparen': 169, // (AZERTY)
         '*': 170,
         '~+*': 171,
         // 'home'	         : 172,
-        'minus': 173,
+        'minus': 173, // firefox
         // 'mute'           : 173,
         // 'unmute'	 : 173,
         'decreasevolumelevel': 174,
@@ -386,8 +386,8 @@ var KeyHandler = /** @class */ (function () {
         'stop': 178,
         'play/pause': 179,
         'email': 180,
-        'mute': 181,
-        'unmute': 181,
+        'mute': 181, // firefox, alternate: 173
+        'unmute': 181, // alternate: 173?
         //'decreasevolumelevel'	182 // firefox
         //'increasevolumelevel'	183 // firefox
         'semicolon': 186,
@@ -397,7 +397,7 @@ var KeyHandler = /** @class */ (function () {
         'dash': 189,
         'period': 190,
         'forwardslash': 191,
-        'ç': 191,
+        'ç': 191, // 231 alternate?
         'grave accent': 192,
         //'ñ' 192,
         'æ': 192,
@@ -426,7 +426,7 @@ var KeyHandler = /** @class */ (function () {
         'half-width': 243,
         'full-width': 243,
         'kanji': 244,
-        'unlocktrackpad': 251,
+        'unlocktrackpad': 251, // Chrome/Edge
         'toggletouchpad': 255
     };
     return KeyHandler;

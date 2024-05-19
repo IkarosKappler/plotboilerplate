@@ -12,7 +12,8 @@
  * @author   Ikaros Kappler
  * @date     2021-01-22
  * @modified 2021-01-26 Moving control points with center points
- * @version  1.0.1
+ * @modified 2024-03-10 Adding the `destory` method for properly removing installed listeners.
+ * @version  1.1.0
  **/
 import { CircleSector } from "../../CircleSector";
 import { PlotBoilerplate } from "../../PlotBoilerplate";
@@ -21,6 +22,12 @@ import { Vertex } from "../../Vertex";
  * @classdesc A helper for handling circles with an additional radius-control-point.
  */
 export declare class CircleSectorHelper {
+    private circleSector;
+    private controlPointStart;
+    private controlPointEnd;
+    private centerListener;
+    private radiusStartListener;
+    private radiusEndListener;
     /**
      * The constructor.
      *
@@ -32,4 +39,43 @@ export declare class CircleSectorHelper {
      * @param {PlotBoilerplate} pb - The PlotBoilerplate which contains the circle sector and both points.
      **/
     constructor(circleSector: CircleSector, controlPointStart: Vertex, controlPointEnd: Vertex, pb: PlotBoilerplate);
+    /**
+     * Creates a new drag handler for the circle sector's center point.
+     *
+     * @private
+     * @method handleDragCenter
+     * @instance
+     * @memberof CircleSectorHelper
+     * @returns A new event handler.
+     */
+    private _handleDragCenter;
+    /**
+     * Creates a new drag handler for the circle sector's start control point.
+     *
+     * @private
+     * @method _handleDragStartControlPoint
+     * @instance
+     * @memberof CircleSectorHelper
+     * @returns A new event handler.
+     */
+    private _handleDragStartControlPoint;
+    /**
+     * Creates a new drag handler for the circle sector's end control point.
+     *
+     * @private
+     * @method _handleDragEndControlPoint
+     * @instance
+     * @memberof CircleSectorHelper
+     * @returns A new event handler.
+     */
+    private _handleDragEndControlPoint;
+    /**
+     * Destroy this circle helper.
+     * The listeners will be removed from the circle sector's points.
+     *
+     * @method destroy
+     * @instance
+     * @memberof CircleSectorHelper
+     */
+    destroy(): void;
 }

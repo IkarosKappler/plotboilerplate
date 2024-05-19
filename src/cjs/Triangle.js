@@ -89,7 +89,7 @@ var Triangle = /** @class */ (function () {
      **/
     Triangle.fromArray = function (arr) {
         if (arr.length < 3)
-            throw "Cannot create triangle from array with less than three vertices (" + arr.length + ")";
+            throw "Cannot create triangle from array with less than three vertices (".concat(arr.length, ")");
         return new Triangle(arr[0], arr[1], arr[2]);
     };
     /**

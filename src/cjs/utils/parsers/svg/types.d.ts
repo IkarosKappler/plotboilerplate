@@ -12,13 +12,13 @@
  * @modified 2023-01-17 Added multiple parameter sets.
  * @version  0.0.2-alpha
  */
-export declare type NumericString = `${number}`;
-export declare type BooleanString = "0" | "1" | `${boolean}`;
-export declare type SVGPathMoveToCommand = ["M" | "m", NumericString, NumericString];
-export declare type SVGPathLineToCommand = ["L" | "l", NumericString, NumericString, ...Array<NumericString>];
-export declare type SVGPathVerticalLineToCommand = ["V" | "v", NumericString];
-export declare type SVGPathHorizontalLineToCommand = ["H" | "h", NumericString];
-export declare type SVGPathQuadraticCurveToCommand = ["Q" | "q", NumericString, NumericString, NumericString, NumericString] | [
+export type NumericString = `${number}`;
+export type BooleanString = "0" | "1" | `${boolean}`;
+export type SVGPathMoveToCommand = ["M" | "m", NumericString, NumericString];
+export type SVGPathLineToCommand = ["L" | "l", NumericString, NumericString, ...Array<NumericString>];
+export type SVGPathVerticalLineToCommand = ["V" | "v", NumericString];
+export type SVGPathHorizontalLineToCommand = ["H" | "h", NumericString];
+export type SVGPathQuadraticCurveToCommand = ["Q" | "q", NumericString, NumericString, NumericString, NumericString] | [
     "Q" | "q",
     NumericString,
     NumericString,
@@ -29,7 +29,7 @@ export declare type SVGPathQuadraticCurveToCommand = ["Q" | "q", NumericString, 
     NumericString,
     ...Array<NumericString>
 ];
-export declare type SVGPathCubicCurveToCommand = [
+export type SVGPathCubicCurveToCommand = [
     "C" | "c",
     NumericString,
     NumericString,
@@ -39,7 +39,7 @@ export declare type SVGPathCubicCurveToCommand = [
     NumericString,
     ...Array<NumericString>
 ];
-export declare type SVGPathShorthandCubicCurveToCommand = [
+export type SVGPathShorthandCubicCurveToCommand = [
     "S" | "s",
     NumericString,
     NumericString,
@@ -47,7 +47,7 @@ export declare type SVGPathShorthandCubicCurveToCommand = [
     NumericString,
     ...Array<NumericString>
 ];
-export declare type SVGPathArcToCommand = [
+export type SVGPathArcToCommand = [
     "A" | "a",
     NumericString,
     NumericString,
@@ -58,6 +58,6 @@ export declare type SVGPathArcToCommand = [
     NumericString,
     ...Array<NumericString>
 ];
-export declare type SVGPathCloseCommand = ["Z" | "z"];
-export declare type SVGPathShorthandQuadraticCurveToCommand = ["T" | "t", NumericString, NumericString, ...Array<NumericString>];
-export declare type SVGPathCommand = SVGPathMoveToCommand | SVGPathLineToCommand | SVGPathVerticalLineToCommand | SVGPathHorizontalLineToCommand | SVGPathQuadraticCurveToCommand | SVGPathCubicCurveToCommand | SVGPathShorthandCubicCurveToCommand | SVGPathArcToCommand | SVGPathCloseCommand;
+export type SVGPathCloseCommand = ["Z" | "z"];
+export type SVGPathShorthandQuadraticCurveToCommand = ["T" | "t", NumericString, NumericString, ...Array<NumericString>];
+export type SVGPathCommand = SVGPathMoveToCommand | SVGPathLineToCommand | SVGPathVerticalLineToCommand | SVGPathHorizontalLineToCommand | SVGPathQuadraticCurveToCommand | SVGPathCubicCurveToCommand | SVGPathShorthandCubicCurveToCommand | SVGPathArcToCommand | SVGPathCloseCommand;

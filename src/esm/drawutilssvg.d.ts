@@ -44,8 +44,9 @@
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-10-04 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
- *
- * @version  1.6.7
+ * @modified 2024-01-30 Fixing an issue with immutable style sets; changes to the global draw config did not reflect here (do now).
+ * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
+ * @version  1.6.9
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -156,6 +157,13 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      */
     private isSecondary;
     /**
+     * Keep the initial draw config to rebuild styles on each render loop.
+     */
+    private drawConfig;
+    /**
+     * Passed from primary to secondary instance.
+     */
+    /**
      * The constructor.
      *
      * @constructor
@@ -169,7 +177,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
      * @param {SVGGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
-    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, drawConfig: DrawConfig, isSecondary?: boolean, gNode?: SVGGElement, bufferGNode?: SVGGElement, nodeDefs?: SVGDefsElement, bufferNodeDefs?: SVGDefsElement);
+    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, drawConfig: DrawConfig, isSecondary?: boolean, gNode?: SVGGElement, bufferGNode?: SVGGElement, nodeDefs?: SVGDefsElement, bufferNodeDefs?: SVGDefsElement, nodeStyle?: SVGStyleElement);
     /**
      * Adds a default style defintion based on the passed DrawConfig.
      * Twaek the draw config to change default colors or line thicknesses.
@@ -177,6 +185,12 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {DrawConfig} drawConfig
      */
     private addStyleDefs;
+    /**
+     * This method is required to re-define the global style defs. It is needed
+     * if any value in the DrawConfig changed in the meantime.
+     * @param drawConfig
+     */
+    private rebuildStyleDefs;
     /**
      * Adds the internal <defs> node.
      */

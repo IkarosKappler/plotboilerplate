@@ -17,7 +17,8 @@
  * @modified 2022-05-11 Modified the `clone` function by just copying the numeric calues, not re-calculating the whole color.
  * @modified 2022-05-11 Fixed the `interpolate` function.
  * @modified 2023-01-23 Added `Color.set(Color)` function to set all values (r,g,b,h,s,l,a) simultanoeusly.
- * @version 0.0.12
+ * @modified 2024-03-10 Fixed some NaN type check for Typescript 5 compatibility.
+ * @version 0.0.13
  **/
 /**
  * @classdesc A color class, inspired by neolitec's Javascript class.
@@ -254,7 +255,8 @@ export class Color {
     //     return this;
     //   }
     saturate(v) {
-        if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+        // if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+        if ("string" == typeof v && v.indexOf("%") > -1 && !Number.isNaN(v = parseInt(v))) {
             this.s += (1 - this.s) * (v / 100);
         }
         else if ("number" == typeof v) {
@@ -278,7 +280,8 @@ export class Color {
         return this;
     }
     desaturate(v) {
-        if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+        // if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+        if ("string" == typeof v && v.indexOf("%") > -1 && !Number.isNaN(v = parseInt(v))) {
             this.s -= v / 100;
         }
         else if ("number" == typeof v) {
@@ -321,7 +324,8 @@ export class Color {
     //     return this;
     //   }
     lighten(v) {
-        if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+        // if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+        if ("string" == typeof v && v.indexOf("%") > -1 && !Number.isNaN(v = parseInt(v))) {
             this.l += (1 - this.l) * (v / 100);
         }
         else if ("number" == typeof v) {
@@ -345,7 +349,8 @@ export class Color {
         return this;
     }
     darken(v) {
-        if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+        // if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+        if ("string" == typeof v && v.indexOf("%") > -1 && !Number.isNaN(v = parseInt(v))) {
             this.l -= this.l * (v / 100);
         }
         else if ("number" == typeof v) {
@@ -369,7 +374,8 @@ export class Color {
         return this;
     }
     fadein(v) {
-        if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+        // if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+        if ("string" == typeof v && v.indexOf("%") > -1 && !Number.isNaN(v = parseInt(v))) {
             this.a += (1 - this.a) * (v / 100);
         }
         else if ("number" == typeof v) {
@@ -394,7 +400,8 @@ export class Color {
         return this;
     }
     fadeout(v) {
-        if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+        // if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+        if ("string" == typeof v && v.indexOf("%") > -1 && !Number.isNaN(v = parseInt(v))) {
             this.a -= v / 100;
         }
         else if ("number" == typeof v) {
@@ -418,11 +425,14 @@ export class Color {
         return this;
     }
     spin(v) {
-        if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN)
+        // if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) this.h += v / 100;
+        if ("string" == typeof v && v.indexOf("%") > -1 && !Number.isNaN(v = parseInt(v))) {
             this.h += v / 100;
-        else if ("number" == typeof v)
+        }
+        else if ("number" == typeof v) {
             // range 360
             this.h += v / 360;
+        }
         else
             throw new Error("error: bad modifier format (percent or number)");
         if (this.h > 1)
@@ -572,14 +582,17 @@ Color.Sanitizer = {
         for (var i = 0; i < arguments.length; i++) {
             var c = arguments[i];
             if ("string" == typeof c && c.indexOf("%") > -1) {
-                if ((c = parseInt(c)) == NaN)
+                // if ((c = parseInt(c)) == NaN) throw new Error("Bad format");
+                if (Number.isNaN(c = parseInt(c))) {
                     throw new Error("Bad format");
+                }
                 if (c < 0 || c > 100)
                     throw new Error("Bad format");
                 o[i] = c / 100;
             }
             else {
-                if ("string" == typeof c && (c = parseInt(c)) == NaN) {
+                // if ("string" == typeof c && (c = parseInt(c)) == NaN) {
+                if ("string" == typeof c && Number.isNaN(c = parseInt(c))) {
                     throw new Error("Bad format");
                 }
                 if (c < 0) {
@@ -605,15 +618,19 @@ Color.Sanitizer = {
         if (arguments.length < 3 || arguments.length > 4)
             throw new Error("3 or 4 arguments required");
         var h = arguments[0], s = arguments[1], l = arguments[2];
-        if ("string" == typeof h && (h = parseFloat(h)) == NaN)
+        // if ("string" == typeof h && (h = parseFloat(h)) == NaN) throw new Error("Bad format for hue");
+        if ("string" == typeof h && Number.isNaN(h = parseFloat(h))) {
             throw new Error("Bad format for hue");
+        }
         if (h < 0 || h > 360)
             throw new Error("Hue out of range (0..360)");
         else if ((("" + h).indexOf(".") > -1 && h > 1) || ("" + h).indexOf(".") == -1)
             h /= 360;
         if ("string" == typeof s && s.indexOf("%") > -1) {
-            if ((s = parseInt(s)) == NaN)
+            // if ((s = parseInt(s)) == NaN) throw new Error("Bad format for saturation");
+            if (Number.isNaN(s = parseInt(s))) {
                 throw new Error("Bad format for saturation");
+            }
             if (s < 0 || s > 100)
                 throw new Error("Bad format for saturation");
             s /= 100;
@@ -621,8 +638,10 @@ Color.Sanitizer = {
         else if (s < 0 || s > 1)
             throw new Error("Bad format for saturation");
         if ("string" == typeof l && l.indexOf("%") > -1) {
-            if ((l = parseInt(l)) == NaN)
+            // if ((l = parseInt(l)) == NaN) throw new Error("Bad format for lightness");
+            if (Number.isNaN(l = parseInt(l))) {
                 throw new Error("Bad format for lightness");
+            }
             if (l < 0 || l > 100)
                 throw new Error("Bad format for lightness");
             l /= 100;

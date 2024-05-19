@@ -3,9 +3,9 @@
 /* The Modal (background) */
 .modal {
     /* display: none; */ /* Hidden by default */
+    font-family: sans-serif, Open Sans, Droid Sans, PT Sans, Asap, Calibri;
     position: fixed; /* Stay in place */
     z-index: 1000; /* Sit on top */
-    padding-top: 100px; /* Location of the box */
     left: 0;
     top: 0;
     width: 100%; /* Full width */
@@ -19,6 +19,12 @@
     display : block !important;
 }
 
+.modal .modal-backdrop {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
 .modal-closed {
     display : none !important;
 }
@@ -27,7 +33,10 @@
 .modal-content {
     position: relative;
     background-color: #fefefe;
-    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10%;
+    margin-bottom: 10%;
     padding: 0;
     border: 1px solid #888;
     width: 80%;

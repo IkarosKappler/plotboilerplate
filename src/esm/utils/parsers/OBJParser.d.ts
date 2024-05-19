@@ -11,8 +11,8 @@
  * @date 2021-04-21
  * @version 0.0.1
  */
-declare type VertHandler = (x: number, y: number, z: number) => void;
-declare type FaceHandler = (a: number, b: number, c: number) => void;
+type VertHandler = (x: number, y: number, z: number) => void;
+type FaceHandler = (a: number, b: number, c: number) => void;
 export declare class OBJParser {
     private handleVert;
     private handleFace;

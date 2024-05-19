@@ -15,7 +15,7 @@
  * @author  Ikaros Kappler
  * @version 1.0.0
  */
-export declare type DataGridFace4<T> = [[T | null, T | null], [T | null, T | null]];
+export type DataGridFace4<T> = [[T | null, T | null], [T | null, T | null]];
 export interface IDataGrid2d<T> {
     readonly xSegmentCount: number;
     readonly ySegmentCount: number;

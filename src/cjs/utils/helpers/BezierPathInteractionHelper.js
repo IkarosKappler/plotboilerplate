@@ -22,7 +22,8 @@
  * @modified 2021-01-03 Added following new functions: `addPathVertexDragStartListeners`, `removePathVertexDragStartListeners`, `addPathVertexDragEndListeners` and `removePathVertexDragEndListeners`.
  * @modified 2021-03-31 Fixed the issue with the new AlloyFinger (Typescript).
  * @modified 2022-02-03 Changing the element to catch events (eventCatcher instead of canvas).
- * @version  1.1.2
+ * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
+ * @version  1.1.3
  *
  * @file BezierPathInteractionHelper
  * @public
@@ -467,7 +468,7 @@ var BezierPathInteractionHelper = /** @class */ (function () {
         this.currentT = closestT;
         this.currentPathIndex = pathIndex;
         this.currentDistance = minDist;
-        this.currentA.set(closestPoint);
+        closestPoint && this.currentA.set(closestPoint);
     };
     // +---------------------------------------------------------------------------------
     // | Sets all vertices on the given path to `bezierAutoAdjust=true`.

@@ -31,7 +31,8 @@
  * @modified 2022-11-28 Added the `subXY`, `subX` and `subY` methods to the `Vertex` class.
  * @modified 2023-09-29 Downgraded types for the `Vertex.utils.buildArrowHead` function (replacing Vertex params by more generic XYCoords type).
  * @modified 2023-09-29 Added the `Vertex.abs()` method as it seems useful.
- * @version  2.8.0
+ * @modified 2024-03-08 Added the optional `precision` param to the `toString` method.
+ * @version  2.9.0
  *
  * @file Vertex
  * @public
@@ -571,8 +572,13 @@ export class Vertex {
      * @instance
      * @memberof Vertex
      **/
-    toString() {
-        return "(" + this.x + "," + this.y + ")";
+    toString(precision) {
+        if (typeof precision === "undefined") {
+            return "(" + this.x + "," + this.y + ")";
+        }
+        else {
+            return "(" + this.x.toFixed(precision) + "," + this.y.toFixed(precision) + ")";
+        }
     }
     /**
      * This function should invalidate any installed listeners and invalidate this object.

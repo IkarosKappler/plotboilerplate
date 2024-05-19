@@ -32,6 +32,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -219,10 +221,10 @@ var MouseHandler = /** @class */ (function () {
             name: eventName,
             isTouchEvent: false,
             pos: rel,
-            button: event.button,
-            leftButton: event.button === 0,
-            middleButton: event.button === 1,
-            rightButton: event.button === 2,
+            button: event.button, // this.mouseButton,
+            leftButton: event.button === 0, // this.mouseButton === 0,
+            middleButton: event.button === 1, // this.mouseButton === 1,
+            rightButton: event.button === 2, // this.mouseButton === 2,
             mouseDownPos: (_a = this.mouseDownPos) !== null && _a !== void 0 ? _a : { x: NaN, y: NaN },
             draggedFrom: (_b = this.mouseDragPos) !== null && _b !== void 0 ? _b : { x: NaN, y: NaN },
             wasDragged: this.mouseDownPos != null && (this.mouseDownPos.x != rel.x || this.mouseDownPos.y != rel.y),
@@ -390,7 +392,7 @@ var MouseHandler = /** @class */ (function () {
      * @return {void}
      */
     MouseHandler.prototype.throwAlreadyInstalled = function (name) {
-        throw "This MouseHandler already has a '" + name + "' callback. To keep the code simple there is only room for one.";
+        throw "This MouseHandler already has a '".concat(name, "' callback. To keep the code simple there is only room for one.");
     };
     /**
      * Call this when your work is done.

@@ -19,7 +19,7 @@ export interface VertEventParams extends XMouseParams {
 export interface VertEvent {
     params: VertEventParams;
 }
-export declare type VertListener = (e: VertEvent) => void;
+export type VertListener = (e: VertEvent) => void;
 /**
  * @classdesc An event listeners wrapper. This is just a set of three listener
  *              queues (drag, dragStart, dragEnd) and their respective firing

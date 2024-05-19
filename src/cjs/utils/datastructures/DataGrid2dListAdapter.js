@@ -19,7 +19,7 @@ var DataGrid2dListAdapter = /** @class */ (function () {
      */
     function DataGrid2dListAdapter(list, xSegmentCount, ySegmentCount) {
         if (xSegmentCount * ySegmentCount > list.length) {
-            throw "Cannot create DataGrid2dListAdapter, the list (length " + list.length + ") does not provide enough items for " + xSegmentCount + "x" + ySegmentCount + " required entries.";
+            throw "Cannot create DataGrid2dListAdapter, the list (length ".concat(list.length, ") does not provide enough items for ").concat(xSegmentCount, "x").concat(ySegmentCount, " required entries.");
         }
         // this.canvas = document.getElementById(canvasId);
         this.xSegmentCount = xSegmentCount;

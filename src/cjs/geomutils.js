@@ -39,14 +39,14 @@ exports.geomutils = {
         if (insideAngle < 0)
             insideAngle = 2 * Math.PI + insideAngle;
         if (!clockwise)
-            insideAngle = (2 * Math.PI - insideAngle) * (-1);
+            insideAngle = (2 * Math.PI - insideAngle) * -1;
         // Scale the rotated lines to the max leg length (looks better)
         var lineLength = Math.max(lineAB.length(), lineAC.length());
         var scaleFactor = lineLength / lineAB.length();
         var result = [];
         for (var i = 1; i < n; i++) {
             // Compute the i-th inner sector line
-            result.push(new Line_1.Line(pA, pB.clone().rotate((-i * (insideAngle / n)), pA)).scale(scaleFactor));
+            result.push(new Line_1.Line(pA, pB.clone().rotate(-i * (insideAngle / n), pA)).scale(scaleFactor));
         }
         return result;
     },
