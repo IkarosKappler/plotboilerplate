@@ -1991,13 +1991,13 @@ var CircleSector = /** @class */ (function () {
         }
     };
     /**
-     * Get the geometric intersection sector of this and some other sector.
+     * Get the angle inside this sector for a given ratio. 0.0 means startAngle, and 1.0 means endAngle.
      *
-     * @param {number} angle - The numeric angle to check.
-     * @method containsAngle
+     * @param {number} t - The ratio inside [0..1].
+     * @method angleAt
      * @instance
      * @memberof CircleSector
-     * @return {boolean} True if (and only if) this sector contains the given angle.
+     * @return {number} The angle inside this sector at a given ratio.
      */
     CircleSector.prototype.angleAt = function (t) {
         if (this.startAngle <= this.endAngle) {
@@ -2074,14 +2074,6 @@ var CircleSector = /** @class */ (function () {
         // If not: reverse result.
         var gapSector = new CircleSector(this.circle, this.endAngle, this.startAngle);
         var centerOfOriginalGap = gapSector.angleAt(0.5);
-        // console.log(
-        //   "Circle",
-        //   this.uid,
-        //   "centerOfOriginalGap",
-        //   centerOfOriginalGap,
-        //   "contains?",
-        //   this.containsAngle(centerOfOriginalGap)
-        // );
         var resultSector = new CircleSector(new Circle_1.Circle(this.circle.center.clone(), this.circle.radius), thisIntersectionAngleA, thisIntersectionAngleB);
         if (resultSector.containsAngle(centerOfOriginalGap)) {
             resultSector.startAngle = thisIntersectionAngleB;
