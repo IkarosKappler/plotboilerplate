@@ -234,7 +234,12 @@
         var radiusPoint = circle.vertAt(Math.PI * 1.75);
         pb.add(radiusPoint);
         circleHelpers.push(new CircleHelper(circle, radiusPoint));
+        // Install resize listeners
         radiusPoint.listeners.addDragListener(function (_evt) {
+          rebuildMetaballs();
+        });
+        // Install move listeners
+        metaballs.inputCircles[i].center.listeners.addDragListener(function (e) {
           rebuildMetaballs();
         });
       }
@@ -243,12 +248,6 @@
     var reinit = function () {
       arrayResize(metaballs.inputCircles, config.numCircles, getRandomCircle);
       rebuildMetaballs();
-      // Install move listeners
-      for (var i = 0; i < metaballs.inputCircles.length; i++) {
-        metaballs.inputCircles[i].center.listeners.addDragListener(function (e) {
-          rebuildMetaballs();
-        });
-      }
       pb.removeAll();
       installCircleHelpers();
       pb.add(metaballs.inputCircles);
