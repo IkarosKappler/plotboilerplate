@@ -146,7 +146,11 @@
       for (var i = 0; i < metaballs.inverseCirclesPairs.length; i++) {
         var circlePair = metaballs.inverseCirclesPairs[i];
         // Step 1: draw inverse circle arcs (these two connect circleA and circleB)
-        if (!circlePair.doIntersect || circlePair.circleB.containsPoint(circlePair.circleA.center)) {
+        if (
+          !circlePair.doIntersect ||
+          circlePair.circleB.containsPoint(circlePair.circleA.center) ||
+          circlePair.circleA.containsPoint(circlePair.circleB.center)
+        ) {
           // drawInverseCircleArcs(draw, fill, circlePair);
           var circleArcA = createInvserseCircleArc(
             circlePair.inverseCircleA,
@@ -161,7 +165,11 @@
           allCircleSectors.push(circleArcA, circleArcB);
         }
         // Step 2: Collect rest of original circles if intersection is not enough for meta connection.
-        if (circlePair.doIntersect && !circlePair.circleB.containsPoint(circlePair.circleA.center)) {
+        if (
+          circlePair.doIntersect &&
+          !circlePair.circleB.containsPoint(circlePair.circleA.center) &&
+          !circlePair.circleA.containsPoint(circlePair.circleB.center)
+        ) {
           var circleArcA = createInvserseCircleArc(
             circlePair.baseCircleA,
             circlePair.circlePointsA[1],
