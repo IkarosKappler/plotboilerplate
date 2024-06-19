@@ -18,6 +18,7 @@
     "compile-typescript-module": "tsc -p tsconfig.module.json",
     "compile-typescript-demo": "cd bin && ./run-compile-demo-ts.sh",
     "mkdocs": "cd bin && ./run-mk-typedocs.sh",
+    "mk-release": "cd bin && ./run-mk-zippackage.sh",
     "server": "npx http-server",
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack-browser": "npx webpack --mode production --config ./webpack5.browser.config.js",
