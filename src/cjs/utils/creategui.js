@@ -8,7 +8,8 @@
  * @date     2020-03-30
  * @modified 2020-04-03 Added empty default global object 'utils'. Added createGUI as an optional child.
  * @modified 2023-09-29 Added try-catch for color attributes; invalid values might break construction of whole gui.
- * @version  1.0.2
+ * @modified 2024-06-25 Replacing dat.gui by equivalent lil-gui calls. Collapsing all lil-gui folders (are open by default).
+ * @version  1.1.0
  **/
 var utils = (globalThis.utils = globalThis.utils || {});
 
@@ -31,8 +32,8 @@ globalThis.utils.guiFolders = globalThis.utils.guiFolders || {};
  * @method createGUI
  * @memberof utils
  * @param {PlotBoilerplate} pb
- * @param {DatGuiProps} props
- * @return {dat.gui.GUI}
+ * @param {DatGuiProps|LilGuiProps} props
+ * @return {dat.gui.GUI|lil-gui.GUI}
  **/
 globalThis.utils.createGUI = function (pb, props) {
   var dummy = {
@@ -44,14 +45,29 @@ globalThis.utils.createGUI = function (pb, props) {
     resetScale: function () {
       pb.setZoom(1.0, 1.0, new Vertex(0, 0));
       pb.redraw();
-    }
+    },
+    guiDoubleSize: false
   };
 
+  // var gui = new dat.gui.GUI(props);
+  var gui = new lil.GUI(props);
+
+  var mobileDevice = globalThis.hasOwnProperty("isMobileDevice") && typeof "isMobileDevice" == "function" && isMobileDevice();
+  var guiSize = guiSizeToggler(gui, dummy, { transformOrigin: "top right" });
+  if (mobileDevice) {
+    dummy.guiDoubleSize = true;
+    guiSize.update();
+  }
+
   var _self = pb;
-  var gui = new dat.gui.GUI(props);
-  gui.remember(pb.config);
-  var fold0 = gui.addFolder("Editor settings");
-  var fold00 = fold0.addFolder("Canvas size");
+  gui
+    .add(dummy, "guiDoubleSize")
+    .name("doubleGUISize")
+    .onChange(function () {
+      guiSize.update();
+    });
+  var fold0 = gui.addFolder("Editor settings").close();
+  var fold00 = fold0.addFolder("Canvas size").close();
   fold00
     .add(pb.config, "fullSize")
     .onChange(function () {
@@ -133,7 +149,7 @@ globalThis.utils.createGUI = function (pb, props) {
     .title("CSS uniform scale (x-scale equlsa y-scale).");
   fold00.add(pb.config, "setToRetina").name("Set to highres fullsize").title("Set canvas to high-res retina resoultion (x2).");
 
-  var fold01 = fold0.addFolder("Draw settings");
+  var fold01 = fold0.addFolder("Draw settings").close();
   fold01
     .add(pb.drawConfig, "drawBezierHandlePoints")
     .onChange(function () {
@@ -165,7 +181,7 @@ globalThis.utils.createGUI = function (pb, props) {
     })
     .title("Draw vertices in general.");
 
-  const fold0100 = fold01.addFolder("Colors and Lines");
+  const fold0100 = fold01.addFolder("Colors and Lines").close();
   const _addDrawConfigElement = function (fold, basePath, conf) {
     for (var i in conf) {
       if (typeof conf[i] == "object") {
@@ -286,7 +302,7 @@ globalThis.utils.createGUI = function (pb, props) {
   fold0.add(dummy, "resetScale").title("Reset the draw scale to (1.,1.).");
 
   if (pb.config.enableSVGExport) {
-    var foldExport = gui.addFolder("Export");
+    var foldExport = gui.addFolder("Export").close();
     foldExport.add(pb.config, "saveFile").name("SVG Image").title("Save as SVG.");
     globalThis.utils.guiFolders["editor_settings.export"] = foldExport;
   }

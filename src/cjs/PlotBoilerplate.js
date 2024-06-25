@@ -1763,7 +1763,8 @@ var PlotBoilerplate = /** @class */ (function () {
                 return { x: pos.x - bounds.left, y: pos.y - bounds.top };
             };
             // Make PB work together with both, AlloyFinger as a esm module or a commonjs function.
-            if (typeof globalThis["AlloyFinger"] === "function" || typeof globalThis["createAlloyFinger"] === "function") {
+            if (typeof globalThis["AlloyFinger"] === "function" ||
+                typeof globalThis["createAlloyFinger"] === "function") {
                 try {
                     var touchMovePos = null;
                     var touchDownPos = null;
@@ -1965,7 +1966,7 @@ var PlotBoilerplate = /** @class */ (function () {
             return utils.createGUI(this, props);
         }
         else {
-            throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an the dat.GUI library?";
+            throw "Cannot create dat.GUI or lil-gui instance; did you load the ./utils/creategui helper function an the dat.GUI/lil-gui library?";
         }
     };
     var _a;

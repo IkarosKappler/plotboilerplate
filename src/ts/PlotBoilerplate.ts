@@ -126,7 +126,8 @@ import {
   SVGPathParams,
   XYCoords,
   XYDimension,
-  DatGuiProps
+  DatGuiProps, // DEPRECATED. Please do not use any more.
+  LilGuiProps
 } from "./interfaces";
 import { PBText } from "./PBText";
 import { AlloyFingerOptions } from "alloyfinger-typescript/src/cjs/alloy_finger";
@@ -706,7 +707,10 @@ export class PlotBoilerplate {
     if (typeof globalThis["saveAs" as keyof Object] !== "function") {
       throw "Cannot save file; did you load the ./utils/savefile helper function and the eligrey/SaveFile library?";
     }
-    var _saveAs : (blob:Blob, filename:string) => void = globalThis["saveAs" as keyof Object] as (blob:Blob, filename:string) => void;
+    var _saveAs: (blob: Blob, filename: string) => void = globalThis["saveAs" as keyof Object] as (
+      blob: Blob,
+      filename: string
+    ) => void;
     _saveAs(blob, "plotboilerplate.svg");
   }
 
@@ -2024,7 +2028,10 @@ export class PlotBoilerplate {
       };
 
       // Make PB work together with both, AlloyFinger as a esm module or a commonjs function.
-      if (typeof globalThis["AlloyFinger" as keyof Object] === "function" || typeof globalThis["createAlloyFinger" as keyof Object] === "function") {
+      if (
+        typeof globalThis["AlloyFinger" as keyof Object] === "function" ||
+        typeof globalThis["createAlloyFinger" as keyof Object] === "function"
+      ) {
         try {
           var touchMovePos: Vertex | undefined | null = null;
           var touchDownPos: Vertex | undefined | null = null;
@@ -2162,7 +2169,10 @@ export class PlotBoilerplate {
           } as unknown as AlloyFingerOptions; // END afProps
           if (window["createAlloyFinger" as keyof Object]) {
             // window["createAlloyFinger"](this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
-            const createAlloyFinger = window["createAlloyFinger" as keyof Object] as (elem:HTMLElement|SVGElement, afProps:AlloyFingerOptions ) => void;
+            const createAlloyFinger = window["createAlloyFinger" as keyof Object] as (
+              elem: HTMLElement | SVGElement,
+              afProps: AlloyFingerOptions
+            ) => void;
             createAlloyFinger(this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
           } else {
             /* tslint:disable-next-line */
@@ -2214,16 +2224,18 @@ export class PlotBoilerplate {
    * @memberof PlotBoilerplate
    * @return {dat.gui.GUI}
    **/
-  createGUI(props?: DatGuiProps): GUI {
+  createGUI(props?: DatGuiProps | LilGuiProps): GUI {
     // This function moved to the helper utils.
     // We do not want to include the whole dat.GUI package.
-    const utils: {createGUI? : (pb:PlotBoilerplate,props:DatGuiProps|undefined)=>GUI } | undefined = globalThis["utils" as keyof Object] as any as {createGUI? : (pb:PlotBoilerplate,props:DatGuiProps|undefined)=>GUI } | undefined;
+    const utils: { createGUI?: (pb: PlotBoilerplate, props: DatGuiProps | undefined) => GUI } | undefined = globalThis[
+      "utils" as keyof Object
+    ] as any as { createGUI?: (pb: PlotBoilerplate, props: DatGuiProps | undefined) => GUI } | undefined;
     // if (globalThis["utils"] && typeof globalThis["utils"].createGUI == "function") {
     //   return (globalThis["utils" as keyof Object] as any as ({createGUI : (pb:PlotBoilerplate,props:DatGuiProps|undefined)=>GUI })).createGUI(this, props);
     if (utils && typeof utils.createGUI === "function") {
       return utils.createGUI(this, props);
-    } else { 
-      throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an the dat.GUI library?";
+    } else {
+      throw "Cannot create dat.GUI or lil-gui instance; did you load the ./utils/creategui helper function an the dat.GUI/lil-gui library?";
     }
   }
 

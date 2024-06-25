@@ -373,7 +373,6 @@
     // | Initialize dat.gui
     // +-------------------------------
     var gui = new dat.gui.GUI();
-    gui.remember(config);
     var f0 = gui.addFolder("Lightning algorithm");
 
     f0.add(config, "animate").listen().title("Toggle animation on/off.").onChange(startAnimation);

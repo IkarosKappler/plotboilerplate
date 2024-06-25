@@ -93,6 +93,7 @@
   },
   "dependencies": {
     "alloyfinger-typescript": "^0.1.19",
+    "lil-gui": "^0.19.2",
     "path2d-polyfill": "^1.1.0"
   }
 }

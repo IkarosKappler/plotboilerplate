@@ -95,7 +95,8 @@ import { Bounds } from "./Bounds";
 import { Grid } from "./Grid";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { IDraggable, Config, DrawLib, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension, DatGuiProps } from "./interfaces";
+import { IDraggable, Config, DrawLib, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension, DatGuiProps, // DEPRECATED. Please do not use any more.
+LilGuiProps } from "./interfaces";
 /**
  * @classdesc The main class of the PlotBoilerplate.
  *
@@ -784,7 +785,7 @@ export declare class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {dat.gui.GUI}
      **/
-    createGUI(props?: DatGuiProps): GUI;
+    createGUI(props?: DatGuiProps | LilGuiProps): GUI;
     /**
      * A set of helper functions.
      **/

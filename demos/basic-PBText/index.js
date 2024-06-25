@@ -81,7 +81,6 @@
     // | Initialize dat.gui for this demo.
     // +-------------------------------
     var gui = new dat.gui.GUI();
-    gui.remember(config);
     var toggleGuiSize = function () {
       // TODO: put into separate function
       gui.domElement.style["transform-origin"] = "100% 0%";
