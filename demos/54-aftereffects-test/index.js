@@ -467,8 +467,6 @@
     // +-------------------------------
     {
       var gui = pb.createGUI();
-      // console.log("gui", gui);
-      // var gui = new lil.GUI();
       // prettier-ignore
       gui.add(config, "numCircles").min(1).max(10).step(1).onChange( function() { reinit(); rebuildMetaballs(); pb.redraw(); } ).name('numCircles').title("Number of circles.");
       // prettier-ignore
