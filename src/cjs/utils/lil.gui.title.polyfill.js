@@ -26,7 +26,6 @@ the super class as the reference is not maintained */
 
   eachController(function (controller) {
     if (!controller.prototype.hasOwnProperty("title")) {
-      console.log("x");
       controller.prototype.title = setTitle;
     }
   });

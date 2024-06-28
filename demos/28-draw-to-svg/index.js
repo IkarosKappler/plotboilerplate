@@ -59,7 +59,7 @@
     // +---------------------------------------------------------------------------------
     // | Use a helper function to build all demo-drawables.
     // +-------------------------------
-    var drawables = createDemoDrawables(pb.viewport(), "../../example-image.png", function () {
+    var drawables = createDemoDrawables(pb, "../../example-image.png", function () {
       pb.redraw();
     });
     pb.add(drawables);

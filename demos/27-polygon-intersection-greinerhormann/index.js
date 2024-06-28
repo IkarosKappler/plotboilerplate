@@ -277,7 +277,7 @@
         useConvexAlgorithm: false,
         triangulate: false,
         triangulationMethod: "Delaunay", // [ "Delaunay", "Earcut" ]
-        clearSelfIntersections: true,
+        clearSelfIntersections: false,
         drawDelaunayCircles: false,
 
         test_random: function () {

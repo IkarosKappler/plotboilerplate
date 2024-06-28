@@ -2,11 +2,18 @@
 
 Todo:
 
+- lightning algorithm fix black background
+- demo 34: fail to compute foutier transform with array length != 8, whats going on here?
+- check greiner hormann (27): doing weird stuff when "clearSelfIntersecting=true"
+
 - remove data.gui
 - integrate gui size toggler into default features.
 - add new guiSizeToggler to all demos.
 - metacircles demo: SVG export not working
 
+* 2024-06-28
+  - Fixing an initialization bug in the contour plot demo (48).
+  - Fixing the demo Draw-to-svg (28).
 * 2024-06-25
   - Replacing dat.gui (deprecated) by lil-gui.
   - Updating demos for lil-gui.

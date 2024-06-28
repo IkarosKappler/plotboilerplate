@@ -326,7 +326,11 @@
       if (options.addTo3DPreview) {
         // console.log("Add contour");
         // contourScene.addContour(polyonHierarchyTree);
-        contourScene.addAllPolygonContainmentTrees(polygonContainmentTrees);
+        try {
+          contourScene.addAllPolygonContainmentTrees(polygonContainmentTrees);
+        } catch (exc) {
+          console.warn("Failed to addAllPolygonContainmentTrees.", exc);
+        }
       }
     };
 
