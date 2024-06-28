@@ -15,6 +15,8 @@ Todo:
 * 2024-06-28
   - Fixing an initialization bug in the contour plot demo (48).
   - Fixing the demo Draw-to-svg (28).
+  - Replaceing dat.gui by lil-gui in all demos.
+  - Adding nice colors to the vectorfield demo (04).
 * 2024-06-25
   - Replacing dat.gui (deprecated) by lil-gui.
   - Updating demos for lil-gui.
