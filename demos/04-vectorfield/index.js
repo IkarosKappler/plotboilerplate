@@ -72,10 +72,15 @@
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
         showFieldVectors: true,
-        animate: false
+        animate: false,
+        shortVecColor: "#008800",
+        longVecColor: "#ff0000"
       },
       GUP
     );
+    var shortVecColor = Color.parse(config.shortVecColor);
+    var longVecColor = Color.parse(config.longVecColor);
+    var vectorMaxLength = Math.min(pb.viewport().width, pb.viewport().height) / 2;
 
     // +---------------------------------------------------------------------------------
     // | Add some interactive control Vectors.
@@ -134,8 +139,14 @@
 
         adjustVector_radial(controlVector, strength, vector);
       }
-      if (vector.length() > 0) pb.draw.arrow(vector.a, vector.b, "#e888e8");
-      else pb.draw.dot(vector.a, "#e800e8");
+      var vecLen = vector.length();
+      if (vecLen > 0) {
+        var ratio = Math.min(1.0, vecLen / vectorMaxLength);
+        var color = shortVecColor.clone().interpolate(longVecColor, ratio);
+        pb.draw.arrow(vector.a, vector.b, color.cssRGB()); //"#e888e8");
+      } else {
+        pb.draw.dot(vector.a, "#e800e8");
+      }
     }
     function preDraw(draw, fill) {
       if (config.showFieldVectors) {
@@ -175,7 +186,9 @@
 
     function adjustVector_radial(controlVector, strength, anyVector) {
       var dist = controlVector.a.distance(anyVector.a);
-      if (dist > strength) return;
+      if (dist > strength) {
+        return;
+      }
       var influence = dist - strength;
       anyVector.b.x += (controlVector.a.x - controlVector.b.x) * (influence / strength);
       anyVector.b.y += (controlVector.a.y - controlVector.b.y) * (influence / strength);
@@ -212,6 +225,20 @@
         })
         .name("Animate a point cloud")
         .title("Animate a point cloud.");
+      f0.addColor(config, "shortVecColor")
+        .onChange(function () {
+          shortVecColor = Color.parse(config.shortVecColor);
+          pb.redraw();
+        })
+        .name("The color of short vectors.")
+        .title("The color of short vectors.");
+      f0.addColor(config, "longVecColor")
+        .onChange(function () {
+          longVecColor = Color.parse(config.longVecColor);
+          pb.redraw();
+        })
+        .name("The color of long vectors.")
+        .title("The color of long vectors.");
       f0.open();
     }
 

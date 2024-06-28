@@ -91,29 +91,8 @@ globalThis.utils.createGUI = (function () {
 
     // Try to initialise dat.gui (old demos) or lil-gui (new demos). They have the ~same~ signature.
     var gui = _tryGetGUIInstance(props);
-    // if (
-    //   globalThis.hasOwnProperty("dat") &&
-    //   typeof globalThis["dat"] == "object" &&
-    //   globalThis["dat"].hasOwnProperty("gui") &&
-    //   typeof globalThis["dat"]["gui"] == "object"
-    // ) {
-    //   console.log("Creating dat.gui");
-    //   gui = new dat.gui.GUI(props);
-    // } else if (
-    //   globalThis.hasOwnProperty("lil") &&
-    //   typeof globalThis["lil"] == "object" &&
-    //   globalThis["lil"].hasOwnProperty("GUI") &&
-    //   typeof globalThis["lil"]["GUI"] == "object"
-    // ) {
-    //   gui = new lil.GUI(props);
-    // } else {
-    //   console.warn("Warning: cannot create GUI. Nor dat.gui not lil-gui seem present.");
-    //   return null;
-    // }
-
     var mobileDevice = _tryDetectMobileDevice();
-    // globalThis.hasOwnProperty("isMobileDevice") && typeof globalThis["isMobileDevice"] == "function" && isMobileDevice();
-    var guiSize = _tryGetGUISizeToggler(gui, dummy); // guiSizeToggler(gui, dummy, { transformOrigin: "top right" });
+    var guiSize = _tryGetGUISizeToggler(gui, dummy);
     if (mobileDevice && guiSize) {
       dummy.guiDoubleSize = true;
       guiSize.update();
@@ -132,7 +111,6 @@ globalThis.utils.createGUI = (function () {
     fold0.close(); // important only for lil-gui
     var fold00 = fold0.addFolder("Canvas size");
     fold00.close(); // important only for lil-gui
-    console.log("fol00", fold00);
 
     fold00
       .add(pb.config, "fullSize")
