@@ -5,6 +5,12 @@ the super class as the reference is not maintained */
   var eachController = function (fnc) {
     // Only in super controller required (?)
     fnc(lil.Controller);
+    fnc(lil.BooleanController);
+    fnc(lil.ColorController);
+    fnc(lil.FunctionController);
+    fnc(lil.OptionController);
+    fnc(lil.NumberController);
+    fnc(lil.StringController);
   };
 
   var setTitle = function (v) {
@@ -20,6 +26,7 @@ the super class as the reference is not maintained */
 
   eachController(function (controller) {
     if (!controller.prototype.hasOwnProperty("title")) {
+      console.log("x");
       controller.prototype.title = setTitle;
     }
   });

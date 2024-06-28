@@ -38,6 +38,14 @@ globalThis.utils.guiFolders = globalThis.utils.guiFolders || {};
 globalThis.utils.createGUI = (function () {
   var _tryGetGUIInstance = function (props) {
     if (
+      globalThis.hasOwnProperty("lil") &&
+      typeof globalThis["lil"] == "object" &&
+      globalThis["lil"].hasOwnProperty("GUI") &&
+      typeof globalThis["lil"]["GUI"] == "function"
+    ) {
+      console.log("Creating lil");
+      return new lil.GUI(props);
+    } else if (
       globalThis.hasOwnProperty("dat") &&
       typeof globalThis["dat"] == "object" &&
       globalThis["dat"].hasOwnProperty("gui") &&
@@ -45,15 +53,6 @@ globalThis.utils.createGUI = (function () {
     ) {
       console.log("Creating dat.gui");
       return new dat.gui.GUI(props);
-    } else if (
-      globalThis.hasOwnProperty("lil") &&
-      typeof globalThis["lil"] == "object" &&
-      globalThis["lil"].hasOwnProperty("GUI") &&
-      typeof globalThis["lil"]["GUI"] == "object"
-    ) {
-      console.log("Creating lil-gui");
-
-      return new lil.GUI(props);
     } else {
       console.warn("Warning: cannot create GUI. Nor dat.gui not lil-gui seem present.");
       return null;
@@ -64,9 +63,12 @@ globalThis.utils.createGUI = (function () {
     return globalThis.hasOwnProperty("isMobileDevice") && typeof globalThis["isMobileDevice"] == "function" && isMobileDevice();
   };
 
-  var _tryGetGUISizeToggler = function () {
+  var _tryGetGUISizeToggler = function (gui, dummyConfig) {
+    if (!gui) {
+      return null;
+    }
     if (globalThis.hasOwnProperty("guiSizeToggler") && typeof globalThis["guiSizeToggler"] == "function") {
-      return guiSizeToggler(gui, dummy, { transformOrigin: "top right" });
+      return guiSizeToggler(gui, dummyConfig, { transformOrigin: "top right" });
     } else {
       console.warn("Warning: cannot create GUI's double size checkbox. guiSizeToggler is not present.");
       return null;
@@ -111,7 +113,7 @@ globalThis.utils.createGUI = (function () {
 
     var mobileDevice = _tryDetectMobileDevice();
     // globalThis.hasOwnProperty("isMobileDevice") && typeof globalThis["isMobileDevice"] == "function" && isMobileDevice();
-    var guiSize = _tryGetGUISizeToggler(); // guiSizeToggler(gui, dummy, { transformOrigin: "top right" });
+    var guiSize = _tryGetGUISizeToggler(gui, dummy); // guiSizeToggler(gui, dummy, { transformOrigin: "top right" });
     if (mobileDevice && guiSize) {
       dummy.guiDoubleSize = true;
       guiSize.update();
@@ -127,9 +129,10 @@ globalThis.utils.createGUI = (function () {
         });
     }
     var fold0 = gui.addFolder("Editor settings");
-    fold0.close(); // important only for lil-gui only
+    fold0.close(); // important only for lil-gui
     var fold00 = fold0.addFolder("Canvas size");
-    fold00.close(); // important only for lil-gui only
+    fold00.close(); // important only for lil-gui
+    console.log("fol00", fold00);
 
     fold00
       .add(pb.config, "fullSize")
@@ -213,7 +216,7 @@ globalThis.utils.createGUI = (function () {
     fold00.add(pb.config, "setToRetina").name("Set to highres fullsize").title("Set canvas to high-res retina resoultion (x2).");
 
     var fold01 = fold0.addFolder("Draw settings");
-    fold01.close(); // important only for lil-gui only
+    fold01.close(); // important only for lil-gui
 
     fold01
       .add(pb.drawConfig, "drawBezierHandlePoints")
@@ -247,7 +250,7 @@ globalThis.utils.createGUI = (function () {
       .title("Draw vertices in general.");
 
     const fold0100 = fold01.addFolder("Colors and Lines");
-    fold0100.close(); // important only for lil-gui only
+    fold0100.close(); // important only for lil-gui
 
     const _addDrawConfigElement = function (fold, basePath, conf) {
       for (var i in conf) {
@@ -370,7 +373,7 @@ globalThis.utils.createGUI = (function () {
 
     if (pb.config.enableSVGExport) {
       var foldExport = gui.addFolder("Export");
-      foldExport.close(); // important only for lil-gui only
+      foldExport.close(); // important only for lil-gui
       foldExport.add(pb.config, "saveFile").name("SVG Image").title("Save as SVG.");
       globalThis.utils.guiFolders["editor_settings.export"] = foldExport;
     }
