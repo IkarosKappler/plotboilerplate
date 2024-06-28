@@ -5,6 +5,7 @@ Todo:
 - lightning algorithm fix black background
 - demo 34: fail to compute foutier transform with array length != 8, whats going on here?
 - check greiner hormann (27): doing weird stuff when "clearSelfIntersecting=true"
+- check demo-18; neighbourhood graph; DEV version not working any more.
 
 - remove data.gui
 - integrate gui size toggler into default features.
