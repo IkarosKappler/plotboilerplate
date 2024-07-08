@@ -38,3 +38,18 @@
 
 .background {
 }
+
+.full-scrreen-size {
+  width: 100vw;
+  height: 100vh;
+}
+
+.center-v {
+  display: flex;
+  justify-content: center;
+}
+
+.center-h {
+  display: flex;
+  align-items: center;
+}

@@ -497,9 +497,14 @@
       gui.addColor(tmpConf, "color").onChange(function (newValue) {
         console.log("New value (0)", newValue);
       });
-      gui.addColorWithAlpha(tmpConf, "color", "colorAlpha").onChange(function (newColorValue, newAlphaValue) {
-        console.log("New value (1)", newColorValue, newAlphaValue);
-      });
+      gui
+        .addColorWithAlpha(tmpConf, "color", "colorAlpha")
+        .onChange(function (newColorValue, newAlphaValue) {
+          console.log("New value (1)", newColorValue, newAlphaValue);
+        })
+        .name("TEST")
+        .title("test");
+      globalThis.myGui = gui;
     }
 
     pb.config.postDraw = redraw;
