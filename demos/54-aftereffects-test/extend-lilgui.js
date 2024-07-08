@@ -60,7 +60,7 @@ lil.ColorWithAlphaController = function (parent, object, colorProperty, alphaPro
   };
 
   this.baseColorController.onChange(function (newColorValue) {
-    this._fireOnChange();
+    _self._fireOnChange();
   });
 
   this.baseColorController.$widget.appendChild(this.$alpha);
@@ -68,7 +68,7 @@ lil.ColorWithAlphaController = function (parent, object, colorProperty, alphaPro
 // lil.ColorWithAlphaController.prototype = lil.ColorController.prototype;
 lil.ColorWithAlphaController.prototype = Object.assign({}, lil.ColorController.prototype);
 lil.ColorWithAlphaController.prototype.updateDisplay = function (newValue) {
-  this.alphaDisplay.innerHTML = newValue;
+  this.alphaDisplay.innerHTML = newValue.toFixed(2);
 };
 lil.GUI.prototype.addColorWithAlpha = function (object, colorProperty, alphaProperty, rgbScale) {
   var cntrlr = new lil.ColorWithAlphaController(this, object, colorProperty, alphaProperty, rgbScale);
