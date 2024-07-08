@@ -489,6 +489,17 @@
       gui.add(config, "epsilonPathDetect").min(0.0).max(1.0).onChange( function() { rebuildMetaballs(); pb.redraw(); } ).name('epsilonPathDetect').title("Which epslion to use for connected path detection.");
       // prettier-ignore
       gui.add(config, "readme").name('readme').title("Display this demo's readme.");
+
+      var tmpConf = {
+        color: "#ff0000",
+        colorAlpha: 0.0
+      };
+      gui.addColor(tmpConf, "color").onChange(function (newValue) {
+        console.log("New value (0)", newValue);
+      });
+      gui.addColorWithAlpha(tmpConf, "color", "colorAlpha").onChange(function (newColorValue, newAlphaValue) {
+        console.log("New value (1)", newColorValue, newAlphaValue);
+      });
     }
 
     pb.config.postDraw = redraw;

@@ -11,6 +11,9 @@ Todo:
 - integrate gui size toggler into default features.
 - add new guiSizeToggler to all demos.
 - metacircles demo: SVG export not working
+- check if the old color class is still used anywhere
+
+- Finish after-effects filter.
 
 * 2024-06-28
   - Fixing an initialization bug in the contour plot demo (48).
