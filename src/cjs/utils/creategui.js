@@ -43,7 +43,7 @@ globalThis.utils.createGUI = (function () {
       globalThis["lil"].hasOwnProperty("GUI") &&
       typeof globalThis["lil"]["GUI"] == "function"
     ) {
-      console.log("Creating lil");
+      // console.log("Creating lil");
       return new lil.GUI(props);
     } else if (
       globalThis.hasOwnProperty("dat") &&
@@ -51,7 +51,7 @@ globalThis.utils.createGUI = (function () {
       globalThis["dat"].hasOwnProperty("gui") &&
       typeof globalThis["dat"]["gui"] == "object"
     ) {
-      console.log("Creating dat.gui");
+      // console.log("Creating dat.gui");
       return new dat.gui.GUI(props);
     } else {
       console.warn("Warning: cannot create GUI. Nor dat.gui not lil-gui seem present.");

@@ -20,6 +20,9 @@
   // Fetch the GET params
   let GUP = gup();
 
+  // Export the current GUI so other demos can use it.
+  _context.demoInitializationObserver = new InitializationObserver(5000);
+
   window.addEventListener("load", function () {
     var isDarkmode = detectDarkMode(GUP);
     var params = new Params(GUP);
@@ -71,6 +74,7 @@
         drawInverseCircles: params.getBoolean("drawInverseCircles", true),
         drawOuterHull: params.getBoolean("drawOuterHull", true),
         epsilonPathDetect: 0.1,
+        isAnimated: false,
         readme: function () {
           globalThis.displayDemoMeta();
         }
@@ -84,7 +88,7 @@
 
     // Find intersections, radical lines and interval
     // Array<number>
-    var innerCircleIndices = null;
+    // var innerCircleIndices = null;
     // Matrix<Line | null>
     var radicalLineMatrix = null;
     // Array<CircularIntervalSet>
@@ -108,7 +112,7 @@
       metaballs.rebuild({ metaRadiusAddon: config.metaRadiusAddon });
 
       // Find intersections, radical lines and interval
-      innerCircleIndices = CircleIntersections.findInnerCircles(metaballs.containingCircles);
+      // innerCircleIndices = CircleIntersections.findInnerCircles(metaballs.containingCircles);
       radicalLineMatrix = CircleIntersections.buildRadicalLineMatrix(metaballs.containingCircles);
       intervalSets = CircleIntersections.findOuterCircleIntervals(metaballs.containingCircles, radicalLineMatrix);
       outerPathListSectors = CircleIntersections.findOuterPartitionsAsSectors(metaballs.containingCircles, intervalSets);
@@ -259,6 +263,8 @@
       pb.removeAll();
       installCircleHelpers();
       pb.add(metaballs.inputCircles);
+      animator = null;
+      toggleAnimation();
     };
 
     var init = function () {
@@ -426,37 +432,75 @@
     };
 
     // +---------------------------------------------------------------------------------
+    // | Some animation stuff.
+    // +-------------------------------
+    var animator = null;
+
+    function toggleAnimation() {
+      if (config.isAnimated) {
+        if (!animator) {
+          var pointList = circleHelpers.reduce(function (accu, circleHelper) {
+            accu.push(circleHelper.circle.center);
+            accu.push(circleHelper.radiusPoint);
+            return accu;
+          }, []);
+          animator = new SinoidVertexAnimator(pointList, pb.viewport(), function () {
+            for (var i = 0; i < circleHelpers.length; i++) {
+              circleHelpers[i].circle.radius = circleHelpers[i].circle.center.distance(circleHelpers[i].radiusPoint);
+            }
+            rebuildMetaballs();
+            pb.redraw();
+          });
+        }
+        if (animator) {
+          animator.start();
+        }
+      } else {
+        if (animator) {
+          console.log("Stopping animator");
+          animator.stop();
+        }
+        pb.redraw();
+      }
+    }
+
+    // +---------------------------------------------------------------------------------
     // | Initialize dat.gui
     // +-------------------------------
     {
       var gui = pb.createGUI();
+      var fold = gui.addFolder("Metacircles");
       // prettier-ignore
-      gui.add(config, "numCircles").min(1).max(10).step(1).onChange( function() { reinit(); rebuildMetaballs(); pb.redraw(); } ).name('numCircles').title("Number of circles.");
+      fold.add(config, "numCircles").min(1).max(10).step(1).onChange( function() { reinit(); rebuildMetaballs(); pb.redraw(); } ).name('numCircles').title("Number of circles.");
       // prettier-ignore
-      gui.add(config, "metaRadiusAddon").min(0).max(100).step(1).onChange(function () {
+      fold.add(config, "metaRadiusAddon").min(0).max(100).step(1).onChange(function () {
         // rebuildContainingCircles();
         rebuildMetaballs();
         pb.redraw();
       }).name("metaRadiusAddon").title("The metaball connection factor.");
       // prettier-ignore
-      gui.add(config, "drawCircles").onChange( function() { toggleCircleVisibility(); pb.redraw(); } ).name('drawCircles').title("Draw circles?");
+      fold.add(config, "drawCircles").onChange( function() { toggleCircleVisibility(); pb.redraw(); } ).name('drawCircles').title("Draw circles?");
       // prettier-ignore
-      gui.add(config, "drawContainingCircles").onChange( function() { pb.redraw(); } ).name('drawContainingCircles').title("Draw containing circles?");
+      fold.add(config, "drawContainingCircles").onChange( function() { pb.redraw(); } ).name('drawContainingCircles').title("Draw containing circles?");
       // prettier-ignore
-      gui.add(config, "drawInverseCircles").onChange( function() { pb.redraw(); } ).name('drawInverseCircles').title("Draw inverse circles at intersection points?");
+      fold.add(config, "drawInverseCircles").onChange( function() { pb.redraw(); } ).name('drawInverseCircles').title("Draw inverse circles at intersection points?");
       // prettier-ignore
-      gui.add(config, "drawCircleNumbers").onChange( function() { pb.redraw(); } ).name('drawCircleNumbers').title("Draw circle numbers?");
+      fold.add(config, "drawCircleNumbers").onChange( function() { pb.redraw(); } ).name('drawCircleNumbers').title("Draw circle numbers?");
       // prettier-ignore
-      gui.add(config, "drawOuterHull").onChange( function() { pb.redraw(); } ).name('drawOuterHull').title("Draw outer hull?");
+      fold.add(config, "drawOuterHull").onChange( function() { pb.redraw(); } ).name('drawOuterHull').title("Draw outer hull?");
       // prettier-ignore
-      gui.add(config, "epsilonPathDetect").min(0.0).max(1.0).onChange( function() { rebuildMetaballs(); pb.redraw(); } ).name('epsilonPathDetect').title("Which epslion to use for connected path detection.");
+      fold.add(config, "epsilonPathDetect").min(0.0).max(1.0).onChange( function() { rebuildMetaballs(); pb.redraw(); } ).name('epsilonPathDetect').title("Which epslion to use for connected path detection.");
       // prettier-ignore
-      gui.add(config, "readme").name('readme').title("Display this demo's readme.");
+      fold.add(config, "isAnimated").onChange( function() { toggleAnimation(); } ).name('isAnimated').title("Check to toggle animation.");
+      // prettier-ignore
+      fold.add(config, "readme").name('readme').title("Display this demo's readme.");
     }
 
     pb.config.postDraw = redraw;
     init();
     rebuildMetaballs();
     pb.redraw();
+
+    demoInitializationObserver.accept(pb);
   });
 })(window);

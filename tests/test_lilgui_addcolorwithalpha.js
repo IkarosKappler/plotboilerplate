@@ -27,9 +27,8 @@
     // | Initialize dat.gui
     // +-------------------------------
     var gui = new lil.GUI();
-    gui.add(config, "alpha").min(0.0).max(1.0);
     gui.addColor(config, "color").onChange(showColor);
-    gui.addColorWithAlpha(config, "color", "alpha").onChange(showColor);
+    gui.addColorWithAlpha(config, "color", "alpha").name("color & alpha").onChange(showColor);
 
     showColor();
   });

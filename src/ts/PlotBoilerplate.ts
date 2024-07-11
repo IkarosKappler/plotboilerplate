@@ -83,7 +83,9 @@
  * @modified 2023-02-10 Cleaning up most type errors in the main class (mostly null checks).
  * @modified 2023-02-10 Adding `enableZoom` and `enablePan` (both default true) to have the option to disable these functions.
  * @modified 2023-09-29 Adding proper dicionary key and value types to the params of `PlotBoilerplate.utils.safeMergeByKeys` (was `object` before).
- * @version  1.17.3
+ * @modified 2024-07-08 Adding `PlotBoilerplate.getGUI()` to retrieve the GUI instance.
+ *
+ * @version  1.18.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -326,6 +328,11 @@ export class PlotBoilerplate {
    * @private
    */
   private renderTime: number = 0;
+
+  /**
+   * A storage variable for retrieving the GUI instance once it was created.
+   */
+  private _gui: GUI | null = null;
 
   /**
    * The constructor.
@@ -2233,10 +2240,19 @@ export class PlotBoilerplate {
     // if (globalThis["utils"] && typeof globalThis["utils"].createGUI == "function") {
     //   return (globalThis["utils" as keyof Object] as any as ({createGUI : (pb:PlotBoilerplate,props:DatGuiProps|undefined)=>GUI })).createGUI(this, props);
     if (utils && typeof utils.createGUI === "function") {
-      return utils.createGUI(this, props);
+      return (this._gui = utils.createGUI(this, props));
     } else {
       throw "Cannot create dat.GUI or lil-gui instance; did you load the ./utils/creategui helper function an the dat.GUI/lil-gui library?";
     }
+  }
+
+  /**
+   * Retriebe the GUI once it was created. If the `createGUI` method was not called or failed to create any
+   * GUI then null is returned.
+   * @returns {GUI | null}
+   */
+  getGUI(): GUI | null {
+    return this._gui;
   }
 
   /**

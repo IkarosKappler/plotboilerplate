@@ -15,6 +15,11 @@ Todo:
 
 - Finish after-effects filter.
 
+* 2024-07-11
+  - Adding vertex animator to the metaballs demo.
+* 2024-07-09
+  - Adding `PlotBoilerplate.getGUI()` to retrieve the GUI instance.
+  - Adding `InitializationObserver` to detect when any demo has loaded and initialized its content.
 * 2024-06-28
   - Fixing an initialization bug in the contour plot demo (48).
   - Fixing the demo Draw-to-svg (28).

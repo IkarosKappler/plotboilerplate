@@ -7,13 +7,11 @@ input[type="range"] {
 
   /***** Chrome, Safari, Opera, and Edge Chromium *****/
   input[type="range"]::-webkit-slider-runnable-track {
-    /* background: #053a5f; */
     height: 0.5rem;
   }
 
   /******** Firefox ********/
   input[type="range"]::-moz-range-track {
-    /* background: #053a5f; */
     height: 100%;
   }
 

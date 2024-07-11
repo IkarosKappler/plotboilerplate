@@ -83,7 +83,9 @@
  * @modified 2023-02-10 Cleaning up most type errors in the main class (mostly null checks).
  * @modified 2023-02-10 Adding `enableZoom` and `enablePan` (both default true) to have the option to disable these functions.
  * @modified 2023-09-29 Adding proper dicionary key and value types to the params of `PlotBoilerplate.utils.safeMergeByKeys` (was `object` before).
- * @version  1.17.3
+ * @modified 2024-07-08 Adding `PlotBoilerplate.getGUI()` to retrieve the GUI instance.
+ *
+ * @version  1.18.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -95,7 +97,8 @@ import { Bounds } from "./Bounds";
 import { Grid } from "./Grid";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { IDraggable, Config, DrawLib, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension, DatGuiProps } from "./interfaces";
+import { IDraggable, Config, DrawLib, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension, DatGuiProps, // DEPRECATED. Please do not use any more.
+LilGuiProps } from "./interfaces";
 /**
  * @classdesc The main class of the PlotBoilerplate.
  *
@@ -263,6 +266,10 @@ export declare class PlotBoilerplate {
      * @private
      */
     private renderTime;
+    /**
+     * A storage variable for retrieving the GUI instance once it was created.
+     */
+    private _gui;
     /**
      * The constructor.
      *
@@ -784,7 +791,13 @@ export declare class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {dat.gui.GUI}
      **/
-    createGUI(props?: DatGuiProps): GUI;
+    createGUI(props?: DatGuiProps | LilGuiProps): GUI;
+    /**
+     * Retriebe the GUI once it was created. If the `createGUI` method was not called or failed to create any
+     * GUI then null is returned.
+     * @returns {GUI | null}
+     */
+    getGUI(): GUI | null;
     /**
      * A set of helper functions.
      **/

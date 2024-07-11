@@ -2,6 +2,8 @@
  * A color-with-alpha extension for lil-gui, adding the missing `alpha` control input.
  * For lil-gui see https://github.com/georgealways/lil-gui
  *
+ * Demo: https://www.int2byte.de/public/plotboilerplate/tests/test_lilgui_addcolorwithalpha.html
+ *
  * Adds a new controller which can be called like
  *  `new lil.GUI()
  *    .addColorWithAlpha( { color: '#ff0000', alpha: 0.0 },
