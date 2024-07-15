@@ -54,8 +54,8 @@ lil.ColorWithAlphaController = function (parent, object, colorProperty, alphaPro
   alphaContainer.appendChild(this.alphaDisplay);
 
   /** Fetch the color-controller's display container and append our additional element */
-  var displayContainer = this.baseColorController.$widget.querySelectorAll(".display")[0];
-  displayContainer.appendChild(alphaContainer);
+  // var displayContainer = this.baseColorController.$widget.querySelectorAll(".display")[0];
+  // displayContainer.appendChild(alphaContainer);
 
   /** This is just a dummy function so we don't need to check for null */
   this._handleChange = function () {

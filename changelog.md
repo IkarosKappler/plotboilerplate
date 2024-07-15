@@ -15,6 +15,9 @@ Todo:
 
 - Finish after-effects filter.
 
+* 2024-07-15
+  - Adding lil-gui extension for numbers-with-checkbox.
+  - Approach to add a configurable controller set for CSS backdrop filters.
 * 2024-07-11
   - Adding vertex animator to the metaballs demo.
 * 2024-07-09

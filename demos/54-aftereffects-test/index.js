@@ -429,7 +429,9 @@
     // ------ NEW
     var effectsConfig = {
       color: "#ff0000",
-      colorAlpha: 0.95
+      colorAlpha: 0.95,
+      myNumber: 0.5,
+      myNumberEnabled: true
     };
 
     var getOpacityPct = function () {
@@ -528,6 +530,17 @@
             })
             .name("TEST")
             .title("test");
+          gui
+            .addNumberWithCheckbox(effectsConfig, "myNumber", "myNumberEnabled")
+            .onChange(function (newColorValue, newAlphaValue) {
+              console.log("New value (1)", newColorValue, newAlphaValue);
+              updateBackdropFilter();
+            })
+            .min(0.0)
+            .max(1.0)
+            .step(0.01)
+            .name("myNumber")
+            .title("myNumber");
           // globalThis.myGui = gui;
         }
 
