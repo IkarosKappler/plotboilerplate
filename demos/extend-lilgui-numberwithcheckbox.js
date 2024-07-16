@@ -27,7 +27,9 @@ lil.NumberWithCheckboxController = function (parent, object, numberProperty, boo
   //     <input type="checkbox" aria-labelledby="lil-gui-name-1">
   this.$checkbox = document.createElement("input");
   this.$checkbox.setAttribute("type", "checkbox");
-  this.$checkbox.setAttribute("checked", Boolean(object[booleanProperty]));
+  if (Boolean(object[booleanProperty])) {
+    this.$checkbox.setAttribute("checked", "checked");
+  }
   this.$checkbox.style["min-width"] = "var(--checkbox-size)"; // "15px";
   this.$checkbox.style["max-width"] = "var(--checkbox-size)"; // "15px";
   this.$checkbox.style["width"] = "var(--checkbox-size)"; // "15px";
@@ -54,10 +56,12 @@ lil.NumberWithCheckboxController = function (parent, object, numberProperty, boo
   });
 
   this._appylNewCheckboxValue = function (isChecked) {
+    console.log("Setting property value for", booleanProperty, "to", isChecked);
     object[booleanProperty] = isChecked;
   };
 
   this._handleCheckboxChange = function (newIsChecked) {
+    console.log("_handleCheckboxChange", newIsChecked);
     if (newIsChecked) {
       _self._enableByCheckbox();
     } else {

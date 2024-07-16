@@ -434,30 +434,30 @@
       myNumberEnabled: true
     };
 
-    var getOpacityPct = function () {
-      return "" + effectsConfig.colorAlpha * 100.0 + "%";
-    };
+    // var getOpacityPct = function () {
+    //   return "" + effectsConfig.colorAlpha * 100.0 + "%";
+    // };
 
-    var getBackdropFilterString = function () {
-      console.log("getOpacityPct", getOpacityPct());
-      var buffer = [];
-      // buffer.push("blur(5px)");
-      buffer.push("invert(80%)");
-      buffer.push("sepia(90%)");
-      buffer.push("blur(2px)");
-      // buffer.push("brightness(60%)");
-      buffer.push("contrast(90%)");
-      // buffer.push("drop-shadow(4px 4px 10px blue)");
-      // buffer.push("grayscale(30%)");
-      // buffer.push("hue-rotate(120deg)");
-      // buffer.push("invert(70%)");
-      // buffer.push("opacity(20%)");
-      buffer.push("opacity(" + getOpacityPct() + ")");
-      // buffer.push("sepia(90%)");
-      buffer.push("saturate(100%)");
+    // var getBackdropFilterString = function () {
+    //   console.log("getOpacityPct", getOpacityPct());
+    //   var buffer = [];
+    //   // buffer.push("blur(5px)");
+    //   buffer.push("invert(80%)");
+    //   buffer.push("sepia(90%)");
+    //   buffer.push("blur(2px)");
+    //   // buffer.push("brightness(60%)");
+    //   buffer.push("contrast(90%)");
+    //   // buffer.push("drop-shadow(4px 4px 10px blue)");
+    //   // buffer.push("grayscale(30%)");
+    //   // buffer.push("hue-rotate(120deg)");
+    //   // buffer.push("invert(70%)");
+    //   // buffer.push("opacity(20%)");
+    //   buffer.push("opacity(" + getOpacityPct() + ")");
+    //   // buffer.push("sepia(90%)");
+    //   buffer.push("saturate(100%)");
 
-      return buffer.join(" ");
-    };
+    //   return buffer.join(" ");
+    // };
 
     var canvas = document.getElementById("my-canvas");
     var canvasParent = canvas.parentElement;
@@ -478,10 +478,11 @@
 
     canvasParent.appendChild(effectsNode);
 
-    var updateBackdropFilter = function () {
-      effectsNode.style["backdrop-filter"] = getBackdropFilterString();
+    var updateBackdropFilter = function (newBackdropFilterString) {
+      console.log("backdropFilter", newBackdropFilterString);
+      effectsNode.style["backdrop-filter"] = newBackdropFilterString; // getBackdropFilterString();
     };
-    updateBackdropFilter();
+    // updateBackdropFilter();
     // ----- /NEW
 
     globalThis.demoInitializationObserver
@@ -494,54 +495,34 @@
         // +---------------------------------------------------------------------------------
         // | Initialize dat.gui
         // +-------------------------------
-        {
-          //     var gui = pb.createGUI();
-          //     // prettier-ignore
-          //     gui.add(config, "numCircles").min(1).max(10).step(1).onChange( function() { reinit(); rebuildMetaballs(); pb.redraw(); } ).name('numCircles').title("Number of circles.");
-          //     // prettier-ignore
-          //     gui.add(config, "metaRadiusAddon").min(0).max(100).step(1).onChange(function () {
-          //   // rebuildContainingCircles();
-          //   rebuildMetaballs();
-          //   pb.redraw();
-          // }).name("metaRadiusAddon").title("The metaball connection factor.");
-          //     // prettier-ignore
-          //     gui.add(config, "drawCircles").onChange( function() { toggleCircleVisibility(); pb.redraw(); } ).name('drawCircles').title("Draw circles?");
-          //     // prettier-ignore
-          //     gui.add(config, "drawContainingCircles").onChange( function() { pb.redraw(); } ).name('drawContainingCircles').title("Draw containing circles?");
-          //     // prettier-ignore
-          //     gui.add(config, "drawInverseCircles").onChange( function() { pb.redraw(); } ).name('drawInverseCircles').title("Draw inverse circles at intersection points?");
-          //     // prettier-ignore
-          //     gui.add(config, "drawCircleNumbers").onChange( function() { pb.redraw(); } ).name('drawCircleNumbers').title("Draw circle numbers?");
-          //     // prettier-ignore
-          //     gui.add(config, "drawOuterHull").onChange( function() { pb.redraw(); } ).name('drawOuterHull').title("Draw outer hull?");
-          //     // prettier-ignore
-          //     gui.add(config, "epsilonPathDetect").min(0.0).max(1.0).onChange( function() { rebuildMetaballs(); pb.redraw(); } ).name('epsilonPathDetect').title("Which epslion to use for connected path detection.");
-          //     // prettier-ignore
-          //     gui.add(config, "readme").name('readme').title("Display this demo's readme.");
-
+        try {
           gui.addColor(effectsConfig, "color").onChange(function (newValue) {
             console.log("New value (0)", newValue);
           });
-          gui
-            .addColorWithAlpha(effectsConfig, "color", "colorAlpha")
-            .onChange(function (newColorValue, newAlphaValue) {
-              console.log("New value (1)", newColorValue, newAlphaValue);
-              updateBackdropFilter();
-            })
-            .name("TEST")
-            .title("test");
-          gui
-            .addNumberWithCheckbox(effectsConfig, "myNumber", "myNumberEnabled")
-            .onChange(function (newColorValue, newAlphaValue) {
-              console.log("New value (1)", newColorValue, newAlphaValue);
-              updateBackdropFilter();
-            })
-            .min(0.0)
-            .max(1.0)
-            .step(0.01)
-            .name("myNumber")
-            .title("myNumber");
-          // globalThis.myGui = gui;
+          // gui
+          //   .addColorWithAlpha(effectsConfig, "color", "colorAlpha")
+          //   .onChange(function (newColorValue, newAlphaValue) {
+          //     console.log("New value (1)", newColorValue, newAlphaValue);
+          //     updateBackdropFilter();
+          //   })
+          //   .name("TEST")
+          //   .title("test");
+          // gui
+          //   .addNumberWithCheckbox(effectsConfig, "myNumber", "myNumberEnabled")
+          //   .onChange(function (newColorValue, newAlphaValue) {
+          //     console.log("New value (1)", newColorValue, newAlphaValue);
+          //     updateBackdropFilter();
+          //   })
+          //   .min(0.0)
+          //   .max(1.0)
+          //   .step(0.01)
+          //   .name("myNumber")
+          //   .title("myNumber");
+
+          var cssBackdropFolder = gui.addFolder("CSS Backdrop Filters");
+          var result = createCssBackdropFilterSelector(cssBackdropFolder, updateBackdropFilter);
+        } catch (exc) {
+          console.error(exc);
         }
 
         // pb.config.postDraw = redraw;
