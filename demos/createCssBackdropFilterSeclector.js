@@ -11,7 +11,7 @@
   };
 
   var getBackdropFilterString = function (config, onBackdropStringChange) {
-    // console.log("getOpacityPct", ratio2pct(config.opactiy));
+    // console.log("getOpacityPct", ratio2pct(config.opacity));
     // console.log("config", config);
     var buffer = [];
     if (config.isBlurEnabled) {
@@ -43,7 +43,7 @@
       buffer.push("invert(" + ratio2pct(config.invert) + ")");
     }
     if (config.isOpacityEnabled) {
-      buffer.push("opacity(" + ratio2pct(config.opactiy) + ")");
+      buffer.push("opacity(" + ratio2pct(config.opacity) + ")");
     }
     if (config.isSaturateEnabled) {
       buffer.push("saturate(" + ratio2pct(config.saturate) + ")");
@@ -59,7 +59,7 @@
 
   var createDefaultConfig = function () {
     return {
-      opactiy: 0.5,
+      opacity: 0.5,
       isOpacityEnabled: false,
       invert: 0.8,
       isInvertEnabled: false,
@@ -95,8 +95,8 @@
 
     // prettier-ignore
     guiFolder
-        .addNumberWithCheckbox(config, "opactiy", "isOpacityEnabled").onChange(handleChange)
-        .min(0.0).max(1.0).step(0.01).name("opactiy").title("opactiy");
+        .addNumberWithCheckbox(config, "opacity", "isOpacityEnabled").onChange(handleChange)
+        .min(0.0).max(1.0).step(0.01).name("opacity").title("opacity");
     // prettier-ignore
     guiFolder
         .addNumberWithCheckbox(config, "invert", "isInvertEnabled").onChange(handleChange)
@@ -137,6 +137,8 @@
     guiFolder
         .addNumberWithCheckbox(config, "saturate", "isSaturateEnabled").onChange(handleChange)
         .min(0.0).max(1.0).step(0.01).name("saturate").title("saturate");
+
+    return handleChange;
   }; // END funcition createCssBackdropFilterSelector
 
   console.log("createCssBackdropFilterSelector", createCssBackdropFilterSelector);

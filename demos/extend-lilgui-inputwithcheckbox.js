@@ -83,12 +83,12 @@
     });
 
     _self._appylNewCheckboxValue = function (isChecked) {
-      console.log("Setting property value for", booleanProperty, "to", isChecked);
+      //   console.log("Setting property value for", booleanProperty, "to", isChecked);
       object[booleanProperty] = isChecked;
     };
 
     _self._handleCheckboxChange = function (newIsChecked) {
-      console.log("_handleCheckboxChange", newIsChecked);
+      //   console.log("_handleCheckboxChange", newIsChecked);
       if (newIsChecked) {
         _self._enableByCheckbox();
       } else {
@@ -111,7 +111,7 @@
     };
 
     _self._enableByCheckbox = function () {
-      console.log("remove");
+      //   console.log("remove");
       this.baseController.$widget.classList.remove("disabled-bycheckbox");
     };
 

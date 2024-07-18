@@ -50,10 +50,16 @@
     var updateBackdropFilter = function (newBackdropFilterString, config) {
       console.log("backdropFilter", newBackdropFilterString);
       // effectsNode.style["background-color"] = effectsConfig.effectFilterColor;
-      if (config.isOpacityEnabled) {
-        effectsNode.style["background-color"] = "rgba(255,0,0,0.5)";
+      // console.log("new value", "rgba(255,0,0," + config.opacity + ")", config);
+      console.log(effectsConfig.isEffectsColorEnabled);
+      if (effectsConfig.isEffectsColorEnabled) {
+        // TODO: find correct color here
+        console.log("SET");
+        effectsNode.style["background-color"] = "rgba(255,0,0," + config.opacity + ")";
       } else {
-        effectsNode.style["background-color"] = "none";
+        console.log("UNSET");
+        effectsNode.style["background-color"] = ""; // rgb(0,255,0)";
+        // unset(effectsNode.style["background-color"]);
       }
       effectsNode.style["backdrop-filter"] = newBackdropFilterString;
     };
@@ -77,6 +83,7 @@
             .addColorWithCheckbox(effectsConfig, "effectFilterColor", "isEffectsColorEnabled")
             .onChange(function (newValue, isEnabled) {
               console.log("New color-with-checkbox value", newValue, "isEnabled", isEnabled);
+              triggerUpdateBackdropFilters();
             });
           gui.addWithCheckbox(effectsConfig, "booleanValue", "isBooleanEnabled").onChange(function (newValue, isEnabled) {
             console.log("New boolean (0)", newValue, "isEnabled", isEnabled);
@@ -102,7 +109,8 @@
           //   .title("myNumber");
 
           var cssBackdropFolder = gui.addFolder("CSS Backdrop Filters");
-          var result = createCssBackdropFilterSelector(cssBackdropFolder, updateBackdropFilter);
+          var triggerUpdateBackdropFilters = createCssBackdropFilterSelector(cssBackdropFolder, updateBackdropFilter);
+          triggerUpdateBackdropFilters();
         } catch (exc) {
           console.error(exc);
         }
