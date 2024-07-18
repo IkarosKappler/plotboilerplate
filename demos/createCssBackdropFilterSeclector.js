@@ -17,53 +17,44 @@
     if (config.isBlurEnabled) {
       buffer.push("invert(" + ratio2pct(config.invert) + ")");
     }
-
     if (config.isSepiaEnabled) {
       buffer.push("sepia(" + ratio2pct(config.sepia) + ")");
     }
-
     if (config.isBlurEnabled) {
       buffer.push("blur(" + config.blur + "px)");
     }
-
     if (config.isBrightnessEnabled) {
       buffer.push("brightness(" + ratio2pct(config.brightness) + ")");
     }
-
     if (config.isContrastEnabled) {
       buffer.push("contrast(" + ratio2pct(config.contrast) + ")");
     }
-
     if (config.isDropShaowEnabled) {
+      // TODO: use more elaborate version of drop-shadow?
       buffer.push("drop-shadow(" + config.dropShadow + "px " + config.dropShadow + "px)");
     }
-
     if (config.isGrayscaleEnabled) {
       buffer.push("grayscale(" + ratio2pct(config.grayscale) + ")");
     }
-
     if (config.isHueRotateEnabled) {
       buffer.push("hue-rotate(" + config.hueRotate + "deg)");
     }
-
     if (config.isInvertEnabled) {
       buffer.push("invert(" + ratio2pct(config.invert) + ")");
     }
-
     if (config.isOpacityEnabled) {
       buffer.push("opacity(" + ratio2pct(config.opactiy) + ")");
     }
-
     if (config.isSaturateEnabled) {
       buffer.push("saturate(" + ratio2pct(config.saturate) + ")");
     }
 
-    return buffer.join(" ");
+    return buffer.length === 0 ? "none" : buffer.join(" ");
   };
 
   var fireBackdropStringChange = function (config, onBackdropStringChange) {
     var newBackdropString = getBackdropFilterString(config, onBackdropStringChange);
-    onBackdropStringChange(newBackdropString);
+    onBackdropStringChange(newBackdropString, config);
   };
 
   var createDefaultConfig = function () {

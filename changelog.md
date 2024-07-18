@@ -14,7 +14,10 @@ Todo:
 - check if the old color class is still used anywhere
 
 - Finish after-effects filter.
+- replace all colors + alphas by the new input extension (lil-gui).
 
+* 2024-07-17
+  - Tweaking the lil-gui extension to handle different input types with checkboxes.
 * 2024-07-15
   - Adding lil-gui extension for numbers-with-checkbox.
   - Approach to add a configurable controller set for CSS backdrop filters.
