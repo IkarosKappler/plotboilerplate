@@ -40,7 +40,8 @@ done;
 echo "Creating file ${filename} ..."
 
 # Create zip file, excluding the .git directory
-tar -czf "$filename" ${SOURCE_DIR}/* --exclude "${SOURCE_DIR}/.git"
+tar -czf "$filename" "${SOURCE_DIR}/"*
+# tar -czf "$filename" "${SOURCE_DIR}/"* --exclude="${SOURCE_DIR}/.git"
 
 # Create a copy for direct linking (website)
 cp "$filename" "plotboilerplate-latest.tar.gz"
