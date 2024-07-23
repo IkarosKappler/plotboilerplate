@@ -1,6 +1,6 @@
 "use strict";
 /**
- * @requires dat.gui
+ * @requires lil-gui
  *
  * @author   Ikaros Kappler
  * @date     2021-12-13
