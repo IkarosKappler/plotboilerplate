@@ -4,10 +4,9 @@
  * Note there are some edge cases where the calculation is locally not working correctly.
  *
  * @requires PlotBoilerplate
- * @requires Bounds
- * @requires MouseHandler
+ * @requires Color
  * @requires gup
- * @requires dat.gui
+ * @requires lil-gui
  *
  * @author   Ikaros Kappler
  * @date     2024-02-06
@@ -21,12 +20,7 @@
   let GUP = gup();
 
   window.addEventListener("load", function () {
-    // Create a custom config for the after effects?
-    var effectsConfig = {
-      effectFilterColor: "#204a87",
-      isEffectsColorEnabled: true
-    };
-
+    // Create a custom config for the after effects
     var canvas = document.getElementById("my-canvas");
     var canvasParent = canvas.parentElement;
     var effectsNode = document.createElement("div");
@@ -35,14 +29,15 @@
     effectsNode.style["top"] = "0px";
     effectsNode.style["width"] = "100%";
     effectsNode.style["height"] = "100%";
+    // This is very important so the backdrop-filter element does not block input events.
     effectsNode.style["pointer-events"] = "none";
 
     canvasParent.appendChild(effectsNode);
 
     var updateBackdropFilter = function (newBackdropFilterString, config) {
       // console.log("backdropFilter", newBackdropFilterString);
-      if (effectsConfig.isEffectsColorEnabled) {
-        var colorParsed = Color.parse(effectsConfig.effectFilterColor);
+      if (config.isEffectsColorEnabled) {
+        var colorParsed = Color.parse(config.effectFilterColor);
         colorParsed.setAlpha(config.opacity);
         effectsNode.style["background-color"] = colorParsed.cssRGBA();
       } else {
@@ -59,30 +54,25 @@
         var pb = initializedPB;
         var gui = pb.getGUI();
 
+        var initialFilterValues = {};
+
         // +---------------------------------------------------------------------------------
         // | Initialize dat.gui
         // +-------------------------------
         try {
           var cssBackdropFolder = gui.addFolder("CSS Backdrop Filters");
-          cssBackdropFolder
-            .addColorWithCheckbox(effectsConfig, "effectFilterColor", "isEffectsColorEnabled")
-            .onChange(function (newValue, isEnabled) {
-              console.log("New color-with-checkbox value", newValue, "isEnabled", isEnabled);
-              triggerUpdateBackdropFilters();
-            });
-          var triggerUpdateBackdropFilters = createCssBackdropFilterSelector(cssBackdropFolder, updateBackdropFilter);
+          var triggerUpdateBackdropFilters = createCssBackdropFilterSelector(
+            cssBackdropFolder,
+            updateBackdropFilter,
+            initialFilterValues
+          );
           triggerUpdateBackdropFilters();
         } catch (exc) {
           console.error(exc);
         }
-
-        // pb.config.postDraw = redraw;
-        // init();
-        // rebuildMetaballs();
-        // pb.redraw();
       })
       .catch(function (error) {
-        console.error("Failed to retrieve PB instance.", error);
+        console.error("Failed to retrieve PB instance from parent demo.", error);
       });
   });
 })(window);
