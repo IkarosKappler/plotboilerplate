@@ -12,3 +12,15 @@ export interface DatGuiProps {
     closed?: boolean;
     closeOnTop?: boolean;
 }
+export interface GUI {
+    domElement: HTMLElement;
+}
+export interface LilGuiProps {
+    name?: string;
+    load?: object;
+    parent?: dat.GUI;
+    autoPlace?: boolean;
+    hideable?: boolean;
+    closed?: boolean;
+    closeOnTop?: boolean;
+}

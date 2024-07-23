@@ -4,7 +4,7 @@
  * @requires PlotBoilerplate
  * @requires MouseHandler
  * @requires gup
- * @requires dat.gui
+ * @requires lil-gui
  * @requires draw
  *
  * @projectname Plotboilerplate.js
@@ -192,16 +192,21 @@
       var yValues = verts.map(function (vert) {
         return vert.y;
       });
-      var a = cfft(yValues); // [1, 1, 1, 1, 0, 0, 0, 0]);
-      var b = icfft(cfft(yValues)); // [1, 1, 1, 1, 0, 0, 0, 0]));
-      console.log(a, b);
-      var FourierPolynomial = function () {
-        this.evaluate = function (value) {
-          return 0.5; // ???
+      // console.log("yValues", yValues);
+      try {
+        var a = cfft(yValues); // [1, 1, 1, 1, 0, 0, 0, 0]);
+        var b = icfft(cfft(yValues)); // [1, 1, 1, 1, 0, 0, 0, 0]));
+        console.log(a, b);
+        var FourierPolynomial = function () {
+          this.evaluate = function (value) {
+            return 0.5; // ???
+          };
         };
-      };
-      var polynomial = new FourierPolynomial();
-      drawPolynomial(draw, fill, polynomial, xValues, "green", 2);
+        var polynomial = new FourierPolynomial();
+        drawPolynomial(draw, fill, polynomial, xValues, "green", 2);
+      } catch (exc) {
+        console.warn("Failed to generate Fourier transform.", exc);
+      }
     };
 
     var drawPolynomial = function (draw, fill, polynomial, xValues, color, lineWidth) {

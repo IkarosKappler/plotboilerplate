@@ -4,7 +4,7 @@
  * @requires PlotBoilerplate
  * @requires MouseHandler
  * @requires gup
- * @requires dat.gui
+ * @requires lil-gui
  *
  *
  * @author   Ikaros Kappler
@@ -70,8 +70,8 @@
         lineThickness: 2,
         innerCircleDistance: 25,
         drawCircleIntersections: true,
-        startColor: "rgba(255,0,0,1)",
-        endColor: "rgba(0,255,0,1)"
+        startColor: "#ff0000", // "rgba(255,0,0,1)",
+        endColor: "#00ff00" // "rgba(0,255,0,1)"
       },
       GUP
     );

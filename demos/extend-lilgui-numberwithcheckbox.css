@@ -1,0 +1,4 @@
+.lil-gui .controller .widget.disabled-bycheckbox *:not(:first-child) {
+    pointer-events: none !important;
+    opacity: 0.5;
+}

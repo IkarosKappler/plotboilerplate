@@ -7,7 +7,7 @@
  * @requires getAvailableContainerSpace
  * @requires drawutilssvg
  * @requires gup
- * @requires dat.gui
+ * @requires lil-gui
  *
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
@@ -328,7 +328,6 @@
     // +-------------------------------
     // var gui = new dat.gui.GUI();
     var gui = pb.createGUI();
-    gui.remember(config);
     var guiSize = guiSizeToggler(gui, config);
     if (isMobileDevice()) {
       config.guiDoubleSize = true;

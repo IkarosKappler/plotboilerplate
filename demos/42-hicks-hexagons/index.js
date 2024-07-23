@@ -4,7 +4,7 @@
  * @requires PlotBoilerplate
  * @requires MouseHandler
  * @requires gup
- * @requires dat.gui
+ * @requires lil-gui
  *
  *
  * @author   Ikaros Kappler

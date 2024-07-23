@@ -5,7 +5,7 @@
  * @requires Bounds
  * @requires MouseHandler
  * @requires gup
- * @requires dat.gui
+ * @requires lil-gui
  * @requires three.js
  *
  * @author   Ikaros Kappler
@@ -323,6 +323,7 @@
       gui.domElement.id = "gui";
 
       var fold0 = gui.addFolder("Mesh");
+      fold0.close();
       // prettier-ignore
       fold0.add(config, "outlineSegmentCount").min(3).max(512).onChange( function() { rebuild() } ).name('outlineSegmentCount').title('The number of segments on the outline.');
       // prettier-ignore
@@ -339,6 +340,7 @@
       fold0.add(config, "closeBottom").onChange( function() { rebuild() } ).name('closeBottom').title('Close the geometry at the bottom point.');
 
       var fold1 = gui.addFolder("Hollow");
+      fold1.close();
       // prettier-ignore
       fold1.add(config, "makeHollow").onChange( function() { rebuild() } ).name('makeHollow').title('Make a hollow mold?');
       // prettier-ignore
@@ -355,6 +357,7 @@
       fold2.add(config, "closeCutAreas").onChange( function() { rebuild() } ).name('closeCutAreas').title('Close the open cut areas on the split.');
 
       var fold3 = gui.addFolder("Render Settings");
+      fold3.close();
       // prettier-ignore
       fold3.add(config, "wireframe").onChange( function() { rebuild() } ).name('wireframe').title('Display the mesh as a wireframe model?');
       // prettier-ignore
@@ -387,12 +390,14 @@
       fold3.add(config, "addPrecalculatedShapeOutlines").onChange( function() { rebuild() } ).name('addPrecalculatedShapeOutlines').title('Show raw unoptimized split shape outline(s)?');
 
       var fold4 = gui.addFolder("Export");
+      fold4.close();
       // prettier-ignore
       fold4.add(config, "exportSTL").name('STL').title('Export an STL file.');
       // prettier-ignore
       fold4.add(config, "showPathJSON").name('Show Path JSON ...').title('Show the path data.');
 
       var fold5 = gui.addFolder("Import");
+      fold5.close();
       // prettier-ignore
       fold5.add(config, "insertPathJSON").name('Insert Path JSON ...').title('Insert path data as JSON.');
 

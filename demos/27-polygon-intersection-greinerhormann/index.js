@@ -9,7 +9,7 @@
  * @requires PlotBoilerplate
  * @requires MouseHandler
  * @requires gup
- * @requires dat.gui
+ * @requires lil-gui
  * @requires greiner-hormann
  *
  * @author   Ikaros Kappler
@@ -277,7 +277,7 @@
         useConvexAlgorithm: false,
         triangulate: false,
         triangulationMethod: "Delaunay", // [ "Delaunay", "Earcut" ]
-        clearSelfIntersections: true,
+        clearSelfIntersections: false,
         drawDelaunayCircles: false,
 
         test_random: function () {

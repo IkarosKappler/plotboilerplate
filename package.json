@@ -1,6 +1,6 @@
 {
   "name": "plotboilerplate",
-  "version": "1.23.0",
+  "version": "1.23.1",
   "description": "A simple javascript plotting boilerplate for 2d stuff.",
   "private": false,
   "main": "src/cjs/index.js",
@@ -18,6 +18,7 @@
     "compile-typescript-module": "tsc -p tsconfig.module.json",
     "compile-typescript-demo": "cd bin && ./run-compile-demo-ts.sh",
     "mkdocs": "cd bin && ./run-mk-typedocs.sh",
+    "mk-release": "cd bin && ./run-mk-zippackage.sh",
     "server": "npx http-server",
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack-browser": "npx webpack --mode production --config ./webpack5.browser.config.js",
@@ -92,6 +93,7 @@
   },
   "dependencies": {
     "alloyfinger-typescript": "^0.1.19",
+    "lil-gui": "^0.19.2",
     "path2d-polyfill": "^1.1.0"
   }
 }

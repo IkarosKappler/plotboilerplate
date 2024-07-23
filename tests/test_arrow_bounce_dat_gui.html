@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Testing bouncing arrow for dat.gui</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="Testing boucing arrow.">
+    <meta name="keywords" content="javascript, css, animation, arrow, bounce">
+    <meta name="author" content="Ikaros Kappler">
+    <meta name="date" content="2020-02-13">
+    <style>
+      .myclass {
+        /* */
+      }
+      .w50 { width: 50%; }
+    </style>
+    <script src="../lib/dat.gui.min.js"></script>
+    <script src="../src/cjs/utils/dat.gui.title.polyfill.js"></script>
+    <script src="../src/cjs/utils/dat.gui.arrowbounce.polyfill.js"></script>
+    <script>
+      window.addEventListener('load', function() {
+	  var config = {
+	      animate: false
+	  };
+	  var gui = new dat.gui.GUI();
+	  var _self = this;
+	  gui.remember(this.config);
+	  var fold0 = gui.addFolder('Editor settings');
+	  fold0.add(config, 'animate').onChange( function() {  } ).name('Animate').title('Animate.').arrowBounce('Click here',{className:'myclass',fadeDelay:5000,detachAfter:6000});
+	  fold0.open();
+      } );
+    </script>
+  </head>
+  <body style="background: #f0f0f0;">
+    <p class="w50">This is just a demo how to add CTAs (action indicators) to
+    the dat.gui interface.</p>
+    <p class="w50">The function is called arrowBounce(string,string) and expects a label text and an optional class name to attach to the label.</p>
+    <p class="w50">This demos uses a class named 'hideAfter5s' which hides the label after 5 seconds using a fadeout animaion (CSS).<p>
+  </body>

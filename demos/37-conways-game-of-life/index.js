@@ -5,7 +5,7 @@
  * @requires drawutilssvg
  * @requires gup
  * @requires Biotope
- * @requires dat.gui
+ * @requires lil-gui
  *
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
@@ -365,8 +365,8 @@
     // +---------------------------------------------------------------------------------
     // | Initialize dat.gui
     // +-------------------------------
-    var gui = new dat.gui.GUI();
-    gui.remember(config);
+    // var gui = new dat.gui.GUI();
+    var gui = new lil.GUI();
     var toggleGuiSize = function () {
       gui.domElement.style["transform-origin"] = "100% 0%";
       if (config.guiDoubleSize) {
@@ -382,7 +382,7 @@
     gui.add(config, "guiDoubleSize").title("Double size GUI?").onChange(toggleGuiSize);
 
     var f0 = gui.addFolder("Biome");
-    f0.open();
+    f0.close();
 
     f0.add(config, "animate").title("Toggle animation on/off.").onChange(startAnimation);
     f0.add(config, "animationDelay").min(10).max(1000).title("The delay in milliseconds between frames.");
@@ -414,9 +414,10 @@
     f0.add(config, "nextStep");
 
     var f1 = gui.addFolder("Biomes & Creatures");
+    f1.close();
     f1.add(config, "directPaintMode").title("Paint directly without any presets.");
-    f1.add(config, "turnLeft").name("&#x21ba;").title("Left turn current preset.");
-    f1.add(config, "turnRight").name("&#x21bb;").title("Right turn current preset.");
+    f1.add(config, "turnLeft").name("↶").title("Left turn current preset.");
+    f1.add(config, "turnRight").name("↷").title("Right turn current preset.");
     f1.add(config, "preset_glider");
     f1.add(config, "preset_lightweightGlider");
     f1.add(config, "preset_middleweightGlider");
@@ -427,6 +428,7 @@
     f1.open();
 
     var f2 = gui.addFolder("Colors");
+    f2.close();
     f2.addColor(config, "backgroundColor").title("The general background color.").onChange(visualizeCreatures);
     f2.addColor(config, "lifeColor").title("The color of living cells").onChange(visualizeCreatures);
     f2.addColor(config, "traceColor").title("The color of traces.").onChange(visualizeCreatures);

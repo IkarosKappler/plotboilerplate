@@ -2,7 +2,7 @@
  * A demo to whow how to get n 'equidistant' points on a Bézier path.
  *
  * @requires gup
- * @requires dat.gui
+ * @requires lil-gui
  *
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
@@ -107,7 +107,6 @@
     // | Initialize dat.gui
     // +-------------------------------
     var gui = pb.createGUI();
-    gui.remember(config);
     var guiSize = guiSizeToggler(gui, config, { transformOrigin: "top right" });
     if (isMobileDevice()) {
       config.guiDoubleSize = true;

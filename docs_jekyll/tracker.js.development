@@ -1,3 +1,0 @@
-<!-- Add your Matomo or any other tracking code here and save this file as _tracker.js -->
-<!-- The _tracker.js file should not be checked in to your repository -->
-<!-- The build.sh script will add that code to the markdown template -->
