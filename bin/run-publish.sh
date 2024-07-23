@@ -11,7 +11,7 @@ _NC='\033[0m'
 
 while true; do
     echo -e "${_PURPLE}Do you really want to publish the new version?${_NC}"
-    read -p "webpack and jekyll will be run again in this process. (y/n)? " yn
+    read -p "webpack will be run again in this process. (y/n)? " yn
     case $yn in
         [Yy]* ) echo "Failsafe."; break;;
         [Nn]* ) exit;;
