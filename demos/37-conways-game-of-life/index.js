@@ -5,7 +5,7 @@
  * @requires drawutilssvg
  * @requires gup
  * @requires Biotope
- * @requires dat.gui
+ * @requires lil-gui
  *
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler

@@ -7,7 +7,7 @@
  * @requires getAvailableContainerSpace
  * @requires drawutilssvg
  * @requires gup
- * @requires dat.gui
+ * @requires lil-gui
  *
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler

@@ -7,7 +7,7 @@
  * @requires PlotBoilerplate
  * @requires MouseHandler
  * @requires gup
- * @requires dat.gui
+ * @requires lil-gui
  *
  * @author   Ikaros Kappler
  * @date     2023-02-24

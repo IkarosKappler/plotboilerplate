@@ -23,7 +23,7 @@
  * @requires PlotBoilerplate
  * @requires MouseHandler
  * @requires gup
- * @requires dat.gui
+ * @requires lil-gui
  * @requires path2d-polyfill (IE only)
  *
  *

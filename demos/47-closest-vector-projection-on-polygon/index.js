@@ -4,7 +4,7 @@
  * @requires PlotBoilerplate
  * @requires MouseHandler
  * @requires gup
- * @requires dat.gui
+ * @requires lil-gui
  * @requires draw
  *
  * @projectname Plotboilerplate.js

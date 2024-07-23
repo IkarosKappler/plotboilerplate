@@ -1,7 +1,7 @@
 /**
  * Test the Color class.
  *
- * @requires dat.gui
+ * @requires lil-gui
  *
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler

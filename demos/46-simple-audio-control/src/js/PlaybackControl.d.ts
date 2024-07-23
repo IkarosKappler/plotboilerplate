@@ -7,7 +7,7 @@
  * @requires PlotBoilerplate
  * @requires MouseHandler
  * @requires gup
- * @requires dat.gui
+ * @requires lil-gui
  *
  * @author   Ikaros Kappler
  * @date     2023-02-24
@@ -17,10 +17,10 @@ import { NoteSelectHandler } from "./NoteSelectHandler";
 import { MainControls } from "./MainControls";
 import { AudioControl } from "./AudioControl";
 export declare class PlaybackControl {
-    private mainControls;
-    private noteSelectHandler;
-    private currentNoteIndex;
-    private isPlaying;
-    constructor(audioControl: AudioControl, _mainControls: MainControls, _noteSelectHandler: NoteSelectHandler);
-    resetLoop(): void;
+  private mainControls;
+  private noteSelectHandler;
+  private currentNoteIndex;
+  private isPlaying;
+  constructor(audioControl: AudioControl, _mainControls: MainControls, _noteSelectHandler: NoteSelectHandler);
+  resetLoop(): void;
 }

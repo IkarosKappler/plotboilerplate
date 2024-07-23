@@ -9,7 +9,7 @@
  * @requires PlotBoilerplate
  * @requires MouseHandler
  * @requires gup
- * @requires dat.gui
+ * @requires lil-gui
  * @requires greiner-hormann
  *
  * @author   Ikaros Kappler

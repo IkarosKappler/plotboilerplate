@@ -5,7 +5,7 @@
  * @requires Bounds
  * @requires MouseHandler
  * @requires gup
- * @requires dat.gui
+ * @requires lil-gui
  *
  * @author   Ikaros Kappler
  * @date     2024-03-08

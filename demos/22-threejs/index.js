@@ -5,7 +5,7 @@
  * @requires Bounds
  * @requires MouseHandler
  * @requires gup
- * @requires dat.gui
+ * @requires lil-gui
  * @requires three.js
  *
  * @author   Ikaros Kappler
