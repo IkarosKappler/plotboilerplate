@@ -23,16 +23,8 @@
   window.addEventListener("load", function () {
     // Create a custom config for the after effects?
     var effectsConfig = {
-      effectFilterColor: "#ff0000",
-      isEffectsColorEnabled: true,
-      color: "#ff0000",
-      isColorEnabled: true,
-
-      // colorAlpha: 0.95,
-      // myNumber: 0.5,
-      // myNumberEnabled: true
-      booleanValue: false,
-      isBooleanEnabled: true
+      effectFilterColor: "#204a87",
+      isEffectsColorEnabled: true
     };
 
     var canvas = document.getElementById("my-canvas");
@@ -48,18 +40,13 @@
     canvasParent.appendChild(effectsNode);
 
     var updateBackdropFilter = function (newBackdropFilterString, config) {
-      console.log("backdropFilter", newBackdropFilterString);
-      // effectsNode.style["background-color"] = effectsConfig.effectFilterColor;
-      // console.log("new value", "rgba(255,0,0," + config.opacity + ")", config);
-      console.log(effectsConfig.isEffectsColorEnabled);
+      // console.log("backdropFilter", newBackdropFilterString);
       if (effectsConfig.isEffectsColorEnabled) {
-        // TODO: find correct color here
-        console.log("SET");
-        effectsNode.style["background-color"] = "rgba(255,0,0," + config.opacity + ")";
+        var colorParsed = Color.parse(effectsConfig.effectFilterColor);
+        colorParsed.setAlpha(config.opacity);
+        effectsNode.style["background-color"] = colorParsed.cssRGBA();
       } else {
-        console.log("UNSET");
-        effectsNode.style["background-color"] = ""; // rgb(0,255,0)";
-        // unset(effectsNode.style["background-color"]);
+        effectsNode.style["background-color"] = "";
       }
       effectsNode.style["backdrop-filter"] = newBackdropFilterString;
     };
@@ -76,39 +63,13 @@
         // | Initialize dat.gui
         // +-------------------------------
         try {
-          gui.addColor(effectsConfig, "color").onChange(function (newValue) {
-            console.log("New color", newValue);
-          });
-          gui
+          var cssBackdropFolder = gui.addFolder("CSS Backdrop Filters");
+          cssBackdropFolder
             .addColorWithCheckbox(effectsConfig, "effectFilterColor", "isEffectsColorEnabled")
             .onChange(function (newValue, isEnabled) {
               console.log("New color-with-checkbox value", newValue, "isEnabled", isEnabled);
               triggerUpdateBackdropFilters();
             });
-          gui.addWithCheckbox(effectsConfig, "booleanValue", "isBooleanEnabled").onChange(function (newValue, isEnabled) {
-            console.log("New boolean (0)", newValue, "isEnabled", isEnabled);
-          });
-          // gui
-          //   .addColorWithAlpha(effectsConfig, "color", "colorAlpha")
-          //   .onChange(function (newColorValue, newAlphaValue) {
-          //     console.log("New value (1)", newColorValue, newAlphaValue);
-          //     updateBackdropFilter();
-          //   })
-          //   .name("TEST")
-          //   .title("test");
-          // gui
-          //   .addNumberWithCheckbox(effectsConfig, "myNumber", "myNumberEnabled")
-          //   .onChange(function (newColorValue, newAlphaValue) {
-          //     console.log("New value (1)", newColorValue, newAlphaValue);
-          //     updateBackdropFilter();
-          //   })
-          //   .min(0.0)
-          //   .max(1.0)
-          //   .step(0.01)
-          //   .name("myNumber")
-          //   .title("myNumber");
-
-          var cssBackdropFolder = gui.addFolder("CSS Backdrop Filters");
           var triggerUpdateBackdropFilters = createCssBackdropFilterSelector(cssBackdropFolder, updateBackdropFilter);
           triggerUpdateBackdropFilters();
         } catch (exc) {

@@ -35,11 +35,11 @@
     };
     targetController.max = function (newMax) {
       sourceController.max(newMax);
-      return sourceController;
+      return targetController;
     };
     targetController.step = function (newStep) {
       sourceController.step(newStep);
-      return sourceController;
+      return targetController;
     };
     targetController._onUpdateMinMax = sourceController._onUpdateMinMax;
 
@@ -124,14 +124,15 @@
     initChildController(this, parent, object, numberProperty, booleanProperty, rgbScale);
   };
 
-  lil.BooleanWithCheckboxController = function (parent, object, numberProperty, booleanProperty, rgbScale) {
-    this.baseController = new lil.BooleanController(parent, object, numberProperty, rgbScale);
-    initChildController(this, parent, object, numberProperty, booleanProperty, rgbScale);
-  };
+  // lil.BooleanWithCheckboxController = function (parent, object, numberProperty, booleanProperty, rgbScale) {
+  //   this.baseController = new lil.BooleanController(parent, object, numberProperty, rgbScale);
+  //   initChildController(this, parent, object, numberProperty, booleanProperty, rgbScale);
+  // };
 
   lil.ColorWithCheckboxController = function (parent, object, numberProperty, booleanProperty, rgbScale) {
     this.baseController = new lil.ColorController(parent, object, numberProperty, rgbScale);
     initChildController(this, parent, object, numberProperty, booleanProperty, rgbScale);
+    this.$checkbox.style["margin-left"] = "var(--spacing)";
   };
 
   /** 'Inherit' from lilgui's default ColorController */
@@ -145,11 +146,11 @@
   };
 
   /** Finally add the new method 'addBooleanWithCheckbox' to lil.GUI */
-  lil.GUI.prototype.addBooleanWithCheckbox = function (object, numberProperty, booleanProperty, rgbScale) {
-    var cntrlr = new lil.BooleanWithCheckboxController(this, object, numberProperty, booleanProperty, rgbScale);
-    copyEssentialControllerProps(cntrlr, cntrlr.baseController);
-    return cntrlr;
-  };
+  // lil.GUI.prototype.addBooleanWithCheckbox = function (object, numberProperty, booleanProperty, rgbScale) {
+  //   var cntrlr = new lil.BooleanWithCheckboxController(this, object, numberProperty, booleanProperty, rgbScale);
+  //   copyEssentialControllerProps(cntrlr, cntrlr.baseController);
+  //   return cntrlr;
+  // };
 
   /** Finally add the new method 'addColorWithCheckbox' to lil.GUI */
   lil.GUI.prototype.addColorWithCheckbox = function (object, numberProperty, booleanProperty, rgbScale) {
@@ -158,15 +159,17 @@
     return cntrlr;
   };
 
-  /** Finally add the new method 'addColorWithCheckbox' to lil.GUI */
-  lil.GUI.prototype.addWithCheckbox = function (object, propertyName, isEnabledPropertyName, rgbScale) {
-    var cntrlr = null;
-    if (typeof object[propertyName] === "number") {
-      cntrlr = this.addNumberWithCheckbox(object, propertyName, isEnabledPropertyName, rgbScale);
-    } else {
-      cntrlr = this.addBooleanWithCheckbox(object, propertyName, isEnabledPropertyName, rgbScale);
-    }
-    copyEssentialControllerProps(cntrlr, cntrlr.baseController);
-    return cntrlr;
-  };
+  /** Finally add the new generic method 'addWithCheckbox' to lil.GUI */
+  // lil.GUI.prototype.addWithCheckbox = function (object, propertyName, isEnabledPropertyName, rgbScale) {
+  //   var cntrlr = null;
+  //   if (typeof object[propertyName] === "number") {
+  //     cntrlr = this.addNumberWithCheckbox(object, propertyName, isEnabledPropertyName, rgbScale);
+  //     // } else {
+  //     //   cntrlr = this.addBooleanWithCheckbox(object, propertyName, isEnabledPropertyName, rgbScale);
+  //   } else {
+  //     cntrlr = this.addBooleanWithCheckbox(object, propertyName, isEnabledPropertyName, rgbScale);
+  //   }
+  //   copyEssentialControllerProps(cntrlr, cntrlr.baseController);
+  //   return cntrlr;
+  // };
 })(lil);

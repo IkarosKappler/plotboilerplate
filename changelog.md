@@ -15,6 +15,7 @@ Todo:
 
 - Finish after-effects filter.
 - replace all colors + alphas by the new input extension (lil-gui).
+- Add googley eyes to the animated metaballs demo.
 
 * 2024-07-17
   - Tweaking the lil-gui extension to handle different input types with checkboxes.

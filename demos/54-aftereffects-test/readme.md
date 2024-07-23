@@ -1,7 +1,7 @@
-# Meta Balls 2D
+# After effects filter (with metaballs 2d demo)
 
-In computer graphics, metaballs, also known as blobby objects, are organic-looking n-dimensional isosurfaces, characterised by their ability to meld together when in close proximity to create single, contiguous objects. ([Wikipedia](https://en.wikipedia.org/wiki/Metaballs))
+Since CSS3 it's possible to apply effect filters to existing graphics. This approach adds a 'filter-layer' onto the canvas and uses it's CSS properties to modify the appearance of the canvas output ([mdn web docs](https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter))
 
-![Meta Balls](../../screenshots/screenshot-20240226-1-metaballs.png)
+![CSS backdrop-filter effects](../../screenshots/screenshot-20240723-after-effects-filter-0-input-dark.png)
 
-[Article by John Wigg](https://john-wigg.dev/2DMetaballs/)
+[mdn web docs: backdrop-filter](https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter)

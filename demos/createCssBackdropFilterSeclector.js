@@ -14,7 +14,13 @@
     // console.log("getOpacityPct", ratio2pct(config.opacity));
     // console.log("config", config);
     var buffer = [];
-    if (config.isBlurEnabled) {
+    // if (config.isBlurEnabled) {
+    //   buffer.push("invert(" + ratio2pct(config.invert) + ")");
+    // }
+    if (config.isOpacityEnabled) {
+      buffer.push("opacity(" + ratio2pct(config.opacity) + ")");
+    }
+    if (config.isInvertEnabled) {
       buffer.push("invert(" + ratio2pct(config.invert) + ")");
     }
     if (config.isSepiaEnabled) {
@@ -38,12 +44,6 @@
     }
     if (config.isHueRotateEnabled) {
       buffer.push("hue-rotate(" + config.hueRotate + "deg)");
-    }
-    if (config.isInvertEnabled) {
-      buffer.push("invert(" + ratio2pct(config.invert) + ")");
-    }
-    if (config.isOpacityEnabled) {
-      buffer.push("opacity(" + ratio2pct(config.opacity) + ")");
     }
     if (config.isSaturateEnabled) {
       buffer.push("saturate(" + ratio2pct(config.saturate) + ")");
@@ -78,8 +78,6 @@
       isGrayscaleEnabled: false,
       hueRotate: 120, // deg
       isHueRotateEnabled: false,
-      invert: 0.7,
-      isInvertEnabled: false,
       saturate: 1.0,
       isSaturateEnabled: false
     };
@@ -108,7 +106,7 @@
     // prettier-ignore
     guiFolder
         .addNumberWithCheckbox(config, "blur", "isBlurEnabled").onChange(handleChange)
-        .min(0.0).max(1.0).step(0.01).name("blur").title("blur");
+        .min(0.0).max(10.0).step(0.01).name("blur px").title("blur px");
     // prettier-ignore
     guiFolder
         .addNumberWithCheckbox(config, "brightness", "isBrightnessEnabled").onChange(handleChange)
@@ -120,7 +118,7 @@
     // prettier-ignore
     guiFolder
         .addNumberWithCheckbox(config, "dropShadow", "isDropShadowEnabled").onChange(handleChange)
-        .min(0.0).max(1.0).step(0.01).name("dropShadow").title("dropShadow");
+        .min(0.0).max(1.0).step(0.01).name("dropShadow px").title("dropShadow px");
     // prettier-ignore
     guiFolder
         .addNumberWithCheckbox(config, "grayscale", "isGrayscaleEnabled").onChange(handleChange)
@@ -128,15 +126,11 @@
     // prettier-ignore
     guiFolder
         .addNumberWithCheckbox(config, "hueRotate", "isHueRotateEnabled").onChange(handleChange)
-        .min(0).max(360).step(1).name("hueRotate").title("hueRotate");
-    // prettier-ignore
-    guiFolder
-        .addNumberWithCheckbox(config, "invert", "isInvertEnabled").onChange(handleChange)
-        .min(0.0).max(1.0).step(0.01).name("invert").title("invert");
+        .min(0).max(360).step(1).name("hueRotate °").title("hueRotate °");
     // prettier-ignore
     guiFolder
         .addNumberWithCheckbox(config, "saturate", "isSaturateEnabled").onChange(handleChange)
-        .min(0.0).max(1.0).step(0.01).name("saturate").title("saturate");
+        .min(0.0).max(10.0).step(0.01).name("saturate").title("saturate");
 
     return handleChange;
   }; // END funcition createCssBackdropFilterSelector
