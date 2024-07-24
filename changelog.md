@@ -1,19 +1,12 @@
 # Changelog
 
-Todo:
+Imminent todos:
 
 - demo 34: fail to compute foutier transform with array length != 8, whats going on here?
 - check greiner hormann (27): doing weird stuff when "clearSelfIntersecting=true"
-
-- integrate gui size toggler into default features.
-- add new guiSizeToggler to all demos.
-- metacircles demo: SVG export not working
 - check if the old color class is still used anywhere
-
-- Finish after-effects filter.
-- replace all colors + alphas by the new input extension (lil-gui).
 - Add googley eyes to the animated metaballs demo.
-- Fix double-gui size for demo 22 (three): transform-origin is wrong
+- check automatic darmode detection
 
 * 2024-07-24
   - drawutilssvg: Caching custom style defs in a private buffer variable.

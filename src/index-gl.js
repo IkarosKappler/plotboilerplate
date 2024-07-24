@@ -15,6 +15,7 @@
 
   // Fetch the GET params
   let GUP = gup();
+  var isDarkmode = detectDarkMode(GUP);
 
   window.addEventListener("load", function () {
     // All config params are optional.
@@ -40,7 +41,7 @@
           autoAdjustOffset: true,
           offsetAdjustXPercent: 50,
           offsetAdjustYPercent: 50,
-          backgroundColor: "#ffffff",
+          backgroundColor: isDarkmode ? "#000000" : "#ffffff",
           enableMouse: true,
           enableTouch: true,
           enableKeys: true,
