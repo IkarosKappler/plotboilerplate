@@ -7,6 +7,7 @@ Imminent todos:
 - check if the old color class is still used anywhere
 - Add googley eyes to the animated metaballs demo.
 - check automatic darmode detection
+- lil-gui does not scroll
 
 * 2024-07-24
   - drawutilssvg: Caching custom style defs in a private buffer variable.

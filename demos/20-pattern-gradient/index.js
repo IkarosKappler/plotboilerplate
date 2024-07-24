@@ -42,7 +42,7 @@
           autoAdjustOffset: true,
           offsetAdjustXPercent: 50,
           offsetAdjustYPercent: 50,
-          backgroundColor: "#e0e0e0",
+          backgroundColor: isDarkmode ? "#000000" : "#e0e0e0",
           enableMouse: true,
           enableKeys: true,
           enableTouch: true,
