@@ -50,7 +50,7 @@
     globalThis.demoInitializationObserver
       .waitForInitialized()
       .then(function (initializedPB) {
-        console.log("initializedPB", initializedPB);
+        // console.log("initializedPB", initializedPB);
         var pb = initializedPB;
         var gui = pb.getGUI();
 

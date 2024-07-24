@@ -2,12 +2,9 @@
 
 Todo:
 
-- lightning algorithm fix black background
 - demo 34: fail to compute foutier transform with array length != 8, whats going on here?
 - check greiner hormann (27): doing weird stuff when "clearSelfIntersecting=true"
-- check demo-18; neighbourhood graph; DEV version not working any more.
 
-- remove data.gui
 - integrate gui size toggler into default features.
 - add new guiSizeToggler to all demos.
 - metacircles demo: SVG export not working
@@ -16,8 +13,12 @@ Todo:
 - Finish after-effects filter.
 - replace all colors + alphas by the new input extension (lil-gui).
 - Add googley eyes to the animated metaballs demo.
+- Fix double-gui size for demo 22 (three): transform-origin is wrong
 
-* 2024-07-23
+* 2024-07-24
+  - drawutilssvg: Caching custom style defs in a private buffer variable.
+  - Fixing lightning-algorithm-demo background issue.
+* 2024-07-23 [v1.23.1]
   - Finalizing the CSS backdrop-filter effects demo (54).
 * 2024-07-17
   - Tweaking the lil-gui extension to handle different input types with checkboxes.
