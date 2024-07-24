@@ -13,6 +13,7 @@
 
   // Fetch the GET params
   let GUP = gup();
+  var isDarkmode = detectDarkMode(GUP);
   var DEG_TO_RAD = Math.PI / 180;
 
   window.addEventListener("load", function () {

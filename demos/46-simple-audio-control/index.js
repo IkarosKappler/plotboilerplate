@@ -26,7 +26,7 @@
 
     // Fetch the GET params
     let GUP = gup();
-    // Always add darkmode
+    var isDarkmode = detectDarkMode(GUP); // Always add darkmode
     var isDarkmode = true || detectDarkMode(GUP);
     if (isDarkmode) {
       document.getElementsByTagName("body")[0].classList.add("darkmode");

@@ -13,7 +13,7 @@
 
   // Fetch the GET params
   let GUP = gup();
-
+  var isDarkmode = detectDarkMode(GUP);
   window.addEventListener("load", function () {
     // All config params are optional.
     var pb = new PlotBoilerplate(
@@ -35,7 +35,7 @@
           autoAdjustOffset: true,
           offsetAdjustXPercent: 0, // auto-adjust to left- ...
           offsetAdjustYPercent: 100, // ... -lower corner
-          backgroundColor: "#ffffff",
+          backgroundColor: isDarkmode ? "#000000" : "#ffffff",
           enableMouse: false,
           enableMouseWheel: false,
           enableKeys: false,

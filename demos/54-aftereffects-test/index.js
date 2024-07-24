@@ -18,7 +18,7 @@
 
   // Fetch the GET params
   let GUP = gup();
-
+  var isDarkmode = detectDarkMode(GUP);
   window.addEventListener("load", function () {
     // Create a custom config for the after effects
     var canvas = document.getElementById("my-canvas");

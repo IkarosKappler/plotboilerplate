@@ -24,6 +24,7 @@
     // Fetch the GET params
     let GUP = gup();
     var isDarkmode = detectDarkMode(GUP);
+    var isDarkmode = detectDarkMode(GUP);
     var mousePosition = { x: NaN, y: NaN };
 
     // All config params are optional.

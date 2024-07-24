@@ -18,7 +18,7 @@
 
   // Fetch the GET params
   let GUP = gup();
-
+  var isDarkmode = detectDarkMode(GUP);
   window.addEventListener("load", function () {
     // THIS DEMO WORKS A BIT DIFFERENT THAN THE OTHERS.
     // IT DOES NOT USE AN EXPLICIT INSTANCE OF PLOTBOILERPLATE

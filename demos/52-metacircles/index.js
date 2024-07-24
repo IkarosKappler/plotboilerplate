@@ -19,7 +19,7 @@
 
   // Fetch the GET params
   let GUP = gup();
-
+  var isDarkmode = detectDarkMode(GUP);
   // Export the current GUI so other demos can use it.
   _context.demoInitializationObserver = new InitializationObserver(5000);
 

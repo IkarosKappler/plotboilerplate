@@ -22,7 +22,7 @@
 
   // Fetch the GET params
   let GUP = gup();
-
+  var isDarkmode = detectDarkMode(GUP);
   window.addEventListener("load", function () {
     // All config params are optional.
     // console.log( 'init. canvas: ', document.getElementById('my-canvas') );
@@ -50,7 +50,7 @@
           autoAdjustOffset: true,
           offsetAdjustXPercent: 2, // 2%
           offsetAdjustYPercent: 50,
-          backgroundColor: "#ffffff",
+          backgroundColor: isDarkmode ? "#000000" : "#ffffff",
           enableMouse: true,
           enableTouch: true,
           enableKeys: true,

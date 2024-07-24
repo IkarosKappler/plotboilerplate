@@ -27,6 +27,7 @@
     // Fetch the GET params
     let GUP = gup();
     var isDarkmode = detectDarkMode(GUP);
+    var isDarkmode = detectDarkMode(GUP);
 
     var textureImage = null;
 

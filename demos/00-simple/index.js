@@ -17,7 +17,7 @@
 
     // Fetch the GET params
     let GUP = gup();
-
+    var isDarkmode = detectDarkMode(GUP);
     // All config params are optional.
     var pb = new PlotBoilerplate(
       PlotBoilerplate.utils.safeMergeByKeys(
@@ -41,7 +41,7 @@
           autoAdjustOffset: true,
           offsetAdjustXPercent: 50,
           offsetAdjustYPercent: 50,
-          backgroundColor: "#ffffff",
+          backgroundColor: isDarkmode ? "#000000" : "#ffffff",
           enableMouse: true,
           enableKeys: true
         },
