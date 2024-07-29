@@ -41,9 +41,13 @@
     if (config.isContrastEnabled) {
       buffer.push("contrast(" + ratio2pct(config.contrast) + ")");
     }
-    if (config.isDropShaowEnabled) {
+    if (config.isDropShadowEnabled) {
       // TODO: use more elaborate version of drop-shadow?
-      buffer.push("drop-shadow(" + config.dropShadow + "px " + config.dropShadow + "px)");
+      buffer.push("drop-shadow(" + config.dropShadow + "px " + config.dropShadow + "px 4px " + config.dropShadowColor + ")");
+      console.log(
+        "dsc",
+        "drop-shadow(" + config.dropShadow + "px " + config.dropShadow + "px 4px " + config.dropShadowColor + ")"
+      );
     }
     if (config.isGrayscaleEnabled) {
       buffer.push("grayscale(" + ratio2pct(config.grayscale) + ")");
@@ -94,7 +98,7 @@
     return {
       // This is just for the global effect color
       effectFilterColor: _getString(initialFilterValues, "effectFilterColor", "#204a87"),
-      isEffectsColorEnabled: _getBoolean(initialFilterValues, "isEffectsColorEnabled", true),
+      isEffectsColorEnabled: _getBoolean(initialFilterValues, "isEffectsColorEnabled", false),
       // These are real filter values
       opacity: _getNumber(initialFilterValues, "opacity", 0.5),
       isOpacityEnabled: _getBoolean(initialFilterValues, "isOpacityEnabled", false),
@@ -165,7 +169,7 @@
     // prettier-ignore
     guiFolder
         .addNumberWithCheckbox(config, "dropShadow", "isDropShadowEnabled").onChange(handleChange)
-        .min(0.0).max(1.0).step(0.01).name("dropShadow px").title("dropShadow px");
+        .min(0).max(20).step(1).name("dropShadow px").title("dropShadow px");
     // prettier-ignore
     guiFolder
         .addNumberWithCheckbox(config, "grayscale", "isGrayscaleEnabled").onChange(handleChange)
