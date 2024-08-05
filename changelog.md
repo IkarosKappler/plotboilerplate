@@ -9,6 +9,8 @@ Imminent todos:
 - check automatic darmode detection
 - lil-gui does not scroll
 
+* 2024-08-05
+  - Disabling backdrop-filter 'drop-shadow'. Currently not supported by canvas elements.
 * 2024-07-24
   - drawutilssvg: Caching custom style defs in a private buffer variable.
   - Fixing lightning-algorithm-demo background issue.

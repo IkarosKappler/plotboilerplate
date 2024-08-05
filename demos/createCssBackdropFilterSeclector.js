@@ -169,7 +169,7 @@
     // prettier-ignore
     guiFolder
         .addNumberWithCheckbox(config, "dropShadow", "isDropShadowEnabled").onChange(handleChange)
-        .min(0).max(20).step(1).name("dropShadow px").title("dropShadow px");
+        .min(0).max(20).step(1).name("dropShadow px").title("dropShadow px").disable();
     // prettier-ignore
     guiFolder
         .addNumberWithCheckbox(config, "grayscale", "isGrayscaleEnabled").onChange(handleChange)

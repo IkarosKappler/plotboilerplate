@@ -69,6 +69,7 @@
           saturate: 2.0,
           isSaturateEnabled: false
         };
+        globalThis.gui = gui;
 
         // +---------------------------------------------------------------------------------
         // | Initialize dat.gui
