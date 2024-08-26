@@ -9,7 +9,8 @@
  * @modified 2020-04-03 Added empty default global object 'utils'. Added createGUI as an optional child.
  * @modified 2023-09-29 Added try-catch for color attributes; invalid values might break construction of whole gui.
  * @modified 2024-06-25 Replacing dat.gui by equivalent lil-gui calls. Collapsing all lil-gui folders (are open by default).
- * @version  1.1.0
+ * @modified 2024-08-25 Added `CSSBackdropEffects` to the GUI (if present).
+ * @version  1.2.0
  **/
 var utils = (globalThis.utils = globalThis.utils || {});
 
@@ -36,6 +37,63 @@ globalThis.utils.guiFolders = globalThis.utils.guiFolders || {};
  * @return {dat.gui.GUI|lil-gui.GUI|null}
  **/
 globalThis.utils.createGUI = (function () {
+  var _tryGetFilterGETParams = function () {
+    // Rule is:
+    // * GET PARAMS first
+    // * pre-defnined params second
+    // * default values third
+    var globalPredefinedValues =
+      typeof globalThis["cssBackdropfilterValues"] === "object" ? globalThis["cssBackdropfilterValues"] : {};
+    var preDefinedValues = Object.assign(Object.assign({}, CSSBackdropEffects.DEFAULT_FILTER_VALUES), globalPredefinedValues);
+    if (typeof gup === "undefined") {
+      return preDefinedValues; // CSSBackdropEffects.DEFAULT_FILTER_VALUES;
+    }
+    var GUP = gup();
+    var params = new Params(GUP);
+    var initialFilterValues = {
+      isBackdropFiltersEnabled: false,
+      // This is just for the global effect color
+      effectFilterColor: params.getString("filter:effectFilterColor", preDefinedValues.effectFilterColor), // "#204a87",
+      isEffectsColorEnabled: params.hasParam("filter:effectFilterColor"),
+      // These are real filter values
+      opacity: params.getNumber("filter:opacity", preDefinedValues.opacity),
+      isOpacityEnabled: params.hasParam("filter:opacity") || preDefinedValues.isOpacityEnabled,
+      invert: params.getNumber("filter:invert", preDefinedValues.invert),
+      isInvertEnabled: params.hasParam("filter:invert") || preDefinedValues.isInvertEnabled,
+      sepia: params.getNumber("filter:sepia", preDefinedValues.sepia),
+      isSepiaEnabled: params.hasParam("filter:sepia") || preDefinedValues.isSepiaEnabled,
+      blur: params.getNumber("filter:blur", preDefinedValues.blur), // px
+      isBlurEnabled: params.hasParam("filter:blur") || preDefinedValues.isBlurEnabled,
+      brightness: params.getNumber("filter:brightness", preDefinedValues.brightness),
+      isBrightnessEnabled: params.hasParam("filter:brightness") || preDefinedValues.isBrightnessEnabled,
+      contrast: params.getNumber("filter:contrast", preDefinedValues.contrast),
+      isContrastEnabled: params.hasParam("filter:contrast") || preDefinedValues.isContrastEnabled,
+      dropShadow: params.getNumber("filter:dropShadow", preDefinedValues.dropShadow), // px
+      dropShadowColor: "#00ffff", // HOW TO DISABLE THIS PROPERLY?
+      isDropShadowEnabled: params.hasParam("filter:dropShadow") || preDefinedValues.isDropShadowEnabled,
+      grayscale: params.getNumber("filter:grayscale", preDefinedValues.grayscale),
+      isGrayscaleEnabled: params.hasParam("filter:grayscale") || preDefinedValues.isGrayscaleEnabled,
+      hueRotate: params.getNumber("filter:hueRotate", preDefinedValues.hueRotate), // deg
+      isHueRotateEnabled: params.hasParam("filter:hueRotate") || preDefinedValues.isHueRotateEnabled,
+      saturate: params.getNumber("filter:saturate", preDefinedValues.saturate),
+      isSaturateEnabled: params.hasParam("filter:saturate") || preDefinedValues.isSaturateEnabled
+    };
+    initialFilterValues.isBackdropFiltersEnabled =
+      initialFilterValues.isOpacityEnabled ||
+      initialFilterValues.isEffectsColorEnabled ||
+      initialFilterValues.isInvertEnabled ||
+      initialFilterValues.isSepiaEnabled ||
+      initialFilterValues.isBlurEnabled ||
+      initialFilterValues.isBrightnessEnabled ||
+      initialFilterValues.isContrastEnabled ||
+      initialFilterValues.isDropShadowEnabled ||
+      initialFilterValues.isGrayscaleEnabled ||
+      initialFilterValues.isHueRotateEnabled ||
+      initialFilterValues.isSaturateEnabled;
+
+    return initialFilterValues;
+  };
+
   var _tryGetGUIInstance = function (props) {
     if (
       globalThis.hasOwnProperty("lil") &&
@@ -354,6 +412,16 @@ globalThis.utils.createGUI = (function () {
       foldExport.close(); // important only for lil-gui
       foldExport.add(pb.config, "saveFile").name("SVG Image").title("Save as SVG.");
       globalThis.utils.guiFolders["editor_settings.export"] = foldExport;
+    }
+
+    if (typeof CSSBackdropEffects !== "undefined") {
+      try {
+        var backdropEffects = new CSSBackdropEffects(pb, gui, _tryGetFilterGETParams());
+        // CSSBackdropEffects.DEFAULT_FILTER_VALUES);
+        globalThis.utils["cssBackdropEffects"] = backdropEffects;
+      } catch (e) {
+        console.warn("[creategui] Failed to create backdrop effect input for gui.", e);
+      }
     }
 
     globalThis.utils.guiFolders["editor_settings"] = fold0;

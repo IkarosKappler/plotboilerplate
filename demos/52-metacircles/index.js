@@ -491,7 +491,7 @@
       // prettier-ignore
       fold.add(config, "epsilonPathDetect").min(0.0).max(1.0).onChange( function() { rebuildMetaballs(); pb.redraw(); } ).name('epsilonPathDetect').title("Which epslion to use for connected path detection.");
       // prettier-ignore
-      fold.add(config, "isAnimated").onChange( function() { toggleAnimation(); } ).name('isAnimated').title("Check to toggle animation.").disable();
+      fold.add(config, "isAnimated").onChange( function() { toggleAnimation(); } ).name('isAnimated').title("Check to toggle animation."); // .disable();
       // prettier-ignore
       fold.add(config, "readme").name('readme').title("Display this demo's readme.");
     }

@@ -19,6 +19,7 @@
  * @modified 2022-11-23 Added `drawRaster` to the `Config` interface.
  * @modified 2023-02-10 All non-function attributes of the `Config` interface are now mandatory.
  * @modified 2023-09-29 Added the `randomPoint(...)` function declaration to the IBounds interface.
+ * @modified 2024-08-25 Added the `CSSBackdropFilterParams` params to the global params (all optional).
  **/
 import { Vertex } from "../Vertex";
 import { Vector } from "../Vector";
@@ -34,6 +35,7 @@ import { Line } from "../Line";
 import { PlotBoilerplate } from "../PlotBoilerplate";
 import { DrawLib } from "./DrawLib";
 import { PBText } from "../PBText";
+import { CSSBackdropFilterParams } from "./externals";
 /**
  * @classdesc Coordinates (x,y) on the plane.
  *
@@ -93,7 +95,7 @@ export interface CanvasWrapper {
 /**
  * The config that's used by PB.
  */
-export interface Config extends Record<string, boolean | number | string | Function | HTMLCanvasElement | SVGElement | undefined> {
+export interface Config extends Record<string, boolean | number | string | Function | HTMLCanvasElement | SVGElement | undefined>, Pick<CSSBackdropFilterParams, "isBackdropFiltersEnabled"> {
     canvas: HTMLCanvasElement | SVGElement | string;
     fullSize: boolean;
     fitToParent: boolean;
@@ -137,7 +139,7 @@ export interface Config extends Record<string, boolean | number | string | Funct
 /**
  * For initialization the constructor needs a mix of config and draw-settings.
  */
-export interface PBParams extends Config {
+export interface PBParams extends Config, CSSBackdropFilterParams {
     title?: string;
 }
 export interface DrawSettings {

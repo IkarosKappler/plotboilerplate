@@ -9,6 +9,13 @@ Imminent todos:
 - check automatic darmode detection
 - lil-gui does not scroll
 
+* 2024-08-26
+  - Added the `utils/Params.hasParam` method.
+  - Decoding URI components in GET params in `utils/gup`.
+* 2024-08-25
+  - Adding `CSSBackdropEffects` to GUI (if present); optional feature.
+  - Added the `CSSBackdropFilterParams` params to the global params (all optional).
+  - Extending main class `PlotBoilerplate` optional param `backdropFiltersEnabled`.
 * 2024-08-05
   - Disabling backdrop-filter 'drop-shadow'. Currently not supported by canvas elements.
 * 2024-07-24

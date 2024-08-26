@@ -29,16 +29,15 @@
     targetController.reset = sourceController.reset;
     targetController.save = sourceController.save;
     targetController.title = sourceController.title;
-    // targetController.enable = sourceController.enable;
-    // targetController.disable = sourceController.disable;
+    targetController.listen = sourceController.listen;
     targetController.disable = function () {
       targetController._disableByCheckbox();
       targetController.$checkbox.setAttribute("disabled", true);
       sourceController.$widget.parentElement.classList.add("disabled");
     };
     targetController.enable = function () {
-      targetController._disableByCheckbox();
-      targetController.$checkbox.setAttribute("disabled", false);
+      targetController._enableByCheckbox();
+      targetController.$checkbox.removeAttribute("disabled");
       sourceController.$widget.parentElement.classList.remove("disabled");
     };
     targetController.min = function (newMin) {

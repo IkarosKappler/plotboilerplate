@@ -84,8 +84,9 @@
  * @modified 2023-02-10 Adding `enableZoom` and `enablePan` (both default true) to have the option to disable these functions.
  * @modified 2023-09-29 Adding proper dicionary key and value types to the params of `PlotBoilerplate.utils.safeMergeByKeys` (was `object` before).
  * @modified 2024-07-08 Adding `PlotBoilerplate.getGUI()` to retrieve the GUI instance.
+ * @modified 2024-08-25 Extending main class `PlotBoilerplate` optional param `isBackdropFiltersEnabled`.
  *
- * @version  1.18.0
+ * @version  1.19.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.

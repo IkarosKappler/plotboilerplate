@@ -11,6 +11,10 @@ export class InitializationObserver {
         this._timeoutMessage = timeoutMessage !== null && timeoutMessage !== void 0 ? timeoutMessage : null;
         globalThis.setTimeout(() => {
             var _a;
+            if (this._isInitialized) {
+                return; // NOOP
+            }
+            // else
             if (!this._timeoutMessage) {
                 console.warn("Failed to initialize object. Reason unknown.");
             }
@@ -18,6 +22,9 @@ export class InitializationObserver {
         }, timeout);
     }
     accept(value) {
+        if (this._isInitialized) {
+            return;
+        }
         this._isInitialized = true;
         this._initializedValue = value;
         this._fireAccept(value);

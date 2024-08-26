@@ -9,6 +9,7 @@
  * Ported to typescript.
  * @date 2021-05-21
  * @modified 2024-03-10 Fixed some type for Typescript 5 compatibility.
+ * @modified 2024-08-26 Decoding URI components in GET params.
  */
 
 // Get the URI GET params as an assoc.
@@ -19,7 +20,8 @@
 export const gup = (): Record<string, string> => {
   const vars: Record<string, string> = {};
   globalThis.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, (_m: string, key: string, value: string): string => {
-    return (vars[key as keyof Object] = value);
+    const keyName: string = key as keyof Object;
+    return (vars[decodeURIComponent(keyName)] = value);
   });
   return vars;
 };

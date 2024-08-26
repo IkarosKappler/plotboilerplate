@@ -4711,7 +4711,8 @@ CircleSector.circleSectorUtils = {
  * @modified 2023-10-04 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
  * @modified 2024-01-30 Fixing an issue with immutable style sets; changes to the global draw config did not reflect here (do now).
  * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
- * @version  1.6.9
+ * @modified 2024-07-24 Caching custom style defs in a private buffer variable.
+ * @version  1.6.10
  **/
 const RAD_TO_DEG = 180 / Math.PI;
 /**
@@ -4819,6 +4820,13 @@ class drawutilssvg {
                 console.warn(`Warning: your draw config is missing the key '${k}' which is required.`);
             }
         }
+        if (this.customStyleDefs) {
+            rules.push("\n/* Custom styles */\n");
+            this.customStyleDefs.forEach((value, key) => {
+                rules.push(key + " { " + value + " }");
+            });
+            // this.nodeStyle.innerHTML += "\n/* Custom styles */\n" + rules.join("\n");
+        }
         this.nodeStyle.innerHTML = rules.join("\n");
     }
     /**
@@ -4842,11 +4850,7 @@ class drawutilssvg {
      * @param {Map<string,string>} defs
      */
     addCustomStyleDefs(defs) {
-        const buffer = [];
-        defs.forEach((value, key) => {
-            buffer.push(key + " { " + value + " }");
-        });
-        this.nodeStyle.innerHTML += "\n/* Custom styles */\n" + buffer.join("\n");
+        this.customStyleDefs = defs;
     }
     /**
      * Retieve an old (cached) element.
@@ -10893,8 +10897,9 @@ VEllipseSector.ellipseSectorUtils = {
  * @modified 2023-02-10 Adding `enableZoom` and `enablePan` (both default true) to have the option to disable these functions.
  * @modified 2023-09-29 Adding proper dicionary key and value types to the params of `PlotBoilerplate.utils.safeMergeByKeys` (was `object` before).
  * @modified 2024-07-08 Adding `PlotBoilerplate.getGUI()` to retrieve the GUI instance.
+ * @modified 2024-08-25 Extending main class `PlotBoilerplate` optional param `isBackdropFiltersEnabled`.
  *
- * @version  1.18.0
+ * @version  1.19.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -11077,7 +11082,8 @@ class PlotBoilerplate {
             enableZoom: f.bool(config, "enableZoom", true), // default=true
             enablePan: f.bool(config, "enablePan", true), // default=true
             // Experimental (and unfinished)
-            enableGL: f.bool(config, "enableGL", false)
+            enableGL: f.bool(config, "enableGL", false),
+            isBackdropFiltersEnabled: f.bool(config, "isBackdropFiltersEnabled", true)
         }; // END confog
         /**
          * Configuration for drawing things.
