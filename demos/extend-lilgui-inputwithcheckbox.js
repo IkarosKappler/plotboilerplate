@@ -99,14 +99,10 @@
     };
 
     _self._handleCheckboxChange = function (newIsChecked) {
-      //   console.log("_handleCheckboxChange", newIsChecked);
       if (newIsChecked) {
         _self._enableByCheckbox();
-        // this.classList.
       } else {
         _self._disableByCheckbox();
-        // _self.domElement.classList.add("disabled");
-        // _self.baseController.$widget.classList.add("disabled");
       }
     };
 

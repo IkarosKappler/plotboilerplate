@@ -166,6 +166,7 @@
     var config = createDefaultConfig(initialFilterValues || {});
 
     var inputElements = []; // Array<Controller>
+    var inputElementsEnabledKeys = []; // Array<String>
 
     var handleChange = function (_newValue, _filterEnabled) {
       //   console.log("New value", newValue, filterEnabled);
@@ -175,6 +176,7 @@
     var handleEnableDisableAll = function (isBackdropFiltersEnabled) {
       // console.log("New enabled?", isBackdropFiltersEnabled);
       for (var i = 0; i < inputElements.length; i++) {
+        // var keyName = inputElementsEnabledKeys[i];
         if (isBackdropFiltersEnabled) {
           inputElements[i].enable();
         } else {
@@ -195,41 +197,48 @@
       .addColorWithCheckbox(config, "effectFilterColor", "isEffectsColorEnabled")
       .onChange(handleChange);
     inputElements.push(cntrlr);
+    inputElementsEnabledKeys.push("isEffectsColorEnabled");
     // prettier-ignore
     cntrlr = guiFolder
         .addNumberWithCheckbox(config, "opacity", "isOpacityEnabled").onChange(handleChange)
         .min(0.0).max(1.0).step(0.01).name("opacity").title("opacity");
     inputElements.push(cntrlr);
+    inputElementsEnabledKeys.push("isOpacityEnabled");
 
     // prettier-ignore
     cntrlr = guiFolder
         .addNumberWithCheckbox(config, "invert", "isInvertEnabled").onChange(handleChange)
         .min(0.0).max(1.0).step(0.01).name("invert").title("invert");
     inputElements.push(cntrlr);
+    inputElementsEnabledKeys.push("isInvertEnabled");
 
     // prettier-ignore
     cntrlr = guiFolder
         .addNumberWithCheckbox(config, "sepia", "isSepiaEnabled").onChange(handleChange)
         .min(0.0).max(1.0).step(0.01).name("sepia").title("sepia");
     inputElements.push(cntrlr);
+    inputElementsEnabledKeys.push("isSepiaEnabled");
 
     // prettier-ignore
     cntrlr = guiFolder
         .addNumberWithCheckbox(config, "blur", "isBlurEnabled").onChange(handleChange)
         .min(0.0).max(10.0).step(0.01).name("blur px").title("blur px");
     inputElements.push(cntrlr);
+    inputElementsEnabledKeys.push("isBlurEnabled");
 
     // prettier-ignore
     cntrlr = guiFolder
         .addNumberWithCheckbox(config, "brightness", "isBrightnessEnabled").onChange(handleChange)
         .min(0.0).max(1.0).step(0.01).name("brightness").title("brightness");
     inputElements.push(cntrlr);
+    inputElementsEnabledKeys.push("isBrightnessEnabled");
 
     // prettier-ignore
     cntrlr = guiFolder
         .addNumberWithCheckbox(config, "contrast", "isContrastEnabled").onChange(handleChange)
         .min(0.0).max(1.0).step(0.01).name("contrast").title("contrast");
     inputElements.push(cntrlr);
+    inputElementsEnabledKeys.push("isContrastEnabled");
 
     // prettier-ignore
     cntrlr = guiFolder
@@ -242,18 +251,21 @@
         .addNumberWithCheckbox(config, "grayscale", "isGrayscaleEnabled").onChange(handleChange)
         .min(0.0).max(1.0).step(0.01).name("grayscale").title("grayscale");
     inputElements.push(cntrlr);
+    inputElementsEnabledKeys.push("isGrayscaleEnabled");
 
     // prettier-ignore
     cntrlr = guiFolder
         .addNumberWithCheckbox(config, "hueRotate", "isHueRotateEnabled").onChange(handleChange)
         .min(0).max(360).step(1).name("hueRotate °").title("hueRotate °");
     inputElements.push(cntrlr);
+    inputElementsEnabledKeys.push("isHueRotateEnabled");
 
     // prettier-ignore
     cntrlr = guiFolder
         .addNumberWithCheckbox(config, "saturate", "isSaturateEnabled").onChange(handleChange)
         .min(0.0).max(10.0).step(0.01).name("saturate").title("saturate");
     inputElements.push(cntrlr);
+    inputElementsEnabledKeys.push("isSaturateEnabled");
 
     handleEnableDisableAll(config.isBackdropFiltersEnabled);
 
