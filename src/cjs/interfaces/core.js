@@ -20,6 +20,7 @@
  * @modified 2022-11-23 Added `drawRaster` to the `Config` interface.
  * @modified 2023-02-10 All non-function attributes of the `Config` interface are now mandatory.
  * @modified 2023-09-29 Added the `randomPoint(...)` function declaration to the IBounds interface.
+ * @modified 2024-08-25 Added the `CSSBackdropFilterParams` params to the global params (all optional).
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 //# sourceMappingURL=core.js.map

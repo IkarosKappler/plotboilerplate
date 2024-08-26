@@ -114,6 +114,9 @@ lil.GUI.prototype.addColorWithAlpha = function (object, colorProperty, alphaProp
   cntrlr.reset = cntrlr.baseColorController.reset;
   cntrlr.save = cntrlr.baseColorController.save;
   cntrlr.title = cntrlr.baseColorController.title;
+  cntrlr.enable = cntrlr.baseColorController.enable;
+  cntrlr.disable = cntrlr.baseColorController.disable;
+  cntrlr.listen = cntrlr.baseColorController.listen;
 
   return cntrlr;
 };

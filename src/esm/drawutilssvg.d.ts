@@ -46,7 +46,8 @@
  * @modified 2023-10-04 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
  * @modified 2024-01-30 Fixing an issue with immutable style sets; changes to the global draw config did not reflect here (do now).
  * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
- * @version  1.6.9
+ * @modified 2024-07-24 Caching custom style defs in a private buffer variable.
+ * @version  1.6.10
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -160,6 +161,10 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * Keep the initial draw config to rebuild styles on each render loop.
      */
     private drawConfig;
+    /**
+     * A buffer element for custom style defs (will be re-generated on each draw cycle).
+     */
+    private customStyleDefs;
     /**
      * Passed from primary to secondary instance.
      */

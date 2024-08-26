@@ -23,6 +23,7 @@
     window.pbInitialized = true;
     // Fetch the GET params
     let GUP = gup();
+    var isDarkmode = detectDarkMode(GUP);
     var isInitialized = false;
 
     // All config params are optional.
@@ -49,7 +50,7 @@
           offsetAdjustXPercent: 50,
           offsetAdjustYPercent: 50,
           autoDetectRetina: false,
-          backgroundColor: "#ffffff",
+          backgroundColor: isDarkmode ? "#000000" : "#ffffff",
           enableMouse: true,
           enableTouch: true,
           enableKeys: true,

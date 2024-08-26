@@ -15,6 +15,10 @@ var InitializationObserver = /** @class */ (function () {
         this._timeoutMessage = timeoutMessage !== null && timeoutMessage !== void 0 ? timeoutMessage : null;
         globalThis.setTimeout(function () {
             var _a;
+            if (_this._isInitialized) {
+                return; // NOOP
+            }
+            // else
             if (!_this._timeoutMessage) {
                 console.warn("Failed to initialize object. Reason unknown.");
             }
@@ -22,6 +26,9 @@ var InitializationObserver = /** @class */ (function () {
         }, timeout);
     }
     InitializationObserver.prototype.accept = function (value) {
+        if (this._isInitialized) {
+            return;
+        }
         this._isInitialized = true;
         this._initializedValue = value;
         this._fireAccept(value);

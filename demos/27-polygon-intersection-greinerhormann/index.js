@@ -26,6 +26,7 @@
 
     // Fetch the GET params
     let GUP = gup();
+    var isDarkmode = detectDarkMode(GUP);
     let Orange = Color.makeRGB(255, 128, 0);
 
     // All config params are optional.
@@ -52,7 +53,7 @@
           autoAdjustOffset: true,
           offsetAdjustXPercent: 50,
           offsetAdjustYPercent: 50,
-          backgroundColor: "#ffffff",
+          backgroundColor: isDarkmode ? "#000000" : "#ffffff",
           enableMouse: true,
           enableKeys: true,
           enableTouch: true,

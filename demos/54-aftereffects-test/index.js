@@ -16,60 +16,69 @@
 (function (_context) {
   "use strict";
 
-  // Fetch the GET params
-  let GUP = gup();
+  // Do this BEFORE the main script is triggered by the LOAD event
+  // var urlParams = new URLSearchParams(window.location.search);
+  // urlParams.set("filter:blur", "10");
+  // document.location.search = urlParams;
+
+  globalThis["cssBackdropfilterValues"] = {
+    blur: 10,
+    isBlurEnabled: true,
+    brightness: 0.75,
+    isBrightnessEnabled: true,
+    saturate: 9.0,
+    isSaturateEnabled: true
+  };
 
   window.addEventListener("load", function () {
     // Create a custom config for the after effects
-    var canvas = document.getElementById("my-canvas");
-    var canvasParent = canvas.parentElement;
-    var effectsNode = document.createElement("div");
-    effectsNode.style["position"] = "absolute";
-    effectsNode.style["left"] = "0px";
-    effectsNode.style["top"] = "0px";
-    effectsNode.style["width"] = "100%";
-    effectsNode.style["height"] = "100%";
-    // This is very important so the backdrop-filter element does not block input events.
-    effectsNode.style["pointer-events"] = "none";
-
-    canvasParent.appendChild(effectsNode);
-
-    var updateBackdropFilter = function (newBackdropFilterString, config) {
-      // console.log("backdropFilter", newBackdropFilterString);
-      if (config.isEffectsColorEnabled) {
-        var colorParsed = Color.parse(config.effectFilterColor);
-        colorParsed.setAlpha(config.opacity);
-        effectsNode.style["background-color"] = colorParsed.cssRGBA();
-      } else {
-        effectsNode.style["background-color"] = "";
-      }
-      effectsNode.style["backdrop-filter"] = newBackdropFilterString;
-    };
-    // ----- /NEW
 
     globalThis.demoInitializationObserver
       .waitForInitialized()
-      .then(function (initializedPB) {
-        console.log("initializedPB", initializedPB);
-        var pb = initializedPB;
-        var gui = pb.getGUI();
-
-        var initialFilterValues = {};
-
-        // +---------------------------------------------------------------------------------
-        // | Initialize dat.gui
-        // +-------------------------------
-        try {
-          var cssBackdropFolder = gui.addFolder("CSS Backdrop Filters");
-          var triggerUpdateBackdropFilters = createCssBackdropFilterSelector(
-            cssBackdropFolder,
-            updateBackdropFilter,
-            initialFilterValues
-          );
-          triggerUpdateBackdropFilters();
-        } catch (exc) {
-          console.error(exc);
-        }
+      .then(function (_initializedPB) {
+        // globalThis.utils["cssBackdropEffects"].filterValues.blur = 10;
+        // globalThis.utils["cssBackdropEffects"].filterValues.isBlurEnabled = true;
+        // Usually we would add backdrop filters explicitly with the following code.
+        // But just by adding the required
+        //
+        //  * function `createCssBackdropFilterSelector` and
+        //  * class `CSSBackdropEffects`
+        // the filter will be automatically available!
+        // var backdropEffects = new CSSBackdropEffects(
+        //   initializedPB,
+        //   initializedPB.getGUI(),
+        //   { isBackdropFiltersEnabled: false } // CSSBackdropEffects.DEFAULT_FILTER_VALUES
+        // );
+        //
+        //
+        // Filter values may look like this (interface `CSSBackdropFilterParams`)
+        // var initialFilterValues = {
+        //   // This is just for the global effect color
+        //   effectFilterColor: "#204a87",
+        //   isEffectsColorEnabled: true,
+        //   // These are real filter values
+        //   opacity: 0.5,
+        //   isOpacityEnabled: false,
+        //   invert: 0.8,
+        //   isInvertEnabled: false,
+        //   sepia: 0.9,
+        //   isSepiaEnabled: false,
+        //   blur: 2, // px
+        //   isBlurEnabled: false,
+        //   brightness: 0.6,
+        //   isBrightnessEnabled: false,
+        //   contrast: 0.9,
+        //   isContrastEnabled: false,
+        //   dropShadow: 4, // px
+        //   dropShadowColor: "#00ffff", // HOW TO DISABLE THIS PROPERLY
+        //   isDropShadowEnabled: false,
+        //   grayscale: 0.3,
+        //   isGrayscaleEnabled: false,
+        //   hueRotate: 120, // deg
+        //   isHueRotateEnabled: false,
+        //   saturate: 2.0,
+        //   isSaturateEnabled: false
+        // };
       })
       .catch(function (error) {
         console.error("Failed to retrieve PB instance from parent demo.", error);

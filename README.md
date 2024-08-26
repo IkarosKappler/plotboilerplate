@@ -304,7 +304,7 @@ var pb = new PlotBoilerplate({
 
   // string
   //   A background color (CSS string) for the canvas.
-  backgroundColor: "#ffffff",
+  backgroundColor: isDarkmode ? "#000000" : "#ffffff",
 
   // boolean
   //   Switch auto-redrawing on resize on/off (some applications

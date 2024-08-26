@@ -47,7 +47,8 @@
  * @modified 2023-10-04 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
  * @modified 2024-01-30 Fixing an issue with immutable style sets; changes to the global draw config did not reflect here (do now).
  * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
- * @version  1.6.9
+ * @modified 2024-07-24 Caching custom style defs in a private buffer variable.
+ * @version  1.6.10
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilssvg = void 0;
@@ -162,6 +163,13 @@ var drawutilssvg = /** @class */ (function () {
                 console.warn("Warning: your draw config is missing the key '".concat(k, "' which is required."));
             }
         }
+        if (this.customStyleDefs) {
+            rules.push("\n/* Custom styles */\n");
+            this.customStyleDefs.forEach(function (value, key) {
+                rules.push(key + " { " + value + " }");
+            });
+            // this.nodeStyle.innerHTML += "\n/* Custom styles */\n" + rules.join("\n");
+        }
         this.nodeStyle.innerHTML = rules.join("\n");
     };
     /**
@@ -185,11 +193,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {Map<string,string>} defs
      */
     drawutilssvg.prototype.addCustomStyleDefs = function (defs) {
-        var buffer = [];
-        defs.forEach(function (value, key) {
-            buffer.push(key + " { " + value + " }");
-        });
-        this.nodeStyle.innerHTML += "\n/* Custom styles */\n" + buffer.join("\n");
+        this.customStyleDefs = defs;
     };
     /**
      * Retieve an old (cached) element.

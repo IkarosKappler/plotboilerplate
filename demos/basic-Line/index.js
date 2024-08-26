@@ -1,44 +1,35 @@
 /**
  * A script for demonstrating the basic usage of the Line class.
  *
- * @requires PlotBoilerplate, gup, dat.gui, 
- * 
+ * @requires PlotBoilerplate, gup, dat.gui,
+ *
  * @author   Ikaros Kappler
  * @date     2020-05-18
  * @version  1.0.0
  **/
 
+(function (_context) {
+  "use strict";
 
-(function(_context) {
-    "use strict";
+  // Fetch the GET params
+  let GUP = gup();
+  var isDarkmode = detectDarkMode(GUP);
+  window.addEventListener("load", function () {
+    // All config params except the canvas are optional.
+    var pb = new PlotBoilerplate(
+      PlotBoilerplate.utils.safeMergeByKeys({ canvas: document.getElementById("my-canvas"), fullSize: true }, GUP)
+    );
 
-    // Fetch the GET params
-    let GUP = gup();
+    // Create two new vertices
+    var vert_a = new Vertex(50, 50);
+    var vert_b = new Vertex(-50, -50);
 
-    window.addEventListener(
-	'load',
-	function() {
-	    // All config params except the canvas are optional.
-	    var pb = new PlotBoilerplate(
-		PlotBoilerplate.utils.safeMergeByKeys(
-		    { canvas                : document.getElementById('my-canvas'),					    
-		      fullSize              : true
-		    }, GUP
-		)
-	    );
+    // Create the line
+    var line = new Line(vert_a, vert_b);
 
-	    // Create two new vertices
-	    var vert_a = new Vertex( 50, 50 );
-	    var vert_b = new Vertex( -50, -50 );
+    // Now add it to your canvas
+    pb.add(line);
 
-	    // Create the line
-	    var line = new Line( vert_a, vert_b );
-
-	    // Now add it to your canvas
-	    pb.add( line );
-
-	    // Note: the line's end points are draggable now :)
-
-	} );
-    
-})(window); 
+    // Note: the line's end points are draggable now :)
+  });
+})(window);

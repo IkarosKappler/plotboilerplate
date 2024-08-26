@@ -46,7 +46,8 @@
  * @modified 2023-10-04 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
  * @modified 2024-01-30 Fixing an issue with immutable style sets; changes to the global draw config did not reflect here (do now).
  * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
- * @version  1.6.9
+ * @modified 2024-07-24 Caching custom style defs in a private buffer variable.
+ * @version  1.6.10
  **/
 
 import { CircleSector } from "./CircleSector";
@@ -203,6 +204,11 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   private drawConfig: DrawConfig;
 
   /**
+   * A buffer element for custom style defs (will be re-generated on each draw cycle).
+   */
+  private customStyleDefs: Map<string, string>;
+
+  /**
    * Passed from primary to secondary instance.
    */
   //private nodeStyle: SVGStyleElement;
@@ -312,6 +318,15 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
         console.warn(`Warning: your draw config is missing the key '${k}' which is required.`);
       }
     }
+
+    if (this.customStyleDefs) {
+      rules.push("\n/* Custom styles */\n");
+      this.customStyleDefs.forEach((value: string, key: string) => {
+        rules.push(key + " { " + value + " }");
+      });
+      // this.nodeStyle.innerHTML += "\n/* Custom styles */\n" + rules.join("\n");
+    }
+
     this.nodeStyle.innerHTML = rules.join("\n");
   }
 
@@ -337,11 +352,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {Map<string,string>} defs
    */
   addCustomStyleDefs(defs: Map<string, string>) {
-    const buffer: string[] = [];
-    defs.forEach((value: string, key: string) => {
-      buffer.push(key + " { " + value + " }");
-    });
-    this.nodeStyle.innerHTML += "\n/* Custom styles */\n" + buffer.join("\n");
+    this.customStyleDefs = defs;
   }
 
   /**

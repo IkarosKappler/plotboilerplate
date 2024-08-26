@@ -37,7 +37,7 @@
           offsetAdjustYPercent: 0, // 100,  // ... -lower corner
           drawBezierHandleLines: false,
           drawBezierHandlePoints: false,
-          backgroundColor: "#ffffff",
+          backgroundColor: isDarkmode ? "#000000" : "#ffffff",
           enableMouse: true,
           enableKeys: true
         },

@@ -18,7 +18,7 @@
 
   // Fetch the GET params
   let GUP = gup();
-
+  var isDarkmode = detectDarkMode(GUP);
   window.addEventListener("load", function () {
     // THIS DEMO WORKS A BIT DIFFERENT THAN THE OTHERS.
     // IT DOES NOT USE AN EXPLICIT INSTANCE OF PLOTBOILERPLATE
@@ -70,6 +70,7 @@
     var squareSize = null;
     var tosvgDraw = null;
     var tosvgFill = null;
+    var customStyleDefs = null;
 
     // +---------------------------------------------------------------------------------
     // | Initialize the draw library for SVG rendering: width and height and style defs.
@@ -93,8 +94,9 @@
         w: squareSize.w - config.borderSize,
         h: squareSize.h - config.borderSize
       };
-      var styleDefs = makeCustomStyleDefs(config, innerSquareSize);
-      tosvgDraw.addCustomStyleDefs(styleDefs);
+      customStyleDefs = makeCustomStyleDefs(config, innerSquareSize);
+      // Always add custom styles to the PRIMARY draw lib.
+      tosvgFill.addCustomStyleDefs(customStyleDefs);
     };
 
     // +---------------------------------------------------------------------------------

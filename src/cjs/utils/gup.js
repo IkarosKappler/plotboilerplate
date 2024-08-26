@@ -10,6 +10,7 @@
  * Ported to typescript.
  * @date 2021-05-21
  * @modified 2024-03-10 Fixed some type for Typescript 5 compatibility.
+ * @modified 2024-08-26 Decoding URI components in GET params.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.gup = void 0;
@@ -21,7 +22,8 @@ exports.gup = void 0;
 var gup = function () {
     var vars = {};
     globalThis.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (_m, key, value) {
-        return (vars[key] = value);
+        var keyName = key;
+        return (vars[decodeURIComponent(keyName)] = value);
     });
     return vars;
 };

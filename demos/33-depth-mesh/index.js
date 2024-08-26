@@ -18,6 +18,7 @@
 
   // Fetch the GET params
   let GUP = gup();
+  var isDarkmode = detectDarkMode(GUP);
   let D2R = Math.PI / 180;
 
   window.addEventListener("load", function () {
@@ -46,7 +47,7 @@
           autoAdjustOffset: true,
           offsetAdjustXPercent: 50,
           offsetAdjustYPercent: 50,
-          backgroundColor: "#ffffff",
+          backgroundColor: isDarkmode ? "#000000" : "#ffffff",
           enableMouse: true,
           enableTouch: true,
           enableKeys: true,

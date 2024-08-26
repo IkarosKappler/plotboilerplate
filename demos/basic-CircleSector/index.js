@@ -1,57 +1,47 @@
 /**
  * A script for demonstrating the basic usage of the Circle class.
  *
- * @requires PlotBoilerplate, gup, dat.gui, 
- * 
+ * @requires PlotBoilerplate, gup, dat.gui,
+ *
  * @author   Ikaros Kappler
  * @date     2020-12-18
  * @modified 2021-01-22 Added the circle sector helper.
  * @version  1.1.0
  **/
 
+(function (_context) {
+  "use strict";
 
-(function(_context) {
-    "use strict";
+  // Fetch the GET params
+  let GUP = gup();
+  var isDarkmode = detectDarkMode(GUP);
+  window.addEventListener("load", function () {
+    // All config params except the canvas are optional.
+    var pb = new PlotBoilerplate(
+      PlotBoilerplate.utils.safeMergeByKeys({ canvas: document.getElementById("my-canvas"), fullSize: true }, GUP)
+    );
 
-    // Fetch the GET params
-    let GUP = gup();
+    // Create center vertex and radius (a non-negative number)
+    var center = new Vertex(10, 10);
+    var radius = 150;
 
-    window.addEventListener(
-	'load',
-	function() {
-	    // All config params except the canvas are optional.
-	    var pb = new PlotBoilerplate(
-		PlotBoilerplate.utils.safeMergeByKeys(
-		    { canvas                : document.getElementById('my-canvas'),
-		      fullSize              : true
-		    }, GUP
-		)
-	    );
+    // Create the circle
+    var circle = new Circle(center, radius);
 
-	    // Create center vertex and radius (a non-negative number)
-	    var center = new Vertex( 10, 10 );
-	    var radius = 150;
+    // Now create a sector from the circle
+    var startAngle = (34 / 180) * Math.PI; // in radians
+    var endAngle = (330 / 180) * Math.PI;
+    var circleSector = new CircleSector(circle, startAngle, endAngle);
 
-	    // Create the circle
-	    var circle = new Circle( center, radius );
+    // Now add the sector to your canvas
+    pb.add(circleSector);
 
-	    // Now create a sector from the circle
-	    var startAngle   = 34 / 180 * Math.PI; // in radians
-	    var endAngle     = 330 / 180 * Math.PI;
-	    var circleSector = new CircleSector( circle, startAngle, endAngle );
+    // Note: the center point is draggable now :)
 
-	    // Now add the sector to your canvas
-	    pb.add( circleSector );
-
-	    // Note: the center point is draggable now :)
-
-
-	    
-	    // Further: add a circle sector helper to edit angles and radius manually (mouse or touch)
-	    var controlPointA = circleSector.circle.vertAt( circleSector.startAngle );
-	    var controlPointB = circleSector.circle.vertAt( circleSector.endAngle );
-	    new CircleSectorHelper( circleSector, controlPointA, controlPointB, pb );
-	    pb.add( [controlPointA, controlPointB] );
-	} );
-    
-})(window); 
+    // Further: add a circle sector helper to edit angles and radius manually (mouse or touch)
+    var controlPointA = circleSector.circle.vertAt(circleSector.startAngle);
+    var controlPointB = circleSector.circle.vertAt(circleSector.endAngle);
+    new CircleSectorHelper(circleSector, controlPointA, controlPointB, pb);
+    pb.add([controlPointA, controlPointB]);
+  });
+})(window);
