@@ -117,12 +117,16 @@
     });
 
     _self._disableByCheckbox = function () {
-      this.baseController.$widget.classList.add("disabled-bycheckbox");
+      if (!Boolean(object[booleanProperty])) {
+        this.baseController.$widget.classList.add("disabled-bycheckbox");
+      }
     };
 
     _self._enableByCheckbox = function () {
       //   console.log("remove");
-      this.baseController.$widget.classList.remove("disabled-bycheckbox");
+      if (Boolean(object[booleanProperty])) {
+        this.baseController.$widget.classList.remove("disabled-bycheckbox");
+      }
     };
 
     _self.baseController.$widget.prepend(checkboxContainer);
