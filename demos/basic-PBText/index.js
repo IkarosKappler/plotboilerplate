@@ -81,22 +81,7 @@
     // +---------------------------------------------------------------------------------
     // | Initialize dat.gui for this demo.
     // +-------------------------------
-    var gui = new dat.gui.GUI();
-    var toggleGuiSize = function () {
-      // TODO: put into separate function
-      gui.domElement.style["transform-origin"] = "100% 0%";
-      if (config.guiDoubleSize) {
-        gui.domElement.style["transform"] = "scale(2.0)";
-      } else {
-        gui.domElement.style["transform"] = "scale(1.0)";
-      }
-    };
-    if (isMobileDevice()) {
-      config.guiDoubleSize = true;
-      toggleGuiSize();
-    }
-    // prettier-ignore
-    gui.add(config, "guiDoubleSize").title("Double size GUI?").onChange(toggleGuiSize);
+    var gui = pb.createGUI();
     // prettier-ignore
     gui.add(config, "x").listen().title("The x position of the text.").onChange( updateTextProperties);
     // prettier-ignore
