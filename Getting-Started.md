@@ -114,7 +114,7 @@ new MouseHandler(pb.eventCatcher)
     }
     // First param: the vertex to add
     // Second param: automatic redraw?
-    pb.add(new Vertex(event.params.pos, false));
+    pb.add(new Vertex(pb.transformMousePosition(event.params.pos.x, event.params.pos.y)), false);
     pb.redraw();
   });
 
@@ -122,7 +122,7 @@ new MouseHandler(pb.eventCatcher)
 new AlloyFinger(this.pb.eventCatcher, {
   // Event type: TouchEvent
   touchEnd: function (event) {
-    pb.add(new Vertex(event.params.pos, false));
+    pb.add(new Vertex(pb.transformMousePosition(event.params.pos.x, event.params.pos.y)), false);
     pb.redraw();
   }
 });

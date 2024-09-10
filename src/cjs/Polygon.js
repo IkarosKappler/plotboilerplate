@@ -75,13 +75,25 @@ var Polygon = /** @class */ (function () {
     /**
      * Add a vertex to the end of the `vertices` array.
      *
-     * @method addVert
+     * @method addVertex
      * @param {Vertex} vert - The vertex to add.
      * @instance
      * @memberof Polygon
      **/
     Polygon.prototype.addVertex = function (vert) {
         this.vertices.push(vert);
+    };
+    /**
+     * Add a vertex at a particular position of the `vertices` array.
+     *
+     * @method addVertexAt
+     * @param {Vertex} vert - The vertex to add.
+     * @param {number} index - The position to add the vertex at. Will be handled modulo.
+     * @instance
+     * @memberof Polygon
+     **/
+    Polygon.prototype.addVertexAt = function (vert, index) {
+        this.vertices.splice(index, 0, vert);
     };
     /**
      * Get the polygon vertex at the given position (index).
@@ -100,10 +112,12 @@ var Polygon = /** @class */ (function () {
      * @return {Vertex} At the given index.
      **/
     Polygon.prototype.getVertexAt = function (index) {
-        if (index < 0)
+        if (index < 0) {
             return this.vertices[this.vertices.length - (Math.abs(index) % this.vertices.length)];
-        else
+        }
+        else {
             return this.vertices[index % this.vertices.length];
+        }
     };
     /**
      * Move the polygon's vertices by the given amount.

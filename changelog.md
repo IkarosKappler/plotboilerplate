@@ -9,7 +9,10 @@ Imminent todos:
 - check automatic darmode detection
 - lil-gui does not scroll
 
-* 2024-08-26
+* 2024-09-10
+  - Chaging the first param of `VertTuple.pointDistance` from `Vertex` to less strict type `XYCoords`. This should not break anything.
+  - Adding the optional `VertTuple.epsilon` param to the `hasPoint` method.
+* 2024-08-26 [v1.23.2]
   - Added the `utils/Params.hasParam` method.
   - Decoding URI components in GET params in `utils/gup`.
 * 2024-08-25

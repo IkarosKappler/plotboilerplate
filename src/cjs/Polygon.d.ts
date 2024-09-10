@@ -96,12 +96,22 @@ export declare class Polygon implements SVGSerializable {
     /**
      * Add a vertex to the end of the `vertices` array.
      *
-     * @method addVert
+     * @method addVertex
      * @param {Vertex} vert - The vertex to add.
      * @instance
      * @memberof Polygon
      **/
     addVertex(vert: Vertex): void;
+    /**
+     * Add a vertex at a particular position of the `vertices` array.
+     *
+     * @method addVertexAt
+     * @param {Vertex} vert - The vertex to add.
+     * @param {number} index - The position to add the vertex at. Will be handled modulo.
+     * @instance
+     * @memberof Polygon
+     **/
+    addVertexAt(vert: Vertex, index: number): void;
     /**
      * Get the polygon vertex at the given position (index).
      *

@@ -111,13 +111,27 @@ export class Polygon implements SVGSerializable {
   /**
    * Add a vertex to the end of the `vertices` array.
    *
-   * @method addVert
+   * @method addVertex
    * @param {Vertex} vert - The vertex to add.
    * @instance
    * @memberof Polygon
    **/
   addVertex(vert: Vertex): void {
     this.vertices.push(vert);
+  }
+
+  /**
+   * Add a vertex at a particular position of the `vertices` array.
+   *
+   * @method addVertexAt
+   * @param {Vertex} vert - The vertex to add.
+   * @param {number} index - The position to add the vertex at. Will be handled modulo.
+   * @instance
+   * @memberof Polygon
+   **/
+  addVertexAt(vert: Vertex, index: number): void {
+    var moduloIndex = index % (this.vertices.length + 1);
+    this.vertices.splice(index, 0, vert);
   }
 
   /**
@@ -137,8 +151,11 @@ export class Polygon implements SVGSerializable {
    * @return {Vertex} At the given index.
    **/
   getVertexAt(index: number): Vertex {
-    if (index < 0) return this.vertices[this.vertices.length - (Math.abs(index) % this.vertices.length)];
-    else return this.vertices[index % this.vertices.length];
+    if (index < 0) {
+      return this.vertices[this.vertices.length - (Math.abs(index) % this.vertices.length)];
+    } else {
+      return this.vertices[index % this.vertices.length];
+    }
   }
 
   /**

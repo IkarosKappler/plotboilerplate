@@ -10,7 +10,9 @@
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2023-09-29 Fixed a calculation error in the VertTuple.hasPoint() function; distance measure was broken!
- * @version 1.2.1
+ * @modified 2024-09-10 Chaging the first param of `pointDistance` from `Vertex` to less strict type `XYCoords`. This should not break anything.
+ * @modified 2024-09-10 Adding the optional `epsilon` param to the `hasPoint` method.
+ * @version 1.2.2
  */
 
 import { Vertex } from "./Vertex";
@@ -269,20 +271,31 @@ export class VertTuple<T extends VertTuple<T>> {
    * that point is located between point `a` and `b`.
    *
    * @method hasPoint
-   * @param {Vertex} point The point to check.
-   * @param {boolean=} insideBoundsOnly If set to to true (default=false) the point must be between start and end point of the line.
+   * @param {Vertex} point - The point to check.
+   * @param {boolean=} insideBoundsOnly - [optional] If set to to true (default=false) the point must be between start and end point of the line.
+   * @param {number=Vertex.EPSILON} epsilon - [optional] A tolerance.
    * @return {boolean} True if the given point is on this line.
    * @instance
    * @memberof VertTuple
    */
-  hasPoint(point: XYCoords, insideBoundsOnly?: boolean): boolean {
+  hasPoint(point: XYCoords, insideBoundsOnly?: boolean, epsilon?: number): boolean {
     const t: number = this.getClosestT(point);
     // Compare to pointDistance?
     const distance: number = Math.sqrt(VertTuple.vtutils.dist2(point, this.vertAt(t)));
+    // console.log(
+    //   "distance",
+    //   distance,
+    //   "epsilon",
+    //   epsilon,
+    //   "distance < (epsilon ?? Vertex.EPSILON)",
+    //   distance < (epsilon ?? Vertex.EPSILON),
+    //   "distance < (epsilon ?? Vertex.EPSILON) && t >= 0 && t <= 1",
+    //   distance < (epsilon ?? Vertex.EPSILON) && t >= 0 && t <= 1
+    // );
     if (typeof insideBoundsOnly !== "undefined" && insideBoundsOnly) {
-      return distance < Vertex.EPSILON && t >= 0 && t <= 1;
+      return distance < (epsilon ?? Vertex.EPSILON) && t >= 0 && t <= 1;
     } else {
-      return distance < Vertex.EPSILON; // t >= 0 && t <= 1;
+      return distance < (epsilon ?? Vertex.EPSILON); // t >= 0 && t <= 1;
     }
   }
 
@@ -304,12 +317,12 @@ export class VertTuple<T extends VertTuple<T>> {
    * The the minimal distance between this line and the specified point.
    *
    * @method pointDistance
-   * @param {Vertex} p The point (vertex) to measre the distance to.
+   * @param {XYCoords} p The point (vertex) to measre the distance to.
    * @return {number} The absolute minimal distance.
    * @instance
    * @memberof VertTuple
    **/
-  pointDistance(p: Vertex): number {
+  pointDistance(p: XYCoords): number {
     // Taken From:
     // https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
     return Math.sqrt(VertTuple.vtutils.dist2(p, this.vertAt(this.getClosestT(p))));
