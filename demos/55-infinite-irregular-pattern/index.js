@@ -48,9 +48,38 @@
       // ...
       if (editableCellPolygon.mouseOverLine) {
         console.log("Mouse over line");
-        pb.draw.line(editableCellPolygon.mouseOverLine.a, editableCellPolygon.mouseOverLine.b, "red", 5.0);
+        pb.draw.line(editableCellPolygon.mouseOverLine.a, editableCellPolygon.mouseOverLine.b, "rgba(0,192,192,0.5)", 5.0);
       }
+      fillPattern(draw);
       drawPolygonIndices(editableCellPolygon.polygon, fill, { color: "orange", fontFamily: "Arial", fontSize: 9 });
+    };
+
+    // var drawPoly = function(poly,offsetx,offsety) {
+
+    // }
+
+    var fillPattern = function (draw) {
+      var polyBounds = editableCellPolygon.polygon.getBounds();
+      var tempPoly = editableCellPolygon.polygon.clone();
+      for (var x = 0; x < 10; x++) {
+        tempPoly.move({ x: polyBounds.width, y: 0 });
+        draw.polygon(tempPoly, "grey", 1);
+      }
+      tempPoly = editableCellPolygon.polygon.clone();
+      for (var x = 0; x < 10; x++) {
+        tempPoly.move({ x: -polyBounds.width, y: 0 });
+        draw.polygon(tempPoly, "grey", 1);
+      }
+      tempPoly = editableCellPolygon.polygon.clone();
+      for (var y = 0; y < 10; y++) {
+        tempPoly.move({ x: 0, y: polyBounds.height });
+        draw.polygon(tempPoly, "grey", 1);
+      }
+      tempPoly = editableCellPolygon.polygon.clone();
+      for (var y = 0; y < 10; y++) {
+        tempPoly.move({ x: 0, y: -polyBounds.height });
+        draw.polygon(tempPoly, "grey", 1);
+      }
     };
 
     // +---------------------------------------------------------------------------------

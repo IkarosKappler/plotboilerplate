@@ -11,12 +11,17 @@
     this.mouseOverIndex = null;
     this.polygon = polygon;
 
+    // Link all initial vertices with their opposite
+    for (var i = 0; i < this.polygon.vertices.length / 2; i++) {
+      this.linkPointWithOpposite(i);
+    }
+
     var _self = this;
     // Install mouse listener
     new MouseHandler(pb.eventCatcher)
       .drag(function (event) {})
       .move(function (event) {
-        console.log("dr");
+        // console.log("dr");
 
         // Detect line of hover ...
         var oldIndex = _self.mouseOverIndex;
@@ -28,7 +33,7 @@
             _self.mouseOverIndex != null &&
             (oldIndex[0] != _self.mouseOverIndex[0] || oldIndex[1] != _self.mouseOverIndex[1]))
         ) {
-          console.log("Redraw");
+          // console.log("Redraw");
           _self.pb.redraw();
         }
       })
@@ -45,22 +50,67 @@
         // _self.pb.add(new Vertex(relPos), false);
         if (_self.mouseOverLine) {
           // Find closest point on line and add
-          var closestLinePoint = _self.mouseOverLine.getClosestPoint(relPos);
-          var clonsesLinePointPartner = closestLinePoint.clone();
-          // _self.pb.add(new Vertex(relPos), false);
-          console.log("_self.mouseOverIndex", _self.mouseOverIndex);
-          _self.polygon.addVertexAt(closestLinePoint, _self.mouseOverIndex[1]);
-          _self.polygon.addVertexAt(
-            clonsesLinePointPartner,
-            _self.mouseOverIndex[1] + 1 + (_self.polygon.vertices.length - 1) / 2
-          );
-          _self.pb.add(closestLinePoint);
-          _self.pb.add(clonsesLinePointPartner);
+          var closestT = _self.mouseOverLine.getClosestT(relPos);
+          var currentLineIndex = _self.mouseOverIndex[1];
+
+          _self.extendPolygonSymmetrically(currentLineIndex, closestT);
           _self.mouseOverIndex = null;
           _self.mouseOverLine = null;
           _self.pb.redraw();
         }
       });
+  };
+
+  /**
+   * Assuming the polygon has 2n vertices it can always be symmetrically extened by adding two points:
+   *  - one at some arbitrary polygon line.
+   *  - ona at the line of the 'opposite' side of the polygon.
+   *
+   * This maintains the invariant of 2(n+1) vertices and if those points are linked by their relative
+   * positions inside the line, then the polygon always stays a plane filling one.
+   *
+   * @param {number} closestT
+   */
+  EditableCellPolygon.prototype.extendPolygonSymmetrically = function (currentLineIndex, closestT) {
+    var closestLinePoint = this.mouseOverLine.vertAt(closestT);
+    var oppositeLineIndex = this.getOppositePointIndex(currentLineIndex);
+    // Reverse line!
+    var oppositeLine = new Line(this.polygon.getVertexAt(oppositeLineIndex), this.polygon.getVertexAt(oppositeLineIndex - 1));
+    var oppositePoint = oppositeLine.vertAt(closestT);
+    // console.log("_self.mouseOverIndex", this.mouseOverIndex);
+    // Add the larger index at first so we don't mess up local index order.
+    if (currentLineIndex > oppositeLineIndex) {
+      this.polygon.addVertexAt(closestLinePoint, currentLineIndex);
+      this.polygon.addVertexAt(oppositePoint, oppositeLineIndex);
+      this.pb.add(closestLinePoint);
+      this.pb.add(oppositePoint);
+      this.linkPointWithOpposite(oppositeLineIndex);
+    } else {
+      this.polygon.addVertexAt(oppositePoint, oppositeLineIndex);
+      this.polygon.addVertexAt(closestLinePoint, currentLineIndex);
+      this.pb.add(oppositePoint);
+      this.pb.add(closestLinePoint);
+      this.linkPointWithOpposite(currentLineIndex);
+    }
+  };
+
+  EditableCellPolygon.prototype.linkPointWithOpposite = function (pointIndex) {
+    var oppositePointIndex = this.getOppositePointIndex(pointIndex);
+    var point = this.polygon.getVertexAt(pointIndex);
+    var oppositePoint = this.polygon.getVertexAt(oppositePointIndex);
+    (function (pointA, pointB) {
+      pointA.listeners.addDragListener(function (event) {
+        pointB.add(event.params.dragAmount);
+      });
+      pointB.listeners.addDragListener(function (event) {
+        pointA.add(event.params.dragAmount);
+      });
+    })(point, oppositePoint);
+  };
+
+  EditableCellPolygon.prototype.getOppositePointIndex = function (pointIndex) {
+    // This MUST be an integer (vertex count multiple of 2).
+    return (pointIndex + Math.round(this.polygon.vertices.length / 2)) % this.polygon.vertices.length;
   };
 
   EditableCellPolygon.prototype.locateMouseOverLine = function (event) {
