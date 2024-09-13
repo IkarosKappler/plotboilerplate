@@ -93,6 +93,7 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      **/
     Polygon.prototype.addVertexAt = function (vert, index) {
+        var moduloIndex = index % (this.vertices.length + 1);
         this.vertices.splice(index, 0, vert);
     };
     /**

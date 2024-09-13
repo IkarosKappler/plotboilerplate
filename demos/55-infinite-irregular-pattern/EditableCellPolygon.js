@@ -11,10 +11,10 @@
     this.mouseOverIndex = null;
     this.polygon = polygon;
 
-    // Link all initial vertices with their opposite
-    for (var i = 0; i < this.polygon.vertices.length / 2; i++) {
-      this.linkPointWithOpposite(i);
-    }
+    // // Link all initial vertices with their opposite
+    // for (var i = 0; i < this.polygon.vertices.length / 2; i++) {
+    //   this.linkPointWithOpposite(i);
+    // }
 
     var _self = this;
     // Install mouse listener

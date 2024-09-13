@@ -57,6 +57,7 @@
  * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @modified 2023-09-30 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
  * @modified 2023-10-07 Adding the optional `arrowHeadBasePositionBuffer` param to the arrowHead(...) method.
+ * @modified 2024-09-13 Remoed the scaling of `lineWidth` in the `polygon` and `polyline` methods. This makes no sense here and doesn't match up with the behavior of other line functions.
  * @version  1.13.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -987,7 +988,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.save();
         this.applyStrokeOpts(strokeOptions);
         this.ctx.beginPath();
-        this.ctx.lineWidth = (lineWidth || 1.0) * this.scale.x;
+        this.ctx.lineWidth = lineWidth || 1.0;
         this.ctx.moveTo(this.offset.x + vertices[0].x * this.scale.x, this.offset.y + vertices[0].y * this.scale.y);
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x * this.scale.x, this.offset.y + vertices[i].y * this.scale.y);

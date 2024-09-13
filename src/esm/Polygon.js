@@ -90,6 +90,7 @@ export class Polygon {
      * @memberof Polygon
      **/
     addVertexAt(vert, index) {
+        var moduloIndex = index % (this.vertices.length + 1);
         this.vertices.splice(index, 0, vert);
     }
     /**
