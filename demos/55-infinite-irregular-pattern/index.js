@@ -50,18 +50,50 @@
       vertA.listeners.addDragListener(function (event) {
         vertB.add({ x: event.params.dragAmount.x, y: 0 });
         vertD.add({ x: 0, y: event.params.dragAmount.y });
+        // Adjust the whole northern line vertically
+        // and the western line horizontally
+        for (var i = 1; i < editableCellPolygon.linePointIndices[0].length; i++) {
+          rectCellPolygon.getVertexAt(editableCellPolygon.linePointIndices[0][i]).add({ x: event.params.dragAmount.x, y: 0 });
+        }
+        for (var i = 1; i < editableCellPolygon.linePointIndices[3].length; i++) {
+          rectCellPolygon.getVertexAt(editableCellPolygon.linePointIndices[3][i]).add({ x: 0, y: event.params.dragAmount.y });
+        }
       });
       vertB.listeners.addDragListener(function (event) {
         vertA.add({ x: event.params.dragAmount.x, y: 0 });
         vertC.add({ x: 0, y: event.params.dragAmount.y });
+        // Adjust the whole northern line vertically
+        // and the eastern line horizontally
+        for (var i = 1; i < editableCellPolygon.linePointIndices[0].length; i++) {
+          rectCellPolygon.getVertexAt(editableCellPolygon.linePointIndices[0][i]).add({ x: event.params.dragAmount.x, y: 0 });
+        }
+        for (var i = 1; i < editableCellPolygon.linePointIndices[1].length; i++) {
+          rectCellPolygon.getVertexAt(editableCellPolygon.linePointIndices[1][i]).add({ x: 0, y: event.params.dragAmount.y });
+        }
       });
       vertC.listeners.addDragListener(function (event) {
         vertD.add({ x: event.params.dragAmount.x, y: 0 });
         vertB.add({ x: 0, y: event.params.dragAmount.y });
+        // Adjust the whole southern line vertically
+        // and the eastern line horizontally
+        for (var i = 1; i < editableCellPolygon.linePointIndices[1].length; i++) {
+          rectCellPolygon.getVertexAt(editableCellPolygon.linePointIndices[1][i]).add({ x: 0, y: event.params.dragAmount.y });
+        }
+        for (var i = 1; i < editableCellPolygon.linePointIndices[2].length; i++) {
+          rectCellPolygon.getVertexAt(editableCellPolygon.linePointIndices[2][i]).add({ x: event.params.dragAmount.x, y: 0 });
+        }
       });
       vertD.listeners.addDragListener(function (event) {
         vertC.add({ x: event.params.dragAmount.x, y: 0 });
         vertA.add({ x: 0, y: event.params.dragAmount.y });
+        // Adjust the whole southern line vertically
+        // and the western line horizontally
+        for (var i = 1; i < editableCellPolygon.linePointIndices[2].length; i++) {
+          rectCellPolygon.getVertexAt(editableCellPolygon.linePointIndices[2][i]).add({ x: event.params.dragAmount.x, y: 0 });
+        }
+        for (var i = 1; i < editableCellPolygon.linePointIndices[3].length; i++) {
+          rectCellPolygon.getVertexAt(editableCellPolygon.linePointIndices[3][i]).add({ x: 0, y: event.params.dragAmount.y });
+        }
       });
     };
 
@@ -96,18 +128,35 @@
       var differenceAFromOriginal = originalRectCellPolygon.getVertexAt(0).difference(rectCellBaseVertices[0]).inv();
       var differenceBFromOriginal = originalRectCellPolygon.getVertexAt(1).difference(rectCellBaseVertices[1]).inv();
       var differenceCFromOriginal = originalRectCellPolygon.getVertexAt(2).difference(rectCellBaseVertices[2]).inv();
+      var differenceDFromOriginal = originalRectCellPolygon.getVertexAt(3).difference(rectCellBaseVertices[3]).inv();
 
       // console.log("differenceFromOriginal", differenceAFromOriginal);
 
       // Draw the center spur
-      fillVerticalPattern(draw, 10, tempPolyA, differenceAFromOriginal, differenceCFromOriginal);
+      fillVerticalPattern(
+        draw,
+        10,
+        tempPolyA,
+        differenceAFromOriginal,
+        differenceBFromOriginal,
+        differenceCFromOriginal,
+        differenceDFromOriginal
+      );
 
       // Fill the left area
       for (var x = 0; x < 10; x++) {
         tempPolyA.move({ x: cellBounds.width, y: 0 });
         tempPolyA.move({ x: 0, y: differenceAFromOriginal.y - differenceBFromOriginal.y });
         draw.polygon(tempPolyA, "grey", 1);
-        fillVerticalPattern(draw, 10, tempPolyA, differenceAFromOriginal, differenceCFromOriginal);
+        fillVerticalPattern(
+          draw,
+          10,
+          tempPolyA,
+          differenceAFromOriginal,
+          differenceBFromOriginal,
+          differenceCFromOriginal,
+          differenceDFromOriginal
+        );
       }
       // Fill the right area
       tempPolyA = editableCellPolygon.polygon.clone();
@@ -115,7 +164,15 @@
         tempPolyA.move({ x: -cellBounds.width, y: 0 });
         tempPolyA.move({ x: 0, y: -differenceAFromOriginal.y + differenceBFromOriginal.y });
         draw.polygon(tempPolyA, "grey", 1);
-        fillVerticalPattern(draw, 10, tempPolyA, differenceAFromOriginal, differenceCFromOriginal);
+        fillVerticalPattern(
+          draw,
+          10,
+          tempPolyA,
+          differenceAFromOriginal,
+          differenceBFromOriginal,
+          differenceCFromOriginal,
+          differenceDFromOriginal
+        );
       }
     };
 
@@ -123,17 +180,59 @@
     // | Fills a vertical section with n elements to the upper and n elements to
     // | the lower direction.
     // +-------------------------------
-    var fillVerticalPattern = function (draw, n, tempPolyA, differenceAFromOriginal, differenceCFromOriginal) {
+    var fillVerticalPattern = function (
+      draw,
+      n,
+      tempPolyA,
+      differenceAFromOriginal,
+      differenceBFromOriginal,
+      differenceCFromOriginal,
+      differenceDFromOriginal
+    ) {
       var tempPolyB = tempPolyA.clone();
+      // for (var y = 0; y < n; y++) {
+      //   tempPolyB.move({ x: 0, y: cellBounds.height });
+      //   tempPolyB.move({ x: differenceAFromOriginal.x - differenceCFromOriginal.x, y: 0 });
+      //   draw.polygon(tempPolyB, "grey", 1);
+      // }
+      // tempPolyB = tempPolyA.clone();
+      // for (var y = 0; y < n; y++) {
+      //   tempPolyB.move({ x: 0, y: -cellBounds.height });
+      //   tempPolyB.move({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
+      //   draw.polygon(tempPolyB, "grey", 1);
+      // }
+      // Generate row up
       for (var y = 0; y < n; y++) {
         tempPolyB.move({ x: 0, y: cellBounds.height });
         tempPolyB.move({ x: differenceAFromOriginal.x - differenceCFromOriginal.x, y: 0 });
+        // Move upper and lower line-combination
+        // for (var i = 1; i < editableCellPolygon.linePointIndices[0].length; i++) {
+        //   tempPolyB
+        //     .getVertexAt(editableCellPolygon.linePointIndices[0][i])
+        //     .add({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
+        //   tempPolyB
+        //     .getVertexAt(editableCellPolygon.linePointIndices[2][i])
+        //     .add({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
+        // }
         draw.polygon(tempPolyB, "grey", 1);
       }
       tempPolyB = tempPolyA.clone();
+      // Generate row down
       for (var y = 0; y < n; y++) {
         tempPolyB.move({ x: 0, y: -cellBounds.height });
         tempPolyB.move({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
+        // tempPolyB
+        //   .getVertexAt(editableCellPolygon.linePointIndices[0][0])
+        //   .add({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
+        // tempPolyB
+        //   .getVertexAt(editableCellPolygon.linePointIndices[1][0])
+        //   .add({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
+        // tempPolyB
+        //   .getVertexAt(editableCellPolygon.linePointIndices[2][0])
+        //   .add({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
+        // tempPolyB
+        //   .getVertexAt(editableCellPolygon.linePointIndices[3][0])
+        //   .add({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
         draw.polygon(tempPolyB, "grey", 1);
       }
     };
