@@ -30,7 +30,8 @@
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
       // The arrow head size
-      amountPct: 75
+      verticalCount: 10,
+      horizontalCount: 10
     };
 
     // Create base polygon to start with: a square
@@ -84,22 +85,22 @@
       var differenceCFromOriginal = originalRectCellPolygon.getVertexAt(2).difference(rectCellBaseVertices[2]).inv();
 
       // Draw the center spur
-      fillVerticalPattern(draw, 10, tempPolyA, differenceAFromOriginal, differenceCFromOriginal);
+      fillVerticalPattern(draw, tempPolyA, differenceAFromOriginal, differenceCFromOriginal);
 
       // Fill the left area
-      for (var x = 0; x < 10; x++) {
+      for (var x = 0; x < config.horizontalCount / 2; x++) {
         tempPolyA.move({ x: cellBounds.width, y: 0 });
         tempPolyA.move({ x: 0, y: differenceAFromOriginal.y - differenceBFromOriginal.y });
         draw.polygon(tempPolyA, "grey", 1);
-        fillVerticalPattern(draw, 10, tempPolyA, differenceAFromOriginal, differenceCFromOriginal);
+        fillVerticalPattern(draw, tempPolyA, differenceAFromOriginal, differenceCFromOriginal);
       }
       // Fill the right area
       tempPolyA = editableCellPolygon.polygon.clone();
-      for (var x = 0; x < 10; x++) {
+      for (var x = 0; x < config.horizontalCount / 2; x++) {
         tempPolyA.move({ x: -cellBounds.width, y: 0 });
         tempPolyA.move({ x: 0, y: -differenceAFromOriginal.y + differenceBFromOriginal.y });
         draw.polygon(tempPolyA, "grey", 1);
-        fillVerticalPattern(draw, 10, tempPolyA, differenceAFromOriginal, differenceCFromOriginal);
+        fillVerticalPattern(draw, tempPolyA, differenceAFromOriginal, differenceCFromOriginal);
       }
     };
 
@@ -107,29 +108,38 @@
     // | Fills a vertical section with n elements to the upper and n elements to
     // | the lower direction.
     // +-------------------------------
-    var fillVerticalPattern = function (draw, n, tempPolyA, differenceAFromOriginal, differenceCFromOriginal) {
+    var fillVerticalPattern = function (draw, tempPolyA, differenceAFromOriginal, differenceCFromOriginal) {
       var tempPolyB = tempPolyA.clone();
       // Generate row up
-      for (var y = 0; y < n; y++) {
+      for (var y = 0; y < config.verticalCount / 2; y++) {
         tempPolyB.move({ x: 0, y: cellBounds.height });
         tempPolyB.move({ x: differenceAFromOriginal.x - differenceCFromOriginal.x, y: 0 });
         draw.polygon(tempPolyB, "grey", 1);
       }
       tempPolyB = tempPolyA.clone();
       // Generate row down
-      for (var y = 0; y < n; y++) {
+      for (var y = 0; y < config.verticalCount / 2; y++) {
         tempPolyB.move({ x: 0, y: -cellBounds.height });
         tempPolyB.move({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
         draw.polygon(tempPolyB, "grey", 1);
       }
     };
 
+    var rebuild = function () {
+      pb.redraw();
+    };
+
     // +---------------------------------------------------------------------------------
     // | Create a GUI.
     // +-------------------------------
     {
-      // prettier-ignore
       var _gui = pb.createGUI();
+      // prettier-ignore
+      _gui.add(config, "verticalCount").min(1).max(100).step(1).name("verticalCount").title("The vertical number of cells.")
+      .onChange( function() { rebuild(); });
+      // prettier-ignore
+      _gui.add(config, "horizontalCount").min(1).max(100).step(1).name("horizontalCount").title("The horizontal number of cells.")
+      .onChange( function() { rebuild(); });
     }
 
     pb.config.preDraw = preDraw;
