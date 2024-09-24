@@ -40,13 +40,13 @@
     var rectCellBaseVertices = rectCellPolygon.vertices.slice(0, rectCellPolygon.vertices.length); // Shallow array copy
     var originalRectCellPolygon = rectCellPolygon.clone();
 
-    var linkRectPolygonVertices = function (rectPoly) {
-      // Must have 4 vertices
-      var vertA = rectPoly.getVertexAt(0);
-      var vertB = rectPoly.getVertexAt(1);
-      var vertC = rectPoly.getVertexAt(2);
-      var vertD = rectPoly.getVertexAt(3);
+    // Must have 4 vertices
+    var vertA = rectCellPolygon.getVertexAt(0);
+    var vertB = rectCellPolygon.getVertexAt(1);
+    var vertC = rectCellPolygon.getVertexAt(2);
+    var vertD = rectCellPolygon.getVertexAt(3);
 
+    var linkRectPolygonVertices = function () {
       vertA.listeners.addDragListener(function (event) {
         vertB.add({ x: event.params.dragAmount.x, y: 0 });
         vertD.add({ x: 0, y: event.params.dragAmount.y });
@@ -83,30 +83,33 @@
       }
       fillPattern(draw);
       drawPolygonIndices(editableCellPolygon.polygon, fill, { color: "orange", fontFamily: "Arial", fontSize: 9 });
+
+      // Highlight main vertices of the square grid
+      draw.circle(vertA, 7, "orange", 1);
+      draw.circle(vertB, 7, "orange", 1);
+      draw.circle(vertC, 7, "orange", 1);
+      draw.circle(vertD, 7, "orange", 1);
     };
 
     var fillPattern = function (draw) {
-      // var cellBounds = editableCellPolygon.polygon.getBounds();
       var tempPolyA = editableCellPolygon.polygon.clone();
-      var tempPolyB; //  = editableCellPolygon.polygon.clone();
-      // var differenceAFromOriginal = originalRectCellPolygon.getVertexAt(0).difference(rectCellPolygon.getVertexAt(0)).inv();
-      // var differenceBFromOriginal = originalRectCellPolygon.getVertexAt(1).difference(rectCellPolygon.getVertexAt(1)).inv();
-      // var differenceCFromOriginal = originalRectCellPolygon.getVertexAt(2).difference(rectCellPolygon.getVertexAt(2)).inv();
-
       var differenceAFromOriginal = originalRectCellPolygon.getVertexAt(0).difference(rectCellBaseVertices[0]).inv();
       var differenceBFromOriginal = originalRectCellPolygon.getVertexAt(1).difference(rectCellBaseVertices[1]).inv();
       var differenceCFromOriginal = originalRectCellPolygon.getVertexAt(2).difference(rectCellBaseVertices[2]).inv();
 
       // console.log("differenceFromOriginal", differenceAFromOriginal);
 
+      // Draw the center spur
       fillVerticalPattern(draw, 10, tempPolyA, differenceAFromOriginal, differenceCFromOriginal);
 
+      // Fill the left area
       for (var x = 0; x < 10; x++) {
         tempPolyA.move({ x: cellBounds.width, y: 0 });
         tempPolyA.move({ x: 0, y: differenceAFromOriginal.y - differenceBFromOriginal.y });
         draw.polygon(tempPolyA, "grey", 1);
         fillVerticalPattern(draw, 10, tempPolyA, differenceAFromOriginal, differenceCFromOriginal);
       }
+      // Fill the right area
       tempPolyA = editableCellPolygon.polygon.clone();
       for (var x = 0; x < 10; x++) {
         tempPolyA.move({ x: -cellBounds.width, y: 0 });

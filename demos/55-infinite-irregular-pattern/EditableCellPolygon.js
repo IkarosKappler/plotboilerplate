@@ -11,6 +11,13 @@
     this.mouseOverIndex = null;
     this.polygon = polygon;
 
+    this.linePointIndices = [
+      [0], // line 0
+      [1], // line 1
+      [2], // line 2
+      [3] // line 3
+    ];
+
     // // Link all initial vertices with their opposite
     // for (var i = 0; i < this.polygon.vertices.length / 2; i++) {
     //   this.linkPointWithOpposite(i);
@@ -25,7 +32,7 @@
 
         // Detect line of hover ...
         var oldIndex = _self.mouseOverIndex;
-        var lineAt = _self.locateMouseOverLine(event);
+        var lineAt = _self.locateMouseOverPolygonLine(event);
         _self.mouseOverLine = lineAt;
         if (
           oldIndex != _self.mouseOverIndex ||
@@ -51,9 +58,9 @@
         if (_self.mouseOverLine) {
           // Find closest point on line and add
           var closestT = _self.mouseOverLine.getClosestT(relPos);
-          var currentLineIndex = _self.mouseOverIndex[1];
+          var currentPolygonLineIndex = _self.mouseOverIndex[0];
 
-          _self.extendPolygonSymmetrically(currentLineIndex, closestT);
+          _self.extendPolygonSymmetrically(currentPolygonLineIndex, closestT);
           _self.mouseOverIndex = null;
           _self.mouseOverLine = null;
           _self.pb.redraw();
@@ -69,41 +76,101 @@
    * This maintains the invariant of 2(n+1) vertices and if those points are linked by their relative
    * positions inside the line, then the polygon always stays a plane filling one.
    *
-   * @param {number} closestT
+   * @param {number} closestT - The position on the polygon line to add the new vertex.
    */
-  EditableCellPolygon.prototype.extendPolygonSymmetrically = function (currentLineIndex, closestT) {
+  EditableCellPolygon.prototype.extendPolygonSymmetrically = function (currentPolygonLineIndex, closestT) {
+    var squarePointIndex = this.locateSquareLinePointIndexByPolygonIndex(currentPolygonLineIndex);
+
+    console.log("currentPolygonLineIndex", currentPolygonLineIndex, "squarePointIndex", squarePointIndex);
     var closestLinePoint = this.mouseOverLine.vertAt(closestT);
-    var oppositeLineIndex = this.getOppositePointIndex(currentLineIndex);
+    var oppositeSquarePointIndex = this.getOppositeSquarePointIndex(currentPolygonLineIndex);
+    var oppositePolygonLineIndex = this.linePointIndices[oppositeSquarePointIndex[0]][oppositeSquarePointIndex[1]];
     // Reverse line!
-    var oppositeLine = new Line(this.polygon.getVertexAt(oppositeLineIndex), this.polygon.getVertexAt(oppositeLineIndex - 1));
+    var oppositeLine = new Line(
+      this.polygon.getVertexAt(oppositePolygonLineIndex + 1),
+      this.polygon.getVertexAt(oppositePolygonLineIndex)
+    );
+    console.log(
+      "currentPolygonLineIndex",
+      currentPolygonLineIndex,
+      "oppositeSquarePointIndex",
+      oppositeSquarePointIndex,
+      "oppositePolygonLineIndex",
+      oppositePolygonLineIndex
+    );
     var oppositePoint = oppositeLine.vertAt(closestT);
     // console.log("_self.mouseOverIndex", this.mouseOverIndex);
     // Add the larger index at first so we don't mess up local index order.
-    if (currentLineIndex > oppositeLineIndex) {
-      this.polygon.addVertexAt(closestLinePoint, currentLineIndex);
-      this.polygon.addVertexAt(oppositePoint, oppositeLineIndex);
-      this.pb.add(closestLinePoint);
-      this.pb.add(oppositePoint);
-      this.linkPointWithOpposite(oppositeLineIndex);
+    if (currentPolygonLineIndex < oppositePolygonLineIndex) {
+      this.addVertexPairToPolygon(
+        currentPolygonLineIndex,
+        closestLinePoint,
+        squarePointIndex,
+        oppositePolygonLineIndex,
+        oppositePoint,
+        oppositeSquarePointIndex
+      );
     } else {
-      this.polygon.addVertexAt(oppositePoint, oppositeLineIndex);
-      this.polygon.addVertexAt(closestLinePoint, currentLineIndex);
-      this.pb.add(oppositePoint);
-      this.pb.add(closestLinePoint);
-      this.linkPointWithOpposite(currentLineIndex);
+      this.addVertexPairToPolygon(
+        oppositePolygonLineIndex,
+        oppositePoint,
+        oppositeSquarePointIndex,
+        currentPolygonLineIndex,
+        closestLinePoint,
+        squarePointIndex
+      );
     }
+    console.log("this.linePointIndices", this.linePointIndices);
   };
 
-  EditableCellPolygon.prototype.linkPointWithOpposite = function (pointIndex) {
-    var oppositePointIndex = this.getOppositePointIndex(pointIndex);
-    var point = this.polygon.getVertexAt(pointIndex);
-    var oppositePoint = this.polygon.getVertexAt(oppositePointIndex);
+  EditableCellPolygon.prototype.addVertexPairToPolygon = function (
+    smallerPolygonLineIndex,
+    smallerPolygonPoint,
+    squarePointIndex,
+    oppositePolygonLineIndex,
+    oppositePolygonPoint,
+    oppositeSquarePointIndex
+  ) {
+    this.polygon.addVertexAt(oppositePolygonPoint, oppositePolygonLineIndex + 1);
+    // this.polygon.addVertexAt(oppositePolygonPoint, oppositePolygonLineIndex + 1);
+    this.polygon.addVertexAt(smallerPolygonPoint, smallerPolygonLineIndex + 1);
+    var newSmallerPointIndex = smallerPolygonLineIndex + 1;
+    var newOppositePointIndex = oppositePolygonLineIndex + 2;
+    // Update current map
+    for (var i = 0; i < this.linePointIndices.length; i++) {
+      for (var j = 0; j < this.linePointIndices[i].length; j++) {
+        if (this.linePointIndices[i][j] >= newSmallerPointIndex) {
+          this.linePointIndices[i][j]++;
+        }
+        if (this.linePointIndices[i][j] >= newOppositePointIndex) {
+          this.linePointIndices[i][j]++;
+        }
+      }
+    }
+    // Also add to index map
+    this.linePointIndices[squarePointIndex[0]].splice(squarePointIndex[1] + 1, 0, newSmallerPointIndex);
+    this.linePointIndices[oppositeSquarePointIndex[0]].splice(oppositeSquarePointIndex[1] + 1, 0, newOppositePointIndex);
+
+    // Add vertices to visible canvas
+    this.pb.add(oppositePolygonPoint);
+    this.pb.add(smallerPolygonPoint);
+    // this.linkPointWithOpposite(newSmallerPointIndex, newOppositePointIndex);
+    this.linkPointWithOpposite(oppositePolygonPoint, smallerPolygonPoint);
+  };
+
+  // EditableCellPolygon.prototype.linkPointWithOpposite = function (pointIndex, oppositePointIndex) {
+  EditableCellPolygon.prototype.linkPointWithOpposite = function (point, oppositePoint) {
+    // console.log("[linkPointWithOpposite] pointIndex", pointIndex, "oppositePointIndex", oppositePointIndex);
+    // var point = this.polygon.getVertexAt(pointIndex);
+    // var oppositePoint = this.polygon.getVertexAt(oppositePointIndex);
     (function (pointA, pointB) {
       pointA.listeners.addDragListener(function (event) {
         pointB.add(event.params.dragAmount);
+        console.log("pointA moved");
       });
       pointB.listeners.addDragListener(function (event) {
         pointA.add(event.params.dragAmount);
+        console.log("pointB moved");
       });
     })(point, oppositePoint);
   };
@@ -113,7 +180,43 @@
     return (pointIndex + Math.round(this.polygon.vertices.length / 2)) % this.polygon.vertices.length;
   };
 
-  EditableCellPolygon.prototype.locateMouseOverLine = function (event) {
+  /**
+   *
+   * @param {*} pointIndex
+   * @returns [number,number] - [squareLineIndex,squarePointIndex]
+   */
+  EditableCellPolygon.prototype.getOppositeSquarePointIndex = function (pointIndex) {
+    // This MUST be an integer (vertex count multiple of 2).
+    // return (pointIndex + Math.round(this.polygon.vertices.length / 2)) % this.polygon.vertices.length;
+    // A) locate line that contains the point
+    var squareLineIndex = this.getContainingSquareIndex(pointIndex);
+    var oppositeSquareLineIndex = (squareLineIndex + 2) % 4;
+    var oppositeSquarePointIndex = this.linePointIndices[squareLineIndex].indexOf(pointIndex);
+    // return [oppositeSquareLineIndex, oppositeSquarePointIndex];
+    return [oppositeSquareLineIndex, this.linePointIndices[squareLineIndex].length - 1 - oppositeSquarePointIndex];
+  };
+
+  /**
+   * Find one of the four square's line indices which contains the given point index.
+   * @param {} pointIndex
+   * @returns
+   */
+  EditableCellPolygon.prototype.getContainingSquareIndex = function (pointIndex) {
+    for (var i = 0; i < this.linePointIndices.length; i++) {
+      if (this.linePointIndices[i].includes(pointIndex)) {
+        return i;
+      }
+    }
+    return -1;
+  };
+
+  EditableCellPolygon.prototype.locateSquareLinePointIndexByPolygonIndex = function (polygonLineIndex) {
+    var squareLineIndex = this.getContainingSquareIndex(polygonLineIndex);
+    var squarePointIndex = this.linePointIndices[squareLineIndex].indexOf(polygonLineIndex);
+    return [squareLineIndex, squarePointIndex];
+  };
+
+  EditableCellPolygon.prototype.locateMouseOverPolygonLine = function (event) {
     var transformedPosition = this.pb.transformMousePosition(event.params.pos.x, event.params.pos.y);
     var line = new Line(new Vertex(), new Vertex());
     var lineDistance = Number.MAX_VALUE;
