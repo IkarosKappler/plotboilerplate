@@ -1,10 +1,10 @@
 /**
- * A script for demonstrating the basic usage of the Bézier trim method.
+ * A script for construction infinite patterns based on a square tiling.
  *
  * @requires PlotBoilerplate, gup, dat.gui,
  *
  * @author   Ikaros Kappler
- * @date     2020-05-18
+ * @date     2020-09-24
  * @version  1.0.0
  **/
 
@@ -23,6 +23,7 @@
         GUP
       )
     );
+    // Let's set up some colors.
     pb.drawConfig.polygon.color = "red";
     pb.drawConfig.polygon.lineWidth = 2;
 
@@ -34,9 +35,13 @@
 
     // Create base polygon to start with: a square
     var viewport = pb.viewport();
+    // Find a nice size for the initial polygon: like one third of the screen size
     var size = Math.min(viewport.width, viewport.height) / 3.0;
+    // Construct a square. This will be our initial plane-filling tile.
     var cellBounds = new Bounds(new Vertex(-size, -size), new Vertex(size, size));
     var rectCellPolygon = cellBounds.toPolygon();
+    // Keep a shallow copy of the original square vertices. We will ue these to calculate offets
+    // for space filling drawing.
     var rectCellBaseVertices = rectCellPolygon.vertices.slice(0, rectCellPolygon.vertices.length); // Shallow array copy
     var originalRectCellPolygon = rectCellPolygon.clone();
 
@@ -45,60 +50,6 @@
     var vertB = rectCellPolygon.getVertexAt(1);
     var vertC = rectCellPolygon.getVertexAt(2);
     var vertD = rectCellPolygon.getVertexAt(3);
-
-    var linkRectPolygonVertices = function () {
-      vertA.listeners.addDragListener(function (event) {
-        vertB.add({ x: event.params.dragAmount.x, y: 0 });
-        vertD.add({ x: 0, y: event.params.dragAmount.y });
-        // Adjust the whole northern line vertically
-        // and the western line horizontally
-        for (var i = 1; i < editableCellPolygon.linePointIndices[0].length; i++) {
-          rectCellPolygon.getVertexAt(editableCellPolygon.linePointIndices[0][i]).add({ x: event.params.dragAmount.x, y: 0 });
-        }
-        for (var i = 1; i < editableCellPolygon.linePointIndices[3].length; i++) {
-          rectCellPolygon.getVertexAt(editableCellPolygon.linePointIndices[3][i]).add({ x: 0, y: event.params.dragAmount.y });
-        }
-      });
-      vertB.listeners.addDragListener(function (event) {
-        vertA.add({ x: event.params.dragAmount.x, y: 0 });
-        vertC.add({ x: 0, y: event.params.dragAmount.y });
-        // Adjust the whole northern line vertically
-        // and the eastern line horizontally
-        for (var i = 1; i < editableCellPolygon.linePointIndices[0].length; i++) {
-          rectCellPolygon.getVertexAt(editableCellPolygon.linePointIndices[0][i]).add({ x: event.params.dragAmount.x, y: 0 });
-        }
-        for (var i = 1; i < editableCellPolygon.linePointIndices[1].length; i++) {
-          rectCellPolygon.getVertexAt(editableCellPolygon.linePointIndices[1][i]).add({ x: 0, y: event.params.dragAmount.y });
-        }
-      });
-      vertC.listeners.addDragListener(function (event) {
-        vertD.add({ x: event.params.dragAmount.x, y: 0 });
-        vertB.add({ x: 0, y: event.params.dragAmount.y });
-        // Adjust the whole southern line vertically
-        // and the eastern line horizontally
-        for (var i = 1; i < editableCellPolygon.linePointIndices[1].length; i++) {
-          rectCellPolygon.getVertexAt(editableCellPolygon.linePointIndices[1][i]).add({ x: 0, y: event.params.dragAmount.y });
-        }
-        for (var i = 1; i < editableCellPolygon.linePointIndices[2].length; i++) {
-          rectCellPolygon.getVertexAt(editableCellPolygon.linePointIndices[2][i]).add({ x: event.params.dragAmount.x, y: 0 });
-        }
-      });
-      vertD.listeners.addDragListener(function (event) {
-        vertC.add({ x: event.params.dragAmount.x, y: 0 });
-        vertA.add({ x: 0, y: event.params.dragAmount.y });
-        // Adjust the whole southern line vertically
-        // and the western line horizontally
-        for (var i = 1; i < editableCellPolygon.linePointIndices[2].length; i++) {
-          rectCellPolygon.getVertexAt(editableCellPolygon.linePointIndices[2][i]).add({ x: event.params.dragAmount.x, y: 0 });
-        }
-        for (var i = 1; i < editableCellPolygon.linePointIndices[3].length; i++) {
-          rectCellPolygon.getVertexAt(editableCellPolygon.linePointIndices[3][i]).add({ x: 0, y: event.params.dragAmount.y });
-        }
-      });
-    };
-
-    linkRectPolygonVertices(rectCellPolygon);
-    // pb.add(cellBounds.toPolygon());
 
     var editableCellPolygon = new EditableCellPolygon(pb, rectCellPolygon, {});
     pb.add(editableCellPolygon.polygon);
@@ -123,40 +74,24 @@
       draw.circle(vertD, 7, "orange", 1);
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Fills a pattern based on the configured polygon and settings.
+    // +-------------------------------
     var fillPattern = function (draw) {
       var tempPolyA = editableCellPolygon.polygon.clone();
       var differenceAFromOriginal = originalRectCellPolygon.getVertexAt(0).difference(rectCellBaseVertices[0]).inv();
       var differenceBFromOriginal = originalRectCellPolygon.getVertexAt(1).difference(rectCellBaseVertices[1]).inv();
       var differenceCFromOriginal = originalRectCellPolygon.getVertexAt(2).difference(rectCellBaseVertices[2]).inv();
-      var differenceDFromOriginal = originalRectCellPolygon.getVertexAt(3).difference(rectCellBaseVertices[3]).inv();
-
-      // console.log("differenceFromOriginal", differenceAFromOriginal);
 
       // Draw the center spur
-      fillVerticalPattern(
-        draw,
-        10,
-        tempPolyA,
-        differenceAFromOriginal,
-        differenceBFromOriginal,
-        differenceCFromOriginal,
-        differenceDFromOriginal
-      );
+      fillVerticalPattern(draw, 10, tempPolyA, differenceAFromOriginal, differenceCFromOriginal);
 
       // Fill the left area
       for (var x = 0; x < 10; x++) {
         tempPolyA.move({ x: cellBounds.width, y: 0 });
         tempPolyA.move({ x: 0, y: differenceAFromOriginal.y - differenceBFromOriginal.y });
         draw.polygon(tempPolyA, "grey", 1);
-        fillVerticalPattern(
-          draw,
-          10,
-          tempPolyA,
-          differenceAFromOriginal,
-          differenceBFromOriginal,
-          differenceCFromOriginal,
-          differenceDFromOriginal
-        );
+        fillVerticalPattern(draw, 10, tempPolyA, differenceAFromOriginal, differenceCFromOriginal);
       }
       // Fill the right area
       tempPolyA = editableCellPolygon.polygon.clone();
@@ -164,15 +99,7 @@
         tempPolyA.move({ x: -cellBounds.width, y: 0 });
         tempPolyA.move({ x: 0, y: -differenceAFromOriginal.y + differenceBFromOriginal.y });
         draw.polygon(tempPolyA, "grey", 1);
-        fillVerticalPattern(
-          draw,
-          10,
-          tempPolyA,
-          differenceAFromOriginal,
-          differenceBFromOriginal,
-          differenceCFromOriginal,
-          differenceDFromOriginal
-        );
+        fillVerticalPattern(draw, 10, tempPolyA, differenceAFromOriginal, differenceCFromOriginal);
       }
     };
 
@@ -180,40 +107,12 @@
     // | Fills a vertical section with n elements to the upper and n elements to
     // | the lower direction.
     // +-------------------------------
-    var fillVerticalPattern = function (
-      draw,
-      n,
-      tempPolyA,
-      differenceAFromOriginal,
-      differenceBFromOriginal,
-      differenceCFromOriginal,
-      differenceDFromOriginal
-    ) {
+    var fillVerticalPattern = function (draw, n, tempPolyA, differenceAFromOriginal, differenceCFromOriginal) {
       var tempPolyB = tempPolyA.clone();
-      // for (var y = 0; y < n; y++) {
-      //   tempPolyB.move({ x: 0, y: cellBounds.height });
-      //   tempPolyB.move({ x: differenceAFromOriginal.x - differenceCFromOriginal.x, y: 0 });
-      //   draw.polygon(tempPolyB, "grey", 1);
-      // }
-      // tempPolyB = tempPolyA.clone();
-      // for (var y = 0; y < n; y++) {
-      //   tempPolyB.move({ x: 0, y: -cellBounds.height });
-      //   tempPolyB.move({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
-      //   draw.polygon(tempPolyB, "grey", 1);
-      // }
       // Generate row up
       for (var y = 0; y < n; y++) {
         tempPolyB.move({ x: 0, y: cellBounds.height });
         tempPolyB.move({ x: differenceAFromOriginal.x - differenceCFromOriginal.x, y: 0 });
-        // Move upper and lower line-combination
-        // for (var i = 1; i < editableCellPolygon.linePointIndices[0].length; i++) {
-        //   tempPolyB
-        //     .getVertexAt(editableCellPolygon.linePointIndices[0][i])
-        //     .add({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
-        //   tempPolyB
-        //     .getVertexAt(editableCellPolygon.linePointIndices[2][i])
-        //     .add({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
-        // }
         draw.polygon(tempPolyB, "grey", 1);
       }
       tempPolyB = tempPolyA.clone();
@@ -221,18 +120,6 @@
       for (var y = 0; y < n; y++) {
         tempPolyB.move({ x: 0, y: -cellBounds.height });
         tempPolyB.move({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
-        // tempPolyB
-        //   .getVertexAt(editableCellPolygon.linePointIndices[0][0])
-        //   .add({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
-        // tempPolyB
-        //   .getVertexAt(editableCellPolygon.linePointIndices[1][0])
-        //   .add({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
-        // tempPolyB
-        //   .getVertexAt(editableCellPolygon.linePointIndices[2][0])
-        //   .add({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
-        // tempPolyB
-        //   .getVertexAt(editableCellPolygon.linePointIndices[3][0])
-        //   .add({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
         draw.polygon(tempPolyB, "grey", 1);
       }
     };
@@ -241,12 +128,8 @@
     // | Create a GUI.
     // +-------------------------------
     {
-      var _gui = pb.createGUI();
       // prettier-ignore
-      // gui.add(config, "amountPct").min(0).max(100).step(1)
-      //   .onChange(function () {
-      //     pb.redraw();
-      //   });
+      var _gui = pb.createGUI();
     }
 
     pb.config.preDraw = preDraw;
