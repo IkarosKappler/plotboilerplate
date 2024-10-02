@@ -23,6 +23,8 @@
     this.mouseOverLine = null;
     // [ number, number ]
     this.mouseOverIndex = null;
+    // Line | null
+    this.mouseOverOppositeLine = null;
     // [ number, number ]
     this.mouseOverOppositeIndex = null;
     // Polygon
@@ -53,7 +55,30 @@
         // Detect line of hover ...
         var oldIndex = _self.mouseOverIndex;
         var lineAt = _self.locateMouseOverPolygonLine(event);
+
+        // this.mouseOverOppositeIndex = this.getOppositeSquarePointIndex(this.mouseOverIndex[0]);
+        // line.a.set(this.polygon.vertices[lineIndex[0]]);
+        // line.b.set(this.polygon.vertices[lineIndex[1]]);
+        if (_self.mouseOverOppositeIndex != null) {
+          console.log("Using indices ");
+          var pointIndex = _self.linePointIndices[_self.mouseOverOppositeIndex[0]][_self.mouseOverOppositeIndex[1]];
+          _self.mouseOverOppositeLine = new Line(
+            _self.polygon.getVertexAt(pointIndex),
+            _self.polygon.getVertexAt(pointIndex + 1)
+          );
+          // this.mouseOverOppositeLine = new Line();
+          // console.log(
+          //   "Setting mouseOverOppositeLine aaaa",
+          //   _self.mouseOverOppositeLine,
+          //   "this.mouseOverOppositeIndex",
+          //   _self.mouseOverOppositeIndex
+          // );
+        } else {
+          _self.mouseOverOppositeLine = null;
+        }
+
         _self.mouseOverLine = lineAt;
+        // _self.oppositeMouseOverLine = _self.getOppositeMouseOverLine();
         if (
           oldIndex != _self.mouseOverIndex ||
           (oldIndex != null &&
@@ -340,12 +365,14 @@
     if (lineFound) {
       this.mouseOverIndex = lineIndex;
       this.mouseOverOppositeIndex = this.getOppositeSquarePointIndex(this.mouseOverIndex[0]);
+      console.log("[locateMouseOverPolygonLine] mouseOverOppositeIndex", this.mouseOverOppositeIndex);
       line.a.set(this.polygon.vertices[lineIndex[0]]);
       line.b.set(this.polygon.vertices[lineIndex[1]]);
 
       return line;
     } else {
       this.mouseOverIndex = null;
+      this.mouseOverOppositeIndex = null;
       return null;
     }
   };

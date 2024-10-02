@@ -60,19 +60,33 @@
     };
 
     var postDraw = function (draw, fill) {
-      // ...
       if (editableCellPolygon.mouseOverLine) {
-        console.log("Mouse over line");
+        console.log("Draw line 0", editableCellPolygon.mouseOverLine.a);
         pb.draw.line(editableCellPolygon.mouseOverLine.a, editableCellPolygon.mouseOverLine.b, "rgba(0,192,192,0.5)", 5.0);
+      }
+      // console.log("editableCellPolygon.mouseOverOppositeLine", editableCellPolygon.mouseOverOppositeLine);
+      if (editableCellPolygon.mouseOverOppositeLine) {
+        // console.log(
+        //   "Draw line 1",
+        //   editableCellPolygon.mouseOverOppositeLine.a,
+        //   "editableCellPolygon.mouseOverOppositeIndex",
+        //   editableCellPolygon.mouseOverOppositeIndex
+        // );
+        pb.draw.line(
+          editableCellPolygon.mouseOverOppositeLine.a,
+          editableCellPolygon.mouseOverOppositeLine.b,
+          "rgba(0,192,192,0.5)",
+          5.0
+        );
       }
       fillPattern(draw);
       drawPolygonIndices(editableCellPolygon.polygon, fill, { color: "orange", fontFamily: "Arial", fontSize: 9 });
 
       // Highlight main vertices of the square grid
-      draw.circle(vertA, 7, "orange", 1);
-      draw.circle(vertB, 7, "orange", 1);
-      draw.circle(vertC, 7, "orange", 1);
-      draw.circle(vertD, 7, "orange", 1);
+      draw.circle(vertA, 7 / draw.scale.x, "orange", 1);
+      draw.circle(vertB, 7 / draw.scale.x, "orange", 1);
+      draw.circle(vertC, 7 / draw.scale.x, "orange", 1);
+      draw.circle(vertD, 7 / draw.scale.x, "orange", 1);
     };
 
     // +---------------------------------------------------------------------------------
