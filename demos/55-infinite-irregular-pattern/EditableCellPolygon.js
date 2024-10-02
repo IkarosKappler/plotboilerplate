@@ -202,30 +202,66 @@
     var _self = this;
     this.vertA.listeners.addDragListener(function (event) {
       // _self.vertB.add({ x: event.params.dragAmount.x, y: 0 });
-      _self.vertD.add({ x: event.params.dragAmount.x, y: event.params.dragAmount.y });
+      _self.vertD.add({ x: -event.params.dragAmount.x, y: -event.params.dragAmount.y });
       _self._moveSublineVertices(0, event.params.dragAmount.x, event.params.dragAmount.y);
-      _self._moveSublineVertices(2, event.params.dragAmount.x, event.params.dragAmount.y);
-      _self._moveSublineVertices(3, event.params.dragAmount.x, event.params.dragAmount.y);
-      _self._moveSublineVertices(5, event.params.dragAmount.x, event.params.dragAmount.y);
+      _self._moveSublineVertices(2, -event.params.dragAmount.x, -event.params.dragAmount.y);
+      // _self._moveSublineVertices(5, -event.params.dragAmount.x, -event.params.dragAmount.y);
+      // _self._moveSublineVertices(3, -event.params.dragAmount.x, -event.params.dragAmount.y);
+      // _self._moveSublineVertices(0, event.params.dragAmount.x, event.params.dragAmount.y);
+      // _self._moveSublineVertices(2, -event.params.dragAmount.x, -event.params.dragAmount.y);
+      // _self._moveSublineVertices(3, -event.params.dragAmount.x, -event.params.dragAmount.y);
+      // _self._moveSublineVertices(5, event.params.dragAmount.x, event.params.dragAmount.y);
     });
-    // this.vertB.listeners.addDragListener(function (event) {
-    //   _self.vertA.add({ x: event.params.dragAmount.x, y: 0 });
-    //   _self.vertC.add({ x: 0, y: event.params.dragAmount.y });
-    //   _self._moveSublineVertices(0, event.params.dragAmount.x, 0);
-    //   _self._moveSublineVertices(1, 0, event.params.dragAmount.y);
-    // });
-    // this.vertC.listeners.addDragListener(function (event) {
-    //   _self.vertD.add({ x: event.params.dragAmount.x, y: 0 });
-    //   _self.vertB.add({ x: 0, y: event.params.dragAmount.y });
-    //   _self._moveSublineVertices(1, event.params.dragAmount.x, 0);
-    //   _self._moveSublineVertices(2, 0, event.params.dragAmount.y);
-    // });
-    // this.vertD.listeners.addDragListener(function (event) {
-    //   _self.vertC.add({ x: event.params.dragAmount.x, y: 0 });
-    //   _self.vertA.add({ x: 0, y: event.params.dragAmount.y });
-    //   _self._moveSublineVertices(2, event.params.dragAmount.x, 0);
-    //   _self._moveSublineVertices(3, 0, event.params.dragAmount.y);
-    // });
+    this.vertB.listeners.addDragListener(function (event) {
+      // _self.vertB.add({ x: event.params.dragAmount.x, y: 0 });
+      _self.vertE.add({ x: -event.params.dragAmount.x, y: -event.params.dragAmount.y });
+      _self._moveSublineVertices(1, event.params.dragAmount.x, event.params.dragAmount.y);
+      _self._moveSublineVertices(3, -event.params.dragAmount.x, -event.params.dragAmount.y);
+      // _self._moveSublineVertices(0, event.params.dragAmount.x, event.params.dragAmount.y);
+      // _self._moveSublineVertices(2, event.params.dragAmount.x, event.params.dragAmount.y);
+      // _self._moveSublineVertices(3, event.params.dragAmount.x, event.params.dragAmount.y);
+      // _self._moveSublineVertices(5, event.params.dragAmount.x, event.params.dragAmount.y);
+    });
+    this.vertC.listeners.addDragListener(function (event) {
+      // _self.vertB.add({ x: event.params.dragAmount.x, y: 0 });
+      _self.vertF.add({ x: -event.params.dragAmount.x, y: -event.params.dragAmount.y });
+      _self._moveSublineVertices(2, event.params.dragAmount.x, event.params.dragAmount.y);
+      _self._moveSublineVertices(4, -event.params.dragAmount.x, -event.params.dragAmount.y);
+      // _self._moveSublineVertices(0, event.params.dragAmount.x, event.params.dragAmount.y);
+      // _self._moveSublineVertices(2, event.params.dragAmount.x, event.params.dragAmount.y);
+      // _self._moveSublineVertices(3, event.params.dragAmount.x, event.params.dragAmount.y);
+      // _self._moveSublineVertices(5, event.params.dragAmount.x, event.params.dragAmount.y);
+    });
+    this.vertD.listeners.addDragListener(function (event) {
+      // _self.vertB.add({ x: event.params.dragAmount.x, y: 0 });
+      _self.vertA.add({ x: -event.params.dragAmount.x, y: -event.params.dragAmount.y });
+      _self._moveSublineVertices(3, event.params.dragAmount.x, event.params.dragAmount.y);
+      _self._moveSublineVertices(5, -event.params.dragAmount.x, -event.params.dragAmount.y);
+      // _self._moveSublineVertices(0, event.params.dragAmount.x, event.params.dragAmount.y);
+      // _self._moveSublineVertices(2, event.params.dragAmount.x, event.params.dragAmount.y);
+      // _self._moveSublineVertices(3, event.params.dragAmount.x, event.params.dragAmount.y);
+      // _self._moveSublineVertices(5, event.params.dragAmount.x, event.params.dragAmount.y);
+    });
+    this.vertE.listeners.addDragListener(function (event) {
+      // _self.vertB.add({ x: event.params.dragAmount.x, y: 0 });
+      _self.vertB.add({ x: -event.params.dragAmount.x, y: -event.params.dragAmount.y });
+      _self._moveSublineVertices(4, event.params.dragAmount.x, event.params.dragAmount.y);
+      _self._moveSublineVertices(0, -event.params.dragAmount.x, -event.params.dragAmount.y);
+      // _self._moveSublineVertices(0, event.params.dragAmount.x, event.params.dragAmount.y);
+      // _self._moveSublineVertices(2, event.params.dragAmount.x, event.params.dragAmount.y);
+      // _self._moveSublineVertices(3, event.params.dragAmount.x, event.params.dragAmount.y);
+      // _self._moveSublineVertices(5, event.params.dragAmount.x, event.params.dragAmount.y);
+    });
+    this.vertF.listeners.addDragListener(function (event) {
+      // _self.vertB.add({ x: event.params.dragAmount.x, y: 0 });
+      _self.vertC.add({ x: -event.params.dragAmount.x, y: -event.params.dragAmount.y });
+      _self._moveSublineVertices(5, event.params.dragAmount.x, event.params.dragAmount.y);
+      _self._moveSublineVertices(1, -event.params.dragAmount.x, -event.params.dragAmount.y);
+      // _self._moveSublineVertices(0, event.params.dragAmount.x, event.params.dragAmount.y);
+      // _self._moveSublineVertices(2, event.params.dragAmount.x, event.params.dragAmount.y);
+      // _self._moveSublineVertices(3, event.params.dragAmount.x, event.params.dragAmount.y);
+      // _self._moveSublineVertices(5, event.params.dragAmount.x, event.params.dragAmount.y);
+    });
   };
 
   /**
