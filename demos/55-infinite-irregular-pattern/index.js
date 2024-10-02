@@ -120,8 +120,8 @@
       vertB = rectCellPolygon.getVertexAt(1);
       vertC = rectCellPolygon.getVertexAt(2);
       vertD = rectCellPolygon.getVertexAt(3);
-      // vertE = rectCellPolygon.getVertexAt(4);
-      // vertF = rectCellPolygon.getVertexAt(5);
+      vertE = rectCellPolygon.getVertexAt(4);
+      vertF = rectCellPolygon.getVertexAt(5);
       // Create the cell polygon
       if (editableCellPolygon != null) {
         editableCellPolygon.destroy();
@@ -177,6 +177,12 @@
       draw.circle(vertB, 7 / draw.scale.x, "orange", 1);
       draw.circle(vertC, 7 / draw.scale.x, "orange", 1);
       draw.circle(vertD, 7 / draw.scale.x, "orange", 1);
+      if (vertE != null) {
+        draw.circle(vertE, 7 / draw.scale.x, "orange", 1);
+      }
+      if (vertF != null) {
+        draw.circle(vertF, 7 / draw.scale.x, "orange", 1);
+      }
     };
 
     // +---------------------------------------------------------------------------------

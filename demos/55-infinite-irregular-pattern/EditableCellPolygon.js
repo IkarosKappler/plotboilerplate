@@ -29,6 +29,8 @@
     this.mouseOverOppositeIndex = null;
     // Polygon
     this.polygon = polygon;
+    // number
+    this.polygonCardinality = polygon.vertices.length;
     // Vertex
     this.vertA = polygon.getVertexAt(0);
     // Vertex
@@ -37,13 +39,32 @@
     this.vertC = polygon.getVertexAt(2);
     // Vertex
     this.vertD = polygon.getVertexAt(3);
+    // Following vertices are used on hexagons only.
+    // Vertex | null
+    this.vertE = this.polygonCardinality > 4 ? polygon.getVertexAt(4) : null;
+    // Vertex | null
+    this.vertF = this.polygonCardinality > 5 ? polygon.getVertexAt(5) : null;
 
-    this.linePointIndices = [
-      [0], // line 0
-      [1], // line 1
-      [2], // line 2
-      [3] // line 3
-    ];
+    if (this.polygonCardinality > 5) {
+      console.log("IS HEXAGON");
+      // Hexagon
+      this.linePointIndices = [
+        [0], // line 0
+        [1], // line 1
+        [2], // line 2
+        [3], // line 3
+        [4], // line 4
+        [5] // line 5
+      ];
+    } else {
+      // Square
+      this.linePointIndices = [
+        [0], // line 0
+        [1], // line 1
+        [2], // line 2
+        [3] // line 3
+      ];
+    }
 
     var _self = this;
     // Install mouse listener
@@ -59,8 +80,9 @@
         // this.mouseOverOppositeIndex = this.getOppositeSquarePointIndex(this.mouseOverIndex[0]);
         // line.a.set(this.polygon.vertices[lineIndex[0]]);
         // line.b.set(this.polygon.vertices[lineIndex[1]]);
+        console.log("_self.mouseOverOppositeIndex", _self.mouseOverOppositeIndex);
         if (_self.mouseOverOppositeIndex != null) {
-          // console.log("Using indices ");
+          console.log("Using indices", _self.linePointIndices);
           var pointIndex = _self.linePointIndices[_self.mouseOverOppositeIndex[0]][_self.mouseOverOppositeIndex[1]];
           _self.mouseOverOppositeLine = new Line(
             _self.polygon.getVertexAt(pointIndex),
@@ -112,65 +134,82 @@
         }
       });
 
-    this._linkRectPolygonVertices();
+    this._linkSquarePolygonVertices();
+  };
+
+  /**
+   * Move all sub points of a given polygon line.
+   */
+  EditableCellPolygon.prototype._moveSublineVertices = function (lineIndex, xAmount, yAmount) {
+    for (var i = 1; i < this.linePointIndices[lineIndex].length; i++) {
+      this.polygon.getVertexAt(this.linePointIndices[lineIndex][i]).add({ x: xAmount, y: yAmount });
+    }
   };
 
   /**
    * This internal helper function adds drag listeners to the essential
-   * four corner vertices. If one is moved, the adjacent two edges
+   * four corner vertices of the input SQUARE. If one is moved, the adjacent two edges
    * are moved as well (their sub vertices).
    *
    * This maintains an infinite tiling shape.
    */
-  EditableCellPolygon.prototype._linkRectPolygonVertices = function () {
+  EditableCellPolygon.prototype._linkSquarePolygonVertices = function () {
     var _self = this;
     this.vertA.listeners.addDragListener(function (event) {
       _self.vertB.add({ x: event.params.dragAmount.x, y: 0 });
       _self.vertD.add({ x: 0, y: event.params.dragAmount.y });
       // Adjust the whole northern line vertically
       // and the western line horizontally
-      for (var i = 1; i < _self.linePointIndices[0].length; i++) {
-        _self.polygon.getVertexAt(_self.linePointIndices[0][i]).add({ x: event.params.dragAmount.x, y: 0 });
-      }
-      for (var i = 1; i < _self.linePointIndices[3].length; i++) {
-        _self.polygon.getVertexAt(_self.linePointIndices[3][i]).add({ x: 0, y: event.params.dragAmount.y });
-      }
+      // for (var i = 1; i < _self.linePointIndices[0].length; i++) {
+      //   _self.polygon.getVertexAt(_self.linePointIndices[0][i]).add({ x: event.params.dragAmount.x, y: 0 });
+      // }
+      // for (var i = 1; i < _self.linePointIndices[3].length; i++) {
+      //   _self.polygon.getVertexAt(_self.linePointIndices[3][i]).add({ x: 0, y: event.params.dragAmount.y });
+      // }
+      _self._moveSublineVertices(0, event.params.dragAmount.x, 0);
+      _self._moveSublineVertices(3, 0, event.params.dragAmount.y);
     });
     this.vertB.listeners.addDragListener(function (event) {
       _self.vertA.add({ x: event.params.dragAmount.x, y: 0 });
       _self.vertC.add({ x: 0, y: event.params.dragAmount.y });
       // Adjust the whole northern line vertically
       // and the eastern line horizontally
-      for (var i = 1; i < _self.linePointIndices[0].length; i++) {
-        _self.polygon.getVertexAt(_self.linePointIndices[0][i]).add({ x: event.params.dragAmount.x, y: 0 });
-      }
-      for (var i = 1; i < _self.linePointIndices[1].length; i++) {
-        _self.polygon.getVertexAt(_self.linePointIndices[1][i]).add({ x: 0, y: event.params.dragAmount.y });
-      }
+      // for (var i = 1; i < _self.linePointIndices[0].length; i++) {
+      //   _self.polygon.getVertexAt(_self.linePointIndices[0][i]).add({ x: event.params.dragAmount.x, y: 0 });
+      // }
+      // for (var i = 1; i < _self.linePointIndices[1].length; i++) {
+      //   _self.polygon.getVertexAt(_self.linePointIndices[1][i]).add({ x: 0, y: event.params.dragAmount.y });
+      // }
+      _self._moveSublineVertices(0, event.params.dragAmount.x, 0);
+      _self._moveSublineVertices(1, 0, event.params.dragAmount.y);
     });
     this.vertC.listeners.addDragListener(function (event) {
       _self.vertD.add({ x: event.params.dragAmount.x, y: 0 });
       _self.vertB.add({ x: 0, y: event.params.dragAmount.y });
       // Adjust the whole southern line vertically
       // and the eastern line horizontally
-      for (var i = 1; i < _self.linePointIndices[1].length; i++) {
-        _self.polygon.getVertexAt(_self.linePointIndices[1][i]).add({ x: 0, y: event.params.dragAmount.y });
-      }
-      for (var i = 1; i < _self.linePointIndices[2].length; i++) {
-        _self.polygon.getVertexAt(_self.linePointIndices[2][i]).add({ x: event.params.dragAmount.x, y: 0 });
-      }
+      // for (var i = 1; i < _self.linePointIndices[1].length; i++) {
+      //   _self.polygon.getVertexAt(_self.linePointIndices[1][i]).add({ x: 0, y: event.params.dragAmount.y });
+      // }
+      // for (var i = 1; i < _self.linePointIndices[2].length; i++) {
+      //   _self.polygon.getVertexAt(_self.linePointIndices[2][i]).add({ x: event.params.dragAmount.x, y: 0 });
+      // }
+      _self._moveSublineVertices(1, event.params.dragAmount.x, 0);
+      _self._moveSublineVertices(2, 0, event.params.dragAmount.y);
     });
     this.vertD.listeners.addDragListener(function (event) {
       _self.vertC.add({ x: event.params.dragAmount.x, y: 0 });
       _self.vertA.add({ x: 0, y: event.params.dragAmount.y });
       // Adjust the whole southern line vertically
       // and the western line horizontally
-      for (var i = 1; i < _self.linePointIndices[2].length; i++) {
-        _self.polygon.getVertexAt(_self.linePointIndices[2][i]).add({ x: event.params.dragAmount.x, y: 0 });
-      }
-      for (var i = 1; i < _self.linePointIndices[3].length; i++) {
-        _self.polygon.getVertexAt(_self.linePointIndices[3][i]).add({ x: 0, y: event.params.dragAmount.y });
-      }
+      // for (var i = 1; i < _self.linePointIndices[2].length; i++) {
+      //   _self.polygon.getVertexAt(_self.linePointIndices[2][i]).add({ x: event.params.dragAmount.x, y: 0 });
+      // }
+      // for (var i = 1; i < _self.linePointIndices[3].length; i++) {
+      //   _self.polygon.getVertexAt(_self.linePointIndices[3][i]).add({ x: 0, y: event.params.dragAmount.y });
+      // }
+      _self._moveSublineVertices(2, event.params.dragAmount.x, 0);
+      _self._moveSublineVertices(3, 0, event.params.dragAmount.y);
     });
   };
 
@@ -296,9 +335,11 @@
    * @returns [number,number] - [squareLineIndex,squarePointIndex]
    */
   EditableCellPolygon.prototype.getOppositeSquarePointIndex = function (polygonPointIndex) {
+    var n = this.polygonCardinality;
+    var nHalf = Math.round(n / 2);
     // locate line that contains the point
-    var squareLineIndex = this.getContainingSquareIndex(polygonPointIndex);
-    var oppositeSquareLineIndex = (squareLineIndex + 2) % 4;
+    var squareLineIndex = this.getContainingPolygonLineIndex(polygonPointIndex);
+    var oppositeSquareLineIndex = (squareLineIndex + nHalf) % n;
     var oppositeSquarePointIndex = this.linePointIndices[squareLineIndex].indexOf(polygonPointIndex);
     return [oppositeSquareLineIndex, this.linePointIndices[squareLineIndex].length - 1 - oppositeSquarePointIndex];
   };
@@ -308,7 +349,7 @@
    * @param {} pointIndex
    * @returns
    */
-  EditableCellPolygon.prototype.getContainingSquareIndex = function (pointIndex) {
+  EditableCellPolygon.prototype.getContainingPolygonLineIndex = function (pointIndex) {
     for (var i = 0; i < this.linePointIndices.length; i++) {
       if (this.linePointIndices[i].includes(pointIndex)) {
         return i;
@@ -325,7 +366,7 @@
    * @returns {number} The line index on the square.
    */
   EditableCellPolygon.prototype.locateSquareLinePointIndexByPolygonIndex = function (polygonLineIndex) {
-    var squareLineIndex = this.getContainingSquareIndex(polygonLineIndex);
+    var squareLineIndex = this.getContainingPolygonLineIndex(polygonLineIndex);
     var squarePointIndex = this.linePointIndices[squareLineIndex].indexOf(polygonLineIndex);
     return [squareLineIndex, squarePointIndex];
   };
