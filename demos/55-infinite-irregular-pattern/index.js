@@ -235,11 +235,48 @@
       }
     };
 
+    var fillDiagonalHexPattern = function (draw, tempHexPolyA) {
+      var diff = tempHexPolyA.getVertexAt(0).difference(tempHexPolyA.getVertexAt(4));
+      var tempHexPolyB = tempHexPolyA.clone();
+      for (var y = 0; y < config.verticalCount / 2; y++) {
+        tempHexPolyB.move({ x: diff.x, y: diff.y });
+        draw.polygon(tempHexPolyB, "grey", 1);
+      }
+      tempHexPolyB = tempHexPolyA.clone();
+      // Generate row down
+      for (var y = 0; y < config.verticalCount / 2; y++) {
+        tempHexPolyB.move({ x: -diff.x, y: -diff.y });
+        draw.polygon(tempHexPolyB, "grey", 1);
+      }
+    };
+
     // +---------------------------------------------------------------------------------
     // | Fills a pattern based on the configured polygon and settings.
     // +-------------------------------
     var fillHexPattern = function (draw) {
-      // ...
+      var tempHexPolyA = editableCellPolygon.polygon.clone();
+      // var differenceAFromOriginal = originalRectCellPolygon.getVertexAt(0).difference(rectCellBaseVertices[0]).inv();
+      // var differenceBFromOriginal = originalRectCellPolygon.getVertexAt(1).difference(rectCellBaseVertices[1]).inv();
+      // var differenceCFromOriginal = originalRectCellPolygon.getVertexAt(2).difference(rectCellBaseVertices[2]).inv();
+
+      fillDiagonalHexPattern(draw, tempHexPolyA); // , differenceAFromOriginal, differenceCFromOriginal);
+
+      var diff = tempHexPolyA.getVertexAt(0).difference(tempHexPolyA.getVertexAt(2));
+      // Fill the left area
+      for (var x = 0; x < config.horizontalCount / 2; x++) {
+        // tempPolyA.move({ x: cellBounds.width, y: 0 });
+        tempHexPolyA.move({ x: diff.x, y: diff.y });
+        draw.polygon(tempHexPolyA, "grey", 1);
+        fillDiagonalHexPattern(draw, tempHexPolyA); // , differenceAFromOriginal, differenceCFromOriginal);
+      }
+      tempHexPolyA = editableCellPolygon.polygon.clone();
+      // Fill the left area
+      for (var x = 0; x < config.horizontalCount / 2; x++) {
+        // tempPolyA.move({ x: cellBounds.width, y: 0 });
+        tempHexPolyA.move({ x: -diff.x, y: -diff.y });
+        draw.polygon(tempHexPolyA, "grey", 1);
+        fillDiagonalHexPattern(draw, tempHexPolyA); // , differenceAFromOriginal, differenceCFromOriginal);
+      }
     };
 
     // +---------------------------------------------------------------------------------

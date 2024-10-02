@@ -130,11 +130,21 @@
           _self.extendPolygonSymmetrically(currentPolygonLineIndex, closestT);
           _self.mouseOverIndex = null;
           _self.mouseOverLine = null;
+          _self.mouseOverOppositeIndex = null;
+          _self.mouseOverOppositeLine = null;
           _self.pb.redraw();
         }
       });
 
-    this._linkSquarePolygonVertices();
+    if (this.isHexagon()) {
+      this._linkHexPolygonVertices();
+    } else {
+      this._linkSquarePolygonVertices();
+    }
+  };
+
+  EditableCellPolygon.prototype.isHexagon = function () {
+    return this.polygonCardinality === 6;
   };
 
   /**
@@ -158,59 +168,64 @@
     this.vertA.listeners.addDragListener(function (event) {
       _self.vertB.add({ x: event.params.dragAmount.x, y: 0 });
       _self.vertD.add({ x: 0, y: event.params.dragAmount.y });
-      // Adjust the whole northern line vertically
-      // and the western line horizontally
-      // for (var i = 1; i < _self.linePointIndices[0].length; i++) {
-      //   _self.polygon.getVertexAt(_self.linePointIndices[0][i]).add({ x: event.params.dragAmount.x, y: 0 });
-      // }
-      // for (var i = 1; i < _self.linePointIndices[3].length; i++) {
-      //   _self.polygon.getVertexAt(_self.linePointIndices[3][i]).add({ x: 0, y: event.params.dragAmount.y });
-      // }
       _self._moveSublineVertices(0, event.params.dragAmount.x, 0);
       _self._moveSublineVertices(3, 0, event.params.dragAmount.y);
     });
     this.vertB.listeners.addDragListener(function (event) {
       _self.vertA.add({ x: event.params.dragAmount.x, y: 0 });
       _self.vertC.add({ x: 0, y: event.params.dragAmount.y });
-      // Adjust the whole northern line vertically
-      // and the eastern line horizontally
-      // for (var i = 1; i < _self.linePointIndices[0].length; i++) {
-      //   _self.polygon.getVertexAt(_self.linePointIndices[0][i]).add({ x: event.params.dragAmount.x, y: 0 });
-      // }
-      // for (var i = 1; i < _self.linePointIndices[1].length; i++) {
-      //   _self.polygon.getVertexAt(_self.linePointIndices[1][i]).add({ x: 0, y: event.params.dragAmount.y });
-      // }
       _self._moveSublineVertices(0, event.params.dragAmount.x, 0);
       _self._moveSublineVertices(1, 0, event.params.dragAmount.y);
     });
     this.vertC.listeners.addDragListener(function (event) {
       _self.vertD.add({ x: event.params.dragAmount.x, y: 0 });
       _self.vertB.add({ x: 0, y: event.params.dragAmount.y });
-      // Adjust the whole southern line vertically
-      // and the eastern line horizontally
-      // for (var i = 1; i < _self.linePointIndices[1].length; i++) {
-      //   _self.polygon.getVertexAt(_self.linePointIndices[1][i]).add({ x: 0, y: event.params.dragAmount.y });
-      // }
-      // for (var i = 1; i < _self.linePointIndices[2].length; i++) {
-      //   _self.polygon.getVertexAt(_self.linePointIndices[2][i]).add({ x: event.params.dragAmount.x, y: 0 });
-      // }
       _self._moveSublineVertices(1, event.params.dragAmount.x, 0);
       _self._moveSublineVertices(2, 0, event.params.dragAmount.y);
     });
     this.vertD.listeners.addDragListener(function (event) {
       _self.vertC.add({ x: event.params.dragAmount.x, y: 0 });
       _self.vertA.add({ x: 0, y: event.params.dragAmount.y });
-      // Adjust the whole southern line vertically
-      // and the western line horizontally
-      // for (var i = 1; i < _self.linePointIndices[2].length; i++) {
-      //   _self.polygon.getVertexAt(_self.linePointIndices[2][i]).add({ x: event.params.dragAmount.x, y: 0 });
-      // }
-      // for (var i = 1; i < _self.linePointIndices[3].length; i++) {
-      //   _self.polygon.getVertexAt(_self.linePointIndices[3][i]).add({ x: 0, y: event.params.dragAmount.y });
-      // }
       _self._moveSublineVertices(2, event.params.dragAmount.x, 0);
       _self._moveSublineVertices(3, 0, event.params.dragAmount.y);
     });
+  };
+
+  /**
+   * This internal helper function adds drag listeners to the essential
+   * four corner vertices of the input SQUARE. If one is moved, the adjacent two edges
+   * are moved as well (their sub vertices).
+   *
+   * This maintains an infinite tiling shape.
+   */
+  EditableCellPolygon.prototype._linkHexPolygonVertices = function () {
+    var _self = this;
+    this.vertA.listeners.addDragListener(function (event) {
+      // _self.vertB.add({ x: event.params.dragAmount.x, y: 0 });
+      _self.vertD.add({ x: event.params.dragAmount.x, y: event.params.dragAmount.y });
+      _self._moveSublineVertices(0, event.params.dragAmount.x, event.params.dragAmount.y);
+      _self._moveSublineVertices(2, event.params.dragAmount.x, event.params.dragAmount.y);
+      _self._moveSublineVertices(3, event.params.dragAmount.x, event.params.dragAmount.y);
+      _self._moveSublineVertices(5, event.params.dragAmount.x, event.params.dragAmount.y);
+    });
+    // this.vertB.listeners.addDragListener(function (event) {
+    //   _self.vertA.add({ x: event.params.dragAmount.x, y: 0 });
+    //   _self.vertC.add({ x: 0, y: event.params.dragAmount.y });
+    //   _self._moveSublineVertices(0, event.params.dragAmount.x, 0);
+    //   _self._moveSublineVertices(1, 0, event.params.dragAmount.y);
+    // });
+    // this.vertC.listeners.addDragListener(function (event) {
+    //   _self.vertD.add({ x: event.params.dragAmount.x, y: 0 });
+    //   _self.vertB.add({ x: 0, y: event.params.dragAmount.y });
+    //   _self._moveSublineVertices(1, event.params.dragAmount.x, 0);
+    //   _self._moveSublineVertices(2, 0, event.params.dragAmount.y);
+    // });
+    // this.vertD.listeners.addDragListener(function (event) {
+    //   _self.vertC.add({ x: event.params.dragAmount.x, y: 0 });
+    //   _self.vertA.add({ x: 0, y: event.params.dragAmount.y });
+    //   _self._moveSublineVertices(2, event.params.dragAmount.x, 0);
+    //   _self._moveSublineVertices(3, 0, event.params.dragAmount.y);
+    // });
   };
 
   /**
