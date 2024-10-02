@@ -60,7 +60,7 @@
         // line.a.set(this.polygon.vertices[lineIndex[0]]);
         // line.b.set(this.polygon.vertices[lineIndex[1]]);
         if (_self.mouseOverOppositeIndex != null) {
-          console.log("Using indices ");
+          // console.log("Using indices ");
           var pointIndex = _self.linePointIndices[_self.mouseOverOppositeIndex[0]][_self.mouseOverOppositeIndex[1]];
           _self.mouseOverOppositeLine = new Line(
             _self.polygon.getVertexAt(pointIndex),
@@ -189,7 +189,7 @@
   EditableCellPolygon.prototype.extendPolygonSymmetrically = function (currentPolygonLineIndex, closestT) {
     var squarePointIndex = this.locateSquareLinePointIndexByPolygonIndex(currentPolygonLineIndex);
 
-    console.log("currentPolygonLineIndex", currentPolygonLineIndex, "squarePointIndex", squarePointIndex);
+    // console.log("currentPolygonLineIndex", currentPolygonLineIndex, "squarePointIndex", squarePointIndex);
     var closestLinePoint = this.mouseOverLine.vertAt(closestT);
     // [number, number]
     var oppositeSquarePointIndex = this.mouseOverOppositeIndex;
@@ -365,7 +365,7 @@
     if (lineFound) {
       this.mouseOverIndex = lineIndex;
       this.mouseOverOppositeIndex = this.getOppositeSquarePointIndex(this.mouseOverIndex[0]);
-      console.log("[locateMouseOverPolygonLine] mouseOverOppositeIndex", this.mouseOverOppositeIndex);
+      // console.log("[locateMouseOverPolygonLine] mouseOverOppositeIndex", this.mouseOverOppositeIndex);
       line.a.set(this.polygon.vertices[lineIndex[0]]);
       line.b.set(this.polygon.vertices[lineIndex[1]]);
 
@@ -375,6 +375,10 @@
       this.mouseOverOppositeIndex = null;
       return null;
     }
+  };
+
+  EditableCellPolygon.prototype.destroy = function () {
+    // TODO
   };
 
   _context.EditableCellPolygon = EditableCellPolygon;
