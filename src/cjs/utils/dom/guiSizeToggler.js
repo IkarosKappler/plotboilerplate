@@ -31,12 +31,13 @@ var applyGuiSize = function (gui, guiDoubleSize, cssProps) {
         gui.domElement.style["transform"] = transform + "scale(1.0)";
     }
 };
-var guiSizeToggler /* gst */ = function (gui, config, cssProps) {
+var guiSizeToggler = function (gui, config, cssProps) {
+    gui.domElement.style["transition"] = "transform 0.5s";
     return {
         update: function () {
             applyGuiSize(gui, Boolean(config.guiDoubleSize), cssProps);
         }
     };
 };
-exports.guiSizeToggler /* gst */ = guiSizeToggler;
+exports.guiSizeToggler = guiSizeToggler;
 //# sourceMappingURL=guiSizeToggler.js.map

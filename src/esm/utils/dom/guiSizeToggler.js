@@ -28,7 +28,8 @@ const applyGuiSize = (gui, guiDoubleSize, cssProps) => {
         gui.domElement.style["transform"] = transform + "scale(1.0)";
     }
 };
-export const guiSizeToggler /* gst */ = (gui, config, cssProps) => {
+export const guiSizeToggler = (gui, config, cssProps) => {
+    gui.domElement.style["transition"] = "scale 2s";
     return {
         update: function () {
             applyGuiSize(gui, Boolean(config.guiDoubleSize), cssProps);

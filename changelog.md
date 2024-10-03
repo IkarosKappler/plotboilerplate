@@ -9,6 +9,8 @@ Imminent todos:
 - check automatic darmode detection
 - lil-gui does not scroll
 
+* 2024-10-02
+  - guiSizeToggler: Added a transition time (CSS style).
 * 2024-09-13
   - Class `draw`: Remoed the scaling of `lineWidth` in the `polygon` and `polyline` methods. This makes no sense here and doesn't match up with the behavior of other line functions.
 * 2024-09-10
