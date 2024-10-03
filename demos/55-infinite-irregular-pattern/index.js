@@ -103,8 +103,7 @@
       var height = size * HEXAGON_RATIO;
       // Construct a square. This will be our initial plane-filling tile.
       // cellBounds = new Bounds(new Vertex(-width, -height), new Vertex(width, height));
-      // This creates a Hexagon
-      // var rectCellPolygon = cellBounds.toPolygon();
+      // Create a hexagon
       var hexVertices = [new Vertex(0, -size)];
       for (var i = 1; i < 6; i++) {
         var tmpVert = hexVertices[0].clone();
@@ -149,17 +148,9 @@
 
     var postDraw = function (draw, fill) {
       if (editableCellPolygon.mouseOverLine) {
-        // console.log("Draw line 0", editableCellPolygon.mouseOverLine.a);
         pb.draw.line(editableCellPolygon.mouseOverLine.a, editableCellPolygon.mouseOverLine.b, "rgba(0,192,192,0.5)", 5.0);
       }
-      // console.log("editableCellPolygon.mouseOverOppositeLine", editableCellPolygon.mouseOverOppositeLine);
       if (editableCellPolygon.mouseOverOppositeLine) {
-        // console.log(
-        //   "Draw line 1",
-        //   editableCellPolygon.mouseOverOppositeLine.a,
-        //   "editableCellPolygon.mouseOverOppositeIndex",
-        //   editableCellPolygon.mouseOverOppositeIndex
-        // );
         pb.draw.line(
           editableCellPolygon.mouseOverOppositeLine.a,
           editableCellPolygon.mouseOverOppositeLine.b,
@@ -237,6 +228,9 @@
       }
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Fills a vertical section with n elements to both diagonal hex directions.
+    // +-------------------------------
     var fillDiagonalHexPattern = function (draw, tempHexPolyA) {
       var diff = rectCellBaseVertices[0].difference(rectCellBaseVertices[4]);
       var tempHexPolyB = tempHexPolyA.clone();

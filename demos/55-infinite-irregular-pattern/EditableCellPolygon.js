@@ -1,5 +1,5 @@
 /**
- * This class handles any symmetrical polygon in square-based space.
+ * This class handles any symmetrical polygon in square-based or in hex-bases space.
  *
  *
  * @author  Ikaros Kappler
@@ -71,30 +71,15 @@
     new MouseHandler(pb.eventCatcher)
       .drag(function (event) {})
       .move(function (event) {
-        // console.log("dr");
-
         // Detect line of hover ...
         var oldIndex = _self.mouseOverIndex;
         var lineAt = _self.locateMouseOverPolygonLine(event);
-
-        // this.mouseOverOppositeIndex = this.getOppositeSquarePointIndex(this.mouseOverIndex[0]);
-        // line.a.set(this.polygon.vertices[lineIndex[0]]);
-        // line.b.set(this.polygon.vertices[lineIndex[1]]);
-        // console.log("_self.mouseOverOppositeIndex", _self.mouseOverOppositeIndex);
         if (_self.mouseOverOppositeIndex != null) {
-          // console.log("Using indices", _self.linePointIndices);
           var pointIndex = _self.linePointIndices[_self.mouseOverOppositeIndex[0]][_self.mouseOverOppositeIndex[1]];
           _self.mouseOverOppositeLine = new Line(
             _self.polygon.getVertexAt(pointIndex),
             _self.polygon.getVertexAt(pointIndex + 1)
           );
-          // this.mouseOverOppositeLine = new Line();
-          // console.log(
-          //   "Setting mouseOverOppositeLine aaaa",
-          //   _self.mouseOverOppositeLine,
-          //   "this.mouseOverOppositeIndex",
-          //   _self.mouseOverOppositeIndex
-          // );
         } else {
           _self.mouseOverOppositeLine = null;
         }
@@ -107,26 +92,21 @@
             _self.mouseOverIndex != null &&
             (oldIndex[0] != _self.mouseOverIndex[0] || oldIndex[1] != _self.mouseOverIndex[1]))
         ) {
-          // console.log("Redraw");
           _self.pb.redraw();
         }
       })
       // Event Type: XMouseEvent (an extension of the regular MouseEvent)
       .up(function (event) {
-        // console.log("event.offsetX", event.offsetX);
-        // console.log("Clicked", event.params);
         if (!event.params.leftButton || event.params.wasDragged) {
           return;
         }
         // First param: the vertex to add
         // Second param: automatic redraw?
         var relPos = _self.pb.transformMousePosition(event.params.pos.x, event.params.pos.y);
-        // _self.pb.add(new Vertex(relPos), false);
         if (_self.mouseOverLine) {
           // Find closest point on line and add
           var closestT = _self.mouseOverLine.getClosestT(relPos);
           var currentPolygonLineIndex = _self.mouseOverIndex[0];
-
           _self.extendPolygonSymmetrically(currentPolygonLineIndex, closestT);
           _self.mouseOverIndex = null;
           _self.mouseOverLine = null;
@@ -202,66 +182,34 @@
   EditableCellPolygon.prototype._linkHexPolygonVertices = function () {
     var _self = this;
     this.vertA.listeners.addDragListener(function (event) {
-      // _self.vertB.add({ x: event.params.dragAmount.x, y: 0 });
       _self.vertD.add({ x: -event.params.dragAmount.x, y: -event.params.dragAmount.y });
       _self._moveSublineVertices(0, event.params.dragAmount.x, event.params.dragAmount.y);
       _self._moveSublineVertices(2, -event.params.dragAmount.x, -event.params.dragAmount.y);
-      // _self._moveSublineVertices(5, -event.params.dragAmount.x, -event.params.dragAmount.y);
-      // _self._moveSublineVertices(3, -event.params.dragAmount.x, -event.params.dragAmount.y);
-      // _self._moveSublineVertices(0, event.params.dragAmount.x, event.params.dragAmount.y);
-      // _self._moveSublineVertices(2, -event.params.dragAmount.x, -event.params.dragAmount.y);
-      // _self._moveSublineVertices(3, -event.params.dragAmount.x, -event.params.dragAmount.y);
-      // _self._moveSublineVertices(5, event.params.dragAmount.x, event.params.dragAmount.y);
     });
     this.vertB.listeners.addDragListener(function (event) {
-      // _self.vertB.add({ x: event.params.dragAmount.x, y: 0 });
       _self.vertE.add({ x: -event.params.dragAmount.x, y: -event.params.dragAmount.y });
       _self._moveSublineVertices(1, event.params.dragAmount.x, event.params.dragAmount.y);
       _self._moveSublineVertices(3, -event.params.dragAmount.x, -event.params.dragAmount.y);
-      // _self._moveSublineVertices(0, event.params.dragAmount.x, event.params.dragAmount.y);
-      // _self._moveSublineVertices(2, event.params.dragAmount.x, event.params.dragAmount.y);
-      // _self._moveSublineVertices(3, event.params.dragAmount.x, event.params.dragAmount.y);
-      // _self._moveSublineVertices(5, event.params.dragAmount.x, event.params.dragAmount.y);
     });
     this.vertC.listeners.addDragListener(function (event) {
-      // _self.vertB.add({ x: event.params.dragAmount.x, y: 0 });
       _self.vertF.add({ x: -event.params.dragAmount.x, y: -event.params.dragAmount.y });
       _self._moveSublineVertices(2, event.params.dragAmount.x, event.params.dragAmount.y);
       _self._moveSublineVertices(4, -event.params.dragAmount.x, -event.params.dragAmount.y);
-      // _self._moveSublineVertices(0, event.params.dragAmount.x, event.params.dragAmount.y);
-      // _self._moveSublineVertices(2, event.params.dragAmount.x, event.params.dragAmount.y);
-      // _self._moveSublineVertices(3, event.params.dragAmount.x, event.params.dragAmount.y);
-      // _self._moveSublineVertices(5, event.params.dragAmount.x, event.params.dragAmount.y);
     });
     this.vertD.listeners.addDragListener(function (event) {
-      // _self.vertB.add({ x: event.params.dragAmount.x, y: 0 });
       _self.vertA.add({ x: -event.params.dragAmount.x, y: -event.params.dragAmount.y });
       _self._moveSublineVertices(3, event.params.dragAmount.x, event.params.dragAmount.y);
       _self._moveSublineVertices(5, -event.params.dragAmount.x, -event.params.dragAmount.y);
-      // _self._moveSublineVertices(0, event.params.dragAmount.x, event.params.dragAmount.y);
-      // _self._moveSublineVertices(2, event.params.dragAmount.x, event.params.dragAmount.y);
-      // _self._moveSublineVertices(3, event.params.dragAmount.x, event.params.dragAmount.y);
-      // _self._moveSublineVertices(5, event.params.dragAmount.x, event.params.dragAmount.y);
     });
     this.vertE.listeners.addDragListener(function (event) {
-      // _self.vertB.add({ x: event.params.dragAmount.x, y: 0 });
       _self.vertB.add({ x: -event.params.dragAmount.x, y: -event.params.dragAmount.y });
       _self._moveSublineVertices(4, event.params.dragAmount.x, event.params.dragAmount.y);
       _self._moveSublineVertices(0, -event.params.dragAmount.x, -event.params.dragAmount.y);
-      // _self._moveSublineVertices(0, event.params.dragAmount.x, event.params.dragAmount.y);
-      // _self._moveSublineVertices(2, event.params.dragAmount.x, event.params.dragAmount.y);
-      // _self._moveSublineVertices(3, event.params.dragAmount.x, event.params.dragAmount.y);
-      // _self._moveSublineVertices(5, event.params.dragAmount.x, event.params.dragAmount.y);
     });
     this.vertF.listeners.addDragListener(function (event) {
-      // _self.vertB.add({ x: event.params.dragAmount.x, y: 0 });
       _self.vertC.add({ x: -event.params.dragAmount.x, y: -event.params.dragAmount.y });
       _self._moveSublineVertices(5, event.params.dragAmount.x, event.params.dragAmount.y);
       _self._moveSublineVertices(1, -event.params.dragAmount.x, -event.params.dragAmount.y);
-      // _self._moveSublineVertices(0, event.params.dragAmount.x, event.params.dragAmount.y);
-      // _self._moveSublineVertices(2, event.params.dragAmount.x, event.params.dragAmount.y);
-      // _self._moveSublineVertices(3, event.params.dragAmount.x, event.params.dragAmount.y);
-      // _self._moveSublineVertices(5, event.params.dragAmount.x, event.params.dragAmount.y);
     });
   };
 
@@ -441,7 +389,6 @@
       var j = (i + 1) % this.polygon.vertices.length;
       line.a.set(this.polygon.vertices[i]);
       line.b.set(this.polygon.vertices[j]);
-      // if (newDist < 5 && newDist < lineDistance) {
       var newDist = line.pointDistance(transformedPosition);
       if (line.hasPoint(transformedPosition, false, 20) && newDist < lineDistance) {
         // Keep clear from corners
@@ -449,7 +396,6 @@
         if (t < 0.05 || t > 0.95) {
           continue;
         }
-        // this.mouseOverLine = line;
         lineDistance = newDist;
         lineIndex = [i, j];
         lineFound = true;
@@ -458,7 +404,6 @@
     if (lineFound) {
       this.mouseOverIndex = lineIndex;
       this.mouseOverOppositeIndex = this.getOppositeSquarePointIndex(this.mouseOverIndex[0]);
-      // console.log("[locateMouseOverPolygonLine] mouseOverOppositeIndex", this.mouseOverOppositeIndex);
       line.a.set(this.polygon.vertices[lineIndex[0]]);
       line.b.set(this.polygon.vertices[lineIndex[1]]);
 
@@ -471,7 +416,7 @@
   };
 
   EditableCellPolygon.prototype.destroy = function () {
-    // TODO
+    // TODO: remove all listeners
   };
 
   _context.EditableCellPolygon = EditableCellPolygon;
