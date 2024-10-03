@@ -200,7 +200,7 @@
       fillVerticalSquarePattern(draw, tempPolyA, differenceAFromOriginal, differenceCFromOriginal);
 
       // Fill the left area
-      for (var x = 0; x < config.horizontalCount / 2; x++) {
+      for (var x = 0; x < config.horizontalCount / 2 - 1; x++) {
         tempPolyA.move({ x: cellBounds.width, y: 0 });
         tempPolyA.move({ x: 0, y: differenceAFromOriginal.y - differenceBFromOriginal.y });
         draw.polygon(tempPolyA, "grey", 1);
@@ -208,7 +208,7 @@
       }
       // Fill the right area
       tempPolyA = editableCellPolygon.polygon.clone();
-      for (var x = 0; x < config.horizontalCount / 2; x++) {
+      for (var x = 0; x < config.horizontalCount / 2 - 1; x++) {
         tempPolyA.move({ x: -cellBounds.width, y: 0 });
         tempPolyA.move({ x: 0, y: -differenceAFromOriginal.y + differenceBFromOriginal.y });
         draw.polygon(tempPolyA, "grey", 1);
@@ -223,14 +223,14 @@
     var fillVerticalSquarePattern = function (draw, tempPolyA, differenceAFromOriginal, differenceCFromOriginal) {
       var tempPolyB = tempPolyA.clone();
       // Generate row up
-      for (var y = 0; y < config.verticalCount / 2; y++) {
+      for (var y = 0; y < config.verticalCount / 2 - 1; y++) {
         tempPolyB.move({ x: 0, y: cellBounds.height });
         tempPolyB.move({ x: differenceAFromOriginal.x - differenceCFromOriginal.x, y: 0 });
         draw.polygon(tempPolyB, "grey", 1);
       }
       tempPolyB = tempPolyA.clone();
       // Generate row down
-      for (var y = 0; y < config.verticalCount / 2; y++) {
+      for (var y = 0; y < config.verticalCount / 2 - 1; y++) {
         tempPolyB.move({ x: 0, y: -cellBounds.height });
         tempPolyB.move({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
         draw.polygon(tempPolyB, "grey", 1);
@@ -240,13 +240,13 @@
     var fillDiagonalHexPattern = function (draw, tempHexPolyA) {
       var diff = rectCellBaseVertices[0].difference(rectCellBaseVertices[4]);
       var tempHexPolyB = tempHexPolyA.clone();
-      for (var y = 0; y < config.verticalCount / 2; y++) {
+      for (var y = 0; y < config.verticalCount / 2 - 1; y++) {
         tempHexPolyB.move({ x: diff.x, y: diff.y });
         draw.polygon(tempHexPolyB, "grey", 1);
       }
       tempHexPolyB = tempHexPolyA.clone();
       // Generate row down
-      for (var y = 0; y < config.verticalCount / 2; y++) {
+      for (var y = 0; y < config.verticalCount / 2 - 1; y++) {
         tempHexPolyB.move({ x: -diff.x, y: -diff.y });
         draw.polygon(tempHexPolyB, "grey", 1);
       }
@@ -261,7 +261,7 @@
 
       var diff = rectCellBaseVertices[0].difference(rectCellBaseVertices[2]);
       // Fill the left area
-      for (var x = 0; x < config.horizontalCount / 2; x++) {
+      for (var x = 0; x < config.horizontalCount / 2 - 1; x++) {
         // tempPolyA.move({ x: cellBounds.width, y: 0 });
         tempHexPolyA.move({ x: diff.x, y: diff.y });
         draw.polygon(tempHexPolyA, "grey", 1);
@@ -269,7 +269,7 @@
       }
       tempHexPolyA = editableCellPolygon.polygon.clone();
       // Fill the left area
-      for (var x = 0; x < config.horizontalCount / 2; x++) {
+      for (var x = 0; x < config.horizontalCount / 2 - 1; x++) {
         // tempPolyA.move({ x: cellBounds.width, y: 0 });
         tempHexPolyA.move({ x: -diff.x, y: -diff.y });
         draw.polygon(tempHexPolyA, "grey", 1);

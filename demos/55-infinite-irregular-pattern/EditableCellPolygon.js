@@ -80,9 +80,9 @@
         // this.mouseOverOppositeIndex = this.getOppositeSquarePointIndex(this.mouseOverIndex[0]);
         // line.a.set(this.polygon.vertices[lineIndex[0]]);
         // line.b.set(this.polygon.vertices[lineIndex[1]]);
-        console.log("_self.mouseOverOppositeIndex", _self.mouseOverOppositeIndex);
+        // console.log("_self.mouseOverOppositeIndex", _self.mouseOverOppositeIndex);
         if (_self.mouseOverOppositeIndex != null) {
-          console.log("Using indices", _self.linePointIndices);
+          // console.log("Using indices", _self.linePointIndices);
           var pointIndex = _self.linePointIndices[_self.mouseOverOppositeIndex[0]][_self.mouseOverOppositeIndex[1]];
           _self.mouseOverOppositeLine = new Line(
             _self.polygon.getVertexAt(pointIndex),
@@ -113,8 +113,8 @@
       })
       // Event Type: XMouseEvent (an extension of the regular MouseEvent)
       .up(function (event) {
-        console.log("event.offsetX", event.offsetX);
-        console.log("Clicked", event.params);
+        // console.log("event.offsetX", event.offsetX);
+        // console.log("Clicked", event.params);
         if (!event.params.leftButton || event.params.wasDragged) {
           return;
         }
@@ -180,8 +180,9 @@
     this.vertC.listeners.addDragListener(function (event) {
       _self.vertD.add({ x: event.params.dragAmount.x, y: 0 });
       _self.vertB.add({ x: 0, y: event.params.dragAmount.y });
-      _self._moveSublineVertices(1, event.params.dragAmount.x, 0);
-      _self._moveSublineVertices(2, 0, event.params.dragAmount.y);
+      _self._moveSublineVertices(1, event.params.dragAmount.x, event.params.dragAmount.y);
+      _self._moveSublineVertices(2, event.params.dragAmount.x, 0);
+      _self._moveSublineVertices(3, event.params.dragAmount.x, 0);
     });
     this.vertD.listeners.addDragListener(function (event) {
       _self.vertC.add({ x: event.params.dragAmount.x, y: 0 });
@@ -311,7 +312,7 @@
         squarePointIndex
       );
     }
-    console.log("this.linePointIndices", this.linePointIndices);
+    // console.log("this.linePointIndices", this.linePointIndices);
   };
 
   /**
