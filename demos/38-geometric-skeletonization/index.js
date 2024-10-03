@@ -328,12 +328,6 @@
     // +-------------------------------
     // var gui = new dat.gui.GUI();
     var gui = pb.createGUI();
-    var guiSize = guiSizeToggler(gui, config);
-    if (isMobileDevice()) {
-      config.guiDoubleSize = true;
-      guiSize.update();
-    }
-    gui.add(config, "guiDoubleSize").title("Double size GUI?").onChange(guiSize.update);
 
     var f0 = gui.addFolder("Settings");
     // prettier-ignore
