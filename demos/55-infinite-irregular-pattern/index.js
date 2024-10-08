@@ -374,7 +374,6 @@
     }
 
     pb.config.preDraw = preDraw;
-    pb.config.postDraw = postDraw;
     pb.redraw();
   });
 })(globalThis);
