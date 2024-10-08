@@ -151,11 +151,12 @@
     };
     initPattern();
 
-    var preDraw = function (_draw, _fill) {
-      // NOOP in this demo
-    };
-
-    var postDraw = function (draw, fill) {
+    var preDraw = function (draw, fill) {
+      if (config.baseShape == "p6m") {
+        fillHexPattern(draw, fill);
+      } else {
+        fillSquarePattern(draw, fill);
+      }
       if (editableCellPolygon.mouseOverLine) {
         pb.draw.line(editableCellPolygon.mouseOverLine.a, editableCellPolygon.mouseOverLine.b, "rgba(0,192,192,0.5)", 5.0);
       }
@@ -166,11 +167,6 @@
           "rgba(0,192,192,0.5)",
           5.0
         );
-      }
-      if (config.baseShape == "p6m") {
-        fillHexPattern(draw, fill);
-      } else {
-        fillSquarePattern(draw, fill);
       }
       if (config.drawPolygonNumbers) {
         drawPolygonIndices(editableCellPolygon.polygon, fill, { color: "orange", fontFamily: "Arial", fontSize: 9 });
