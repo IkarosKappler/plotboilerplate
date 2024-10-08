@@ -36,6 +36,10 @@
     AVAILABLE_COLOR_SETS["Malachite" + (typeof WebColorsMalachite !== "undefined" ? "" : "(unavailable)")] = "Malachite";
     AVAILABLE_COLOR_SETS["Contrast" + (typeof WebColorsContrast !== "undefined" ? "" : "(unavailable)")] = "Mixed";
     AVAILABLE_COLOR_SETS["WebColors" + (typeof WebColors !== "undefined" ? "" : "(unavailable)")] = "WebColors";
+    var POLYGON_FILL_TYPES = {
+      "Linear": "linear",
+      "Falloff 75%": "falloff0.75"
+    };
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
       // The arrow head size
@@ -44,6 +48,8 @@
       // p6m: "hexagon" | p4m: "square" (default)
       baseShape: params.getString("baseShape", BASE_SHAPE_OPTIONS.p4m),
       fillRecursive: params.getBoolean("fillRecursive", true),
+      fillIterationCount: params.getNumber("fillIterationCount", 10),
+      fillType: "linear", // "falloff 0.75"
       useColors: params.getBoolean("useColors", false),
       colorSet: "Malachite",
       drawPolygonNumbers: false
@@ -209,8 +215,15 @@
       if (config.fillRecursive) {
         var centerOfPolygon = vertexMedian(polygon.vertices);
         var tmpPoly = polygon.clone();
-        for (var i = 0; i < 10; i++) {
-          tmpPoly.scale(0.75, centerOfPolygon);
+        var n = config.fillIterationCount;
+        for (var i = 0; i < n; i++) {
+          if (config.fillType === "linear") {
+            tmpPoly = polygon.clone();
+            tmpPoly.scale((n - i) / (n + 1), centerOfPolygon);
+          } else {
+            // "falloff0.75"
+            tmpPoly.scale(0.75, centerOfPolygon);
+          }
           var color = randomWebColor(i + 1, config.colorSet, 1.0);
           if (config.useColors) {
             fill.polygon(tmpPoly, color, 1);
@@ -346,6 +359,12 @@
       .onChange( function() { initPattern(); rebuild(); });
       // prettier-ignore
       gui.add(config, "fillRecursive").name("fillRecursive").title("Draw inner patterns.")
+      .onChange( function() { pb.redraw(); });
+      // prettier-ignore
+      gui.add(config, "fillIterationCount").min(1).max(16).step(1).name("fillIterationCount").title("How many polygons inside each cell (if `fillRecursive` is enabled).")
+      .onChange( function() { pb.redraw(); });
+      // prettier-ignore
+      gui.add(config, "fillType", POLYGON_FILL_TYPES).name("fillType").title("How to fill polygons recursively.")
       .onChange( function() { pb.redraw(); });
       // prettier-ignore
       gui.add(config, "useColors").name("useColors").title("Colors, yes or no – how depressed are you?")
