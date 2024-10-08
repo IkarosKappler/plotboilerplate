@@ -45,8 +45,7 @@
     // Vertex | null
     this.vertF = this.polygonCardinality > 5 ? polygon.getVertexAt(5) : null;
 
-    if (this.polygonCardinality > 5) {
-      console.log("IS HEXAGON");
+    if (this.isHexagon()) {
       // Hexagon
       this.linePointIndices = [
         [0], // line 0

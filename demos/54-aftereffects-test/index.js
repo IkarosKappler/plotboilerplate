@@ -36,6 +36,8 @@
     globalThis.demoInitializationObserver
       .waitForInitialized()
       .then(function (_initializedPB) {
+        console.log(globalThis.utils["cssBackdropEffects"]);
+        globalThis.utils["cssBackdropEffects"].cssBackdropFolder.open();
         // globalThis.utils["cssBackdropEffects"].filterValues.blur = 10;
         // globalThis.utils["cssBackdropEffects"].filterValues.isBlurEnabled = true;
         // Usually we would add backdrop filters explicitly with the following code.

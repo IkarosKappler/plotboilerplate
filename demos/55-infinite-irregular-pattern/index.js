@@ -32,7 +32,10 @@
     pb.drawConfig.polygon.lineWidth = 2;
 
     var BASE_SHAPE_OPTIONS = { p4m: "p4m", p6m: "p6m" };
-    // var BASE_SHAPE_OPTIONS = ["p4m", "p6m"];
+    var AVAILABLE_COLOR_SETS = {};
+    AVAILABLE_COLOR_SETS["Malachite" + (typeof WebColorsMalachite !== "undefined" ? "" : "(unavailable)")] = "Malachite";
+    AVAILABLE_COLOR_SETS["Contrast" + (typeof WebColorsContrast !== "undefined" ? "" : "(unavailable)")] = "Mixed";
+    AVAILABLE_COLOR_SETS["WebColors" + (typeof WebColors !== "undefined" ? "" : "(unavailable)")] = "WebColors";
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
       // The arrow head size
@@ -40,7 +43,10 @@
       horizontalCount: params.getNumber("horizontalCount", 10),
       // p6m: "hexagon" | p4m: "square" (default)
       baseShape: params.getString("baseShape", BASE_SHAPE_OPTIONS.p4m),
-      fillRecursive: true
+      fillRecursive: params.getBoolean("fillRecursive", true),
+      useColors: params.getBoolean("useColors", false),
+      colorSet: "Malachite",
+      drawPolygonNumbers: false
     };
 
     // +---------------------------------------------------------------------------------
@@ -83,7 +89,7 @@
       vertD = rectCellPolygon.getVertexAt(3);
       vertE = null; // Square has only four vertices
       vertF = null; // Square has only four vertices
-      // Create the cell polygon
+      // Create the cell polygon (and destroy old one)
       if (editableCellPolygon != null) {
         editableCellPolygon.destroy();
       }
@@ -100,10 +106,6 @@
       // var viewport = pb.viewport();
       // Find a nice size for the initial polygon: like one third of the screen size
       var size = Math.min(viewport.width, viewport.height) / 3.0;
-      var width = size;
-      var height = size * HEXAGON_RATIO;
-      // Construct a square. This will be our initial plane-filling tile.
-      // cellBounds = new Bounds(new Vertex(-width, -height), new Vertex(width, height));
       // Create a hexagon
       var hexVertices = [new Vertex(0, -size)];
       for (var i = 1; i < 6; i++) {
@@ -124,7 +126,7 @@
       vertD = rectCellPolygon.getVertexAt(3);
       vertE = rectCellPolygon.getVertexAt(4);
       vertF = rectCellPolygon.getVertexAt(5);
-      // Create the cell polygon
+      // Create the cell polygon (and destroy old one)
       if (editableCellPolygon != null) {
         editableCellPolygon.destroy();
       }
@@ -162,9 +164,11 @@
       if (config.baseShape == "p6m") {
         fillHexPattern(draw, fill);
       } else {
-        fillSquarePattern(draw);
+        fillSquarePattern(draw, fill);
       }
-      drawPolygonIndices(editableCellPolygon.polygon, fill, { color: "orange", fontFamily: "Arial", fontSize: 9 });
+      if (config.drawPolygonNumbers) {
+        drawPolygonIndices(editableCellPolygon.polygon, fill, { color: "orange", fontFamily: "Arial", fontSize: 9 });
+      }
 
       // Highlight main vertices of the square grid
       draw.circle(vertA, 7 / draw.scale.x, "orange", 1);
@@ -182,24 +186,35 @@
     // +---------------------------------------------------------------------------------
     // | Get a 'random' color.
     // +-------------------------------
-    var randColor = function (i, alpha) {
-      var color = WebColorsContrast[i % WebColorsContrast.length].clone();
-      if (typeof alpha !== undefined) color.a = alpha;
-      return color.cssRGBA();
-    };
+    // var randColor = function (i, alpha) {
+    //   var color = WebColors[i % WebColorsContrast.length].clone();
+    //   if (typeof alpha !== undefined) color.a = alpha;
+    //   return color.cssRGBA();
+    //   //   "Malachite":
+    //   // case "Mixed":
+    //   // case "WebColors":
+    //   // return randomWebColor(i, "Malachite");
+    // };
+    // randomWebColor
 
     // +---------------------------------------------------------------------------------
     // | Draws a single cell.
     // +-------------------------------
     var drawCell = function (draw, fill, polygon) {
+      if (config.useColors) {
+        var color = randomWebColor(0, config.colorSet, 1.0);
+        fill.polygon(polygon, color, 1);
+      }
       draw.polygon(polygon, "grey", 1);
       if (config.fillRecursive) {
         var centerOfPolygon = vertexMedian(polygon.vertices);
         var tmpPoly = polygon.clone();
         for (var i = 0; i < 10; i++) {
           tmpPoly.scale(0.75, centerOfPolygon);
-          var color = randColor(i, 1.0);
-          fill.polygon(tmpPoly, color, 1);
+          var color = randomWebColor(i + 1, config.colorSet, 1.0);
+          if (config.useColors) {
+            fill.polygon(tmpPoly, color, 1);
+          }
           draw.polygon(tmpPoly, "grey", 1);
         }
       }
@@ -289,26 +304,22 @@
     // +-------------------------------
     var fillHexPattern = function (draw, fill) {
       var tempHexPolyA = editableCellPolygon.polygon.clone();
-      fillDiagonalHexPattern(draw, fill, tempHexPolyA); // , differenceAFromOriginal, differenceCFromOriginal);
+      fillDiagonalHexPattern(draw, fill, tempHexPolyA);
 
       var diff = rectCellBaseVertices[0].difference(rectCellBaseVertices[2]);
       // Fill the left area
       for (var x = 0; x < config.horizontalCount / 2 - 1; x++) {
-        // tempPolyA.move({ x: cellBounds.width, y: 0 });
         tempHexPolyA.move({ x: diff.x, y: diff.y });
-        // draw.polygon(tempHexPolyA, "grey", 1);
         drawCell(draw, fill, tempHexPolyA);
 
-        fillDiagonalHexPattern(draw, fill, tempHexPolyA); // , differenceAFromOriginal, differenceCFromOriginal);
+        fillDiagonalHexPattern(draw, fill, tempHexPolyA);
       }
       tempHexPolyA = editableCellPolygon.polygon.clone();
       // Fill the left area
       for (var x = 0; x < config.horizontalCount / 2 - 1; x++) {
-        // tempPolyA.move({ x: cellBounds.width, y: 0 });
         tempHexPolyA.move({ x: -diff.x, y: -diff.y });
-        // draw.polyg on(tempHexPolyA, "grey", 1);
         drawCell(draw, fill, tempHexPolyA);
-        fillDiagonalHexPattern(draw, fill, tempHexPolyA); // , differenceAFromOriginal, differenceCFromOriginal);
+        fillDiagonalHexPattern(draw, fill, tempHexPolyA);
       }
     };
 
@@ -335,6 +346,15 @@
       .onChange( function() { initPattern(); rebuild(); });
       // prettier-ignore
       gui.add(config, "fillRecursive").name("fillRecursive").title("Draw inner patterns.")
+      .onChange( function() { pb.redraw(); });
+      // prettier-ignore
+      gui.add(config, "useColors").name("useColors").title("Colors, yes or no – how depressed are you?")
+       .onChange( function() { pb.redraw(); });
+      // prettier-ignore
+      gui.add(config, "colorSet", AVAILABLE_COLOR_SETS).name("colorSet").title("The color set you want to use (if colors are enabled).")
+      .onChange( function() { pb.redraw(); });
+      // prettier-ignore
+      gui.add(config, "drawPolygonNumbers").name("drawPolygonNumbers").title("Draw polygon numbers.")
       .onChange( function() { pb.redraw(); });
     }
 

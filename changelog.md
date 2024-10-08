@@ -9,6 +9,8 @@ Imminent todos:
 - check automatic darmode detection
 - lil-gui does not scroll
 
+* 2024-10-08
+  - Adding `cssBackdropFolder` as a class attribute to the `CSSBackdropEffects` class.
 * 2024-10-02
   - guiSizeToggler: Added a transition time (CSS style).
 * 2024-09-13

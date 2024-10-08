@@ -1,8 +1,9 @@
 /**
  * Refactored from demo 54 and put into a global function.
- * @author  Ikaros Kappler
- * @date    2024-08-24
- * @version 1.0.0
+ * @author   Ikaros Kappler
+ * @date     2024-08-24
+ * @modified 2024-10-08 Adding `cssBackdropFolder` as a class attribute.
+ * @version  1.0.1
  *
  * @require createCanvasCover
  */
@@ -37,6 +38,7 @@
     this.pb = pb;
     this.gui = initializingGUI;
     this.filterValues = null;
+    this.cssBackdropFolder = null;
     this._initialize(initialFilterValues);
   };
 
@@ -84,9 +86,10 @@
     // | Initialize filter selector
     // +-------------------------------
     try {
-      var cssBackdropFolder = this.gui.addFolder("CSS Backdrop Filters");
+      this.cssBackdropFolder = this.gui.addFolder("CSS Backdrop Filters");
+      this.cssBackdropFolder.close();
       var triggerUpdateBackdropFilters = createCssBackdropFilterSelector(
-        cssBackdropFolder,
+        this.cssBackdropFolder,
         updateBackdropFilter(effectsNode),
         this.filterValues
       );
