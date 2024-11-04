@@ -28,13 +28,16 @@
  * @modified 2023-09-25 Added the `Polygon.lineIntersections(Line,boolean)` function.
  * @modified 2023-09-29 Added the `Polygon.closestLineIntersection(Line,boolean)` function.
  * @modified 2023-11-24 Added the `Polygon.containsPolygon(Polygon)' function.
- * @version 1.12.0
+ * @modified 2024-10-12 Added the `getLineAt` method.
+ * @modified 2024-10-30 Added the `getLines` method.
+ * @version 1.13.0
  *
  * @file Polygon
  * @public
  **/
 import { BezierPath } from "./BezierPath";
 import { Bounds } from "./Bounds";
+import { Line } from "./Line";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 import { XYCoords, SVGSerializable, UID } from "./interfaces";
@@ -112,6 +115,25 @@ export declare class Polygon implements SVGSerializable {
      * @memberof Polygon
      **/
     addVertexAt(vert: Vertex, index: number): void;
+    /**
+     * Get a new instance of the line at the given start index. The returned line will consist
+     * of the vertex at `vertIndex` and `vertIndex+1` (will be handled modulo).
+     *
+     * @method getLineAt
+     * @param {number} vertIndex - The vertex index of the line to start.
+     * @instance
+     * @memberof Line
+     * @return {Line}
+     **/
+    getLineAt(vertIndex: number): Line;
+    /**
+     * Converts this polygon into a sequence of lines. Please note that each time
+     * this method is called new lines are created. The underlying line vertices are no clones
+     * (instances).
+     *
+     * @return {Array<Line>}
+     */
+    getLines(): Array<Line>;
     /**
      * Get the polygon vertex at the given position (index).
      *
@@ -228,6 +250,17 @@ export declare class Polygon implements SVGSerializable {
      * @return {Polygon} this, for chaining.
      **/
     rotate(angle: number, center: Vertex): Polygon;
+    /**
+     * Get the mean `center` of this polygon by calculating the mean value of all vertices.
+     *
+     * Mean: (v[0] + v[1] + ... v[n-1]) / n
+     *
+     * @method getMeanCenter
+     * @instance
+     * @memberof Polygon
+     * @return {Vertex|null} `null` is no vertices are available.
+     */
+    getMeanCenter(): Vertex;
     /**
      * Get all line intersections with this polygon.
      *

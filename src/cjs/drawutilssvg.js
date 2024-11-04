@@ -952,6 +952,30 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.prototype.grid = function (center, width, height, sizeX, sizeY, color) {
+        // console.log("grid");
+        // const node: SVGElement = this.makeNode("pattern");
+        // var patternId = "pattern_id_" + Math.floor(Math.random() * 65365);
+        // node.setAttribute("id", patternId);
+        // node.setAttribute("viewBox", `0,0,${sizeX},${sizeY}`);
+        // node.setAttribute("width", `${sizeX}`);
+        // node.setAttribute("height", `${sizeX}`);
+        // var pattern: SVGElement = this.makeNode("path");
+        // const d: SVGPathParams = [];
+        // d.push("M", sizeX / 2.0, 0);
+        // d.push("L", sizeX / 2.0, sizeY);
+        // d.push("M", 0, sizeY / 2.0);
+        // d.push("L", sizeX, sizeY / 2.0);
+        // node.setAttribute("d", d.join(" "));
+        // this.bufferedNodeDefs.append(pattern);
+        // const fillNode: SVGElement = this.makeNode("rect");
+        // // For some strange reason SVG rotation transforms use degrees instead of radians
+        // // Note that the background does not scale with the zoom level (always covers full element)
+        // fillNode.setAttribute("x", "0");
+        // fillNode.setAttribute("y", "0");
+        // fillNode.setAttribute("width", `${this.canvasSize.width}`);
+        // fillNode.setAttribute("height", `${this.canvasSize.height}`);
+        // fillNode.setAttribute("fill", `url(#${patternId})`);
+        // return this._bindFillDraw(fillNode, "grid", "red", 1);
         var node = this.makeNode("path");
         var d = [];
         var yMin = -Math.ceil((height * 0.5) / sizeY) * sizeY;

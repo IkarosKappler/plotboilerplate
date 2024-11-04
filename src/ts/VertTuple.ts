@@ -282,16 +282,6 @@ export class VertTuple<T extends VertTuple<T>> {
     const t: number = this.getClosestT(point);
     // Compare to pointDistance?
     const distance: number = Math.sqrt(VertTuple.vtutils.dist2(point, this.vertAt(t)));
-    // console.log(
-    //   "distance",
-    //   distance,
-    //   "epsilon",
-    //   epsilon,
-    //   "distance < (epsilon ?? Vertex.EPSILON)",
-    //   distance < (epsilon ?? Vertex.EPSILON),
-    //   "distance < (epsilon ?? Vertex.EPSILON) && t >= 0 && t <= 1",
-    //   distance < (epsilon ?? Vertex.EPSILON) && t >= 0 && t <= 1
-    // );
     if (typeof insideBoundsOnly !== "undefined" && insideBoundsOnly) {
       return distance < (epsilon ?? Vertex.EPSILON) && t >= 0 && t <= 1;
     } else {

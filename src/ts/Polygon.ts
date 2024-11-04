@@ -28,7 +28,9 @@
  * @modified 2023-09-25 Added the `Polygon.lineIntersections(Line,boolean)` function.
  * @modified 2023-09-29 Added the `Polygon.closestLineIntersection(Line,boolean)` function.
  * @modified 2023-11-24 Added the `Polygon.containsPolygon(Polygon)' function.
- * @version 1.12.0
+ * @modified 2024-10-12 Added the `getLineAt` method.
+ * @modified 2024-10-30 Added the `getLines` method.
+ * @version 1.13.0
  *
  * @file Polygon
  * @public
@@ -103,7 +105,9 @@ export class Polygon implements SVGSerializable {
    **/
   constructor(vertices?: Array<Vertex>, isOpen?: boolean) {
     this.uid = UIDGenerator.next();
-    if (typeof vertices == "undefined") vertices = [];
+    if (typeof vertices == "undefined") {
+      vertices = [];
+    }
     this.vertices = vertices;
     this.isOpen = isOpen || false;
   }
@@ -130,8 +134,41 @@ export class Polygon implements SVGSerializable {
    * @memberof Polygon
    **/
   addVertexAt(vert: Vertex, index: number): void {
-    var moduloIndex = index % (this.vertices.length + 1);
+    // var moduloIndex = index % (this.vertices.length + 1);
     this.vertices.splice(index, 0, vert);
+  }
+
+  /**
+   * Get a new instance of the line at the given start index. The returned line will consist
+   * of the vertex at `vertIndex` and `vertIndex+1` (will be handled modulo).
+   *
+   * @method getLineAt
+   * @param {number} vertIndex - The vertex index of the line to start.
+   * @instance
+   * @memberof Line
+   * @return {Line}
+   **/
+  getLineAt(vertIndex: number): Line {
+    return new Line(this.getVertexAt(vertIndex), this.getVertexAt(vertIndex + 1));
+  }
+
+  /**
+   * Converts this polygon into a sequence of lines. Please note that each time
+   * this method is called new lines are created. The underlying line vertices are no clones
+   * (instances).
+   *
+   * @return {Array<Line>}
+   */
+  getLines(): Array<Line> {
+    const lines: Array<Line> = [];
+    for (var i = 0; i + 1 < this.vertices.length; i++) {
+      // var line = this.getLineAt(i).clone();
+      lines.push(this.getLineAt(i));
+    }
+    if (!this.isOpen && this.vertices.length > 0) {
+      lines.push(this.getLineAt(this.vertices.length - 1));
+    }
+    return lines;
   }
 
   /**
@@ -326,6 +363,29 @@ export class Polygon implements SVGSerializable {
       this.vertices[i].rotate(angle, center);
     }
     return this;
+  }
+
+  /**
+   * Get the mean `center` of this polygon by calculating the mean value of all vertices.
+   *
+   * Mean: (v[0] + v[1] + ... v[n-1]) / n
+   *
+   * @method getMeanCenter
+   * @instance
+   * @memberof Polygon
+   * @return {Vertex|null} `null` is no vertices are available.
+   */
+  getMeanCenter() {
+    if (this.vertices.length === 0) {
+      return null;
+    }
+    const center = this.vertices[0].clone();
+    for (var i = 1; i < this.vertices.length; i++) {
+      center.add(this.vertices[i]);
+    }
+    center.x /= this.vertices.length;
+    center.y /= this.vertices.length;
+    return center;
   }
 
   /**

@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html class="fullscreen">
   <head>
-    <title>2D Plotting Boilerplate – How to create infinite patterns</title>
+    <title>2D Plotting Boilerplate – How to create the smaller inside polygon of a polygon</title>
     <meta charset="UTF-8">
-    <meta name="description" content="A demo about drawing infinite patterns with PlotBoilerplate.js.">
+    <meta name="description" content="A demo about drawing the smaller inside polygon of a polygon with PlotBoilerplate.js.">
     <meta name="keywords" content="plotboilerplate, Bézier, curve, trim, usage, howto, docs, documentation">
     <meta name="author" content="Ikaros Kappler">
     <meta name="date" content="2024-09-10">
-    <meta name="docinfo" content="How to create infinite patterns.">
+    <meta name="docinfo" content="How to create the smaller inside polygon of a polygon.">
 
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@humanearthpig">
     <meta name="twitter:creator" content="@humanearthpig">
     <meta property="og:url" content="https://www.plotboilerplate.de">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="A demo about drawing infinite patterns with PlotBoilerplate.js.">
-    <meta property="og:description" content="A demo about drawing infinite patterns with PlotBoilerplate.js.">
-    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/n1.png">
+    <meta property="og:title" content="A demo about drawing the smaller inside polygon of a polygon with PlotBoilerplate.js.">
+    <meta property="og:description" content="A demo about drawing the smaller inside polygon of a polygon with PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/na.png">
 
     <!-- Polyfills for IE -->
     <script src="../../lib/globalthis-polyfill.min.js"></script> 
@@ -43,8 +43,8 @@
     <script src="../../src/cjs/utils/WebColors.js"></script>
     <script src="../../src/cjs/utils/WebColorsContrast.js"></script>
     <script src="../../src/cjs/utils/WebColorsMalachite.js"></script>
-    <script src="../../lib/FileSaver.min.js"></script>
     <script src="../../src/cjs/utils/datastructures/Color.js"></script>
+    <script src="../../lib/FileSaver.min.js"></script>
     <script src="../../lib/alloy_finger.js"></script>
 
     <!-- Load helpers -->
@@ -57,7 +57,6 @@
     <script src="../randomWebColor.js"></script>
     <script src="../vertexMedian.js"></script>
     <script src="../drawPolygonIndices.js"></script>
-    <script src="./EditableCellPolygon.js"></script>
 
     <!-- For production -->
     <script src="../../dist/plotboilerplate.min.js"></script>
@@ -69,6 +68,6 @@
   <body class="fullscreen">
     <input type="file" name="file" id="file" data-type="image-upload" style="display: none;">
 
-    <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
+    <svg id="my-canvas"></svg>
   </body>
 </html>

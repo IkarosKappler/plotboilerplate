@@ -6,7 +6,8 @@
  * @date     2021-12-13
  * @modified 2022-01-10
  * @modified 2024-06-25 Ported to typescript and moved to utils/dom (was located inside demos before).
- * @version  1.1.0
+ * @modified 2024-10-02 Added a transition time.
+ * @version  1.1.1
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.guiSizeToggler = void 0;

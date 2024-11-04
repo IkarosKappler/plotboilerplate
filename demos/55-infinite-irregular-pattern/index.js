@@ -1,7 +1,7 @@
 /**
- * A script for construction infinite patterns based on a square tiling.
+ * A script for constructing infinite patterns based on a square or hexagonal tilings.
  *
- * @requires PlotBoilerplate, gup, dat.gui,
+ * @requires PlotBoilerplate, gup, dat.gui
  *
  * @author   Ikaros Kappler
  * @date     2020-09-24

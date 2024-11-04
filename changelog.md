@@ -9,6 +9,10 @@ Imminent todos:
 - check automatic darmode detection
 - lil-gui does not scroll
 
+* 2024-10-30
+  - Added tge `Polygon.getLines` method.
+* 2024-10-12
+  - Added the `Polygon.getLineAt` method.
 * 2024-10-08
   - Adding `cssBackdropFolder` as a class attribute to the `CSSBackdropEffects` class.
 * 2024-10-02

@@ -25,7 +25,8 @@
     "webpack-dev": "npx webpack --mode development --config ./webpack5-dev.config.js",
     "rollup-module": "npx rollup -c",
     "tslint": "npx eslint ./src/ts/",
-    "start-python-server": "python3 -m http.server 8000"
+    "start-python-server": "python3 -m http.server 8000",
+    "serve": "npm run start-python-server"
   },
   "repository": {
     "type": "git",
