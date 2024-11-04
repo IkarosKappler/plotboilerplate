@@ -228,6 +228,8 @@
         if (intersection == null) {
           console.warn("[clearPolygonByFilteredLines] WARN intersection line must not be null", i, leftLine, rightLine);
         }
+        leftLine.b = intersection;
+        rightLine.a = intersection.clone();
         resultLines.splice(i, 1);
         // i++;
       }
@@ -277,6 +279,7 @@
       for (var i = 0; i < insetRectanglePolygons.length; i++) {
         var rectPolygon = insetRectanglePolygons[i];
         fill.polygon(rectPolygon, "rgba(192,192,192,0.25)");
+        // Draw rectangular cross inside
       }
 
       // Step 3: identify polygon lines outside the desired bounds.
