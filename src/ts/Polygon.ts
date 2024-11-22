@@ -39,9 +39,11 @@
 import { BezierPath } from "./BezierPath";
 import { Bounds } from "./Bounds";
 import { Line } from "./Line";
+import { Triangle } from "./Triangle";
 import { UIDGenerator } from "./UIDGenerator";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
+import { geomutils } from "./geomutils";
 import { XYCoords, SVGSerializable, UID } from "./interfaces";
 
 /**
@@ -172,6 +174,67 @@ export class Polygon implements SVGSerializable {
   }
 
   /**
+   * Checks if the angle at the given polygon vertex (index) is acute. Please not that this is
+   * only working for clockwise polygons. If this polygon is not clockwise please use the
+   * `isClockwise` method and reverse polygon vertices if needed.
+   *
+   * @method isAngleAcute
+   * @instance
+   * @memberof Polygon
+   * @param {number} vertIndex - The index of the polygon vertex to check.
+   * @returns {boolean} `true` is angle is acute, `false` is obtuse.
+   */
+  getInnerAngleAt(vertIndex: number): number {
+    const p2: Vertex = this.vertices[vertIndex];
+    const p1: Vertex = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
+    const p3: Vertex = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
+
+    // See
+    //    https://math.stackexchange.com/questions/149959/how-to-find-the-interior-angle-of-an-irregular-pentagon-or-polygon
+    // π−arccos((P2−P1)⋅(P3−P2)|P2−P1||P3−P2|)
+
+    // Check if triangle is acute (will be used later)
+    // Acute angles and obtuse angles need to be handled differently.
+    const isAcute: boolean = this.isAngleAcute(vertIndex);
+
+    // Differences
+    const zero: Vertex = new Vertex(0, 0);
+    const p2mp1: Vertex = new Vertex(p2.x - p1.x, p2.y - p1.y);
+    const p3mp2: Vertex = new Vertex(p3.x - p2.x, p3.y - p2.y);
+    const p2mp1_len: number = zero.distance(p2mp1);
+    const p3mp2_len: number = zero.distance(p3mp2);
+
+    // Dot products
+    const dotProduct: number = geomutils.dotProduct(p2mp1, p3mp2);
+    const lengthProduct: number = p2mp1_len * p3mp2_len;
+    if (isAcute) {
+      return Math.PI - Math.acos(dotProduct / lengthProduct);
+    } else {
+      return Math.PI + Math.acos(dotProduct / lengthProduct);
+    }
+  }
+
+  /**
+   * Checks if the angle at the given polygon vertex (index) is acute.
+   *
+   * @method isAngleAcute
+   * @instance
+   * @memberof Polygon
+   * @param {number} vertIndex - The index of the polygon vertex to check.
+   * @returns {boolean} `true` is angle is acute, `false` is obtuse.
+   */
+  isAngleAcute(vertIndex: number): boolean {
+    const A: Vertex = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
+    const B: Vertex = this.vertices[vertIndex];
+    const C: Vertex = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
+
+    // Find local winding number for triangle A B C
+    const windingNumber: number = Triangle.utils.determinant(A, B, C);
+    // console.log("vertIndex", vertIndex, "windingNumber", windingNumber);
+    return windingNumber < 0;
+  }
+
+  /**
    * Get the polygon vertex at the given position (index).
    *
    * The index may exceed the total vertex count, and will be wrapped around then (modulo).
@@ -181,7 +244,7 @@ export class Polygon implements SVGSerializable {
    *  - getVertexAt( vertices.length + k ) == getVertexAt( k )
    *  - getVertexAt( -k )                  == getVertexAt( vertices.length -k )
    *
-   * @metho getVertexAt
+   * @method getVertexAt
    * @param {number} index - The index of the desired vertex.
    * @instance
    * @memberof Polygon
@@ -649,7 +712,9 @@ export class Polygon implements SVGSerializable {
    **/
   toCubicBezierSVGString(threshold: number): string {
     var qdata: Array<Vertex> = this.toCubicBezierData(threshold);
-    if (qdata.length == 0) return "";
+    if (qdata.length == 0) {
+      return "";
+    }
     var buffer = ["M " + qdata[0].x + " " + qdata[0].y];
     for (var i = 1; i < qdata.length; i += 3) {
       buffer.push(

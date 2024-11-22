@@ -134,6 +134,7 @@ export declare class Polygon implements SVGSerializable {
      * @return {Array<Line>}
      */
     getLines(): Array<Line>;
+    getInnerAngleAt(vertIndex: number): number;
     /**
      * Get the polygon vertex at the given position (index).
      *

@@ -230,16 +230,6 @@ export class VertTuple {
         const t = this.getClosestT(point);
         // Compare to pointDistance?
         const distance = Math.sqrt(VertTuple.vtutils.dist2(point, this.vertAt(t)));
-        // console.log(
-        //   "distance",
-        //   distance,
-        //   "epsilon",
-        //   epsilon,
-        //   "distance < (epsilon ?? Vertex.EPSILON)",
-        //   distance < (epsilon ?? Vertex.EPSILON),
-        //   "distance < (epsilon ?? Vertex.EPSILON) && t >= 0 && t <= 1",
-        //   distance < (epsilon ?? Vertex.EPSILON) && t >= 0 && t <= 1
-        // );
         if (typeof insideBoundsOnly !== "undefined" && insideBoundsOnly) {
             return distance < (epsilon !== null && epsilon !== void 0 ? epsilon : Vertex.EPSILON) && t >= 0 && t <= 1;
         }

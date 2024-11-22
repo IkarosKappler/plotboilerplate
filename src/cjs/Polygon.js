@@ -41,8 +41,10 @@ exports.Polygon = void 0;
 var BezierPath_1 = require("./BezierPath");
 var Bounds_1 = require("./Bounds");
 var Line_1 = require("./Line");
+var Triangle_1 = require("./Triangle");
 var UIDGenerator_1 = require("./UIDGenerator");
 var Vertex_1 = require("./Vertex");
+var geomutils_1 = require("./geomutils");
 /**
  * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
  *
@@ -131,6 +133,61 @@ var Polygon = /** @class */ (function () {
         return lines;
     };
     /**
+     * Checks if the angle at the given polygon vertex (index) is acute. Please not that this is
+     * only working for clockwise polygons. If this polygon is not clockwise please use the
+     * `isClockwise` method and reverse polygon vertices if needed.
+     *
+     * @method isAngleAcute
+     * @instance
+     * @memberof Polygon
+     * @param {number} vertIndex - The index of the polygon vertex to check.
+     * @returns {boolean} `true` is angle is acute, `false` is obtuse.
+     */
+    Polygon.prototype.getInnerAngleAt = function (vertIndex) {
+        var p2 = this.vertices[vertIndex];
+        var p1 = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
+        var p3 = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
+        // See
+        //    https://math.stackexchange.com/questions/149959/how-to-find-the-interior-angle-of-an-irregular-pentagon-or-polygon
+        // π−arccos((P2−P1)⋅(P3−P2)|P2−P1||P3−P2|)
+        // Check if triangle is acute (will be used later)
+        // Acute angles and obtuse angles need to be handled differently.
+        var isAcute = this.isAngleAcute(vertIndex);
+        // Differences
+        var zero = new Vertex_1.Vertex(0, 0);
+        var p2mp1 = new Vertex_1.Vertex(p2.x - p1.x, p2.y - p1.y);
+        var p3mp2 = new Vertex_1.Vertex(p3.x - p2.x, p3.y - p2.y);
+        var p2mp1_len = zero.distance(p2mp1);
+        var p3mp2_len = zero.distance(p3mp2);
+        // Dot products
+        var dotProduct = geomutils_1.geomutils.dotProduct(p2mp1, p3mp2);
+        var lengthProduct = p2mp1_len * p3mp2_len;
+        if (isAcute) {
+            return Math.PI - Math.acos(dotProduct / lengthProduct);
+        }
+        else {
+            return Math.PI + Math.acos(dotProduct / lengthProduct);
+        }
+    };
+    /**
+     * Checks if the angle at the given polygon vertex (index) is acute.
+     *
+     * @method isAngleAcute
+     * @instance
+     * @memberof Polygon
+     * @param {number} vertIndex - The index of the polygon vertex to check.
+     * @returns {boolean} `true` is angle is acute, `false` is obtuse.
+     */
+    Polygon.prototype.isAngleAcute = function (vertIndex) {
+        var A = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
+        var B = this.vertices[vertIndex];
+        var C = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
+        // Find local winding number for triangle A B C
+        var windingNumber = Triangle_1.Triangle.utils.determinant(A, B, C);
+        // console.log("vertIndex", vertIndex, "windingNumber", windingNumber);
+        return windingNumber < 0;
+    };
+    /**
      * Get the polygon vertex at the given position (index).
      *
      * The index may exceed the total vertex count, and will be wrapped around then (modulo).
@@ -140,7 +197,7 @@ var Polygon = /** @class */ (function () {
      *  - getVertexAt( vertices.length + k ) == getVertexAt( k )
      *  - getVertexAt( -k )                  == getVertexAt( vertices.length -k )
      *
-     * @metho getVertexAt
+     * @method getVertexAt
      * @param {number} index - The index of the desired vertex.
      * @instance
      * @memberof Polygon
@@ -583,8 +640,9 @@ var Polygon = /** @class */ (function () {
      **/
     Polygon.prototype.toCubicBezierSVGString = function (threshold) {
         var qdata = this.toCubicBezierData(threshold);
-        if (qdata.length == 0)
+        if (qdata.length == 0) {
             return "";
+        }
         var buffer = ["M " + qdata[0].x + " " + qdata[0].y];
         for (var i = 1; i < qdata.length; i += 3) {
             buffer.push("C " +

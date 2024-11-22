@@ -108,6 +108,15 @@
     return insetRectanglePolygons;
   };
 
+  // STATIC
+  PolygonInset.convertToBasicInsetPolygon = function (insetPolygonLines) {
+    var insetPolygon = new Polygon([], false);
+    insetPolygonLines.forEach(function (insetLine) {
+      insetPolygon.vertices.push(insetLine.a);
+    });
+    return insetPolygon;
+  };
+
   /**
    *
    * @param {*} insetPolygonLines
@@ -130,13 +139,22 @@
       var isInAnyRectangle = insetRectanglePolygons.some(function (rect, rectIndex) {
         return pLineIndex != rectIndex && rect.containsVert(centerPoint);
       });
-      var isInsideSourcePolygon = originalPolygon.containsVert(centerPoint);
+      var isInsideSourcePolygon = true; //  originalPolygon.containsVert(centerPoint);
       // return !isInAnyRectangle && isInsideSourcePolygon;
       // return true; // true -> Keep
       keepInsetPolygonLines[pLineIndex] = !isInAnyRectangle && isInsideSourcePolygon;
     });
   };
 
+  /**
+   *
+   * @param {*} insetPolygonLines
+   * @param {*} insetLines
+   * @param {*} insetRectanglePolygons
+   * @param {*} originalPolygon
+   * @param {*} keepInsetPolygonLines
+   * @returns
+   */
   PolygonInset.prototype.clearPolygonByFilteredLines = function (
     insetPolygonLines,
     insetLines,

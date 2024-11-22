@@ -21,7 +21,9 @@
  * @modified  2021-01-22 Always updating circumcircle when retieving it.
  * @modified  2022-02-02 Added the `destroy` method.
  * @modified  2022-02-02 Cleared the `Triangle.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version   2.6.0
+ * @modified  2024-11-22 Added static utility function Triangle.utils.determinant; adapted method `determinant`.
+ * @modified  2024-11-22 Changing visibility of `Triangle.utils` from `private` to `public`.
+ * @version   2.8.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -35,7 +37,7 @@ import { Polygon } from "./Polygon";
 import { UIDGenerator } from "./UIDGenerator";
 import { Vertex } from "./Vertex";
 import { geomutils } from "./geomutils";
-import { SVGSerializable, UID } from "./interfaces";
+import { SVGSerializable, UID, XYCoords } from "./interfaces";
 
 /**
  * @classdesc A triangle class for triangulations.
@@ -374,7 +376,8 @@ export class Triangle implements SVGSerializable {
    */
   determinant(): number {
     // (b.y - a.y)*(c.x - b.x) - (c.y - b.y)*(b.x - a.x);
-    return (this.b.y - this.a.y) * (this.c.x - this.b.x) - (this.c.y - this.b.y) * (this.b.x - this.a.x);
+    // return (this.b.y - this.a.y) * (this.c.x - this.b.x) - (this.c.y - this.b.y) * (this.b.x - this.a.x);
+    return Triangle.utils.determinant(this.a, this.b, this.c);
   }
 
   /**
@@ -464,7 +467,7 @@ export class Triangle implements SVGSerializable {
     this.isDestroyed = true;
   }
 
-  private static utils = {
+  public static utils = {
     // Used in the bounds() function.
     max3(a: number, b: number, c: number): number {
       return a >= b && a >= c ? a : b >= a && b >= c ? b : c;
@@ -500,6 +503,17 @@ export class Triangle implements SVGSerializable {
       var t: number = (1 / (2 * area)) * (p0x * p1y - p0y * p1x + (p0y - p1y) * px + (p1x - p0x) * py);
 
       return s > 0 && t > 0 && 1 - s - t > 0;
+    },
+
+    /**
+     * Calculate the determinant of the three vertices a, b and c (in this order).
+     * @param {XYCords} a - The first vertex.
+     * @param {XYCords} b - The first vertex.
+     * @param {XYCords} c - The first vertex.
+     * @returns {nmber}
+     */
+    determinant(a: XYCoords, b: XYCoords, c: XYCoords): number {
+      return (b.y - a.y) * (c.x - b.x) - (c.y - b.y) * (b.x - a.x);
     }
   };
 }

@@ -9,6 +9,17 @@ Imminent todos:
 - check automatic darmode detection
 - lil-gui does not scroll
 
+* 2024-11-22
+  - Added static utility function `Triangle.utils.determinant(XYCoord,XYCoords,XYCoords)`; adapted method `Triangle.determinant()`.
+  - Changing visibility of `Triangle.utils` from `private` to `public`.
+  - Adding params `xOffset` and `yOffset` to helper functions `drawPolygonIndices`.
+  - Adding `Polygon.getInnerAngleAt(number)` to determine if polygon angle at index is acute or obtuse.
+  - Adding helper function `geomutils.mapAngleTo2PI(number)` for mapping any value into the interval `[0,2*PI)`.
+  - Adding helper function `geomutils.dotProduct(number)` for calculating the dot product of two vertices (as vectors).
+  - Fixing demo 03-random-scripture: darkmode detection failed.
+  - Fixed a type error in `utils/algorithms/findPolygonSelfIntersections`.
+  - Adding lil-gui style: Override lil-gui scroll setting (activate scrolling) in `./demos/style.css`.
+  - Added the `insideBoundsOnly` param to the `splitPolygonToNonIntersecting` algorithm.
 * 2024-10-30
   - Added tge `Polygon.getLines` method.
 * 2024-10-12

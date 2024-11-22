@@ -17,6 +17,7 @@
 
   // Fetch the GET params
   let GUP = gup();
+  const RAD_TO_DEG = 180.0 / Math.PI;
   _context.addEventListener("load", function () {
     var params = new Params(GUP);
     var isDarkmode = detectDarkMode(GUP);
@@ -36,7 +37,8 @@
     var config = {
       pointCount: params.getNumber("pointCount", 8),
       innerPolygonOffset: params.getNumber("innerPolygonOffset", 45), // px
-      drawVertexNumbers: params.getBoolean("drawVertexNumbers", false)
+      drawVertexNumbers: params.getBoolean("drawVertexNumbers", false),
+      drawPolygonInsetLines: params.getBoolean("drawPolygonInsetLines", true)
     };
 
     var buildRandomizedPolygon = function (numVertices) {
@@ -70,172 +72,13 @@
       // ...
     };
 
-    // // Question: what happens if line is completely out of bounds?
-    // var expandLineToRectBounds = function (line, boundsRectPolygon) {
-    //   var boundsIntersections = boundsRectPolygon.lineIntersections(line, false);
-    //   if (boundsIntersections.length != 2) {
-    //     // This should not be te case by construction
-    //     console.log(
-    //       "If this happens then the given line is completely outside of the rectangular bounds. No intersections can be calculated. Check your code."
-    //     );
-    //     return null;
-    //   }
-    //   return new Line(boundsIntersections[0], boundsIntersections[1]);
-    // };
-
     var postDraw = function (draw, fill) {
       drawInsetPolygon(draw, fill, polygon);
 
       if (config.drawVertexNumbers) {
-        drawPolygonIndices(polygon, fill, { color: "orange", fontFamily: "Arial", fontSize: 9 });
+        drawPolygonIndices(polygon, fill, { color: "orange", fontFamily: "Arial", fontSize: 9, yOffset: 20 });
       }
     };
-
-    // /**
-    //  * This method transforms each polygon line into a new line
-    //  * by moving it to the inside direction of the polygon (by the given `insetAmount`).
-    //  *
-    //  * @param {Array<Line>} polygonLines
-    //  * @param {number} insetAmount
-    //  * @return {Array<Line>} The transformed lines. The result array has the same length and order as the input array.
-    //  */
-    // var collectInsetLines = function (polygonLines, insetAmount) {
-    //   var insetLines = []; // Array<Line>
-    //   for (var i = 0; i < polygonLines.length; i++) {
-    //     var line = polygonLines[i];
-    //     var perp = new Vector(line.a, line.b).perp();
-    //     var t = insetAmount / perp.length();
-    //     var offsetOnPerp = perp.vertAt(t);
-    //     var diff = line.a.difference(offsetOnPerp);
-    //     // Polygon is is clockwise order.
-    //     // Move line inside polygon
-    //     var movedLine = line.clone();
-    //     movedLine.a.add(diff);
-    //     movedLine.b.add(diff);
-    //     insetLines.push(movedLine);
-    //   }
-    //   return insetLines;
-    // };
-
-    // /**
-    //  * For a sequence of inset polygon lines get the inset polygon by detecting
-    //  * useful intersections (by cropping or extending them).
-    //  *
-    //  * The returned lines resemble a new polygon.
-    //  *
-    //  * Please note that the returned polygon can be self-intersecting!
-    //  *
-    //  * @param {Array<Line>} insetLines
-    //  * @returns {Array<Line>} The cropped or exented inset polygon lines.
-    //  */
-    // var collectInsetPolygonLines = function (insetLines) {
-    //   if (insetLines.length <= 1) {
-    //     return [];
-    //   }
-    //   var insetPolygonLines = []; // Array<Line>
-    //   // Collect first intersection at beginning :)
-    //   var lastInsetLine = insetLines[insetLines.length - 1];
-    //   var firstInsetLine = insetLines[0];
-    //   var lastIntersectionPoint = lastInsetLine.intersection(firstInsetLine); // Must not be null
-    //   for (var i = 0; i < insetLines.length; i++) {
-    //     var insetLine = insetLines[i];
-    //     // // Get whole line inside poly bounds.
-    //     // var lineInsidePolyBounds = expandLineToRectBounds(insetLine, boundsAsRectPoly);
-    //     // draw.line(lineInsidePolyBounds.a, lineInsidePolyBounds.b, "rgba(0,255,0,0.2)", 1.0);
-
-    //     var nextInsetLine = insetLines[(i + 1) % insetLines.length];
-    //     // Find desired intersection
-    //     var intersection = insetLine.intersection(nextInsetLine);
-    //     if (intersection == null) {
-    //       console.warn("[collectInsetPolygon] WARN intersection line must not be null", i, nextInsetLine);
-    //     }
-    //     // By construction they MUST have any non-null intersection!
-    //     if (lastIntersectionPoint != null) {
-    //       var resultLine = new Line(lastIntersectionPoint, intersection);
-    //       insetPolygonLines.push(resultLine);
-    //     }
-    //     lastIntersectionPoint = intersection;
-    //   }
-    //   return insetPolygonLines;
-    // };
-
-    // var collectRectangularPolygonInsets = function (originalPolygonLines, insetLines) {
-    //   // Convert to rectangle polygon
-    //   var insetRectanglePolygons = originalPolygonLines.map(function (polygonLine, index) {
-    //     var rectPolygon = new Polygon([], false);
-    //     // Add in original order
-    //     rectPolygon.vertices.push(polygonLine.a.clone());
-    //     rectPolygon.vertices.push(polygonLine.b.clone());
-    //     // Add in reverse order
-    //     var insetLine = insetLines[index];
-    //     rectPolygon.vertices.push(insetLine.b.clone());
-    //     rectPolygon.vertices.push(insetLine.a.clone());
-    //     return rectPolygon;
-    //   });
-    //   return insetRectanglePolygons;
-    // };
-
-    // /**
-    //  *
-    //  * @param {*} insetPolygonLines
-    //  * @param {*} insetLines
-    //  * @param {*} insetRectanglePolygons
-    //  * @param {*} originalPolygon
-    //  * @param {*} keepInsetPolygonLines
-    //  * @returns void
-    //  */
-    // var filterLines = function (insetPolygonLines, insetLines, insetRectanglePolygons, originalPolygon, keepInsetPolygonLines) {
-    //   return insetPolygonLines.filter(function (insetPLine, pLineIndex) {
-    //     // Does the center of the line lay inside an inset rectangle?
-    //     var centerPoint = insetPLine.vertAt(0.5);
-    //     var isInAnyRectangle = insetRectanglePolygons.some(function (rect, rectIndex) {
-    //       return pLineIndex != rectIndex && rect.containsVert(centerPoint);
-    //     });
-    //     var isInsideSourcePolygon = originalPolygon.containsVert(centerPoint);
-    //     // return !isInAnyRectangle && isInsideSourcePolygon;
-    //     // return true; // true -> Keep
-    //     keepInsetPolygonLines[pLineIndex] = !isInAnyRectangle && isInsideSourcePolygon;
-    //   });
-    // };
-
-    // var clearPolygonByFilteredLines = function (
-    //   insetPolygonLines,
-    //   insetLines,
-    //   insetRectanglePolygons,
-    //   originalPolygon,
-    //   keepInsetPolygonLines
-    // ) {
-    //   // Clone array
-    //   var resultLines = insetPolygonLines.map(function (line) {
-    //     return new Line(line.a.clone(), line.b.clone());
-    //   });
-    //   var index = 0;
-    //   // for (var i = 0; i < keepInsetPolygonLines.length; i++) {
-    //   var i = 0;
-    //   while (i < resultLines.length && resultLines.length > 2) {
-    //     var keepLine = keepInsetPolygonLines[index++];
-    //     if (keepLine) {
-    //       i++;
-    //       continue;
-    //     }
-    //     console.log("Remove", i);
-    //     // Remove line and crop neighbours
-    //     var leftIndex = (i + resultLines.length - 1) % resultLines.length;
-    //     var rightIndex = (i + 1) % resultLines.length;
-    //     console.log("leftIndex", leftIndex, "rightIndex", rightIndex);
-    //     var leftLine = resultLines[leftIndex];
-    //     var rightLine = resultLines[rightIndex];
-    //     var intersection = leftLine.intersection(rightLine);
-    //     if (intersection == null) {
-    //       console.warn("[clearPolygonByFilteredLines] WARN intersection line must not be null", i, leftLine, rightLine);
-    //     }
-    //     leftLine.b = intersection;
-    //     rightLine.a = intersection.clone();
-    //     resultLines.splice(i, 1);
-    //     // i++;
-    //   }
-    //   return resultLines;
-    // };
 
     /**
      * Draw the inset polygon.
@@ -269,10 +112,12 @@
 
       // Step 2: Transform inset line to resemble a polygon (expand or crop).
       var insetPolygonLines = polygonInset.collectInsetPolygonLines(insetLines);
-      for (var i = 0; i < insetPolygonLines.length; i++) {
-        var ipl = insetPolygonLines[i];
-        // console.log("ipl", ipl);
-        draw.line(ipl.a, ipl.b, "green", 4.0);
+      if (config.drawPolygonInsetLines) {
+        for (var i = 0; i < insetPolygonLines.length; i++) {
+          var ipl = insetPolygonLines[i];
+          // console.log("ipl", ipl);
+          draw.line(ipl.a, ipl.b, "green", 4.0);
+        }
       }
 
       // Convert to rectangle polygons
@@ -283,24 +128,82 @@
         // Draw rectangular cross inside
       }
 
+      //----------------------------- THIS MUST BE DISCUSSED -----------------------------
       // Step 3: identify polygon lines outside the desired bounds.
-      polygonInset.filterLines(insetPolygonLines, insetLines, insetRectanglePolygons, polygon, keepInsetPolygonLines);
-      for (var i = 0; i < keepInsetPolygonLines.length; i++) {
-        if (keepInsetPolygonLines[i]) {
-          draw.line(insetPolygonLines[i].a, insetPolygonLines[i].b, "rgba(0,0,255,0.5)", 6.0);
+      // polygonInset.filterLines(insetPolygonLines, insetLines, insetRectanglePolygons, polygon, keepInsetPolygonLines);
+      // for (var i = 0; i < keepInsetPolygonLines.length; i++) {
+      //   if (keepInsetPolygonLines[i]) {
+      //     draw.line(insetPolygonLines[i].a, insetPolygonLines[i].b, "rgba(0,0,255,0.5)", 6.0);
+      //   }
+      // }
+
+      // var resultLines = polygonInset.clearPolygonByFilteredLines(
+      //   insetPolygonLines,
+      //   insetLines,
+      //   insetRectanglePolygons,
+      //   polygon,
+      //   keepInsetPolygonLines
+      // );
+      // for (var i = 0; i < resultLines.length; i++) {
+      //   draw.line(resultLines[i].a, resultLines[i].b, "rgba(255,0,128,1.0)", 2.0);
+      // }
+      //-END------------------------- THIS MUST BE DISCUSSED -----------------------------
+
+      // Convert inset polygon lines back to polygon.
+      // var insetPolygon = new Polygon([]);
+      // insetPolygonLines.forEach(function (insetLine) {
+      //   insetPolygon.vertices.push(insetLine.a);
+      // });
+      var insetPolygon = PolygonInset.convertToBasicInsetPolygon(insetPolygonLines);
+      // Test draw inner polygon.
+      for (var i = 0; i <= insetPolygon.vertices.length; i++) {
+        draw.line(insetPolygon.getVertexAt(i), insetPolygon.getVertexAt(i + 1), "rgba(255,0,0,0.5)", 4);
+      }
+      // Array<Array<Vertex>>
+      var maxSplitDepth = 10;
+      var splitPolygons = splitPolygonToNonIntersecting(insetPolygon.vertices, maxSplitDepth, true); // insideBoundsOnly
+      console.log("splitPolygons.length", splitPolygons.length);
+      if (splitPolygons.length > 1) {
+        console.log("splitPolygons", splitPolygons);
+      }
+      for (var i = 0; i < splitPolygons.length; i++) {
+        var split = splitPolygons[i];
+        for (var j = 0; j < split.length; j++) {
+          draw.crosshair(split[j], 10.0, "green", 1);
         }
+
+        var nextColor = randomWebColor(i, "Mixed", 1.0);
+        fill.polyline(split, false, nextColor);
       }
 
-      var resultLines = polygonInset.clearPolygonByFilteredLines(
-        insetPolygonLines,
-        insetLines,
-        insetRectanglePolygons,
-        polygon,
-        keepInsetPolygonLines
-      );
-      for (var i = 0; i < resultLines.length; i++) {
-        draw.line(resultLines[i].a, resultLines[i].b, "rgba(255,0,0,0.75)", 1.0);
+      // Draw inner angles?
+      for (var i = 0; i < polygonInset.polygon.vertices.length; i++) {
+        var innerAngle = polygonInset.polygon.getInnerAngleAt(i);
+        var tmpLine = new Line(polygonInset.polygon.vertices[i].clone(), polygonInset.polygon.getVertexAt(i + 1).clone());
+        tmpLine.b.rotate(innerAngle / 2.0, tmpLine.a);
+        draw.line(tmpLine.a, tmpLine.b, "orange", 2);
+        fill.text((innerAngle * RAD_TO_DEG).toFixed(1) + "°", tmpLine.a.x, tmpLine.a.y, { color: "orange" });
+        var isAcute = polygon.isAngleAcute(i);
+        fill.text("isAcute=" + isAcute, tmpLine.a.x, tmpLine.a.y + 10, { color: "orange" });
       }
+
+      // Draw line angles
+      for (var i = 0; i < polygonInset.polygon.vertices.length; i++) {
+        var line = polygonInset.polygon.getLineAt(i);
+        var lineCenter = line.vertAt(0.5);
+        var lineAngle = geomutils.mapAngleTo2PI(line.angle());
+        fill.text((lineAngle * RAD_TO_DEG).toFixed(1) + "°", lineCenter.x - 5, lineCenter.y - 10, { color: "green" });
+      }
+    };
+
+    var mapAngleTo2PI = function (angle) {
+      var new_angle = Math.asin(Math.sin(angle));
+      if (Math.cos(angle) < 0) {
+        new_angle = Math.PI - new_angle;
+      } else if (new_angle < 0) {
+        new_angle += 2 * Math.PI;
+      }
+      return new_angle;
     };
 
     // +---------------------------------------------------------------------------------
@@ -326,10 +229,13 @@
       gui.add(config, "pointCount").min(3).max(32).step(1).name("pointCount").title("Number of polygon vertices")
       .onChange( function() { rebuildPolygon(); });
       // prettier-ignore
-      gui.add(config, "innerPolygonOffset").min(0).max(400).step(1).name("innerPolygonOffset").title("The line offset to use.")
+      gui.add(config, "innerPolygonOffset").min(-100).max(400).step(1).name("innerPolygonOffset").title("The line offset to use.")
       .onChange( function() { pb.redraw() });
       // prettier-ignore
       gui.add(config, "drawVertexNumbers").name("drawVertexNumbers").title("Check to toggle vertex number on/off")
+      .onChange( function() { pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "drawPolygonInsetLines").name("drawPolygonInsetLines").title("Draw polygon inset lines")
       .onChange( function() { pb.redraw() });
     }
 

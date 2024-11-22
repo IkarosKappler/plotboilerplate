@@ -127,6 +127,19 @@ export class Polygon {
         }
         return lines;
     }
+    // TODO: FIX and doc
+    getInnerAngleAt(vertIndex) {
+        const curVert = this.vertices[vertIndex];
+        const prevVert = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
+        const nextVert = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
+        // prevVert.sub(curVert);
+        // nextVert.sub(curVert);
+        var preAngle = curVert.angle(prevVert);
+        var nextAngle = curVert.angle(nextVert);
+        // var preAngle = prevVert.angle(curVert);
+        // var nextAngle = nextVert.angle(curVert);
+        return nextAngle; //  - (nextAngle - preAngle) / 2.0;
+    }
     /**
      * Get the polygon vertex at the given position (index).
      *
@@ -578,8 +591,9 @@ export class Polygon {
      **/
     toCubicBezierSVGString(threshold) {
         var qdata = this.toCubicBezierData(threshold);
-        if (qdata.length == 0)
+        if (qdata.length == 0) {
             return "";
+        }
         var buffer = ["M " + qdata[0].x + " " + qdata[0].y];
         for (var i = 1; i < qdata.length; i += 3) {
             buffer.push("C " +

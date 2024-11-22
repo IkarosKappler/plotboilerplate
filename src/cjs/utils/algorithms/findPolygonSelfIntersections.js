@@ -6,6 +6,7 @@
  * @author   Ikaros Kappler
  * @date     2020-12-04
  * @modified 2020-12-09 Ported from vanilla JS to Typescript.
+ * @modified 2024-11-22 Fixed a type error in line 41.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.findPolygonSelfIntersections = void 0;
@@ -18,7 +19,7 @@ var Vertex_1 = require("../../Vertex");
  *
  * @name findPolygonSelfIntersections
  * @param {Array<Vertex>} vertices - The vertices that form the polygon.
- * @return Array<Vertex>
+ * @return {Array<Vertex>}
  */
 var findPolygonSelfIntersections = function (vertices) {
     var pointList = [];
@@ -39,8 +40,7 @@ var findPolygonSelfIntersections = function (vertices) {
             // The point is undefined if and only if both line are parallel (co-linear).
             var intersectionPoint = lineA.intersection(lineB);
             // Check if the intersection point is on both (finite) edges of the polygon.
-            if (intersectionPoint
-                && lineA.hasPoint(intersectionPoint) && lineB.hasPoint(intersectionPoint)) {
+            if (intersectionPoint && lineA.hasPoint(intersectionPoint) && lineB.hasPoint(intersectionPoint)) {
                 pointList.push(intersectionPoint);
             }
         }
