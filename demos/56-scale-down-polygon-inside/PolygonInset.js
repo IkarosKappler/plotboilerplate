@@ -1,4 +1,8 @@
 /**
+ * Calculate the inset of any polygon.
+ *
+ * Input: A polygon and an offset amount. May be negative.
+ * Output: A sequence of vertice-lists, each representin an inset polygon. May be empty.
  *
  * @required sutherlandHodgman
  * @required splitPolygonToNonIntersecting
@@ -43,8 +47,15 @@
     // var maxPolygonSplitDepth = 10;
     this.splitPolygons = splitPolygonToNonIntersecting(this.insetPolygon.vertices, maxPolygonSplitDepth, true); // insideBoundsOnly
 
-    this.filteredSplitPolygons = PolygonInset._filterSplitPolygonsByCoverage(this.splitPolygons, this.insetRectanglePolygons);
-    this.filteredSplitPolygons = PolygonInset._filterSplitPolygonsByOriginalBounds(this.filteredSplitPolygons, this.polygon);
+    // This method was initially meant to calculate inset-polygons only.
+    // But with a simple filter we COULD also create outer offset-polygons.
+    // Maybe this is a task for the future
+    this.filteredSplitPolygons = PolygonInset._filterInnerSplitPolygonsByCoverage(
+      this.splitPolygons,
+      this.insetRectanglePolygons,
+      intersectionEpsilon
+    );
+    this.filteredSplitPolygons = PolygonInset._filterInnerSplitPolygonsByOriginalBounds(this.filteredSplitPolygons, this.polygon);
     return this.filteredSplitPolygons;
     // return this.splitPolygons;
   };
@@ -173,7 +184,7 @@
    * @param {Polygon} originalPolygon
    * @return {{Array<Array<Vertex<>}} The filtered polygon list.
    */
-  PolygonInset._filterSplitPolygonsByOriginalBounds = function (splitPolygonsVertices, originalPolygon) {
+  PolygonInset._filterInnerSplitPolygonsByOriginalBounds = function (splitPolygonsVertices, originalPolygon) {
     return splitPolygonsVertices.filter(function (splitPolyVerts, _splitPolyIndex) {
       // console.log("_splitPolyIndex", _splitPolyIndex);
       return splitPolyVerts.every(function (splitPVert) {
@@ -191,7 +202,7 @@
    * @param {number?=1.0} epsilon - (optional, default is 1.0) A epsislon to define a tolerance for checking if two polygons intersect.
    */
   // STATIC
-  PolygonInset._filterSplitPolygonsByCoverage = function (splitPolygonsVertices, insetRectanglePolygons, epsilon) {
+  PolygonInset._filterInnerSplitPolygonsByCoverage = function (splitPolygonsVertices, insetRectanglePolygons, epsilon) {
     if (typeof epsilon === "undefined") {
       epsilon = 1.0;
     }
@@ -206,15 +217,15 @@
     // );
     return splitPolygonsVertices.filter(function (splitPolyVerts, _splitPolyIndex) {
       // console.log("_splitPolyIndex", _splitPolyIndex);
-      var intersectsWithAnyRect = insetRectanglePolygons.some(function (rectanglePoly, rectanglePolyIndex) {
+      var intersectsWithAnyRect = insetRectanglePolygons.some(function (rectanglePoly, _rectanglePolyIndex) {
         var intersectionVerts = sutherlandHodgman(splitPolyVerts, rectanglePoly.vertices);
         // var interSecionPoly = new Polygon(intersectionVerts, false);
         var intersectionAreaSize = Polygon.utils.area(intersectionVerts); // interSecionPoly.area();
         // console.log(
         //   "_splitPolyIndex",
         //   _splitPolyIndex,
-        //   "rectanglePolyIndex",
-        //   rectanglePolyIndex,
+        //   "_rectanglePolyIndex",
+        //   _rectanglePolyIndex,
         //   "epsilon",
         //   epsilon,
         //   "intersectionAreaSize",
@@ -229,83 +240,6 @@
       return !intersectsWithAnyRect;
     });
   };
-
-  /**
-   *
-   * @param {*} insetPolygonLines
-   * @param {*} insetLines
-   * @param {*} insetRectanglePolygons
-   * @param {*} originalPolygon
-   * @param {*} keepInsetPolygonLines
-   * @returns void
-   */
-  // PolygonInset.prototype.filterLines = function (
-  //   insetPolygonLines,
-  //   insetLines,
-  //   insetRectanglePolygons,
-  //   originalPolygon,
-  //   keepInsetPolygonLines
-  // ) {
-  //   return insetPolygonLines.filter(function (insetPLine, pLineIndex) {
-  //     // Does the center of the line lay inside an inset rectangle?
-  //     var centerPoint = insetPLine.vertAt(0.5);
-  //     var isInAnyRectangle = insetRectanglePolygons.some(function (rect, rectIndex) {
-  //       return pLineIndex != rectIndex && rect.containsVert(centerPoint);
-  //     });
-  //     var isInsideSourcePolygon = true; //  originalPolygon.containsVert(centerPoint);
-  //     // return !isInAnyRectangle && isInsideSourcePolygon;
-  //     // return true; // true -> Keep
-  //     keepInsetPolygonLines[pLineIndex] = !isInAnyRectangle && isInsideSourcePolygon;
-  //   });
-  // };
-
-  /**
-   *
-   * @param {*} insetPolygonLines
-   * @param {*} insetLines
-   * @param {*} insetRectanglePolygons
-   * @param {*} originalPolygon
-   * @param {*} keepInsetPolygonLines
-   * @returns
-   */
-  // PolygonInset.prototype.clearPolygonByFilteredLines = function (
-  //   insetPolygonLines,
-  //   insetLines,
-  //   insetRectanglePolygons,
-  //   originalPolygon,
-  //   keepInsetPolygonLines
-  // ) {
-  //   // Clone array
-  //   var resultLines = insetPolygonLines.map(function (line) {
-  //     return new Line(line.a.clone(), line.b.clone());
-  //   });
-  //   var index = 0;
-  //   // for (var i = 0; i < keepInsetPolygonLines.length; i++) {
-  //   var i = 0;
-  //   while (i < resultLines.length && resultLines.length > 2) {
-  //     var keepLine = keepInsetPolygonLines[index++];
-  //     if (keepLine) {
-  //       i++;
-  //       continue;
-  //     }
-  //     console.log("Remove", i);
-  //     // Remove line and crop neighbours
-  //     var leftIndex = (i + resultLines.length - 1) % resultLines.length;
-  //     var rightIndex = (i + 1) % resultLines.length;
-  //     console.log("leftIndex", leftIndex, "rightIndex", rightIndex);
-  //     var leftLine = resultLines[leftIndex];
-  //     var rightLine = resultLines[rightIndex];
-  //     var intersection = leftLine.intersection(rightLine);
-  //     if (intersection == null) {
-  //       console.warn("[clearPolygonByFilteredLines] WARN intersection line must not be null", i, leftLine, rightLine);
-  //     }
-  //     leftLine.b = intersection;
-  //     rightLine.a = intersection.clone();
-  //     resultLines.splice(i, 1);
-  //     // i++;
-  //   }
-  //   return resultLines;
-  // };
 
   _context.PolygonInset = PolygonInset;
 })(globalThis);
