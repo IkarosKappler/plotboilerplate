@@ -42,7 +42,9 @@
       intersectionEpsilon: params.getNumber("intersectionEpsilon", 1.0), // square pixels
       drawVertexNumbers: params.getBoolean("drawVertexNumbers", false),
       drawPolygonInsetLines: params.getBoolean("drawPolygonInsetLines", true),
-      drawUnfilteredSplitPolygons: params.getBoolean("drawUnfilteredSplitPolygons", false)
+      drawUnfilteredSplitPolygons: params.getBoolean("drawUnfilteredSplitPolygons", false),
+      drawInnerPolygonAngles: params.getBoolean("drawInnerPolygonAngles", false),
+      fillResultPolygons: params.getBoolean("fillResultPolygons", true)
     };
 
     var buildRandomizedPolygon = function (numVertices) {
@@ -92,6 +94,20 @@
       }
     };
 
+    var drawResultPolygons = function (draw, fill, resultPolygons) {
+      for (var i = 0; i < resultPolygons.length; i++) {
+        var split = resultPolygons[i];
+        for (var j = 0; j < split.length; j++) {
+          draw.crosshair(split[j], 10.0, "green", 1);
+        }
+
+        if (config.fillResultPolygons) {
+          var nextColor = randomWebColor(i, "Mixed", 1.0);
+          fill.polyline(split, false, nextColor);
+        }
+      }
+    };
+
     /**
      * Draw the inset polygon.
      *
@@ -100,35 +116,14 @@
      * @param {*} polygon
      */
     var drawInsetPolygon = function (draw, fill, polygon) {
-      console.log("drawInsetPolygon");
       var polygonBounds = polygon.getBounds();
       var boundsAsRectPoly = polygonBounds.toPolygon();
-      // var originalPolygonLines = polygon.getLines();
       draw.polygon(boundsAsRectPoly, "grey", 1);
 
-      // var maxPolygonSplitDepth = config.pointCount; // This definitely return enough split polygons
-      // polygonInset.computeOutputPolygons(config.innerPolygonOffset, maxPolygonSplitDepth, config.intersectionEpsilon);
-
       if (config.drawUnfilteredSplitPolygons) {
-        for (var i = 0; i < polygonInset.splitPolygons.length; i++) {
-          var split = polygonInset.splitPolygons[i];
-          for (var j = 0; j < split.length; j++) {
-            draw.crosshair(split[j], 10.0, "green", 1);
-          }
-
-          var nextColor = randomWebColor(i, "Mixed", 1.0);
-          fill.polyline(split, false, nextColor);
-        }
+        drawResultPolygons(draw, fill, polygonInset.splitPolygons);
       } else {
-        for (var i = 0; i < polygonInset.filteredSplitPolygons.length; i++) {
-          var split = polygonInset.filteredSplitPolygons[i];
-          for (var j = 0; j < split.length; j++) {
-            draw.crosshair(split[j], 10.0, "green", 1);
-          }
-
-          var nextColor = randomWebColor(i, "Mixed", 1.0);
-          fill.polyline(split, false, nextColor);
-        }
+        drawResultPolygons(draw, fill, polygonInset.filteredSplitPolygons);
       }
 
       // Step 1: draw collected inset lines.
@@ -139,7 +134,7 @@
         draw.line(originalLine.a, insetLine.a, "grey", 1.0, { dashOffset: 0.0, dashArray: [3.0, 4.0] });
         draw.line(originalLine.b, insetLine.b, "grey", 1.0, { dashOffset: 0.0, dashArray: [3.0, 4.0] });
         // // Get whole line inside poly bounds.
-        var lineInsidePolyBounds = polygonInset.expandLineToRectBounds(insetLine, boundsAsRectPoly);
+        var lineInsidePolyBounds = expandLineToRectBounds(insetLine, boundsAsRectPoly);
         if (lineInsidePolyBounds) {
           // Some polygons produce inset lines that are completely OUTSIDE the original bounds!
           // Just ignore those.
@@ -148,7 +143,6 @@
       }
 
       // Step 2: Transform inset line to resemble a polygon (expand or crop).
-      // var insetPolygonLines = polygonInset.collectInsetPolygonLines(insetLines);
       if (config.drawPolygonInsetLines) {
         for (var i = 0; i < polygonInset.insetPolygonLines.length; i++) {
           var ipl = polygonInset.insetPolygonLines[i];
@@ -160,7 +154,6 @@
       for (var i = 0; i < polygonInset.insetRectanglePolygons.length; i++) {
         var rectPolygon = polygonInset.insetRectanglePolygons[i];
         fill.polygon(rectPolygon, "rgba(192,192,192,0.25)");
-        // Draw rectangular cross inside
       }
 
       for (var i = 0; i <= polygonInset.insetPolygon.vertices.length; i++) {
@@ -168,34 +161,42 @@
       }
 
       // Draw inner angles?
-      for (var i = 0; i < polygonInset.polygon.vertices.length; i++) {
-        var innerAngle = polygonInset.polygon.getInnerAngleAt(i);
-        var tmpLine = new Line(polygonInset.polygon.vertices[i].clone(), polygonInset.polygon.getVertexAt(i + 1).clone());
-        tmpLine.b.rotate(innerAngle / 2.0, tmpLine.a);
-        draw.line(tmpLine.a, tmpLine.b, "orange", 2);
-        fill.text((innerAngle * RAD_TO_DEG).toFixed(1) + "°", tmpLine.a.x, tmpLine.a.y, { color: "orange" });
-        var isAcute = polygon.isAngleAcute(i);
-        fill.text("isAcute=" + isAcute, tmpLine.a.x, tmpLine.a.y + 10, { color: "orange" });
-      }
+      if (config.drawInnerPolygonAngles) {
+        for (var i = 0; i < polygonInset.polygon.vertices.length; i++) {
+          var innerAngle = polygonInset.polygon.getInnerAngleAt(i);
+          var tmpLine = new Line(polygonInset.polygon.vertices[i].clone(), polygonInset.polygon.getVertexAt(i + 1).clone());
+          tmpLine.b.rotate(innerAngle / 2.0, tmpLine.a);
+          draw.line(tmpLine.a, tmpLine.b, "orange", 2);
+          fill.text((innerAngle * RAD_TO_DEG).toFixed(1) + "°", tmpLine.a.x, tmpLine.a.y, { color: "orange" });
+          var isAcute = polygon.isAngleAcute(i);
+          fill.text("isAcute=" + isAcute, tmpLine.a.x, tmpLine.a.y + 10, { color: "orange" });
+        }
 
-      // Draw line angles
-      for (var i = 0; i < polygonInset.polygon.vertices.length; i++) {
-        var line = polygonInset.polygon.getLineAt(i);
-        var lineCenter = line.vertAt(0.5);
-        var lineAngle = geomutils.mapAngleTo2PI(line.angle());
-        fill.text((lineAngle * RAD_TO_DEG).toFixed(1) + "°", lineCenter.x - 5, lineCenter.y - 10, { color: "green" });
+        // Draw line angles
+        for (var i = 0; i < polygonInset.polygon.vertices.length; i++) {
+          var line = polygonInset.polygon.getLineAt(i);
+          var lineCenter = line.vertAt(0.5);
+          var lineAngle = geomutils.mapAngleTo2PI(line.angle());
+          fill.text((lineAngle * RAD_TO_DEG).toFixed(1) + "°", lineCenter.x - 5, lineCenter.y - 10, { color: "green" });
+        }
       }
     };
 
-    // var mapAngleTo2PI = function (angle) {
-    //   var new_angle = Math.asin(Math.sin(angle));
-    //   if (Math.cos(angle) < 0) {
-    //     new_angle = Math.PI - new_angle;
-    //   } else if (new_angle < 0) {
-    //     new_angle += 2 * Math.PI;
-    //   }
-    //   return new_angle;
-    // };
+    /**
+     * Question: what happens if line is completely out of bounds?
+     * Answer: then the bounds were not correctly constructed!
+     **/
+    var expandLineToRectBounds = function (line, boundsRectPolygon) {
+      var boundsIntersections = boundsRectPolygon.lineIntersections(line, false);
+      if (boundsIntersections.length != 2) {
+        // This should not be te case by construction
+        console.log(
+          "If this happens then the given line is completely outside of the rectangular bounds. No intersections can be calculated. Check your code."
+        );
+        return null;
+      }
+      return new Line(boundsIntersections[0], boundsIntersections[1]);
+    };
 
     var rebuildPolygonInset = function () {
       // Create new polygon-inset instance.
@@ -203,7 +204,11 @@
 
       // Compute the polygon inset.
       var maxPolygonSplitDepth = config.pointCount; // This definitely return enough split polygons
-      polygonInset.computeOutputPolygons(config.innerPolygonOffset, maxPolygonSplitDepth, config.intersectionEpsilon);
+      polygonInset.computeOutputPolygons({
+        innerPolygonOffset: config.innerPolygonOffset,
+        maxPolygonSplitDepth: maxPolygonSplitDepth,
+        intersectionEpsilon: config.intersectionEpsilon
+      });
 
       // Update stats
       stats.numResultPolygons = polygonInset.filteredSplitPolygons.length;
@@ -218,18 +223,6 @@
     var rebuildPolygon = function () {
       // Create a new randomized polygon.
       polygon = buildRandomizedPolygon(config.pointCount);
-      // keepInsetPolygonLines = polygon.vertices.map(function () {
-      //   return true;
-      // });
-      // Also create new polygon-inset instance.
-      // polygonInset = new PolygonInset(polygon);
-
-      // // Compute the polygon inset.
-      // var maxPolygonSplitDepth = config.pointCount; // This definitely return enough split polygons
-      // polygonInset.computeOutputPolygons(config.innerPolygonOffset, maxPolygonSplitDepth, config.intersectionEpsilon);
-
-      // Update stats
-      // stats.numResultPolygons = polygonInset.filteredSplitPolygons.length;
 
       // Re-add the new polygon to trigger redraw.
       pb.removeAll(false, false); // Don't trigger redraw
@@ -256,6 +249,9 @@
       gui.add(config, "innerPolygonOffset").min(-400).max(400).step(1).name("innerPolygonOffset").title("The line offset to use.")
       .onChange( function() { rebuildPolygonInset() });
       // prettier-ignore
+      gui.add(config, "intersectionEpsilon").min(0.0).max(100.0).step(1.0).name("intersectionEpsilon").title("Draw all (unfiltered) split polygons?")
+      .onChange( function() { rebuildPolygonInset() });
+      // prettier-ignore
       gui.add(config, "drawVertexNumbers").name("drawVertexNumbers").title("Check to toggle vertex number on/off")
       .onChange( function() { rebuildPolygonInset() });
       // prettier-ignore
@@ -263,10 +259,13 @@
       .onChange( function() { rebuildPolygonInset()});
       // prettier-ignore
       gui.add(config, "drawUnfilteredSplitPolygons").name("drawUnfilteredSplitPolygons").title("Draw all (unfiltered) split polygons?")
-       .onChange( function() { rebuildPolygonInset() });
+       .onChange( function() { pb.redraw() });
       // prettier-ignore
-      gui.add(config, "intersectionEpsilon").min(0.0).max(100.0).step(1.0).name("intersectionEpsilon").title("Draw all (unfiltered) split polygons?")
-      .onChange( function() { rebuildPolygonInset() });
+      gui.add(config, "drawInnerPolygonAngles").name("drawInnerPolygonAngles").title("Draw the inner polygon angles?")
+      .onChange( function() { pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "fillResultPolygons").name("fillResultPolygons").title("Fill the final result polygons?")
+      .onChange( function() { pb.redraw() });
 
       // Add stats
       var uiStats = new UIStats(stats);

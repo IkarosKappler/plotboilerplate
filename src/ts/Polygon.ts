@@ -30,6 +30,7 @@
  * @modified 2023-11-24 Added the `Polygon.containsPolygon(Polygon)' function.
  * @modified 2024-10-12 Added the `getLineAt` method.
  * @modified 2024-10-30 Added the `getLines` method.
+ * @modified 2024-12-02 Added the `elimitateColinearEdges` method.
  * @version 1.13.0
  *
  * @file Polygon
@@ -600,6 +601,9 @@ export class Polygon implements SVGSerializable {
   /**
    * Create a deep copy of this polygon.
    *
+   * @method clone
+   * @instance
+   * @memberof Polygon
    * @return {Polygon} The cloned polygon.
    */
   clone(): Polygon {
@@ -607,6 +611,57 @@ export class Polygon implements SVGSerializable {
       this.vertices.map(vert => vert.clone()),
       this.isOpen
     );
+  }
+
+  /**
+   * Create a new polygon without colinear adjacent edges. This method does not midify the current polygon
+   * but creates a new one.
+   *
+   * Please note that this method does NOT create deep clones of the vertices. Use Polygon.clone() if you need to.
+   *
+   * Please also note that the `tolerance` may become really large here, as the denominator of two closely
+   * parallel lines is usually pretty large. See the demo `57-eliminate-colinear-polygon-edges` to get
+   * an impression of how denominators work.
+   *
+   * @method elimitateColinearEdges
+   * @instance
+   * @memberof Polygon
+   * @param {number?} tolerance - (default is 1.0) The epsilon to detect co-linear edges.
+   * @return {Polygon} A new polygon without co-linear adjacent edges – respective the given epsilon.
+   */
+  elimitateColinearEdges(tolerance?: number): Polygon {
+    const eps: number = typeof tolerance === "undefined" ? 1.0 : tolerance;
+    const verts: Array<Vertex> = this.vertices.slice(); // Creates a shallow copy
+    let i: number = 0;
+    var lineA: Line = new Line(new Vertex(), new Vertex());
+    var lineB: Line = new Line(new Vertex(), new Vertex());
+    while (i + 1 < verts.length && verts.length > 2) {
+      const vertA = verts[i];
+      const vertB = verts[(i + 1) % verts.length];
+      lineA.a = vertA;
+      lineA.b = vertB;
+      lineB.a = vertB;
+      let areColinear: boolean = false;
+      let j = i + 2;
+      do {
+        let vertC: Vertex = verts[j % verts.length];
+        lineB.b = vertC;
+        areColinear = lineA.colinear(lineB, eps);
+        // console.log("are colinear?", i, i + 1, j, areColinear);
+        if (areColinear) {
+          j++;
+        }
+      } while (areColinear);
+      // Now j points to the first vertex that's NOT colinear to the current lineA
+      // -> delete all vertices in between
+      if (j - i > 2) {
+        // Means: there have been 'colinear vertices' in between
+        // console.log("Splice", "i", i, "j", j, i + 1, j - i - 1);
+        verts.splice(i + 1, j - i - 2);
+      }
+      i++;
+    }
+    return new Polygon(verts, this.isOpen);
   }
 
   /**

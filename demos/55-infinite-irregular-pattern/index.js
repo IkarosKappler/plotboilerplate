@@ -52,7 +52,7 @@
       fillType: "linear", // "falloff 0.75"
       useColors: params.getBoolean("useColors", false),
       colorSet: "Malachite",
-      drawPolygonNumbers: false
+      drawPolygonNumbers: params.getBoolean("drawPolygonNumbers", false)
     };
 
     // +---------------------------------------------------------------------------------
@@ -199,6 +199,22 @@
     // };
     // randomWebColor
 
+    // Due to Wolfram the 'polygons diameter is'
+    //  "The diameter of a polygon is the largest distance between any pair of vertices"
+    // https://mathworld.wolfram.com/PolygonDiameter.html
+    var getPolygonDiameter = function (polygon) {
+      var diameter = 0.0; // Number.MIN_VALUE;
+      for (var i = 0; i < polygon.vertices.length; i++) {
+        var vertA = polygon.vertices[i];
+        for (var j = i + 1; j < polygon.vertices.length; j++) {
+          var vertB = polygon.vertices[j];
+          var dist = vertA.distance(vertB);
+          diameter = Math.max(diameter, dist);
+        }
+      }
+      return diameter;
+    };
+
     // +---------------------------------------------------------------------------------
     // | Draws a single cell.
     // +-------------------------------
@@ -207,26 +223,83 @@
         var color = randomWebColor(0, config.colorSet, 1.0);
         fill.polygon(polygon, color, 1);
       }
+      var isSimpleScale = false;
       draw.polygon(polygon, "grey", 1);
+      var poylgonDiameter = getPolygonDiameter(polygon);
       if (config.fillRecursive) {
         var centerOfPolygon = vertexMedian(polygon.vertices);
         var tmpPoly = polygon.clone();
         var n = config.fillIterationCount;
+        var polygonInset = new PolygonInset(elimitateColinearEdges(polygon, undefined));
+        var polygonInsetStep = poylgonDiameter / n;
         for (var i = 0; i < n; i++) {
-          if (config.fillType === "linear") {
-            tmpPoly = polygon.clone();
-            tmpPoly.scale((n - i) / (n + 1), centerOfPolygon);
-          } else {
-            // "falloff0.75"
-            tmpPoly.scale(0.75, centerOfPolygon);
-          }
           var color = randomWebColor(i + 1, config.colorSet, 1.0);
-          if (config.useColors) {
-            fill.polygon(tmpPoly, color, 1);
+
+          if (isSimpleScale) {
+            if (config.fillType === "linear") {
+              tmpPoly = polygon.clone();
+              tmpPoly.scale((n - i) / (n + 1), centerOfPolygon);
+            } else {
+              // "falloff0.75"
+              tmpPoly.scale(0.75, centerOfPolygon);
+            }
+            if (config.useColors) {
+              fill.polygon(tmpPoly, color, 1);
+            }
+            draw.polygon(tmpPoly, "grey", 1);
+          } else {
+            // Compute the polygon inset.
+            var maxPolygonSplitDepth = config.pointCount; // This definitely return enough split polygons
+            // Array<Vertex[]>
+            var insetPolygons = polygonInset.computeOutputPolygons({
+              innerPolygonOffset: i * polygonInsetStep,
+              maxPolygonSplitDepth: maxPolygonSplitDepth
+              // intersectionEpsilon: config.intersectionEpsilon
+            });
+            for (var p = 0; p < insetPolygons.length; p++) {
+              var polyVerts = insetPolygons[p];
+              if (config.useColors) {
+                fill.polyline(polyVerts, false, color, 1);
+              }
+              draw.polyline(polyVerts, false, "grey", 1);
+            }
           }
-          draw.polygon(tmpPoly, "grey", 1);
         }
       }
+    };
+
+    var elimitateColinearEdges = function (polygon, epsilon) {
+      var verts = cloneVertexArray(polygon.vertices); // .slice(); // Creates a shallow copy
+      console.log("elimitateColinearEdges verts shallow copy", verts);
+      let i = 0;
+      var lineA = new Line(new Vertex(), new Vertex());
+      var lineB = new Line(new Vertex(), new Vertex());
+      while (i + 2 < verts.length && verts.length > 2) {
+        const vertA = verts[i];
+        const vertB = verts[(i + 1) % verts.length];
+        lineA.a = vertA;
+        lineA.b = vertB;
+        lineB.a = vertB;
+        var areColinear = false;
+        let j = i + 2;
+        do {
+          let vertC = verts[j % verts.length];
+          lineB.b = vertC;
+          areColinear = lineA.colinear(lineB); // , epsilon);
+          console.log("are colinear", i, i + 1, j);
+          j++;
+        } while (areColinear);
+        // Now j points to the first vertex that's NOT colinear to the current lineA
+        // -> delete all vertices in between
+        if (j - i > 2) {
+          // Means: there have been 'colinear vertices' in between
+          console.log("Splice", "i", i, "j", j, i + 1, j - i - 1);
+          verts.splice(i + 1, j - i - 1);
+        }
+        i++;
+      }
+      console.log("elimitateColinearEdges", verts);
+      return new Polygon(verts, polygon.isOpen);
     };
 
     // +---------------------------------------------------------------------------------

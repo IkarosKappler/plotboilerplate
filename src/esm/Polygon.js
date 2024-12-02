@@ -537,6 +537,48 @@ export class Polygon {
         return new Polygon(this.vertices.map(vert => vert.clone()), this.isOpen);
     }
     /**
+     * Create a new polygon without colinear adjacent edges. This method does not midify the current polygon
+     * but creates a new one.
+     *
+     * Please not that this method does NOT create deep clones of the vertices. Use Polygon.clone() if you need to.
+     *
+     * @param {number?} epsilon - (default is 1.0) The epsilon to detect co-linear edges.
+     */
+    elimitateColinearEdges(epsilon) {
+        const eps = typeof epsilon === "undefined" ? 1.0 : epsilon;
+        const verts = this.vertices.slice(); // Creates a shallow copy
+        let i = 0;
+        var lineA = new Line(new Vertex(), new Vertex());
+        var lineB = new Line(new Vertex(), new Vertex());
+        while (i + 1 < verts.length && verts.length > 2) {
+            const vertA = verts[i];
+            const vertB = verts[(i + 1) % verts.length];
+            lineA.a = vertA;
+            lineA.b = vertB;
+            lineB.a = vertB;
+            let areColinear = false;
+            let j = i + 2;
+            do {
+                let vertC = verts[j % verts.length];
+                lineB.b = vertC;
+                areColinear = lineA.colinear(lineB, eps);
+                // console.log("are colinear?", i, i + 1, j, areColinear);
+                if (areColinear) {
+                    j++;
+                }
+            } while (areColinear);
+            // Now j points to the first vertex that's NOT colinear to the current lineA
+            // -> delete all vertices in between
+            if (j - i > 2) {
+                // Means: there have been 'colinear vertices' in between
+                // console.log("Splice", "i", i, "j", j, i + 1, j - i - 1);
+                verts.splice(i + 1, j - i - 2);
+            }
+            i++;
+        }
+        return new Polygon(verts, this.isOpen);
+    }
+    /**
      * Convert this polygon to a sequence of quadratic Bézier curves.<br>
      * <br>
      * The first vertex in the returned array is the start point.<br>

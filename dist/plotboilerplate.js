@@ -7043,6 +7043,48 @@ var Polygon = /** @class */ (function () {
         return new Polygon(this.vertices.map(function (vert) { return vert.clone(); }), this.isOpen);
     };
     /**
+     * Create a new polygon without colinear adjacent edges. This method does not midify the current polygon
+     * but creates a new one.
+     *
+     * Please not that this method does NOT create deep clones of the vertices. Use Polygon.clone() if you need to.
+     *
+     * @param {number?} epsilon - (default is 1.0) The epsilon to detect co-linear edges.
+     */
+    Polygon.prototype.elimitateColinearEdges = function (epsilon) {
+        var eps = typeof epsilon === "undefined" ? 1.0 : epsilon;
+        var verts = this.vertices.slice(); // Creates a shallow copy
+        var i = 0;
+        var lineA = new Line_1.Line(new Vertex_1.Vertex(), new Vertex_1.Vertex());
+        var lineB = new Line_1.Line(new Vertex_1.Vertex(), new Vertex_1.Vertex());
+        while (i + 1 < verts.length && verts.length > 2) {
+            var vertA = verts[i];
+            var vertB = verts[(i + 1) % verts.length];
+            lineA.a = vertA;
+            lineA.b = vertB;
+            lineB.a = vertB;
+            var areColinear = false;
+            var j = i + 2;
+            do {
+                var vertC = verts[j % verts.length];
+                lineB.b = vertC;
+                areColinear = lineA.colinear(lineB, eps);
+                // console.log("are colinear?", i, i + 1, j, areColinear);
+                if (areColinear) {
+                    j++;
+                }
+            } while (areColinear);
+            // Now j points to the first vertex that's NOT colinear to the current lineA
+            // -> delete all vertices in between
+            if (j - i > 2) {
+                // Means: there have been 'colinear vertices' in between
+                // console.log("Splice", "i", i, "j", j, i + 1, j - i - 1);
+                verts.splice(i + 1, j - i - 2);
+            }
+            i++;
+        }
+        return new Polygon(verts, this.isOpen);
+    };
+    /**
      * Convert this polygon to a sequence of quadratic Bézier curves.<br>
      * <br>
      * The first vertex in the returned array is the start point.<br>
@@ -8608,7 +8650,8 @@ exports.Vector = Vector;
  * @modified 2023-09-29 Fixed a calculation error in the VertTuple.hasPoint() function; distance measure was broken!
  * @modified 2024-09-10 Chaging the first param of `pointDistance` from `Vertex` to less strict type `XYCoords`. This should not break anything.
  * @modified 2024-09-10 Adding the optional `epsilon` param to the `hasPoint` method.
- * @version 1.2.2
+ * @modified 2024-12-02 Added the `epsilon` param to the `colinear` method. Default is 1.0e-6.
+ * @version 1.3.0
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VertTuple = void 0;
@@ -8783,12 +8826,13 @@ var VertTuple = /** @class */ (function () {
      *
      * @method colinear
      * @param {VertTuple} line
+     * @param {epsilon?=1.0e-6} epsilon - The epsilon to use (default is 1.0e-6).
      * @instance
      * @memberof VertTuple
      * @return true if both lines are co-linear.
      */
-    VertTuple.prototype.colinear = function (line) {
-        return Math.abs(this.denominator(line)) < Vertex_1.Vertex.EPSILON;
+    VertTuple.prototype.colinear = function (line, epsilon) {
+        return Math.abs(this.denominator(line)) < (typeof epsilon === "undefined" ? Vertex_1.Vertex.EPSILON : epsilon);
     };
     /**
      * Get the closest position T from this line to the specified point.

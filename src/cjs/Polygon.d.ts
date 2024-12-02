@@ -335,6 +335,15 @@ export declare class Polygon implements SVGSerializable {
      */
     clone(): Polygon;
     /**
+     * Create a new polygon without colinear adjacent edges. This method does not midify the current polygon
+     * but creates a new one.
+     *
+     * Please not that this method does NOT create deep clones of the vertices. Use Polygon.clone() if you need to.
+     *
+     * @param {number?} epsilon - (default is 1.0) The epsilon to detect co-linear edges.
+     */
+    elimitateColinearEdges(epsilon?: number): Polygon;
+    /**
      * Convert this polygon to a sequence of quadratic Bézier curves.<br>
      * <br>
      * The first vertex in the returned array is the start point.<br>

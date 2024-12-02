@@ -13,7 +13,8 @@
  * @modified 2023-09-29 Fixed a calculation error in the VertTuple.hasPoint() function; distance measure was broken!
  * @modified 2024-09-10 Chaging the first param of `pointDistance` from `Vertex` to less strict type `XYCoords`. This should not break anything.
  * @modified 2024-09-10 Adding the optional `epsilon` param to the `hasPoint` method.
- * @version 1.2.2
+ * @modified 2024-12-02 Added the `epsilon` param to the `colinear` method. Default is 1.0e-6.
+ * @version 1.3.0
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VertTuple = void 0;
@@ -188,12 +189,13 @@ var VertTuple = /** @class */ (function () {
      *
      * @method colinear
      * @param {VertTuple} line
+     * @param {epsilon?=1.0e-6} epsilon - The epsilon to use (default is 1.0e-6).
      * @instance
      * @memberof VertTuple
      * @return true if both lines are co-linear.
      */
-    VertTuple.prototype.colinear = function (line) {
-        return Math.abs(this.denominator(line)) < Vertex_1.Vertex.EPSILON;
+    VertTuple.prototype.colinear = function (line, epsilon) {
+        return Math.abs(this.denominator(line)) < (typeof epsilon === "undefined" ? Vertex_1.Vertex.EPSILON : epsilon);
     };
     /**
      * Get the closest position T from this line to the specified point.

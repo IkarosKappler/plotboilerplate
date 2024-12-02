@@ -2,6 +2,7 @@
 
 Imminent todos:
 
+- !!! rename Polygon.getLineAt to getEdgeAt before publishing!!!!!!
 - demo 34: fail to compute foutier transform with array length != 8, whats going on here?
 - check greiner hormann (27): doing weird stuff when "clearSelfIntersecting=true"
 - check if the old color class is still used anywhere
@@ -10,6 +11,9 @@ Imminent todos:
 
 * 2024-12-02
   - Adding the `triggerRedraw` to the `PlotBoilerplate.removeAll` method.
+  - Added the `epsilon` param to the `VertTuple.colinear` method. Default is 1.0e-6.
+  - Added the `Polygon.elimitateColinearEdges` method.
+  - Added the demo 57: how to eliminate co-linear edges from a polygon.
 * 2024-11-22
   - Added static utility function `Triangle.utils.determinant(XYCoord,XYCoords,XYCoords)`; adapted method `Triangle.determinant()`.
   - Changing visibility of `Triangle.utils` from `private` to `public`.
