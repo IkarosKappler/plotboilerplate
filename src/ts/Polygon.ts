@@ -28,8 +28,8 @@
  * @modified 2023-09-25 Added the `Polygon.lineIntersections(Line,boolean)` function.
  * @modified 2023-09-29 Added the `Polygon.closestLineIntersection(Line,boolean)` function.
  * @modified 2023-11-24 Added the `Polygon.containsPolygon(Polygon)' function.
- * @modified 2024-10-12 Added the `getLineAt` method.
- * @modified 2024-10-30 Added the `getLines` method.
+ * @modified 2024-10-12 Added the `getEdgeAt` method.
+ * @modified 2024-10-30 Added the `getEdges` method.
  * @modified 2024-12-02 Added the `elimitateColinearEdges` method.
  * @version 1.13.0
  *
@@ -145,13 +145,13 @@ export class Polygon implements SVGSerializable {
    * Get a new instance of the line at the given start index. The returned line will consist
    * of the vertex at `vertIndex` and `vertIndex+1` (will be handled modulo).
    *
-   * @method getLineAt
+   * @method getEdgeAt
    * @param {number} vertIndex - The vertex index of the line to start.
    * @instance
-   * @memberof Line
+   * @memberof Polygon
    * @return {Line}
    **/
-  getLineAt(vertIndex: number): Line {
+  getEdgeAt(vertIndex: number): Line {
     return new Line(this.getVertexAt(vertIndex), this.getVertexAt(vertIndex + 1));
   }
 
@@ -160,16 +160,19 @@ export class Polygon implements SVGSerializable {
    * this method is called new lines are created. The underlying line vertices are no clones
    * (instances).
    *
+   * @method getEdges
+   * @instance
+   * @memberof Polygon
    * @return {Array<Line>}
    */
-  getLines(): Array<Line> {
+  getEdges(): Array<Line> {
     const lines: Array<Line> = [];
     for (var i = 0; i + 1 < this.vertices.length; i++) {
       // var line = this.getLineAt(i).clone();
-      lines.push(this.getLineAt(i));
+      lines.push(this.getEdgeAt(i));
     }
     if (!this.isOpen && this.vertices.length > 0) {
-      lines.push(this.getLineAt(this.vertices.length - 1));
+      lines.push(this.getEdgeAt(this.vertices.length - 1));
     }
     return lines;
   }

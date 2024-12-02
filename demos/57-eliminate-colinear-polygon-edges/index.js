@@ -62,7 +62,7 @@
     var addColinearEdgesToPolygon = function (polygon) {
       var verts = [];
       for (var i = 0; i < polygon.vertices.length; i++) {
-        var edge = polygon.getLineAt(i);
+        var edge = polygon.getEdgeAt(i);
         var middle = edge.vertAt(0.5);
         verts.push(edge.a);
         verts.push(middle);
@@ -98,8 +98,8 @@
 
       // Draw denomitators indicating the colinearity
       for (var i = 0; i < polygon.vertices.length + 1; i++) {
-        var lineA = polygon.getLineAt(i);
-        var lineB = polygon.getLineAt(i + 1);
+        var lineA = polygon.getEdgeAt(i);
+        var lineB = polygon.getEdgeAt(i + 1);
         var denom = lineA.denominator(lineB);
         pb.fill.text("denominator=" + denom, lineA.b.x, lineA.b.y, {
           color: "orange",

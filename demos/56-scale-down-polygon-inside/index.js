@@ -174,7 +174,7 @@
 
         // Draw line angles
         for (var i = 0; i < polygonInset.polygon.vertices.length; i++) {
-          var line = polygonInset.polygon.getLineAt(i);
+          var line = polygonInset.polygon.getEdgeAt(i);
           var lineCenter = line.vertAt(0.5);
           var lineAngle = geomutils.mapAngleTo2PI(line.angle());
           fill.text((lineAngle * RAD_TO_DEG).toFixed(1) + "°", lineCenter.x - 5, lineCenter.y - 10, { color: "green" });

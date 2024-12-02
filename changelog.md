@@ -26,9 +26,9 @@ Imminent todos:
   - Adding lil-gui style: Override lil-gui scroll setting (activate scrolling) in `./demos/style.css`.
   - Added the `insideBoundsOnly` param to the `splitPolygonToNonIntersecting` algorithm.
 * 2024-10-30
-  - Added tge `Polygon.getLines` method.
+  - Added tge `Polygon.getEdges` method.
 * 2024-10-12
-  - Added the `Polygon.getLineAt` method.
+  - Added the `Polygon.getEdgeAt` method.
 * 2024-10-08
   - Adding `cssBackdropFolder` as a class attribute to the `CSSBackdropEffects` class.
 * 2024-10-02

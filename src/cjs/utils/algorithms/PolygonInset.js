@@ -66,7 +66,7 @@ var PolygonInset = /** @class */ (function () {
         var _a;
         var maxPolygonSplitDepth = (_a = options === null || options === void 0 ? void 0 : options.maxPolygonSplitDepth) !== null && _a !== void 0 ? _a : this.polygon.vertices.length;
         var intersectionEpsilon = options.intersectionEpsilon;
-        this.originalPolygonLines = this.polygon.getLines();
+        this.originalPolygonLines = this.polygon.getEdges();
         this._collectInsetLines(this.originalPolygonLines, options.innerPolygonOffset);
         this._collectInsetPolygonLines(this.insetLines);
         this.insetPolygon = PolygonInset.convertToBasicInsetPolygon(this.insetPolygonLines);

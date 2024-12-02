@@ -30,6 +30,7 @@
  * @modified 2023-11-24 Added the `Polygon.containsPolygon(Polygon)' function.
  * @modified 2024-10-12 Added the `getLineAt` method.
  * @modified 2024-10-30 Added the `getLines` method.
+ * @modified 2024-12-02 Added the `elimitateColinearEdges` method.
  * @version 1.13.0
  *
  * @file Polygon
@@ -119,21 +120,24 @@ export declare class Polygon implements SVGSerializable {
      * Get a new instance of the line at the given start index. The returned line will consist
      * of the vertex at `vertIndex` and `vertIndex+1` (will be handled modulo).
      *
-     * @method getLineAt
+     * @method getEdgeAt
      * @param {number} vertIndex - The vertex index of the line to start.
      * @instance
-     * @memberof Line
+     * @memberof Polygon
      * @return {Line}
      **/
-    getLineAt(vertIndex: number): Line;
+    getEdgeAt(vertIndex: number): Line;
     /**
      * Converts this polygon into a sequence of lines. Please note that each time
      * this method is called new lines are created. The underlying line vertices are no clones
      * (instances).
      *
+     * @method getEdges
+     * @instance
+     * @memberof Polygon
      * @return {Array<Line>}
      */
-    getLines(): Array<Line>;
+    getEdges(): Array<Line>;
     /**
      * Checks if the angle at the given polygon vertex (index) is acute. Please not that this is
      * only working for clockwise polygons. If this polygon is not clockwise please use the
@@ -331,6 +335,9 @@ export declare class Polygon implements SVGSerializable {
     /**
      * Create a deep copy of this polygon.
      *
+     * @method clone
+     * @instance
+     * @memberof Polygon
      * @return {Polygon} The cloned polygon.
      */
     clone(): Polygon;
@@ -338,11 +345,19 @@ export declare class Polygon implements SVGSerializable {
      * Create a new polygon without colinear adjacent edges. This method does not midify the current polygon
      * but creates a new one.
      *
-     * Please not that this method does NOT create deep clones of the vertices. Use Polygon.clone() if you need to.
+     * Please note that this method does NOT create deep clones of the vertices. Use Polygon.clone() if you need to.
      *
-     * @param {number?} epsilon - (default is 1.0) The epsilon to detect co-linear edges.
+     * Please also note that the `tolerance` may become really large here, as the denominator of two closely
+     * parallel lines is usually pretty large. See the demo `57-eliminate-colinear-polygon-edges` to get
+     * an impression of how denominators work.
+     *
+     * @method elimitateColinearEdges
+     * @instance
+     * @memberof Polygon
+     * @param {number?} tolerance - (default is 1.0) The epsilon to detect co-linear edges.
+     * @return {Polygon} A new polygon without co-linear adjacent edges – respective the given epsilon.
      */
-    elimitateColinearEdges(epsilon?: number): Polygon;
+    elimitateColinearEdges(tolerance?: number): Polygon;
     /**
      * Convert this polygon to a sequence of quadratic Bézier curves.<br>
      * <br>

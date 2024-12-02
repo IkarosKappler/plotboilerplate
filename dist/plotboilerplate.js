@@ -6532,6 +6532,7 @@ exports["default"] = PlotBoilerplate;
  * @modified 2023-11-24 Added the `Polygon.containsPolygon(Polygon)' function.
  * @modified 2024-10-12 Added the `getLineAt` method.
  * @modified 2024-10-30 Added the `getLines` method.
+ * @modified 2024-12-02 Added the `elimitateColinearEdges` method.
  * @version 1.13.0
  *
  * @file Polygon
@@ -6606,13 +6607,13 @@ var Polygon = /** @class */ (function () {
      * Get a new instance of the line at the given start index. The returned line will consist
      * of the vertex at `vertIndex` and `vertIndex+1` (will be handled modulo).
      *
-     * @method getLineAt
+     * @method getEdgeAt
      * @param {number} vertIndex - The vertex index of the line to start.
      * @instance
-     * @memberof Line
+     * @memberof Polygon
      * @return {Line}
      **/
-    Polygon.prototype.getLineAt = function (vertIndex) {
+    Polygon.prototype.getEdgeAt = function (vertIndex) {
         return new Line_1.Line(this.getVertexAt(vertIndex), this.getVertexAt(vertIndex + 1));
     };
     /**
@@ -6620,16 +6621,19 @@ var Polygon = /** @class */ (function () {
      * this method is called new lines are created. The underlying line vertices are no clones
      * (instances).
      *
+     * @method getEdges
+     * @instance
+     * @memberof Polygon
      * @return {Array<Line>}
      */
-    Polygon.prototype.getLines = function () {
+    Polygon.prototype.getEdges = function () {
         var lines = [];
         for (var i = 0; i + 1 < this.vertices.length; i++) {
             // var line = this.getLineAt(i).clone();
-            lines.push(this.getLineAt(i));
+            lines.push(this.getEdgeAt(i));
         }
         if (!this.isOpen && this.vertices.length > 0) {
-            lines.push(this.getLineAt(this.vertices.length - 1));
+            lines.push(this.getEdgeAt(this.vertices.length - 1));
         }
         return lines;
     };
@@ -7037,6 +7041,9 @@ var Polygon = /** @class */ (function () {
     /**
      * Create a deep copy of this polygon.
      *
+     * @method clone
+     * @instance
+     * @memberof Polygon
      * @return {Polygon} The cloned polygon.
      */
     Polygon.prototype.clone = function () {
@@ -7046,12 +7053,20 @@ var Polygon = /** @class */ (function () {
      * Create a new polygon without colinear adjacent edges. This method does not midify the current polygon
      * but creates a new one.
      *
-     * Please not that this method does NOT create deep clones of the vertices. Use Polygon.clone() if you need to.
+     * Please note that this method does NOT create deep clones of the vertices. Use Polygon.clone() if you need to.
      *
-     * @param {number?} epsilon - (default is 1.0) The epsilon to detect co-linear edges.
+     * Please also note that the `tolerance` may become really large here, as the denominator of two closely
+     * parallel lines is usually pretty large. See the demo `57-eliminate-colinear-polygon-edges` to get
+     * an impression of how denominators work.
+     *
+     * @method elimitateColinearEdges
+     * @instance
+     * @memberof Polygon
+     * @param {number?} tolerance - (default is 1.0) The epsilon to detect co-linear edges.
+     * @return {Polygon} A new polygon without co-linear adjacent edges – respective the given epsilon.
      */
-    Polygon.prototype.elimitateColinearEdges = function (epsilon) {
-        var eps = typeof epsilon === "undefined" ? 1.0 : epsilon;
+    Polygon.prototype.elimitateColinearEdges = function (tolerance) {
+        var eps = typeof tolerance === "undefined" ? 1.0 : tolerance;
         var verts = this.vertices.slice(); // Creates a shallow copy
         var i = 0;
         var lineA = new Line_1.Line(new Vertex_1.Vertex(), new Vertex_1.Vertex());

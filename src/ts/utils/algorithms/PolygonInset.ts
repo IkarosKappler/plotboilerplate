@@ -98,7 +98,7 @@ export class PolygonInset {
   public computeOutputPolygons(options: IPolygonInsetOptions): Array<Array<Vertex>> {
     const maxPolygonSplitDepth = options?.maxPolygonSplitDepth ?? this.polygon.vertices.length;
     const intersectionEpsilon: number | undefined = options.intersectionEpsilon;
-    this.originalPolygonLines = this.polygon.getLines();
+    this.originalPolygonLines = this.polygon.getEdges();
     this._collectInsetLines(this.originalPolygonLines, options.innerPolygonOffset);
     this._collectInsetPolygonLines(this.insetLines);
     this.insetPolygon = PolygonInset.convertToBasicInsetPolygon(this.insetPolygonLines);
