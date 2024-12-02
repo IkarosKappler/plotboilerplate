@@ -5,6 +5,7 @@
  * @author   Ikaros Kappler
  * @date     2020-12-04
  * @modified 2020-12-09 Ported from vanilla JS to Typescript.
+ * @modified 2024-11-22 Fixed a type error in line 41.
  */
 import { Line } from "../../Line";
 import { Vertex } from "../../Vertex";
@@ -15,7 +16,7 @@ import { Vertex } from "../../Vertex";
  *
  * @name findPolygonSelfIntersections
  * @param {Array<Vertex>} vertices - The vertices that form the polygon.
- * @return Array<Vertex>
+ * @return {Array<Vertex>}
  */
 export const findPolygonSelfIntersections = (vertices) => {
     const pointList = [];
@@ -36,8 +37,7 @@ export const findPolygonSelfIntersections = (vertices) => {
             // The point is undefined if and only if both line are parallel (co-linear).
             const intersectionPoint = lineA.intersection(lineB);
             // Check if the intersection point is on both (finite) edges of the polygon.
-            if (intersectionPoint
-                && lineA.hasPoint(intersectionPoint) && lineB.hasPoint(intersectionPoint)) {
+            if (intersectionPoint && lineA.hasPoint(intersectionPoint) && lineB.hasPoint(intersectionPoint)) {
                 pointList.push(intersectionPoint);
             }
         }

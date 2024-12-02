@@ -38,8 +38,10 @@
 import { BezierPath } from "./BezierPath";
 import { Bounds } from "./Bounds";
 import { Line } from "./Line";
+import { Triangle } from "./Triangle";
 import { UIDGenerator } from "./UIDGenerator";
 import { Vertex } from "./Vertex";
+import { geomutils } from "./geomutils";
 /**
  * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
  *
@@ -127,18 +129,60 @@ export class Polygon {
         }
         return lines;
     }
-    // TODO: FIX and doc
+    /**
+     * Checks if the angle at the given polygon vertex (index) is acute. Please not that this is
+     * only working for clockwise polygons. If this polygon is not clockwise please use the
+     * `isClockwise` method and reverse polygon vertices if needed.
+     *
+     * @method isAngleAcute
+     * @instance
+     * @memberof Polygon
+     * @param {number} vertIndex - The index of the polygon vertex to check.
+     * @returns {boolean} `true` is angle is acute, `false` is obtuse.
+     */
     getInnerAngleAt(vertIndex) {
-        const curVert = this.vertices[vertIndex];
-        const prevVert = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
-        const nextVert = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
-        // prevVert.sub(curVert);
-        // nextVert.sub(curVert);
-        var preAngle = curVert.angle(prevVert);
-        var nextAngle = curVert.angle(nextVert);
-        // var preAngle = prevVert.angle(curVert);
-        // var nextAngle = nextVert.angle(curVert);
-        return nextAngle; //  - (nextAngle - preAngle) / 2.0;
+        const p2 = this.vertices[vertIndex];
+        const p1 = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
+        const p3 = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
+        // See
+        //    https://math.stackexchange.com/questions/149959/how-to-find-the-interior-angle-of-an-irregular-pentagon-or-polygon
+        // π−arccos((P2−P1)⋅(P3−P2)|P2−P1||P3−P2|)
+        // Check if triangle is acute (will be used later)
+        // Acute angles and obtuse angles need to be handled differently.
+        const isAcute = this.isAngleAcute(vertIndex);
+        // Differences
+        const zero = new Vertex(0, 0);
+        const p2mp1 = new Vertex(p2.x - p1.x, p2.y - p1.y);
+        const p3mp2 = new Vertex(p3.x - p2.x, p3.y - p2.y);
+        const p2mp1_len = zero.distance(p2mp1);
+        const p3mp2_len = zero.distance(p3mp2);
+        // Dot products
+        const dotProduct = geomutils.dotProduct(p2mp1, p3mp2);
+        const lengthProduct = p2mp1_len * p3mp2_len;
+        if (isAcute) {
+            return Math.PI - Math.acos(dotProduct / lengthProduct);
+        }
+        else {
+            return Math.PI + Math.acos(dotProduct / lengthProduct);
+        }
+    }
+    /**
+     * Checks if the angle at the given polygon vertex (index) is acute.
+     *
+     * @method isAngleAcute
+     * @instance
+     * @memberof Polygon
+     * @param {number} vertIndex - The index of the polygon vertex to check.
+     * @returns {boolean} `true` is angle is acute, `false` is obtuse.
+     */
+    isAngleAcute(vertIndex) {
+        const A = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
+        const B = this.vertices[vertIndex];
+        const C = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
+        // Find local winding number for triangle A B C
+        const windingNumber = Triangle.utils.determinant(A, B, C);
+        // console.log("vertIndex", vertIndex, "windingNumber", windingNumber);
+        return windingNumber < 0;
     }
     /**
      * Get the polygon vertex at the given position (index).
@@ -150,7 +194,7 @@ export class Polygon {
      *  - getVertexAt( vertices.length + k ) == getVertexAt( k )
      *  - getVertexAt( -k )                  == getVertexAt( vertices.length -k )
      *
-     * @metho getVertexAt
+     * @method getVertexAt
      * @param {number} index - The index of the desired vertex.
      * @instance
      * @memberof Polygon

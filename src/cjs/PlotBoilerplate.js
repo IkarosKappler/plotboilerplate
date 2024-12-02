@@ -86,8 +86,9 @@
  * @modified 2023-09-29 Adding proper dicionary key and value types to the params of `PlotBoilerplate.utils.safeMergeByKeys` (was `object` before).
  * @modified 2024-07-08 Adding `PlotBoilerplate.getGUI()` to retrieve the GUI instance.
  * @modified 2024-08-25 Extending main class `PlotBoilerplate` optional param `isBackdropFiltersEnabled`.
+ * @modified 2024-12-02 Adding the `triggerRedraw` to the `removeAll` method.
  *
- * @version  1.19.0
+ * @version  1.20.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -847,16 +848,19 @@ var PlotBoilerplate = /** @class */ (function () {
      *
      * @method removeAll
      * @param {boolean=false} keepVertices
+     * @param {boolean=true} triggerRedraw - By default this method triggers the redraw routine; passing `false` will suppress redrawing.
      * @instance
      * @memberof PlotBoilerplate
      * @return {void}
      */
-    PlotBoilerplate.prototype.removeAll = function (keepVertices) {
+    PlotBoilerplate.prototype.removeAll = function (keepVertices, triggerRedraw) {
         this.drawables = [];
         if (!Boolean(keepVertices)) {
             this.vertices = [];
         }
-        this.redraw();
+        if (triggerRedraw || typeof triggerRedraw === "undefined") {
+            this.redraw();
+        }
     };
     /**
      * Find the vertex near the given position.

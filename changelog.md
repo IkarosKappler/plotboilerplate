@@ -6,9 +6,10 @@ Imminent todos:
 - check greiner hormann (27): doing weird stuff when "clearSelfIntersecting=true"
 - check if the old color class is still used anywhere
 - Add googley eyes to the animated metaballs demo.
-- check automatic darmode detection
-- lil-gui does not scroll
+- check automatic darkmode detection
 
+* 2024-12-02
+  - Adding the `triggerRedraw` to the `PlotBoilerplate.removeAll` method.
 * 2024-11-22
   - Added static utility function `Triangle.utils.determinant(XYCoord,XYCoords,XYCoords)`; adapted method `Triangle.determinant()`.
   - Changing visibility of `Triangle.utils` from `private` to `public`.

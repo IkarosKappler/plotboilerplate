@@ -134,7 +134,28 @@ export declare class Polygon implements SVGSerializable {
      * @return {Array<Line>}
      */
     getLines(): Array<Line>;
+    /**
+     * Checks if the angle at the given polygon vertex (index) is acute. Please not that this is
+     * only working for clockwise polygons. If this polygon is not clockwise please use the
+     * `isClockwise` method and reverse polygon vertices if needed.
+     *
+     * @method isAngleAcute
+     * @instance
+     * @memberof Polygon
+     * @param {number} vertIndex - The index of the polygon vertex to check.
+     * @returns {boolean} `true` is angle is acute, `false` is obtuse.
+     */
     getInnerAngleAt(vertIndex: number): number;
+    /**
+     * Checks if the angle at the given polygon vertex (index) is acute.
+     *
+     * @method isAngleAcute
+     * @instance
+     * @memberof Polygon
+     * @param {number} vertIndex - The index of the polygon vertex to check.
+     * @returns {boolean} `true` is angle is acute, `false` is obtuse.
+     */
+    isAngleAcute(vertIndex: number): boolean;
     /**
      * Get the polygon vertex at the given position (index).
      *
@@ -145,7 +166,7 @@ export declare class Polygon implements SVGSerializable {
      *  - getVertexAt( vertices.length + k ) == getVertexAt( k )
      *  - getVertexAt( -k )                  == getVertexAt( vertices.length -k )
      *
-     * @metho getVertexAt
+     * @method getVertexAt
      * @param {number} index - The index of the desired vertex.
      * @instance
      * @memberof Polygon

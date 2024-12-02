@@ -21,7 +21,9 @@
  * @modified  2021-01-22 Always updating circumcircle when retieving it.
  * @modified  2022-02-02 Added the `destroy` method.
  * @modified  2022-02-02 Cleared the `Triangle.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version   2.6.0
+ * @modified  2024-11-22 Added static utility function Triangle.utils.determinant; adapted method `determinant`.
+ * @modified  2024-11-22 Changing visibility of `Triangle.utils` from `private` to `public`.
+ * @version   2.8.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -31,7 +33,7 @@ import { Bounds } from "./Bounds";
 import { Circle } from "./Circle";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { SVGSerializable, UID } from "./interfaces";
+import { SVGSerializable, UID, XYCoords } from "./interfaces";
 /**
  * @classdesc A triangle class for triangulations.
  *
@@ -319,5 +321,23 @@ export declare class Triangle implements SVGSerializable {
      * should not be used.
      */
     destroy(): void;
-    private static utils;
+    static utils: {
+        max3(a: number, b: number, c: number): number;
+        min3(a: number, b: number, c: number): number;
+        signedArea(p0x: number, p0y: number, p1x: number, p1y: number, p2x: number, p2y: number): number;
+        /**
+         * Used by the containsPoint() function.
+         *
+         * @private
+         **/
+        pointIsInTriangle(px: number, py: number, p0x: number, p0y: number, p1x: number, p1y: number, p2x: number, p2y: number): boolean;
+        /**
+         * Calculate the determinant of the three vertices a, b and c (in this order).
+         * @param {XYCords} a - The first vertex.
+         * @param {XYCords} b - The first vertex.
+         * @param {XYCords} c - The first vertex.
+         * @returns {nmber}
+         */
+        determinant(a: XYCoords, b: XYCoords, c: XYCoords): number;
+    };
 }

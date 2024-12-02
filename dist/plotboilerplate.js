@@ -4333,8 +4333,9 @@ exports.PBText = PBText;
  * @modified 2023-09-29 Adding proper dicionary key and value types to the params of `PlotBoilerplate.utils.safeMergeByKeys` (was `object` before).
  * @modified 2024-07-08 Adding `PlotBoilerplate.getGUI()` to retrieve the GUI instance.
  * @modified 2024-08-25 Extending main class `PlotBoilerplate` optional param `isBackdropFiltersEnabled`.
+ * @modified 2024-12-02 Adding the `triggerRedraw` to the `removeAll` method.
  *
- * @version  1.19.0
+ * @version  1.20.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -5094,16 +5095,19 @@ var PlotBoilerplate = /** @class */ (function () {
      *
      * @method removeAll
      * @param {boolean=false} keepVertices
+     * @param {boolean=true} triggerRedraw - By default this method triggers the redraw routine; passing `false` will suppress redrawing.
      * @instance
      * @memberof PlotBoilerplate
      * @return {void}
      */
-    PlotBoilerplate.prototype.removeAll = function (keepVertices) {
+    PlotBoilerplate.prototype.removeAll = function (keepVertices, triggerRedraw) {
         this.drawables = [];
         if (!Boolean(keepVertices)) {
             this.vertices = [];
         }
-        this.redraw();
+        if (triggerRedraw || typeof triggerRedraw === "undefined") {
+            this.redraw();
+        }
     };
     /**
      * Find the vertex near the given position.
@@ -6538,8 +6542,10 @@ exports.Polygon = void 0;
 var BezierPath_1 = __webpack_require__(733);
 var Bounds_1 = __webpack_require__(76);
 var Line_1 = __webpack_require__(939);
+var Triangle_1 = __webpack_require__(737);
 var UIDGenerator_1 = __webpack_require__(938);
 var Vertex_1 = __webpack_require__(787);
+var geomutils_1 = __webpack_require__(328);
 /**
  * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
  *
@@ -6627,18 +6633,60 @@ var Polygon = /** @class */ (function () {
         }
         return lines;
     };
-    // TODO: FIX and doc
+    /**
+     * Checks if the angle at the given polygon vertex (index) is acute. Please not that this is
+     * only working for clockwise polygons. If this polygon is not clockwise please use the
+     * `isClockwise` method and reverse polygon vertices if needed.
+     *
+     * @method isAngleAcute
+     * @instance
+     * @memberof Polygon
+     * @param {number} vertIndex - The index of the polygon vertex to check.
+     * @returns {boolean} `true` is angle is acute, `false` is obtuse.
+     */
     Polygon.prototype.getInnerAngleAt = function (vertIndex) {
-        var curVert = this.vertices[vertIndex];
-        var prevVert = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
-        var nextVert = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
-        // prevVert.sub(curVert);
-        // nextVert.sub(curVert);
-        var preAngle = curVert.angle(prevVert);
-        var nextAngle = curVert.angle(nextVert);
-        // var preAngle = prevVert.angle(curVert);
-        // var nextAngle = nextVert.angle(curVert);
-        return nextAngle; //  - (nextAngle - preAngle) / 2.0;
+        var p2 = this.vertices[vertIndex];
+        var p1 = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
+        var p3 = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
+        // See
+        //    https://math.stackexchange.com/questions/149959/how-to-find-the-interior-angle-of-an-irregular-pentagon-or-polygon
+        // π−arccos((P2−P1)⋅(P3−P2)|P2−P1||P3−P2|)
+        // Check if triangle is acute (will be used later)
+        // Acute angles and obtuse angles need to be handled differently.
+        var isAcute = this.isAngleAcute(vertIndex);
+        // Differences
+        var zero = new Vertex_1.Vertex(0, 0);
+        var p2mp1 = new Vertex_1.Vertex(p2.x - p1.x, p2.y - p1.y);
+        var p3mp2 = new Vertex_1.Vertex(p3.x - p2.x, p3.y - p2.y);
+        var p2mp1_len = zero.distance(p2mp1);
+        var p3mp2_len = zero.distance(p3mp2);
+        // Dot products
+        var dotProduct = geomutils_1.geomutils.dotProduct(p2mp1, p3mp2);
+        var lengthProduct = p2mp1_len * p3mp2_len;
+        if (isAcute) {
+            return Math.PI - Math.acos(dotProduct / lengthProduct);
+        }
+        else {
+            return Math.PI + Math.acos(dotProduct / lengthProduct);
+        }
+    };
+    /**
+     * Checks if the angle at the given polygon vertex (index) is acute.
+     *
+     * @method isAngleAcute
+     * @instance
+     * @memberof Polygon
+     * @param {number} vertIndex - The index of the polygon vertex to check.
+     * @returns {boolean} `true` is angle is acute, `false` is obtuse.
+     */
+    Polygon.prototype.isAngleAcute = function (vertIndex) {
+        var A = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
+        var B = this.vertices[vertIndex];
+        var C = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
+        // Find local winding number for triangle A B C
+        var windingNumber = Triangle_1.Triangle.utils.determinant(A, B, C);
+        // console.log("vertIndex", vertIndex, "windingNumber", windingNumber);
+        return windingNumber < 0;
     };
     /**
      * Get the polygon vertex at the given position (index).
@@ -6650,7 +6698,7 @@ var Polygon = /** @class */ (function () {
      *  - getVertexAt( vertices.length + k ) == getVertexAt( k )
      *  - getVertexAt( -k )                  == getVertexAt( vertices.length -k )
      *
-     * @metho getVertexAt
+     * @method getVertexAt
      * @param {number} index - The index of the desired vertex.
      * @instance
      * @memberof Polygon
@@ -7216,7 +7264,9 @@ exports.Polygon = Polygon;
  * @modified  2021-01-22 Always updating circumcircle when retieving it.
  * @modified  2022-02-02 Added the `destroy` method.
  * @modified  2022-02-02 Cleared the `Triangle.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version   2.6.0
+ * @modified  2024-11-22 Added static utility function Triangle.utils.determinant; adapted method `determinant`.
+ * @modified  2024-11-22 Changing visibility of `Triangle.utils` from `private` to `public`.
+ * @version   2.8.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -7478,7 +7528,8 @@ var Triangle = /** @class */ (function () {
      */
     Triangle.prototype.determinant = function () {
         // (b.y - a.y)*(c.x - b.x) - (c.y - b.y)*(b.x - a.x);
-        return (this.b.y - this.a.y) * (this.c.x - this.b.x) - (this.c.y - this.b.y) * (this.b.x - this.a.x);
+        // return (this.b.y - this.a.y) * (this.c.x - this.b.x) - (this.c.y - this.b.y) * (this.b.x - this.a.x);
+        return Triangle.utils.determinant(this.a, this.b, this.c);
     };
     /**
      * Checks if the passed vertex (p) is inside this triangle.
@@ -7591,6 +7642,16 @@ var Triangle = /** @class */ (function () {
             var s = (1 / (2 * area)) * (p0y * p2x - p0x * p2y + (p2y - p0y) * px + (p0x - p2x) * py);
             var t = (1 / (2 * area)) * (p0x * p1y - p0y * p1x + (p0y - p1y) * px + (p1x - p0x) * py);
             return s > 0 && t > 0 && 1 - s - t > 0;
+        },
+        /**
+         * Calculate the determinant of the three vertices a, b and c (in this order).
+         * @param {XYCords} a - The first vertex.
+         * @param {XYCords} b - The first vertex.
+         * @param {XYCords} c - The first vertex.
+         * @returns {nmber}
+         */
+        determinant: function (a, b, c) {
+            return (b.y - a.y) * (c.x - b.x) - (c.y - b.y) * (b.x - a.x);
         }
     };
     return Triangle;
@@ -13528,7 +13589,10 @@ exports.drawutilssvg = drawutilssvg;
  * @author   Ikaros Kappler
  * @date     2019-02-03
  * @modified 2021-03-01 Added `wrapMax` function.
- * @version  1.1.0
+ * @modified 2024-11-15 Adding helper function `geomutils.mapAngleTo2PI(number)` for mapping any value into the interval [0,2*PI).
+ * @modified 2024-11-22 Adding helper function `geomutils.dotProduct(number)` for calculating the dot product of two vertices (as vectors).
+ *
+ * @version  1.2.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.geomutils = void 0;
@@ -13540,6 +13604,37 @@ var Triangle_1 = __webpack_require__(737);
  * @global
  **/
 exports.geomutils = {
+    /**
+     * Map any angle (any numeric value) to [0, Math.PI).
+     *
+     * @param {number} angle - The numeric value to map.
+     * @return {number} The mapped angle inside [0,PI*2].
+     **/
+    mapAngleTo2PI: function (angle) {
+        // Source: https://forums.codeguru.com/showthread.php?384172-get-angle-into-range-0-2*pi
+        var new_angle = Math.asin(Math.sin(angle));
+        if (Math.cos(angle) < 0) {
+            return Math.PI - new_angle;
+        }
+        else if (new_angle < 0) {
+            return new_angle + 2 * Math.PI;
+        }
+        else {
+            return new_angle;
+        }
+    },
+    /**
+     * Map any angle (any numeric value) to [0, Math.PI).
+     *
+     * A × B := (A.x * B.x) + (A.y * B.y)
+     *
+     * @param {XYCoords} vertA - The first vertex.
+     * @param {XYCoords} vertB - The second vertex.
+     * @return {number} The dot product of the two vertices.
+     **/
+    dotProduct: function (vertA, vertB) {
+        return vertA.x * vertB.x + vertA.y * vertB.y;
+    },
     /**
      * Compute the n-section of the angle – described as a triangle (A,B,C) – in point A.
      *
