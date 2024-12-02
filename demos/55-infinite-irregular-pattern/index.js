@@ -11,9 +11,6 @@
 (function (_context) {
   "use strict";
 
-  // See hexagon properties https://en.wikipedia.org/wiki/Hexagon
-  var HEXAGON_RATIO = 1.1547005;
-
   // Fetch the GET params
   let GUP = gup();
   _context.addEventListener("load", function () {
@@ -45,12 +42,14 @@
       // The arrow head size
       verticalCount: params.getNumber("verticalCount", 10),
       horizontalCount: params.getNumber("horizontalCount", 10),
+      useInsetPolygonScaling: params.getBoolean("useInsetPolygonScaling", true),
+      colinearityTolerance: params.getNumber("colinearityTolerance", 1000.0),
       // p6m: "hexagon" | p4m: "square" (default)
       baseShape: params.getString("baseShape", BASE_SHAPE_OPTIONS.p4m),
       fillRecursive: params.getBoolean("fillRecursive", true),
       fillIterationCount: params.getNumber("fillIterationCount", 10),
-      fillType: "linear", // "falloff 0.75"
-      useColors: params.getBoolean("useColors", false),
+      fillType: params.getString("fillType", "linear"), // falloff0.75
+      useColors: params.getBoolean("useColors", true),
       colorSet: "Malachite",
       drawPolygonNumbers: params.getBoolean("drawPolygonNumbers", false)
     };
@@ -230,7 +229,9 @@
         var centerOfPolygon = vertexMedian(polygon.vertices);
         var tmpPoly = polygon.clone();
         var n = config.fillIterationCount;
-        var polygonInset = new PolygonInset(elimitateColinearEdges(polygon, undefined));
+        // var polygonInset = new PolygonInset(elimitateColinearEdges(polygon, undefined));
+        var polygonInset = new PolygonInset(polygon.elimitateColinearEdges(config.colinearityTolerance)); // 1000.0);
+
         var polygonInsetStep = poylgonDiameter / n;
         for (var i = 0; i < n; i++) {
           var color = randomWebColor(i + 1, config.colorSet, 1.0);
@@ -240,7 +241,7 @@
               tmpPoly = polygon.clone();
               tmpPoly.scale((n - i) / (n + 1), centerOfPolygon);
             } else {
-              // "falloff0.75"
+              // "falloff 0.75"
               tmpPoly.scale(0.75, centerOfPolygon);
             }
             if (config.useColors) {
@@ -249,10 +250,12 @@
             draw.polygon(tmpPoly, "grey", 1);
           } else {
             // Compute the polygon inset.
-            var maxPolygonSplitDepth = config.pointCount; // This definitely return enough split polygons
+            var maxPolygonSplitDepth = config.pointCount; // This value definitely returns enough split polygons
+            // console.log("polygonOffset", i * polygonInsetStep);
             // Array<Vertex[]>
+            var scalingFactor = config.fillType === "linear" ? i * polygonInsetStep : polygonInsetStep / Math.pow(0.75, i);
             var insetPolygons = polygonInset.computeOutputPolygons({
-              innerPolygonOffset: i * polygonInsetStep,
+              innerPolygonOffset: scalingFactor,
               maxPolygonSplitDepth: maxPolygonSplitDepth
               // intersectionEpsilon: config.intersectionEpsilon
             });
@@ -266,40 +269,6 @@
           }
         }
       }
-    };
-
-    var elimitateColinearEdges = function (polygon, epsilon) {
-      var verts = cloneVertexArray(polygon.vertices); // .slice(); // Creates a shallow copy
-      console.log("elimitateColinearEdges verts shallow copy", verts);
-      let i = 0;
-      var lineA = new Line(new Vertex(), new Vertex());
-      var lineB = new Line(new Vertex(), new Vertex());
-      while (i + 2 < verts.length && verts.length > 2) {
-        const vertA = verts[i];
-        const vertB = verts[(i + 1) % verts.length];
-        lineA.a = vertA;
-        lineA.b = vertB;
-        lineB.a = vertB;
-        var areColinear = false;
-        let j = i + 2;
-        do {
-          let vertC = verts[j % verts.length];
-          lineB.b = vertC;
-          areColinear = lineA.colinear(lineB); // , epsilon);
-          console.log("are colinear", i, i + 1, j);
-          j++;
-        } while (areColinear);
-        // Now j points to the first vertex that's NOT colinear to the current lineA
-        // -> delete all vertices in between
-        if (j - i > 2) {
-          // Means: there have been 'colinear vertices' in between
-          console.log("Splice", "i", i, "j", j, i + 1, j - i - 1);
-          verts.splice(i + 1, j - i - 1);
-        }
-        i++;
-      }
-      console.log("elimitateColinearEdges", verts);
-      return new Polygon(verts, polygon.isOpen);
     };
 
     // +---------------------------------------------------------------------------------
@@ -422,6 +391,12 @@
       .onChange( function() { rebuild(); });
       // prettier-ignore
       gui.add(config, "horizontalCount").min(1).max(100).step(1).name("horizontalCount").title("The horizontal number of cells.")
+      .onChange( function() { rebuild(); });
+      // prettier-ignore
+      gui.add(config, "useInsetPolygonScaling").name("useInsetPolygonScaling").title("Use inset scaling (bad performance) or simple linear scaling (quick but ugly)")
+      .onChange( function() { rebuild(); });
+      // prettier-ignore
+      gui.add(config, "colinearityTolerance").min(0.0).max(10000.0).step(0.1).name("colinearityTolerance").title("The tolerance for deleting co-linear edges.")
       .onChange( function() { rebuild(); });
       // prettier-ignore
       gui.add(config, "baseShape", BASE_SHAPE_OPTIONS).name("baseShape").title("The pattern type (square/p4m or hexagonal/p6m).")

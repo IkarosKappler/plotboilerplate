@@ -72,6 +72,9 @@ export class PolygonInset {
         // This method was initially meant to calculate inset-polygons only.
         // But with a simple filter we COULD also create outer offset-polygons.
         // Maybe this is a task for the future
+        if (options.innerPolygonOffset === 0) {
+            return [this.polygon.vertices]; // No change
+        }
         this.filteredSplitPolygons = PolygonInset._filterInnerSplitPolygonsByCoverage(this.splitPolygons, this.insetRectanglePolygons, intersectionEpsilon);
         this.filteredSplitPolygons = PolygonInset._filterInnerSplitPolygonsByOriginalBounds(this.filteredSplitPolygons, this.polygon);
         return this.filteredSplitPolygons;

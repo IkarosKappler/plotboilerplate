@@ -6530,8 +6530,8 @@ exports["default"] = PlotBoilerplate;
  * @modified 2023-09-25 Added the `Polygon.lineIntersections(Line,boolean)` function.
  * @modified 2023-09-29 Added the `Polygon.closestLineIntersection(Line,boolean)` function.
  * @modified 2023-11-24 Added the `Polygon.containsPolygon(Polygon)' function.
- * @modified 2024-10-12 Added the `getLineAt` method.
- * @modified 2024-10-30 Added the `getLines` method.
+ * @modified 2024-10-12 Added the `getEdgeAt` method.
+ * @modified 2024-10-30 Added the `getEdges` method.
  * @modified 2024-12-02 Added the `elimitateColinearEdges` method.
  * @version 1.13.0
  *
