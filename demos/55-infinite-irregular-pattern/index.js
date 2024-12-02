@@ -51,7 +51,9 @@
       fillType: params.getString("fillType", "linear"), // falloff0.75
       useColors: params.getBoolean("useColors", true),
       colorSet: "Malachite",
-      drawPolygonNumbers: params.getBoolean("drawPolygonNumbers", false)
+      drawPolygonNumbers: params.getBoolean("drawPolygonNumbers", false),
+      drawOutline: params.getBoolean("drawOutline", true),
+      drawInnerOutlines: params.getBoolean("drawInnerOutlines", false)
     };
 
     // +---------------------------------------------------------------------------------
@@ -223,7 +225,9 @@
         fill.polygon(polygon, color, 1);
       }
       var isSimpleScale = false;
-      draw.polygon(polygon, "grey", 1);
+      if (config.drawOutline) {
+        draw.polygon(polygon, "grey", 1);
+      }
       var poylgonDiameter = getPolygonDiameter(polygon);
       if (config.fillRecursive) {
         var centerOfPolygon = vertexMedian(polygon.vertices);
@@ -247,7 +251,9 @@
             if (config.useColors) {
               fill.polygon(tmpPoly, color, 1);
             }
-            draw.polygon(tmpPoly, "grey", 1);
+            if (config.drawInnerOutlines) {
+              draw.polygon(tmpPoly, "grey", 1);
+            }
           } else {
             // Compute the polygon inset.
             var maxPolygonSplitDepth = config.pointCount; // This value definitely returns enough split polygons
@@ -264,7 +270,9 @@
               if (config.useColors) {
                 fill.polyline(polyVerts, false, color, 1);
               }
-              draw.polyline(polyVerts, false, "grey", 1);
+              if (config.drawInnerOutlines) {
+                draw.polyline(polyVerts, false, "grey", 1);
+              }
             }
           }
         }
@@ -418,6 +426,12 @@
       .onChange( function() { pb.redraw(); });
       // prettier-ignore
       gui.add(config, "drawPolygonNumbers").name("drawPolygonNumbers").title("Draw polygon numbers.")
+      .onChange( function() { pb.redraw(); });
+      // prettier-ignore
+      gui.add(config, "drawOutline").name("drawOutline").title("Draw the main polygon's outline?")
+      .onChange( function() { pb.redraw(); });
+      // prettier-ignore
+      gui.add(config, "drawInnerOutlines").name("drawInnerOutlines").title("Draw the outlines of inner cell polygons.")
       .onChange( function() { pb.redraw(); });
     }
 
