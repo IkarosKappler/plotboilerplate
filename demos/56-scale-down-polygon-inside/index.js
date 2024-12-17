@@ -234,8 +234,26 @@
     };
 
     var stats = {
-      numResultPolygons: 0
+      numResultPolygons: 0,
+      mouseX: 0,
+      mouseY: 0
     };
+
+    // +---------------------------------------------------------------------------------
+    // | Add a mouse listener to track the mouse position.
+    // +-------------------------------
+    new MouseHandler(pb.canvas, "polygon-demo")
+      .move(function (e) {
+        var relPos = pb.transformMousePosition(e.params.pos.x, e.params.pos.y);
+        // stats.positionInA = polygonA != null && relPos != null && polygonA.containsVert(relPos);
+        // stats.positionInB = polygonB != null && relPos != null && polygonB.containsVert(relPos);
+        stats.mouseX = relPos.x;
+        stats.mouseY = relPos.y;
+      })
+      .drag(function (e) {
+        // When vertices are moved, the convex hull might change
+        if (config.useConvexHullA || config.useConvexHullB) adjustPolygons();
+      });
 
     // +---------------------------------------------------------------------------------
     // | Create a GUI.
@@ -271,6 +289,8 @@
       var uiStats = new UIStats(stats);
       stats = uiStats.proxy;
       uiStats.add("numResultPolygons").suffix(" polygons");
+      uiStats.add("mouseX").suffix("");
+      uiStats.add("mouseY").suffix("");
     }
 
     pb.config.preDraw = preDraw;

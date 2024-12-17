@@ -314,7 +314,8 @@ export class Polygon {
      * @return {boolean}
      */
     isClockwise() {
-        return Polygon.utils.signedArea(this.vertices) < 0;
+        // return Polygon.utils.signedArea(this.vertices) < 0;
+        return Polygon.utils.isClockwise(this.vertices);
     }
     /**
      * Get the perimeter of this polygon.
@@ -764,6 +765,9 @@ Polygon.utils = {
             total -= subX * subY * 0.5;
         }
         return Math.abs(total);
+    },
+    isClockwise(vertices) {
+        return Polygon.utils.signedArea(vertices) < 0;
     },
     /**
      * Calulate the signed polyon area by interpreting the polygon as a matrix

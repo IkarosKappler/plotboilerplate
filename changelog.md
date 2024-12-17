@@ -2,13 +2,16 @@
 
 Imminent todos:
 
-- !!! rename Polygon.getLineAt to getEdgeAt before publishing!!!!!!
+- Optimize infinite pattern demo: compute inner polygons before drawing
 - demo 34: fail to compute foutier transform with array length != 8, whats going on here?
 - check greiner hormann (27): doing weird stuff when "clearSelfIntersecting=true"
 - check if the old color class is still used anywhere
 - Add googley eyes to the animated metaballs demo.
 - check automatic darkmode detection
 
+* 2024-12-17
+  - Outsourced the euclidean distance calculation of `Vertex.distance` to `geomutils.dist4`.
+  - Simplified the helper function `utils/algorithms/clearDuplicateVertices`to work with generic sub types of XYCoords as well.
 * 2024-12-02
   - Adding the `triggerRedraw` to the `PlotBoilerplate.removeAll` method.
   - Added the `epsilon` param to the `VertTuple.colinear` method. Default is 1.0e-6.

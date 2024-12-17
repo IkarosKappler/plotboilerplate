@@ -65,6 +65,10 @@ export declare class PolygonInset {
     filteredSplitPolygons: Array<Array<Vertex>>;
     /**
      * Constructs a new PolygonInset instance with the underlying given polygon to work with.
+     *
+     * Please note that the algorithm will reverse the vertex order if the given polygon
+     * is not clockwise.
+     *
      * @param {Polygon} polygon - The polygon to calculate the offset for.
      */
     constructor(polygon: Polygon);
@@ -136,4 +140,6 @@ export declare class PolygonInset {
      * @param {number?=1.0} intersectionEpsilon - (optional, default is 1.0) A epsislon to define a tolerance for checking if two polygons intersect.
      */
     private static _filterInnerSplitPolygonsByCoverage;
+    private static _assertAllPolygonsAreClockwise;
+    private static _assertPolygonIsClockwise;
 }

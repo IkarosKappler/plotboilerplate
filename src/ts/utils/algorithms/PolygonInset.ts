@@ -23,8 +23,13 @@ import { Line } from "../../Line";
 import { Polygon } from "../../Polygon";
 import { Vector } from "../../Vector";
 import { Vertex } from "../../Vertex";
+import { XYCoords } from "../../interfaces";
+import { clearDuplicateVertices } from "./clearDuplicateVertices";
 import { splitPolygonToNonIntersecting } from "./splitPolygonToNonIntersecting";
 import { sutherlandHodgman } from "./sutherlandHodgman";
+
+// import { GreinerHorman } from "greiner-hormann-typescript";
+// import DEBUG from "debug";
 
 export interface IPolygonInsetOptions {
   innerPolygonOffset: number;
@@ -79,6 +84,10 @@ export class PolygonInset {
 
   /**
    * Constructs a new PolygonInset instance with the underlying given polygon to work with.
+   *
+   * Please note that the algorithm will reverse the vertex order if the given polygon
+   * is not clockwise.
+   *
    * @param {Polygon} polygon - The polygon to calculate the offset for.
    */
   constructor(polygon: Polygon) {
@@ -96,6 +105,7 @@ export class PolygonInset {
    * @returns {Array<Array<Vertex>>} A list of vertex-lists, each one representing a simple polygon from the offset-polygons.
    */
   public computeOutputPolygons(options: IPolygonInsetOptions): Array<Array<Vertex>> {
+    PolygonInset._assertPolygonIsClockwise(this.polygon.vertices);
     const maxPolygonSplitDepth = options?.maxPolygonSplitDepth ?? this.polygon.vertices.length;
     const intersectionEpsilon: number | undefined = options.intersectionEpsilon;
     this.originalPolygonLines = this.polygon.getEdges();
@@ -108,15 +118,24 @@ export class PolygonInset {
     // This method was initially meant to calculate inset-polygons only.
     // But with a simple filter we COULD also create outer offset-polygons.
     // Maybe this is a task for the future
+    // console.log("DEBUG", DEBUG);
+    // DEBUG("TEST");
     if (options.innerPolygonOffset === 0) {
       return [this.polygon.vertices]; // No change
     }
+
+    // console.log("splitPolygons.length", this.splitPolygons.length);
+    // Assert all polygons are clockwise!
+    PolygonInset._assertAllPolygonsAreClockwise(this.splitPolygons);
+
     this.filteredSplitPolygons = PolygonInset._filterInnerSplitPolygonsByCoverage(
       this.splitPolygons,
       this.insetRectanglePolygons,
       intersectionEpsilon
     );
+    // console.log("[0] filteredSplitPolygons.length", this.filteredSplitPolygons.length);
     this.filteredSplitPolygons = PolygonInset._filterInnerSplitPolygonsByOriginalBounds(this.filteredSplitPolygons, this.polygon);
+    // console.log("[1] filteredSplitPolygons.length", this.filteredSplitPolygons.length);
     return this.filteredSplitPolygons;
   }
 
@@ -261,16 +280,70 @@ export class PolygonInset {
     insetRectanglePolygons: Array<Polygon>,
     intersectionEpsilon?: number
   ) {
+    // TEST: Add some jitter
+    // splitPolygonsVertices.forEach(split => {
+    //   split.forEach(vert => {
+    //     vert.x += (0.5 - Math.random()) * 0.01;
+    //     vert.y += (0.5 - Math.random()) * 0.01;
+    //   });
+    // });
+
+    splitPolygonsVertices.forEach((split, index) => {
+      const isCW: boolean = Polygon.utils.isClockwise(split);
+      if (!isCW) {
+        console.log("split is not isClockwise!", index, isCW);
+      }
+    });
+    insetRectanglePolygons.forEach((rect, index) => {
+      const isCW: boolean = rect.isClockwise();
+      if (!isCW) {
+        console.log("rect is not isClockwise!", index, isCW);
+      }
+    });
+
     const eps: number =
       intersectionEpsilon === undefined || typeof intersectionEpsilon === "undefined" ? 1.0 : intersectionEpsilon;
-    return splitPolygonsVertices.filter(function (splitPolyVerts, _splitPolyIndex) {
-      const intersectsWithAnyRect = insetRectanglePolygons.some(function (rectanglePoly, _rectanglePolyIndex) {
-        const intersectionVerts = sutherlandHodgman(splitPolyVerts, rectanglePoly.vertices);
-        const intersectionAreaSize = Polygon.utils.area(intersectionVerts);
+    return splitPolygonsVertices.filter((splitPolyVerts: Vertex[], _splitPolyIndex: number) => {
+      const intersectsWithAnyRect = insetRectanglePolygons.some((rectanglePoly: Polygon, _rectanglePolyIndex: number) => {
+        // const intersectionVerts: XYCoords[] = sutherlandHodgman(splitPolyVerts, rectanglePoly.vertices);
+        const intersectionVerts: XYCoords[] = sutherlandHodgman(rectanglePoly.vertices, splitPolyVerts);
+
+        // var intersection = GreinerHorman.intersection(sourcePolygon.vertices, clipPolygon.vertices);
+        // const uniqueIntersectionVerts = clearDuplicateVertices(intersectionVerts);
+        const intersectionAreaSize: number = Polygon.utils.area(intersectionVerts);
+        if (intersectionAreaSize >= eps) {
+          console.log(
+            "intersectionAreaSize",
+            intersectionAreaSize,
+            "_splitPolyIndex",
+            _splitPolyIndex,
+            "_rectanglePolyIndex",
+            _rectanglePolyIndex,
+            "intersectionVerts",
+            intersectionVerts
+            // "uniqueIntersectionVerts",
+            // uniqueIntersectionVerts
+          );
+        }
         return intersectionAreaSize >= eps;
       });
 
       return !intersectsWithAnyRect;
     });
+  }
+
+  private static _assertAllPolygonsAreClockwise(polygons: Array<Vertex[]>) {
+    polygons.forEach((polygonVerts: Vertex[], _polyIndex: number) => {
+      // if (!Polygon.utils.isClockwise(polygonVerts)) {
+      //   polygonVerts.reverse(); // Attention: this happens in-place (Array.reverse is destructive!)
+      // }
+      PolygonInset._assertPolygonIsClockwise(polygonVerts);
+    });
+  }
+
+  private static _assertPolygonIsClockwise(polygonVerts: Vertex[]) {
+    if (!Polygon.utils.isClockwise(polygonVerts)) {
+      polygonVerts.reverse(); // Attention: this happens in-place (Array.reverse is destructive!)
+    }
   }
 }

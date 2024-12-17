@@ -431,6 +431,7 @@ export declare class Polygon implements SVGSerializable {
          * @return {number}
          */
         area(vertices: Array<XYCoords>): number;
+        isClockwise(vertices: Array<XYCoords>): boolean;
         /**
          * Calulate the signed polyon area by interpreting the polygon as a matrix
          * and calculating its determinant.

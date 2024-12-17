@@ -24,6 +24,16 @@ export declare const geomutils: {
      **/
     mapAngleTo2PI(angle: number): number;
     /**
+     * Calculate the euclidean distance between two points given by four coordinates (two coordinates each).
+     *
+     * @param {number} x1
+     * @param {number} y1
+     * @param {number} x2
+     * @param {number} y2
+     * @returns {number}
+     */
+    dist4(x1: number, y1: number, x2: number, y2: number): number;
+    /**
      * Map any angle (any numeric value) to [0, Math.PI).
      *
      * A × B := (A.x * B.x) + (A.y * B.y)

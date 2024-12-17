@@ -6,16 +6,17 @@
  * @author   Ikaros Kappler
  * @date     2021-07-13
  * @modified 2023-10-28 Refactored and ported to Typescript.
- * @version  1.0.0
+ * @modified 2024-12-17 Simplified this method to work with generic sub types of XYCoords as well.
+ * @version  1.0.1
  */
-import { Vertex } from "../../Vertex";
+import { XYCoords } from "../../interfaces";
 /**
  * Filter the array and clear all duplicates.
  *
  * The original array is left unchanged. The vertices in the array are not cloned.
  *
- * @param {Vertex[]} vertices
+ * @param {XYCoords[]} vertices
  * @param {number=EPS} epsilon
  * @return {Vertex[]}
  */
-export declare const clearDuplicateVertices: (vertices: Vertex[], epsilon?: number) => Vertex[];
+export declare const clearDuplicateVertices: <T extends XYCoords>(vertices: T[], epsilon?: number) => T[];

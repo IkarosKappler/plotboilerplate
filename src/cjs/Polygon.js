@@ -317,7 +317,8 @@ var Polygon = /** @class */ (function () {
      * @return {boolean}
      */
     Polygon.prototype.isClockwise = function () {
-        return Polygon.utils.signedArea(this.vertices) < 0;
+        // return Polygon.utils.signedArea(this.vertices) < 0;
+        return Polygon.utils.isClockwise(this.vertices);
     };
     /**
      * Get the perimeter of this polygon.
@@ -768,6 +769,9 @@ var Polygon = /** @class */ (function () {
                 total -= subX * subY * 0.5;
             }
             return Math.abs(total);
+        },
+        isClockwise: function (vertices) {
+            return Polygon.utils.signedArea(vertices) < 0;
         },
         /**
          * Calulate the signed polyon area by interpreting the polygon as a matrix

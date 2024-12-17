@@ -38,6 +38,19 @@ export const geomutils = {
   },
 
   /**
+   * Calculate the euclidean distance between two points given by four coordinates (two coordinates each).
+   *
+   * @param {number} x1
+   * @param {number} y1
+   * @param {number} x2
+   * @param {number} y2
+   * @returns {number}
+   */
+  dist4(x1: number, y1: number, x2: number, y2: number): number {
+    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y1 - y2, 2));
+  },
+
+  /**
    * Map any angle (any numeric value) to [0, Math.PI).
    *
    * A × B := (A.x * B.x) + (A.y * B.y)

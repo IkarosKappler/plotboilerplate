@@ -371,7 +371,8 @@ export class Polygon implements SVGSerializable {
    * @return {boolean}
    */
   isClockwise(): boolean {
-    return Polygon.utils.signedArea(this.vertices) < 0;
+    // return Polygon.utils.signedArea(this.vertices) < 0;
+    return Polygon.utils.isClockwise(this.vertices);
   }
 
   /**
@@ -848,6 +849,10 @@ export class Polygon implements SVGSerializable {
         total -= subX * subY * 0.5;
       }
       return Math.abs(total);
+    },
+
+    isClockwise(vertices: Array<XYCoords>): boolean {
+      return Polygon.utils.signedArea(vertices) < 0;
     },
 
     /**

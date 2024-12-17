@@ -228,53 +228,62 @@
       if (config.drawOutline) {
         draw.polygon(polygon, "grey", 1);
       }
-      var poylgonDiameter = getPolygonDiameter(polygon);
       if (config.fillRecursive) {
-        var centerOfPolygon = vertexMedian(polygon.vertices);
-        var tmpPoly = polygon.clone();
         var n = config.fillIterationCount;
-        // var polygonInset = new PolygonInset(elimitateColinearEdges(polygon, undefined));
-        var polygonInset = new PolygonInset(polygon.elimitateColinearEdges(config.colinearityTolerance)); // 1000.0);
-
-        var polygonInsetStep = poylgonDiameter / n;
+        var tmpPoly = polygon.clone();
         for (var i = 0; i < n; i++) {
           var color = randomWebColor(i + 1, config.colorSet, 1.0);
-
           if (isSimpleScale) {
-            if (config.fillType === "linear") {
-              tmpPoly = polygon.clone();
-              tmpPoly.scale((n - i) / (n + 1), centerOfPolygon);
-            } else {
-              // "falloff 0.75"
-              tmpPoly.scale(0.75, centerOfPolygon);
-            }
-            if (config.useColors) {
-              fill.polygon(tmpPoly, color, 1);
-            }
-            if (config.drawInnerOutlines) {
-              draw.polygon(tmpPoly, "grey", 1);
-            }
+            fillSimpleScale(draw, fill, polygon, tmpPoly, i, color);
           } else {
-            // Compute the polygon inset.
-            var maxPolygonSplitDepth = config.pointCount; // This value definitely returns enough split polygons
-            // console.log("polygonOffset", i * polygonInsetStep);
-            // Array<Vertex[]>
-            var scalingFactor = config.fillType === "linear" ? i * polygonInsetStep : polygonInsetStep / Math.pow(0.75, i);
-            var insetPolygons = polygonInset.computeOutputPolygons({
-              innerPolygonOffset: scalingFactor,
-              maxPolygonSplitDepth: maxPolygonSplitDepth
-              // intersectionEpsilon: config.intersectionEpsilon
-            });
-            for (var p = 0; p < insetPolygons.length; p++) {
-              var polyVerts = insetPolygons[p];
-              if (config.useColors) {
-                fill.polyline(polyVerts, false, color, 1);
-              }
-              if (config.drawInnerOutlines) {
-                draw.polyline(polyVerts, false, "grey", 1);
-              }
-            }
+            fillInsetScale(draw, fill, polygon, tmpPoly, i, color);
           }
+        }
+      }
+    };
+
+    var fillSimpleScale = function (draw, fill, polygon, tmpPoly, i, color) {
+      var n = config.fillIterationCount;
+      var centerOfPolygon = vertexMedian(polygon.vertices);
+      if (config.fillType === "linear") {
+        tmpPoly = polygon.clone();
+        tmpPoly.scale((n - i) / (n + 1), centerOfPolygon);
+      } else {
+        // "falloff 0.75"
+        tmpPoly.scale(0.75, centerOfPolygon);
+      }
+      if (config.useColors) {
+        fill.polygon(tmpPoly, color, 1);
+      }
+      if (config.drawInnerOutlines) {
+        draw.polygon(tmpPoly, "grey", 1);
+      }
+    };
+
+    var fillInsetScale = function (draw, fill, polygon, tmpPoly, i, color) {
+      var n = config.fillIterationCount;
+      var poylgonDiameter = getPolygonDiameter(polygon);
+      var polygonInset = new PolygonInset(polygon.elimitateColinearEdges(config.colinearityTolerance)); // 1000.0);
+      var polygonInsetStep = poylgonDiameter / n;
+      // Compute the polygon inset.
+      // This value definitely returns enough split polygons
+      var maxPolygonSplitDepth = config.pointCount;
+      // console.log("polygonOffset", i * polygonInsetStep);
+      // Array<Vertex[]>
+      // var scalingFactor = config.fillType === "linear" ? i * polygonInsetStep : polygonInsetStep / Math.pow(0.75, i);
+      var scalingFactor = (i * polygonInsetStep) / 2;
+      var insetPolygons = polygonInset.computeOutputPolygons({
+        innerPolygonOffset: scalingFactor,
+        maxPolygonSplitDepth: maxPolygonSplitDepth
+        // intersectionEpsilon: config.intersectionEpsilon
+      });
+      for (var p = 0; p < insetPolygons.length; p++) {
+        var polyVerts = insetPolygons[p];
+        if (config.useColors) {
+          fill.polyline(polyVerts, false, color, 1);
+        }
+        if (config.drawInnerOutlines) {
+          draw.polyline(polyVerts, false, "grey", 1);
         }
       }
     };
