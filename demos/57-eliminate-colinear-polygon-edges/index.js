@@ -89,7 +89,7 @@
       // console.log("nonColinearPoly", nonColinearPoly.vertices.length);
       for (var i = 0; i < nonColinearPoly.vertices.length; i++) {
         var vert = nonColinearPoly.vertices[i];
-        draw.circle(vert, 8, "orange", 1.0);
+        // draw.circle(vert, 8, "orange", 1.0);
       }
       if (config.drawVertexNumbers) {
         // console.log("drawVertexNumbers", config.drawVertexNumbers);
@@ -107,6 +107,25 @@
           fontSize: 9,
           yOffset: 20
         });
+
+        // Draw removed vertices
+        var polyVert = polygon.getVertexAt(i);
+        // var wasRemoved = function (vert, index) {
+        //   if (index != i && polyVert.distance(vert) < 0.1) {
+        //     return false;
+        //   }
+        // };
+        var equalPoint = function (p) {
+          var eq = p.distance(polyVert) < 0.1;
+          // console.log("Compare", p, polyVert, "equal?", eq);
+          return eq; // p.distance(polyVert) < 0.1;
+        };
+        // if (nonColinearPoly.vertices.findIndex(wasRemoved) != -1) {
+        // console.log("nonColinearPoly.vertices.indexOf(equalPoint)", i, polyVert, nonColinearPoly.vertices.indexOf(equalPoint));
+        if (nonColinearPoly.vertices.findIndex(equalPoint) !== -1) {
+          draw.circle(polyVert, 8, "orange", 1.0);
+          // console.log("Draw");
+        }
       }
     };
 
