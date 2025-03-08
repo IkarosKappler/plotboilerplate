@@ -79,7 +79,7 @@
       cellInsetPolygons = [];
       if (config.fillRecursive) {
         var n = config.fillIterationCount;
-        var tmpPoly = polygon.clone();
+        // var tmpPoly = polygon.clone();
         for (var i = 0; i < n; i++) {
           var n = config.fillIterationCount;
           var poylgonDiameter = getPolygonDiameter(polygon);
@@ -103,7 +103,7 @@
       } else {
         cellInsetPolygons.push([polygon.clone()]);
       }
-      console.log("cellInsetPolygons.length", cellInsetPolygons.length);
+      // console.log("cellInsetPolygons.length", cellInsetPolygons.length);
     };
 
     // +---------------------------------------------------------------------------------
@@ -177,9 +177,10 @@
       if (editableCellPolygon != null) {
         editableCellPolygon.destroy();
       }
-      editableCellPolygon = new EditableCellPolygon(pb, rectCellPolygon, {});
+      editableCellPolygon = new EditableCellPolygon(pb, rectCellPolygon, handlePolygonChanged);
+      rebuildInsetPolygons(editableCellPolygon.polygon);
       pb.removeAll();
-      pb.add(editableCellPolygon.polygon);
+      pb.add(editableCellPolygon.polygon, false); // Do not redraw yet
     };
 
     var initPattern = function () {
@@ -189,8 +190,8 @@
         // "p4m"
         initiSquarePattern();
       }
+      // rebuildInsetPolygons(editableCellPolygon.polygon);
     };
-    initPattern();
 
     var preDraw = function (draw, fill) {
       if (config.baseShape == "p6m") {
@@ -226,20 +227,6 @@
       }
     };
 
-    // +---------------------------------------------------------------------------------
-    // | Get a 'random' color.
-    // +-------------------------------
-    // var randColor = function (i, alpha) {
-    //   var color = WebColors[i % WebColorsContrast.length].clone();
-    //   if (typeof alpha !== undefined) color.a = alpha;
-    //   return color.cssRGBA();
-    //   //   "Malachite":
-    //   // case "Mixed":
-    //   // case "WebColors":
-    //   // return randomWebColor(i, "Malachite");
-    // };
-    // randomWebColor
-
     // Due to Wolfram the 'polygons diameter is'
     //  "The diameter of a polygon is the largest distance between any pair of vertices"
     // https://mathworld.wolfram.com/PolygonDiameter.html
@@ -259,7 +246,7 @@
     // +---------------------------------------------------------------------------------
     // | Draws a single cell.
     // +-------------------------------
-    var drawCell = function (draw, fill, polygon) {
+    var drawCell = function (draw, fill, polygon, offset) {
       if (config.useColors) {
         var color = randomWebColor(0, config.colorSet, 1.0);
         fill.polygon(polygon, color, 1);
@@ -281,7 +268,7 @@
           }
         }
         if (!isSimpleScale) {
-          fillInsetScale(draw, fill);
+          fillInsetScale(draw, fill, offset);
         }
       }
     };
@@ -304,41 +291,22 @@
       }
     };
 
-    var __fillInsetScale = function (draw, fill, polygon, tmpPoly, i, color) {
-      var n = config.fillIterationCount;
-      var poylgonDiameter = getPolygonDiameter(polygon);
-      var polygonInset = new PolygonInset(polygon.elimitateColinearEdges(config.colinearityTolerance)); // 1000.0);
-      var polygonInsetStep = poylgonDiameter / n;
-      // Compute the polygon inset.
-      // This value definitely returns enough split polygons
-      var maxPolygonSplitDepth = config.pointCount;
-      // console.log("polygonOffset", i * polygonInsetStep);
-      // Array<Vertex[]>
-      // var scalingFactor = config.fillType === "linear" ? i * polygonInsetStep : polygonInsetStep / Math.pow(0.75, i);
-      var scalingFactor = (i * polygonInsetStep) / 2;
-      var insetPolygons = polygonInset.computeOutputPolygons({
-        innerPolygonOffset: scalingFactor,
-        maxPolygonSplitDepth: maxPolygonSplitDepth,
-        intersectionEpsilon: 1.0, // config.intersectionEpsilon
-        removeEars: true
-      });
-      for (var p = 0; p < insetPolygons.length; p++) {
-        var polyVerts = insetPolygons[p];
-        if (config.useColors) {
-          fill.polyline(polyVerts, false, color, 1);
-        }
-        if (config.drawInnerOutlines) {
-          draw.polyline(polyVerts, false, "grey", 1);
-        }
-      }
-    };
-
-    var fillInsetScale = function (draw, fill) {
+    /**
+     *
+     * @param {DrawLin} draw
+     * @param {DrawLib} fill
+     * @param {XYCoords} offset
+     */
+    var fillInsetScale = function (draw, fill, offset) {
       for (var i = 0; i < cellInsetPolygons.length; i++) {
         var color = randomWebColor(i + 1, config.colorSet, 1.0);
         var insetPolygons = cellInsetPolygons[i];
         for (var p = 0; p < insetPolygons.length; p++) {
           var polyVerts = insetPolygons[p];
+          // Copy and move vertices by offset
+          polyVerts = polyVerts.map(function (vert) {
+            return vert.clone().add(offset);
+          });
           if (config.useColors) {
             fill.polyline(polyVerts, false, color, 1);
           }
@@ -376,10 +344,11 @@
         fillVerticalSquarePattern(draw, fill, tempPolyA, differenceAFromOriginal, differenceCFromOriginal, offset);
       }
       // Fill the right area
+      offset = { x: 0, y: 0 };
       tempPolyA = editableCellPolygon.polygon.clone();
       for (var x = 0; x < config.horizontalCount / 2 - 1; x++) {
-        offset.x -= cellBounds.width;
-        offset.y -= differenceAFromOriginal.y + differenceBFromOriginal.y;
+        offset.x += -cellBounds.width;
+        offset.y += -differenceAFromOriginal.y + differenceBFromOriginal.y;
         tempPolyA.move({ x: -cellBounds.width, y: 0 });
         tempPolyA.move({ x: 0, y: -differenceAFromOriginal.y + differenceBFromOriginal.y });
         // draw.polygon(tempPolyA, "grey", 1);
@@ -392,18 +361,31 @@
     // | Fills a vertical section with n elements to the upper and n elements to
     // | the lower direction.
     // +-------------------------------
-    var fillVerticalSquarePattern = function (draw, fill, tempPolyA, differenceAFromOriginal, differenceCFromOriginal, offset) {
+    var fillVerticalSquarePattern = function (
+      draw,
+      fill,
+      tempPolyA,
+      differenceAFromOriginal,
+      differenceCFromOriginal,
+      verticalOffset
+    ) {
+      var offset = { x: verticalOffset.x, y: verticalOffset.y };
       var tempPolyB = tempPolyA.clone();
       // Generate row up
       for (var y = 0; y < config.verticalCount / 2 - 1; y++) {
+        offset.x += differenceAFromOriginal.x - differenceCFromOriginal.x;
+        offset.y += cellBounds.height;
         tempPolyB.move({ x: 0, y: cellBounds.height });
         tempPolyB.move({ x: differenceAFromOriginal.x - differenceCFromOriginal.x, y: 0 });
         // draw.polygon(tempPolyB, "grey", 1);
         drawCell(draw, fill, tempPolyB, offset);
       }
+      offset = { x: verticalOffset.x, y: verticalOffset.y };
       tempPolyB = tempPolyA.clone();
       // Generate row down
       for (var y = 0; y < config.verticalCount / 2 - 1; y++) {
+        offset.x += -differenceAFromOriginal.x + differenceCFromOriginal.x;
+        offset.y += -cellBounds.height;
         tempPolyB.move({ x: 0, y: -cellBounds.height });
         tempPolyB.move({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
         draw.polygon(tempPolyB, "grey", 1);
@@ -414,23 +396,31 @@
     // +---------------------------------------------------------------------------------
     // | Fills a vertical section with n elements to both diagonal hex directions.
     // +-------------------------------
-    var fillDiagonalHexPattern = function (draw, fill, tempHexPolyA) {
+    var fillDiagonalHexPattern = function (draw, fill, tempHexPolyA, diagonalOffset) {
       var diff = rectCellBaseVertices[0].difference(rectCellBaseVertices[4]);
 
-      drawCell(draw, fill, tempHexPolyA);
+      var offset = { x: diagonalOffset.x, y: diagonalOffset.y };
+
+      drawCell(draw, fill, tempHexPolyA, offset);
 
       var tempHexPolyB = tempHexPolyA.clone();
       for (var y = 0; y < config.verticalCount / 2 - 1; y++) {
+        offset.x += diff.x;
+        offset.y += diff.y;
         tempHexPolyB.move({ x: diff.x, y: diff.y });
         draw.polygon(tempHexPolyB, "grey", 1);
-        drawCell(draw, fill, tempHexPolyB);
+        drawCell(draw, fill, tempHexPolyB, offset);
       }
+
+      offset = { x: diagonalOffset.x, y: diagonalOffset.y };
       tempHexPolyB = tempHexPolyA.clone();
       // Generate row down
       for (var y = 0; y < config.verticalCount / 2 - 1; y++) {
+        offset.x += -diff.x;
+        offset.y += -diff.y;
         tempHexPolyB.move({ x: -diff.x, y: -diff.y });
         draw.polygon(tempHexPolyB, "grey", 1);
-        drawCell(draw, fill, tempHexPolyB);
+        drawCell(draw, fill, tempHexPolyB, offset);
       }
     };
 
@@ -439,22 +429,29 @@
     // +-------------------------------
     var fillHexPattern = function (draw, fill) {
       var tempHexPolyA = editableCellPolygon.polygon.clone();
-      fillDiagonalHexPattern(draw, fill, tempHexPolyA);
+
+      var offset = { x: 0, y: 0 };
+      fillDiagonalHexPattern(draw, fill, tempHexPolyA, offset);
 
       var diff = rectCellBaseVertices[0].difference(rectCellBaseVertices[2]);
       // Fill the left area
       for (var x = 0; x < config.horizontalCount / 2 - 1; x++) {
+        offset.x += diff.x;
+        offset.y += diff.y;
         tempHexPolyA.move({ x: diff.x, y: diff.y });
-        drawCell(draw, fill, tempHexPolyA);
+        drawCell(draw, fill, tempHexPolyA, offset);
 
-        fillDiagonalHexPattern(draw, fill, tempHexPolyA);
+        fillDiagonalHexPattern(draw, fill, tempHexPolyA, offset);
       }
+      offset = { x: 0, y: 0 };
       tempHexPolyA = editableCellPolygon.polygon.clone();
       // Fill the left area
       for (var x = 0; x < config.horizontalCount / 2 - 1; x++) {
+        offset.x += -diff.x;
+        offset.y += -diff.y;
         tempHexPolyA.move({ x: -diff.x, y: -diff.y });
-        drawCell(draw, fill, tempHexPolyA);
-        fillDiagonalHexPattern(draw, fill, tempHexPolyA);
+        drawCell(draw, fill, tempHexPolyA, offset);
+        fillDiagonalHexPattern(draw, fill, tempHexPolyA, offset);
       }
     };
 
@@ -515,6 +512,7 @@
       .onChange( function() { pb.redraw(); });
     }
 
+    initPattern();
     pb.config.preDraw = preDraw;
     // pb.redraw();
     rebuild();
