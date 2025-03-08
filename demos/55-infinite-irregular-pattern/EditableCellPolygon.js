@@ -15,8 +15,9 @@
    *
    * @param {PlotBoilerplate} pb
    * @param {Polygon} polygon
+   * @param {Function} onPolygonChanged
    */
-  var EditableCellPolygon = function (pb, polygon) {
+  var EditableCellPolygon = function (pb, polygon, onPolygonChanged) {
     // PlotBoilerplate
     this.pb = pb;
     // Line | null
@@ -29,6 +30,8 @@
     this.mouseOverOppositeIndex = null;
     // Polygon
     this.polygon = polygon;
+    // Function: void
+    this.onPolygonChanged = onPolygonChanged;
     // number
     this.polygonCardinality = polygon.vertices.length;
     // Vertex
@@ -91,6 +94,7 @@
             _self.mouseOverIndex != null &&
             (oldIndex[0] != _self.mouseOverIndex[0] || oldIndex[1] != _self.mouseOverIndex[1]))
         ) {
+          _self.onPolygonChanged();
           _self.pb.redraw();
         }
       })
@@ -111,6 +115,7 @@
           _self.mouseOverLine = null;
           _self.mouseOverOppositeIndex = null;
           _self.mouseOverOppositeLine = null;
+          _self.onPolygonChanged();
           _self.pb.redraw();
         }
       });
@@ -149,12 +154,14 @@
       _self.vertD.add({ x: 0, y: event.params.dragAmount.y });
       _self._moveSublineVertices(0, event.params.dragAmount.x, 0);
       _self._moveSublineVertices(3, 0, event.params.dragAmount.y);
+      _self.onPolygonChanged();
     });
     this.vertB.listeners.addDragListener(function (event) {
       _self.vertA.add({ x: event.params.dragAmount.x, y: 0 });
       _self.vertC.add({ x: 0, y: event.params.dragAmount.y });
       _self._moveSublineVertices(0, event.params.dragAmount.x, 0);
       _self._moveSublineVertices(1, 0, event.params.dragAmount.y);
+      _self.onPolygonChanged();
     });
     this.vertC.listeners.addDragListener(function (event) {
       _self.vertD.add({ x: event.params.dragAmount.x, y: 0 });
@@ -162,12 +169,14 @@
       _self._moveSublineVertices(1, event.params.dragAmount.x, event.params.dragAmount.y);
       _self._moveSublineVertices(2, event.params.dragAmount.x, 0);
       _self._moveSublineVertices(3, event.params.dragAmount.x, 0);
+      _self.onPolygonChanged();
     });
     this.vertD.listeners.addDragListener(function (event) {
       _self.vertC.add({ x: event.params.dragAmount.x, y: 0 });
       _self.vertA.add({ x: 0, y: event.params.dragAmount.y });
       _self._moveSublineVertices(2, event.params.dragAmount.x, 0);
       _self._moveSublineVertices(3, 0, event.params.dragAmount.y);
+      _self.onPolygonChanged();
     });
   };
 
@@ -184,31 +193,37 @@
       _self.vertD.add({ x: -event.params.dragAmount.x, y: -event.params.dragAmount.y });
       _self._moveSublineVertices(0, event.params.dragAmount.x, event.params.dragAmount.y);
       _self._moveSublineVertices(2, -event.params.dragAmount.x, -event.params.dragAmount.y);
+      _self.onPolygonChanged();
     });
     this.vertB.listeners.addDragListener(function (event) {
       _self.vertE.add({ x: -event.params.dragAmount.x, y: -event.params.dragAmount.y });
       _self._moveSublineVertices(1, event.params.dragAmount.x, event.params.dragAmount.y);
       _self._moveSublineVertices(3, -event.params.dragAmount.x, -event.params.dragAmount.y);
+      _self.onPolygonChanged();
     });
     this.vertC.listeners.addDragListener(function (event) {
       _self.vertF.add({ x: -event.params.dragAmount.x, y: -event.params.dragAmount.y });
       _self._moveSublineVertices(2, event.params.dragAmount.x, event.params.dragAmount.y);
       _self._moveSublineVertices(4, -event.params.dragAmount.x, -event.params.dragAmount.y);
+      _self.onPolygonChanged();
     });
     this.vertD.listeners.addDragListener(function (event) {
       _self.vertA.add({ x: -event.params.dragAmount.x, y: -event.params.dragAmount.y });
       _self._moveSublineVertices(3, event.params.dragAmount.x, event.params.dragAmount.y);
       _self._moveSublineVertices(5, -event.params.dragAmount.x, -event.params.dragAmount.y);
+      _self.onPolygonChanged();
     });
     this.vertE.listeners.addDragListener(function (event) {
       _self.vertB.add({ x: -event.params.dragAmount.x, y: -event.params.dragAmount.y });
       _self._moveSublineVertices(4, event.params.dragAmount.x, event.params.dragAmount.y);
       _self._moveSublineVertices(0, -event.params.dragAmount.x, -event.params.dragAmount.y);
+      _self.onPolygonChanged();
     });
     this.vertF.listeners.addDragListener(function (event) {
       _self.vertC.add({ x: -event.params.dragAmount.x, y: -event.params.dragAmount.y });
       _self._moveSublineVertices(5, event.params.dragAmount.x, event.params.dragAmount.y);
       _self._moveSublineVertices(1, -event.params.dragAmount.x, -event.params.dragAmount.y);
+      _self.onPolygonChanged();
     });
   };
 
@@ -316,12 +331,15 @@
    * @param {Vertex} oppositePoint
    */
   EditableCellPolygon.prototype.linkPointWithOpposite = function (point, oppositePoint) {
+    var _self = this;
     (function (pointA, pointB) {
       pointA.listeners.addDragListener(function (event) {
         pointB.add(event.params.dragAmount);
+        _self.onPolygonChanged();
       });
       pointB.listeners.addDragListener(function (event) {
         pointA.add(event.params.dragAmount);
+        _self.onPolygonChanged();
       });
     })(point, oppositePoint);
   };

@@ -9,6 +9,10 @@ Imminent todos:
 - Add googley eyes to the animated metaballs demo.
 - check automatic darkmode detection
 
+* 2025-02-12
+
+- Added the `Polygon.containsVerts` method to test multiple vertices for containment.
+
 * 2024-12-17
   - Outsourced the euclidean distance calculation of `Vertex.distance` to `geomutils.dist4`.
   - Simplified the helper function `utils/algorithms/clearDuplicateVertices`to work with generic sub types of XYCoords as well.

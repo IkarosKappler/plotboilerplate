@@ -68,22 +68,51 @@ var PolygonInset = /** @class */ (function () {
      */
     PolygonInset.prototype.computeOutputPolygons = function (options) {
         var _a;
+        // No offset implies: no change.
+        if (options.innerPolygonOffset === 0) {
+            return [this.polygon.vertices]; // No change
+        }
+        // This algorithm only works with polygon in clockwise vertex order.
+        // If the polygon is not clockwise: revert.
         PolygonInset._assertPolygonIsClockwise(this.polygon.vertices);
-        var maxPolygonSplitDepth = (_a = options === null || options === void 0 ? void 0 : options.maxPolygonSplitDepth) !== null && _a !== void 0 ? _a : this.polygon.vertices.length;
+        // The potential result polygons might overlap with other parts. These are not part of the desired
+        // result set and need to be filtered out.
+        // Define an intersection-epsilon: minimal critical overlaps might result of rounding errors and
+        // don't represent real overlaps.
         var intersectionEpsilon = options.intersectionEpsilon;
-        this.originalPolygonLines = this.polygon.getEdges();
+        // This will create a deep clone
+        this.optimizedPolygon = this.polygon.clone();
+        // In case the potential result polygons are self intersecting we need to split them apart later.
+        // Using the initial vertex number as the upper split limit should be safe here.
+        var maxPolygonSplitDepth = (_a = options === null || options === void 0 ? void 0 : options.maxPolygonSplitDepth) !== null && _a !== void 0 ? _a : this.optimizedPolygon.vertices.length;
+        // For calculations of initial inset rectagles we need the original polygon's lines.
+        this.originalPolygonLines = this.optimizedPolygon.getEdges();
         this._collectInsetLines(this.originalPolygonLines, options.innerPolygonOffset);
         this._collectInsetPolygonLines(this.insetLines);
-        this.insetPolygon = PolygonInset.convertToBasicInsetPolygon(this.insetPolygonLines);
         this.insetRectanglePolygons = this._collectRectangularPolygonInsets(this.originalPolygonLines, this.insetLines);
+        // Optimize inset polygon AND the insetRectanglePolygons?
+        if (options.removeEars) {
+            console.log("Remove ears");
+            // This will modify both params!
+            PolygonInset._optimizeInsetPolygon(this.optimizedPolygon, this.insetRectanglePolygons);
+        }
+        // Create a naive first inset polygon for later optimization.
+        this.insetPolygon = PolygonInset.convertToBasicInsetPolygon(this.insetPolygonLines);
+        // // Optimize inset polygon AND the insetRectanglePolygons!
+        // if (options.removeEars) {
+        //   // This will modify both params!
+        //   PolygonInset._optimizeInsetPolygon(this.insetPolygon, this.insetRectanglePolygons);
+        // }
+        // The resulting polygon will likely intersect itself multiple times.
+        // For further calculations split apart into non-self-intersecting.
         this.splitPolygons = (0, splitPolygonToNonIntersecting_1.splitPolygonToNonIntersecting)(this.insetPolygon.vertices, maxPolygonSplitDepth, true); // insideBoundsOnly
         // This method was initially meant to calculate inset-polygons only.
         // But with a simple filter we COULD also create outer offset-polygons.
         // Maybe this is a task for the future
         // console.log("DEBUG", DEBUG);
         // DEBUG("TEST");
-        if (options.innerPolygonOffset === 0) {
-            return [this.polygon.vertices]; // No change
+        if (options.innerPolygonOffset < 0) {
+            // return [this.polygon.vertices]; // No change
         }
         // console.log("splitPolygons.length", this.splitPolygons.length);
         // Assert all polygons are clockwise!
@@ -233,34 +262,27 @@ var PolygonInset = /** @class */ (function () {
         splitPolygonsVertices.forEach(function (split, index) {
             var isCW = Polygon_1.Polygon.utils.isClockwise(split);
             if (!isCW) {
-                console.log("split is not isClockwise!", index, isCW);
+                console.warn("------ split is not isClockwise!", index, isCW);
             }
         });
         insetRectanglePolygons.forEach(function (rect, index) {
             var isCW = rect.isClockwise();
             if (!isCW) {
-                console.log("rect is not isClockwise!", index, isCW);
+                console.warn("------ rect is not isClockwise!", index, isCW);
             }
         });
         var eps = intersectionEpsilon === undefined || typeof intersectionEpsilon === "undefined" ? 1.0 : intersectionEpsilon;
         return splitPolygonsVertices.filter(function (splitPolyVerts, _splitPolyIndex) {
-            var intersectsWithAnyRect = insetRectanglePolygons.some(function (rectanglePoly, _rectanglePolyIndex) {
-                // const intersectionVerts: XYCoords[] = sutherlandHodgman(splitPolyVerts, rectanglePoly.vertices);
-                var intersectionVerts = (0, sutherlandHodgman_1.sutherlandHodgman)(rectanglePoly.vertices, splitPolyVerts);
-                // var intersection = GreinerHorman.intersection(sourcePolygon.vertices, clipPolygon.vertices);
-                // const uniqueIntersectionVerts = clearDuplicateVertices(intersectionVerts);
-                var intersectionAreaSize = Polygon_1.Polygon.utils.area(intersectionVerts);
-                if (intersectionAreaSize >= eps) {
-                    console.log("intersectionAreaSize", intersectionAreaSize, "_splitPolyIndex", _splitPolyIndex, "_rectanglePolyIndex", _rectanglePolyIndex, "intersectionVerts", intersectionVerts
-                    // "uniqueIntersectionVerts",
-                    // uniqueIntersectionVerts
-                    );
-                }
-                return intersectionAreaSize >= eps;
-            });
+            var intersectionTestCallback = PolygonInset._hasIntersectionCallback(splitPolyVerts, eps, _splitPolyIndex);
+            var intersectsWithAnyRect = insetRectanglePolygons.some(intersectionTestCallback);
             return !intersectsWithAnyRect;
         });
     };
+    /**
+     * This private method will reverse each polygon's vertex order that's not clockwise.
+     *
+     * @param {Array<Vertex[]>} polygons
+     */
     PolygonInset._assertAllPolygonsAreClockwise = function (polygons) {
         polygons.forEach(function (polygonVerts, _polyIndex) {
             // if (!Polygon.utils.isClockwise(polygonVerts)) {
@@ -269,10 +291,139 @@ var PolygonInset = /** @class */ (function () {
             PolygonInset._assertPolygonIsClockwise(polygonVerts);
         });
     };
+    /**
+     * This private method will revert the vertex order if the polygon is not clockwise.
+     *
+     * @param {Vertex[]} polygonVerts
+     */
     PolygonInset._assertPolygonIsClockwise = function (polygonVerts) {
         if (!Polygon_1.Polygon.utils.isClockwise(polygonVerts)) {
             polygonVerts.reverse(); // Attention: this happens in-place (Array.reverse is destructive!)
         }
+    };
+    /**
+     * Optimize the inset polygon by removing critical `ear` edges.
+     * Such an is identified by: the edge itself is completely located inside its neighbours inset rectangle.
+     *
+     * In this process multiple edges from the ear might be dropped and two adjacent edges get a new
+     * common intersection point.
+     *
+     * Note: this method is not working as expected in all cases and quite experimental.
+     *
+     * @param insetPolygon
+     * @param insetRectangles
+     */
+    PolygonInset._optimizeInsetPolygon = function (insetPolygon, insetRectangles) {
+        // Locate edge that can be removed:
+        var earEdgeIndex = -1;
+        var maxLimit = insetPolygon.vertices.length;
+        var i = 0;
+        while (i++ < maxLimit &&
+            insetPolygon.vertices.length > 3 &&
+            (earEdgeIndex = PolygonInset._locateExcessiveEarEdge(insetPolygon, insetRectangles)) != -1) {
+            // console.log("REMOVE EAR EDGE", earEdgeIndex);
+            // As this is an ear edge: don't just remove the vertex.
+            //   i) Remove the vertex and calculate the new intersection point of neighbour edges.
+            //  ii) Update neightbour rectangles
+            var leftEdge = insetPolygon.getEdgeAt(earEdgeIndex - 2);
+            var rightEdge = insetPolygon.getEdgeAt(earEdgeIndex + 1);
+            var newIntersection = leftEdge.intersection(rightEdge);
+            newIntersection && rightEdge.a.set(newIntersection);
+            // Update rectangles
+            // ...
+            insetPolygon.vertices.splice(earEdgeIndex, 1);
+            insetRectangles.splice(earEdgeIndex, 1);
+        }
+        // TODO remove if not -1
+    };
+    PolygonInset._locateExcessiveEarEdge = function (insetPolygon, insetRectangles) {
+        for (var i = 0; i < insetPolygon.vertices.length; i++) {
+            var thisEdge = insetPolygon.getEdgeAt(i);
+            var leftIndex = i == 0 ? insetPolygon.vertices.length - 1 : i - 1;
+            // const rightIndex = i + 1 >= insetPolygon.vertices.length ? 0 : i + 1;
+            var leftRect = insetRectangles[leftIndex];
+            // const rightRect = insetRectangles[rightIndex];
+            var leftRectContainsThisEdge = PolygonInset._rectangleFullyContainsLine(leftRect, thisEdge);
+            if (leftRectContainsThisEdge) {
+                return i;
+            }
+            var leftEdge = insetPolygon.getEdgeAt(leftIndex);
+            var thisRect = insetRectangles[i];
+            var thisRectContainsLeftEdge = PolygonInset._rectangleFullyContainsLine(thisRect, leftEdge);
+            if (thisRectContainsLeftEdge) {
+                return i; // leftIndex;
+            }
+        }
+        return -1;
+    };
+    // Pre: rectangle.vertices.length === 4
+    PolygonInset._rectangleFullyContainsLine = function (rectangle, edge) {
+        var rectWidth = rectangle.getEdgeAt(0).length();
+        var rectHeight = rectangle.getEdgeAt(1).length();
+        // Both line corners must be at least 1% within the rectangle limits.
+        var eps = Math.min(rectWidth, rectHeight) / 100;
+        var edgeLen = edge.length();
+        var epsPointA = edge.vertAt(0.01); // edgeLen * eps);
+        var epsPointB = edge.vertAt(0.99); // 1.0 - edgeLen * eps);
+        var centerPoint = edge.vertAt(0.5);
+        return rectangle.containsVerts([epsPointA, epsPointB, centerPoint]);
+    };
+    /**
+     * For simplification I'm using a callback generator function here.
+     *
+     * @param splitPolyVerts
+     * @param eps
+     * @param _splitPolyIndex
+     * @returns {Function} The callback for an `Array.some` parameter.
+     */
+    PolygonInset._hasIntersectionCallback = function (splitPolyVerts, eps, _splitPolyIndex) {
+        return function (rectanglePoly, _rectanglePolyIndex) {
+            // const intersectionVerts: XYCoords[] = sutherlandHodgman(splitPolyVerts, rectanglePoly.vertices);
+            var intersectionVerts = (0, sutherlandHodgman_1.sutherlandHodgman)(rectanglePoly.vertices, splitPolyVerts);
+            // var intersection = GreinerHorman.intersection(sourcePolygon.vertices, clipPolygon.vertices);
+            // const uniqueIntersectionVerts = clearDuplicateVertices(intersectionVerts);
+            var intersectionAreaSize = Polygon_1.Polygon.utils.area(intersectionVerts);
+            if (intersectionAreaSize < 0) {
+                console.warn("%cFound a polygon split with negative area. Counterclockwise against all odds?", "color: red; background: black;", //  font-size: 30px",
+                "intersectionAreaSize", intersectionAreaSize, "_splitPolyIndex", _splitPolyIndex, "_rectanglePolyIndex", _rectanglePolyIndex, "intersectionVerts", intersectionVerts
+                // "uniqueIntersectionVerts",
+                // uniqueIntersectionVerts
+                );
+            }
+            // if (intersectionAreaSize >= eps) {
+            //   console.log(
+            //     "%cFound a polygon split for removal",
+            //     "color: orange; background: grey;", //  font-size: 30px",
+            //     "intersectionAreaSize",
+            //     intersectionAreaSize,
+            //     "_splitPolyIndex",
+            //     _splitPolyIndex,
+            //     "_rectanglePolyIndex",
+            //     _rectanglePolyIndex,
+            //     "intersectionVerts",
+            //     intersectionVerts
+            //     // "uniqueIntersectionVerts",
+            //     // uniqueIntersectionVerts
+            //   );
+            // }
+            // if (intersectionAreaSize < eps) {
+            //   // console.log("%cHello", "color: green; background: yellow; font-size: 30px");
+            //   console.log(
+            //     "Polygon split can be kept. Area is position but below epsilon.",
+            //     "intersectionAreaSize",
+            //     intersectionAreaSize,
+            //     "_splitPolyIndex",
+            //     _splitPolyIndex,
+            //     "_rectanglePolyIndex",
+            //     _rectanglePolyIndex,
+            //     "intersectionVerts",
+            //     intersectionVerts
+            //     // "uniqueIntersectionVerts",
+            //     // uniqueIntersectionVerts
+            //   );
+            // }
+            return intersectionAreaSize >= eps;
+        };
     };
     return PolygonInset;
 }());

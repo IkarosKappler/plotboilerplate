@@ -40,6 +40,7 @@
       pointCount: params.getNumber("pointCount", 8),
       innerPolygonOffset: params.getNumber("innerPolygonOffset", 45), // px
       intersectionEpsilon: params.getNumber("intersectionEpsilon", 1.0), // square pixels
+      removeEars: params.getBoolean("removeEars", false),
       drawVertexNumbers: params.getBoolean("drawVertexNumbers", false),
       drawPolygonInsetLines: params.getBoolean("drawPolygonInsetLines", true),
       drawUnfilteredSplitPolygons: params.getBoolean("drawUnfilteredSplitPolygons", false),
@@ -151,11 +152,13 @@
         }
       }
 
+      // Draw rectangles.
       for (var i = 0; i < polygonInset.insetRectanglePolygons.length; i++) {
         var rectPolygon = polygonInset.insetRectanglePolygons[i];
         fill.polygon(rectPolygon, "rgba(192,192,192,0.25)");
       }
 
+      // Draw the final result: the inset polygon!
       for (var i = 0; i <= polygonInset.insetPolygon.vertices.length; i++) {
         draw.line(polygonInset.insetPolygon.getVertexAt(i), polygonInset.insetPolygon.getVertexAt(i + 1), "rgba(255,0,0,0.5)", 4);
       }
@@ -207,7 +210,8 @@
       polygonInset.computeOutputPolygons({
         innerPolygonOffset: config.innerPolygonOffset,
         maxPolygonSplitDepth: maxPolygonSplitDepth,
-        intersectionEpsilon: config.intersectionEpsilon
+        intersectionEpsilon: config.intersectionEpsilon,
+        removeEars: config.removeEars
       });
 
       // Update stats
@@ -268,6 +272,9 @@
       .onChange( function() { rebuildPolygonInset() });
       // prettier-ignore
       gui.add(config, "intersectionEpsilon").min(0.0).max(100.0).step(1.0).name("intersectionEpsilon").title("Draw all (unfiltered) split polygons?")
+      .onChange( function() { rebuildPolygonInset() });
+      // prettier-ignore
+      gui.add(config, "removeEars").name("removeEars").title("Remove all ear edges from raw inset polygon?")
       .onChange( function() { rebuildPolygonInset() });
       // prettier-ignore
       gui.add(config, "drawVertexNumbers").name("drawVertexNumbers").title("Check to toggle vertex number on/off")

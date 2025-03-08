@@ -43,6 +43,7 @@
       verticalCount: params.getNumber("verticalCount", 10),
       horizontalCount: params.getNumber("horizontalCount", 10),
       useInsetPolygonScaling: params.getBoolean("useInsetPolygonScaling", true),
+      insetRemoveEars: params.getBoolean("insetRemoveEars", false),
       colinearityTolerance: params.getNumber("colinearityTolerance", 1000.0),
       // p6m: "hexagon" | p4m: "square" (default)
       baseShape: params.getString("baseShape", BASE_SHAPE_OPTIONS.p4m),
@@ -70,8 +71,40 @@
     var vertE = null; // Vertex (Hexagon only)
     var vertF = null; // Vertex (Hexagon only)
     var editableCellPolygon = null; // EditableCellPolygon
+    var cellInsetPolygons = []; // Array<Polygon[]>
 
     var viewport = pb.viewport();
+
+    var rebuildInsetPolygons = function (polygon) {
+      cellInsetPolygons = [];
+      if (config.fillRecursive) {
+        var n = config.fillIterationCount;
+        var tmpPoly = polygon.clone();
+        for (var i = 0; i < n; i++) {
+          var n = config.fillIterationCount;
+          var poylgonDiameter = getPolygonDiameter(polygon);
+          var polygonInset = new PolygonInset(polygon.elimitateColinearEdges(config.colinearityTolerance)); // 1000.0);
+          var polygonInsetStep = poylgonDiameter / n;
+          // Compute the polygon inset.
+          // This value definitely returns enough split polygons
+          var maxPolygonSplitDepth = config.pointCount;
+          // console.log("polygonOffset", i * polygonInsetStep);
+          // Array<Vertex[]>
+          // var scalingFactor = config.fillType === "linear" ? i * polygonInsetStep : polygonInsetStep / Math.pow(0.75, i);
+          var scalingFactor = (i * polygonInsetStep) / 2;
+          var insetPolygons = polygonInset.computeOutputPolygons({
+            innerPolygonOffset: scalingFactor,
+            maxPolygonSplitDepth: maxPolygonSplitDepth,
+            intersectionEpsilon: 1.0, // config.intersectionEpsilon
+            removeEars: config.insetRemoveEars
+          });
+          cellInsetPolygons.push(insetPolygons);
+        }
+      } else {
+        cellInsetPolygons.push([polygon.clone()]);
+      }
+      console.log("cellInsetPolygons.length", cellInsetPolygons.length);
+    };
 
     // +---------------------------------------------------------------------------------
     // | Init the SQUARE pattern.
@@ -100,9 +133,16 @@
       if (editableCellPolygon != null) {
         editableCellPolygon.destroy();
       }
-      editableCellPolygon = new EditableCellPolygon(pb, rectCellPolygon, {});
+      editableCellPolygon = new EditableCellPolygon(pb, rectCellPolygon, handlePolygonChanged);
       pb.removeAll();
       pb.add(editableCellPolygon.polygon);
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Called from the EditableCellPolygon whenever the polygon changes (in any way).
+    // +-------------------------------
+    var handlePolygonChanged = function () {
+      rebuildInsetPolygons(editableCellPolygon.polygon);
     };
 
     // +---------------------------------------------------------------------------------
@@ -236,8 +276,12 @@
           if (isSimpleScale) {
             fillSimpleScale(draw, fill, polygon, tmpPoly, i, color);
           } else {
-            fillInsetScale(draw, fill, polygon, tmpPoly, i, color);
+            // This is done during cell construction for performance reasons.
+            // fillInsetScale(draw, fill, polygon, tmpPoly, i, color);
           }
+        }
+        if (!isSimpleScale) {
+          fillInsetScale(draw, fill);
         }
       }
     };
@@ -260,7 +304,7 @@
       }
     };
 
-    var fillInsetScale = function (draw, fill, polygon, tmpPoly, i, color) {
+    var __fillInsetScale = function (draw, fill, polygon, tmpPoly, i, color) {
       var n = config.fillIterationCount;
       var poylgonDiameter = getPolygonDiameter(polygon);
       var polygonInset = new PolygonInset(polygon.elimitateColinearEdges(config.colinearityTolerance)); // 1000.0);
@@ -274,8 +318,9 @@
       var scalingFactor = (i * polygonInsetStep) / 2;
       var insetPolygons = polygonInset.computeOutputPolygons({
         innerPolygonOffset: scalingFactor,
-        maxPolygonSplitDepth: maxPolygonSplitDepth
-        // intersectionEpsilon: config.intersectionEpsilon
+        maxPolygonSplitDepth: maxPolygonSplitDepth,
+        intersectionEpsilon: 1.0, // config.intersectionEpsilon
+        removeEars: true
       });
       for (var p = 0; p < insetPolygons.length; p++) {
         var polyVerts = insetPolygons[p];
@@ -284,6 +329,22 @@
         }
         if (config.drawInnerOutlines) {
           draw.polyline(polyVerts, false, "grey", 1);
+        }
+      }
+    };
+
+    var fillInsetScale = function (draw, fill) {
+      for (var i = 0; i < cellInsetPolygons.length; i++) {
+        var color = randomWebColor(i + 1, config.colorSet, 1.0);
+        var insetPolygons = cellInsetPolygons[i];
+        for (var p = 0; p < insetPolygons.length; p++) {
+          var polyVerts = insetPolygons[p];
+          if (config.useColors) {
+            fill.polyline(polyVerts, false, color, 1);
+          }
+          if (config.drawInnerOutlines) {
+            draw.polyline(polyVerts, false, "grey", 1);
+          }
         }
       }
     };
@@ -297,27 +358,33 @@
       var differenceBFromOriginal = originalRectCellPolygon.getVertexAt(1).difference(rectCellBaseVertices[1]).inv();
       var differenceCFromOriginal = originalRectCellPolygon.getVertexAt(2).difference(rectCellBaseVertices[2]).inv();
 
-      drawCell(draw, fill, tempPolyA);
+      var offset = { x: 0, y: 0 };
+
+      drawCell(draw, fill, tempPolyA, offset);
 
       // Draw the center spur
-      fillVerticalSquarePattern(draw, fill, tempPolyA, differenceAFromOriginal, differenceCFromOriginal);
+      fillVerticalSquarePattern(draw, fill, tempPolyA, differenceAFromOriginal, differenceCFromOriginal, offset);
 
       // Fill the left area
       for (var x = 0; x < config.horizontalCount / 2 - 1; x++) {
+        offset.x += cellBounds.width;
+        offset.y += differenceAFromOriginal.y - differenceBFromOriginal.y;
         tempPolyA.move({ x: cellBounds.width, y: 0 });
         tempPolyA.move({ x: 0, y: differenceAFromOriginal.y - differenceBFromOriginal.y });
         // draw.polygon(tempPolyA, "grey", 1);
-        drawCell(draw, fill, tempPolyA);
-        fillVerticalSquarePattern(draw, fill, tempPolyA, differenceAFromOriginal, differenceCFromOriginal);
+        drawCell(draw, fill, tempPolyA, offset);
+        fillVerticalSquarePattern(draw, fill, tempPolyA, differenceAFromOriginal, differenceCFromOriginal, offset);
       }
       // Fill the right area
       tempPolyA = editableCellPolygon.polygon.clone();
       for (var x = 0; x < config.horizontalCount / 2 - 1; x++) {
+        offset.x -= cellBounds.width;
+        offset.y -= differenceAFromOriginal.y + differenceBFromOriginal.y;
         tempPolyA.move({ x: -cellBounds.width, y: 0 });
         tempPolyA.move({ x: 0, y: -differenceAFromOriginal.y + differenceBFromOriginal.y });
         // draw.polygon(tempPolyA, "grey", 1);
-        drawCell(draw, fill, tempPolyA);
-        fillVerticalSquarePattern(draw, fill, tempPolyA, differenceAFromOriginal, differenceCFromOriginal);
+        drawCell(draw, fill, tempPolyA, offset);
+        fillVerticalSquarePattern(draw, fill, tempPolyA, differenceAFromOriginal, differenceCFromOriginal, offset);
       }
     };
 
@@ -325,14 +392,14 @@
     // | Fills a vertical section with n elements to the upper and n elements to
     // | the lower direction.
     // +-------------------------------
-    var fillVerticalSquarePattern = function (draw, fill, tempPolyA, differenceAFromOriginal, differenceCFromOriginal) {
+    var fillVerticalSquarePattern = function (draw, fill, tempPolyA, differenceAFromOriginal, differenceCFromOriginal, offset) {
       var tempPolyB = tempPolyA.clone();
       // Generate row up
       for (var y = 0; y < config.verticalCount / 2 - 1; y++) {
         tempPolyB.move({ x: 0, y: cellBounds.height });
         tempPolyB.move({ x: differenceAFromOriginal.x - differenceCFromOriginal.x, y: 0 });
         // draw.polygon(tempPolyB, "grey", 1);
-        drawCell(draw, fill, tempPolyB);
+        drawCell(draw, fill, tempPolyB, offset);
       }
       tempPolyB = tempPolyA.clone();
       // Generate row down
@@ -340,7 +407,7 @@
         tempPolyB.move({ x: 0, y: -cellBounds.height });
         tempPolyB.move({ x: -differenceAFromOriginal.x + differenceCFromOriginal.x, y: 0 });
         draw.polygon(tempPolyB, "grey", 1);
-        drawCell(draw, fill, tempPolyB);
+        drawCell(draw, fill, tempPolyB, offset);
       }
     };
 
@@ -395,6 +462,7 @@
     // | Just rebuilds the pattern on changes.
     // +-------------------------------
     var rebuild = function () {
+      rebuildInsetPolygons(editableCellPolygon.polygon);
       pb.redraw();
     };
 
@@ -411,6 +479,9 @@
       .onChange( function() { rebuild(); });
       // prettier-ignore
       gui.add(config, "useInsetPolygonScaling").name("useInsetPolygonScaling").title("Use inset scaling (bad performance) or simple linear scaling (quick but ugly)")
+      .onChange( function() { rebuild(); });
+      // prettier-ignore
+      gui.add(config, "insetRemoveEars").name("insetRemoveEars (experimental)").title("(Experimental feature) Remove excessive polygon ears before insetting.")
       .onChange( function() { rebuild(); });
       // prettier-ignore
       gui.add(config, "colinearityTolerance").min(0.0).max(10000.0).step(0.1).name("colinearityTolerance").title("The tolerance for deleting co-linear edges.")
@@ -445,6 +516,7 @@
     }
 
     pb.config.preDraw = preDraw;
-    pb.redraw();
+    // pb.redraw();
+    rebuild();
   });
 })(globalThis);

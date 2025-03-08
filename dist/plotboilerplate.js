@@ -6533,7 +6533,8 @@ exports["default"] = PlotBoilerplate;
  * @modified 2024-10-12 Added the `getEdgeAt` method.
  * @modified 2024-10-30 Added the `getEdges` method.
  * @modified 2024-12-02 Added the `elimitateColinearEdges` method.
- * @version 1.13.0
+ * @modified 2025-02-12 Added the `containsVerts` method to test multiple vertices for containment.
+ * @version 1.14.0
  *
  * @file Polygon
  * @public
@@ -6738,7 +6739,7 @@ var Polygon = /** @class */ (function () {
      *    https://stackoverflow.com/questions/22521982/check-if-point-inside-a-polygon
      *
      * @method containsVert
-     * @param {XYCoords} vert - The vertex to check. The new x-component.
+     * @param {XYCoords} vert - The vertex to check.
      * @return {boolean} True if the passed vertex is inside this polygon. The polygon is considered closed.
      * @instance
      * @memberof Polygon
@@ -6755,6 +6756,21 @@ var Polygon = /** @class */ (function () {
                 inside = !inside;
         }
         return inside;
+    };
+    /**
+     * Check if all given vertices are inside this polygon.<br>
+     * <br>
+     * This method just uses the `Polygon.containsVert` method.
+     *
+     * @method containsVerts
+     * @param {XYCoords[]} verts - The vertices to check.
+     * @return {boolean} True if all passed vertices are inside this polygon. The polygon is considered closed.
+     * @instance
+     * @memberof Polygon
+     **/
+    Polygon.prototype.containsVerts = function (verts) {
+        var _this = this;
+        return verts.every(function (vert) { return _this.containsVert(vert); });
     };
     /**
      * Check if the passed polygon is completly contained inside this polygon.

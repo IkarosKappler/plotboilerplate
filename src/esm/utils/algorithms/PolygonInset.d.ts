@@ -25,12 +25,17 @@ export interface IPolygonInsetOptions {
     innerPolygonOffset: number;
     maxPolygonSplitDepth?: number;
     intersectionEpsilon?: number;
+    removeEars?: boolean;
 }
 export declare class PolygonInset {
     /**
      * The polygon to work with.
      */
     readonly polygon: Polygon;
+    /**
+     * The input polygon, but without ear edges.
+     */
+    optimizedPolygon: Polygon;
     /**
      * The original polygon as a sequence of line objects. This is easier to use than a list of points.
      */
@@ -123,6 +128,19 @@ export declare class PolygonInset {
      */
     private static convertToBasicInsetPolygon;
     /**
+     * Optimize the inset polygon by removing critical `ear` edges.
+     * Such an is identified by: the edge itself is completely located inside its neighbours inset rectangle.
+     *
+     * In this process multiple edges from the ear might be dropped and two adjacent edges get a new
+     * common intersection point.
+     *
+     * @param insetPolygon
+     * @param insetRectangles
+     */
+    private static _optimizeInsetPolygon;
+    private static _locateExcessiveEarEdge;
+    private static _rectangleFullyContainsLine;
+    /**
      * Filter split polygons: only keep those whose vertices are all contained inside the original polygon.
      * Reason: scaling too much will result in excessive translation beyond the opposite bounds of the polygon (like more than 200% of possible insetting).
      *
@@ -140,6 +158,25 @@ export declare class PolygonInset {
      * @param {number?=1.0} intersectionEpsilon - (optional, default is 1.0) A epsislon to define a tolerance for checking if two polygons intersect.
      */
     private static _filterInnerSplitPolygonsByCoverage;
+    /**
+     * This private method will reverse each polygon's vertex order that's not clockwise.
+     *
+     * @param {Array<Vertex[]>} polygons
+     */
     private static _assertAllPolygonsAreClockwise;
+    /**
+     * This private method will revert the vertex order if the polygon is not clockwise.
+     *
+     * @param {Vertex[]} polygonVerts
+     */
     private static _assertPolygonIsClockwise;
+    /**
+     * For simplification I'm using a callback generator function here.
+     *
+     * @param splitPolyVerts
+     * @param eps
+     * @param _splitPolyIndex
+     * @returns {Function} The callback for an `Array.some` parameter.
+     */
+    private static _hasIntersectionCallback;
 }
