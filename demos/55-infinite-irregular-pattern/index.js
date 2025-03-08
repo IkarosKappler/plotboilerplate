@@ -251,7 +251,7 @@
         var color = randomWebColor(0, config.colorSet, 1.0);
         fill.polygon(polygon, color, 1);
       }
-      var isSimpleScale = false;
+      var isSimpleScale = !config.useInsetPolygonScaling;
       if (config.drawOutline) {
         draw.polygon(polygon, "grey", 1);
       }
