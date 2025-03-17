@@ -1,6 +1,8 @@
 /**
  * @requires lil-gui
  *
+ * @DEPRECATED Use /src/ts/utils/dom/guiSizeToggler.ts instead
+ *
  * @author   Ikaros Kappler
  * @date     2021-12-13
  * @modified 2022-01-10

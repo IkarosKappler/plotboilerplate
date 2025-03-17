@@ -3,7 +3,10 @@
  * @author   Ikaros Kappler
  * @date     2019-02-03
  * @modified 2021-03-01 Added `wrapMax` function.
- * @version  1.1.0
+ * @modified 2024-11-15 Adding helper function `geomutils.mapAngleTo2PI(number)` for mapping any value into the interval [0,2*PI).
+ * @modified 2024-11-22 Adding helper function `geomutils.dotProduct(number)` for calculating the dot product of two vertices (as vectors).
+ *
+ * @version  1.2.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.geomutils = void 0;
@@ -15,6 +18,49 @@ var Triangle_1 = require("./Triangle");
  * @global
  **/
 exports.geomutils = {
+    /**
+     * Map any angle (any numeric value) to [0, Math.PI).
+     *
+     * @param {number} angle - The numeric value to map.
+     * @return {number} The mapped angle inside [0,PI*2].
+     **/
+    mapAngleTo2PI: function (angle) {
+        // Source: https://forums.codeguru.com/showthread.php?384172-get-angle-into-range-0-2*pi
+        var new_angle = Math.asin(Math.sin(angle));
+        if (Math.cos(angle) < 0) {
+            return Math.PI - new_angle;
+        }
+        else if (new_angle < 0) {
+            return new_angle + 2 * Math.PI;
+        }
+        else {
+            return new_angle;
+        }
+    },
+    /**
+     * Calculate the euclidean distance between two points given by four coordinates (two coordinates each).
+     *
+     * @param {number} x1
+     * @param {number} y1
+     * @param {number} x2
+     * @param {number} y2
+     * @returns {number}
+     */
+    dist4: function (x1, y1, x2, y2) {
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y1 - y2, 2));
+    },
+    /**
+     * Map any angle (any numeric value) to [0, Math.PI).
+     *
+     * A × B := (A.x * B.x) + (A.y * B.y)
+     *
+     * @param {XYCoords} vertA - The first vertex.
+     * @param {XYCoords} vertB - The second vertex.
+     * @return {number} The dot product of the two vertices.
+     **/
+    dotProduct: function (vertA, vertB) {
+        return vertA.x * vertB.x + vertA.y * vertB.y;
+    },
     /**
      * Compute the n-section of the angle – described as a triangle (A,B,C) – in point A.
      *

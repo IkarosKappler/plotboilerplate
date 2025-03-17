@@ -22,7 +22,9 @@
  * @modified  2021-01-22 Always updating circumcircle when retieving it.
  * @modified  2022-02-02 Added the `destroy` method.
  * @modified  2022-02-02 Cleared the `Triangle.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version   2.6.0
+ * @modified  2024-11-22 Added static utility function Triangle.utils.determinant; adapted method `determinant`.
+ * @modified  2024-11-22 Changing visibility of `Triangle.utils` from `private` to `public`.
+ * @version   2.8.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -284,7 +286,8 @@ var Triangle = /** @class */ (function () {
      */
     Triangle.prototype.determinant = function () {
         // (b.y - a.y)*(c.x - b.x) - (c.y - b.y)*(b.x - a.x);
-        return (this.b.y - this.a.y) * (this.c.x - this.b.x) - (this.c.y - this.b.y) * (this.b.x - this.a.x);
+        // return (this.b.y - this.a.y) * (this.c.x - this.b.x) - (this.c.y - this.b.y) * (this.b.x - this.a.x);
+        return Triangle.utils.determinant(this.a, this.b, this.c);
     };
     /**
      * Checks if the passed vertex (p) is inside this triangle.
@@ -397,6 +400,16 @@ var Triangle = /** @class */ (function () {
             var s = (1 / (2 * area)) * (p0y * p2x - p0x * p2y + (p2y - p0y) * px + (p0x - p2x) * py);
             var t = (1 / (2 * area)) * (p0x * p1y - p0y * p1x + (p0y - p1y) * px + (p1x - p0x) * py);
             return s > 0 && t > 0 && 1 - s - t > 0;
+        },
+        /**
+         * Calculate the determinant of the three vertices a, b and c (in this order).
+         * @param {XYCords} a - The first vertex.
+         * @param {XYCords} b - The first vertex.
+         * @param {XYCords} c - The first vertex.
+         * @returns {nmber}
+         */
+        determinant: function (a, b, c) {
+            return (b.y - a.y) * (c.x - b.x) - (c.y - b.y) * (b.x - a.x);
         }
     };
     return Triangle;

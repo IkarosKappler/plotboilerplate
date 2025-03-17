@@ -13,6 +13,7 @@
 
   // Fetch the GET params
   let GUP = {}; // gup();
+  var isDarkmode = detectDarkMode(GUP);
 
   window.addEventListener("load", function () {
     // All config params are optional.

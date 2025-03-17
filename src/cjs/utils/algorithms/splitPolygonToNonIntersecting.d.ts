@@ -5,7 +5,8 @@
  * @author   Ikaros Kappler
  * @date     2020-12-04
  * @modified 2020-12-07 Ported from vanilla JS to typescript.
- * @version  1.0.1
+ * @modified 2024-11-22 Added the `insideBoundsOnly` param to the `splitPolygonToNonIntersecting` algorithm.
+ * @version  1.1.0
  */
 import { Vertex } from "../../Vertex";
 /**
@@ -24,4 +25,4 @@ import { Vertex } from "../../Vertex";
  * @param {number=10} maxDepth - Number of max recursive steps (default is 10).
  * @return {Array<Array<Vertex>>} A sequence of non-self-intersecting sub polygons.
  */
-export declare const splitPolygonToNonIntersecting: (vertices: Array<Vertex>, maxDepth?: number) => Array<Array<Vertex>>;
+export declare const splitPolygonToNonIntersecting: (vertices: Array<Vertex>, maxDepth?: number, insideBoundsOnly?: boolean) => Array<Array<Vertex>>;

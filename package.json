@@ -25,7 +25,8 @@
     "webpack-dev": "npx webpack --mode development --config ./webpack5-dev.config.js",
     "rollup-module": "npx rollup -c",
     "tslint": "npx eslint ./src/ts/",
-    "start-python-server": "python3 -m http.server 8000"
+    "start-python-server": "python3 -m http.server 8000",
+    "serve": "npm run start-python-server"
   },
   "repository": {
     "type": "git",
@@ -93,6 +94,7 @@
   },
   "dependencies": {
     "alloyfinger-typescript": "^0.1.19",
+    "greiner-hormann-typescript": "^1.4.1",
     "lil-gui": "^0.19.2",
     "path2d-polyfill": "^1.1.0"
   }

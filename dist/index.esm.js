@@ -330,6 +330,946 @@ class VertexListeners {
 
 /**
  * @author   Ikaros Kappler
+ * @date     2019-01-30
+ * @modified 2019-02-23 Added the toSVGString function, overriding Line.toSVGString.
+ * @modified 2019-03-20 Added JSDoc tags.
+ * @modified 2019-04-19 Added the clone function (overriding Line.clone()).
+ * @modified 2019-09-02 Added the Vector.perp() function.
+ * @modified 2019-09-02 Added the Vector.inverse() function.
+ * @modified 2019-12-04 Added the Vector.inv() function.
+ * @modified 2020-03-23 Ported to Typescript from JS.
+ * @modified 2021-01-20 Added UID.
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `Vector.toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @modified 2022-10-25 Added the `getOrthogonal` method.
+ * @version  1.5.0
+ *
+ * @file Vector
+ * @public
+ **/
+/**
+ * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
+ *            <br>
+ *            Vectors are drawn with an arrow at their end point.<br>
+ *            <b>The Vector class extends the Line class.</b>
+ *
+ * @requires VertTuple
+ * @requires Vertex
+ **/
+class Vector extends VertTuple {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name Vector
+     * @extends Line
+     * @param {Vertex} vertA - The start vertex of the vector.
+     * @param {Vertex} vertB - The end vertex of the vector.
+     **/
+    constructor(vertA, vertB) {
+        super(vertA, vertB, (a, b) => new Vector(a, b));
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "Vector";
+    }
+    /**
+     * Get the perpendicular of this vector which is located at a.
+     *
+     * @param {Number} t The position on the vector.
+     * @return {Vector} A new vector being the perpendicular of this vector sitting on a.
+     **/
+    perp() {
+        var v = this.clone();
+        v.sub(this.a);
+        v = new Vector(new Vertex(), new Vertex(-v.b.y, v.b.x));
+        v.a.add(this.a);
+        v.b.add(this.a);
+        return v;
+    }
+    /**
+     * The inverse of a vector is a vector with the same magnitude but oppose direction.
+     *
+     * Please not that the origin of this vector changes here: a->b becomes b->a.
+     *
+     * @return {Vector}
+     **/
+    inverse() {
+        var tmp = this.a;
+        this.a = this.b;
+        this.b = tmp;
+        return this;
+    }
+    /**
+     * This function computes the inverse of the vector, which means 'a' stays untouched.
+     *
+     * @return {Vector} this for chaining.
+     **/
+    inv() {
+        this.b.x = this.a.x - (this.b.x - this.a.x);
+        this.b.y = this.a.y - (this.b.y - this.a.y);
+        return this;
+    }
+    /**
+     * Get the intersection if this vector and the specified vector.
+     *
+     * @method intersection
+     * @param {Vector} line The second vector.
+     * @return {Vertex} The intersection (may lie outside the end-points).
+     * @instance
+     * @memberof Line
+     **/
+    intersection(line) {
+        var denominator = this.denominator(line);
+        if (denominator == 0)
+            return null;
+        var a = this.a.y - line.a.y;
+        var b = this.a.x - line.a.x;
+        var numerator1 = (line.b.x - line.a.x) * a - (line.b.y - line.a.y) * b;
+        var numerator2 = (this.b.x - this.a.x) * a - (this.b.y - this.a.y) * b;
+        a = numerator1 / denominator; // NaN if parallel lines
+        b = numerator2 / denominator;
+        // TODO:
+        // FOR A VECTOR THE LINE-INTERSECTION MUST BE ON BOTH VECTORS
+        // if we cast these lines infinitely in both directions, they intersect here:
+        return new Vertex(this.a.x + a * (this.b.x - this.a.x), this.a.y + a * (this.b.y - this.a.y));
+    }
+    /**
+     * Get the orthogonal "vector" of this vector (rotated by 90° clockwise).
+     *
+     * @name getOrthogonal
+     * @method getOrthogonal
+     * @return {Vector} A new vector with the same length that stands on this vector's point a.
+     * @instance
+     * @memberof Vector
+     **/
+    getOrthogonal() {
+        // Orthogonal of vector (0,0)->(x,y) is (0,0)->(-y,x)
+        const linePoint = this.a.clone();
+        const startPoint = this.b.clone().sub(this.a);
+        const tmp = startPoint.x;
+        startPoint.x = -startPoint.y;
+        startPoint.y = tmp;
+        return new Vector(linePoint, startPoint.add(this.a));
+    }
+}
+Vector.utils = {
+    /**
+     * Generate a four-point arrow head, starting at the vector end minus the
+     * arrow head length.
+     *
+     * The first vertex in the returned array is guaranteed to be the located
+     * at the vector line end minus the arrow head length.
+     *
+     *
+     * Due to performance all params are required.
+     *
+     * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
+     * scaling different). Arrow heads should not look distored on non-uniform scaling.
+     *
+     * If unsure use 1.0 for scaleX and scaleY (=no distortion).
+     * For headlen use 8, it's a good arrow head size.
+     *
+     * Example:
+     *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
+     *
+     * @param {XYCoords} zA - The start vertex of the vector to calculate the arrow head for.
+     * @param {XYCoords} zB - The end vertex of the vector.
+     * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
+     * @param {number} scaleX  - The horizontal scaling during draw.
+     * @param {number} scaleY  - the vertical scaling during draw.
+     **/
+    buildArrowHead: (zA, zB, headlen, scaleX, scaleY) => {
+        const angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
+        const vertices = [];
+        vertices.push(new Vertex(zB.x * scaleX - headlen * Math.cos(angle), zB.y * scaleY - headlen * Math.sin(angle)));
+        vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle - Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle - Math.PI / 8)));
+        vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
+        vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle + Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle + Math.PI / 8)));
+        return vertices;
+    }
+};
+
+/**
+ * @author   Ikaros Kappler
+ * @date     2020-05-04
+ * @modified 2020-05-09 Ported to typescript.
+ * @modified 2020-05-25 Added the vertAt and tangentAt functions.
+ * @mofidied 2020-09-07 Added the circleIntersection(Circle) function.
+ * @modified 2020-09-07 Changed the vertAt function by switching sin and cos! The old version did not return the correct vertex (by angle) accoring to the assumed circle math.
+ * @modified 2020-10-16 Added the containsCircle(...) function.
+ * @modified 2021-01-20 Added UID.
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @modified 2022-08-15 Added the `containsPoint` function.
+ * @modified 2022-08-23 Added the `lineIntersection` function.
+ * @modified 2022-08-23 Added the `closestPoint` function.
+ * @version  1.4.0
+ **/
+/**
+ * @classdesc A simple circle: center point and radius.
+ *
+ * @requires Line
+ * @requires Vector
+ * @requires VertTuple
+ * @requires Vertex
+ * @requires SVGSerializale
+ * @requires UID
+ * @requires UIDGenerator
+ **/
+class Circle {
+    /**
+     * Create a new circle with given center point and radius.
+     *
+     * @constructor
+     * @name Circle
+     * @param {Vertex} center - The center point of the circle.
+     * @param {number} radius - The radius of the circle.
+     */
+    constructor(center, radius) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "Circle";
+        this.uid = UIDGenerator.next();
+        this.center = center;
+        this.radius = radius;
+    }
+    /**
+     * Check if the given circle is fully contained inside this circle.
+     *
+     * @method containsPoint
+     * @param {XYCoords} point - The point to check if it is contained in this circle.
+     * @instance
+     * @memberof Circle
+     * @return {boolean} `true` if the given point is inside this circle.
+     */
+    containsPoint(point) {
+        return this.center.distance(point) < this.radius;
+    }
+    /**
+     * Check if the given circle is fully contained inside this circle.
+     *
+     * @method containsCircle
+     * @param {Circle} circle - The circle to check if it is contained in this circle.
+     * @instance
+     * @memberof Circle
+     * @return {boolean} `true` if any only if the given circle is completely inside this circle.
+     */
+    containsCircle(circle) {
+        return this.center.distance(circle.center) + circle.radius < this.radius;
+    }
+    /**
+     * Calculate the distance from this circle to the given line.
+     *
+     * * If the line does not intersect this ciecle then the returned
+     *   value will be the minimal distance.
+     * * If the line goes through this circle then the returned value
+     *   will be max inner distance and it will be negative.
+     *
+     * @method lineDistance
+     * @param {Line} line - The line to measure the distance to.
+     * @return {number} The minimal distance from the outline of this circle to the given line.
+     * @instance
+     * @memberof Circle
+     */
+    lineDistance(line) {
+        const closestPointOnLine = line.getClosestPoint(this.center);
+        return closestPointOnLine.distance(this.center) - this.radius;
+    }
+    /**
+     * Get the vertex on the this circle for the given angle.
+     *
+     * @method vertAt
+     * @param {number} angle - The angle (in radians) to use.
+     * @return {Vertex} The vertex (point) at the given angle.
+     * @instance
+     * @memberof Circle
+     **/
+    vertAt(angle) {
+        // Find the point on the circle respective the angle. Then move relative to center.
+        return Circle.circleUtils.vertAt(angle, this.radius).add(this.center);
+    }
+    /**
+     * Get a tangent line of this circle for a given angle.
+     *
+     * Point a of the returned line is located on the circle, the length equals the radius.
+     *
+     * @method tangentAt
+     * @instance
+     * @param {number} angle - The angle (in radians) to use.
+     * @return {Line} The tangent line.
+     * @memberof Circle
+     **/
+    tangentAt(angle) {
+        const pointA = Circle.circleUtils.vertAt(angle, this.radius);
+        // Construct the perpendicular of the line in point a. Then move relative to center.
+        return new Vector(pointA, new Vertex(0, 0)).add(this.center).perp();
+    }
+    /**
+     * Calculate the intersection points (if exists) with the given circle.
+     *
+     * @method circleIntersection
+     * @instance
+     * @memberof Circle
+     * @param {Circle} circle
+     * @return {Line|null} The intersection points (as a line) or null if the two circles do not intersect.
+     **/
+    circleIntersection(circle) {
+        // Circles do not intersect at all?
+        if (this.center.distance(circle.center) > this.radius + circle.radius) {
+            return null;
+        }
+        // One circle is fully inside the other?
+        if (this.center.distance(circle.center) < Math.abs(this.radius - circle.radius)) {
+            return null;
+        }
+        // Based on the C++ implementation by Robert King
+        //    https://stackoverflow.com/questions/3349125/circle-circle-intersection-points
+        // and the 'Circles and spheres' article by Paul Bourke.
+        //    http://paulbourke.net/geometry/circlesphere/
+        //
+        // This is the original C++ implementation:
+        //
+        // pair<Point, Point> intersections(Circle c) {
+        //    Point P0(x, y);
+        //    Point P1(c.x, c.y);
+        //    float d, a, h;
+        //    d = P0.distance(P1);
+        //    a = (r*r - c.r*c.r + d*d)/(2*d);
+        //    h = sqrt(r*r - a*a);
+        //    Point P2 = P1.sub(P0).scale(a/d).add(P0);
+        //    float x3, y3, x4, y4;
+        //    x3 = P2.x + h*(P1.y - P0.y)/d;
+        //    y3 = P2.y - h*(P1.x - P0.x)/d;
+        //    x4 = P2.x - h*(P1.y - P0.y)/d;
+        //    y4 = P2.y + h*(P1.x - P0.x)/d;
+        //    return pair<Point, Point>(Point(x3, y3), Point(x4, y4));
+        // }
+        var p0 = this.center;
+        var p1 = circle.center;
+        var d = p0.distance(p1);
+        var a = (this.radius * this.radius - circle.radius * circle.radius + d * d) / (2 * d);
+        var h = Math.sqrt(this.radius * this.radius - a * a);
+        var p2 = p1.clone().scale(a / d, p0);
+        var x3 = p2.x + (h * (p1.y - p0.y)) / d;
+        var y3 = p2.y - (h * (p1.x - p0.x)) / d;
+        var x4 = p2.x - (h * (p1.y - p0.y)) / d;
+        var y4 = p2.y + (h * (p1.x - p0.x)) / d;
+        return new Line(new Vertex(x3, y3), new Vertex(x4, y4));
+    }
+    /**
+     * Calculate the intersection points (if exists) with the given infinite line (defined by two points).
+     *
+     * @method lineIntersection
+     * @instance
+     * @memberof Circle
+     * @param {Vertex} a- The first of the two points defining the line.
+     * @param {Vertex} b - The second of the two points defining the line.
+     * @return {Line|null} The intersection points (as a line) or null if this circle does not intersect the line given.
+     **/
+    lineIntersection(a, b) {
+        // Based on the math from
+        //    https://mathworld.wolfram.com/Circle-LineIntersection.html
+        const interA = new Vertex();
+        const interB = new Vertex();
+        // First do a transformation, because the calculation is based on a cicle at (0,0)
+        const transA = new Vertex(a).sub(this.center);
+        const transB = new Vertex(b).sub(this.center);
+        const diff = transA.difference(transB);
+        // There is a special case if diff.y=0, where the intersection is not calcuatable.
+        // Use an non-zero epsilon here to approximate this case.
+        // TODO for the future: find a better solution
+        if (Math.abs(diff.y) === 0) {
+            diff.y = 0.000001;
+        }
+        const dist = transA.distance(transB);
+        const det = transA.x * transB.y - transA.y * transB.x;
+        const distSquared = dist * dist;
+        const radiusSquared = this.radius * this.radius;
+        // Check if circle and line have an intersection at all
+        if (radiusSquared * distSquared - det * det < 0) {
+            return null;
+        }
+        const belowSqrt = this.radius * this.radius * dist * dist - det * det;
+        const sqrt = Math.sqrt(belowSqrt);
+        interA.x = (det * diff.y + Math.sign(diff.y) * diff.x * sqrt) / distSquared;
+        interB.x = (det * diff.y - Math.sign(diff.y) * diff.x * sqrt) / distSquared;
+        interA.y = (-det * diff.x + Math.abs(diff.y) * sqrt) / distSquared;
+        interB.y = (-det * diff.x - Math.abs(diff.y) * sqrt) / distSquared;
+        return new Line(interA.add(this.center), interB.add(this.center));
+        // return new Line(interA, interB);
+    }
+    /**
+     * Calculate the closest point on the outline of this circle to the given point.
+     *
+     * @method closestPoint
+     * @instance
+     * @memberof Circle
+     * @param {XYCoords} vert - The point to find the closest circle point for.
+     * @return {Vertex} The closest point on this circle.
+     **/
+    closestPoint(vert) {
+        const lineIntersection = this.lineIntersection(this.center, vert);
+        if (!lineIntersection) {
+            // Note: this case should not happen as a radial from the center always intersect this circle.
+            return new Vertex();
+        }
+        // Return closed of both
+        if (lineIntersection.a.distance(vert) < lineIntersection.b.distance(vert)) {
+            return lineIntersection.a;
+        }
+        else {
+            return lineIntersection.b;
+        }
+    }
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy() {
+        this.center.destroy();
+        this.isDestroyed = true;
+    }
+} // END class
+Circle.circleUtils = {
+    vertAt: (angle, radius) => {
+        /* return new Vertex( Math.sin(angle) * radius,
+                     Math.cos(angle) * radius ); */
+        return new Vertex(Math.cos(angle) * radius, Math.sin(angle) * radius);
+    }
+};
+
+/**
+ * @author    Ikaros Kappler
+ * @date_init 2012-10-17 (Wrote a first version of this in that year).
+ * @date      2018-04-03 (Refactored the code into a new class).
+ * @modified  2018-04-28 Added some documentation.
+ * @modified  2019-09-11 Added the scaleToCentroid(Number) function (used by the walking triangle demo).
+ * @modified  2019-09-12 Added beautiful JSDoc compliable comments.
+ * @modified  2019-11-07 Added to toSVG(options) function to make Triangles renderable as SVG.
+ * @modified  2019-12-09 Fixed the determinant() function. The calculation was just wrong.
+ * @modified  2020-03-16 (Corona times) Added the 'fromArray' function.
+ * @modified  2020-03-17 Added the Triangle.toPolygon() function.
+ * @modified  2020-03-17 Added proper JSDoc comments.
+ * @modified  2020-03-25 Ported this class from vanilla-JS to Typescript.
+ * @modified  2020-05-09 Added the new Circle class (ported to Typescript from the demos).
+ * @modified  2020-05-12 Added getIncircularTriangle() function.
+ * @modified  2020-05-12 Added getIncircle() function.
+ * @modified  2020-05-12 Fixed the signature of getCircumcirle(). Was still a generic object.
+ * @modified  2020-06-18 Added the `getIncenter` function.
+ * @modified  2020-12-28 Added the `getArea` function.
+ * @modified  2021-01-20 Added UID.
+ * @modified  2021-01-22 Always updating circumcircle when retieving it.
+ * @modified  2022-02-02 Added the `destroy` method.
+ * @modified  2022-02-02 Cleared the `Triangle.toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @modified  2024-11-22 Added static utility function Triangle.utils.determinant; adapted method `determinant`.
+ * @modified  2024-11-22 Changing visibility of `Triangle.utils` from `private` to `public`.
+ * @version   2.8.0
+ *
+ * @file Triangle
+ * @fileoverview A simple triangle class: three vertices.
+ * @public
+ **/
+/**
+ * @classdesc A triangle class for triangulations.
+ *
+ * The class was written for a Delaunay trinagulation demo so it might
+ * contain some strange and unexpected functions.
+ *
+ * @requires Bounds
+ * @requires Circle
+ * @requires Line
+ * @requires Vertex
+ * @requires Polygon
+ * @requires SVGSerializale
+ * @requires UID
+ * @requires UIDGenerator
+ * @requires geomutils
+ *
+ */
+class Triangle {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name Triangle
+     * @param {Vertex} a - The first vertex of the triangle.
+     * @param {Vertex} b - The second vertex of the triangle.
+     * @param {Vertex} c - The third vertex of the triangle.
+     **/
+    constructor(a, b, c) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "Triangle";
+        this.uid = UIDGenerator.next();
+        this.a = a;
+        this.b = b;
+        this.c = c;
+        this.calcCircumcircle();
+    }
+    /**
+     * Create a new triangle from the given array of vertices.
+     *
+     * The array must have at least three vertices, otherwise an error will be raised.
+     * This function will not create copies of the vertices.
+     *
+     * @method fromArray
+     * @static
+     * @param {Array<Vertex>} arr - The required array with at least three vertices.
+     * @memberof Vertex
+     * @return {Triangle}
+     **/
+    static fromArray(arr) {
+        if (arr.length < 3)
+            throw `Cannot create triangle from array with less than three vertices (${arr.length})`;
+        return new Triangle(arr[0], arr[1], arr[2]);
+    }
+    /**
+     * Get the area of this triangle. The returned area is never negative.
+     *
+     * If you are interested in the signed area, please consider using the
+     * `Triangle.utils.signedArea` helper function. This method just returns
+     * the absolute value of the signed area.
+     *
+     * @method getArea
+     * @instance
+     * @memberof Triangle
+     * @return {number} The non-negative area of this triangle.
+     */
+    getArea() {
+        return Math.abs(Triangle.utils.signedArea(this.a.x, this.a.y, this.b.x, this.b.y, this.c.x, this.c.y));
+    }
+    /**
+     * Get the centroid of this triangle.
+     *
+     * The centroid is the average midpoint for each side.
+     *
+     * @method getCentroid
+     * @return {Vertex} The centroid
+     * @instance
+     * @memberof Triangle
+     **/
+    getCentroid() {
+        return new Vertex((this.a.x + this.b.x + this.c.x) / 3, (this.a.y + this.b.y + this.c.y) / 3);
+    }
+    /**
+     * Scale the triangle towards its centroid.
+     *
+     * @method scaleToCentroid
+     * @param {number} - The scale factor to use. That can be any scalar.
+     * @return {Triangle} this (for chaining)
+     * @instance
+     * @memberof Triangle
+     */
+    scaleToCentroid(factor) {
+        let centroid = this.getCentroid();
+        this.a.scale(factor, centroid);
+        this.b.scale(factor, centroid);
+        this.c.scale(factor, centroid);
+        return this;
+    }
+    /**
+     * Get the circumcircle of this triangle.
+     *
+     * The circumcircle is that unique circle on which all three
+     * vertices of this triangle are located on.
+     *
+     * Please note that for performance reasons any changes to vertices will not reflect in changes
+     * of the circumcircle (center or radius). Please call the calcCirumcircle() function
+     * after triangle vertex changes.
+     *
+     * @method getCircumcircle
+     * @return {Object} - { center:Vertex, radius:float }
+     * @instance
+     * @memberof Triangle
+     */
+    getCircumcircle() {
+        // if( !this.center || !this.radius )
+        this.calcCircumcircle();
+        return new Circle(this.center.clone(), this.radius);
+    }
+    /**
+     * Check if this triangle and the passed triangle share an
+     * adjacent edge.
+     *
+     * For edge-checking Vertex.equals is used which uses an
+     * an epsilon for comparison.
+     *
+     * @method isAdjacent
+     * @param {Triangle} tri - The second triangle to check adjacency with.
+     * @return {boolean} - True if this and the passed triangle have at least one common edge.
+     * @instance
+     * @memberof Triangle
+     */
+    isAdjacent(tri) {
+        var a = this.a.equals(tri.a) || this.a.equals(tri.b) || this.a.equals(tri.c);
+        var b = this.b.equals(tri.a) || this.b.equals(tri.b) || this.b.equals(tri.c);
+        var c = this.c.equals(tri.a) || this.c.equals(tri.b) || this.c.equals(tri.c);
+        return (a && b) || (a && c) || (b && c);
+    }
+    /**
+     * Get that vertex of this triangle (a,b,c) that is not vert1 nor vert2 of
+     * the passed two.
+     *
+     * @method getThirdVertex
+     * @param {Vertex} vert1 - The first vertex.
+     * @param {Vertex} vert2 - The second vertex.
+     * @return {Vertex} - The third vertex of this triangle that makes up the whole triangle with vert1 and vert2.
+     * @instance
+     * @memberof Triangle
+     */
+    getThirdVertex(vert1, vert2) {
+        if ((this.a.equals(vert1) && this.b.equals(vert2)) || (this.a.equals(vert2) && this.b.equals(vert1)))
+            return this.c;
+        if ((this.b.equals(vert1) && this.c.equals(vert2)) || (this.b.equals(vert2) && this.c.equals(vert1)))
+            return this.a;
+        //if( this.c.equals(vert1) && this.a.equals(vert2) || this.c.equals(vert2) && this.a.equals(vert1) )
+        return this.b;
+    }
+    /**
+     * Re-compute the circumcircle of this triangle (if the vertices
+     * have changed).
+     *
+     * The circumcenter and radius are stored in this.center and
+     * this.radius. There is a third result: radius_squared (for internal computations).
+     *
+     * @method calcCircumcircle
+     * @return void
+     * @instance
+     * @memberof Triangle
+     */
+    calcCircumcircle() {
+        // From
+        //    http://www.exaflop.org/docs/cgafaq/cga1.html
+        const A = this.b.x - this.a.x;
+        const B = this.b.y - this.a.y;
+        const C = this.c.x - this.a.x;
+        const D = this.c.y - this.a.y;
+        const E = A * (this.a.x + this.b.x) + B * (this.a.y + this.b.y);
+        const F = C * (this.a.x + this.c.x) + D * (this.a.y + this.c.y);
+        const G = 2.0 * (A * (this.c.y - this.b.y) - B * (this.c.x - this.b.x));
+        let dx, dy;
+        if (Math.abs(G) < Triangle.EPSILON) {
+            // Collinear - find extremes and use the midpoint
+            const bounds = this.bounds();
+            this.center = new Vertex((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
+            dx = this.center.x - bounds.min.x;
+            dy = this.center.y - bounds.min.y;
+        }
+        else {
+            const cx = (D * E - B * F) / G;
+            const cy = (A * F - C * E) / G;
+            this.center = new Vertex(cx, cy);
+            dx = this.center.x - this.a.x;
+            dy = this.center.y - this.a.y;
+        }
+        this.radius_squared = dx * dx + dy * dy;
+        this.radius = Math.sqrt(this.radius_squared);
+    } // END calcCircumcircle
+    /**
+     * Check if the passed vertex is inside this triangle's
+     * circumcircle.
+     *
+     * @method inCircumcircle
+     * @param {Vertex} v - The vertex to check.
+     * @return {boolean}
+     * @instance
+     * @memberof Triangle
+     */
+    inCircumcircle(v) {
+        const dx = this.center.x - v.x;
+        const dy = this.center.y - v.y;
+        const dist_squared = dx * dx + dy * dy;
+        return dist_squared <= this.radius_squared;
+    }
+    /**
+     * Get the rectangular bounds for this triangle.
+     *
+     * @method bounds
+     * @return {Bounds} - The min/max bounds of this triangle.
+     * @instance
+     * @memberof Triangle
+     */
+    bounds() {
+        return new Bounds(new Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)), new Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y)));
+    }
+    /**
+     * Convert this triangle to a polygon instance.
+     *
+     * Plase note that this conversion does not perform a deep clone.
+     *
+     * @method toPolygon
+     * @return {Polygon} A new polygon representing this triangle.
+     * @instance
+     * @memberof Triangle
+     **/
+    toPolygon() {
+        return new Polygon([this.a, this.b, this.c]);
+    }
+    /**
+     * Get the determinant of this triangle.
+     *
+     * @method determinant
+     * @return {number} - The determinant (float).
+     * @instance
+     * @memberof Triangle
+     */
+    determinant() {
+        // (b.y - a.y)*(c.x - b.x) - (c.y - b.y)*(b.x - a.x);
+        // return (this.b.y - this.a.y) * (this.c.x - this.b.x) - (this.c.y - this.b.y) * (this.b.x - this.a.x);
+        return Triangle.utils.determinant(this.a, this.b, this.c);
+    }
+    /**
+     * Checks if the passed vertex (p) is inside this triangle.
+     *
+     * Note: matrix determinants rock.
+     *
+     * @method containsPoint
+     * @param {Vertex} p - The vertex to check.
+     * @return {boolean}
+     * @instance
+     * @memberof Triangle
+     */
+    containsPoint(p) {
+        return Triangle.utils.pointIsInTriangle(p.x, p.y, this.a.x, this.a.y, this.b.x, this.b.y, this.c.x, this.c.y);
+    }
+    /**
+     * Get that inner triangle which defines the maximal incircle.
+     *
+     * @return {Triangle} The triangle of those points in this triangle that define the incircle.
+     */
+    getIncircularTriangle() {
+        const lineA = new Line(this.a, this.b);
+        const lineB = new Line(this.b, this.c);
+        const lineC = new Line(this.c, this.a);
+        const bisector1 = geomutils.nsectAngle(this.b, this.a, this.c, 2)[0]; // bisector of first angle (in b)
+        const bisector2 = geomutils.nsectAngle(this.c, this.b, this.a, 2)[0]; // bisector of second angle (in c)
+        // Cast to non-null here because we know there _is_ an intersection
+        const intersection = bisector1.intersection(bisector2);
+        // Find the closest points on one of the polygon lines (all have same distance by construction)
+        const circleIntersA = lineA.getClosestPoint(intersection);
+        const circleIntersB = lineB.getClosestPoint(intersection);
+        const circleIntersC = lineC.getClosestPoint(intersection);
+        return new Triangle(circleIntersA, circleIntersB, circleIntersC);
+    }
+    /**
+     * Get the incircle of this triangle. That is the circle that touches each side
+     * of this triangle in exactly one point.
+     *
+     * Note this just calls getIncircularTriangle().getCircumcircle()
+     *
+     * @return {Circle} The incircle of this triangle.
+     */
+    getIncircle() {
+        return this.getIncircularTriangle().getCircumcircle();
+    }
+    /**
+     * Get the incenter of this triangle (which is the center of the circumcircle).
+     *
+     * Note: due to performance reasonst the incenter is buffered inside the triangle because
+     *       computing it is relatively expensive. If a, b or c have changed you should call the
+     *       calcCircumcircle() function first, otherwise you might get wrong results.
+     * @return Vertex The incenter of this triangle.
+     **/
+    getIncenter() {
+        if (!this.center || !this.radius)
+            this.calcCircumcircle();
+        return this.center.clone();
+    }
+    /**
+     * Converts this triangle into a human-readable string.
+     *
+     * @method toString
+     * @return {string}
+     * @instance
+     * @memberof Triangle
+     */
+    toString() {
+        return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + ", c : " + this.c.toString() + "}";
+    }
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy() {
+        this.a.destroy();
+        this.b.destroy();
+        this.c.destroy();
+        this.isDestroyed = true;
+    }
+}
+/**
+ * An epsilon for comparison.
+ * This should be the same epsilon as in Vertex.
+ *
+ * @private
+ **/
+Triangle.EPSILON = 1.0e-6;
+Triangle.utils = {
+    // Used in the bounds() function.
+    max3(a, b, c) {
+        return a >= b && a >= c ? a : b >= a && b >= c ? b : c;
+    },
+    min3(a, b, c) {
+        return a <= b && a <= c ? a : b <= a && b <= c ? b : c;
+    },
+    signedArea(p0x, p0y, p1x, p1y, p2x, p2y) {
+        return 0.5 * (-p1y * p2x + p0y * (-p1x + p2x) + p0x * (p1y - p2y) + p1x * p2y);
+    },
+    /**
+     * Used by the containsPoint() function.
+     *
+     * @private
+     **/
+    pointIsInTriangle(px, py, p0x, p0y, p1x, p1y, p2x, p2y) {
+        //
+        // Point-in-Triangle test found at
+        //   http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-2d-triangle
+        // var area : number = 1/2*(-p1y*p2x + p0y*(-p1x + p2x) + p0x*(p1y - p2y) + p1x*p2y);
+        var area = Triangle.utils.signedArea(p0x, p0y, p1x, p1y, p2x, p2y);
+        var s = (1 / (2 * area)) * (p0y * p2x - p0x * p2y + (p2y - p0y) * px + (p0x - p2x) * py);
+        var t = (1 / (2 * area)) * (p0x * p1y - p0y * p1x + (p0y - p1y) * px + (p1x - p0x) * py);
+        return s > 0 && t > 0 && 1 - s - t > 0;
+    },
+    /**
+     * Calculate the determinant of the three vertices a, b and c (in this order).
+     * @param {XYCords} a - The first vertex.
+     * @param {XYCords} b - The first vertex.
+     * @param {XYCords} c - The first vertex.
+     * @returns {nmber}
+     */
+    determinant(a, b, c) {
+        return (b.y - a.y) * (c.x - b.x) - (c.y - b.y) * (b.x - a.x);
+    }
+};
+
+/**
+ * @author   Ikaros Kappler
+ * @date     2019-02-03
+ * @modified 2021-03-01 Added `wrapMax` function.
+ * @modified 2024-11-15 Adding helper function `geomutils.mapAngleTo2PI(number)` for mapping any value into the interval [0,2*PI).
+ * @modified 2024-11-22 Adding helper function `geomutils.dotProduct(number)` for calculating the dot product of two vertices (as vectors).
+ *
+ * @version  1.2.0
+ **/
+/**
+ * A collection of usefull geometry utilities.
+ *
+ * @global
+ **/
+const geomutils = {
+    /**
+     * Map any angle (any numeric value) to [0, Math.PI).
+     *
+     * @param {number} angle - The numeric value to map.
+     * @return {number} The mapped angle inside [0,PI*2].
+     **/
+    mapAngleTo2PI(angle) {
+        // Source: https://forums.codeguru.com/showthread.php?384172-get-angle-into-range-0-2*pi
+        const new_angle = Math.asin(Math.sin(angle));
+        if (Math.cos(angle) < 0) {
+            return Math.PI - new_angle;
+        }
+        else if (new_angle < 0) {
+            return new_angle + 2 * Math.PI;
+        }
+        else {
+            return new_angle;
+        }
+    },
+    /**
+     * Calculate the euclidean distance between two points given by four coordinates (two coordinates each).
+     *
+     * @param {number} x1
+     * @param {number} y1
+     * @param {number} x2
+     * @param {number} y2
+     * @returns {number}
+     */
+    dist4(x1, y1, x2, y2) {
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y1 - y2, 2));
+    },
+    /**
+     * Map any angle (any numeric value) to [0, Math.PI).
+     *
+     * A × B := (A.x * B.x) + (A.y * B.y)
+     *
+     * @param {XYCoords} vertA - The first vertex.
+     * @param {XYCoords} vertB - The second vertex.
+     * @return {number} The dot product of the two vertices.
+     **/
+    dotProduct(vertA, vertB) {
+        return vertA.x * vertB.x + vertA.y * vertB.y;
+    },
+    /**
+     * Compute the n-section of the angle – described as a triangle (A,B,C) – in point A.
+     *
+     * @param {Vertex} pA - The first triangle point.
+     * @param {Vertex} pB - The second triangle point.
+     * @param {Vertex} pC - The third triangle point.
+     * @param {number} n - The number of desired angle sections (example: 2 means the angle will be divided into two sections,
+     *                      means an returned array with length 1, the middle line).
+     *
+     * @return {Line[]} An array of n-1 lines secting the given angle in point A into n equal sized angle sections. The lines' first vertex is A.
+     */
+    nsectAngle(pA, pB, pC, n) {
+        const triangle = new Triangle(pA, pB, pC);
+        const lineAB = new Line(pA, pB);
+        const lineAC = new Line(pA, pC);
+        // Compute the difference; this is the angle between AB and AC
+        var insideAngle = lineAB.angle(lineAC);
+        // We want the inner angles of the triangle, not the outer angle;
+        //   which one is which depends on the triangle 'direction'
+        const clockwise = triangle.determinant() > 0;
+        // For convenience convert the angle [-PI,PI] to [0,2*PI]
+        if (insideAngle < 0)
+            insideAngle = 2 * Math.PI + insideAngle;
+        if (!clockwise)
+            insideAngle = (2 * Math.PI - insideAngle) * -1;
+        // Scale the rotated lines to the max leg length (looks better)
+        const lineLength = Math.max(lineAB.length(), lineAC.length());
+        const scaleFactor = lineLength / lineAB.length();
+        var result = [];
+        for (var i = 1; i < n; i++) {
+            // Compute the i-th inner sector line
+            result.push(new Line(pA, pB.clone().rotate(-i * (insideAngle / n), pA)).scale(scaleFactor));
+        }
+        return result;
+    },
+    /**
+     * Wrap the value (e.g. an angle) into the given range of [0,max).
+     *
+     * @name wrapMax
+     * @param {number} x - The value to wrap.
+     * @param {number} max - The max bound to use for the range.
+     * @return {number} The wrapped value inside the range [0,max).
+     */
+    wrapMax(x, max) {
+        // Found at
+        //    https://stackoverflow.com/questions/4633177/c-how-to-wrap-a-float-to-the-interval-pi-pi
+        return (max + (x % max)) % max;
+    },
+    /**
+     * Wrap the value (e.g. an angle) into the given range of [min,max).
+     *
+     * @name wrapMinMax
+     * @param {number} x - The value to wrap.
+     * @param {number} min - The min bound to use for the range.
+     * @param {number} max - The max bound to use for the range.
+     * @return {number} The wrapped value inside the range [min,max).
+     */
+    // Currently un-used
+    wrapMinMax(x, min, max) {
+        return min + geomutils.wrapMax(x - min, max - min);
+    }
+};
+
+/**
+ * @author   Ikaros Kappler
  * @date     2012-10-17
  * @modified 2018-04-03 Refactored the code of october 2012 into a new class.
  * @modified 2018-04-28 Added some documentation.
@@ -362,7 +1302,8 @@ class VertexListeners {
  * @modified 2023-09-29 Downgraded types for the `Vertex.utils.buildArrowHead` function (replacing Vertex params by more generic XYCoords type).
  * @modified 2023-09-29 Added the `Vertex.abs()` method as it seems useful.
  * @modified 2024-03-08 Added the optional `precision` param to the `toString` method.
- * @version  2.9.0
+ * @modified 2024-12-17 Outsourced the euclidean distance calculation of `Vertex.distance` to `geomutils.dist4`.
+ * @version  2.9.1
  *
  * @file Vertex
  * @public
@@ -710,7 +1651,8 @@ class Vertex {
      * @memberof Vertex
      **/
     distance(vert) {
-        return Math.sqrt(Math.pow(vert.x - this.x, 2) + Math.pow(vert.y - this.y, 2));
+        // return Math.sqrt(Math.pow(vert.x - this.x, 2) + Math.pow(vert.y - this.y, 2));
+        return geomutils.dist4(this.x, this.y, vert.x, vert.y);
     }
     /**
      * Get the angle of this point (relative to (0,0) or to the given other origin point).
@@ -998,7 +1940,10 @@ Vertex.utils = {
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2023-09-29 Fixed a calculation error in the VertTuple.hasPoint() function; distance measure was broken!
- * @version 1.2.1
+ * @modified 2024-09-10 Chaging the first param of `pointDistance` from `Vertex` to less strict type `XYCoords`. This should not break anything.
+ * @modified 2024-09-10 Adding the optional `epsilon` param to the `hasPoint` method.
+ * @modified 2024-12-02 Added the `epsilon` param to the `colinear` method. Default is 1.0e-6.
+ * @version 1.3.0
  */
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
@@ -1169,12 +2114,13 @@ class VertTuple {
      *
      * @method colinear
      * @param {VertTuple} line
+     * @param {epsilon?=1.0e-6} epsilon - The epsilon to use (default is 1.0e-6).
      * @instance
      * @memberof VertTuple
      * @return true if both lines are co-linear.
      */
-    colinear(line) {
-        return Math.abs(this.denominator(line)) < Vertex.EPSILON;
+    colinear(line, epsilon) {
+        return Math.abs(this.denominator(line)) < (typeof epsilon === "undefined" ? Vertex.EPSILON : epsilon);
     }
     /**
      * Get the closest position T from this line to the specified point.
@@ -1203,21 +2149,22 @@ class VertTuple {
      * that point is located between point `a` and `b`.
      *
      * @method hasPoint
-     * @param {Vertex} point The point to check.
-     * @param {boolean=} insideBoundsOnly If set to to true (default=false) the point must be between start and end point of the line.
+     * @param {Vertex} point - The point to check.
+     * @param {boolean=} insideBoundsOnly - [optional] If set to to true (default=false) the point must be between start and end point of the line.
+     * @param {number=Vertex.EPSILON} epsilon - [optional] A tolerance.
      * @return {boolean} True if the given point is on this line.
      * @instance
      * @memberof VertTuple
      */
-    hasPoint(point, insideBoundsOnly) {
+    hasPoint(point, insideBoundsOnly, epsilon) {
         const t = this.getClosestT(point);
         // Compare to pointDistance?
         const distance = Math.sqrt(VertTuple.vtutils.dist2(point, this.vertAt(t)));
         if (typeof insideBoundsOnly !== "undefined" && insideBoundsOnly) {
-            return distance < Vertex.EPSILON && t >= 0 && t <= 1;
+            return distance < (epsilon !== null && epsilon !== void 0 ? epsilon : Vertex.EPSILON) && t >= 0 && t <= 1;
         }
         else {
-            return distance < Vertex.EPSILON; // t >= 0 && t <= 1;
+            return distance < (epsilon !== null && epsilon !== void 0 ? epsilon : Vertex.EPSILON); // t >= 0 && t <= 1;
         }
     }
     /**
@@ -1237,7 +2184,7 @@ class VertTuple {
      * The the minimal distance between this line and the specified point.
      *
      * @method pointDistance
-     * @param {Vertex} p The point (vertex) to measre the distance to.
+     * @param {XYCoords} p The point (vertex) to measre the distance to.
      * @return {number} The absolute minimal distance.
      * @instance
      * @memberof VertTuple
@@ -1452,7 +2399,11 @@ class Line extends VertTuple {
  * @modified 2023-09-25 Added the `Polygon.lineIntersections(Line,boolean)` function.
  * @modified 2023-09-29 Added the `Polygon.closestLineIntersection(Line,boolean)` function.
  * @modified 2023-11-24 Added the `Polygon.containsPolygon(Polygon)' function.
- * @version 1.12.0
+ * @modified 2024-10-12 Added the `getEdgeAt` method.
+ * @modified 2024-10-30 Added the `getEdges` method.
+ * @modified 2024-12-02 Added the `elimitateColinearEdges` method.
+ * @modified 2025-02-12 Added the `containsVerts` method to test multiple vertices for containment.
+ * @version 1.14.0
  *
  * @file Polygon
  * @public
@@ -1483,21 +2434,124 @@ class Polygon {
          **/
         this.className = "Polygon";
         this.uid = UIDGenerator.next();
-        if (typeof vertices == "undefined")
+        if (typeof vertices == "undefined") {
             vertices = [];
+        }
         this.vertices = vertices;
         this.isOpen = isOpen || false;
     }
     /**
      * Add a vertex to the end of the `vertices` array.
      *
-     * @method addVert
+     * @method addVertex
      * @param {Vertex} vert - The vertex to add.
      * @instance
      * @memberof Polygon
      **/
     addVertex(vert) {
         this.vertices.push(vert);
+    }
+    /**
+     * Add a vertex at a particular position of the `vertices` array.
+     *
+     * @method addVertexAt
+     * @param {Vertex} vert - The vertex to add.
+     * @param {number} index - The position to add the vertex at. Will be handled modulo.
+     * @instance
+     * @memberof Polygon
+     **/
+    addVertexAt(vert, index) {
+        // var moduloIndex = index % (this.vertices.length + 1);
+        this.vertices.splice(index, 0, vert);
+    }
+    /**
+     * Get a new instance of the line at the given start index. The returned line will consist
+     * of the vertex at `vertIndex` and `vertIndex+1` (will be handled modulo).
+     *
+     * @method getEdgeAt
+     * @param {number} vertIndex - The vertex index of the line to start.
+     * @instance
+     * @memberof Polygon
+     * @return {Line}
+     **/
+    getEdgeAt(vertIndex) {
+        return new Line(this.getVertexAt(vertIndex), this.getVertexAt(vertIndex + 1));
+    }
+    /**
+     * Converts this polygon into a sequence of lines. Please note that each time
+     * this method is called new lines are created. The underlying line vertices are no clones
+     * (instances).
+     *
+     * @method getEdges
+     * @instance
+     * @memberof Polygon
+     * @return {Array<Line>}
+     */
+    getEdges() {
+        const lines = [];
+        for (var i = 0; i + 1 < this.vertices.length; i++) {
+            // var line = this.getLineAt(i).clone();
+            lines.push(this.getEdgeAt(i));
+        }
+        if (!this.isOpen && this.vertices.length > 0) {
+            lines.push(this.getEdgeAt(this.vertices.length - 1));
+        }
+        return lines;
+    }
+    /**
+     * Checks if the angle at the given polygon vertex (index) is acute. Please not that this is
+     * only working for clockwise polygons. If this polygon is not clockwise please use the
+     * `isClockwise` method and reverse polygon vertices if needed.
+     *
+     * @method isAngleAcute
+     * @instance
+     * @memberof Polygon
+     * @param {number} vertIndex - The index of the polygon vertex to check.
+     * @returns {boolean} `true` is angle is acute, `false` is obtuse.
+     */
+    getInnerAngleAt(vertIndex) {
+        const p2 = this.vertices[vertIndex];
+        const p1 = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
+        const p3 = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
+        // See
+        //    https://math.stackexchange.com/questions/149959/how-to-find-the-interior-angle-of-an-irregular-pentagon-or-polygon
+        // π−arccos((P2−P1)⋅(P3−P2)|P2−P1||P3−P2|)
+        // Check if triangle is acute (will be used later)
+        // Acute angles and obtuse angles need to be handled differently.
+        const isAcute = this.isAngleAcute(vertIndex);
+        // Differences
+        const zero = new Vertex(0, 0);
+        const p2mp1 = new Vertex(p2.x - p1.x, p2.y - p1.y);
+        const p3mp2 = new Vertex(p3.x - p2.x, p3.y - p2.y);
+        const p2mp1_len = zero.distance(p2mp1);
+        const p3mp2_len = zero.distance(p3mp2);
+        // Dot products
+        const dotProduct = geomutils.dotProduct(p2mp1, p3mp2);
+        const lengthProduct = p2mp1_len * p3mp2_len;
+        if (isAcute) {
+            return Math.PI - Math.acos(dotProduct / lengthProduct);
+        }
+        else {
+            return Math.PI + Math.acos(dotProduct / lengthProduct);
+        }
+    }
+    /**
+     * Checks if the angle at the given polygon vertex (index) is acute.
+     *
+     * @method isAngleAcute
+     * @instance
+     * @memberof Polygon
+     * @param {number} vertIndex - The index of the polygon vertex to check.
+     * @returns {boolean} `true` is angle is acute, `false` is obtuse.
+     */
+    isAngleAcute(vertIndex) {
+        const A = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
+        const B = this.vertices[vertIndex];
+        const C = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
+        // Find local winding number for triangle A B C
+        const windingNumber = Triangle.utils.determinant(A, B, C);
+        // console.log("vertIndex", vertIndex, "windingNumber", windingNumber);
+        return windingNumber < 0;
     }
     /**
      * Get the polygon vertex at the given position (index).
@@ -1509,17 +2563,19 @@ class Polygon {
      *  - getVertexAt( vertices.length + k ) == getVertexAt( k )
      *  - getVertexAt( -k )                  == getVertexAt( vertices.length -k )
      *
-     * @metho getVertexAt
+     * @method getVertexAt
      * @param {number} index - The index of the desired vertex.
      * @instance
      * @memberof Polygon
      * @return {Vertex} At the given index.
      **/
     getVertexAt(index) {
-        if (index < 0)
+        if (index < 0) {
             return this.vertices[this.vertices.length - (Math.abs(index) % this.vertices.length)];
-        else
+        }
+        else {
             return this.vertices[index % this.vertices.length];
+        }
     }
     /**
      * Move the polygon's vertices by the given amount.
@@ -1543,7 +2599,7 @@ class Polygon {
      *    https://stackoverflow.com/questions/22521982/check-if-point-inside-a-polygon
      *
      * @method containsVert
-     * @param {XYCoords} vert - The vertex to check. The new x-component.
+     * @param {XYCoords} vert - The vertex to check.
      * @return {boolean} True if the passed vertex is inside this polygon. The polygon is considered closed.
      * @instance
      * @memberof Polygon
@@ -1560,6 +2616,20 @@ class Polygon {
                 inside = !inside;
         }
         return inside;
+    }
+    /**
+     * Check if all given vertices are inside this polygon.<br>
+     * <br>
+     * This method just uses the `Polygon.containsVert` method.
+     *
+     * @method containsVerts
+     * @param {XYCoords[]} verts - The vertices to check.
+     * @return {boolean} True if all passed vertices are inside this polygon. The polygon is considered closed.
+     * @instance
+     * @memberof Polygon
+     **/
+    containsVerts(verts) {
+        return verts.every((vert) => this.containsVert(vert));
     }
     /**
      * Check if the passed polygon is completly contained inside this polygon.
@@ -1623,7 +2693,8 @@ class Polygon {
      * @return {boolean}
      */
     isClockwise() {
-        return Polygon.utils.signedArea(this.vertices) < 0;
+        // return Polygon.utils.signedArea(this.vertices) < 0;
+        return Polygon.utils.isClockwise(this.vertices);
     }
     /**
      * Get the perimeter of this polygon.
@@ -1681,6 +2752,28 @@ class Polygon {
             this.vertices[i].rotate(angle, center);
         }
         return this;
+    }
+    /**
+     * Get the mean `center` of this polygon by calculating the mean value of all vertices.
+     *
+     * Mean: (v[0] + v[1] + ... v[n-1]) / n
+     *
+     * @method getMeanCenter
+     * @instance
+     * @memberof Polygon
+     * @return {Vertex|null} `null` is no vertices are available.
+     */
+    getMeanCenter() {
+        if (this.vertices.length === 0) {
+            return null;
+        }
+        const center = this.vertices[0].clone();
+        for (var i = 1; i < this.vertices.length; i++) {
+            center.add(this.vertices[i]);
+        }
+        center.x /= this.vertices.length;
+        center.y /= this.vertices.length;
+        return center;
     }
     /**
      * Get all line intersections with this polygon.
@@ -1822,10 +2915,63 @@ class Polygon {
     /**
      * Create a deep copy of this polygon.
      *
+     * @method clone
+     * @instance
+     * @memberof Polygon
      * @return {Polygon} The cloned polygon.
      */
     clone() {
         return new Polygon(this.vertices.map(vert => vert.clone()), this.isOpen);
+    }
+    /**
+     * Create a new polygon without colinear adjacent edges. This method does not midify the current polygon
+     * but creates a new one.
+     *
+     * Please note that this method does NOT create deep clones of the vertices. Use Polygon.clone() if you need to.
+     *
+     * Please also note that the `tolerance` may become really large here, as the denominator of two closely
+     * parallel lines is usually pretty large. See the demo `57-eliminate-colinear-polygon-edges` to get
+     * an impression of how denominators work.
+     *
+     * @method elimitateColinearEdges
+     * @instance
+     * @memberof Polygon
+     * @param {number?} tolerance - (default is 1.0) The epsilon to detect co-linear edges.
+     * @return {Polygon} A new polygon without co-linear adjacent edges – respective the given epsilon.
+     */
+    elimitateColinearEdges(tolerance) {
+        const eps = typeof tolerance === "undefined" ? 1.0 : tolerance;
+        const verts = this.vertices.slice(); // Creates a shallow copy
+        let i = 0;
+        var lineA = new Line(new Vertex(), new Vertex());
+        var lineB = new Line(new Vertex(), new Vertex());
+        while (i + 1 < verts.length && verts.length > 2) {
+            const vertA = verts[i];
+            const vertB = verts[(i + 1) % verts.length];
+            lineA.a = vertA;
+            lineA.b = vertB;
+            lineB.a = vertB;
+            let areColinear = false;
+            let j = i + 2;
+            do {
+                let vertC = verts[j % verts.length];
+                lineB.b = vertC;
+                areColinear = lineA.colinear(lineB, eps);
+                // console.log("are colinear?", i, i + 1, j, areColinear);
+                if (areColinear) {
+                    j++;
+                }
+            } while (areColinear);
+            // Now j points to the first vertex that's NOT colinear to the current lineA
+            // -> delete all vertices in between
+            if (j - i > 2) {
+                // Means: there have been 'colinear vertices' in between
+                // console.log("Splice", "i", i, "j", j, i + 1, j - i - 1);
+                verts.splice(i + 1, j - i - 2);
+            }
+            i++;
+        }
+        return new Polygon(verts, this.isOpen);
     }
     /**
      * Convert this polygon to a sequence of quadratic Bézier curves.<br>
@@ -1926,8 +3072,9 @@ class Polygon {
      **/
     toCubicBezierSVGString(threshold) {
         var qdata = this.toCubicBezierData(threshold);
-        if (qdata.length == 0)
+        if (qdata.length == 0) {
             return "";
+        }
         var buffer = ["M " + qdata[0].x + " " + qdata[0].y];
         for (var i = 1; i < qdata.length; i += 3) {
             buffer.push("C " +
@@ -1997,6 +3144,9 @@ Polygon.utils = {
             total -= subX * subY * 0.5;
         }
         return Math.abs(total);
+    },
+    isClockwise(vertices) {
+        return Polygon.utils.signedArea(vertices) < 0;
     },
     /**
      * Calulate the signed polyon area by interpreting the polygon as a matrix
@@ -2155,168 +3305,6 @@ class Bounds {
         return new Bounds(origin !== null && origin !== void 0 ? origin : { x: 0, y: 0 }, { x: (origin ? origin.x : 0) + width, y: (origin ? origin.y : 0) + height });
     }
 } // END class bounds
-
-/**
- * @author   Ikaros Kappler
- * @date     2019-01-30
- * @modified 2019-02-23 Added the toSVGString function, overriding Line.toSVGString.
- * @modified 2019-03-20 Added JSDoc tags.
- * @modified 2019-04-19 Added the clone function (overriding Line.clone()).
- * @modified 2019-09-02 Added the Vector.perp() function.
- * @modified 2019-09-02 Added the Vector.inverse() function.
- * @modified 2019-12-04 Added the Vector.inv() function.
- * @modified 2020-03-23 Ported to Typescript from JS.
- * @modified 2021-01-20 Added UID.
- * @modified 2022-02-02 Added the `destroy` method.
- * @modified 2022-02-02 Cleared the `Vector.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @modified 2022-10-25 Added the `getOrthogonal` method.
- * @version  1.5.0
- *
- * @file Vector
- * @public
- **/
-/**
- * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
- *            <br>
- *            Vectors are drawn with an arrow at their end point.<br>
- *            <b>The Vector class extends the Line class.</b>
- *
- * @requires VertTuple
- * @requires Vertex
- **/
-class Vector extends VertTuple {
-    /**
-     * The constructor.
-     *
-     * @constructor
-     * @name Vector
-     * @extends Line
-     * @param {Vertex} vertA - The start vertex of the vector.
-     * @param {Vertex} vertB - The end vertex of the vector.
-     **/
-    constructor(vertA, vertB) {
-        super(vertA, vertB, (a, b) => new Vector(a, b));
-        /**
-         * Required to generate proper CSS classes and other class related IDs.
-         **/
-        this.className = "Vector";
-    }
-    /**
-     * Get the perpendicular of this vector which is located at a.
-     *
-     * @param {Number} t The position on the vector.
-     * @return {Vector} A new vector being the perpendicular of this vector sitting on a.
-     **/
-    perp() {
-        var v = this.clone();
-        v.sub(this.a);
-        v = new Vector(new Vertex(), new Vertex(-v.b.y, v.b.x));
-        v.a.add(this.a);
-        v.b.add(this.a);
-        return v;
-    }
-    /**
-     * The inverse of a vector is a vector with the same magnitude but oppose direction.
-     *
-     * Please not that the origin of this vector changes here: a->b becomes b->a.
-     *
-     * @return {Vector}
-     **/
-    inverse() {
-        var tmp = this.a;
-        this.a = this.b;
-        this.b = tmp;
-        return this;
-    }
-    /**
-     * This function computes the inverse of the vector, which means 'a' stays untouched.
-     *
-     * @return {Vector} this for chaining.
-     **/
-    inv() {
-        this.b.x = this.a.x - (this.b.x - this.a.x);
-        this.b.y = this.a.y - (this.b.y - this.a.y);
-        return this;
-    }
-    /**
-     * Get the intersection if this vector and the specified vector.
-     *
-     * @method intersection
-     * @param {Vector} line The second vector.
-     * @return {Vertex} The intersection (may lie outside the end-points).
-     * @instance
-     * @memberof Line
-     **/
-    intersection(line) {
-        var denominator = this.denominator(line);
-        if (denominator == 0)
-            return null;
-        var a = this.a.y - line.a.y;
-        var b = this.a.x - line.a.x;
-        var numerator1 = (line.b.x - line.a.x) * a - (line.b.y - line.a.y) * b;
-        var numerator2 = (this.b.x - this.a.x) * a - (this.b.y - this.a.y) * b;
-        a = numerator1 / denominator; // NaN if parallel lines
-        b = numerator2 / denominator;
-        // TODO:
-        // FOR A VECTOR THE LINE-INTERSECTION MUST BE ON BOTH VECTORS
-        // if we cast these lines infinitely in both directions, they intersect here:
-        return new Vertex(this.a.x + a * (this.b.x - this.a.x), this.a.y + a * (this.b.y - this.a.y));
-    }
-    /**
-     * Get the orthogonal "vector" of this vector (rotated by 90° clockwise).
-     *
-     * @name getOrthogonal
-     * @method getOrthogonal
-     * @return {Vector} A new vector with the same length that stands on this vector's point a.
-     * @instance
-     * @memberof Vector
-     **/
-    getOrthogonal() {
-        // Orthogonal of vector (0,0)->(x,y) is (0,0)->(-y,x)
-        const linePoint = this.a.clone();
-        const startPoint = this.b.clone().sub(this.a);
-        const tmp = startPoint.x;
-        startPoint.x = -startPoint.y;
-        startPoint.y = tmp;
-        return new Vector(linePoint, startPoint.add(this.a));
-    }
-}
-Vector.utils = {
-    /**
-     * Generate a four-point arrow head, starting at the vector end minus the
-     * arrow head length.
-     *
-     * The first vertex in the returned array is guaranteed to be the located
-     * at the vector line end minus the arrow head length.
-     *
-     *
-     * Due to performance all params are required.
-     *
-     * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
-     * scaling different). Arrow heads should not look distored on non-uniform scaling.
-     *
-     * If unsure use 1.0 for scaleX and scaleY (=no distortion).
-     * For headlen use 8, it's a good arrow head size.
-     *
-     * Example:
-     *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
-     *
-     * @param {XYCoords} zA - The start vertex of the vector to calculate the arrow head for.
-     * @param {XYCoords} zB - The end vertex of the vector.
-     * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
-     * @param {number} scaleX  - The horizontal scaling during draw.
-     * @param {number} scaleY  - the vertical scaling during draw.
-     **/
-    buildArrowHead: (zA, zB, headlen, scaleX, scaleY) => {
-        const angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
-        const vertices = [];
-        vertices.push(new Vertex(zB.x * scaleX - headlen * Math.cos(angle), zB.y * scaleY - headlen * Math.sin(angle)));
-        vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle - Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle - Math.PI / 8)));
-        vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
-        vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle + Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle + Math.PI / 8)));
-        return vertices;
-    }
-};
 
 /**
  * @author   Ikaros Kappler
@@ -4193,257 +5181,6 @@ BezierPath.END_POINT = 3;
 
 /**
  * @author   Ikaros Kappler
- * @date     2020-05-04
- * @modified 2020-05-09 Ported to typescript.
- * @modified 2020-05-25 Added the vertAt and tangentAt functions.
- * @mofidied 2020-09-07 Added the circleIntersection(Circle) function.
- * @modified 2020-09-07 Changed the vertAt function by switching sin and cos! The old version did not return the correct vertex (by angle) accoring to the assumed circle math.
- * @modified 2020-10-16 Added the containsCircle(...) function.
- * @modified 2021-01-20 Added UID.
- * @modified 2022-02-02 Added the `destroy` method.
- * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @modified 2022-08-15 Added the `containsPoint` function.
- * @modified 2022-08-23 Added the `lineIntersection` function.
- * @modified 2022-08-23 Added the `closestPoint` function.
- * @version  1.4.0
- **/
-/**
- * @classdesc A simple circle: center point and radius.
- *
- * @requires Line
- * @requires Vector
- * @requires VertTuple
- * @requires Vertex
- * @requires SVGSerializale
- * @requires UID
- * @requires UIDGenerator
- **/
-class Circle {
-    /**
-     * Create a new circle with given center point and radius.
-     *
-     * @constructor
-     * @name Circle
-     * @param {Vertex} center - The center point of the circle.
-     * @param {number} radius - The radius of the circle.
-     */
-    constructor(center, radius) {
-        /**
-         * Required to generate proper CSS classes and other class related IDs.
-         **/
-        this.className = "Circle";
-        this.uid = UIDGenerator.next();
-        this.center = center;
-        this.radius = radius;
-    }
-    /**
-     * Check if the given circle is fully contained inside this circle.
-     *
-     * @method containsPoint
-     * @param {XYCoords} point - The point to check if it is contained in this circle.
-     * @instance
-     * @memberof Circle
-     * @return {boolean} `true` if the given point is inside this circle.
-     */
-    containsPoint(point) {
-        return this.center.distance(point) < this.radius;
-    }
-    /**
-     * Check if the given circle is fully contained inside this circle.
-     *
-     * @method containsCircle
-     * @param {Circle} circle - The circle to check if it is contained in this circle.
-     * @instance
-     * @memberof Circle
-     * @return {boolean} `true` if any only if the given circle is completely inside this circle.
-     */
-    containsCircle(circle) {
-        return this.center.distance(circle.center) + circle.radius < this.radius;
-    }
-    /**
-     * Calculate the distance from this circle to the given line.
-     *
-     * * If the line does not intersect this ciecle then the returned
-     *   value will be the minimal distance.
-     * * If the line goes through this circle then the returned value
-     *   will be max inner distance and it will be negative.
-     *
-     * @method lineDistance
-     * @param {Line} line - The line to measure the distance to.
-     * @return {number} The minimal distance from the outline of this circle to the given line.
-     * @instance
-     * @memberof Circle
-     */
-    lineDistance(line) {
-        const closestPointOnLine = line.getClosestPoint(this.center);
-        return closestPointOnLine.distance(this.center) - this.radius;
-    }
-    /**
-     * Get the vertex on the this circle for the given angle.
-     *
-     * @method vertAt
-     * @param {number} angle - The angle (in radians) to use.
-     * @return {Vertex} The vertex (point) at the given angle.
-     * @instance
-     * @memberof Circle
-     **/
-    vertAt(angle) {
-        // Find the point on the circle respective the angle. Then move relative to center.
-        return Circle.circleUtils.vertAt(angle, this.radius).add(this.center);
-    }
-    /**
-     * Get a tangent line of this circle for a given angle.
-     *
-     * Point a of the returned line is located on the circle, the length equals the radius.
-     *
-     * @method tangentAt
-     * @instance
-     * @param {number} angle - The angle (in radians) to use.
-     * @return {Line} The tangent line.
-     * @memberof Circle
-     **/
-    tangentAt(angle) {
-        const pointA = Circle.circleUtils.vertAt(angle, this.radius);
-        // Construct the perpendicular of the line in point a. Then move relative to center.
-        return new Vector(pointA, new Vertex(0, 0)).add(this.center).perp();
-    }
-    /**
-     * Calculate the intersection points (if exists) with the given circle.
-     *
-     * @method circleIntersection
-     * @instance
-     * @memberof Circle
-     * @param {Circle} circle
-     * @return {Line|null} The intersection points (as a line) or null if the two circles do not intersect.
-     **/
-    circleIntersection(circle) {
-        // Circles do not intersect at all?
-        if (this.center.distance(circle.center) > this.radius + circle.radius) {
-            return null;
-        }
-        // One circle is fully inside the other?
-        if (this.center.distance(circle.center) < Math.abs(this.radius - circle.radius)) {
-            return null;
-        }
-        // Based on the C++ implementation by Robert King
-        //    https://stackoverflow.com/questions/3349125/circle-circle-intersection-points
-        // and the 'Circles and spheres' article by Paul Bourke.
-        //    http://paulbourke.net/geometry/circlesphere/
-        //
-        // This is the original C++ implementation:
-        //
-        // pair<Point, Point> intersections(Circle c) {
-        //    Point P0(x, y);
-        //    Point P1(c.x, c.y);
-        //    float d, a, h;
-        //    d = P0.distance(P1);
-        //    a = (r*r - c.r*c.r + d*d)/(2*d);
-        //    h = sqrt(r*r - a*a);
-        //    Point P2 = P1.sub(P0).scale(a/d).add(P0);
-        //    float x3, y3, x4, y4;
-        //    x3 = P2.x + h*(P1.y - P0.y)/d;
-        //    y3 = P2.y - h*(P1.x - P0.x)/d;
-        //    x4 = P2.x - h*(P1.y - P0.y)/d;
-        //    y4 = P2.y + h*(P1.x - P0.x)/d;
-        //    return pair<Point, Point>(Point(x3, y3), Point(x4, y4));
-        // }
-        var p0 = this.center;
-        var p1 = circle.center;
-        var d = p0.distance(p1);
-        var a = (this.radius * this.radius - circle.radius * circle.radius + d * d) / (2 * d);
-        var h = Math.sqrt(this.radius * this.radius - a * a);
-        var p2 = p1.clone().scale(a / d, p0);
-        var x3 = p2.x + (h * (p1.y - p0.y)) / d;
-        var y3 = p2.y - (h * (p1.x - p0.x)) / d;
-        var x4 = p2.x - (h * (p1.y - p0.y)) / d;
-        var y4 = p2.y + (h * (p1.x - p0.x)) / d;
-        return new Line(new Vertex(x3, y3), new Vertex(x4, y4));
-    }
-    /**
-     * Calculate the intersection points (if exists) with the given infinite line (defined by two points).
-     *
-     * @method lineIntersection
-     * @instance
-     * @memberof Circle
-     * @param {Vertex} a- The first of the two points defining the line.
-     * @param {Vertex} b - The second of the two points defining the line.
-     * @return {Line|null} The intersection points (as a line) or null if this circle does not intersect the line given.
-     **/
-    lineIntersection(a, b) {
-        // Based on the math from
-        //    https://mathworld.wolfram.com/Circle-LineIntersection.html
-        const interA = new Vertex();
-        const interB = new Vertex();
-        // First do a transformation, because the calculation is based on a cicle at (0,0)
-        const transA = new Vertex(a).sub(this.center);
-        const transB = new Vertex(b).sub(this.center);
-        const diff = transA.difference(transB);
-        // There is a special case if diff.y=0, where the intersection is not calcuatable.
-        // Use an non-zero epsilon here to approximate this case.
-        // TODO for the future: find a better solution
-        if (Math.abs(diff.y) === 0) {
-            diff.y = 0.000001;
-        }
-        const dist = transA.distance(transB);
-        const det = transA.x * transB.y - transA.y * transB.x;
-        const distSquared = dist * dist;
-        const radiusSquared = this.radius * this.radius;
-        // Check if circle and line have an intersection at all
-        if (radiusSquared * distSquared - det * det < 0) {
-            return null;
-        }
-        const belowSqrt = this.radius * this.radius * dist * dist - det * det;
-        const sqrt = Math.sqrt(belowSqrt);
-        interA.x = (det * diff.y + Math.sign(diff.y) * diff.x * sqrt) / distSquared;
-        interB.x = (det * diff.y - Math.sign(diff.y) * diff.x * sqrt) / distSquared;
-        interA.y = (-det * diff.x + Math.abs(diff.y) * sqrt) / distSquared;
-        interB.y = (-det * diff.x - Math.abs(diff.y) * sqrt) / distSquared;
-        return new Line(interA.add(this.center), interB.add(this.center));
-        // return new Line(interA, interB);
-    }
-    /**
-     * Calculate the closest point on the outline of this circle to the given point.
-     *
-     * @method closestPoint
-     * @instance
-     * @memberof Circle
-     * @param {XYCoords} vert - The point to find the closest circle point for.
-     * @return {Vertex} The closest point on this circle.
-     **/
-    closestPoint(vert) {
-        const lineIntersection = this.lineIntersection(this.center, vert);
-        if (!lineIntersection) {
-            // Note: this case should not happen as a radial from the center always intersect this circle.
-            return new Vertex();
-        }
-        // Return closed of both
-        if (lineIntersection.a.distance(vert) < lineIntersection.b.distance(vert)) {
-            return lineIntersection.a;
-        }
-        else {
-            return lineIntersection.b;
-        }
-    }
-    /**
-     * This function should invalidate any installed listeners and invalidate this object.
-     * After calling this function the object might not hold valid data any more and
-     * should not be used.
-     */
-    destroy() {
-        this.center.destroy();
-        this.isDestroyed = true;
-    }
-} // END class
-Circle.circleUtils = {
-    vertAt: (angle, radius) => {
-        /* return new Vertex( Math.sin(angle) * radius,
-                     Math.cos(angle) * radius ); */
-        return new Vertex(Math.cos(angle) * radius, Math.sin(angle) * radius);
-    }
-};
-
-/**
- * @author   Ikaros Kappler
  * @date     2020-12-17
  * @modified 2021-01-20 Added UID.
  * @modified 2021-02-26 Fixed an error in the svg-arc-calculation (case angle<90deg and anti-clockwise).
@@ -5602,6 +6339,30 @@ class drawutilssvg {
      * @memberof drawutilssvg
      */
     grid(center, width, height, sizeX, sizeY, color) {
+        // console.log("grid");
+        // const node: SVGElement = this.makeNode("pattern");
+        // var patternId = "pattern_id_" + Math.floor(Math.random() * 65365);
+        // node.setAttribute("id", patternId);
+        // node.setAttribute("viewBox", `0,0,${sizeX},${sizeY}`);
+        // node.setAttribute("width", `${sizeX}`);
+        // node.setAttribute("height", `${sizeX}`);
+        // var pattern: SVGElement = this.makeNode("path");
+        // const d: SVGPathParams = [];
+        // d.push("M", sizeX / 2.0, 0);
+        // d.push("L", sizeX / 2.0, sizeY);
+        // d.push("M", 0, sizeY / 2.0);
+        // d.push("L", sizeX, sizeY / 2.0);
+        // node.setAttribute("d", d.join(" "));
+        // this.bufferedNodeDefs.append(pattern);
+        // const fillNode: SVGElement = this.makeNode("rect");
+        // // For some strange reason SVG rotation transforms use degrees instead of radians
+        // // Note that the background does not scale with the zoom level (always covers full element)
+        // fillNode.setAttribute("x", "0");
+        // fillNode.setAttribute("y", "0");
+        // fillNode.setAttribute("width", `${this.canvasSize.width}`);
+        // fillNode.setAttribute("height", `${this.canvasSize.height}`);
+        // fillNode.setAttribute("fill", `url(#${patternId})`);
+        // return this._bindFillDraw(fillNode, "grid", "red", 1);
         const node = this.makeNode("path");
         const d = [];
         var yMin = -Math.ceil((height * 0.5) / sizeY) * sizeY;
@@ -6370,6 +7131,7 @@ drawutilssvg.HEAD_XML = [
  * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @modified 2023-09-30 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
  * @modified 2023-10-07 Adding the optional `arrowHeadBasePositionBuffer` param to the arrowHead(...) method.
+ * @modified 2024-09-13 Remoed the scaling of `lineWidth` in the `polygon` and `polyline` methods. This makes no sense here and doesn't match up with the behavior of other line functions.
  * @version  1.13.0
  **/
 // Todo: rename this class to Drawutils?
@@ -7290,7 +8052,7 @@ class drawutils {
         this.ctx.save();
         this.applyStrokeOpts(strokeOptions);
         this.ctx.beginPath();
-        this.ctx.lineWidth = (lineWidth || 1.0) * this.scale.x;
+        this.ctx.lineWidth = lineWidth || 1.0;
         this.ctx.moveTo(this.offset.x + vertices[0].x * this.scale.x, this.offset.y + vertices[0].y * this.scale.y);
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x * this.scale.x, this.offset.y + vertices[i].y * this.scale.y);
@@ -8262,474 +9024,6 @@ class GLU {
         return program;
     }
 }
-
-/**
- * @author    Ikaros Kappler
- * @date_init 2012-10-17 (Wrote a first version of this in that year).
- * @date      2018-04-03 (Refactored the code into a new class).
- * @modified  2018-04-28 Added some documentation.
- * @modified  2019-09-11 Added the scaleToCentroid(Number) function (used by the walking triangle demo).
- * @modified  2019-09-12 Added beautiful JSDoc compliable comments.
- * @modified  2019-11-07 Added to toSVG(options) function to make Triangles renderable as SVG.
- * @modified  2019-12-09 Fixed the determinant() function. The calculation was just wrong.
- * @modified  2020-03-16 (Corona times) Added the 'fromArray' function.
- * @modified  2020-03-17 Added the Triangle.toPolygon() function.
- * @modified  2020-03-17 Added proper JSDoc comments.
- * @modified  2020-03-25 Ported this class from vanilla-JS to Typescript.
- * @modified  2020-05-09 Added the new Circle class (ported to Typescript from the demos).
- * @modified  2020-05-12 Added getIncircularTriangle() function.
- * @modified  2020-05-12 Added getIncircle() function.
- * @modified  2020-05-12 Fixed the signature of getCircumcirle(). Was still a generic object.
- * @modified  2020-06-18 Added the `getIncenter` function.
- * @modified  2020-12-28 Added the `getArea` function.
- * @modified  2021-01-20 Added UID.
- * @modified  2021-01-22 Always updating circumcircle when retieving it.
- * @modified  2022-02-02 Added the `destroy` method.
- * @modified  2022-02-02 Cleared the `Triangle.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version   2.6.0
- *
- * @file Triangle
- * @fileoverview A simple triangle class: three vertices.
- * @public
- **/
-/**
- * @classdesc A triangle class for triangulations.
- *
- * The class was written for a Delaunay trinagulation demo so it might
- * contain some strange and unexpected functions.
- *
- * @requires Bounds
- * @requires Circle
- * @requires Line
- * @requires Vertex
- * @requires Polygon
- * @requires SVGSerializale
- * @requires UID
- * @requires UIDGenerator
- * @requires geomutils
- *
- */
-class Triangle {
-    /**
-     * The constructor.
-     *
-     * @constructor
-     * @name Triangle
-     * @param {Vertex} a - The first vertex of the triangle.
-     * @param {Vertex} b - The second vertex of the triangle.
-     * @param {Vertex} c - The third vertex of the triangle.
-     **/
-    constructor(a, b, c) {
-        /**
-         * Required to generate proper CSS classes and other class related IDs.
-         **/
-        this.className = "Triangle";
-        this.uid = UIDGenerator.next();
-        this.a = a;
-        this.b = b;
-        this.c = c;
-        this.calcCircumcircle();
-    }
-    /**
-     * Create a new triangle from the given array of vertices.
-     *
-     * The array must have at least three vertices, otherwise an error will be raised.
-     * This function will not create copies of the vertices.
-     *
-     * @method fromArray
-     * @static
-     * @param {Array<Vertex>} arr - The required array with at least three vertices.
-     * @memberof Vertex
-     * @return {Triangle}
-     **/
-    static fromArray(arr) {
-        if (arr.length < 3)
-            throw `Cannot create triangle from array with less than three vertices (${arr.length})`;
-        return new Triangle(arr[0], arr[1], arr[2]);
-    }
-    /**
-     * Get the area of this triangle. The returned area is never negative.
-     *
-     * If you are interested in the signed area, please consider using the
-     * `Triangle.utils.signedArea` helper function. This method just returns
-     * the absolute value of the signed area.
-     *
-     * @method getArea
-     * @instance
-     * @memberof Triangle
-     * @return {number} The non-negative area of this triangle.
-     */
-    getArea() {
-        return Math.abs(Triangle.utils.signedArea(this.a.x, this.a.y, this.b.x, this.b.y, this.c.x, this.c.y));
-    }
-    /**
-     * Get the centroid of this triangle.
-     *
-     * The centroid is the average midpoint for each side.
-     *
-     * @method getCentroid
-     * @return {Vertex} The centroid
-     * @instance
-     * @memberof Triangle
-     **/
-    getCentroid() {
-        return new Vertex((this.a.x + this.b.x + this.c.x) / 3, (this.a.y + this.b.y + this.c.y) / 3);
-    }
-    /**
-     * Scale the triangle towards its centroid.
-     *
-     * @method scaleToCentroid
-     * @param {number} - The scale factor to use. That can be any scalar.
-     * @return {Triangle} this (for chaining)
-     * @instance
-     * @memberof Triangle
-     */
-    scaleToCentroid(factor) {
-        let centroid = this.getCentroid();
-        this.a.scale(factor, centroid);
-        this.b.scale(factor, centroid);
-        this.c.scale(factor, centroid);
-        return this;
-    }
-    /**
-     * Get the circumcircle of this triangle.
-     *
-     * The circumcircle is that unique circle on which all three
-     * vertices of this triangle are located on.
-     *
-     * Please note that for performance reasons any changes to vertices will not reflect in changes
-     * of the circumcircle (center or radius). Please call the calcCirumcircle() function
-     * after triangle vertex changes.
-     *
-     * @method getCircumcircle
-     * @return {Object} - { center:Vertex, radius:float }
-     * @instance
-     * @memberof Triangle
-     */
-    getCircumcircle() {
-        // if( !this.center || !this.radius )
-        this.calcCircumcircle();
-        return new Circle(this.center.clone(), this.radius);
-    }
-    /**
-     * Check if this triangle and the passed triangle share an
-     * adjacent edge.
-     *
-     * For edge-checking Vertex.equals is used which uses an
-     * an epsilon for comparison.
-     *
-     * @method isAdjacent
-     * @param {Triangle} tri - The second triangle to check adjacency with.
-     * @return {boolean} - True if this and the passed triangle have at least one common edge.
-     * @instance
-     * @memberof Triangle
-     */
-    isAdjacent(tri) {
-        var a = this.a.equals(tri.a) || this.a.equals(tri.b) || this.a.equals(tri.c);
-        var b = this.b.equals(tri.a) || this.b.equals(tri.b) || this.b.equals(tri.c);
-        var c = this.c.equals(tri.a) || this.c.equals(tri.b) || this.c.equals(tri.c);
-        return (a && b) || (a && c) || (b && c);
-    }
-    /**
-     * Get that vertex of this triangle (a,b,c) that is not vert1 nor vert2 of
-     * the passed two.
-     *
-     * @method getThirdVertex
-     * @param {Vertex} vert1 - The first vertex.
-     * @param {Vertex} vert2 - The second vertex.
-     * @return {Vertex} - The third vertex of this triangle that makes up the whole triangle with vert1 and vert2.
-     * @instance
-     * @memberof Triangle
-     */
-    getThirdVertex(vert1, vert2) {
-        if ((this.a.equals(vert1) && this.b.equals(vert2)) || (this.a.equals(vert2) && this.b.equals(vert1)))
-            return this.c;
-        if ((this.b.equals(vert1) && this.c.equals(vert2)) || (this.b.equals(vert2) && this.c.equals(vert1)))
-            return this.a;
-        //if( this.c.equals(vert1) && this.a.equals(vert2) || this.c.equals(vert2) && this.a.equals(vert1) )
-        return this.b;
-    }
-    /**
-     * Re-compute the circumcircle of this triangle (if the vertices
-     * have changed).
-     *
-     * The circumcenter and radius are stored in this.center and
-     * this.radius. There is a third result: radius_squared (for internal computations).
-     *
-     * @method calcCircumcircle
-     * @return void
-     * @instance
-     * @memberof Triangle
-     */
-    calcCircumcircle() {
-        // From
-        //    http://www.exaflop.org/docs/cgafaq/cga1.html
-        const A = this.b.x - this.a.x;
-        const B = this.b.y - this.a.y;
-        const C = this.c.x - this.a.x;
-        const D = this.c.y - this.a.y;
-        const E = A * (this.a.x + this.b.x) + B * (this.a.y + this.b.y);
-        const F = C * (this.a.x + this.c.x) + D * (this.a.y + this.c.y);
-        const G = 2.0 * (A * (this.c.y - this.b.y) - B * (this.c.x - this.b.x));
-        let dx, dy;
-        if (Math.abs(G) < Triangle.EPSILON) {
-            // Collinear - find extremes and use the midpoint
-            const bounds = this.bounds();
-            this.center = new Vertex((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
-            dx = this.center.x - bounds.min.x;
-            dy = this.center.y - bounds.min.y;
-        }
-        else {
-            const cx = (D * E - B * F) / G;
-            const cy = (A * F - C * E) / G;
-            this.center = new Vertex(cx, cy);
-            dx = this.center.x - this.a.x;
-            dy = this.center.y - this.a.y;
-        }
-        this.radius_squared = dx * dx + dy * dy;
-        this.radius = Math.sqrt(this.radius_squared);
-    } // END calcCircumcircle
-    /**
-     * Check if the passed vertex is inside this triangle's
-     * circumcircle.
-     *
-     * @method inCircumcircle
-     * @param {Vertex} v - The vertex to check.
-     * @return {boolean}
-     * @instance
-     * @memberof Triangle
-     */
-    inCircumcircle(v) {
-        const dx = this.center.x - v.x;
-        const dy = this.center.y - v.y;
-        const dist_squared = dx * dx + dy * dy;
-        return dist_squared <= this.radius_squared;
-    }
-    /**
-     * Get the rectangular bounds for this triangle.
-     *
-     * @method bounds
-     * @return {Bounds} - The min/max bounds of this triangle.
-     * @instance
-     * @memberof Triangle
-     */
-    bounds() {
-        return new Bounds(new Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)), new Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y)));
-    }
-    /**
-     * Convert this triangle to a polygon instance.
-     *
-     * Plase note that this conversion does not perform a deep clone.
-     *
-     * @method toPolygon
-     * @return {Polygon} A new polygon representing this triangle.
-     * @instance
-     * @memberof Triangle
-     **/
-    toPolygon() {
-        return new Polygon([this.a, this.b, this.c]);
-    }
-    /**
-     * Get the determinant of this triangle.
-     *
-     * @method determinant
-     * @return {number} - The determinant (float).
-     * @instance
-     * @memberof Triangle
-     */
-    determinant() {
-        // (b.y - a.y)*(c.x - b.x) - (c.y - b.y)*(b.x - a.x);
-        return (this.b.y - this.a.y) * (this.c.x - this.b.x) - (this.c.y - this.b.y) * (this.b.x - this.a.x);
-    }
-    /**
-     * Checks if the passed vertex (p) is inside this triangle.
-     *
-     * Note: matrix determinants rock.
-     *
-     * @method containsPoint
-     * @param {Vertex} p - The vertex to check.
-     * @return {boolean}
-     * @instance
-     * @memberof Triangle
-     */
-    containsPoint(p) {
-        return Triangle.utils.pointIsInTriangle(p.x, p.y, this.a.x, this.a.y, this.b.x, this.b.y, this.c.x, this.c.y);
-    }
-    /**
-     * Get that inner triangle which defines the maximal incircle.
-     *
-     * @return {Triangle} The triangle of those points in this triangle that define the incircle.
-     */
-    getIncircularTriangle() {
-        const lineA = new Line(this.a, this.b);
-        const lineB = new Line(this.b, this.c);
-        const lineC = new Line(this.c, this.a);
-        const bisector1 = geomutils.nsectAngle(this.b, this.a, this.c, 2)[0]; // bisector of first angle (in b)
-        const bisector2 = geomutils.nsectAngle(this.c, this.b, this.a, 2)[0]; // bisector of second angle (in c)
-        // Cast to non-null here because we know there _is_ an intersection
-        const intersection = bisector1.intersection(bisector2);
-        // Find the closest points on one of the polygon lines (all have same distance by construction)
-        const circleIntersA = lineA.getClosestPoint(intersection);
-        const circleIntersB = lineB.getClosestPoint(intersection);
-        const circleIntersC = lineC.getClosestPoint(intersection);
-        return new Triangle(circleIntersA, circleIntersB, circleIntersC);
-    }
-    /**
-     * Get the incircle of this triangle. That is the circle that touches each side
-     * of this triangle in exactly one point.
-     *
-     * Note this just calls getIncircularTriangle().getCircumcircle()
-     *
-     * @return {Circle} The incircle of this triangle.
-     */
-    getIncircle() {
-        return this.getIncircularTriangle().getCircumcircle();
-    }
-    /**
-     * Get the incenter of this triangle (which is the center of the circumcircle).
-     *
-     * Note: due to performance reasonst the incenter is buffered inside the triangle because
-     *       computing it is relatively expensive. If a, b or c have changed you should call the
-     *       calcCircumcircle() function first, otherwise you might get wrong results.
-     * @return Vertex The incenter of this triangle.
-     **/
-    getIncenter() {
-        if (!this.center || !this.radius)
-            this.calcCircumcircle();
-        return this.center.clone();
-    }
-    /**
-     * Converts this triangle into a human-readable string.
-     *
-     * @method toString
-     * @return {string}
-     * @instance
-     * @memberof Triangle
-     */
-    toString() {
-        return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + ", c : " + this.c.toString() + "}";
-    }
-    /**
-     * This function should invalidate any installed listeners and invalidate this object.
-     * After calling this function the object might not hold valid data any more and
-     * should not be used.
-     */
-    destroy() {
-        this.a.destroy();
-        this.b.destroy();
-        this.c.destroy();
-        this.isDestroyed = true;
-    }
-}
-/**
- * An epsilon for comparison.
- * This should be the same epsilon as in Vertex.
- *
- * @private
- **/
-Triangle.EPSILON = 1.0e-6;
-Triangle.utils = {
-    // Used in the bounds() function.
-    max3(a, b, c) {
-        return a >= b && a >= c ? a : b >= a && b >= c ? b : c;
-    },
-    min3(a, b, c) {
-        return a <= b && a <= c ? a : b <= a && b <= c ? b : c;
-    },
-    signedArea(p0x, p0y, p1x, p1y, p2x, p2y) {
-        return 0.5 * (-p1y * p2x + p0y * (-p1x + p2x) + p0x * (p1y - p2y) + p1x * p2y);
-    },
-    /**
-     * Used by the containsPoint() function.
-     *
-     * @private
-     **/
-    pointIsInTriangle(px, py, p0x, p0y, p1x, p1y, p2x, p2y) {
-        //
-        // Point-in-Triangle test found at
-        //   http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-2d-triangle
-        // var area : number = 1/2*(-p1y*p2x + p0y*(-p1x + p2x) + p0x*(p1y - p2y) + p1x*p2y);
-        var area = Triangle.utils.signedArea(p0x, p0y, p1x, p1y, p2x, p2y);
-        var s = (1 / (2 * area)) * (p0y * p2x - p0x * p2y + (p2y - p0y) * px + (p0x - p2x) * py);
-        var t = (1 / (2 * area)) * (p0x * p1y - p0y * p1x + (p0y - p1y) * px + (p1x - p0x) * py);
-        return s > 0 && t > 0 && 1 - s - t > 0;
-    }
-};
-
-/**
- * @author   Ikaros Kappler
- * @date     2019-02-03
- * @modified 2021-03-01 Added `wrapMax` function.
- * @version  1.1.0
- **/
-/**
- * A collection of usefull geometry utilities.
- *
- * @global
- **/
-const geomutils = {
-    /**
-     * Compute the n-section of the angle – described as a triangle (A,B,C) – in point A.
-     *
-     * @param {Vertex} pA - The first triangle point.
-     * @param {Vertex} pB - The second triangle point.
-     * @param {Vertex} pC - The third triangle point.
-     * @param {number} n - The number of desired angle sections (example: 2 means the angle will be divided into two sections,
-     *                      means an returned array with length 1, the middle line).
-     *
-     * @return {Line[]} An array of n-1 lines secting the given angle in point A into n equal sized angle sections. The lines' first vertex is A.
-     */
-    nsectAngle(pA, pB, pC, n) {
-        const triangle = new Triangle(pA, pB, pC);
-        const lineAB = new Line(pA, pB);
-        const lineAC = new Line(pA, pC);
-        // Compute the difference; this is the angle between AB and AC
-        var insideAngle = lineAB.angle(lineAC);
-        // We want the inner angles of the triangle, not the outer angle;
-        //   which one is which depends on the triangle 'direction'
-        const clockwise = triangle.determinant() > 0;
-        // For convenience convert the angle [-PI,PI] to [0,2*PI]
-        if (insideAngle < 0)
-            insideAngle = 2 * Math.PI + insideAngle;
-        if (!clockwise)
-            insideAngle = (2 * Math.PI - insideAngle) * -1;
-        // Scale the rotated lines to the max leg length (looks better)
-        const lineLength = Math.max(lineAB.length(), lineAC.length());
-        const scaleFactor = lineLength / lineAB.length();
-        var result = [];
-        for (var i = 1; i < n; i++) {
-            // Compute the i-th inner sector line
-            result.push(new Line(pA, pB.clone().rotate(-i * (insideAngle / n), pA)).scale(scaleFactor));
-        }
-        return result;
-    },
-    /**
-     * Wrap the value (e.g. an angle) into the given range of [0,max).
-     *
-     * @name wrapMax
-     * @param {number} x - The value to wrap.
-     * @param {number} max - The max bound to use for the range.
-     * @return {number} The wrapped value inside the range [0,max).
-     */
-    wrapMax(x, max) {
-        // Found at
-        //    https://stackoverflow.com/questions/4633177/c-how-to-wrap-a-float-to-the-interval-pi-pi
-        return (max + (x % max)) % max;
-    },
-    /**
-     * Wrap the value (e.g. an angle) into the given range of [min,max).
-     *
-     * @name wrapMinMax
-     * @param {number} x - The value to wrap.
-     * @param {number} min - The min bound to use for the range.
-     * @param {number} max - The max bound to use for the range.
-     * @return {number} The wrapped value inside the range [min,max).
-     */
-    // Currently un-used
-    wrapMinMax(x, min, max) {
-        return min + geomutils.wrapMax(x - min, max - min);
-    }
-};
 
 /**
  * @author   Ikaros Kappler
@@ -10898,8 +11192,9 @@ VEllipseSector.ellipseSectorUtils = {
  * @modified 2023-09-29 Adding proper dicionary key and value types to the params of `PlotBoilerplate.utils.safeMergeByKeys` (was `object` before).
  * @modified 2024-07-08 Adding `PlotBoilerplate.getGUI()` to retrieve the GUI instance.
  * @modified 2024-08-25 Extending main class `PlotBoilerplate` optional param `isBackdropFiltersEnabled`.
+ * @modified 2024-12-02 Adding the `triggerRedraw` to the `removeAll` method.
  *
- * @version  1.19.0
+ * @version  1.20.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -11637,16 +11932,19 @@ class PlotBoilerplate {
      *
      * @method removeAll
      * @param {boolean=false} keepVertices
+     * @param {boolean=true} triggerRedraw - By default this method triggers the redraw routine; passing `false` will suppress redrawing.
      * @instance
      * @memberof PlotBoilerplate
      * @return {void}
      */
-    removeAll(keepVertices) {
+    removeAll(keepVertices, triggerRedraw) {
         this.drawables = [];
         if (!Boolean(keepVertices)) {
             this.vertices = [];
         }
-        this.redraw();
+        if (triggerRedraw || typeof triggerRedraw === "undefined") {
+            this.redraw();
+        }
     }
     /**
      * Find the vertex near the given position.

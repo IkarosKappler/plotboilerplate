@@ -28,7 +28,11 @@
  * @modified 2023-09-25 Added the `Polygon.lineIntersections(Line,boolean)` function.
  * @modified 2023-09-29 Added the `Polygon.closestLineIntersection(Line,boolean)` function.
  * @modified 2023-11-24 Added the `Polygon.containsPolygon(Polygon)' function.
- * @version 1.12.0
+ * @modified 2024-10-12 Added the `getEdgeAt` method.
+ * @modified 2024-10-30 Added the `getEdges` method.
+ * @modified 2024-12-02 Added the `elimitateColinearEdges` method.
+ * @modified 2025-02-12 Added the `containsVerts` method to test multiple vertices for containment.
+ * @version 1.14.0
  *
  * @file Polygon
  * @public
@@ -37,9 +41,11 @@
 import { BezierPath } from "./BezierPath";
 import { Bounds } from "./Bounds";
 import { Line } from "./Line";
+import { Triangle } from "./Triangle";
 import { UIDGenerator } from "./UIDGenerator";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
+import { geomutils } from "./geomutils";
 import { XYCoords, SVGSerializable, UID } from "./interfaces";
 
 /**
@@ -103,7 +109,9 @@ export class Polygon implements SVGSerializable {
    **/
   constructor(vertices?: Array<Vertex>, isOpen?: boolean) {
     this.uid = UIDGenerator.next();
-    if (typeof vertices == "undefined") vertices = [];
+    if (typeof vertices == "undefined") {
+      vertices = [];
+    }
     this.vertices = vertices;
     this.isOpen = isOpen || false;
   }
@@ -111,13 +119,124 @@ export class Polygon implements SVGSerializable {
   /**
    * Add a vertex to the end of the `vertices` array.
    *
-   * @method addVert
+   * @method addVertex
    * @param {Vertex} vert - The vertex to add.
    * @instance
    * @memberof Polygon
    **/
   addVertex(vert: Vertex): void {
     this.vertices.push(vert);
+  }
+
+  /**
+   * Add a vertex at a particular position of the `vertices` array.
+   *
+   * @method addVertexAt
+   * @param {Vertex} vert - The vertex to add.
+   * @param {number} index - The position to add the vertex at. Will be handled modulo.
+   * @instance
+   * @memberof Polygon
+   **/
+  addVertexAt(vert: Vertex, index: number): void {
+    // var moduloIndex = index % (this.vertices.length + 1);
+    this.vertices.splice(index, 0, vert);
+  }
+
+  /**
+   * Get a new instance of the line at the given start index. The returned line will consist
+   * of the vertex at `vertIndex` and `vertIndex+1` (will be handled modulo).
+   *
+   * @method getEdgeAt
+   * @param {number} vertIndex - The vertex index of the line to start.
+   * @instance
+   * @memberof Polygon
+   * @return {Line}
+   **/
+  getEdgeAt(vertIndex: number): Line {
+    return new Line(this.getVertexAt(vertIndex), this.getVertexAt(vertIndex + 1));
+  }
+
+  /**
+   * Converts this polygon into a sequence of lines. Please note that each time
+   * this method is called new lines are created. The underlying line vertices are no clones
+   * (instances).
+   *
+   * @method getEdges
+   * @instance
+   * @memberof Polygon
+   * @return {Array<Line>}
+   */
+  getEdges(): Array<Line> {
+    const lines: Array<Line> = [];
+    for (var i = 0; i + 1 < this.vertices.length; i++) {
+      // var line = this.getLineAt(i).clone();
+      lines.push(this.getEdgeAt(i));
+    }
+    if (!this.isOpen && this.vertices.length > 0) {
+      lines.push(this.getEdgeAt(this.vertices.length - 1));
+    }
+    return lines;
+  }
+
+  /**
+   * Checks if the angle at the given polygon vertex (index) is acute. Please not that this is
+   * only working for clockwise polygons. If this polygon is not clockwise please use the
+   * `isClockwise` method and reverse polygon vertices if needed.
+   *
+   * @method isAngleAcute
+   * @instance
+   * @memberof Polygon
+   * @param {number} vertIndex - The index of the polygon vertex to check.
+   * @returns {boolean} `true` is angle is acute, `false` is obtuse.
+   */
+  getInnerAngleAt(vertIndex: number): number {
+    const p2: Vertex = this.vertices[vertIndex];
+    const p1: Vertex = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
+    const p3: Vertex = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
+
+    // See
+    //    https://math.stackexchange.com/questions/149959/how-to-find-the-interior-angle-of-an-irregular-pentagon-or-polygon
+    // π−arccos((P2−P1)⋅(P3−P2)|P2−P1||P3−P2|)
+
+    // Check if triangle is acute (will be used later)
+    // Acute angles and obtuse angles need to be handled differently.
+    const isAcute: boolean = this.isAngleAcute(vertIndex);
+
+    // Differences
+    const zero: Vertex = new Vertex(0, 0);
+    const p2mp1: Vertex = new Vertex(p2.x - p1.x, p2.y - p1.y);
+    const p3mp2: Vertex = new Vertex(p3.x - p2.x, p3.y - p2.y);
+    const p2mp1_len: number = zero.distance(p2mp1);
+    const p3mp2_len: number = zero.distance(p3mp2);
+
+    // Dot products
+    const dotProduct: number = geomutils.dotProduct(p2mp1, p3mp2);
+    const lengthProduct: number = p2mp1_len * p3mp2_len;
+    if (isAcute) {
+      return Math.PI - Math.acos(dotProduct / lengthProduct);
+    } else {
+      return Math.PI + Math.acos(dotProduct / lengthProduct);
+    }
+  }
+
+  /**
+   * Checks if the angle at the given polygon vertex (index) is acute.
+   *
+   * @method isAngleAcute
+   * @instance
+   * @memberof Polygon
+   * @param {number} vertIndex - The index of the polygon vertex to check.
+   * @returns {boolean} `true` is angle is acute, `false` is obtuse.
+   */
+  isAngleAcute(vertIndex: number): boolean {
+    const A: Vertex = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
+    const B: Vertex = this.vertices[vertIndex];
+    const C: Vertex = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
+
+    // Find local winding number for triangle A B C
+    const windingNumber: number = Triangle.utils.determinant(A, B, C);
+    // console.log("vertIndex", vertIndex, "windingNumber", windingNumber);
+    return windingNumber < 0;
   }
 
   /**
@@ -130,15 +249,18 @@ export class Polygon implements SVGSerializable {
    *  - getVertexAt( vertices.length + k ) == getVertexAt( k )
    *  - getVertexAt( -k )                  == getVertexAt( vertices.length -k )
    *
-   * @metho getVertexAt
+   * @method getVertexAt
    * @param {number} index - The index of the desired vertex.
    * @instance
    * @memberof Polygon
    * @return {Vertex} At the given index.
    **/
   getVertexAt(index: number): Vertex {
-    if (index < 0) return this.vertices[this.vertices.length - (Math.abs(index) % this.vertices.length)];
-    else return this.vertices[index % this.vertices.length];
+    if (index < 0) {
+      return this.vertices[this.vertices.length - (Math.abs(index) % this.vertices.length)];
+    } else {
+      return this.vertices[index % this.vertices.length];
+    }
   }
 
   /**
@@ -164,7 +286,7 @@ export class Polygon implements SVGSerializable {
    *    https://stackoverflow.com/questions/22521982/check-if-point-inside-a-polygon
    *
    * @method containsVert
-   * @param {XYCoords} vert - The vertex to check. The new x-component.
+   * @param {XYCoords} vert - The vertex to check.
    * @return {boolean} True if the passed vertex is inside this polygon. The polygon is considered closed.
    * @instance
    * @memberof Polygon
@@ -183,6 +305,21 @@ export class Polygon implements SVGSerializable {
       if (intersect) inside = !inside;
     }
     return inside;
+  }
+
+  /**
+   * Check if all given vertices are inside this polygon.<br>
+   * <br>
+   * This method just uses the `Polygon.containsVert` method.
+   *
+   * @method containsVerts
+   * @param {XYCoords[]} verts - The vertices to check.
+   * @return {boolean} True if all passed vertices are inside this polygon. The polygon is considered closed.
+   * @instance
+   * @memberof Polygon
+   **/
+  containsVerts(verts: XYCoords[]): boolean {
+    return verts.every((vert: XYCoords) => this.containsVert(vert));
   }
 
   /**
@@ -250,7 +387,8 @@ export class Polygon implements SVGSerializable {
    * @return {boolean}
    */
   isClockwise(): boolean {
-    return Polygon.utils.signedArea(this.vertices) < 0;
+    // return Polygon.utils.signedArea(this.vertices) < 0;
+    return Polygon.utils.isClockwise(this.vertices);
   }
 
   /**
@@ -309,6 +447,29 @@ export class Polygon implements SVGSerializable {
       this.vertices[i].rotate(angle, center);
     }
     return this;
+  }
+
+  /**
+   * Get the mean `center` of this polygon by calculating the mean value of all vertices.
+   *
+   * Mean: (v[0] + v[1] + ... v[n-1]) / n
+   *
+   * @method getMeanCenter
+   * @instance
+   * @memberof Polygon
+   * @return {Vertex|null} `null` is no vertices are available.
+   */
+  getMeanCenter() {
+    if (this.vertices.length === 0) {
+      return null;
+    }
+    const center = this.vertices[0].clone();
+    for (var i = 1; i < this.vertices.length; i++) {
+      center.add(this.vertices[i]);
+    }
+    center.x /= this.vertices.length;
+    center.y /= this.vertices.length;
+    return center;
   }
 
   /**
@@ -460,6 +621,9 @@ export class Polygon implements SVGSerializable {
   /**
    * Create a deep copy of this polygon.
    *
+   * @method clone
+   * @instance
+   * @memberof Polygon
    * @return {Polygon} The cloned polygon.
    */
   clone(): Polygon {
@@ -467,6 +631,57 @@ export class Polygon implements SVGSerializable {
       this.vertices.map(vert => vert.clone()),
       this.isOpen
     );
+  }
+
+  /**
+   * Create a new polygon without colinear adjacent edges. This method does not midify the current polygon
+   * but creates a new one.
+   *
+   * Please note that this method does NOT create deep clones of the vertices. Use Polygon.clone() if you need to.
+   *
+   * Please also note that the `tolerance` may become really large here, as the denominator of two closely
+   * parallel lines is usually pretty large. See the demo `57-eliminate-colinear-polygon-edges` to get
+   * an impression of how denominators work.
+   *
+   * @method elimitateColinearEdges
+   * @instance
+   * @memberof Polygon
+   * @param {number?} tolerance - (default is 1.0) The epsilon to detect co-linear edges.
+   * @return {Polygon} A new polygon without co-linear adjacent edges – respective the given epsilon.
+   */
+  elimitateColinearEdges(tolerance?: number): Polygon {
+    const eps: number = typeof tolerance === "undefined" ? 1.0 : tolerance;
+    const verts: Array<Vertex> = this.vertices.slice(); // Creates a shallow copy
+    let i: number = 0;
+    var lineA: Line = new Line(new Vertex(), new Vertex());
+    var lineB: Line = new Line(new Vertex(), new Vertex());
+    while (i + 1 < verts.length && verts.length > 2) {
+      const vertA = verts[i];
+      const vertB = verts[(i + 1) % verts.length];
+      lineA.a = vertA;
+      lineA.b = vertB;
+      lineB.a = vertB;
+      let areColinear: boolean = false;
+      let j = i + 2;
+      do {
+        let vertC: Vertex = verts[j % verts.length];
+        lineB.b = vertC;
+        areColinear = lineA.colinear(lineB, eps);
+        // console.log("are colinear?", i, i + 1, j, areColinear);
+        if (areColinear) {
+          j++;
+        }
+      } while (areColinear);
+      // Now j points to the first vertex that's NOT colinear to the current lineA
+      // -> delete all vertices in between
+      if (j - i > 2) {
+        // Means: there have been 'colinear vertices' in between
+        // console.log("Splice", "i", i, "j", j, i + 1, j - i - 1);
+        verts.splice(i + 1, j - i - 2);
+      }
+      i++;
+    }
+    return new Polygon(verts, this.isOpen);
   }
 
   /**
@@ -572,7 +787,9 @@ export class Polygon implements SVGSerializable {
    **/
   toCubicBezierSVGString(threshold: number): string {
     var qdata: Array<Vertex> = this.toCubicBezierData(threshold);
-    if (qdata.length == 0) return "";
+    if (qdata.length == 0) {
+      return "";
+    }
     var buffer = ["M " + qdata[0].x + " " + qdata[0].y];
     for (var i = 1; i < qdata.length; i += 3) {
       buffer.push(
@@ -648,6 +865,10 @@ export class Polygon implements SVGSerializable {
         total -= subX * subY * 0.5;
       }
       return Math.abs(total);
+    },
+
+    isClockwise(vertices: Array<XYCoords>): boolean {
+      return Polygon.utils.signedArea(vertices) < 0;
     },
 
     /**

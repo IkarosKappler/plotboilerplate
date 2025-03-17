@@ -28,13 +28,18 @@
  * @modified 2023-09-25 Added the `Polygon.lineIntersections(Line,boolean)` function.
  * @modified 2023-09-29 Added the `Polygon.closestLineIntersection(Line,boolean)` function.
  * @modified 2023-11-24 Added the `Polygon.containsPolygon(Polygon)' function.
- * @version 1.12.0
+ * @modified 2024-10-12 Added the `getEdgeAt` method.
+ * @modified 2024-10-30 Added the `getEdges` method.
+ * @modified 2024-12-02 Added the `elimitateColinearEdges` method.
+ * @modified 2025-02-12 Added the `containsVerts` method to test multiple vertices for containment.
+ * @version 1.14.0
  *
  * @file Polygon
  * @public
  **/
 import { BezierPath } from "./BezierPath";
 import { Bounds } from "./Bounds";
+import { Line } from "./Line";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 import { XYCoords, SVGSerializable, UID } from "./interfaces";
@@ -96,12 +101,66 @@ export declare class Polygon implements SVGSerializable {
     /**
      * Add a vertex to the end of the `vertices` array.
      *
-     * @method addVert
+     * @method addVertex
      * @param {Vertex} vert - The vertex to add.
      * @instance
      * @memberof Polygon
      **/
     addVertex(vert: Vertex): void;
+    /**
+     * Add a vertex at a particular position of the `vertices` array.
+     *
+     * @method addVertexAt
+     * @param {Vertex} vert - The vertex to add.
+     * @param {number} index - The position to add the vertex at. Will be handled modulo.
+     * @instance
+     * @memberof Polygon
+     **/
+    addVertexAt(vert: Vertex, index: number): void;
+    /**
+     * Get a new instance of the line at the given start index. The returned line will consist
+     * of the vertex at `vertIndex` and `vertIndex+1` (will be handled modulo).
+     *
+     * @method getEdgeAt
+     * @param {number} vertIndex - The vertex index of the line to start.
+     * @instance
+     * @memberof Polygon
+     * @return {Line}
+     **/
+    getEdgeAt(vertIndex: number): Line;
+    /**
+     * Converts this polygon into a sequence of lines. Please note that each time
+     * this method is called new lines are created. The underlying line vertices are no clones
+     * (instances).
+     *
+     * @method getEdges
+     * @instance
+     * @memberof Polygon
+     * @return {Array<Line>}
+     */
+    getEdges(): Array<Line>;
+    /**
+     * Checks if the angle at the given polygon vertex (index) is acute. Please not that this is
+     * only working for clockwise polygons. If this polygon is not clockwise please use the
+     * `isClockwise` method and reverse polygon vertices if needed.
+     *
+     * @method isAngleAcute
+     * @instance
+     * @memberof Polygon
+     * @param {number} vertIndex - The index of the polygon vertex to check.
+     * @returns {boolean} `true` is angle is acute, `false` is obtuse.
+     */
+    getInnerAngleAt(vertIndex: number): number;
+    /**
+     * Checks if the angle at the given polygon vertex (index) is acute.
+     *
+     * @method isAngleAcute
+     * @instance
+     * @memberof Polygon
+     * @param {number} vertIndex - The index of the polygon vertex to check.
+     * @returns {boolean} `true` is angle is acute, `false` is obtuse.
+     */
+    isAngleAcute(vertIndex: number): boolean;
     /**
      * Get the polygon vertex at the given position (index).
      *
@@ -112,7 +171,7 @@ export declare class Polygon implements SVGSerializable {
      *  - getVertexAt( vertices.length + k ) == getVertexAt( k )
      *  - getVertexAt( -k )                  == getVertexAt( vertices.length -k )
      *
-     * @metho getVertexAt
+     * @method getVertexAt
      * @param {number} index - The index of the desired vertex.
      * @instance
      * @memberof Polygon
@@ -136,12 +195,24 @@ export declare class Polygon implements SVGSerializable {
      *    https://stackoverflow.com/questions/22521982/check-if-point-inside-a-polygon
      *
      * @method containsVert
-     * @param {XYCoords} vert - The vertex to check. The new x-component.
+     * @param {XYCoords} vert - The vertex to check.
      * @return {boolean} True if the passed vertex is inside this polygon. The polygon is considered closed.
      * @instance
      * @memberof Polygon
      **/
     containsVert(vert: XYCoords): boolean;
+    /**
+     * Check if all given vertices are inside this polygon.<br>
+     * <br>
+     * This method just uses the `Polygon.containsVert` method.
+     *
+     * @method containsVerts
+     * @param {XYCoords[]} verts - The vertices to check.
+     * @return {boolean} True if all passed vertices are inside this polygon. The polygon is considered closed.
+     * @instance
+     * @memberof Polygon
+     **/
+    containsVerts(verts: XYCoords[]): boolean;
     /**
      * Check if the passed polygon is completly contained inside this polygon.
      *
@@ -219,6 +290,17 @@ export declare class Polygon implements SVGSerializable {
      **/
     rotate(angle: number, center: Vertex): Polygon;
     /**
+     * Get the mean `center` of this polygon by calculating the mean value of all vertices.
+     *
+     * Mean: (v[0] + v[1] + ... v[n-1]) / n
+     *
+     * @method getMeanCenter
+     * @instance
+     * @memberof Polygon
+     * @return {Vertex|null} `null` is no vertices are available.
+     */
+    getMeanCenter(): Vertex;
+    /**
      * Get all line intersections with this polygon.
      *
      * See demo `47-closest-vector-projection-on-polygon` for how it works.
@@ -266,9 +348,29 @@ export declare class Polygon implements SVGSerializable {
     /**
      * Create a deep copy of this polygon.
      *
+     * @method clone
+     * @instance
+     * @memberof Polygon
      * @return {Polygon} The cloned polygon.
      */
     clone(): Polygon;
+    /**
+     * Create a new polygon without colinear adjacent edges. This method does not midify the current polygon
+     * but creates a new one.
+     *
+     * Please note that this method does NOT create deep clones of the vertices. Use Polygon.clone() if you need to.
+     *
+     * Please also note that the `tolerance` may become really large here, as the denominator of two closely
+     * parallel lines is usually pretty large. See the demo `57-eliminate-colinear-polygon-edges` to get
+     * an impression of how denominators work.
+     *
+     * @method elimitateColinearEdges
+     * @instance
+     * @memberof Polygon
+     * @param {number?} tolerance - (default is 1.0) The epsilon to detect co-linear edges.
+     * @return {Polygon} A new polygon without co-linear adjacent edges – respective the given epsilon.
+     */
+    elimitateColinearEdges(tolerance?: number): Polygon;
     /**
      * Convert this polygon to a sequence of quadratic Bézier curves.<br>
      * <br>
@@ -342,6 +444,7 @@ export declare class Polygon implements SVGSerializable {
          * @return {number}
          */
         area(vertices: Array<XYCoords>): number;
+        isClockwise(vertices: Array<XYCoords>): boolean;
         /**
          * Calulate the signed polyon area by interpreting the polygon as a matrix
          * and calculating its determinant.

@@ -33,7 +33,8 @@
  * @modified 2023-09-29 Downgraded types for the `Vertex.utils.buildArrowHead` function (replacing Vertex params by more generic XYCoords type).
  * @modified 2023-09-29 Added the `Vertex.abs()` method as it seems useful.
  * @modified 2024-03-08 Added the optional `precision` param to the `toString` method.
- * @version  2.9.0
+ * @modified 2024-12-17 Outsourced the euclidean distance calculation of `Vertex.distance` to `geomutils.dist4`.
+ * @version  2.9.1
  *
  * @file Vertex
  * @public
@@ -43,6 +44,7 @@ exports.Vertex = void 0;
 var VertexAttr_1 = require("./VertexAttr");
 var UIDGenerator_1 = require("./UIDGenerator");
 var VertexListeners_1 = require("./VertexListeners");
+var geomutils_1 = require("./geomutils");
 /**
  * @classdesc A vertex is a pair of two numbers.<br>
  * <br>
@@ -386,7 +388,8 @@ var Vertex = /** @class */ (function () {
      * @memberof Vertex
      **/
     Vertex.prototype.distance = function (vert) {
-        return Math.sqrt(Math.pow(vert.x - this.x, 2) + Math.pow(vert.y - this.y, 2));
+        // return Math.sqrt(Math.pow(vert.x - this.x, 2) + Math.pow(vert.y - this.y, 2));
+        return geomutils_1.geomutils.dist4(this.x, this.y, vert.x, vert.y);
     };
     /**
      * Get the angle of this point (relative to (0,0) or to the given other origin point).

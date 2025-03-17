@@ -4333,8 +4333,9 @@ exports.PBText = PBText;
  * @modified 2023-09-29 Adding proper dicionary key and value types to the params of `PlotBoilerplate.utils.safeMergeByKeys` (was `object` before).
  * @modified 2024-07-08 Adding `PlotBoilerplate.getGUI()` to retrieve the GUI instance.
  * @modified 2024-08-25 Extending main class `PlotBoilerplate` optional param `isBackdropFiltersEnabled`.
+ * @modified 2024-12-02 Adding the `triggerRedraw` to the `removeAll` method.
  *
- * @version  1.19.0
+ * @version  1.20.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -5094,16 +5095,19 @@ var PlotBoilerplate = /** @class */ (function () {
      *
      * @method removeAll
      * @param {boolean=false} keepVertices
+     * @param {boolean=true} triggerRedraw - By default this method triggers the redraw routine; passing `false` will suppress redrawing.
      * @instance
      * @memberof PlotBoilerplate
      * @return {void}
      */
-    PlotBoilerplate.prototype.removeAll = function (keepVertices) {
+    PlotBoilerplate.prototype.removeAll = function (keepVertices, triggerRedraw) {
         this.drawables = [];
         if (!Boolean(keepVertices)) {
             this.vertices = [];
         }
-        this.redraw();
+        if (triggerRedraw || typeof triggerRedraw === "undefined") {
+            this.redraw();
+        }
     };
     /**
      * Find the vertex near the given position.
@@ -6526,7 +6530,11 @@ exports["default"] = PlotBoilerplate;
  * @modified 2023-09-25 Added the `Polygon.lineIntersections(Line,boolean)` function.
  * @modified 2023-09-29 Added the `Polygon.closestLineIntersection(Line,boolean)` function.
  * @modified 2023-11-24 Added the `Polygon.containsPolygon(Polygon)' function.
- * @version 1.12.0
+ * @modified 2024-10-12 Added the `getEdgeAt` method.
+ * @modified 2024-10-30 Added the `getEdges` method.
+ * @modified 2024-12-02 Added the `elimitateColinearEdges` method.
+ * @modified 2025-02-12 Added the `containsVerts` method to test multiple vertices for containment.
+ * @version 1.14.0
  *
  * @file Polygon
  * @public
@@ -6536,8 +6544,10 @@ exports.Polygon = void 0;
 var BezierPath_1 = __webpack_require__(733);
 var Bounds_1 = __webpack_require__(76);
 var Line_1 = __webpack_require__(939);
+var Triangle_1 = __webpack_require__(737);
 var UIDGenerator_1 = __webpack_require__(938);
 var Vertex_1 = __webpack_require__(787);
+var geomutils_1 = __webpack_require__(328);
 /**
  * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
  *
@@ -6564,21 +6574,124 @@ var Polygon = /** @class */ (function () {
          **/
         this.className = "Polygon";
         this.uid = UIDGenerator_1.UIDGenerator.next();
-        if (typeof vertices == "undefined")
+        if (typeof vertices == "undefined") {
             vertices = [];
+        }
         this.vertices = vertices;
         this.isOpen = isOpen || false;
     }
     /**
      * Add a vertex to the end of the `vertices` array.
      *
-     * @method addVert
+     * @method addVertex
      * @param {Vertex} vert - The vertex to add.
      * @instance
      * @memberof Polygon
      **/
     Polygon.prototype.addVertex = function (vert) {
         this.vertices.push(vert);
+    };
+    /**
+     * Add a vertex at a particular position of the `vertices` array.
+     *
+     * @method addVertexAt
+     * @param {Vertex} vert - The vertex to add.
+     * @param {number} index - The position to add the vertex at. Will be handled modulo.
+     * @instance
+     * @memberof Polygon
+     **/
+    Polygon.prototype.addVertexAt = function (vert, index) {
+        // var moduloIndex = index % (this.vertices.length + 1);
+        this.vertices.splice(index, 0, vert);
+    };
+    /**
+     * Get a new instance of the line at the given start index. The returned line will consist
+     * of the vertex at `vertIndex` and `vertIndex+1` (will be handled modulo).
+     *
+     * @method getEdgeAt
+     * @param {number} vertIndex - The vertex index of the line to start.
+     * @instance
+     * @memberof Polygon
+     * @return {Line}
+     **/
+    Polygon.prototype.getEdgeAt = function (vertIndex) {
+        return new Line_1.Line(this.getVertexAt(vertIndex), this.getVertexAt(vertIndex + 1));
+    };
+    /**
+     * Converts this polygon into a sequence of lines. Please note that each time
+     * this method is called new lines are created. The underlying line vertices are no clones
+     * (instances).
+     *
+     * @method getEdges
+     * @instance
+     * @memberof Polygon
+     * @return {Array<Line>}
+     */
+    Polygon.prototype.getEdges = function () {
+        var lines = [];
+        for (var i = 0; i + 1 < this.vertices.length; i++) {
+            // var line = this.getLineAt(i).clone();
+            lines.push(this.getEdgeAt(i));
+        }
+        if (!this.isOpen && this.vertices.length > 0) {
+            lines.push(this.getEdgeAt(this.vertices.length - 1));
+        }
+        return lines;
+    };
+    /**
+     * Checks if the angle at the given polygon vertex (index) is acute. Please not that this is
+     * only working for clockwise polygons. If this polygon is not clockwise please use the
+     * `isClockwise` method and reverse polygon vertices if needed.
+     *
+     * @method isAngleAcute
+     * @instance
+     * @memberof Polygon
+     * @param {number} vertIndex - The index of the polygon vertex to check.
+     * @returns {boolean} `true` is angle is acute, `false` is obtuse.
+     */
+    Polygon.prototype.getInnerAngleAt = function (vertIndex) {
+        var p2 = this.vertices[vertIndex];
+        var p1 = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
+        var p3 = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
+        // See
+        //    https://math.stackexchange.com/questions/149959/how-to-find-the-interior-angle-of-an-irregular-pentagon-or-polygon
+        // π−arccos((P2−P1)⋅(P3−P2)|P2−P1||P3−P2|)
+        // Check if triangle is acute (will be used later)
+        // Acute angles and obtuse angles need to be handled differently.
+        var isAcute = this.isAngleAcute(vertIndex);
+        // Differences
+        var zero = new Vertex_1.Vertex(0, 0);
+        var p2mp1 = new Vertex_1.Vertex(p2.x - p1.x, p2.y - p1.y);
+        var p3mp2 = new Vertex_1.Vertex(p3.x - p2.x, p3.y - p2.y);
+        var p2mp1_len = zero.distance(p2mp1);
+        var p3mp2_len = zero.distance(p3mp2);
+        // Dot products
+        var dotProduct = geomutils_1.geomutils.dotProduct(p2mp1, p3mp2);
+        var lengthProduct = p2mp1_len * p3mp2_len;
+        if (isAcute) {
+            return Math.PI - Math.acos(dotProduct / lengthProduct);
+        }
+        else {
+            return Math.PI + Math.acos(dotProduct / lengthProduct);
+        }
+    };
+    /**
+     * Checks if the angle at the given polygon vertex (index) is acute.
+     *
+     * @method isAngleAcute
+     * @instance
+     * @memberof Polygon
+     * @param {number} vertIndex - The index of the polygon vertex to check.
+     * @returns {boolean} `true` is angle is acute, `false` is obtuse.
+     */
+    Polygon.prototype.isAngleAcute = function (vertIndex) {
+        var A = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
+        var B = this.vertices[vertIndex];
+        var C = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
+        // Find local winding number for triangle A B C
+        var windingNumber = Triangle_1.Triangle.utils.determinant(A, B, C);
+        // console.log("vertIndex", vertIndex, "windingNumber", windingNumber);
+        return windingNumber < 0;
     };
     /**
      * Get the polygon vertex at the given position (index).
@@ -6590,17 +6703,19 @@ var Polygon = /** @class */ (function () {
      *  - getVertexAt( vertices.length + k ) == getVertexAt( k )
      *  - getVertexAt( -k )                  == getVertexAt( vertices.length -k )
      *
-     * @metho getVertexAt
+     * @method getVertexAt
      * @param {number} index - The index of the desired vertex.
      * @instance
      * @memberof Polygon
      * @return {Vertex} At the given index.
      **/
     Polygon.prototype.getVertexAt = function (index) {
-        if (index < 0)
+        if (index < 0) {
             return this.vertices[this.vertices.length - (Math.abs(index) % this.vertices.length)];
-        else
+        }
+        else {
             return this.vertices[index % this.vertices.length];
+        }
     };
     /**
      * Move the polygon's vertices by the given amount.
@@ -6624,7 +6739,7 @@ var Polygon = /** @class */ (function () {
      *    https://stackoverflow.com/questions/22521982/check-if-point-inside-a-polygon
      *
      * @method containsVert
-     * @param {XYCoords} vert - The vertex to check. The new x-component.
+     * @param {XYCoords} vert - The vertex to check.
      * @return {boolean} True if the passed vertex is inside this polygon. The polygon is considered closed.
      * @instance
      * @memberof Polygon
@@ -6641,6 +6756,21 @@ var Polygon = /** @class */ (function () {
                 inside = !inside;
         }
         return inside;
+    };
+    /**
+     * Check if all given vertices are inside this polygon.<br>
+     * <br>
+     * This method just uses the `Polygon.containsVert` method.
+     *
+     * @method containsVerts
+     * @param {XYCoords[]} verts - The vertices to check.
+     * @return {boolean} True if all passed vertices are inside this polygon. The polygon is considered closed.
+     * @instance
+     * @memberof Polygon
+     **/
+    Polygon.prototype.containsVerts = function (verts) {
+        var _this = this;
+        return verts.every(function (vert) { return _this.containsVert(vert); });
     };
     /**
      * Check if the passed polygon is completly contained inside this polygon.
@@ -6704,7 +6834,8 @@ var Polygon = /** @class */ (function () {
      * @return {boolean}
      */
     Polygon.prototype.isClockwise = function () {
-        return Polygon.utils.signedArea(this.vertices) < 0;
+        // return Polygon.utils.signedArea(this.vertices) < 0;
+        return Polygon.utils.isClockwise(this.vertices);
     };
     /**
      * Get the perimeter of this polygon.
@@ -6762,6 +6893,28 @@ var Polygon = /** @class */ (function () {
             this.vertices[i].rotate(angle, center);
         }
         return this;
+    };
+    /**
+     * Get the mean `center` of this polygon by calculating the mean value of all vertices.
+     *
+     * Mean: (v[0] + v[1] + ... v[n-1]) / n
+     *
+     * @method getMeanCenter
+     * @instance
+     * @memberof Polygon
+     * @return {Vertex|null} `null` is no vertices are available.
+     */
+    Polygon.prototype.getMeanCenter = function () {
+        if (this.vertices.length === 0) {
+            return null;
+        }
+        var center = this.vertices[0].clone();
+        for (var i = 1; i < this.vertices.length; i++) {
+            center.add(this.vertices[i]);
+        }
+        center.x /= this.vertices.length;
+        center.y /= this.vertices.length;
+        return center;
     };
     /**
      * Get all line intersections with this polygon.
@@ -6905,10 +7058,63 @@ var Polygon = /** @class */ (function () {
     /**
      * Create a deep copy of this polygon.
      *
+     * @method clone
+     * @instance
+     * @memberof Polygon
      * @return {Polygon} The cloned polygon.
      */
     Polygon.prototype.clone = function () {
         return new Polygon(this.vertices.map(function (vert) { return vert.clone(); }), this.isOpen);
+    };
+    /**
+     * Create a new polygon without colinear adjacent edges. This method does not midify the current polygon
+     * but creates a new one.
+     *
+     * Please note that this method does NOT create deep clones of the vertices. Use Polygon.clone() if you need to.
+     *
+     * Please also note that the `tolerance` may become really large here, as the denominator of two closely
+     * parallel lines is usually pretty large. See the demo `57-eliminate-colinear-polygon-edges` to get
+     * an impression of how denominators work.
+     *
+     * @method elimitateColinearEdges
+     * @instance
+     * @memberof Polygon
+     * @param {number?} tolerance - (default is 1.0) The epsilon to detect co-linear edges.
+     * @return {Polygon} A new polygon without co-linear adjacent edges – respective the given epsilon.
+     */
+    Polygon.prototype.elimitateColinearEdges = function (tolerance) {
+        var eps = typeof tolerance === "undefined" ? 1.0 : tolerance;
+        var verts = this.vertices.slice(); // Creates a shallow copy
+        var i = 0;
+        var lineA = new Line_1.Line(new Vertex_1.Vertex(), new Vertex_1.Vertex());
+        var lineB = new Line_1.Line(new Vertex_1.Vertex(), new Vertex_1.Vertex());
+        while (i + 1 < verts.length && verts.length > 2) {
+            var vertA = verts[i];
+            var vertB = verts[(i + 1) % verts.length];
+            lineA.a = vertA;
+            lineA.b = vertB;
+            lineB.a = vertB;
+            var areColinear = false;
+            var j = i + 2;
+            do {
+                var vertC = verts[j % verts.length];
+                lineB.b = vertC;
+                areColinear = lineA.colinear(lineB, eps);
+                // console.log("are colinear?", i, i + 1, j, areColinear);
+                if (areColinear) {
+                    j++;
+                }
+            } while (areColinear);
+            // Now j points to the first vertex that's NOT colinear to the current lineA
+            // -> delete all vertices in between
+            if (j - i > 2) {
+                // Means: there have been 'colinear vertices' in between
+                // console.log("Splice", "i", i, "j", j, i + 1, j - i - 1);
+                verts.splice(i + 1, j - i - 2);
+            }
+            i++;
+        }
+        return new Polygon(verts, this.isOpen);
     };
     /**
      * Convert this polygon to a sequence of quadratic Bézier curves.<br>
@@ -7009,8 +7215,9 @@ var Polygon = /** @class */ (function () {
      **/
     Polygon.prototype.toCubicBezierSVGString = function (threshold) {
         var qdata = this.toCubicBezierData(threshold);
-        if (qdata.length == 0)
+        if (qdata.length == 0) {
             return "";
+        }
         var buffer = ["M " + qdata[0].x + " " + qdata[0].y];
         for (var i = 1; i < qdata.length; i += 3) {
             buffer.push("C " +
@@ -7080,6 +7287,9 @@ var Polygon = /** @class */ (function () {
             }
             return Math.abs(total);
         },
+        isClockwise: function (vertices) {
+            return Polygon.utils.signedArea(vertices) < 0;
+        },
         /**
          * Calulate the signed polyon area by interpreting the polygon as a matrix
          * and calculating its determinant.
@@ -7131,7 +7341,9 @@ exports.Polygon = Polygon;
  * @modified  2021-01-22 Always updating circumcircle when retieving it.
  * @modified  2022-02-02 Added the `destroy` method.
  * @modified  2022-02-02 Cleared the `Triangle.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version   2.6.0
+ * @modified  2024-11-22 Added static utility function Triangle.utils.determinant; adapted method `determinant`.
+ * @modified  2024-11-22 Changing visibility of `Triangle.utils` from `private` to `public`.
+ * @version   2.8.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -7393,7 +7605,8 @@ var Triangle = /** @class */ (function () {
      */
     Triangle.prototype.determinant = function () {
         // (b.y - a.y)*(c.x - b.x) - (c.y - b.y)*(b.x - a.x);
-        return (this.b.y - this.a.y) * (this.c.x - this.b.x) - (this.c.y - this.b.y) * (this.b.x - this.a.x);
+        // return (this.b.y - this.a.y) * (this.c.x - this.b.x) - (this.c.y - this.b.y) * (this.b.x - this.a.x);
+        return Triangle.utils.determinant(this.a, this.b, this.c);
     };
     /**
      * Checks if the passed vertex (p) is inside this triangle.
@@ -7506,6 +7719,16 @@ var Triangle = /** @class */ (function () {
             var s = (1 / (2 * area)) * (p0y * p2x - p0x * p2y + (p2y - p0y) * px + (p0x - p2x) * py);
             var t = (1 / (2 * area)) * (p0x * p1y - p0y * p1x + (p0y - p1y) * px + (p1x - p0x) * py);
             return s > 0 && t > 0 && 1 - s - t > 0;
+        },
+        /**
+         * Calculate the determinant of the three vertices a, b and c (in this order).
+         * @param {XYCords} a - The first vertex.
+         * @param {XYCords} b - The first vertex.
+         * @param {XYCords} c - The first vertex.
+         * @returns {nmber}
+         */
+        determinant: function (a, b, c) {
+            return (b.y - a.y) * (c.x - b.x) - (c.y - b.y) * (b.x - a.x);
         }
     };
     return Triangle;
@@ -8460,7 +8683,10 @@ exports.Vector = Vector;
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2023-09-29 Fixed a calculation error in the VertTuple.hasPoint() function; distance measure was broken!
- * @version 1.2.1
+ * @modified 2024-09-10 Chaging the first param of `pointDistance` from `Vertex` to less strict type `XYCoords`. This should not break anything.
+ * @modified 2024-09-10 Adding the optional `epsilon` param to the `hasPoint` method.
+ * @modified 2024-12-02 Added the `epsilon` param to the `colinear` method. Default is 1.0e-6.
+ * @version 1.3.0
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VertTuple = void 0;
@@ -8635,12 +8861,13 @@ var VertTuple = /** @class */ (function () {
      *
      * @method colinear
      * @param {VertTuple} line
+     * @param {epsilon?=1.0e-6} epsilon - The epsilon to use (default is 1.0e-6).
      * @instance
      * @memberof VertTuple
      * @return true if both lines are co-linear.
      */
-    VertTuple.prototype.colinear = function (line) {
-        return Math.abs(this.denominator(line)) < Vertex_1.Vertex.EPSILON;
+    VertTuple.prototype.colinear = function (line, epsilon) {
+        return Math.abs(this.denominator(line)) < (typeof epsilon === "undefined" ? Vertex_1.Vertex.EPSILON : epsilon);
     };
     /**
      * Get the closest position T from this line to the specified point.
@@ -8669,21 +8896,22 @@ var VertTuple = /** @class */ (function () {
      * that point is located between point `a` and `b`.
      *
      * @method hasPoint
-     * @param {Vertex} point The point to check.
-     * @param {boolean=} insideBoundsOnly If set to to true (default=false) the point must be between start and end point of the line.
+     * @param {Vertex} point - The point to check.
+     * @param {boolean=} insideBoundsOnly - [optional] If set to to true (default=false) the point must be between start and end point of the line.
+     * @param {number=Vertex.EPSILON} epsilon - [optional] A tolerance.
      * @return {boolean} True if the given point is on this line.
      * @instance
      * @memberof VertTuple
      */
-    VertTuple.prototype.hasPoint = function (point, insideBoundsOnly) {
+    VertTuple.prototype.hasPoint = function (point, insideBoundsOnly, epsilon) {
         var t = this.getClosestT(point);
         // Compare to pointDistance?
         var distance = Math.sqrt(VertTuple.vtutils.dist2(point, this.vertAt(t)));
         if (typeof insideBoundsOnly !== "undefined" && insideBoundsOnly) {
-            return distance < Vertex_1.Vertex.EPSILON && t >= 0 && t <= 1;
+            return distance < (epsilon !== null && epsilon !== void 0 ? epsilon : Vertex_1.Vertex.EPSILON) && t >= 0 && t <= 1;
         }
         else {
-            return distance < Vertex_1.Vertex.EPSILON; // t >= 0 && t <= 1;
+            return distance < (epsilon !== null && epsilon !== void 0 ? epsilon : Vertex_1.Vertex.EPSILON); // t >= 0 && t <= 1;
         }
     };
     /**
@@ -8703,7 +8931,7 @@ var VertTuple = /** @class */ (function () {
      * The the minimal distance between this line and the specified point.
      *
      * @method pointDistance
-     * @param {Vertex} p The point (vertex) to measre the distance to.
+     * @param {XYCoords} p The point (vertex) to measre the distance to.
      * @return {number} The absolute minimal distance.
      * @instance
      * @memberof VertTuple
@@ -8798,7 +9026,8 @@ exports.VertTuple = VertTuple;
  * @modified 2023-09-29 Downgraded types for the `Vertex.utils.buildArrowHead` function (replacing Vertex params by more generic XYCoords type).
  * @modified 2023-09-29 Added the `Vertex.abs()` method as it seems useful.
  * @modified 2024-03-08 Added the optional `precision` param to the `toString` method.
- * @version  2.9.0
+ * @modified 2024-12-17 Outsourced the euclidean distance calculation of `Vertex.distance` to `geomutils.dist4`.
+ * @version  2.9.1
  *
  * @file Vertex
  * @public
@@ -8808,6 +9037,7 @@ exports.Vertex = void 0;
 var VertexAttr_1 = __webpack_require__(476);
 var UIDGenerator_1 = __webpack_require__(938);
 var VertexListeners_1 = __webpack_require__(934);
+var geomutils_1 = __webpack_require__(328);
 /**
  * @classdesc A vertex is a pair of two numbers.<br>
  * <br>
@@ -9151,7 +9381,8 @@ var Vertex = /** @class */ (function () {
      * @memberof Vertex
      **/
     Vertex.prototype.distance = function (vert) {
-        return Math.sqrt(Math.pow(vert.x - this.x, 2) + Math.pow(vert.y - this.y, 2));
+        // return Math.sqrt(Math.pow(vert.x - this.x, 2) + Math.pow(vert.y - this.y, 2));
+        return geomutils_1.geomutils.dist4(this.x, this.y, vert.x, vert.y);
     };
     /**
      * Get the angle of this point (relative to (0,0) or to the given other origin point).
@@ -9832,6 +10063,7 @@ exports.VertexListeners = VertexListeners;
  * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @modified 2023-09-30 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
  * @modified 2023-10-07 Adding the optional `arrowHeadBasePositionBuffer` param to the arrowHead(...) method.
+ * @modified 2024-09-13 Remoed the scaling of `lineWidth` in the `polygon` and `polyline` methods. This makes no sense here and doesn't match up with the behavior of other line functions.
  * @version  1.13.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -10762,7 +10994,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.save();
         this.applyStrokeOpts(strokeOptions);
         this.ctx.beginPath();
-        this.ctx.lineWidth = (lineWidth || 1.0) * this.scale.x;
+        this.ctx.lineWidth = lineWidth || 1.0;
         this.ctx.moveTo(this.offset.x + vertices[0].x * this.scale.x, this.offset.y + vertices[0].y * this.scale.y);
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x * this.scale.x, this.offset.y + vertices[i].y * this.scale.y);
@@ -12690,6 +12922,30 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.prototype.grid = function (center, width, height, sizeX, sizeY, color) {
+        // console.log("grid");
+        // const node: SVGElement = this.makeNode("pattern");
+        // var patternId = "pattern_id_" + Math.floor(Math.random() * 65365);
+        // node.setAttribute("id", patternId);
+        // node.setAttribute("viewBox", `0,0,${sizeX},${sizeY}`);
+        // node.setAttribute("width", `${sizeX}`);
+        // node.setAttribute("height", `${sizeX}`);
+        // var pattern: SVGElement = this.makeNode("path");
+        // const d: SVGPathParams = [];
+        // d.push("M", sizeX / 2.0, 0);
+        // d.push("L", sizeX / 2.0, sizeY);
+        // d.push("M", 0, sizeY / 2.0);
+        // d.push("L", sizeX, sizeY / 2.0);
+        // node.setAttribute("d", d.join(" "));
+        // this.bufferedNodeDefs.append(pattern);
+        // const fillNode: SVGElement = this.makeNode("rect");
+        // // For some strange reason SVG rotation transforms use degrees instead of radians
+        // // Note that the background does not scale with the zoom level (always covers full element)
+        // fillNode.setAttribute("x", "0");
+        // fillNode.setAttribute("y", "0");
+        // fillNode.setAttribute("width", `${this.canvasSize.width}`);
+        // fillNode.setAttribute("height", `${this.canvasSize.height}`);
+        // fillNode.setAttribute("fill", `url(#${patternId})`);
+        // return this._bindFillDraw(fillNode, "grid", "red", 1);
         var node = this.makeNode("path");
         var d = [];
         var yMin = -Math.ceil((height * 0.5) / sizeY) * sizeY;
@@ -13415,7 +13671,10 @@ exports.drawutilssvg = drawutilssvg;
  * @author   Ikaros Kappler
  * @date     2019-02-03
  * @modified 2021-03-01 Added `wrapMax` function.
- * @version  1.1.0
+ * @modified 2024-11-15 Adding helper function `geomutils.mapAngleTo2PI(number)` for mapping any value into the interval [0,2*PI).
+ * @modified 2024-11-22 Adding helper function `geomutils.dotProduct(number)` for calculating the dot product of two vertices (as vectors).
+ *
+ * @version  1.2.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.geomutils = void 0;
@@ -13427,6 +13686,49 @@ var Triangle_1 = __webpack_require__(737);
  * @global
  **/
 exports.geomutils = {
+    /**
+     * Map any angle (any numeric value) to [0, Math.PI).
+     *
+     * @param {number} angle - The numeric value to map.
+     * @return {number} The mapped angle inside [0,PI*2].
+     **/
+    mapAngleTo2PI: function (angle) {
+        // Source: https://forums.codeguru.com/showthread.php?384172-get-angle-into-range-0-2*pi
+        var new_angle = Math.asin(Math.sin(angle));
+        if (Math.cos(angle) < 0) {
+            return Math.PI - new_angle;
+        }
+        else if (new_angle < 0) {
+            return new_angle + 2 * Math.PI;
+        }
+        else {
+            return new_angle;
+        }
+    },
+    /**
+     * Calculate the euclidean distance between two points given by four coordinates (two coordinates each).
+     *
+     * @param {number} x1
+     * @param {number} y1
+     * @param {number} x2
+     * @param {number} y2
+     * @returns {number}
+     */
+    dist4: function (x1, y1, x2, y2) {
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y1 - y2, 2));
+    },
+    /**
+     * Map any angle (any numeric value) to [0, Math.PI).
+     *
+     * A × B := (A.x * B.x) + (A.y * B.y)
+     *
+     * @param {XYCoords} vertA - The first vertex.
+     * @param {XYCoords} vertB - The second vertex.
+     * @return {number} The dot product of the two vertices.
+     **/
+    dotProduct: function (vertA, vertB) {
+        return vertA.x * vertB.x + vertA.y * vertB.y;
+    },
     /**
      * Compute the n-section of the angle – described as a triangle (A,B,C) – in point A.
      *

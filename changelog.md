@@ -2,14 +2,50 @@
 
 Imminent todos:
 
+- Optimize infinite pattern demo: compute inner polygons before drawing
 - demo 34: fail to compute foutier transform with array length != 8, whats going on here?
 - check greiner hormann (27): doing weird stuff when "clearSelfIntersecting=true"
 - check if the old color class is still used anywhere
 - Add googley eyes to the animated metaballs demo.
-- check automatic darmode detection
-- lil-gui does not scroll
+- check automatic darkmode detection
 
-* 2024-08-26
+* 2025-03-17
+  - Finalizing infinite irregular pattern demo.
+* 2025-02-12
+  - Added the `Polygon.containsVerts` method to test multiple vertices for containment.
+* 2024-12-17
+  - Outsourced the euclidean distance calculation of `Vertex.distance` to `geomutils.dist4`.
+  - Simplified the helper function `utils/algorithms/clearDuplicateVertices`to work with generic sub types of XYCoords as well.
+* 2024-12-02
+  - Adding the `triggerRedraw` to the `PlotBoilerplate.removeAll` method.
+  - Added the `epsilon` param to the `VertTuple.colinear` method. Default is 1.0e-6.
+  - Added the `Polygon.elimitateColinearEdges` method.
+  - Added the demo 57: how to eliminate co-linear edges from a polygon.
+* 2024-11-22
+  - Added static utility function `Triangle.utils.determinant(XYCoord,XYCoords,XYCoords)`; adapted method `Triangle.determinant()`.
+  - Changing visibility of `Triangle.utils` from `private` to `public`.
+  - Adding params `xOffset` and `yOffset` to helper functions `drawPolygonIndices`.
+  - Adding `Polygon.getInnerAngleAt(number)` to determine if polygon angle at index is acute or obtuse.
+  - Adding helper function `geomutils.mapAngleTo2PI(number)` for mapping any value into the interval `[0,2*PI)`.
+  - Adding helper function `geomutils.dotProduct(number)` for calculating the dot product of two vertices (as vectors).
+  - Fixing demo 03-random-scripture: darkmode detection failed.
+  - Fixed a type error in `utils/algorithms/findPolygonSelfIntersections`.
+  - Adding lil-gui style: Override lil-gui scroll setting (activate scrolling) in `./demos/style.css`.
+  - Added the `insideBoundsOnly` param to the `splitPolygonToNonIntersecting` algorithm.
+* 2024-10-30
+  - Added tge `Polygon.getEdges` method.
+* 2024-10-12
+  - Added the `Polygon.getEdgeAt` method.
+* 2024-10-08
+  - Adding `cssBackdropFolder` as a class attribute to the `CSSBackdropEffects` class.
+* 2024-10-02
+  - guiSizeToggler: Added a transition time (CSS style).
+* 2024-09-13
+  - Class `draw`: Remoed the scaling of `lineWidth` in the `polygon` and `polyline` methods. This makes no sense here and doesn't match up with the behavior of other line functions.
+* 2024-09-10
+  - Chaging the first param of `VertTuple.pointDistance` from `Vertex` to less strict type `XYCoords`. This should not break anything.
+  - Adding the optional `VertTuple.epsilon` param to the `hasPoint` method.
+* 2024-08-26 [v1.23.2]
   - Added the `utils/Params.hasParam` method.
   - Decoding URI components in GET params in `utils/gup`.
 * 2024-08-25

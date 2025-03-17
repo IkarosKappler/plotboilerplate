@@ -211,7 +211,7 @@
     var drawPolygonNumbers = function (draw, fill) {
       for (var i = 0; i < polygons.length; i++) {
         var poly = polygons[i];
-        // console.log("poly[i].vertices.length", poly.vertices.length);
+        console.log("poly[i].vertices.length", poly.vertices.length);
         for (var j = 0; j < poly.vertices.length; j++) {
           const coords = convertCoords2Pos(poly.vertices[j].x, poly.vertices[j].y);
           fill.text("" + i, coords.x, coords.y, { color: "orange", fontFamily: "Arial", fontSize: 9 });

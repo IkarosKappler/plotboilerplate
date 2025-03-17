@@ -13,7 +13,16 @@ module.exports = [
     devtool: "source-map",
     optimization: {
       minimize: false
-    }
+    },
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          compress: {
+            pure_funcs: ["console.log"]
+          }
+        }
+      })
+    ]
   },
   {
     // https://webpack.js.org/configuration/mode/

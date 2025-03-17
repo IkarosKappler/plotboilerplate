@@ -6,10 +6,12 @@
  * @author   Ikaros Kappler
  * @date     2021-07-13
  * @modified 2023-10-28 Refactored and ported to Typescript.
- * @version  1.0.0
+ * @modified 2024-12-17 Simplified this method to work with generic sub types of XYCoords as well.
+ * @version  1.0.1
  */
 
-import { Vertex } from "../../Vertex";
+import { geomutils } from "../../geomutils";
+import { XYCoords } from "../../interfaces";
 
 const EPS: number = 0.000001;
 
@@ -18,15 +20,15 @@ const EPS: number = 0.000001;
  *
  * The original array is left unchanged. The vertices in the array are not cloned.
  *
- * @param {Vertex[]} vertices
+ * @param {XYCoords[]} vertices
  * @param {number=EPS} epsilon
  * @return {Vertex[]}
  */
-export const clearDuplicateVertices = (vertices: Vertex[], epsilon?: number) => {
+export const clearDuplicateVertices = <T extends XYCoords>(vertices: T[], epsilon?: number) => {
   if (typeof epsilon === "undefined") {
     epsilon = EPS;
   }
-  const result: Array<Vertex> = [];
+  const result: Array<T> = [];
   for (var i = 0; i < vertices.length; i++) {
     if (!containsElementFrom(vertices, vertices[i], i + 1, epsilon)) {
       result.push(vertices[i]);
@@ -35,11 +37,12 @@ export const clearDuplicateVertices = (vertices: Vertex[], epsilon?: number) => 
   return result;
 };
 
-const isCloseTo = (vertA: Vertex, vertB: Vertex, eps: number): boolean => {
-  return vertA.distance(vertB) < eps;
+const isCloseTo = <T extends XYCoords>(vertA: T, vertB: T, eps: number): boolean => {
+  // return vertA.distance(vertB) < eps;
+  return geomutils.dist4(vertA.x, vertA.y, vertB.x, vertB.y) < eps;
 };
 
-const containsElementFrom = (vertices: Array<Vertex>, vertex: Vertex, fromIndex: number, epsilon: number): boolean => {
+const containsElementFrom = <T extends XYCoords>(vertices: Array<T>, vertex: T, fromIndex: number, epsilon: number): boolean => {
   for (var i = fromIndex; i < vertices.length; i++) {
     if (isCloseTo(vertices[i], vertex, epsilon)) {
       return true;

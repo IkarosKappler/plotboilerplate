@@ -6,15 +6,17 @@
  * @author   Ikaros Kappler
  * @date     2021-07-13
  * @modified 2023-10-28 Refactored and ported to Typescript.
- * @version  1.0.0
+ * @modified 2024-12-17 Simplified this method to work with generic sub types of XYCoords as well.
+ * @version  1.0.1
  */
+import { geomutils } from "../../geomutils";
 const EPS = 0.000001;
 /**
  * Filter the array and clear all duplicates.
  *
  * The original array is left unchanged. The vertices in the array are not cloned.
  *
- * @param {Vertex[]} vertices
+ * @param {XYCoords[]} vertices
  * @param {number=EPS} epsilon
  * @return {Vertex[]}
  */
@@ -31,7 +33,8 @@ export const clearDuplicateVertices = (vertices, epsilon) => {
     return result;
 };
 const isCloseTo = (vertA, vertB, eps) => {
-    return vertA.distance(vertB) < eps;
+    // return vertA.distance(vertB) < eps;
+    return geomutils.dist4(vertA.x, vertA.y, vertB.x, vertB.y) < eps;
 };
 const containsElementFrom = (vertices, vertex, fromIndex, epsilon) => {
     for (var i = fromIndex; i < vertices.length; i++) {

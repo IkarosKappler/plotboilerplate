@@ -17,6 +17,8 @@
   var GUP = gup();
 
   window.addEventListener("load", function () {
+    var isDarkmode = detectDarkMode(GUP);
+
     // All config params are optional.
     var pb = new PlotBoilerplate(
       PlotBoilerplate.utils.safeMergeByKeys(
@@ -107,12 +109,12 @@
     // | Initialize dat.gui
     // +-------------------------------
     var gui = pb.createGUI();
-    var guiSize = guiSizeToggler(gui, config, { transformOrigin: "top right" });
-    if (isMobileDevice()) {
-      config.guiDoubleSize = true;
-      guiSize.update();
-    }
-    gui.add(config, "guiDoubleSize").title("Double size GUI?").onChange(guiSize.update);
+    // var guiSize = guiSizeToggler(gui, config, { transformOrigin: "top right" });
+    // if (isMobileDevice()) {
+    //   config.guiDoubleSize = true;
+    //   guiSize.update();
+    // }
+    // gui.add(config, "guiDoubleSize").title("Double size GUI?").onChange(guiSize.update);
 
     var f0 = gui.addFolder("Settings");
     // prettier-ignore

@@ -5,7 +5,8 @@
  * @author   Ikaros Kappler
  * @date     2020-12-04
  * @modified 2020-12-07 Ported from vanilla JS to typescript.
- * @version  1.0.1
+ * @modified 2024-11-22 Added the `insideBoundsOnly` param to the `splitPolygonToNonIntersecting` algorithm.
+ * @version  1.1.0
  */
 import { Line } from "../../Line";
 import { Vertex } from "../../Vertex";
@@ -30,12 +31,12 @@ export const splitPolygonToNonIntersecting = (() => {
      * @param {Array<Vertex>} vertices
      * @param {number=10} maxDepth
      */
-    const splitPolygonToNonIntersecting = (vertices, maxDepth) => {
+    const splitPolygonToNonIntersecting = (vertices, maxDepth, insideBoundsOnly) => {
         if (typeof maxDepth === "undefined")
             maxDepth = 10;
-        return _splitPolygonToNonIntersecting(vertices, maxDepth);
+        return _splitPolygonToNonIntersecting(vertices, maxDepth, insideBoundsOnly);
     };
-    const _splitPolygonToNonIntersecting = (vertices, maxDepth) => {
+    const _splitPolygonToNonIntersecting = (vertices, maxDepth, insideBoundsOnly) => {
         if (maxDepth <= 0) {
             // aborting at max depth
             return [vertices];
@@ -53,18 +54,19 @@ export const splitPolygonToNonIntersecting = (() => {
             for (var b = 0; b < vertices.length; b++) {
                 // Equal edges or neighbour edges intersect by definition.
                 // We ignore them.
-                if (a == b || a + 1 == b || a == b + 1
-                    || (a == 0 && b + 1 == vertices.length) || (b == 0 && a + 1 == vertices.length))
+                if (a == b || a + 1 == b || a == b + 1 || (a == 0 && b + 1 == vertices.length) || (b == 0 && a + 1 == vertices.length))
                     continue;
                 lineB.a.set(vertices[b]);
                 lineB.b.set(vertices[(b + 1) % n]);
                 const intersectionPoint = lineA.intersection(lineB);
-                if (intersectionPoint && lineA.hasPoint(intersectionPoint) && lineB.hasPoint(intersectionPoint)) {
+                if (intersectionPoint &&
+                    lineA.hasPoint(intersectionPoint, insideBoundsOnly) &&
+                    lineB.hasPoint(intersectionPoint, insideBoundsOnly)) {
                     // Cut polygon into two here
                     const split = splitPolygonAt(vertices, a, b, intersectionPoint);
                     // Split has 2 elements.
-                    const leftCleaned = _splitPolygonToNonIntersecting(split[0], maxDepth - 1);
-                    const rightCleaned = _splitPolygonToNonIntersecting(split[1], maxDepth - 1);
+                    const leftCleaned = _splitPolygonToNonIntersecting(split[0], maxDepth - 1, insideBoundsOnly);
+                    const rightCleaned = _splitPolygonToNonIntersecting(split[1], maxDepth - 1, insideBoundsOnly);
                     return leftCleaned.concat(rightCleaned);
                 }
             }

@@ -57,3 +57,8 @@ html.fullscreen, body.fullscreen {
 /* Button line */
 od-bl { }
 /* --- END --- Dialog classes --- */
+
+/* Override lil-gui scroll setting (activate scrolling) */
+.lil-gui.root .children  {
+    overflow-y: scroll !important;
+}
