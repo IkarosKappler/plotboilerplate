@@ -134,6 +134,8 @@ export declare class PolygonInset {
      * In this process multiple edges from the ear might be dropped and two adjacent edges get a new
      * common intersection point.
      *
+     * Note: this method is not working as expected in all cases and quite experimental.
+     *
      * @param insetPolygon
      * @param insetRectangles
      */

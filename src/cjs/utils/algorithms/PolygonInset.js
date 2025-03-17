@@ -92,7 +92,7 @@ var PolygonInset = /** @class */ (function () {
         this.insetRectanglePolygons = this._collectRectangularPolygonInsets(this.originalPolygonLines, this.insetLines);
         // Optimize inset polygon AND the insetRectanglePolygons?
         if (options.removeEars) {
-            console.log("Remove ears");
+            // console.log("Remove ears");
             // This will modify both params!
             PolygonInset._optimizeInsetPolygon(this.optimizedPolygon, this.insetRectanglePolygons);
         }

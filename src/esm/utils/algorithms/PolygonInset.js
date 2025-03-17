@@ -89,6 +89,7 @@ export class PolygonInset {
         this.insetRectanglePolygons = this._collectRectangularPolygonInsets(this.originalPolygonLines, this.insetLines);
         // Optimize inset polygon AND the insetRectanglePolygons?
         if (options.removeEars) {
+            // console.log("Remove ears");
             // This will modify both params!
             PolygonInset._optimizeInsetPolygon(this.optimizedPolygon, this.insetRectanglePolygons);
         }
@@ -304,6 +305,8 @@ export class PolygonInset {
  *
  * In this process multiple edges from the ear might be dropped and two adjacent edges get a new
  * common intersection point.
+ *
+ * Note: this method is not working as expected in all cases and quite experimental.
  *
  * @param insetPolygon
  * @param insetRectangles
