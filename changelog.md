@@ -9,7 +9,7 @@ Imminent todos:
 - Add googley eyes to the animated metaballs demo.
 - check automatic darkmode detection
 
-* 2025-03-17
+* 2025-03-17 [v1.23.3]
   - Finalizing infinite irregular pattern demo.
 * 2025-02-12
   - Added the `Polygon.containsVerts` method to test multiple vertices for containment.
