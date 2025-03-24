@@ -48,23 +48,6 @@
       fillResultPolygons: params.getBoolean("fillResultPolygons", true)
     };
 
-    var buildRandomizedPolygon = function (numVertices) {
-      var polygon = new Polygon();
-      for (var i = 0; i < numVertices; i++) {
-        var vert = new Vertex(Math.min(viewport.width, viewport.height) * 0.33, 0.0);
-        vert.rotate(((Math.PI * 2) / numVertices) * i);
-        vert.addXY(viewport.width * 0.1 * (1.0 - Math.random() * 2), viewport.height * 0.1 * (1.0 - Math.random() * 2));
-        polygon.addVertex(vert);
-      }
-
-      if (!polygon.isClockwise()) {
-        // Reverse
-        polygon.vertices = polygon.vertices.reverse();
-      }
-
-      return polygon;
-    };
-
     var installPolygonListeners = function (polygon) {
       for (var i = 0; i < polygon.vertices.length; i++) {
         polygon.vertices[i].listeners.addDragListener(function () {
@@ -226,7 +209,7 @@
     // +-------------------------------
     var rebuildPolygon = function () {
       // Create a new randomized polygon.
-      polygon = buildRandomizedPolygon(config.pointCount);
+      polygon = createRandomizedPolygon(config.pointCount, viewport, true); // createClockwise=true
 
       // Re-add the new polygon to trigger redraw.
       pb.removeAll(false, false); // Don't trigger redraw

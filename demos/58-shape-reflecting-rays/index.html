@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html class="fullscreen">
   <head>
-    <title>2D Plotting Boilerplate – How to create the smaller inside polygon of a polygon</title>
+    <title>2D Plotting Boilerplate – How to remove co-linear polygon edges</title>
     <meta charset="UTF-8">
-    <meta name="description" content="A demo about drawing the smaller inside polygon of a polygon with PlotBoilerplate.js.">
-    <meta name="keywords" content="plotboilerplate, Bézier, curve, trim, usage, howto, docs, documentation">
+    <meta name="description" content="A demo about reflecting rays inside any shape with PlotBoilerplate.js.">
+    <meta name="keywords" content="plotboilerplate, polygon, co-linear, colinear, usage, howto, docs, documentation">
     <meta name="author" content="Ikaros Kappler">
-    <meta name="date" content="2024-09-10">
-    <meta name="docinfo" content="How to create the smaller inside polygon of a polygon.">
+    <meta name="date" content="2025-03-23">
+    <meta name="docinfo" content="How to eliminate co-linear edges from polygons.">
 
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@humanearthpig">
     <meta name="twitter:creator" content="@humanearthpig">
     <meta property="og:url" content="https://www.plotboilerplate.de">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="A demo about drawing the smaller inside polygon of a polygon with PlotBoilerplate.js.">
-    <meta property="og:description" content="A demo about drawing the smaller inside polygon of a polygon with PlotBoilerplate.js.">
-    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20241030-polygon-inset-0.png">
+    <meta property="og:title" content="A demo about reflecting rays inside any shape with PlotBoilerplate.js.">
+    <meta property="og:description" content="A demo about reflecting rays inside any shape with PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/na.png">
 
     <!-- Polyfills for IE -->
     <script src="../../lib/globalthis-polyfill.min.js"></script> 
@@ -34,10 +34,11 @@
     <script src="../extend-lilgui-inputwithcheckbox.js"></script>
     <script src="../createCssBackdropFilterSeclector.js"></script>
     <script src="../cssBackdropEffects.js"></script>
+    <script src="../../src/cjs/utils/cloneVertexArray.js"></script>
     <script src="../../src/cjs/utils/creategui.js"></script>
+    <script src="../../src/cjs/utils/createRandomizedPolygon.js"></script>
     <script src="../../src/cjs/utils/lil.gui.title.polyfill.js"></script>
     <script src="../../src/cjs/utils/lil.gui.arrowbounce.polyfill.js"></script>
-    <script src="../../src/cjs/utils/createRandomizedPolygon.js"></script>
     <script src="../../src/cjs/utils/datastructures/Color.js"></script>
     <script src="../../src/cjs/utils/detectDarkMode.js"></script>
     <script src="../../src/cjs/utils/dom/guiSizeToggler.js"></script>
@@ -60,11 +61,9 @@
     <script src="../vertexMedian.js"></script>
     <script src="../drawPolygonIndices.js"></script>
     <!-- <script src="PolygonInset.js"></script> -->
-    <script src="../../src/cjs/utils/algorithms/clearDuplicateVertices.js"></script>
-    <script src="../../src/cjs/utils/algorithms/splitPolygonToNonIntersecting.js"></script>
+    <!-- <script src="../../src/cjs/utils/algorithms/splitPolygonToNonIntersecting.js"></script>
     <script src="../../src/cjs/utils/algorithms/sutherlandHodgman.js"></script>
-    <script src="../../src/cjs/utils/algorithms/PolygonInset.js"></script>
-    <!-- <script src="../../lib/greiner-hormann-typescript/dist/greiner-hormann.min.js"></script> -->
+    <script src="../../src/cjs/utils/algorithms/PolygonInset.js"></script> -->
 
 
     <!-- For production -->

@@ -113,7 +113,7 @@
       // Create base polygon to start with: a square
       // var viewport = pb.viewport();
       // Find a nice size for the initial polygon: like one third of the screen size
-      var size = Math.min(viewport.width, viewport.height) / 3.0;
+      var size = viewport.getMinDimension() / 3.0;
       // Construct a square. This will be our initial plane-filling tile.
       cellBounds = new Bounds(new Vertex(-size, -size), new Vertex(size, size));
       // This – by nature – creates a square.
@@ -152,7 +152,7 @@
       // Create base polygon to start with: a square
       // var viewport = pb.viewport();
       // Find a nice size for the initial polygon: like one third of the screen size
-      var size = Math.min(viewport.width, viewport.height) / 3.0;
+      var size = viewport.getMinDimension() / 3.0;
       // Create a hexagon
       var hexVertices = [new Vertex(0, -size)];
       for (var i = 1; i < 6; i++) {

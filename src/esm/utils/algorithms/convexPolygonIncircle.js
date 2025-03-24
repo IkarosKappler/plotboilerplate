@@ -2,7 +2,8 @@
  * @author   mbostock, extended and ported to TypeScript by Ikaros Kappler
  * @date     2020-05-19
  * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
- * @version  1.0.2
+ * @modified 2024-03-24 Fixing some unstrict types to match with the new Typescript settings.
+ * @version  1.0.3
  * @file     contextPolygonIncircle
  * @public
  */
@@ -15,7 +16,6 @@ import { Triangle } from "../../Triangle";
  * eliminate smaller precision errors.
  */
 const EPS = 0.000001;
-;
 /**
  * Compute the max sized inlying circle in the given convex (!) polygon - also called the
  * convex-polygon incircle.
@@ -42,8 +42,8 @@ const EPS = 0.000001;
  */
 export const convexPolygonIncircle = (convexHull) => {
     var n = convexHull.vertices.length;
-    var bestCircle = undefined;
-    var bestTriangle = undefined;
+    var bestCircle = null;
+    var bestTriangle = null;
     for (var a = 0; a < n; a++) {
         for (var b = a + 1; b < n; b++) {
             for (var c = b + 1; c < n; c++) {
@@ -56,8 +56,14 @@ export const convexPolygonIncircle = (convexHull) => {
                 // Find intersections by expanding the lines
                 let vertB = lineA.intersection(lineB);
                 let vertC = lineB.intersection(lineC);
+                if (!vertB || !vertC) {
+                    continue;
+                }
                 // An object: { center: Vertex, radius: number }
                 let triangle = getTangentTriangle4(lineA.a, vertB, vertC, lineC.b);
+                if (!triangle) {
+                    continue;
+                }
                 // Workaround. There will be a future version where the 'getCircumCircle()' functions
                 // returns a real Circle instance.
                 let _circle = triangle.getCircumcircle();
@@ -78,8 +84,7 @@ export const convexPolygonIncircle = (convexHull) => {
             }
         }
     }
-    return { circle: bestCircle,
-        triangle: bestTriangle };
+    return { circle: bestCircle, triangle: bestTriangle };
 };
 /**
  * This function computes the three points for the inner maximum circle
@@ -106,6 +111,9 @@ const getTangentTriangle4 = (vertA, vertB, vertC, vertD) => {
     const bisector1 = geomutils.nsectAngle(vertB, vertA, vertC, 2)[0]; // bisector of first triangle
     const bisector2 = geomutils.nsectAngle(vertC, vertB, vertD, 2)[0]; // bisector of second triangle
     const intersection = bisector1.intersection(bisector2);
+    if (!intersection) {
+        return null;
+    }
     // Find the closest points on one of the polygon lines (all have same distance by construction)
     const circleIntersA = lineA.getClosestPoint(intersection);
     const circleIntersB = lineB.getClosestPoint(intersection);
@@ -120,7 +128,7 @@ const getTangentTriangle4 = (vertA, vertB, vertC, vertD) => {
  * @return {Array<number>} The indices of those lines that intersect (or touch) the circle.
  **/
 const findCircleIntersections = (convexHull, circle) => {
-    var result = [];
+    const result = [];
     for (var i = 0; i < convexHull.vertices.length; i++) {
         var line = new Line(convexHull.vertices[i], convexHull.vertices[(i + 1) % convexHull.vertices.length]);
         // Use an epsilon here because circle coordinates can be kind of unprecise in the detail.

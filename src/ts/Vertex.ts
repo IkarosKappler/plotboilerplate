@@ -33,7 +33,8 @@
  * @modified 2023-09-29 Added the `Vertex.abs()` method as it seems useful.
  * @modified 2024-03-08 Added the optional `precision` param to the `toString` method.
  * @modified 2024-12-17 Outsourced the euclidean distance calculation of `Vertex.distance` to `geomutils.dist4`.
- * @version  2.9.1
+ * @modified 2025-03-24 Making the second parameter `center` of the `Vertex.rotate` method optional.
+ * @version  2.9.2
  *
  * @file Vertex
  * @public
@@ -554,7 +555,7 @@ export class Vertex implements XYCoords, SVGSerializable {
    * @instance
    * @memberof Vertex
    **/
-  rotate(angle: number, center: XYCoords | undefined): Vertex {
+  rotate(angle: number, center?: XYCoords | undefined): Vertex {
     if (!center || typeof center === "undefined") {
       center = { x: 0, y: 0 };
     }

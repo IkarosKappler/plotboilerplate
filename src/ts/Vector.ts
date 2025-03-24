@@ -53,7 +53,6 @@ export class Vector extends VertTuple<Vector> implements SVGSerializable {
   /**
    * Get the perpendicular of this vector which is located at a.
    *
-   * @param {Number} t The position on the vector.
    * @return {Vector} A new vector being the perpendicular of this vector sitting on a.
    **/
   perp(): Vector {

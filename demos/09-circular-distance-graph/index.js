@@ -52,7 +52,7 @@
     );
 
     var viewport = pb.viewport();
-    var minDimension = Math.min(viewport.max.x - viewport.min.x, viewport.max.y - viewport.min.y);
+    var minDimension = viewport.getMinDimension();
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
         animate: true,

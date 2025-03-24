@@ -9,7 +9,8 @@
  * @modified 2022-10-09 Added the `fromDimension` function.
  * @modified 2022-11-28 Added the `clone` method.
  * @modified 2023-09-29 Added the `randomPoint` method.
- * @version  1.7.0
+ * @modified 2025-03-23 Added the `getMinDimension` and `getMaxDimension` methods.
+ * @version  1.8.0
  **/
 import { Polygon } from "./Polygon";
 import { XYCoords, IBounds, XYDimension } from "./interfaces";
@@ -77,6 +78,18 @@ export declare class Bounds implements IBounds, XYDimension {
      * @returns {Vertex} The center of these bounds.
      */
     getCenter(): Vertex;
+    /**
+     * Get the minimum of `width` and `height`.
+     *
+     * @returns {number} The value of Math.min( this.width, this.height )
+     */
+    getMinDimension(): number;
+    /**
+     * Get the minimum of `width` and `height`.
+     *
+     * @returns {number} The value of Math.min( this.width, this.height )
+     */
+    getMaxDimension(): number;
     /**
      * Generate a random point inside this bounds object. Safe areas at the border to avoid
      * included.

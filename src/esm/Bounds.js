@@ -9,7 +9,8 @@
  * @modified 2022-10-09 Added the `fromDimension` function.
  * @modified 2022-11-28 Added the `clone` method.
  * @modified 2023-09-29 Added the `randomPoint` method.
- * @version  1.7.0
+ * @modified 2025-03-23 Added the `getMinDimension` and `getMaxDimension` methods.
+ * @version  1.8.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -56,6 +57,22 @@ export class Bounds {
      */
     getCenter() {
         return new Vertex(this.min.x + (this.max.x - this.min.x) / 2.0, this.min.y + (this.max.y - this.min.y) / 2);
+    }
+    /**
+     * Get the minimum of `width` and `height`.
+     *
+     * @returns {number} The value of Math.min( this.width, this.height )
+     */
+    getMinDimension() {
+        return Math.min(this.width, this.height);
+    }
+    /**
+     * Get the minimum of `width` and `height`.
+     *
+     * @returns {number} The value of Math.min( this.width, this.height )
+     */
+    getMaxDimension() {
+        return Math.max(this.width, this.height);
     }
     /**
      * Generate a random point inside this bounds object. Safe areas at the border to avoid

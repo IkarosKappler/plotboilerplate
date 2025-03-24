@@ -1303,7 +1303,8 @@ const geomutils = {
  * @modified 2023-09-29 Added the `Vertex.abs()` method as it seems useful.
  * @modified 2024-03-08 Added the optional `precision` param to the `toString` method.
  * @modified 2024-12-17 Outsourced the euclidean distance calculation of `Vertex.distance` to `geomutils.dist4`.
- * @version  2.9.1
+ * @modified 2025-03-24 Making the second parameter `center` of the `Vertex.rotate` method optional.
+ * @version  2.9.2
  *
  * @file Vertex
  * @public
@@ -3177,7 +3178,8 @@ Polygon.utils = {
  * @modified 2022-10-09 Added the `fromDimension` function.
  * @modified 2022-11-28 Added the `clone` method.
  * @modified 2023-09-29 Added the `randomPoint` method.
- * @version  1.7.0
+ * @modified 2025-03-23 Added the `getMinDimension` and `getMaxDimension` methods.
+ * @version  1.8.0
  **/
 /**
  * @classdesc A bounds class with min and max values. Implementing IBounds.
@@ -3222,6 +3224,22 @@ class Bounds {
      */
     getCenter() {
         return new Vertex(this.min.x + (this.max.x - this.min.x) / 2.0, this.min.y + (this.max.y - this.min.y) / 2);
+    }
+    /**
+     * Get the minimum of `width` and `height`.
+     *
+     * @returns {number} The value of Math.min( this.width, this.height )
+     */
+    getMinDimension() {
+        return Math.min(this.width, this.height);
+    }
+    /**
+     * Get the minimum of `width` and `height`.
+     *
+     * @returns {number} The value of Math.min( this.width, this.height )
+     */
+    getMaxDimension() {
+        return Math.max(this.width, this.height);
     }
     /**
      * Generate a random point inside this bounds object. Safe areas at the border to avoid

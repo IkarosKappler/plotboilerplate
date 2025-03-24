@@ -3,7 +3,8 @@
  * @author   mbostock, extended and ported to TypeScript by Ikaros Kappler
  * @date     2020-05-19
  * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
- * @version  1.0.2
+ * @modified 2024-03-24 Fixing some unstrict types to match with the new Typescript settings.
+ * @version  1.0.3
  * @file     contextPolygonIncircle
  * @public
  */
@@ -18,7 +19,6 @@ var Triangle_1 = require("../../Triangle");
  * eliminate smaller precision errors.
  */
 var EPS = 0.000001;
-;
 /**
  * Compute the max sized inlying circle in the given convex (!) polygon - also called the
  * convex-polygon incircle.
@@ -45,8 +45,8 @@ var EPS = 0.000001;
  */
 var convexPolygonIncircle = function (convexHull) {
     var n = convexHull.vertices.length;
-    var bestCircle = undefined;
-    var bestTriangle = undefined;
+    var bestCircle = null;
+    var bestTriangle = null;
     for (var a = 0; a < n; a++) {
         for (var b = a + 1; b < n; b++) {
             for (var c = b + 1; c < n; c++) {
@@ -59,8 +59,14 @@ var convexPolygonIncircle = function (convexHull) {
                 // Find intersections by expanding the lines
                 var vertB = lineA.intersection(lineB);
                 var vertC = lineB.intersection(lineC);
+                if (!vertB || !vertC) {
+                    continue;
+                }
                 // An object: { center: Vertex, radius: number }
                 var triangle = getTangentTriangle4(lineA.a, vertB, vertC, lineC.b);
+                if (!triangle) {
+                    continue;
+                }
                 // Workaround. There will be a future version where the 'getCircumCircle()' functions
                 // returns a real Circle instance.
                 var _circle = triangle.getCircumcircle();
@@ -81,8 +87,7 @@ var convexPolygonIncircle = function (convexHull) {
             }
         }
     }
-    return { circle: bestCircle,
-        triangle: bestTriangle };
+    return { circle: bestCircle, triangle: bestTriangle };
 };
 exports.convexPolygonIncircle = convexPolygonIncircle;
 /**
@@ -110,6 +115,9 @@ var getTangentTriangle4 = function (vertA, vertB, vertC, vertD) {
     var bisector1 = geomutils_1.geomutils.nsectAngle(vertB, vertA, vertC, 2)[0]; // bisector of first triangle
     var bisector2 = geomutils_1.geomutils.nsectAngle(vertC, vertB, vertD, 2)[0]; // bisector of second triangle
     var intersection = bisector1.intersection(bisector2);
+    if (!intersection) {
+        return null;
+    }
     // Find the closest points on one of the polygon lines (all have same distance by construction)
     var circleIntersA = lineA.getClosestPoint(intersection);
     var circleIntersB = lineB.getClosestPoint(intersection);

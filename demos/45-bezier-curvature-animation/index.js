@@ -83,7 +83,7 @@
       GUP
     );
 
-    var size = Math.min(viewport.width, viewport.height);
+    var size = viewport.getMinDimension();
     var pathPoints = [];
     for (var i = 0; i < 8; i++) {
       var startControlPoint = new Vertex(Math.random() * size - size / 2, Math.random() * size - size / 2);
