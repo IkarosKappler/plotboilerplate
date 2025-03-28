@@ -69,18 +69,60 @@
         const reflectedRays = [];
         rays.forEach(function (ray) {
           var reflectedRay = findReflectedRay(shape, ray);
-          reflectedRays.push(reflectedRay);
+          if (reflectedRay != null) {
+            reflectedRays.push(reflectedRay);
+          }
         });
         resultVectors.push(reflectedRays);
       });
       return resultVectors;
     };
 
+    /**
+     * TODO: also allow circle sectors, elliptic sectors, bezier curves??
+     * @param {Polygon | Circle | Ellipse} shape
+     * @param {Vector} ray
+     * @returns
+     */
     var findReflectedRay = function (shape, ray) {
-      var reflectedRay = ray.perp().moveTo(ray.b);
+      var reflectedRay = null; // ray.perp().moveTo(ray.b);
+
+      // Find intersection with min distance
+      if (shape instanceof Polygon) {
+        // Array<Vector>
+        var intersectionTangents = shape.lineIntersectionTangents(ray, true);
+        // Find closest intersection vector
+        var closestIntersectionTangent = intersectionTangents.reduce(function (accu, curVal) {
+          if (accu === null || curVal.a.distance(ray.a) < accu.a.distance(ray.a)) {
+            accu = curVal;
+          }
+          return accu;
+        }, null);
+        if (closestIntersectionTangent) {
+          var angleBetween = closestIntersectionTangent.angle(ray);
+          rotateVector(closestIntersectionTangent, angleBetween);
+          reflectedRay = closestIntersectionTangent;
+        } else {
+          reflectedRay = null;
+        }
+      } else if (shape instanceof Circle) {
+      } else if (shape instanceof Ellipse) {
+      } else {
+        // ERR=!
+      }
 
       return reflectedRay;
     };
+
+    /**
+     * TODO: MOVE TO VECTOR CLASS.
+     *
+     * Rotate  vector by the given angle.
+     * @param angle
+     */
+    function rotateVector(vector, angle) {
+      vector.b.rotate(angle, vector.a);
+    }
 
     // +---------------------------------------------------------------------------------
     // | Just rebuilds the pattern on changes.

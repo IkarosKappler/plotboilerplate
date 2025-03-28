@@ -32,7 +32,9 @@
  * @modified 2024-10-30 Added the `getEdges` method.
  * @modified 2024-12-02 Added the `elimitateColinearEdges` method.
  * @modified 2025-02-12 Added the `containsVerts` method to test multiple vertices for containment.
- * @version 1.14.0
+ * @modified 2025-03-28 Added the `Polygon.utils.locateLineIntersecion` static helper method.
+ * @modified 2025-03-28 Added the `Polygon.lineIntersectionTangents` method.
+ * @version 1.15.0
  *
  * @file Polygon
  * @public
@@ -40,6 +42,7 @@
 import { BezierPath } from "./BezierPath";
 import { Bounds } from "./Bounds";
 import { Line } from "./Line";
+import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 import { XYCoords, SVGSerializable, UID } from "./interfaces";
@@ -310,6 +313,7 @@ export declare class Polygon implements SVGSerializable {
      * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
      */
     lineIntersections(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vertex>;
+    lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vector>;
     /**
      * Get the closest line-polygon-intersection point (closest the line point A).
      *
@@ -453,5 +457,9 @@ export declare class Polygon implements SVGSerializable {
          * @return {number}
          */
         signedArea(vertices: Array<XYCoords>): number;
+        locateLineIntersecion(line: VertTuple<any>, vertices: Array<Vertex>, isOpen: boolean, inVectorBoundsOnly: boolean): Array<{
+            edgeIndex: number;
+            intersectionPoint: Vertex;
+        }>;
     };
 }
