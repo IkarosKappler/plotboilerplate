@@ -18,7 +18,7 @@ import { Line } from "./Line";
 import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { SVGSerializable, UID, XYCoords } from "./interfaces";
+import { Intersectable, SVGSerializable, UID, XYCoords } from "./interfaces";
 /**
  * @classdesc A simple circle: center point and radius.
  *
@@ -30,7 +30,7 @@ import { SVGSerializable, UID, XYCoords } from "./interfaces";
  * @requires UID
  * @requires UIDGenerator
  **/
-export declare class Circle implements SVGSerializable {
+export declare class Circle implements Intersectable, SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
      **/
@@ -150,6 +150,28 @@ export declare class Circle implements SVGSerializable {
      * @return {Line|null} The intersection points (as a line) or null if this circle does not intersect the line given.
      **/
     lineIntersection(a: Vertex, b: XYCoords): Line | null;
+    /**
+     * Get all line intersections with this polygon.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+     *
+     * See demo `47-closest-vector-projection-on-polygon` for how it works.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     */
+    lineIntersections(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vertex>;
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param inVectorBoundsOnly
+     * @returns
+     */
+    lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vector>;
     /**
      * Calculate the closest point on the outline of this circle to the given point.
      *

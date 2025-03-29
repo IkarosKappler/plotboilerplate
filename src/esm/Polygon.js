@@ -414,8 +414,11 @@ export class Polygon {
         center.y /= this.vertices.length;
         return center;
     }
+    //--- BEGIN --- Implement interface `Intersectable`
     /**
      * Get all line intersections with this polygon.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
      *
      * See demo `47-closest-vector-projection-on-polygon` for how it works.
      *
@@ -445,6 +448,15 @@ export class Polygon {
             .locateLineIntersecion(line, this.vertices, this.isOpen, inVectorBoundsOnly)
             .map(intersectionTuple => intersectionTuple.intersectionPoint);
     }
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param inVectorBoundsOnly
+     * @returns
+     */
     lineIntersectionTangents(line, inVectorBoundsOnly = false) {
         // // Find the intersections of all lines inside the edge bounds
         // const intersectionPoints: Array<Vector> = [];
@@ -470,6 +482,7 @@ export class Polygon {
             return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersectionPoint);
         });
     }
+    //--- END --- Implement interface `Intersectable`
     /**
      * Get the closest line-polygon-intersection point (closest the line point A).
      *

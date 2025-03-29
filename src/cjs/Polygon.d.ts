@@ -45,7 +45,7 @@ import { Line } from "./Line";
 import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { XYCoords, SVGSerializable, UID } from "./interfaces";
+import { XYCoords, SVGSerializable, UID, Intersectable } from "./interfaces";
 /**
  * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
  *
@@ -57,7 +57,7 @@ import { XYCoords, SVGSerializable, UID } from "./interfaces";
  * @requires Vertex
  * @requires XYCoords
  */
-export declare class Polygon implements SVGSerializable {
+export declare class Polygon implements Intersectable, SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
      **/
@@ -306,6 +306,8 @@ export declare class Polygon implements SVGSerializable {
     /**
      * Get all line intersections with this polygon.
      *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+     *
      * See demo `47-closest-vector-projection-on-polygon` for how it works.
      *
      * @param {VertTuple} line - The line to find intersections with.
@@ -313,6 +315,15 @@ export declare class Polygon implements SVGSerializable {
      * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
      */
     lineIntersections(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vertex>;
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param inVectorBoundsOnly
+     * @returns
+     */
     lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vector>;
     /**
      * Get the closest line-polygon-intersection point (closest the line point A).

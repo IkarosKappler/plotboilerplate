@@ -697,8 +697,55 @@ class Circle {
         interA.y = (-det * diff.x + Math.abs(diff.y) * sqrt) / distSquared;
         interB.y = (-det * diff.x - Math.abs(diff.y) * sqrt) / distSquared;
         return new Line(interA.add(this.center), interB.add(this.center));
-        // return new Line(interA, interB);
     }
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get all line intersections with this polygon.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+     *
+     * See demo `47-closest-vector-projection-on-polygon` for how it works.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     */
+    lineIntersections(line, inVectorBoundsOnly = false) {
+        // Find the intersections of all lines inside the edge bounds
+        const intersectioLine = this.lineIntersection(line.a, line.b);
+        if (!intersectioLine) {
+            return [];
+        }
+        if (inVectorBoundsOnly) {
+            const maxDist = line.length();
+            return [intersectioLine.a, intersectioLine.b].filter((vert) => line.a.distance(vert) < maxDist);
+        }
+        else {
+            return [intersectioLine.a, intersectioLine.b];
+        }
+    }
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param inVectorBoundsOnly
+     * @returns
+     */
+    lineIntersectionTangents(line, inVectorBoundsOnly = false) {
+        // Find the intersections of all lines plus their tangents inside the circle bounds
+        const interSectionPoints = this.lineIntersections(line, inVectorBoundsOnly);
+        return interSectionPoints.map((vert) => {
+            // Calculate angle
+            const lineFromCenter = new Line(this.center, vert);
+            const angle = lineFromCenter.angle();
+            // const angle = Math.random() * Math.PI * 2; // TODO
+            // Calculate tangent at angle
+            return this.tangentAt(angle);
+        });
+    }
+    //--- END --- Implement interface `Intersectable`
     /**
      * Calculate the closest point on the outline of this circle to the given point.
      *
@@ -2777,8 +2824,11 @@ class Polygon {
         center.y /= this.vertices.length;
         return center;
     }
+    //--- BEGIN --- Implement interface `Intersectable`
     /**
      * Get all line intersections with this polygon.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
      *
      * See demo `47-closest-vector-projection-on-polygon` for how it works.
      *
@@ -2808,6 +2858,15 @@ class Polygon {
             .locateLineIntersecion(line, this.vertices, this.isOpen, inVectorBoundsOnly)
             .map(intersectionTuple => intersectionTuple.intersectionPoint);
     }
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param inVectorBoundsOnly
+     * @returns
+     */
     lineIntersectionTangents(line, inVectorBoundsOnly = false) {
         // // Find the intersections of all lines inside the edge bounds
         // const intersectionPoints: Array<Vector> = [];
@@ -2833,6 +2892,7 @@ class Polygon {
             return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersectionPoint);
         });
     }
+    //--- END --- Implement interface `Intersectable`
     /**
      * Get the closest line-polygon-intersection point (closest the line point A).
      *

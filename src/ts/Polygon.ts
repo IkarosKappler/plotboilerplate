@@ -49,7 +49,7 @@ import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 import { geomutils } from "./geomutils";
-import { XYCoords, SVGSerializable, UID } from "./interfaces";
+import { XYCoords, SVGSerializable, UID, Intersectable } from "./interfaces";
 
 /**
  * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
@@ -62,7 +62,7 @@ import { XYCoords, SVGSerializable, UID } from "./interfaces";
  * @requires Vertex
  * @requires XYCoords
  */
-export class Polygon implements SVGSerializable {
+export class Polygon implements Intersectable, SVGSerializable {
   /**
    * Required to generate proper CSS classes and other class related IDs.
    **/
@@ -475,8 +475,11 @@ export class Polygon implements SVGSerializable {
     return center;
   }
 
+  //--- BEGIN --- Implement interface `Intersectable`
   /**
    * Get all line intersections with this polygon.
+   *
+   * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
    *
    * See demo `47-closest-vector-projection-on-polygon` for how it works.
    *
@@ -507,6 +510,15 @@ export class Polygon implements SVGSerializable {
       .map(intersectionTuple => intersectionTuple.intersectionPoint);
   }
 
+  /**
+   * Get all line intersections of this polygon and their tangents along the shape.
+   *
+   * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+   *
+   * @param line
+   * @param inVectorBoundsOnly
+   * @returns
+   */
   lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly: boolean = false): Array<Vector> {
     // // Find the intersections of all lines inside the edge bounds
     // const intersectionPoints: Array<Vector> = [];
@@ -532,6 +544,7 @@ export class Polygon implements SVGSerializable {
       return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersectionPoint) as Vector;
     });
   }
+  //--- END --- Implement interface `Intersectable`
 
   /**
    * Get the closest line-polygon-intersection point (closest the line point A).

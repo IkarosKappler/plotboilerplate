@@ -9,6 +9,10 @@ Imminent todos:
 - Add googley eyes to the animated metaballs demo.
 - check automatic darkmode detection
 
+* 2025-03-29
+  - Adding core interface `Intersectable` for shapes that support linear intersection calculation.
+  - Added the demo `59-circle-tangents`.
+  - Implementing interface `Intersectable` to the `Circle` and `Polygon` classes.
 * 2025-03-28
   - Added the `Polygon.utils.locateLineIntersecion` static helper method.
   - Added the `Polygon.lineIntersectionTangents` method.

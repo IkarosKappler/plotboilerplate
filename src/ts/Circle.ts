@@ -20,7 +20,7 @@ import { UIDGenerator } from "./UIDGenerator";
 import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { SVGSerializable, UID, XYCoords } from "./interfaces";
+import { Intersectable, SVGSerializable, UID, XYCoords } from "./interfaces";
 
 /**
  * @classdesc A simple circle: center point and radius.
@@ -33,7 +33,7 @@ import { SVGSerializable, UID, XYCoords } from "./interfaces";
  * @requires UID
  * @requires UIDGenerator
  **/
-export class Circle implements SVGSerializable {
+export class Circle implements Intersectable, SVGSerializable {
   /**
    * Required to generate proper CSS classes and other class related IDs.
    **/
@@ -262,8 +262,57 @@ export class Circle implements SVGSerializable {
     interB.y = (-det * diff.x - Math.abs(diff.y) * sqrt) / distSquared;
 
     return new Line(interA.add(this.center), interB.add(this.center));
-    // return new Line(interA, interB);
   }
+
+  //--- BEGIN --- Implement interface `Intersectable`
+  /**
+   * Get all line intersections with this polygon.
+   *
+   * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+   *
+   * See demo `47-closest-vector-projection-on-polygon` for how it works.
+   *
+   * @param {VertTuple} line - The line to find intersections with.
+   * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+   * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+   */
+  lineIntersections(line: VertTuple<any>, inVectorBoundsOnly: boolean = false): Array<Vertex> {
+    // Find the intersections of all lines inside the edge bounds
+    const intersectioLine: Line | null = this.lineIntersection(line.a, line.b);
+    if (!intersectioLine) {
+      return [];
+    }
+    if (inVectorBoundsOnly) {
+      // const maxDist = line.length();
+      return [intersectioLine.a, intersectioLine.b].filter((vert: Vertex) => line.hasPoint(vert, true));
+    } else {
+      return [intersectioLine.a, intersectioLine.b];
+    }
+  }
+
+  /**
+   * Get all line intersections of this polygon and their tangents along the shape.
+   *
+   * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+   *
+   * @param line
+   * @param inVectorBoundsOnly
+   * @returns
+   */
+  lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly: boolean = false): Array<Vector> {
+    // Find the intersections of all lines plus their tangents inside the circle bounds
+    const interSectionPoints: Array<Vertex> = this.lineIntersections(line, inVectorBoundsOnly);
+    return interSectionPoints.map((vert: Vertex) => {
+      // Calculate angle
+      const lineFromCenter = new Line(this.center, vert);
+      const angle: number = lineFromCenter.angle();
+      console.log("angle", (angle / Math.PI) * 180.0);
+      // const angle = Math.random() * Math.PI * 2; // TODO
+      // Calculate tangent at angle
+      return this.tangentAt(angle);
+    });
+  }
+  //--- END --- Implement interface `Intersectable`
 
   /**
    * Calculate the closest point on the outline of this circle to the given point.

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html class="fullscreen">
+  <head>
+    <title>2D Plotting Boilerplate – How to calculate circle tangents</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="A demo how to calculate circle tangents with PlotBoilerplate.js.">
+    <meta name="keywords" content="plotboilerplate, polygon, co-linear, colinear, usage, howto, docs, documentation">
+    <meta name="author" content="Ikaros Kappler">
+    <meta name="date" content="2025-03-23">
+    <meta name="docinfo" content="How to eliminate co-linear edges from polygons.">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@humanearthpig">
+    <meta name="twitter:creator" content="@humanearthpig">
+    <meta property="og:url" content="https://www.plotboilerplate.de">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="A demo how to calculate circle tangentswith PlotBoilerplate.js.">
+    <meta property="og:description" content="A demo how to calculate circle tangents with PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/20250329-circle-tangents-0.png">
+
+    <!-- Polyfills for IE -->
+    <script src="../../lib/globalthis-polyfill.min.js"></script> 
+    <script src="../../lib/path2d-polyfill.min.js"></script>
+
+    <!-- A modal -->
+    <script src="../modal.js"></script>
+    <link rel="stylesheet" href="../modal.css">
+    
+    <!-- Load thirdparty libraries -->
+    <script src="../../src/cjs/utils/module.js"></script>
+    <script src="../../lib/lil-gui-0.19.min.js"></script>
+    
+    <script src="../extend-lilgui-colorwithalpha.js"></script>
+    <script src="../extend-lilgui-inputwithcheckbox.js"></script>
+    <script src="../createCssBackdropFilterSeclector.js"></script>
+    <script src="../cssBackdropEffects.js"></script>
+    <script src="../../src/cjs/utils/cloneVertexArray.js"></script>
+    <script src="../../src/cjs/utils/creategui.js"></script>
+    <script src="../../src/cjs/utils/createRandomizedPolygon.js"></script>
+    <script src="../../src/cjs/utils/lil.gui.title.polyfill.js"></script>
+    <script src="../../src/cjs/utils/lil.gui.arrowbounce.polyfill.js"></script>
+    <script src="../../src/cjs/utils/datastructures/Color.js"></script>
+    <script src="../../src/cjs/utils/detectDarkMode.js"></script>
+    <script src="../../src/cjs/utils/dom/guiSizeToggler.js"></script>
+    <script src="../../src/cjs/utils/WebColors.js"></script>
+    <script src="../../src/cjs/utils/WebColorsContrast.js"></script>
+    <script src="../../src/cjs/utils/WebColorsMalachite.js"></script>
+    <script src="../../src/cjs/utils/datastructures/Color.js"></script>
+    <script src="../../lib/FileSaver.min.js"></script>
+    <script src="../../lib/alloy_finger.js"></script>
+    <script src="../../lib/uistats.min.js"></script>
+
+    <!-- Load helpers -->
+    <!-- <script src="../../src/cjs/utils/cloneVertexArray.js"></script> -->
+    <script src="../../src/cjs/utils/gup.js"></script>
+    <script src="../../src/cjs/utils/Params.js"></script>
+    <script src="../../src/cjs/utils/detectDarkMode.js"></script>
+    <script src="../../src/cjs/utils/algorithms/getContrastColor.js"></script>
+    <script src="../createCanvasCover.js"></script>
+    <script src="../randomWebColor.js"></script>
+    <script src="../vertexMedian.js"></script>
+    <script src="../drawPolygonIndices.js"></script>
+    <!-- <script src="PolygonInset.js"></script> -->
+    <!-- <script src="../../src/cjs/utils/algorithms/splitPolygonToNonIntersecting.js"></script>
+    <script src="../../src/cjs/utils/algorithms/sutherlandHodgman.js"></script>
+    <script src="../../src/cjs/utils/algorithms/PolygonInset.js"></script> -->
+
+
+    <!-- For production -->
+    <!-- <script src="../../dist/plotboilerplate.min.js"></script> -->
+    <!-- END For production -->
+
+    <!-- For development -->
+    <script src="../../src/cjs/UIDGenerator.js"></script>
+    <script src="../../src/cjs/VertexAttr.js"></script>
+    <script src="../../src/cjs/VertexListeners.js"></script>
+    <script src="../../src/cjs/VertTuple.js"></script>
+    <script src="../../src/cjs/Vertex.js"></script>
+    <script src="../../src/cjs/Bounds.js"></script>
+    <script src="../../src/cjs/Grid.js"></script>
+    <script src="../../src/cjs/Line.js"></script>
+    <script src="../../src/cjs/Vector.js"></script>
+    <script src="../../src/cjs/CubicBezierCurve.js"></script>
+    <script src="../../src/cjs/BezierPath.js"></script>
+    <script src="../../src/cjs/Polygon.js"></script>
+    <script src="../../src/cjs/Triangle.js"></script>
+    <script src="../../src/cjs/VEllipse.js"></script>
+    <script src="../../src/cjs/VEllipseSector.js"></script>
+    <script src="../../src/cjs/Circle.js"></script>
+    <script src="../../src/cjs/CircleSector.js"></script>
+    <script src="../../src/cjs/PBImage.js"></script>
+    <script src="../../src/cjs/PBText.js"></script>
+    <script src="../../src/cjs/MouseHandler.js"></script>
+    <script src="../../src/cjs/KeyHandler.js"></script>
+    <script src="../../src/cjs/draw.js"></script>
+    <script src="../../src/cjs/drawutilssvg.js"></script>
+    <script src="../../src/cjs/geomutils.js"></script>
+    <script src="../../src/cjs/PlotBoilerplate.js"></script>
+    <!-- END for development -->
+    
+    <script src="index.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="../style.css"> 
+  </head>
+  <body class="fullscreen">
+    <input type="file" name="file" id="file" data-type="image-upload" style="display: none;">
+
+    <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
+  </body>
+</html>

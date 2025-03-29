@@ -88,7 +88,7 @@
       var reflectedRay = null; // ray.perp().moveTo(ray.b);
 
       // Find intersection with min distance
-      if (shape instanceof Polygon) {
+      if (shape instanceof Polygon || shape instanceof Circle) {
         // Array<Vector>
         var intersectionTangents = shape.lineIntersectionTangents(ray, true);
         // Find closest intersection vector
@@ -99,6 +99,7 @@
           return accu;
         }, null);
         if (closestIntersectionTangent) {
+          // pb.draw.arrow(closestIntersectionTangent.a, closestIntersectionTangent.b, "green");
           var angleBetween = closestIntersectionTangent.angle(ray);
           rotateVector(closestIntersectionTangent, angleBetween);
           reflectedRay = closestIntersectionTangent;
