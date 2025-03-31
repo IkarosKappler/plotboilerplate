@@ -1302,7 +1302,9 @@ export class PlotBoilerplate {
       }
     } else if (d instanceof Triangle) {
       draw.polyline([d.a, d.b, d.c], false, this.drawConfig.triangle.color, this.drawConfig.triangle.lineWidth);
-      if (!this.drawConfig.drawHandlePoints) d.a.attr.renderTime = d.b.attr.renderTime = d.c.attr.renderTime = renderTime;
+      if (!this.drawConfig.drawHandlePoints) {
+        d.a.attr.renderTime = d.b.attr.renderTime = d.c.attr.renderTime = renderTime;
+      }
     } else if (d instanceof VEllipse) {
       if (this.drawConfig.drawHandleLines) {
         draw.setCurrentId(`${d.uid}_e0`);
@@ -1332,12 +1334,6 @@ export class PlotBoilerplate {
     } else if (d instanceof VEllipseSector) {
       draw.setCurrentId(d.uid);
       draw.setCurrentClassName(`${d.className}`);
-      /* draw.ellipse( d.center,
-			  // Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y),
-			  d.radiusH(), d.radiusV(),
-			  this.drawConfig.ellipse.color,
-			  this.drawConfig.ellipse.lineWidth,
-			  d.rotation ); */
       const data: SVGPathParams = VEllipseSector.ellipseSectorUtils.describeSVGArc(
         d.ellipse.center.x,
         d.ellipse.center.y,

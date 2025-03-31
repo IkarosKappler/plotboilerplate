@@ -9,6 +9,15 @@ Imminent todos:
 - Add googley eyes to the animated metaballs demo.
 - check automatic darkmode detection
 
+- VEllipse.normalAt(angle,length): length not used!!!
+- Create VEllipseHelper (only VEllipseSectorHelper exists)
+- Extend Demo '32-ellipse-to-bezier' with the new helper.
+
+* 2025-03-31
+  - Added the `VerTuple.revert` method.
+  - ATTENTION: modified the winding direction of the `VEllipse.tangentAt` method to match with the `Circle.tangentAt` method. This is a breaking change!
+  - Adding a new class: `VEllipseHelper` for easily manipulating ellipses by dragging points (position, size, rotation). This class also supports basic helper lines rendering.
+  - Adding the `VEllipse.move(amount: XYCoords)` method.
 * 2025-03-29
   - Adding core interface `Intersectable` for shapes that support linear intersection calculation.
   - Added the demo `59-circle-tangents`.

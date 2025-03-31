@@ -16,7 +16,9 @@
  * @modified 2021-03-19 Added the `VEllipse.rotate` function.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `VEllipse.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version  1.3.0
+ * @modified 2025-03-31 ATTENTION: modified the winding direction of the `tangentAt` method to match with the Circle method. This is a breaking change!
+ * @modified 2025-03-31 Adding the `VEllipse.move(amount: XYCoords)` method.
+ * @version  1.4.0
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
@@ -115,6 +117,20 @@ var VEllipse = /** @class */ (function () {
         return new Vertex_1.Vertex(this.axis).rotate(-this.rotation, this.center).y - this.center.y;
     };
     /**
+     * Move the ellipse by the given amount. This is equivalent by moving the `center` and `axis` points.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof VEllipse
+     * @return {VEllipse} this for chaining
+     **/
+    VEllipse.prototype.move = function (amount) {
+        this.center.add(amount);
+        this.axis.add(amount);
+        return this;
+    };
+    /**
      * Scale this ellipse by the given factor from the center point. The factor will be applied to both radii.
      *
      * @method scale
@@ -183,12 +199,18 @@ var VEllipse = /** @class */ (function () {
             .addX(50)
             .clone()
             .rotate(Math.PI + centerAngle, point);
-        if (this.center.distance(endPointA) < this.center.distance(endPointB)) {
-            return new Vector_1.Vector(point, endPointB);
+        var resultVector = this.center.distance(endPointA) < this.center.distance(endPointB)
+            ? new Vector_1.Vector(point, endPointB)
+            : new Vector_1.Vector(point, endPointA);
+        if (typeof length === "number") {
+            resultVector.setLength(length);
         }
-        else {
-            return new Vector_1.Vector(point, endPointA);
-        }
+        // if (this.center.distance(endPointA) < this.center.distance(endPointB)) {
+        //   return new Vector(point, endPointB);
+        // } else {
+        //   return new Vector(point, endPointA);
+        // }
+        return resultVector;
     };
     /**
      * Get the tangent vector at the given angle.
@@ -208,8 +230,9 @@ var VEllipse = /** @class */ (function () {
     VEllipse.prototype.tangentAt = function (angle, length) {
         var normal = this.normalAt(angle, length);
         // Rotate the normal by 90 degrees, then it is the tangent.
-        normal.b.rotate(Math.PI / 2, normal.a);
-        return normal;
+        // normal.b.rotate(Math.PI / 2, normal.a);
+        // return normal;
+        return normal.inv().perp();
     };
     /**
      * Get the perimeter of this ellipse.

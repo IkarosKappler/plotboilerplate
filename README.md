@@ -558,6 +558,8 @@ new MouseHandler(document.getElementById("mycanvas"))
 - [Rick Moore for the useful javascript-synthesizer howto](https://medium.com/geekculture/building-a-modular-synth-with-web-audio-api-and-javascript-d38ccdeca9ea)
 - [marked Markdown compiler](https://marked.js.org/) by Christopher Jeffrey.
 - [Interactive Visualization of Molecular Surface Dynamics](https://www.computer.org/csdl/journal/tg/2009/06/ttg2009061391/13rRUwInvsI) for the illustration image which inspired the metaballs demo.
+- Darel Rex Finley for the Polygon Inset Calculation article [Inset A Polygon By A Fixed, Perpendicular Distance, With C Code Sample](https://alienryderflex.com/polygon_inset/ "Inset A Polygon By A Fixed, Perpendicular Distance, With C Code Sample")
+- Fernando Cacciola for [A Survey of Polygon Offseting Strategies](http://fcacciola.50webs.com/Offseting%20Methods.htm "A Survey of Polygon Offseting Strategies")
 
 ## Todos
 

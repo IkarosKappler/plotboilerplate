@@ -15,7 +15,9 @@
  * @modified 2021-03-19 Added the `VEllipse.rotate` function.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `VEllipse.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version  1.3.0
+ * @modified 2025-03-31 ATTENTION: modified the winding direction of the `tangentAt` method to match with the Circle method. This is a breaking change!
+ * @modified 2025-03-31 Adding the `VEllipse.move(amount: XYCoords)` method.
+ * @version  1.4.0
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
@@ -123,6 +125,16 @@ export declare class VEllipse implements SVGSerializable {
      * @return {number} The signed vertical radius of this ellipse.
      */
     signedRadiusV(): number;
+    /**
+     * Move the ellipse by the given amount. This is equivalent by moving the `center` and `axis` points.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof VEllipse
+     * @return {VEllipse} this for chaining
+     **/
+    move(amount: XYCoords): VEllipse;
     /**
      * Scale this ellipse by the given factor from the center point. The factor will be applied to both radii.
      *

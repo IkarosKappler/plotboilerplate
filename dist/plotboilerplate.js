@@ -1799,6 +1799,7 @@ var Circle = /** @class */ (function () {
         var pointA = Circle.circleUtils.vertAt(angle, this.radius);
         // Construct the perpendicular of the line in point a. Then move relative to center.
         return new Vector_1.Vector(pointA, new Vertex_1.Vertex(0, 0)).add(this.center).perp();
+        // return (new Vector(this.center.clone(), pointA).add(pointA) as Vector).perp() as Vector;
     };
     /**
      * Calculate the intersection points (if exists) with the given circle.
@@ -1913,8 +1914,8 @@ var Circle = /** @class */ (function () {
             return [];
         }
         if (inVectorBoundsOnly) {
-            var maxDist_1 = line.length();
-            return [intersectioLine.a, intersectioLine.b].filter(function (vert) { return line.a.distance(vert) < maxDist_1; });
+            // const maxDist = line.length();
+            return [intersectioLine.a, intersectioLine.b].filter(function (vert) { return line.hasPoint(vert, true); });
         }
         else {
             return [intersectioLine.a, intersectioLine.b];
@@ -1938,6 +1939,7 @@ var Circle = /** @class */ (function () {
             // Calculate angle
             var lineFromCenter = new Line_1.Line(_this.center, vert);
             var angle = lineFromCenter.angle();
+            // console.log("angle", (angle / Math.PI) * 180.0);
             // const angle = Math.random() * Math.PI * 2; // TODO
             // Calculate tangent at angle
             return _this.tangentAt(angle);
@@ -5379,8 +5381,9 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         else if (d instanceof Triangle_1.Triangle) {
             draw.polyline([d.a, d.b, d.c], false, this.drawConfig.triangle.color, this.drawConfig.triangle.lineWidth);
-            if (!this.drawConfig.drawHandlePoints)
+            if (!this.drawConfig.drawHandlePoints) {
                 d.a.attr.renderTime = d.b.attr.renderTime = d.c.attr.renderTime = renderTime;
+            }
         }
         else if (d instanceof VEllipse_1.VEllipse) {
             if (this.drawConfig.drawHandleLines) {
@@ -5406,12 +5409,6 @@ var PlotBoilerplate = /** @class */ (function () {
         else if (d instanceof VEllipseSector_1.VEllipseSector) {
             draw.setCurrentId(d.uid);
             draw.setCurrentClassName("".concat(d.className));
-            /* draw.ellipse( d.center,
-                    // Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y),
-                    d.radiusH(), d.radiusV(),
-                    this.drawConfig.ellipse.color,
-                    this.drawConfig.ellipse.lineWidth,
-                    d.rotation ); */
             var data = VEllipseSector_1.VEllipseSector.ellipseSectorUtils.describeSVGArc(d.ellipse.center.x, d.ellipse.center.y, d.ellipse.radiusH(), d.ellipse.radiusV(), d.startAngle, d.endAngle, d.ellipse.rotation, { moveToStart: true });
             draw.path(data, this.drawConfig.ellipseSector.color, this.drawConfig.ellipseSector.lineWidth);
         }
@@ -7922,7 +7919,9 @@ exports.UIDGenerator = UIDGenerator;
  * @modified 2021-03-19 Added the `VEllipse.rotate` function.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `VEllipse.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version  1.3.0
+ * @modified 2025-03-31 ATTENTION: modified the winding direction of the `tangentAt` method to match with the Circle method. This is a breaking change!
+ * @modified 2025-03-31 Adding the `VEllipse.move(amount: XYCoords)` method.
+ * @version  1.4.0
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
@@ -8021,6 +8020,20 @@ var VEllipse = /** @class */ (function () {
         return new Vertex_1.Vertex(this.axis).rotate(-this.rotation, this.center).y - this.center.y;
     };
     /**
+     * Move the ellipse by the given amount. This is equivalent by moving the `center` and `axis` points.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof VEllipse
+     * @return {VEllipse} this for chaining
+     **/
+    VEllipse.prototype.move = function (amount) {
+        this.center.add(amount);
+        this.axis.add(amount);
+        return this;
+    };
+    /**
      * Scale this ellipse by the given factor from the center point. The factor will be applied to both radii.
      *
      * @method scale
@@ -8089,12 +8102,18 @@ var VEllipse = /** @class */ (function () {
             .addX(50)
             .clone()
             .rotate(Math.PI + centerAngle, point);
-        if (this.center.distance(endPointA) < this.center.distance(endPointB)) {
-            return new Vector_1.Vector(point, endPointB);
+        var resultVector = this.center.distance(endPointA) < this.center.distance(endPointB)
+            ? new Vector_1.Vector(point, endPointB)
+            : new Vector_1.Vector(point, endPointA);
+        if (typeof length === "number") {
+            resultVector.setLength(length);
         }
-        else {
-            return new Vector_1.Vector(point, endPointA);
-        }
+        // if (this.center.distance(endPointA) < this.center.distance(endPointB)) {
+        //   return new Vector(point, endPointB);
+        // } else {
+        //   return new Vector(point, endPointA);
+        // }
+        return resultVector;
     };
     /**
      * Get the tangent vector at the given angle.
@@ -8114,8 +8133,9 @@ var VEllipse = /** @class */ (function () {
     VEllipse.prototype.tangentAt = function (angle, length) {
         var normal = this.normalAt(angle, length);
         // Rotate the normal by 90 degrees, then it is the tangent.
-        normal.b.rotate(Math.PI / 2, normal.a);
-        return normal;
+        // normal.b.rotate(Math.PI / 2, normal.a);
+        // return normal;
+        return normal.inv().perp();
     };
     /**
      * Get the perimeter of this ellipse.
@@ -8821,7 +8841,8 @@ exports.Vector = Vector;
  * @modified 2024-09-10 Chaging the first param of `pointDistance` from `Vertex` to less strict type `XYCoords`. This should not break anything.
  * @modified 2024-09-10 Adding the optional `epsilon` param to the `hasPoint` method.
  * @modified 2024-12-02 Added the `epsilon` param to the `colinear` method. Default is 1.0e-6.
- * @version 1.3.0
+ * @modified 2025-03-31 Added the `VertTuple.revert` method.
+ * @version 1.4.0
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VertTuple = void 0;
@@ -8890,13 +8911,29 @@ var VertTuple = /** @class */ (function () {
      *
      * @method add
      * @param {XYCoords} amount The amount (x,y) to add.
-     * @return {Line} this
      * @instance
      * @memberof VertTuple
+     * @return {VertTuple<T>} this
      **/
     VertTuple.prototype.add = function (amount) {
         this.a.add(amount);
         this.b.add(amount);
+        return this;
+    };
+    /**
+     * Reverse this vertex tuple: a becomes b, and b becomes a.
+     * This operation is in-place.
+     *
+     * @method add
+     * @param {XYCoords} amount The amount (x,y) to add.
+     * @instance
+     * @memberof VertTuple
+     * @return {VertTuple<T>} this
+     */
+    VertTuple.prototype.revert = function () {
+        var tmp = this.a;
+        this.a = this.b;
+        this.b = tmp;
         return this;
     };
     /**

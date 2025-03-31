@@ -159,6 +159,7 @@ export class Circle implements Intersectable, SVGSerializable {
     const pointA: Vertex = Circle.circleUtils.vertAt(angle, this.radius);
     // Construct the perpendicular of the line in point a. Then move relative to center.
     return (new Vector(pointA, new Vertex(0, 0)).add(this.center) as Vector).perp() as Vector;
+    // return (new Vector(this.center.clone(), pointA).add(pointA) as Vector).perp() as Vector;
   }
 
   /**
@@ -306,7 +307,7 @@ export class Circle implements Intersectable, SVGSerializable {
       // Calculate angle
       const lineFromCenter = new Line(this.center, vert);
       const angle: number = lineFromCenter.angle();
-      console.log("angle", (angle / Math.PI) * 180.0);
+      // console.log("angle", (angle / Math.PI) * 180.0);
       // const angle = Math.random() * Math.PI * 2; // TODO
       // Calculate tangent at angle
       return this.tangentAt(angle);

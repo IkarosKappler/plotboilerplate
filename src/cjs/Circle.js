@@ -120,6 +120,7 @@ var Circle = /** @class */ (function () {
         var pointA = Circle.circleUtils.vertAt(angle, this.radius);
         // Construct the perpendicular of the line in point a. Then move relative to center.
         return new Vector_1.Vector(pointA, new Vertex_1.Vertex(0, 0)).add(this.center).perp();
+        // return (new Vector(this.center.clone(), pointA).add(pointA) as Vector).perp() as Vector;
     };
     /**
      * Calculate the intersection points (if exists) with the given circle.
@@ -259,7 +260,7 @@ var Circle = /** @class */ (function () {
             // Calculate angle
             var lineFromCenter = new Line_1.Line(_this.center, vert);
             var angle = lineFromCenter.angle();
-            console.log("angle", (angle / Math.PI) * 180.0);
+            // console.log("angle", (angle / Math.PI) * 180.0);
             // const angle = Math.random() * Math.PI * 2; // TODO
             // Calculate tangent at angle
             return _this.tangentAt(angle);

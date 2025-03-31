@@ -117,6 +117,7 @@ export class Circle {
         const pointA = Circle.circleUtils.vertAt(angle, this.radius);
         // Construct the perpendicular of the line in point a. Then move relative to center.
         return new Vector(pointA, new Vertex(0, 0)).add(this.center).perp();
+        // return (new Vector(this.center.clone(), pointA).add(pointA) as Vector).perp() as Vector;
     }
     /**
      * Calculate the intersection points (if exists) with the given circle.
@@ -230,8 +231,8 @@ export class Circle {
             return [];
         }
         if (inVectorBoundsOnly) {
-            const maxDist = line.length();
-            return [intersectioLine.a, intersectioLine.b].filter((vert) => line.a.distance(vert) < maxDist);
+            // const maxDist = line.length();
+            return [intersectioLine.a, intersectioLine.b].filter((vert) => line.hasPoint(vert, true));
         }
         else {
             return [intersectioLine.a, intersectioLine.b];
@@ -253,6 +254,7 @@ export class Circle {
             // Calculate angle
             const lineFromCenter = new Line(this.center, vert);
             const angle = lineFromCenter.angle();
+            // console.log("angle", (angle / Math.PI) * 180.0);
             // const angle = Math.random() * Math.PI * 2; // TODO
             // Calculate tangent at angle
             return this.tangentAt(angle);

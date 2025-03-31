@@ -35,7 +35,7 @@
     var shapes = [];
     // Array<Vector>
     var rays = [];
-    rays.push(new Vector(new Vertex(), new Vertex(100, 100)));
+    rays.push(new Vector(new Vertex(), new Vertex(250, 250).rotate(Math.random() * Math.PI)));
 
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
@@ -107,13 +107,66 @@
           reflectedRay = null;
         }
       } else if (shape instanceof Circle) {
-      } else if (shape instanceof Ellipse) {
+      } else if (shape instanceof VEllipse) {
+        var ellipseIntersections = findEllipseIntersections(shape, ray);
+        for (var i = 0; i < ellipseIntersections.length; i++) {
+          pb.draw.circleHandle(ellipseIntersections[i], 6, "red");
+        }
       } else {
-        // ERR=!
+        // ERR! (unrecognized shape)
+        // In the end all shapes should have the same methods!
       }
 
       return reflectedRay;
     };
+
+    // Todo: move to VEllipse class!
+    function findEllipseIntersections(_ellipse, _ray, inVectorBoundsOnly) {
+      // Question: what happens to extreme versions when ellipse is a line (width or height is zero)?
+      //           This would result in a Division_by_Zero exception!
+
+      // Step A: create clones for operations (keep originals unchanged)
+      var ellipse = _ellipse.clone(); // VEllipse
+      var ray = _ray.clone(); // Vector
+
+      // Step B: move both so ellipse's center is located at (0,0)
+      var moveAmount = ellipse.center.clone().inv();
+      ellipse.move(moveAmount);
+      ray.add(moveAmount);
+
+      // Step C: rotate eclipse backwards it's rotation, so that rotation is zero (0.0).
+      //         Rotate together with ray!
+      var rotationAmount = -ellipse.rotation;
+      ellipse.rotate(rotationAmount); // Rotation around (0,0) = center of translated ellipse
+      ray.a.rotate(rotationAmount, ellipse.center);
+      ray.b.rotate(rotationAmount, ellipse.center);
+
+      // Step D: find x/y factors to use for scaling to transform the ellipse to a circle.
+      //         Scale together with vector ray.
+      var radiusH = ellipse.radiusH();
+      var radiusV = ellipse.radiusV();
+      var scalingFactors = radiusH > radiusV ? { x: radiusV / radiusH, y: 1.0 } : { x: 1.0, y: radiusH / radiusV };
+
+      // Step E: scale ellipse AND ray by calculated factors.
+      ellipse.axis.scaleXY(scalingFactors);
+      ray.a.scaleXY(scalingFactors);
+      ray.b.scaleXY(scalingFactors);
+
+      // Intermediate result: now the ellipse is transformed to a circle and we can calculate intersections :)
+      // Step F: calculate circle+line intersecions
+      var tmpCircle = new Circle(new Vertex(), ellipse.radiusH()); // radiusH() === radiusV()
+      var intersections = tmpCircle.lineIntersections(ray, inVectorBoundsOnly);
+
+      // Step G: transform intersecions back to original configuration
+      intersections.forEach(function (intersectionPoint) {
+        //
+        intersectionPoint.scaleXY({ x: 1 / scalingFactors.x, y: 1 / scalingFactors.y }, ellipse.center);
+        intersectionPoint.rotate(-rotationAmount, ellipse.center);
+        intersectionPoint.sub(moveAmount);
+      });
+
+      return intersections; // [];
+    }
 
     /**
      * TODO: MOVE TO VECTOR CLASS.
@@ -135,8 +188,10 @@
       // Re-add the new polygon to trigger redraw.
       pb.removeAll(false, false); // Don't trigger redraw
 
-      var circle = new Circle(new Vertex(), 90.0);
-      shapes = [polygon, circle];
+      var circle = new Circle(new Vertex(-25, -15), 90.0);
+      var ellipse = new VEllipse(new Vertex(25, 15), new Vertex(150, 200), -Math.PI * 0.3);
+
+      shapes = [polygon, circle, ellipse];
       pb.add(shapes, false);
       pb.add(rays, true); // trigger redraw
     };

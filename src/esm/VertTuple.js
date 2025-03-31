@@ -13,7 +13,8 @@
  * @modified 2024-09-10 Chaging the first param of `pointDistance` from `Vertex` to less strict type `XYCoords`. This should not break anything.
  * @modified 2024-09-10 Adding the optional `epsilon` param to the `hasPoint` method.
  * @modified 2024-12-02 Added the `epsilon` param to the `colinear` method. Default is 1.0e-6.
- * @version 1.3.0
+ * @modified 2025-03-31 Added the `VertTuple.revert` method.
+ * @version 1.4.0
  */
 import { Vertex } from "./Vertex";
 import { UIDGenerator } from "./UIDGenerator";
@@ -80,13 +81,29 @@ export class VertTuple {
      *
      * @method add
      * @param {XYCoords} amount The amount (x,y) to add.
-     * @return {Line} this
      * @instance
      * @memberof VertTuple
+     * @return {VertTuple<T>} this
      **/
     add(amount) {
         this.a.add(amount);
         this.b.add(amount);
+        return this;
+    }
+    /**
+     * Reverse this vertex tuple: a becomes b, and b becomes a.
+     * This operation is in-place.
+     *
+     * @method add
+     * @param {XYCoords} amount The amount (x,y) to add.
+     * @instance
+     * @memberof VertTuple
+     * @return {VertTuple<T>} this
+     */
+    revert() {
+        const tmp = this.a;
+        this.a = this.b;
+        this.b = tmp;
         return this;
     }
     /**
