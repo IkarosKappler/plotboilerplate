@@ -35,6 +35,7 @@
     var shapes = [];
     // Array<Vector>
     var rays = [];
+    var ellipseHelper;
     rays.push(new Vector(new Vertex(), new Vertex(250, 250).rotate(Math.random() * Math.PI)));
 
     // Create a config: we want to have control about the arrow head size in this demo
@@ -51,12 +52,13 @@
 
     var postDraw = function (draw, fill) {
       // draw.circle({ x: 0, y: 0 }, 50.0, "red", 1.0);
-      var reflectedRays = calculateAllReflections();
-      reflectedRays.forEach(function (rays) {
-        rays.forEach(function (ray) {
-          draw.arrow(ray.a, ray.b, "orange");
+      var reflectedRaysByShapes = calculateAllReflections();
+      reflectedRaysByShapes.forEach(function (reflectedRays) {
+        reflectedRays.forEach(function (ray) {
+          draw.arrow(ray.a, ray.b, "orange", 5.0);
         });
       });
+      ellipseHelper.drawHandleLines(draw, fill);
     };
 
     /**
@@ -88,7 +90,7 @@
       var reflectedRay = null; // ray.perp().moveTo(ray.b);
 
       // Find intersection with min distance
-      if (shape instanceof Polygon || shape instanceof Circle) {
+      if (shape instanceof Polygon || shape instanceof Circle || shape instanceof VEllipse) {
         // Array<Vector>
         var intersectionTangents = shape.lineIntersectionTangents(ray, true);
         // Find closest intersection vector
@@ -106,12 +108,13 @@
         } else {
           reflectedRay = null;
         }
-      } else if (shape instanceof Circle) {
-      } else if (shape instanceof VEllipse) {
-        var ellipseIntersections = findEllipseIntersections(shape, ray);
-        for (var i = 0; i < ellipseIntersections.length; i++) {
-          pb.draw.circleHandle(ellipseIntersections[i], 6, "red");
-        }
+        // } else if (shape instanceof Circle) {
+        // } else if (shape instanceof VEllipse) {
+        //   // var ellipseIntersections = findEllipseIntersections(shape, ray);
+        //   var ellipseIntersections = shape.lineIntersections(ray, true);
+        //   for (var i = 0; i < ellipseIntersections.length; i++) {
+        //     pb.draw.circleHandle(ellipseIntersections[i], 6, "red");
+        //   }
       } else {
         // ERR! (unrecognized shape)
         // In the end all shapes should have the same methods!
@@ -191,7 +194,15 @@
       var circle = new Circle(new Vertex(-25, -15), 90.0);
       var ellipse = new VEllipse(new Vertex(25, 15), new Vertex(150, 200), -Math.PI * 0.3);
 
-      shapes = [polygon, circle, ellipse];
+      // We want to change the ellipse's radii and rotation by dragging points around
+      var ellipseRotationControlPoint = ellipse.vertAt(0.0).scale(1.2, ellipse.center);
+      if (ellipseHelper) {
+        ellipseHelper.destroy();
+      }
+      ellipseHelper = new VEllipseHelper(ellipse, ellipseRotationControlPoint);
+      // pb.add([circle, ellipse, ellipseRotationControlPoint], false);
+
+      shapes = [polygon, circle, ellipse, ellipseRotationControlPoint];
       pb.add(shapes, false);
       pb.add(rays, true); // trigger redraw
     };

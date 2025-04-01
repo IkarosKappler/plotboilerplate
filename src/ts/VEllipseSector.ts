@@ -6,7 +6,8 @@
  * @date     2021-02-26
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-11-01 Tweaked the `endpointToCenterParameters` function to handle negative values, too, without errors.
- * @version  1.1.1
+ * @modified 2025-04-01 Adapting a the `toCubicBezier` calculation to match an underlying change in the vertAt and tangentAt calculation of ellipses (was required to hamonize both methods with circles).
+ * @version  1.1.2
  */
 
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -125,8 +126,8 @@ export class VEllipseSector {
       let nextAngle = angles[(i + 1) % angles.length];
       let endPoint: Vertex = this.ellipse.vertAt(nextAngle);
 
-      let startTangent: Vector = this.ellipse.tangentAt(curAngle);
-      let endTangent: Vector = this.ellipse.tangentAt(nextAngle);
+      let startTangent: Vector = this.ellipse.tangentAt(curAngle + this.ellipse.rotation);
+      let endTangent: Vector = this.ellipse.tangentAt(nextAngle + this.ellipse.rotation);
 
       // Distorted ellipses can only be approximated by linear Bézier segments
       if (Math.abs(radiusV) < 0.0001 || Math.abs(radiusH) < 0.0001) {

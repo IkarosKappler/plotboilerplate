@@ -26,6 +26,7 @@ import { Vector } from "./Vector";
 import { Vertex } from "./Vertex";
 import { SVGSerializable, UID, XYCoords } from "./interfaces";
 import { CubicBezierCurve } from "./CubicBezierCurve";
+import { VertTuple } from "./VertTuple";
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -216,10 +217,32 @@ export declare class VEllipse implements SVGSerializable {
     /**
      * Get equally distributed points on the outline of this ellipse.
      *
+     * @method getEquidistantVertices
+     * @instance
      * @param {number} pointCount - The number of points.
      * @returns {Array<Vertex>}
      */
     getEquidistantVertices(pointCount: number): Array<Vertex>;
+    /**
+     * Get the line intersections as vectors with this ellipse.
+     *
+     * @method lineIntersections
+     * @instance
+     * @param {VertTuple<Vector> ray - The line/ray to intersect this ellipse with.
+     * @param {boolean} inVectorBoundsOnly - (default=false) Set to true if only intersections within the vector bounds are of interest.
+     * @returns
+     */
+    lineIntersections(ray: VertTuple<Vector>, inVectorBoundsOnly?: boolean): Array<Vertex>;
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vector>;
     /**
      * Convert this ellipse into cubic Bézier curves.
      *

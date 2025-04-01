@@ -30,6 +30,7 @@ var Vector_1 = require("./Vector");
 var Vertex_1 = require("./Vertex");
 var UIDGenerator_1 = require("./UIDGenerator");
 var CubicBezierCurve_1 = require("./CubicBezierCurve");
+var Circle_1 = require("./Circle");
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -172,6 +173,7 @@ var VEllipse = /** @class */ (function () {
         var a = this.radiusH();
         var b = this.radiusV();
         return new Vertex_1.Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle)).rotate(this.rotation, this.center);
+        // return new Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle + this.rotation));
     };
     /**
      * Get the normal vector at the given angle.
@@ -187,7 +189,8 @@ var VEllipse = /** @class */ (function () {
      * @param {number=1.0} length - [optional, default=1] The length of the returned vector.
      */
     VEllipse.prototype.normalAt = function (angle, length) {
-        var point = this.vertAt(angle);
+        // const point: Vertex = this.vertAt(angle);
+        var point = this.vertAt(angle - this.rotation); // HERE IS THE CORRECT BEHAVIOR!
         var foci = this.getFoci();
         // Calculate the angle between [point,focusA] and [point,focusB]
         var angleA = new Line_1.Line(point, foci[0]).angle();
@@ -205,11 +208,6 @@ var VEllipse = /** @class */ (function () {
         if (typeof length === "number") {
             resultVector.setLength(length);
         }
-        // if (this.center.distance(endPointA) < this.center.distance(endPointB)) {
-        //   return new Vector(point, endPointB);
-        // } else {
-        //   return new Vector(point, endPointA);
-        // }
         return resultVector;
     };
     /**
@@ -229,6 +227,7 @@ var VEllipse = /** @class */ (function () {
      */
     VEllipse.prototype.tangentAt = function (angle, length) {
         var normal = this.normalAt(angle, length);
+        // const normal: Vector = this.normalAt(angle - this.rotation, length);
         // Rotate the normal by 90 degrees, then it is the tangent.
         // normal.b.rotate(Math.PI / 2, normal.a);
         // return normal;
@@ -283,6 +282,8 @@ var VEllipse = /** @class */ (function () {
     /**
      * Get equally distributed points on the outline of this ellipse.
      *
+     * @method getEquidistantVertices
+     * @instance
      * @param {number} pointCount - The number of points.
      * @returns {Array<Vertex>}
      */
@@ -294,6 +295,80 @@ var VEllipse = /** @class */ (function () {
         }
         return result;
     };
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get the line intersections as vectors with this ellipse.
+     *
+     * @method lineIntersections
+     * @instance
+     * @param {VertTuple<Vector> ray - The line/ray to intersect this ellipse with.
+     * @param {boolean} inVectorBoundsOnly - (default=false) Set to true if only intersections within the vector bounds are of interest.
+     * @returns
+     */
+    VEllipse.prototype.lineIntersections = function (ray, inVectorBoundsOnly) {
+        // Question: what happens to extreme versions when ellipse is a line (width or height is zero)?
+        //           This would result in a Division_by_Zero exception!
+        if (inVectorBoundsOnly === void 0) { inVectorBoundsOnly = false; }
+        // Step A: create clones for operations (keep originals unchanged)
+        var ellipseCopy = this.clone(); // VEllipse
+        var rayCopy = ray.clone(); // Vector
+        // Step B: move both so ellipse's center is located at (0,0)
+        var moveAmount = ellipseCopy.center.clone().inv();
+        ellipseCopy.move(moveAmount);
+        rayCopy.add(moveAmount);
+        // Step C: rotate eclipse backwards it's rotation, so that rotation is zero (0.0).
+        //         Rotate together with ray!
+        var rotationAmount = -ellipseCopy.rotation;
+        ellipseCopy.rotate(rotationAmount); // Rotation around (0,0) = center of translated ellipse
+        rayCopy.a.rotate(rotationAmount, ellipseCopy.center);
+        rayCopy.b.rotate(rotationAmount, ellipseCopy.center);
+        // Step D: find x/y factors to use for scaling to transform the ellipse to a circle.
+        //         Scale together with vector ray.
+        var radiusH = ellipseCopy.radiusH();
+        var radiusV = ellipseCopy.radiusV();
+        var scalingFactors = radiusH > radiusV ? { x: radiusV / radiusH, y: 1.0 } : { x: 1.0, y: radiusH / radiusV };
+        // Step E: scale ellipse AND ray by calculated factors.
+        ellipseCopy.axis.scaleXY(scalingFactors);
+        rayCopy.a.scaleXY(scalingFactors);
+        rayCopy.b.scaleXY(scalingFactors);
+        // Intermediate result: now the ellipse is transformed to a circle and we can calculate intersections :)
+        // Step F: calculate circle+line intersecions
+        var tmpCircle = new Circle_1.Circle(new Vertex_1.Vertex(), ellipseCopy.radiusH()); // radiusH() === radiusV()
+        var intersections = tmpCircle.lineIntersections(rayCopy, inVectorBoundsOnly);
+        // Step G: transform intersecions back to original configuration
+        intersections.forEach(function (intersectionPoint) {
+            // Reverse transformation from above.
+            intersectionPoint.scaleXY({ x: 1 / scalingFactors.x, y: 1 / scalingFactors.y }, ellipseCopy.center);
+            intersectionPoint.rotate(-rotationAmount, ellipseCopy.center);
+            intersectionPoint.sub(moveAmount);
+        });
+        return intersections;
+    };
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    VEllipse.prototype.lineIntersectionTangents = function (line, inVectorBoundsOnly) {
+        var _this = this;
+        if (inVectorBoundsOnly === void 0) { inVectorBoundsOnly = false; }
+        // Find the intersections of all lines plus their tangents inside the circle bounds
+        var interSectionPoints = this.lineIntersections(line, inVectorBoundsOnly);
+        return interSectionPoints.map(function (vert) {
+            // Calculate angle
+            var lineFromCenter = new Line_1.Line(_this.center, vert);
+            var angle = lineFromCenter.angle();
+            // console.log("angle", (angle / Math.PI) * 180.0);
+            // const angle = Math.random() * Math.PI * 2; // TODO
+            // Calculate tangent at angle
+            return _this.tangentAt(angle);
+        });
+    };
+    //--- END --- Implement interface `Intersectable`
     /**
      * Convert this ellipse into cubic Bézier curves.
      *
@@ -336,10 +411,10 @@ var VEllipse = /** @class */ (function () {
         var radiusV = this.radiusV();
         var curves = [];
         var angles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, segmentCount);
-        var curAngle = angles[0];
+        var curAngle = angles[0] + this.rotation;
         var startPoint = this.vertAt(curAngle);
         for (var i = 0; i < angles.length; i++) {
-            var nextAngle = angles[(i + 1) % angles.length];
+            var nextAngle = angles[(i + 1) % angles.length] + this.rotation;
             var endPoint = this.vertAt(nextAngle);
             if (Math.abs(radiusV) < 0.0001 || Math.abs(radiusH) < 0.0001) {
                 // Distorted ellipses can only be approximated by linear Bézier segments
@@ -348,8 +423,8 @@ var VEllipse = /** @class */ (function () {
                 curves.push(curve);
             }
             else {
-                var startTangent = this.tangentAt(curAngle);
-                var endTangent = this.tangentAt(nextAngle);
+                var startTangent = this.tangentAt(curAngle + this.rotation);
+                var endTangent = this.tangentAt(nextAngle + this.rotation);
                 // Find intersection (ignore that the result might be null in some extreme cases)
                 var intersection = startTangent.intersection(endTangent);
                 // What if intersection is undefined?

@@ -35,7 +35,6 @@
 
     // We want to change the ellipse's radii and rotation by dragging points around
     var ellipseRotationControlPoint = ellipse.vertAt(0.0).scale(1.2, ellipse.center);
-
     var ellipseHelper = new VEllipseHelper(ellipse, ellipseRotationControlPoint);
     pb.add([circle, ellipse, ellipseRotationControlPoint], false);
 

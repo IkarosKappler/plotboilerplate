@@ -1896,15 +1896,13 @@ var Circle = /** @class */ (function () {
     };
     //--- BEGIN --- Implement interface `Intersectable`
     /**
-     * Get all line intersections with this polygon.
+     * Get all line intersections with this circle.
      *
      * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
      *
-     * See demo `47-closest-vector-projection-on-polygon` for how it works.
-     *
      * @param {VertTuple} line - The line to find intersections with.
      * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
-     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     * @returns {Array<Vertex>} - An array of all intersections with the circle outline.
      */
     Circle.prototype.lineIntersections = function (line, inVectorBoundsOnly) {
         if (inVectorBoundsOnly === void 0) { inVectorBoundsOnly = false; }
@@ -1927,7 +1925,7 @@ var Circle = /** @class */ (function () {
      * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
      *
      * @param line
-     * @param inVectorBoundsOnly
+     * @param lineIntersectionTangents
      * @returns
      */
     Circle.prototype.lineIntersectionTangents = function (line, inVectorBoundsOnly) {
@@ -7933,6 +7931,7 @@ var Vector_1 = __webpack_require__(30);
 var Vertex_1 = __webpack_require__(787);
 var UIDGenerator_1 = __webpack_require__(938);
 var CubicBezierCurve_1 = __webpack_require__(973);
+var Circle_1 = __webpack_require__(118);
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -8108,11 +8107,6 @@ var VEllipse = /** @class */ (function () {
         if (typeof length === "number") {
             resultVector.setLength(length);
         }
-        // if (this.center.distance(endPointA) < this.center.distance(endPointB)) {
-        //   return new Vector(point, endPointB);
-        // } else {
-        //   return new Vector(point, endPointA);
-        // }
         return resultVector;
     };
     /**
@@ -8132,6 +8126,7 @@ var VEllipse = /** @class */ (function () {
      */
     VEllipse.prototype.tangentAt = function (angle, length) {
         var normal = this.normalAt(angle, length);
+        // const normal: Vector = this.normalAt(angle - this.rotation, length);
         // Rotate the normal by 90 degrees, then it is the tangent.
         // normal.b.rotate(Math.PI / 2, normal.a);
         // return normal;
@@ -8186,6 +8181,8 @@ var VEllipse = /** @class */ (function () {
     /**
      * Get equally distributed points on the outline of this ellipse.
      *
+     * @method getEquidistantVertices
+     * @instance
      * @param {number} pointCount - The number of points.
      * @returns {Array<Vertex>}
      */
@@ -8197,6 +8194,80 @@ var VEllipse = /** @class */ (function () {
         }
         return result;
     };
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get the line intersections as vectors with this ellipse.
+     *
+     * @method lineIntersections
+     * @instance
+     * @param {VertTuple<Vector> ray - The line/ray to intersect this ellipse with.
+     * @param {boolean} inVectorBoundsOnly - (default=false) Set to true if only intersections within the vector bounds are of interest.
+     * @returns
+     */
+    VEllipse.prototype.lineIntersections = function (ray, inVectorBoundsOnly) {
+        // Question: what happens to extreme versions when ellipse is a line (width or height is zero)?
+        //           This would result in a Division_by_Zero exception!
+        if (inVectorBoundsOnly === void 0) { inVectorBoundsOnly = false; }
+        // Step A: create clones for operations (keep originals unchanged)
+        var ellipseCopy = this.clone(); // VEllipse
+        var rayCopy = ray.clone(); // Vector
+        // Step B: move both so ellipse's center is located at (0,0)
+        var moveAmount = ellipseCopy.center.clone().inv();
+        ellipseCopy.move(moveAmount);
+        rayCopy.add(moveAmount);
+        // Step C: rotate eclipse backwards it's rotation, so that rotation is zero (0.0).
+        //         Rotate together with ray!
+        var rotationAmount = -ellipseCopy.rotation;
+        ellipseCopy.rotate(rotationAmount); // Rotation around (0,0) = center of translated ellipse
+        rayCopy.a.rotate(rotationAmount, ellipseCopy.center);
+        rayCopy.b.rotate(rotationAmount, ellipseCopy.center);
+        // Step D: find x/y factors to use for scaling to transform the ellipse to a circle.
+        //         Scale together with vector ray.
+        var radiusH = ellipseCopy.radiusH();
+        var radiusV = ellipseCopy.radiusV();
+        var scalingFactors = radiusH > radiusV ? { x: radiusV / radiusH, y: 1.0 } : { x: 1.0, y: radiusH / radiusV };
+        // Step E: scale ellipse AND ray by calculated factors.
+        ellipseCopy.axis.scaleXY(scalingFactors);
+        rayCopy.a.scaleXY(scalingFactors);
+        rayCopy.b.scaleXY(scalingFactors);
+        // Intermediate result: now the ellipse is transformed to a circle and we can calculate intersections :)
+        // Step F: calculate circle+line intersecions
+        var tmpCircle = new Circle_1.Circle(new Vertex_1.Vertex(), ellipseCopy.radiusH()); // radiusH() === radiusV()
+        var intersections = tmpCircle.lineIntersections(rayCopy, inVectorBoundsOnly);
+        // Step G: transform intersecions back to original configuration
+        intersections.forEach(function (intersectionPoint) {
+            // Reverse transformation from above.
+            intersectionPoint.scaleXY({ x: 1 / scalingFactors.x, y: 1 / scalingFactors.y }, ellipseCopy.center);
+            intersectionPoint.rotate(-rotationAmount, ellipseCopy.center);
+            intersectionPoint.sub(moveAmount);
+        });
+        return intersections;
+    };
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    VEllipse.prototype.lineIntersectionTangents = function (line, inVectorBoundsOnly) {
+        var _this = this;
+        if (inVectorBoundsOnly === void 0) { inVectorBoundsOnly = false; }
+        // Find the intersections of all lines plus their tangents inside the circle bounds
+        var interSectionPoints = this.lineIntersections(line, inVectorBoundsOnly);
+        return interSectionPoints.map(function (vert) {
+            // Calculate angle
+            var lineFromCenter = new Line_1.Line(_this.center, vert);
+            var angle = lineFromCenter.angle();
+            // console.log("angle", (angle / Math.PI) * 180.0);
+            // const angle = Math.random() * Math.PI * 2; // TODO
+            // Calculate tangent at angle
+            return _this.tangentAt(angle);
+        });
+    };
+    //--- END --- Implement interface `Intersectable`
     /**
      * Convert this ellipse into cubic Bézier curves.
      *

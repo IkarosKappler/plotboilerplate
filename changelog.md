@@ -13,6 +13,8 @@ Imminent todos:
 - Create VEllipseHelper (only VEllipseSectorHelper exists)
 - Extend Demo '32-ellipse-to-bezier' with the new helper.
 
+* 2025-04-01
+  - Adapting a the `VEllipseSector.toCubicBezier` calculation to match an underlying change in the vertAt and tangentAt calculation of ellipses (was required to hamonize both methods with circles).
 * 2025-03-31
   - Added the `VerTuple.revert` method.
   - ATTENTION: modified the winding direction of the `VEllipse.tangentAt` method to match with the `Circle.tangentAt` method. This is a breaking change!

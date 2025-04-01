@@ -29,6 +29,8 @@ import { Vertex } from "./Vertex";
 import { UIDGenerator } from "./UIDGenerator";
 import { SVGSerializable, UID, XYCoords } from "./interfaces";
 import { CubicBezierCurve } from "./CubicBezierCurve";
+import { VertTuple } from "./VertTuple";
+import { Circle } from "./Circle";
 
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
@@ -224,6 +226,7 @@ export class VEllipse implements SVGSerializable {
       this.rotation,
       this.center
     );
+    // return new Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle + this.rotation));
   }
 
   /**
@@ -240,7 +243,8 @@ export class VEllipse implements SVGSerializable {
    * @param {number=1.0} length - [optional, default=1] The length of the returned vector.
    */
   normalAt(angle: number, length?: number): Vector {
-    const point: Vertex = this.vertAt(angle);
+    // const point: Vertex = this.vertAt(angle);
+    const point: Vertex = this.vertAt(angle - this.rotation); // HERE IS THE CORRECT BEHAVIOR!
     const foci: [Vertex, Vertex] = this.getFoci();
     // Calculate the angle between [point,focusA] and [point,focusB]
     const angleA: number = new Line(point, foci[0]).angle();
@@ -259,12 +263,6 @@ export class VEllipse implements SVGSerializable {
     if (typeof length === "number") {
       resultVector.setLength(length);
     }
-
-    // if (this.center.distance(endPointA) < this.center.distance(endPointB)) {
-    //   return new Vector(point, endPointB);
-    // } else {
-    //   return new Vector(point, endPointA);
-    // }
     return resultVector;
   }
 
@@ -285,6 +283,7 @@ export class VEllipse implements SVGSerializable {
    */
   tangentAt(angle: number, length?: number): Vector {
     const normal: Vector = this.normalAt(angle, length);
+    // const normal: Vector = this.normalAt(angle - this.rotation, length);
     // Rotate the normal by 90 degrees, then it is the tangent.
     // normal.b.rotate(Math.PI / 2, normal.a);
     // return normal;
@@ -341,6 +340,8 @@ export class VEllipse implements SVGSerializable {
   /**
    * Get equally distributed points on the outline of this ellipse.
    *
+   * @method getEquidistantVertices
+   * @instance
    * @param {number} pointCount - The number of points.
    * @returns {Array<Vertex>}
    */
@@ -352,6 +353,87 @@ export class VEllipse implements SVGSerializable {
     }
     return result;
   }
+
+  //--- BEGIN --- Implement interface `Intersectable`
+  /**
+   * Get the line intersections as vectors with this ellipse.
+   *
+   * @method lineIntersections
+   * @instance
+   * @param {VertTuple<Vector> ray - The line/ray to intersect this ellipse with.
+   * @param {boolean} inVectorBoundsOnly - (default=false) Set to true if only intersections within the vector bounds are of interest.
+   * @returns
+   */
+  lineIntersections(ray: VertTuple<Vector>, inVectorBoundsOnly: boolean = false): Array<Vertex> {
+    // Question: what happens to extreme versions when ellipse is a line (width or height is zero)?
+    //           This would result in a Division_by_Zero exception!
+
+    // Step A: create clones for operations (keep originals unchanged)
+    const ellipseCopy: VEllipse = this.clone(); // VEllipse
+    const rayCopy: VertTuple<Vector> = ray.clone(); // Vector
+
+    // Step B: move both so ellipse's center is located at (0,0)
+    const moveAmount: Vertex = ellipseCopy.center.clone().inv();
+    ellipseCopy.move(moveAmount);
+    rayCopy.add(moveAmount);
+
+    // Step C: rotate eclipse backwards it's rotation, so that rotation is zero (0.0).
+    //         Rotate together with ray!
+    const rotationAmount: number = -ellipseCopy.rotation;
+    ellipseCopy.rotate(rotationAmount); // Rotation around (0,0) = center of translated ellipse
+    rayCopy.a.rotate(rotationAmount, ellipseCopy.center);
+    rayCopy.b.rotate(rotationAmount, ellipseCopy.center);
+
+    // Step D: find x/y factors to use for scaling to transform the ellipse to a circle.
+    //         Scale together with vector ray.
+    const radiusH: number = ellipseCopy.radiusH();
+    const radiusV: number = ellipseCopy.radiusV();
+    const scalingFactors: XYCoords = radiusH > radiusV ? { x: radiusV / radiusH, y: 1.0 } : { x: 1.0, y: radiusH / radiusV };
+
+    // Step E: scale ellipse AND ray by calculated factors.
+    ellipseCopy.axis.scaleXY(scalingFactors);
+    rayCopy.a.scaleXY(scalingFactors);
+    rayCopy.b.scaleXY(scalingFactors);
+
+    // Intermediate result: now the ellipse is transformed to a circle and we can calculate intersections :)
+    // Step F: calculate circle+line intersecions
+    const tmpCircle: Circle = new Circle(new Vertex(), ellipseCopy.radiusH()); // radiusH() === radiusV()
+    const intersections: Vertex[] = tmpCircle.lineIntersections(rayCopy, inVectorBoundsOnly);
+
+    // Step G: transform intersecions back to original configuration
+    intersections.forEach(function (intersectionPoint) {
+      // Reverse transformation from above.
+      intersectionPoint.scaleXY({ x: 1 / scalingFactors.x, y: 1 / scalingFactors.y }, ellipseCopy.center);
+      intersectionPoint.rotate(-rotationAmount, ellipseCopy.center);
+      intersectionPoint.sub(moveAmount);
+    });
+
+    return intersections;
+  }
+
+  /**
+   * Get all line intersections of this polygon and their tangents along the shape.
+   *
+   * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+   *
+   * @param line
+   * @param lineIntersectionTangents
+   * @returns
+   */
+  lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly: boolean = false): Array<Vector> {
+    // Find the intersections of all lines plus their tangents inside the circle bounds
+    const interSectionPoints: Array<Vertex> = this.lineIntersections(line, inVectorBoundsOnly);
+    return interSectionPoints.map((vert: Vertex) => {
+      // Calculate angle
+      const lineFromCenter = new Line(this.center, vert);
+      const angle: number = lineFromCenter.angle();
+      // console.log("angle", (angle / Math.PI) * 180.0);
+      // const angle = Math.random() * Math.PI * 2; // TODO
+      // Calculate tangent at angle
+      return this.tangentAt(angle);
+    });
+  }
+  //--- END --- Implement interface `Intersectable`
 
   /**
    * Convert this ellipse into cubic Bézier curves.
@@ -398,10 +480,10 @@ export class VEllipse implements SVGSerializable {
 
     const curves: Array<CubicBezierCurve> = [];
     const angles: Array<number> = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, segmentCount);
-    let curAngle: number = angles[0];
+    let curAngle: number = angles[0] + this.rotation;
     let startPoint: Vertex = this.vertAt(curAngle);
     for (var i = 0; i < angles.length; i++) {
-      let nextAngle = angles[(i + 1) % angles.length];
+      let nextAngle = angles[(i + 1) % angles.length] + this.rotation;
       let endPoint: Vertex = this.vertAt(nextAngle);
 
       if (Math.abs(radiusV) < 0.0001 || Math.abs(radiusH) < 0.0001) {
@@ -415,8 +497,8 @@ export class VEllipse implements SVGSerializable {
         );
         curves.push(curve);
       } else {
-        let startTangent: Vector = this.tangentAt(curAngle);
-        let endTangent: Vector = this.tangentAt(nextAngle);
+        let startTangent: Vector = this.tangentAt(curAngle + this.rotation);
+        let endTangent: Vector = this.tangentAt(nextAngle + this.rotation);
 
         // Find intersection (ignore that the result might be null in some extreme cases)
         let intersection: Vertex = startTangent.intersection(endTangent) as Vertex;

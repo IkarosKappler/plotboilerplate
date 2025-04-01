@@ -151,15 +151,13 @@ export declare class Circle implements Intersectable, SVGSerializable {
      **/
     lineIntersection(a: Vertex, b: XYCoords): Line | null;
     /**
-     * Get all line intersections with this polygon.
+     * Get all line intersections with this circle.
      *
      * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
      *
-     * See demo `47-closest-vector-projection-on-polygon` for how it works.
-     *
      * @param {VertTuple} line - The line to find intersections with.
      * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
-     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     * @returns {Array<Vertex>} - An array of all intersections with the circle outline.
      */
     lineIntersections(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vertex>;
     /**
@@ -168,7 +166,7 @@ export declare class Circle implements Intersectable, SVGSerializable {
      * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
      *
      * @param line
-     * @param inVectorBoundsOnly
+     * @param lineIntersectionTangents
      * @returns
      */
     lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vector>;

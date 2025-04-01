@@ -78,8 +78,8 @@ var VEllipseSector = /** @class */ (function () {
         for (var i = 0; i + 1 < angles.length; i++) {
             var nextAngle = angles[(i + 1) % angles.length];
             var endPoint = this.ellipse.vertAt(nextAngle);
-            var startTangent = this.ellipse.tangentAt(curAngle);
-            var endTangent = this.ellipse.tangentAt(nextAngle);
+            var startTangent = this.ellipse.tangentAt(curAngle + this.ellipse.rotation);
+            var endTangent = this.ellipse.tangentAt(nextAngle + this.ellipse.rotation);
             // Distorted ellipses can only be approximated by linear Bézier segments
             if (Math.abs(radiusV) < 0.0001 || Math.abs(radiusH) < 0.0001) {
                 var diff = startPoint.difference(endPoint);
