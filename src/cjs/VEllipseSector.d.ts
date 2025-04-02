@@ -6,7 +6,8 @@
  * @date     2021-02-26
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-11-01 Tweaked the `endpointToCenterParameters` function to handle negative values, too, without errors.
- * @version  1.1.1
+ * @modified 2025-04-01 Adapting a the `toCubicBezier` calculation to match an underlying change in the vertAt and tangentAt calculation of ellipses (was required to hamonize both methods with circles).
+ * @version  1.1.2
  */
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { SVGPathParams, UID } from "./interfaces";

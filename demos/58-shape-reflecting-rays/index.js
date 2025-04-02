@@ -1,7 +1,7 @@
 /**
  * A script for calculating ray reflections on any shape.
  *
- * @requires PlotBoilerplate, gup, dat.gui,
+ * @requires PlotBoilerplate, gup, dat.gui, randomCircleSector
  *
  * @author   Ikaros Kappler
  * @date     2025-03-24
@@ -36,6 +36,7 @@
     // Array<Vector>
     var rays = [];
     var ellipseHelper;
+    var cicleSectorHelper;
     rays.push(new Vector(new Vertex(), new Vertex(250, 250).rotate(Math.random() * Math.PI)));
 
     // Create a config: we want to have control about the arrow head size in this demo
@@ -59,6 +60,7 @@
         });
       });
       ellipseHelper.drawHandleLines(draw, fill);
+      cicleSectorHelper.drawHandleLines(draw, fill);
     };
 
     /**
@@ -90,7 +92,7 @@
       var reflectedRay = null; // ray.perp().moveTo(ray.b);
 
       // Find intersection with min distance
-      if (shape instanceof Polygon || shape instanceof Circle || shape instanceof VEllipse) {
+      if (shape instanceof Polygon || shape instanceof Circle || shape instanceof VEllipse || shape instanceof CircleSector) {
         // Array<Vector>
         var intersectionTangents = shape.lineIntersectionTangents(ray, true);
         // Find closest intersection vector
@@ -123,54 +125,6 @@
       return reflectedRay;
     };
 
-    // Todo: move to VEllipse class!
-    function findEllipseIntersections(_ellipse, _ray, inVectorBoundsOnly) {
-      // Question: what happens to extreme versions when ellipse is a line (width or height is zero)?
-      //           This would result in a Division_by_Zero exception!
-
-      // Step A: create clones for operations (keep originals unchanged)
-      var ellipse = _ellipse.clone(); // VEllipse
-      var ray = _ray.clone(); // Vector
-
-      // Step B: move both so ellipse's center is located at (0,0)
-      var moveAmount = ellipse.center.clone().inv();
-      ellipse.move(moveAmount);
-      ray.add(moveAmount);
-
-      // Step C: rotate eclipse backwards it's rotation, so that rotation is zero (0.0).
-      //         Rotate together with ray!
-      var rotationAmount = -ellipse.rotation;
-      ellipse.rotate(rotationAmount); // Rotation around (0,0) = center of translated ellipse
-      ray.a.rotate(rotationAmount, ellipse.center);
-      ray.b.rotate(rotationAmount, ellipse.center);
-
-      // Step D: find x/y factors to use for scaling to transform the ellipse to a circle.
-      //         Scale together with vector ray.
-      var radiusH = ellipse.radiusH();
-      var radiusV = ellipse.radiusV();
-      var scalingFactors = radiusH > radiusV ? { x: radiusV / radiusH, y: 1.0 } : { x: 1.0, y: radiusH / radiusV };
-
-      // Step E: scale ellipse AND ray by calculated factors.
-      ellipse.axis.scaleXY(scalingFactors);
-      ray.a.scaleXY(scalingFactors);
-      ray.b.scaleXY(scalingFactors);
-
-      // Intermediate result: now the ellipse is transformed to a circle and we can calculate intersections :)
-      // Step F: calculate circle+line intersecions
-      var tmpCircle = new Circle(new Vertex(), ellipse.radiusH()); // radiusH() === radiusV()
-      var intersections = tmpCircle.lineIntersections(ray, inVectorBoundsOnly);
-
-      // Step G: transform intersecions back to original configuration
-      intersections.forEach(function (intersectionPoint) {
-        //
-        intersectionPoint.scaleXY({ x: 1 / scalingFactors.x, y: 1 / scalingFactors.y }, ellipse.center);
-        intersectionPoint.rotate(-rotationAmount, ellipse.center);
-        intersectionPoint.sub(moveAmount);
-      });
-
-      return intersections; // [];
-    }
-
     /**
      * TODO: MOVE TO VECTOR CLASS.
      *
@@ -191,6 +145,7 @@
       // Re-add the new polygon to trigger redraw.
       pb.removeAll(false, false); // Don't trigger redraw
 
+      // Create circle and ellpise
       var circle = new Circle(new Vertex(-25, -15), 90.0);
       var ellipse = new VEllipse(new Vertex(25, 15), new Vertex(150, 200), -Math.PI * 0.3);
 
@@ -200,9 +155,18 @@
         ellipseHelper.destroy();
       }
       ellipseHelper = new VEllipseHelper(ellipse, ellipseRotationControlPoint);
-      // pb.add([circle, ellipse, ellipseRotationControlPoint], false);
 
-      shapes = [polygon, circle, ellipse, ellipseRotationControlPoint];
+      // Create circle sector
+      var circleSector = randomCircleSector(viewport);
+      // Further: add a circle sector helper to edit angles and radius manually (mouse or touch)
+      var controlPointA = circleSector.circle.vertAt(circleSector.startAngle);
+      var controlPointB = circleSector.circle.vertAt(circleSector.endAngle);
+      if (cicleSectorHelper) {
+        cicleSectorHelper.destroy();
+      }
+      cicleSectorHelper = new CircleSectorHelper(circleSector, controlPointA, controlPointB, pb);
+
+      shapes = [polygon, circle, ellipse, ellipseRotationControlPoint, circleSector, controlPointA, controlPointB];
       pb.add(shapes, false);
       pb.add(rays, true); // trigger redraw
     };

@@ -11,6 +11,8 @@
  * @version  1.2.0
  **/
 import { Circle } from "./Circle";
+import { Vector } from "./Vector";
+import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 import { SVGPathParams, SVGSerializable, UID, XYCoords } from "./interfaces";
 /**
@@ -123,6 +125,26 @@ export declare class CircleSector implements SVGSerializable {
      * @return {CircleSector | null} The intersecion of both sectors or null if they don't intersect.
      */
     circleSectorIntersection(sector: CircleSector): CircleSector | null;
+    /**
+     * Get the line intersections as vectors with this ellipse.
+     *
+     * @method lineIntersections
+     * @instance
+     * @param {VertTuple<Vector> ray - The line/ray to intersect this ellipse with.
+     * @param {boolean} inVectorBoundsOnly - (default=false) Set to true if only intersections within the vector bounds are of interest.
+     * @returns
+     */
+    lineIntersections(ray: VertTuple<Vector>, inVectorBoundsOnly?: boolean): Array<Vertex>;
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vector>;
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and

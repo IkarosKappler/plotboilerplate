@@ -14,7 +14,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CircleSector = void 0;
 var Circle_1 = require("./Circle");
+var Line_1 = require("./Line");
 var UIDGenerator_1 = require("./UIDGenerator");
+var Vertex_1 = require("./Vertex");
+var geomutils_1 = require("./geomutils");
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
  *
@@ -153,6 +156,54 @@ var CircleSector = /** @class */ (function () {
         }
         return resultSector;
     };
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get the line intersections as vectors with this ellipse.
+     *
+     * @method lineIntersections
+     * @instance
+     * @param {VertTuple<Vector> ray - The line/ray to intersect this ellipse with.
+     * @param {boolean} inVectorBoundsOnly - (default=false) Set to true if only intersections within the vector bounds are of interest.
+     * @returns
+     */
+    CircleSector.prototype.lineIntersections = function (ray, inVectorBoundsOnly) {
+        var _this = this;
+        if (inVectorBoundsOnly === void 0) { inVectorBoundsOnly = false; }
+        // First get all line intersections from underlying ellipse.
+        var ellipseIntersections = this.circle.lineIntersections(ray, inVectorBoundsOnly);
+        // Drop all intersection points that are not contained in the circle sectors bounds.
+        var tmpLine = new Line_1.Line(this.circle.center, new Vertex_1.Vertex());
+        return ellipseIntersections.filter(function (intersectionPoint) {
+            tmpLine.b.set(intersectionPoint);
+            var lineAngle = tmpLine.angle();
+            return _this.containsAngle(geomutils_1.geomutils.wrapMinMax(lineAngle, 0, Math.PI * 2));
+        });
+    };
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    CircleSector.prototype.lineIntersectionTangents = function (line, inVectorBoundsOnly) {
+        var _this = this;
+        if (inVectorBoundsOnly === void 0) { inVectorBoundsOnly = false; }
+        // Find the intersections of all lines plus their tangents inside the circle bounds
+        var interSectionPoints = this.lineIntersections(line, inVectorBoundsOnly);
+        return interSectionPoints.map(function (vert) {
+            // Calculate angle
+            var lineFromCenter = new Line_1.Line(_this.circle.center, vert);
+            var angle = lineFromCenter.angle();
+            // console.log("angle", (angle / Math.PI) * 180.0);
+            // const angle = Math.random() * Math.PI * 2; // TODO
+            // Calculate tangent at angle
+            return _this.circle.tangentAt(angle);
+        });
+    };
+    //--- END --- Implement interface `Intersectable`
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and

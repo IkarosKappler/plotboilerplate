@@ -4,6 +4,7 @@
  *
  * @author  Ikaros Kappler
  * @date    2025-03-31
+ * @modified 2025-04-02 Adding `VEllipseHelper.drawHandleLines()`.
  * @version 1.0.0
  */
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -30,9 +31,18 @@ var VEllipseHelper = /** @class */ (function () {
             ellipse.axis.rotate(rDiff, ellipse.center);
         });
     }
+    /**
+     * Draw grey handle lines.
+     *
+     * @param {DrawLib<any>} draw - The draw library instance to use.
+     * @param {DrawLib<any>} fill - The fill library instance to use.
+     */
     VEllipseHelper.prototype.drawHandleLines = function (draw, fill) {
         // Draw rotation handle line
-        draw.line(this.ellipse.center, this.rotationControlPoint, "rgba(64,192,128,0.333)", 1.0);
+        draw.line(this.ellipse.center, this.rotationControlPoint, "rgba(64,192,128,0.333)", 1.0, {
+            dashOffset: 0.0,
+            dashArray: [4, 2]
+        });
     };
     return VEllipseHelper;
 }());

@@ -8,14 +8,18 @@
  * @modified 2024-03-08 Added the `containsAngle` method.
  * @modified 2024-03-09 Added the `circleSectorIntersection` method to find coherent sector intersections..
  * @modified 2024-03-09 Added the `angleAt` method to determine any angle at some ratio.
+ * @modified 2025-04-02 Adding `CircleSector.lineIntersections` and `CircleSector.lineIntersectionTangents` and implementing `Intersectable`.
  * @version  1.2.0
  **/
 
 import { Circle } from "./Circle";
 import { Line } from "./Line";
 import { UIDGenerator } from "./UIDGenerator";
+import { Vector } from "./Vector";
+import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { PathSegment, SVGPathParams, SVGSerializable, UID, XYCoords } from "./interfaces";
+import { geomutils } from "./geomutils";
+import { Intersectable, PathSegment, SVGPathParams, SVGSerializable, UID, XYCoords } from "./interfaces";
 
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
@@ -26,7 +30,7 @@ import { PathSegment, SVGPathParams, SVGSerializable, UID, XYCoords } from "./in
  * @requires UIDGenerator
  * @requires XYCoords
  **/
-export class CircleSector implements SVGSerializable {
+export class CircleSector implements Intersectable, SVGSerializable {
   /**
    * Required to generate proper CSS classes and other class related IDs.
    **/
@@ -205,6 +209,52 @@ export class CircleSector implements SVGSerializable {
     }
     return resultSector;
   }
+
+  //--- BEGIN --- Implement interface `Intersectable`
+  /**
+   * Get the line intersections as vectors with this ellipse.
+   *
+   * @method lineIntersections
+   * @instance
+   * @param {VertTuple<Vector> ray - The line/ray to intersect this ellipse with.
+   * @param {boolean} inVectorBoundsOnly - (default=false) Set to true if only intersections within the vector bounds are of interest.
+   * @returns
+   */
+  lineIntersections(ray: VertTuple<Vector>, inVectorBoundsOnly: boolean = false): Array<Vertex> {
+    // First get all line intersections from underlying ellipse.
+    const ellipseIntersections: Array<Vertex> = this.circle.lineIntersections(ray, inVectorBoundsOnly);
+    // Drop all intersection points that are not contained in the circle sectors bounds.
+    const tmpLine = new Line(this.circle.center, new Vertex());
+    return ellipseIntersections.filter((intersectionPoint: Vertex) => {
+      tmpLine.b.set(intersectionPoint);
+      const lineAngle = tmpLine.angle();
+      return this.containsAngle(geomutils.wrapMinMax(lineAngle, 0, Math.PI * 2));
+    });
+  }
+
+  /**
+   * Get all line intersections of this polygon and their tangents along the shape.
+   *
+   * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+   *
+   * @param line
+   * @param lineIntersectionTangents
+   * @returns
+   */
+  lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly: boolean = false): Array<Vector> {
+    // Find the intersections of all lines plus their tangents inside the circle bounds
+    const interSectionPoints: Array<Vertex> = this.lineIntersections(line, inVectorBoundsOnly);
+    return interSectionPoints.map((vert: Vertex) => {
+      // Calculate angle
+      const lineFromCenter = new Line(this.circle.center, vert);
+      const angle: number = lineFromCenter.angle();
+      // console.log("angle", (angle / Math.PI) * 180.0);
+      // const angle = Math.random() * Math.PI * 2; // TODO
+      // Calculate tangent at angle
+      return this.circle.tangentAt(angle);
+    });
+  }
+  //--- END --- Implement interface `Intersectable`
 
   /**
    * This function should invalidate any installed listeners and invalidate this object.

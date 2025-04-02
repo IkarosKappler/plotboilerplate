@@ -27,7 +27,7 @@ import { Line } from "./Line";
 import { Vector } from "./Vector";
 import { Vertex } from "./Vertex";
 import { UIDGenerator } from "./UIDGenerator";
-import { SVGSerializable, UID, XYCoords } from "./interfaces";
+import { Intersectable, SVGSerializable, UID, XYCoords } from "./interfaces";
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { VertTuple } from "./VertTuple";
 import { Circle } from "./Circle";
@@ -40,7 +40,7 @@ import { Circle } from "./Circle";
  * @requires UIDGenerator
  * @requires Vertex
  */
-export class VEllipse implements SVGSerializable {
+export class VEllipse implements Intersectable, SVGSerializable {
   /**
    * Required to generate proper CSS classes and other class related IDs.
    **/

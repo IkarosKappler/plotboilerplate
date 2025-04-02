@@ -13,6 +13,11 @@ Imminent todos:
 - Create VEllipseHelper (only VEllipseSectorHelper exists)
 - Extend Demo '32-ellipse-to-bezier' with the new helper.
 
+* 2025-04-02
+  - Adding `CircleSectorHelper.drawHandleLines()`.
+  - Adding `VEllipseHelper.drawHandleLines()`.
+  - Adding `CircleSector.lineIntersections` and `CircleSector.lineIntersectionTangents` and implementing `Intersectable`.
+  - Adding demo helper function `demos/randomCircleSector.js` and refactoring demo '53-circle-sector-intersections'.
 * 2025-04-01
   - Adapting a the `VEllipseSector.toCubicBezier` calculation to match an underlying change in the vertAt and tangentAt calculation of ellipses (was required to hamonize both methods with circles).
 * 2025-03-31

@@ -24,7 +24,7 @@
  **/
 import { Vector } from "./Vector";
 import { Vertex } from "./Vertex";
-import { SVGSerializable, UID, XYCoords } from "./interfaces";
+import { Intersectable, SVGSerializable, UID, XYCoords } from "./interfaces";
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { VertTuple } from "./VertTuple";
 /**
@@ -35,7 +35,7 @@ import { VertTuple } from "./VertTuple";
  * @requires UIDGenerator
  * @requires Vertex
  */
-export declare class VEllipse implements SVGSerializable {
+export declare class VEllipse implements Intersectable, SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
      **/

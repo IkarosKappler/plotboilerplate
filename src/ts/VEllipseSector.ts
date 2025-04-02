@@ -18,6 +18,7 @@ import { UIDGenerator } from "./UIDGenerator";
 import { Vector } from "./Vector";
 import { VEllipse } from "./VEllipse";
 import { Vertex } from "./Vertex";
+import { VertTuple } from "./VertTuple";
 
 /**
  * @classdesc A class for elliptic sectors.
