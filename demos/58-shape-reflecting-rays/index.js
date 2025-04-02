@@ -37,6 +37,7 @@
     var rays = [];
     var ellipseHelper;
     var cicleSectorHelper;
+    var ellipseSectorHelper;
     rays.push(new Vector(new Vertex(), new Vertex(250, 250).rotate(Math.random() * Math.PI)));
 
     // Create a config: we want to have control about the arrow head size in this demo
@@ -61,6 +62,7 @@
       });
       ellipseHelper.drawHandleLines(draw, fill);
       cicleSectorHelper.drawHandleLines(draw, fill);
+      ellipseSectorHelper.drawHandleLines(draw, fill);
     };
 
     /**
@@ -92,7 +94,13 @@
       var reflectedRay = null; // ray.perp().moveTo(ray.b);
 
       // Find intersection with min distance
-      if (shape instanceof Polygon || shape instanceof Circle || shape instanceof VEllipse || shape instanceof CircleSector) {
+      if (
+        shape instanceof Polygon ||
+        shape instanceof Circle ||
+        shape instanceof VEllipse ||
+        shape instanceof CircleSector ||
+        shape instanceof VEllipseSector
+      ) {
         // Array<Vector>
         var intersectionTangents = shape.lineIntersectionTangents(ray, true);
         // Find closest intersection vector
@@ -166,7 +174,32 @@
       }
       cicleSectorHelper = new CircleSectorHelper(circleSector, controlPointA, controlPointB, pb);
 
-      shapes = [polygon, circle, ellipse, ellipseRotationControlPoint, circleSector, controlPointA, controlPointB];
+      // Create an ellipse helper
+      var ellipseSector = randomEllipseSector(viewport);
+      // We want to change the ellipse's radii and rotation by dragging points around
+      var startControlPoint = ellipseSector.ellipse.vertAt(ellipseSector.startAngle);
+      var endControlPoint = ellipseSector.ellipse.vertAt(ellipseSector.endAngle);
+      var rotationControlPoint = ellipseSector.ellipse
+        .vertAt(0) // ellipseSector.ellipse.rotation)
+        .scale(1.2, ellipseSector.ellipse.center);
+      if (ellipseSectorHelper) {
+        ellipseSectorHelper.destroy();
+      }
+      ellipseSectorHelper = new VEllipseSectorHelper(ellipseSector, startControlPoint, endControlPoint, rotationControlPoint);
+
+      shapes = [
+        polygon,
+        circle,
+        ellipse,
+        ellipseRotationControlPoint,
+        circleSector,
+        controlPointA,
+        controlPointB,
+        ellipseSector,
+        startControlPoint,
+        endControlPoint,
+        rotationControlPoint
+      ];
       pb.add(shapes, false);
       pb.add(rays, true); // trigger redraw
     };

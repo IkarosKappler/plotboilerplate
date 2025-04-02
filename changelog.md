@@ -18,6 +18,10 @@ Imminent todos:
   - Adding `VEllipseHelper.drawHandleLines()`.
   - Adding `CircleSector.lineIntersections` and `CircleSector.lineIntersectionTangents` and implementing `Intersectable`.
   - Adding demo helper function `demos/randomCircleSector.js` and refactoring demo '53-circle-sector-intersections'.
+  - Adding demo helper function `demos/randomEllipseSector.js`.
+  - Adding `VEllipseSector.containsAngle` method.
+  - Adding `VEllipseSector.lineIntersections` and `VEllipseSector.lineIntersectionTangents` and implementing `Intersectable`.
+  - Adding `VEllipseSectorHelper.drawHandleLines`.
 * 2025-04-01
   - Adapting a the `VEllipseSector.toCubicBezier` calculation to match an underlying change in the vertAt and tangentAt calculation of ellipses (was required to hamonize both methods with circles).
 * 2025-03-31

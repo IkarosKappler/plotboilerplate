@@ -2,10 +2,10 @@
 /**
  * A helper for VEllipses.
  *
- * @author  Ikaros Kappler
- * @date    2025-03-31
+ * @author   Ikaros Kappler
+ * @date     2025-03-31
  * @modified 2025-04-02 Adding `VEllipseHelper.drawHandleLines()`.
- * @version 1.0.0
+ * @version  1.0.0
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VEllipseHelper = void 0;
