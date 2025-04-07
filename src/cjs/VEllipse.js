@@ -227,6 +227,7 @@ var VEllipse = /** @class */ (function () {
      */
     VEllipse.prototype.tangentAt = function (angle, length) {
         var normal = this.normalAt(angle, length);
+        // TODO: cleanup
         // const normal: Vector = this.normalAt(angle - this.rotation, length);
         // Rotate the normal by 90 degrees, then it is the tangent.
         // normal.b.rotate(Math.PI / 2, normal.a);

@@ -6,11 +6,17 @@
  * @date     2021-02-26
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-11-01 Tweaked the `endpointToCenterParameters` function to handle negative values, too, without errors.
- * @version  1.1.1
+ * @modified 2025-04-01 Adapting a the `toCubicBezier` calculation to match an underlying change in the vertAt and tangentAt calculation of ellipses (was required to hamonize both methods with circles).
+ * @modified 2025-04-02 Adding `VEllipseSector.containsAngle` method.
+ * @modified 2025-04-02 Adding `VEllipseSector.lineIntersections` and `VEllipseSector.lineIntersectionTangents` and implementing `Intersectable`.
+ * @version  1.2.0
  */
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { SVGPathParams, UID } from "./interfaces";
+import { Vector } from "./Vector";
 import { VEllipse } from "./VEllipse";
+import { Vertex } from "./Vertex";
+import { VertTuple } from "./VertTuple";
 /**
  * @classdesc A class for elliptic sectors.
  *
@@ -74,6 +80,39 @@ export declare class VEllipseSector {
      * @param {numner} endAngle - The end angle of the sector.
      */
     constructor(ellipse: VEllipse, startAngle: number, endAngle: number);
+    /**
+     * Checks wether the given angle (must be inside 0 and PI*2) is contained inside this sector.
+     *
+     * @param {number} angle - The numeric angle to check.
+     * @method containsAngle
+     * @instance
+     * @memberof VEllipseSectpr
+     * @return {boolean} True if (and only if) this sector contains the given angle.
+     */
+    containsAngle(angle: number): boolean;
+    /**
+     * Get the line intersections as vectors with this ellipse.
+     *
+     * @method lineIntersections
+     * @instance
+     * @memberof VEllipseSectpr
+     * @param {VertTuple<Vector>} ray - The line/ray to intersect this ellipse with.
+     * @param {boolean} inVectorBoundsOnly - (default=false) Set to true if only intersections within the vector bounds are of interest.
+     * @returns
+     */
+    lineIntersections(ray: VertTuple<Vector>, inVectorBoundsOnly?: boolean): Array<Vertex>;
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @method lineIntersections
+     * @memberof VEllipseSectpr
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vector>;
     /**
      * Convert this elliptic sector into cubic Bézier curves.
      *

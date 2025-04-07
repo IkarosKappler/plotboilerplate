@@ -6,7 +6,10 @@
  * @date     2021-02-26
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-11-01 Tweaked the `endpointToCenterParameters` function to handle negative values, too, without errors.
- * @version  1.1.1
+ * @modified 2025-04-01 Adapting a the `toCubicBezier` calculation to match an underlying change in the vertAt and tangentAt calculation of ellipses (was required to hamonize both methods with circles).
+ * @modified 2025-04-02 Adding `VEllipseSector.containsAngle` method.
+ * @modified 2025-04-02 Adding `VEllipseSector.lineIntersections` and `VEllipseSector.lineIntersectionTangents` and implementing `Intersectable`.
+ * @version  1.2.0
  */
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { geomutils } from "./geomutils";
@@ -49,6 +52,73 @@ export class VEllipseSector {
         this.endAngle = geomutils.wrapMinMax(endAngle, 0, Math.PI * 2);
     }
     /**
+     * Checks wether the given angle (must be inside 0 and PI*2) is contained inside this sector.
+     *
+     * @param {number} angle - The numeric angle to check.
+     * @method containsAngle
+     * @instance
+     * @memberof VEllipseSectpr
+     * @return {boolean} True if (and only if) this sector contains the given angle.
+     */
+    containsAngle(angle) {
+        // angle -= this.ellipse.rotation;
+        angle = geomutils.wrapMinMax(angle - this.ellipse.rotation, 0, Math.PI * 2);
+        if (this.startAngle <= this.endAngle) {
+            return angle >= this.startAngle && angle < this.endAngle;
+        }
+        else {
+            // startAngle > endAngle
+            return angle >= this.startAngle || angle < this.endAngle;
+        }
+    }
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get the line intersections as vectors with this ellipse.
+     *
+     * @method lineIntersections
+     * @instance
+     * @memberof VEllipseSectpr
+     * @param {VertTuple<Vector>} ray - The line/ray to intersect this ellipse with.
+     * @param {boolean} inVectorBoundsOnly - (default=false) Set to true if only intersections within the vector bounds are of interest.
+     * @returns
+     */
+    lineIntersections(ray, inVectorBoundsOnly = false) {
+        // First get all line intersections from underlying ellipse.
+        const ellipseIntersections = this.ellipse.lineIntersections(ray, inVectorBoundsOnly);
+        // Drop all intersection points that are not contained in the circle sectors bounds.
+        const tmpLine = new Line(this.ellipse.center, new Vertex());
+        return ellipseIntersections.filter((intersectionPoint) => {
+            tmpLine.b.set(intersectionPoint);
+            const lineAngle = tmpLine.angle();
+            return this.containsAngle(lineAngle);
+        });
+    }
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @method lineIntersections
+     * @memberof VEllipseSectpr
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    lineIntersectionTangents(line, inVectorBoundsOnly = false) {
+        // Find the intersections of all lines plus their tangents inside the circle bounds
+        const interSectionPoints = this.lineIntersections(line, inVectorBoundsOnly);
+        return interSectionPoints.map((vert) => {
+            // Calculate angle
+            const lineFromCenter = new Line(this.ellipse.center, vert);
+            const angle = lineFromCenter.angle();
+            // console.log("angle", (angle / Math.PI) * 180.0);
+            // const angle = Math.random() * Math.PI * 2; // TODO
+            // Calculate tangent at angle
+            return this.ellipse.tangentAt(angle);
+        });
+    }
+    //--- END --- Implement interface `Intersectable`
+    /**
      * Convert this elliptic sector into cubic Bézier curves.
      *
      * @param {number=3} quarterSegmentCount - The number of segments per base elliptic quarter (default is 3, min is 1).
@@ -75,8 +145,8 @@ export class VEllipseSector {
         for (var i = 0; i + 1 < angles.length; i++) {
             let nextAngle = angles[(i + 1) % angles.length];
             let endPoint = this.ellipse.vertAt(nextAngle);
-            let startTangent = this.ellipse.tangentAt(curAngle);
-            let endTangent = this.ellipse.tangentAt(nextAngle);
+            let startTangent = this.ellipse.tangentAt(curAngle + this.ellipse.rotation);
+            let endTangent = this.ellipse.tangentAt(nextAngle + this.ellipse.rotation);
             // Distorted ellipses can only be approximated by linear Bézier segments
             if (Math.abs(radiusV) < 0.0001 || Math.abs(radiusH) < 0.0001) {
                 let diff = startPoint.difference(endPoint);

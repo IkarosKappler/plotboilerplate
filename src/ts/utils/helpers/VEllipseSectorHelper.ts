@@ -90,5 +90,43 @@ export class VEllipseSectorHelper {
       dashOffset: 0.0,
       dashArray: [4, 2]
     });
+    // Draw helper box
+    const xAxisPoint = this.sector.ellipse.vertAt(0.0);
+    const yAxisPoint = this.sector.ellipse.vertAt(-Math.PI / 2.0);
+    // Draw rotation handle line
+    // draw.line(xAxisPoint, this.sector.ellipse.axis, "rgba(64,128,192,0.333)", 1.0, {
+    //   dashOffset: 0.0,
+    //   dashArray: [4, 2]
+    // });
+    // draw.line(yAxisPoint, this.sector.ellipse.axis, "rgba(64,128,192,0.333)", 1.0, {
+    //   dashOffset: 0.0,
+    //   dashArray: [4, 2]
+    // });
+    draw.line(
+      this.sector.ellipse.center
+        .clone()
+        .add(0, this.sector.ellipse.signedRadiusV())
+        .rotate(this.sector.ellipse.rotation, this.sector.ellipse.center),
+      this.sector.ellipse.axis,
+      "rgba(64,128,192,0.333)",
+      1.0,
+      {
+        dashOffset: 0.0,
+        dashArray: [4, 2]
+      }
+    );
+    draw.line(
+      this.sector.ellipse.center
+        .clone()
+        .add(this.sector.ellipse.signedRadiusH(), 0)
+        .rotate(this.sector.ellipse.rotation, this.sector.ellipse.center),
+      this.sector.ellipse.axis,
+      "rgba(64,128,192,0.333)",
+      1.0,
+      {
+        dashOffset: 0.0,
+        dashArray: [4, 2]
+      }
+    );
   }
 }

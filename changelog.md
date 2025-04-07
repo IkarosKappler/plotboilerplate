@@ -13,6 +13,8 @@ Imminent todos:
 - Create VEllipseHelper (only VEllipseSectorHelper exists)
 - Extend Demo '32-ellipse-to-bezier' with the new helper.
 
+* 2025-04-07
+  - Adding demo '60-elliptic-sector-angle-containment'.
 * 2025-04-02
   - Adding `CircleSectorHelper.drawHandleLines()`.
   - Adding `VEllipseHelper.drawHandleLines()`.

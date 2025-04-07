@@ -18,10 +18,4 @@ var randomEllipseSector = function (viewport) {
   var sector = new VEllipseSector(ellipse, startAngle, endAngle);
 
   return sector;
-
-  //   // var vp = pb.viewport();
-  //   var circle = new Circle(viewport.randomPoint(0.35, 0.35), (Math.random() * Math.min(viewport.width, viewport.height)) / 5);
-  //   var startAngle = Math.random() * Math.PI * 2;
-  //   var endAngle = Math.random() * Math.PI * 2;
-  //   return new CircleSector(circle, startAngle, endAngle);
 };

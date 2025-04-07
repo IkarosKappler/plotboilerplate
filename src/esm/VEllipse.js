@@ -170,6 +170,7 @@ export class VEllipse {
         const a = this.radiusH();
         const b = this.radiusV();
         return new Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle)).rotate(this.rotation, this.center);
+        // return new Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle + this.rotation));
     }
     /**
      * Get the normal vector at the given angle.
@@ -185,7 +186,8 @@ export class VEllipse {
      * @param {number=1.0} length - [optional, default=1] The length of the returned vector.
      */
     normalAt(angle, length) {
-        const point = this.vertAt(angle);
+        // const point: Vertex = this.vertAt(angle);
+        const point = this.vertAt(angle - this.rotation); // HERE IS THE CORRECT BEHAVIOR!
         const foci = this.getFoci();
         // Calculate the angle between [point,focusA] and [point,focusB]
         const angleA = new Line(point, foci[0]).angle();
@@ -403,10 +405,10 @@ export class VEllipse {
         const radiusV = this.radiusV();
         const curves = [];
         const angles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, segmentCount);
-        let curAngle = angles[0];
+        let curAngle = angles[0] + this.rotation;
         let startPoint = this.vertAt(curAngle);
         for (var i = 0; i < angles.length; i++) {
-            let nextAngle = angles[(i + 1) % angles.length];
+            let nextAngle = angles[(i + 1) % angles.length] + this.rotation;
             let endPoint = this.vertAt(nextAngle);
             if (Math.abs(radiusV) < 0.0001 || Math.abs(radiusH) < 0.0001) {
                 // Distorted ellipses can only be approximated by linear Bézier segments
@@ -415,8 +417,8 @@ export class VEllipse {
                 curves.push(curve);
             }
             else {
-                let startTangent = this.tangentAt(curAngle);
-                let endTangent = this.tangentAt(nextAngle);
+                let startTangent = this.tangentAt(curAngle + this.rotation);
+                let endTangent = this.tangentAt(nextAngle + this.rotation);
                 // Find intersection (ignore that the result might be null in some extreme cases)
                 let intersection = startTangent.intersection(endTangent);
                 // What if intersection is undefined?

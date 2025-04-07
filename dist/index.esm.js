@@ -5336,6 +5336,7 @@ BezierPath.END_POINT = 3;
  * @modified 2024-03-08 Added the `containsAngle` method.
  * @modified 2024-03-09 Added the `circleSectorIntersection` method to find coherent sector intersections..
  * @modified 2024-03-09 Added the `angleAt` method to determine any angle at some ratio.
+ * @modified 2025-04-02 Adding `CircleSector.lineIntersections` and `CircleSector.lineIntersectionTangents` and implementing `Intersectable`.
  * @version  1.2.0
  **/
 /**
@@ -5476,6 +5477,50 @@ class CircleSector {
         }
         return resultSector;
     }
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get the line intersections as vectors with this ellipse.
+     *
+     * @method lineIntersections
+     * @instance
+     * @param {VertTuple<Vector> ray - The line/ray to intersect this ellipse with.
+     * @param {boolean} inVectorBoundsOnly - (default=false) Set to true if only intersections within the vector bounds are of interest.
+     * @returns
+     */
+    lineIntersections(ray, inVectorBoundsOnly = false) {
+        // First get all line intersections from underlying ellipse.
+        const ellipseIntersections = this.circle.lineIntersections(ray, inVectorBoundsOnly);
+        // Drop all intersection points that are not contained in the circle sectors bounds.
+        const tmpLine = new Line(this.circle.center, new Vertex());
+        return ellipseIntersections.filter((intersectionPoint) => {
+            tmpLine.b.set(intersectionPoint);
+            const lineAngle = tmpLine.angle();
+            return this.containsAngle(geomutils.wrapMinMax(lineAngle, 0, Math.PI * 2));
+        });
+    }
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    lineIntersectionTangents(line, inVectorBoundsOnly = false) {
+        // Find the intersections of all lines plus their tangents inside the circle bounds
+        const interSectionPoints = this.lineIntersections(line, inVectorBoundsOnly);
+        return interSectionPoints.map((vert) => {
+            // Calculate angle
+            const lineFromCenter = new Line(this.circle.center, vert);
+            const angle = lineFromCenter.angle();
+            // console.log("angle", (angle / Math.PI) * 180.0);
+            // const angle = Math.random() * Math.PI * 2; // TODO
+            // Calculate tangent at angle
+            return this.circle.tangentAt(angle);
+        });
+    }
+    //--- END --- Implement interface `Intersectable`
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
@@ -10741,6 +10786,7 @@ class VEllipse {
         const a = this.radiusH();
         const b = this.radiusV();
         return new Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle)).rotate(this.rotation, this.center);
+        // return new Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle + this.rotation));
     }
     /**
      * Get the normal vector at the given angle.
@@ -10756,7 +10802,8 @@ class VEllipse {
      * @param {number=1.0} length - [optional, default=1] The length of the returned vector.
      */
     normalAt(angle, length) {
-        const point = this.vertAt(angle);
+        // const point: Vertex = this.vertAt(angle);
+        const point = this.vertAt(angle - this.rotation); // HERE IS THE CORRECT BEHAVIOR!
         const foci = this.getFoci();
         // Calculate the angle between [point,focusA] and [point,focusB]
         const angleA = new Line(point, foci[0]).angle();
@@ -10974,10 +11021,10 @@ class VEllipse {
         const radiusV = this.radiusV();
         const curves = [];
         const angles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, segmentCount);
-        let curAngle = angles[0];
+        let curAngle = angles[0] + this.rotation;
         let startPoint = this.vertAt(curAngle);
         for (var i = 0; i < angles.length; i++) {
-            let nextAngle = angles[(i + 1) % angles.length];
+            let nextAngle = angles[(i + 1) % angles.length] + this.rotation;
             let endPoint = this.vertAt(nextAngle);
             if (Math.abs(radiusV) < 0.0001 || Math.abs(radiusH) < 0.0001) {
                 // Distorted ellipses can only be approximated by linear Bézier segments
@@ -10986,8 +11033,8 @@ class VEllipse {
                 curves.push(curve);
             }
             else {
-                let startTangent = this.tangentAt(curAngle);
-                let endTangent = this.tangentAt(nextAngle);
+                let startTangent = this.tangentAt(curAngle + this.rotation);
+                let endTangent = this.tangentAt(nextAngle + this.rotation);
                 // Find intersection (ignore that the result might be null in some extreme cases)
                 let intersection = startTangent.intersection(endTangent);
                 // What if intersection is undefined?
@@ -11079,7 +11126,10 @@ VEllipse.utils = {
  * @date     2021-02-26
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-11-01 Tweaked the `endpointToCenterParameters` function to handle negative values, too, without errors.
- * @version  1.1.1
+ * @modified 2025-04-01 Adapting a the `toCubicBezier` calculation to match an underlying change in the vertAt and tangentAt calculation of ellipses (was required to hamonize both methods with circles).
+ * @modified 2025-04-02 Adding `VEllipseSector.containsAngle` method.
+ * @modified 2025-04-02 Adding `VEllipseSector.lineIntersections` and `VEllipseSector.lineIntersectionTangents` and implementing `Intersectable`.
+ * @version  1.2.0
  */
 /**
  * @classdesc A class for elliptic sectors.
@@ -11116,6 +11166,73 @@ class VEllipseSector {
         this.endAngle = geomutils.wrapMinMax(endAngle, 0, Math.PI * 2);
     }
     /**
+     * Checks wether the given angle (must be inside 0 and PI*2) is contained inside this sector.
+     *
+     * @param {number} angle - The numeric angle to check.
+     * @method containsAngle
+     * @instance
+     * @memberof VEllipseSectpr
+     * @return {boolean} True if (and only if) this sector contains the given angle.
+     */
+    containsAngle(angle) {
+        // angle -= this.ellipse.rotation;
+        angle = geomutils.wrapMinMax(angle - this.ellipse.rotation, 0, Math.PI * 2);
+        if (this.startAngle <= this.endAngle) {
+            return angle >= this.startAngle && angle < this.endAngle;
+        }
+        else {
+            // startAngle > endAngle
+            return angle >= this.startAngle || angle < this.endAngle;
+        }
+    }
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get the line intersections as vectors with this ellipse.
+     *
+     * @method lineIntersections
+     * @instance
+     * @memberof VEllipseSectpr
+     * @param {VertTuple<Vector>} ray - The line/ray to intersect this ellipse with.
+     * @param {boolean} inVectorBoundsOnly - (default=false) Set to true if only intersections within the vector bounds are of interest.
+     * @returns
+     */
+    lineIntersections(ray, inVectorBoundsOnly = false) {
+        // First get all line intersections from underlying ellipse.
+        const ellipseIntersections = this.ellipse.lineIntersections(ray, inVectorBoundsOnly);
+        // Drop all intersection points that are not contained in the circle sectors bounds.
+        const tmpLine = new Line(this.ellipse.center, new Vertex());
+        return ellipseIntersections.filter((intersectionPoint) => {
+            tmpLine.b.set(intersectionPoint);
+            const lineAngle = tmpLine.angle();
+            return this.containsAngle(lineAngle);
+        });
+    }
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @method lineIntersections
+     * @memberof VEllipseSectpr
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    lineIntersectionTangents(line, inVectorBoundsOnly = false) {
+        // Find the intersections of all lines plus their tangents inside the circle bounds
+        const interSectionPoints = this.lineIntersections(line, inVectorBoundsOnly);
+        return interSectionPoints.map((vert) => {
+            // Calculate angle
+            const lineFromCenter = new Line(this.ellipse.center, vert);
+            const angle = lineFromCenter.angle();
+            // console.log("angle", (angle / Math.PI) * 180.0);
+            // const angle = Math.random() * Math.PI * 2; // TODO
+            // Calculate tangent at angle
+            return this.ellipse.tangentAt(angle);
+        });
+    }
+    //--- END --- Implement interface `Intersectable`
+    /**
      * Convert this elliptic sector into cubic Bézier curves.
      *
      * @param {number=3} quarterSegmentCount - The number of segments per base elliptic quarter (default is 3, min is 1).
@@ -11142,8 +11259,8 @@ class VEllipseSector {
         for (var i = 0; i + 1 < angles.length; i++) {
             let nextAngle = angles[(i + 1) % angles.length];
             let endPoint = this.ellipse.vertAt(nextAngle);
-            let startTangent = this.ellipse.tangentAt(curAngle);
-            let endTangent = this.ellipse.tangentAt(nextAngle);
+            let startTangent = this.ellipse.tangentAt(curAngle + this.ellipse.rotation);
+            let endTangent = this.ellipse.tangentAt(nextAngle + this.ellipse.rotation);
             // Distorted ellipses can only be approximated by linear Bézier segments
             if (Math.abs(radiusV) < 0.0001 || Math.abs(radiusH) < 0.0001) {
                 let diff = startPoint.difference(endPoint);
