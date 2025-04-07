@@ -91,7 +91,8 @@
         var controlPointB = ellipseSector.ellipse.vertAt(ellipseSector.endAngle);
         // var rotationControlPoint = ellipseSector.
         var rotationControlPoint = ellipseSector.ellipse
-          .vertAt(ellipseSector.ellipse.rotation)
+          // .vertAt(ellipseSector.ellipse.rotation)
+          .vertAt(0)
           .scale(1.2, ellipseSector.ellipse.center);
         var csHelper = new VEllipseSectorHelper(ellipseSector, controlPointA, controlPointB, rotationControlPoint);
         ellipseSectorHelpers.push(csHelper);
@@ -134,11 +135,28 @@
     var drawAnglePointInfo = function (draw, fill) {
       for (var i = 0; i < ellipseSectors.length; i++) {
         const sector = ellipseSectors[i];
-        var angleInEllipseSector = sector.ellipse.center.angle(anglePoint);
+        var angleInEllipseSector = sector.ellipse.center.angle(anglePoint) - sector.ellipse.rotation;
         var pointOnEllipse = sector.ellipse.vertAt(angleInEllipseSector);
         var color = sector.containsAngle(angleInEllipseSector) ? "green" : "red";
         draw.line(sector.ellipse.center, pointOnEllipse, color, 1);
         draw.diamondHandle(pointOnEllipse, 7, color);
+
+        // Draw n test angles
+        for (var i = 0; i < 24; i++) {
+          var vertAngle = Math.PI * 2 * (i / 24);
+          var sectorVertex = sector.ellipse.vertAt(vertAngle).scale(0.9, sector.ellipse.center);
+          // draw.diamondHandle(sectorVertex, 7, "orange");
+          var containedInSector = sector.containsAngle(vertAngle);
+          // console.log("Angle ", i, "vertAngle", vertAngle, "containedInSector", containedInSector);
+          draw.diamondHandle(sectorVertex, 7, containedInSector ? "green" : "orange");
+        }
+        // var vertices = sector.ellipse.getEquidistantVertices(24);
+        // for (var i = 0; i < vertices.length; i++) {
+        //   var vertAngle = new Line(sector.ellipse.center.clone(), vertices[i]).angle();
+        //   var containedInSector = sector.containsAngle(vertAngle);
+        //   // console.log("Angle ", i, "vertAngle", vertAngle, "containedInSector", containedInSector);
+        //   draw.diamondHandle(vertices[i].clone().scale(0.9, sector.ellipse.center), 7, containedInSector ? "green" : "orange");
+        // }
       }
     };
 

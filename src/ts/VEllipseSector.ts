@@ -9,6 +9,7 @@
  * @modified 2025-04-01 Adapting a the `toCubicBezier` calculation to match an underlying change in the vertAt and tangentAt calculation of ellipses (was required to hamonize both methods with circles).
  * @modified 2025-04-02 Adding `VEllipseSector.containsAngle` method.
  * @modified 2025-04-02 Adding `VEllipseSector.lineIntersections` and `VEllipseSector.lineIntersectionTangents` and implementing `Intersectable`.
+ * @modified 2025-04-07 Adding value wrapping (0 to TWO_PI) to the `VEllipseSector.containsAngle` method.
  * @version  1.2.0
  */
 
@@ -107,13 +108,21 @@ export class VEllipseSector {
    * @return {boolean} True if (and only if) this sector contains the given angle.
    */
   containsAngle(angle: number) {
-    // angle -= this.ellipse.rotation;
-    angle = geomutils.wrapMinMax(angle - this.ellipse.rotation, 0, Math.PI * 2);
-    if (this.startAngle <= this.endAngle) {
-      return angle >= this.startAngle && angle < this.endAngle;
+    angle = geomutils.mapAngleTo2PI(angle); // wrapMinMax(angle, 0, Math.PI * 2);
+    var sAngle = geomutils.mapAngleTo2PI(this.startAngle);
+    var eAngle = geomutils.mapAngleTo2PI(this.endAngle);
+    // TODO: cleanup
+    // if (this.startAngle <= this.endAngle) {
+    //   return angle >= this.startAngle && angle < this.endAngle;
+    // } else {
+    //   // startAngle > endAngle
+    //   return angle >= this.startAngle || angle < this.endAngle;
+    // }
+    if (sAngle <= eAngle) {
+      return angle >= sAngle && angle < eAngle;
     } else {
       // startAngle > endAngle
-      return angle >= this.startAngle || angle < this.endAngle;
+      return angle >= sAngle || angle < eAngle;
     }
   }
 
@@ -136,7 +145,7 @@ export class VEllipseSector {
     return ellipseIntersections.filter((intersectionPoint: Vertex) => {
       tmpLine.b.set(intersectionPoint);
       const lineAngle = tmpLine.angle();
-      return this.containsAngle(lineAngle);
+      return this.containsAngle(lineAngle - this.ellipse.rotation);
     });
   }
 

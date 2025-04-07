@@ -5,11 +5,13 @@
  * @author   Ikaros Kappler
  * @date     2021-03-24
  * @modified 2025-04-02 Adding `VEllipseSectorHelper.drawHandleLines`.
+ * @modified 2025-05-07 Modifying the calculation of `startAngle` and `endAngle` from the rotation control point: wrapping result into [0,TWO_PI).
  * @version  1.1.0
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VEllipseSectorHelper = void 0;
 var Line_1 = require("../../Line");
+var geomutils_1 = require("../../geomutils");
 var VEllipseSectorHelper = /** @class */ (function () {
     function VEllipseSectorHelper(sector, startAngleControlPoint, endAngleControlPoint, rotationControlPoint) {
         this.sector = sector;
@@ -42,13 +44,14 @@ var VEllipseSectorHelper = /** @class */ (function () {
         // | Listen for start angle changes.
         // +-------------------------------------------
         startAngleControlPoint.listeners.addDragListener(function (event) {
-            sector.startAngle = startAngleControlLine.angle() - sector.ellipse.rotation;
+            // sector.startAngle = startAngleControlLine.angle() - sector.ellipse.rotation;
+            sector.startAngle = geomutils_1.geomutils.mapAngleTo2PI(startAngleControlLine.angle() - sector.ellipse.rotation);
         });
         // +---------------------------------------------------------------------
         // | Listen for end angle changes.
         // +-------------------------------------------
         endAngleControlPoint.listeners.addDragListener(function (event) {
-            sector.endAngle = endAngleControlLine.angle() - sector.ellipse.rotation;
+            sector.endAngle = geomutils_1.geomutils.mapAngleTo2PI(endAngleControlLine.angle() - sector.ellipse.rotation);
         });
     }
     /**

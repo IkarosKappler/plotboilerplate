@@ -4,6 +4,7 @@
  * @author   Ikaros Kappler
  * @date     2021-03-24
  * @modified 2025-04-02 Adding `VEllipseSectorHelper.drawHandleLines`.
+ * @modified 2025-05-07 Modifying the calculation of `startAngle` and `endAngle` from the rotation control point: wrapping result into [0,TWO_PI).
  * @version  1.1.0
  */
 
@@ -11,6 +12,7 @@ import { Line } from "../../Line";
 import { VEllipseSector } from "../../VEllipseSector";
 import { Vertex } from "../../Vertex";
 import { VertEvent } from "../../VertexListeners";
+import { geomutils } from "../../geomutils";
 import { DrawLib } from "../../interfaces";
 
 export class VEllipseSectorHelper {
@@ -59,14 +61,15 @@ export class VEllipseSectorHelper {
     // | Listen for start angle changes.
     // +-------------------------------------------
     startAngleControlPoint.listeners.addDragListener((event: VertEvent) => {
-      sector.startAngle = startAngleControlLine.angle() - sector.ellipse.rotation;
+      // sector.startAngle = startAngleControlLine.angle() - sector.ellipse.rotation;
+      sector.startAngle = geomutils.mapAngleTo2PI(startAngleControlLine.angle() - sector.ellipse.rotation);
     });
 
     // +---------------------------------------------------------------------
     // | Listen for end angle changes.
     // +-------------------------------------------
     endAngleControlPoint.listeners.addDragListener((event: VertEvent) => {
-      sector.endAngle = endAngleControlLine.angle() - sector.ellipse.rotation;
+      sector.endAngle = geomutils.mapAngleTo2PI(endAngleControlLine.angle() - sector.ellipse.rotation);
     });
   }
 

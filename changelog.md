@@ -15,6 +15,8 @@ Imminent todos:
 
 * 2025-04-07
   - Adding demo '60-elliptic-sector-angle-containment'.
+  - Modifying the calculation of `startAngle` and `endAngle` in `VEllipseSectorHelper` from the rotation control point: wrapping result into [0,TWO_PI).
+  - Adding value wrapping (0 to TWO_PI) to the `VEllipseSector.containsAngle` method.
 * 2025-04-02
   - Adding `CircleSectorHelper.drawHandleLines()`.
   - Adding `VEllipseHelper.drawHandleLines()`.

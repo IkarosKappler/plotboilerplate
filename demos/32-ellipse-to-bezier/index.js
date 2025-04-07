@@ -100,6 +100,7 @@
       fill.text("end", pointB.x, pointB.y);
 
       // Draw radii (axis helper)
+      // TODO: Use VellipseSectorHelper here!
       draw.line(
         sector.ellipse.center
           .clone()
