@@ -25,7 +25,10 @@
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2023-10-06 Adding the `BezierPath.toPathPoints()` method.
  * @modified 2023-10-07 Adding the `BezierPath.fromCurve(CubicBezierCurve)` static function.
- * @version 2.6.0
+ * @modified 2025-04-09 Added the `BezierPath.move` method to match the convention – which just calls `translate`.
+ * @modified 2025-04-09 Modified the `BezierPath.translate` method: chaning parameter `Vertex` to more generalized `XYCoords`.
+ 
+ * @version 2.7.0
  *
  * @file BezierPath
  * @public
@@ -309,13 +312,13 @@ export class BezierPath implements SVGSerializable {
    * Move the whole bezier path by the given (x,y)-amount.
    *
    * @method translate
-   * @param {Vertex} amount - The amount to be added (amount.x and amount.y)
+   * @param {XYCoords} amount - The amount to be added (amount.x and amount.y)
    *                          to each vertex of the curve.
    * @instance
    * @memberof BezierPath
    * @return {BezierPath} this for chaining
    **/
-  translate(amount: Vertex): BezierPath {
+  translate(amount: XYCoords): BezierPath {
     for (var i = 0; i < this.bezierCurves.length; i++) {
       var curve = this.bezierCurves[i];
       curve.getStartPoint().add(amount);
@@ -329,6 +332,20 @@ export class BezierPath implements SVGSerializable {
 
     this.updateArcLengths();
     return this;
+  }
+
+  /**
+   * Move the whole bezier path by the given (x,y)-amount.
+   *
+   * @method move
+   * @param {XYCoords} amount - The amount to be added (amount.x and amount.y)
+   *                          to each vertex of the curve.
+   * @instance
+   * @memberof BezierPath
+   * @return {BezierPath} this for chaining
+   **/
+  move(amount: XYCoords): BezierPath {
+    return this.translate(amount);
   }
 
   /**

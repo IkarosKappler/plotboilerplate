@@ -10,6 +10,7 @@
  * @modified 2025-04-02 Adding `VEllipseSector.containsAngle` method.
  * @modified 2025-04-02 Adding `VEllipseSector.lineIntersections` and `VEllipseSector.lineIntersectionTangents` and implementing `Intersectable`.
  * @modified 2025-04-07 Adding value wrapping (0 to TWO_PI) to the `VEllipseSector.containsAngle` method.
+ * @modified 2025-04-09 Adding the `VEllipseSector.move` method.
  * @version  1.2.0
  */
 
@@ -96,6 +97,20 @@ export class VEllipseSector {
     this.ellipse = ellipse;
     this.startAngle = geomutils.wrapMinMax(startAngle, 0, Math.PI * 2);
     this.endAngle = geomutils.wrapMinMax(endAngle, 0, Math.PI * 2);
+  }
+
+  /**
+   * Move the ellipse sector by the given amount.
+   *
+   * @method move
+   * @param {XYCoords} amount - The amount to move.
+   * @instance
+   * @memberof VEllipseSector
+   * @return {VEllipseSector} this for chaining
+   **/
+  move(amount: XYCoords): VEllipseSector {
+    this.ellipse.move(amount);
+    return this;
   }
 
   /**

@@ -9,7 +9,8 @@
  * @modified 2024-03-08 Added the `containsAngle` method.
  * @modified 2024-03-09 Added the `circleSectorIntersection` method to find coherent sector intersections..
  * @modified 2024-03-09 Added the `angleAt` method to determine any angle at some ratio.
- * @modified 2025-04-02 Adding `CircleSector.lineIntersections` and `CircleSector.lineIntersectionTangents` and implementing `Intersectable`.
+ * @modified 2025-04-02 Adding the `CircleSector.lineIntersections` and `CircleSector.lineIntersectionTangents` and implementing `Intersectable`.
+ * @modified 2025-04-09 Adding the `CircleSector.move()` method.
  * @version  1.2.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -48,6 +49,19 @@ var CircleSector = /** @class */ (function () {
         this.startAngle = startAngle;
         this.endAngle = endAngle;
     }
+    /**
+     * Move the circle sector by the given amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof CircleSector
+     * @return {CircleSector} this for chaining
+     **/
+    CircleSector.prototype.move = function (amount) {
+        this.circle.move(amount);
+        return this;
+    };
     /**
      * Checks wether the given angle (must be inside 0 and PI*2) is contained inside this sector.
      *

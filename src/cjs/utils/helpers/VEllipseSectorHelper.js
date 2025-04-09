@@ -6,6 +6,7 @@
  * @date     2021-03-24
  * @modified 2025-04-02 Adding `VEllipseSectorHelper.drawHandleLines`.
  * @modified 2025-04-07 Modifying the calculation of `startAngle` and `endAngle` from the rotation control point: wrapping result into [0,TWO_PI).
+ * @modified 2025-04-09 Adding the `VEllipseSectorHelper.destroy` method.
  * @version  1.1.0
  */
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -98,7 +99,7 @@ var VEllipseSectorHelper = /** @class */ (function () {
             dashArray: [4, 2]
         });
         // Draw rotation handle line
-        draw.line(this.sector.ellipse.center, this.rotationControlPoint, "rgba(64,192,128,0.333)", 1.0, {
+        draw.line(this.sector.ellipse.center, this.rotationControlPoint, "rgba(192,64,128,0.333)", 1.0, {
             dashOffset: 0.0,
             dashArray: [4, 2]
         });

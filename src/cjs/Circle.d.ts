@@ -12,7 +12,8 @@
  * @modified 2022-08-15 Added the `containsPoint` function.
  * @modified 2022-08-23 Added the `lineIntersection` function.
  * @modified 2022-08-23 Added the `closestPoint` function.
- * @version  1.4.0
+ * @modified 2025-04-09 Added the `Circle.move(amount: XYCoords)` method.
+ * @version  1.5.0
  **/
 import { Line } from "./Line";
 import { Vector } from "./Vector";
@@ -72,6 +73,16 @@ export declare class Circle implements Intersectable, SVGSerializable {
      * @param {number} radius - The radius of the circle.
      */
     constructor(center: Vertex, radius: number);
+    /**
+     * Move the circle by the given amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof Circle
+     * @return {Circle} this for chaining
+     **/
+    move(amount: XYCoords): Circle;
     /**
      * Check if the given circle is fully contained inside this circle.
      *

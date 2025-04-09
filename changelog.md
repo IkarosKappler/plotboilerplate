@@ -16,6 +16,14 @@ Imminent todos:
 * 2025-04-09
   - Added the `Polygon.getCentroid` method.
   - Adding the `VEllipseSectorHelper.destroy` method.
+  - Added the `Circle.move(amount: XYCoords)` method.
+  - Adding the `CircleSector.move()` method.
+  - Adding the `VEllipseSector.move` method.
+  - Adding the `VEllipseHelper.destroy()` method.
+  - Added the `CubicBezierCurve.move` method to match the convention – which just calls `translate`.
+  - Modified the `CubicBezierCurve.translate` method: chaning parameter `Vertex` to more generalized `XYCoords`.
+  - Added the `BezierPath.move` method to match the convention – which just calls `translate`.
+  - Modified the `BezierPath.translate` method: chaning parameter `Vertex` to more generalized `XYCoords`.
 * 2025-04-07
   - Adding demo '60-elliptic-sector-angle-containment'.
   - Modifying the calculation of `startAngle` and `endAngle` in `VEllipseSectorHelper` from the rotation control point: wrapping result into [0,TWO_PI).

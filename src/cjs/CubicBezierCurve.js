@@ -24,7 +24,9 @@
  * @modified 2022-10-17 The `CubicBezierCurve` class now implements the new `PathSegment` interface.
  * @modified 2023-09-30 Added the function `CubicbezierCurve.getSubCurve(number,number)` – similar to `getSubCurveAt(...)` but with absolute position parameters.
  * @modified 2023-10-07 Added the `trimEnd`, `trimEndAt`, `trimStart`, `trimStartAt` methods.
- * @version 2.8.0
+ * @modified 2025-04-09 Added the `CubicBezierCurve.move` method to match the convention – which just calls `translate`.
+ * @modified 2025-04-09 Modified the `CubicBezierCurve.translate` method: chaning parameter `Vertex` to more generalized `XYCoords`.
+ * @version 2.9.0
  *
  * @file CubicBezierCurve
  * @public
@@ -119,7 +121,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * Translate the whole curve by the given {x,y} amount: moves all four points.
      *
      * @method translate
-     * @param {Vertex} amount - The amount to translate this curve by.
+     * @param {XYCoords} amount - The amount to translate this curve by.
      * @instance
      * @memberof CubicBezierCurve
      * @return {CubicBezierCurve} this (for chaining).
@@ -130,6 +132,18 @@ var CubicBezierCurve = /** @class */ (function () {
         this.endControlPoint.add(amount);
         this.endPoint.add(amount);
         return this;
+    };
+    /**
+     * Translate the whole curve by the given {x,y} amount: moves all four points.
+     *
+     * @method translate
+     * @param {XYCoords} amount - The amount to translate this curve by.
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {CubicBezierCurve} this (for chaining).
+     **/
+    CubicBezierCurve.prototype.move = function (amount) {
+        return this.translate(amount);
     };
     /**
      * Reverse this curve, means swapping start- and end-point and swapping

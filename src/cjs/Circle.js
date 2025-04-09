@@ -13,7 +13,8 @@
  * @modified 2022-08-15 Added the `containsPoint` function.
  * @modified 2022-08-23 Added the `lineIntersection` function.
  * @modified 2022-08-23 Added the `closestPoint` function.
- * @version  1.4.0
+ * @modified 2025-04-09 Added the `Circle.move(amount: XYCoords)` method.
+ * @version  1.5.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Circle = void 0;
@@ -50,6 +51,19 @@ var Circle = /** @class */ (function () {
         this.center = center;
         this.radius = radius;
     }
+    /**
+     * Move the circle by the given amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof Circle
+     * @return {Circle} this for chaining
+     **/
+    Circle.prototype.move = function (amount) {
+        this.center.add(amount);
+        return this;
+    };
     /**
      * Check if the given circle is fully contained inside this circle.
      *

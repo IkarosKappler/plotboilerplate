@@ -5,6 +5,7 @@
  * @date     2021-03-24
  * @modified 2025-04-02 Adding `VEllipseSectorHelper.drawHandleLines`.
  * @modified 2025-04-07 Modifying the calculation of `startAngle` and `endAngle` from the rotation control point: wrapping result into [0,TWO_PI).
+ * @modified 2025-04-09 Adding the `VEllipseSectorHelper.destroy` method.
  * @version  1.1.0
  */
 import { VEllipseSector } from "../../VEllipseSector";

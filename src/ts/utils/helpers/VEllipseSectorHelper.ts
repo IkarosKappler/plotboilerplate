@@ -132,7 +132,7 @@ export class VEllipseSectorHelper {
       dashArray: [4, 2]
     });
     // Draw rotation handle line
-    draw.line(this.sector.ellipse.center, this.rotationControlPoint, "rgba(64,192,128,0.333)", 1.0, {
+    draw.line(this.sector.ellipse.center, this.rotationControlPoint, "rgba(192,64,128,0.333)", 1.0, {
       dashOffset: 0.0,
       dashArray: [4, 2]
     });
