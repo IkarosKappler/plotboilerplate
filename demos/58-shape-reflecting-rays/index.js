@@ -28,8 +28,16 @@
       )
     );
     // Let's set up some colors.
-    pb.drawConfig.polygon.color = "rgba(255,192,0,0.75)";
+    pb.drawConfig.polygon.color = "rgba(128,128,128,0.5)";
     pb.drawConfig.polygon.lineWidth = 2;
+    pb.drawConfig.ellipse.color = "rgba(128,128,128,0.5)";
+    pb.drawConfig.ellipse.lineWidth = 2;
+    pb.drawConfig.circle.color = "rgba(128,128,128,0.5)";
+    pb.drawConfig.circle.lineWidth = 2;
+    pb.drawConfig.ellipseSector.color = "rgba(128,128,128,0.5)";
+    pb.drawConfig.ellipseSector.lineWidth = 2;
+    pb.drawConfig.circleSector.color = "rgba(128,128,128,0.5)";
+    pb.drawConfig.circleSector.lineWidth = 2;
 
     // Array<Polygon | Circle | Ellipse>
     var shapes = [];
@@ -63,6 +71,14 @@
       ellipseHelper.drawHandleLines(draw, fill);
       cicleSectorHelper.drawHandleLines(draw, fill);
       ellipseSectorHelper.drawHandleLines(draw, fill);
+
+      // Draw barycenter of polygon?
+      // shapes.forEach(function (shape) {
+      //   if (shape instanceof Polygon) {
+      //     console.log("centroid", shape.getCentroid());
+      //     draw.diamondHandle(shape.getCentroid(), 5, "orange");
+      //   }
+      // });
     };
 
     /**
@@ -118,13 +134,6 @@
         } else {
           reflectedRay = null;
         }
-        // } else if (shape instanceof Circle) {
-        // } else if (shape instanceof VEllipse) {
-        //   // var ellipseIntersections = findEllipseIntersections(shape, ray);
-        //   var ellipseIntersections = shape.lineIntersections(ray, true);
-        //   for (var i = 0; i < ellipseIntersections.length; i++) {
-        //     pb.draw.circleHandle(ellipseIntersections[i], 6, "red");
-        //   }
       } else {
         // ERR! (unrecognized shape)
         // In the end all shapes should have the same methods!

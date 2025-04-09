@@ -13,6 +13,9 @@ Imminent todos:
 - Create VEllipseHelper (only VEllipseSectorHelper exists)
 - Extend Demo '32-ellipse-to-bezier' with the new helper.
 
+* 2025-04-09
+  - Added the `Polygon.getCentroid` method.
+  - Adding the `VEllipseSectorHelper.destroy` method.
 * 2025-04-07
   - Adding demo '60-elliptic-sector-angle-containment'.
   - Modifying the calculation of `startAngle` and `endAngle` in `VEllipseSectorHelper` from the rotation control point: wrapping result into [0,TWO_PI).

@@ -34,6 +34,7 @@
  * @modified 2025-02-12 Added the `containsVerts` method to test multiple vertices for containment.
  * @modified 2025-03-28 Added the `Polygon.utils.locateLineIntersecion` static helper method.
  * @modified 2025-03-28 Added the `Polygon.lineIntersectionTangents` method.
+ * @modified 2025-04-09 Added the `Polygon.getCentroid` method.
  * @version 1.15.0
  *
  * @file Polygon
@@ -462,16 +463,49 @@ export class Polygon implements Intersectable, SVGSerializable {
    * @memberof Polygon
    * @return {Vertex|null} `null` is no vertices are available.
    */
-  getMeanCenter() {
+  getMeanCenter(): Vertex | null {
     if (this.vertices.length === 0) {
       return null;
     }
-    const center = this.vertices[0].clone();
+    const center: Vertex = this.vertices[0].clone();
     for (var i = 1; i < this.vertices.length; i++) {
       center.add(this.vertices[i]);
     }
     center.x /= this.vertices.length;
     center.y /= this.vertices.length;
+    return center;
+  }
+
+  /**
+   * Get centroid.
+   * Centroids define the barycenter of any non self-intersecting convex polygon.
+   *
+   * If the polygon is self intersecting or non konvex then the barycenter is not well defined.
+   *
+   * https://mathworld.wolfram.com/PolygonCentroid.html
+   *
+   * @method getCentroid
+   * @instance
+   * @memberof Polygon
+   * @returns {Vertex|null}
+   */
+  getCentroid(): Vertex | null {
+    if (this.vertices.length === 0) {
+      return null;
+    }
+    const center: Vertex = new Vertex(0.0, 0.0);
+    const n = this.vertices.length;
+    for (var i = 0; i < n; i++) {
+      // center.add(this.vertices[i]);
+      const cur: Vertex = this.vertices[i];
+      const next: Vertex = this.vertices[(i + 1) % n];
+      var factor: number = cur.x * next.y - next.x * cur.y;
+      center.x += (cur.x + next.x) * factor;
+      center.y += (cur.y + next.y) * factor;
+    }
+    const area = this.area();
+    center.x *= 1 / (6 * area);
+    center.y *= 1 / (6 * area);
     return center;
   }
 
