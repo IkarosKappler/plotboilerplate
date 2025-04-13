@@ -560,6 +560,8 @@ new MouseHandler(document.getElementById("mycanvas"))
 - [Interactive Visualization of Molecular Surface Dynamics](https://www.computer.org/csdl/journal/tg/2009/06/ttg2009061391/13rRUwInvsI) for the illustration image which inspired the metaballs demo.
 - Darel Rex Finley for the Polygon Inset Calculation article [Inset A Polygon By A Fixed, Perpendicular Distance, With C Code Sample](https://alienryderflex.com/polygon_inset/ "Inset A Polygon By A Fixed, Perpendicular Distance, With C Code Sample")
 - Fernando Cacciola for [A Survey of Polygon Offseting Strategies](http://fcacciola.50webs.com/Offseting%20Methods.htm "A Survey of Polygon Offseting Strategies")
+- Stephen Schmitt for solvin cubic Beziér intersections with line segments http://mysite.verizon.net/res148h4j/javascript/script_exact_cubic.html
+- And _Particle in Cell Consulting LLC_ for refactoring Stephen Schmitt's solution: [Computing Intersections Between a Cubic Bezier Curve and a Line](https://www.particleincell.com/2013/cubic-line-intersection/)
 
 ## Todos
 

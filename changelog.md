@@ -13,6 +13,12 @@ Imminent todos:
 - Create VEllipseHelper (only VEllipseSectorHelper exists)
 - Extend Demo '32-ellipse-to-bezier' with the new helper.
 
+* 2025-04-13
+  - Adding the `Vertex.move(amount: XYCoords)` method (does the same as `add`, added by naming convention).
+  - Changed visibility of `CubicBezierCurve.utils` from 'private' to 'public'.
+  - Added helper function `CubicBezierCurve.utils.bezierCoeffs`.
+  - Added helper functopn `CubicBezierCurve.utils.sgn(number)` for division safe sign calculation.
+  - Class `CubicBezierCurve` is now implementing interface `Intersectable`.
 * 2025-04-09
   - Added the `Polygon.getCentroid` method.
   - Adding the `VEllipseSectorHelper.destroy` method.

@@ -25,6 +25,10 @@
  * @modified 2023-10-07 Added the `trimEnd`, `trimEndAt`, `trimStart`, `trimStartAt` methods.
  * @modified 2025-04-09 Added the `CubicBezierCurve.move` method to match the convention – which just calls `translate`.
  * @modified 2025-04-09 Modified the `CubicBezierCurve.translate` method: chaning parameter `Vertex` to more generalized `XYCoords`.
+ * @modified 2025-04-13 Changed visibility of `CubicBezierCurve.utils` from 'private' to  'public'.
+ * @modified 2025-04-13 Added helper function `CubicBezierCurve.utils.bezierCoeffs`.
+ * @modified 2025-04-13 Added helper functopn `CubicBezierCurve.utils.sgn(number)` for division safe sign calculation.
+ * @modified 2025-03-13 Class `CubicBezierCurve` is now implementing interface `Intersectable`.
  * @version 2.9.0
  *
  * @file CubicBezierCurve
@@ -35,7 +39,8 @@ import { Bounds } from "./Bounds";
 import { UIDGenerator } from "./UIDGenerator";
 import { Vertex } from "./Vertex";
 import { Vector } from "./Vector";
-import { XYCoords, UID, PathSegment } from "./interfaces";
+import { XYCoords, UID, PathSegment, Intersectable } from "./interfaces";
+import { VertTuple } from "./VertTuple";
 
 /**
  * @classdesc A refactored cubic bezier curve class.
@@ -47,7 +52,7 @@ import { XYCoords, UID, PathSegment } from "./interfaces";
  * @requires UID
  * @requires UIDGenerator
  */
-export class CubicBezierCurve implements PathSegment {
+export class CubicBezierCurve implements Intersectable, PathSegment {
   /** @constant {number} */
   static readonly START_POINT: number = 0;
   /** @constant {number} */
@@ -761,6 +766,143 @@ export class CubicBezierCurve implements PathSegment {
   }
   //---END PathSegment-------------------------
 
+  //--- BEGIN --- Implement interface `Intersectable`
+  /**
+   * Get all line intersections with this circle.
+   *
+   * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+   *
+   * @param {VertTuple} line - The line to find intersections with.
+   * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+   * @returns {Array<Vertex>} - An array of all intersections with the circle outline.
+   */
+  lineIntersections(line: VertTuple<any>, inVectorBoundsOnly: boolean = false): Array<Vertex> {
+    const intersectionTs: number[] = this.lineIntersectionTs(line);
+    const intersectionPoints: Vertex[] = intersectionTs.map((t: number) => {
+      return this.getPointAt(t);
+    });
+    if (inVectorBoundsOnly) {
+      // const maxDist = line.length();
+      return intersectionPoints.filter((vert: Vertex) => line.hasPoint(vert, true));
+    } else {
+      return intersectionPoints;
+    }
+  }
+
+  /**
+   * Get all line intersections of this polygon and their tangents along the shape.
+   *
+   * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+   *
+   * @param line
+   * @param lineIntersectionTangents
+   * @returns
+   */
+  lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly: boolean = false): Array<Vector> {
+    // // Find the intersections of all lines plus their tangents inside the circle bounds
+    // const interSectionPoints: Array<Vertex> = this.lineIntersections(line, inVectorBoundsOnly);
+    // return interSectionPoints.map((vert: Vertex) => {
+    //   // Calculate angle
+    //   const lineFromCenter = new Line(this.center, vert);
+    //   const angle: number = lineFromCenter.angle();
+    //   // console.log("angle", (angle / Math.PI) * 180.0);
+    //   // const angle = Math.random() * Math.PI * 2; // TODO
+    //   // Calculate tangent at angle
+    //   return this.tangentAt(angle);
+    // });
+    const intersectionTs: number[] = this.lineIntersectionTs(line);
+    return intersectionTs.map((t: number) => {
+      const startPoint = this.getPointAt(t);
+      const endPoint = this.getTangentAt(t);
+      return new Vector(startPoint, endPoint);
+    });
+    // return []; // TODO
+  }
+  //--- END --- Implement interface `Intersectable`
+
+  lineIntersectionTs(line: VertTuple<any>): Array<number> {
+    // THIS IS NEW
+    var I = new Array(new Vertex(NaN, NaN), new Vertex(NaN, NaN), new Vertex(NaN, NaN));
+    var Y = Array();
+
+    var X = Array();
+
+    // var A = ly[1] - ly[0]; // A=y2-y1
+    // var B = lx[0] - lx[1]; // B=x1-x2
+    // var C = lx[0] * (ly[0] - ly[1]) + ly[0] * (lx[1] - lx[0]); //C=x1*(y1-y2)+y1*(x2-x1)
+    var A = line.b.y - line.a.y; // A=y2-y1
+    var B = line.a.x - line.b.x; // B=x1-x2
+    var C = line.a.x * (line.a.y - line.b.y) + line.a.y * (line.b.x - line.a.x); //C=x1*(y1-y2)+y1*(x2-x1)
+
+    // var bx = bezierCoeffs(px[0], px[1], px[2], px[3]);
+    // var by = bezierCoeffs(py[0], py[1], py[2], py[3]);
+    var bx = CubicBezierCurve.utils.bezierCoeffs(
+      this.startPoint.x,
+      this.startControlPoint.x,
+      this.endControlPoint.x,
+      this.endPoint.x
+    );
+    var by = CubicBezierCurve.utils.bezierCoeffs(
+      this.startPoint.y,
+      this.startControlPoint.y,
+      this.endControlPoint.y,
+      this.endPoint.y
+    );
+
+    var P = Array();
+    P[0] = A * bx[0] + B * by[0]; /*t^3*/
+    P[1] = A * bx[1] + B * by[1]; /*t^2*/
+    P[2] = A * bx[2] + B * by[2]; /*t*/
+    P[3] = A * bx[3] + B * by[3] + C; /*1*/
+
+    var r = CubicBezierCurve.utils.cubicRoots(P);
+
+    return r;
+
+    // /*verify the roots are in bounds of the linear segment*/
+    // for (var i = 0; i < 3; i++) {
+    //   // t = r[i];
+    //   var t = r[i];
+
+    //   X[0] = bx[0] * t * t * t + bx[1] * t * t + bx[2] * t + bx[3];
+    //   X[1] = by[0] * t * t * t + by[1] * t * t + by[2] * t + by[3];
+
+    //   //
+    //   // above is intersection point assuming infinitely long line segment,
+    //   //  make sure we are also in bounds of the line
+    //   var s;
+    //   // if (lx[1] - lx[0] != 0) {
+    //   if (line.b.x - line.a.x != 0) {
+    //     /*if not vertical line*/
+    //     // s = (X[0] - lx[0]) / (lx[1] - lx[0]);
+    //     s = (X[0] - line.a.x) / (line.b.x - line.a.x);
+    //   } else {
+    //     // s = (X[1] - ly[0]) / (ly[1] - ly[0]);
+    //     s = (X[1] - line.a.y) / (line.b.y - line.a.y);
+    //   }
+
+    //   // in bounds?
+    //   if (t < 0 || t > 1.0 || s < 0 || s > 1.0) {
+    //     X[0] = -100; /*move off screen*/
+    //     X[1] = -100;
+    //   }
+
+    //   // Store intersection point
+    //   // I[i].setAttributeNS(null, "cx", X[0]);
+    //   // I[i].setAttributeNS(null, "cy", X[1]);
+    //   I[i].set(X[0], Y[0]);
+    // }
+
+    // console.log("r", r);
+
+    // r.forEach(function (localT) {
+    //   var point = bezier.getPointAt(localT);
+    //   pb.draw.circle(point, 4, "red", 2);
+    // });
+
+    // return I;
+  }
+
   /**
    * Check if this and the specified curve are equal.<br>
    * <br>
@@ -926,7 +1068,7 @@ export class CubicBezierCurve implements PathSegment {
   /**
    * Helper utils.
    */
-  private static utils = {
+  public static utils = {
     /**
      * Get the points of a sub curve at the given start end end offsets (values between 0.0 and 1.0).
      *
@@ -953,6 +1095,115 @@ export class CubicBezierCurve implements PathSegment {
       endVec.scale(0.33333333 * (tEnd - tStart));
 
       return [startVec.a, endVec.a, startVec.b, endVec.b];
+    },
+
+    /**
+     * Compute the cubic roots for the given cubic polynomial coefficients.
+     *
+     * @param poly
+     * @returns
+     */
+    /*based on http://mysite.verizon.net/res148h4j/javascript/script_exact_cubic.html#the%20source%20code*/
+    // Inspired by
+    //    https://www.particleincell.com/2013/cubic-line-intersection/
+    cubicRoots: (poly: number[]): number[] => {
+      const a: number = poly[0];
+      const b = poly[1];
+      const c = poly[2];
+      const d = poly[3];
+
+      const A = b / a;
+      const B = c / a;
+      const C = d / a;
+
+      var S: number, T: number, Im: number;
+
+      const Q: number = (3 * B - Math.pow(A, 2)) / 9;
+      const R: number = (9 * A * B - 27 * C - 2 * Math.pow(A, 3)) / 54;
+      const D: number = Math.pow(Q, 3) + Math.pow(R, 2); // polynomial discriminant
+
+      const t: Array<number> = []; // Array();
+
+      if (D >= 0) {
+        // complex or duplicate roots
+        S = CubicBezierCurve.utils.sgn(R + Math.sqrt(D)) * Math.pow(Math.abs(R + Math.sqrt(D)), 1 / 3);
+        T = CubicBezierCurve.utils.sgn(R - Math.sqrt(D)) * Math.pow(Math.abs(R - Math.sqrt(D)), 1 / 3);
+
+        t[0] = -A / 3 + (S + T); // real root
+        t[1] = -A / 3 - (S + T) / 2; // real part of complex root
+        t[2] = -A / 3 - (S + T) / 2; // real part of complex root
+        Im = Math.abs((Math.sqrt(3) * (S - T)) / 2); // complex part of root pair
+
+        /*discard complex roots*/
+        if (Im != 0) {
+          t[1] = -1;
+          t[2] = -1;
+        }
+      } // distinct real roots
+      else {
+        const th: number = Math.acos(R / Math.sqrt(-Math.pow(Q, 3)));
+
+        t[0] = 2 * Math.sqrt(-Q) * Math.cos(th / 3) - A / 3;
+        t[1] = 2 * Math.sqrt(-Q) * Math.cos((th + 2 * Math.PI) / 3) - A / 3;
+        t[2] = 2 * Math.sqrt(-Q) * Math.cos((th + 4 * Math.PI) / 3) - A / 3;
+        Im = 0.0;
+      }
+
+      /*discard out of spec roots*/
+      for (var i = 0; i < 3; i++) if (t[i] < 0 || t[i] > 1.0) t[i] = -1;
+
+      /*sort but place -1 at the end*/
+      // t = sortSpecial(t);
+      // t = CubicBezierCurve.utils.sortSpecial(t);
+      return CubicBezierCurve.utils.sortSpecial(t);
+
+      // console.log(t[0] + " " + t[1] + " " + t[2]);
+      // return t;
+    },
+
+    // TODO: no return value, this is IN-PLACE
+    sortSpecial: (a: number[]): number[] => {
+      var flip;
+      var temp: number;
+
+      do {
+        flip = false;
+        for (var i = 0; i < a.length - 1; i++) {
+          if ((a[i + 1] >= 0 && a[i] > a[i + 1]) || (a[i] < 0 && a[i + 1] >= 0)) {
+            flip = true;
+            temp = a[i];
+            a[i] = a[i + 1];
+            a[i + 1] = temp;
+          }
+        }
+      } while (flip);
+      return a;
+    },
+
+    /**
+     * Compute the Bézier coefficients from the given Bézier point coordinates.
+     *
+     * @param {number} p0 - The start point coordinate.
+     * @param {number} p1 - The start point coordinate.
+     * @param {number} p2 - The start point coordinate.
+     * @param {number} p3 - The start point coordinate.
+     * @returns {Array<number>}
+     */
+    bezierCoeffs: (p0: number, p1: number, p2: number, p3: number): Array<number> => {
+      const coeffs = Array(4);
+      coeffs[0] = -p0 + 3 * p1 + -3 * p2 + p3;
+      coeffs[1] = 3 * p0 - 6 * p1 + 3 * p2;
+      coeffs[2] = -3 * p0 + 3 * p1;
+      coeffs[3] = p0;
+      return coeffs;
+    },
+
+    /**
+     * sign of number, but is division safe: no zero returned :)
+     */
+    sgn(x: number): number {
+      if (x < 0.0) return -1;
+      return 1;
     }
   };
 }
