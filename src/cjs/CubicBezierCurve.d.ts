@@ -607,7 +607,6 @@ export declare class CubicBezierCurve implements Intersectable, PathSegment {
          * @returns
          */
         cubicRoots: (poly: number[]) => number[];
-        sortSpecial: (a: number[]) => number[];
         /**
          * Compute the Bézier coefficients from the given Bézier point coordinates.
          *

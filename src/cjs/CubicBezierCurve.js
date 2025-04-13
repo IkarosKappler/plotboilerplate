@@ -533,17 +533,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @return {CubicBezierCurve} The sub curve as a new curve.
      **/
     CubicBezierCurve.prototype.getSubCurveAt = function (tStart, tEnd) {
-        // const startVec: Vector = new Vector(this.getPointAt(tStart), this.getTangentAt(tStart));
-        // const endVec: Vector = new Vector(this.getPointAt(tEnd), this.getTangentAt(tEnd).inv());
-        // // Tangents are relative. Make absolute.
-        // startVec.b.add(startVec.a);
-        // endVec.b.add(endVec.a);
-        // // This 'splits' the curve at the given point at t.
-        // startVec.scale(0.33333333 * (tEnd - tStart));
-        // endVec.scale(0.33333333 * (tEnd - tStart));
-        // // Draw the bezier curve
-        // // pb.draw.cubicBezier( startVec.a, endVec.a, startVec.b, endVec.b, '#8800ff', 2 );
-        // return new CubicBezierCurve(startVec.a, endVec.a, startVec.b, endVec.b);
+        // This 'splits' the curve at the given point at t.
         var subCurbePoints = CubicBezierCurve.utils.getSubCurvePointsAt(this, tStart, tEnd);
         return new CubicBezierCurve(subCurbePoints[0], subCurbePoints[1], subCurbePoints[2], subCurbePoints[3]);
     };
@@ -684,22 +674,22 @@ var CubicBezierCurve = /** @class */ (function () {
         //   return this.tangentAt(angle);
         // });
         var intersectionTs = this.lineIntersectionTs(line);
-        return intersectionTs.map(function (t) {
+        var intersectionTangents = intersectionTs.map(function (t) {
             var startPoint = _this.getPointAt(t);
             var endPoint = _this.getTangentAt(t);
-            return new Vector_1.Vector(startPoint, endPoint);
+            return new Vector_1.Vector(startPoint, endPoint.add(startPoint));
         });
+        if (inVectorBoundsOnly) {
+            // const maxDist = line.length();
+            return intersectionTangents.filter(function (vec) { return line.hasPoint(vec.a, true); });
+        }
+        else {
+            return intersectionTangents;
+        }
         // return []; // TODO
     };
     //--- END --- Implement interface `Intersectable`
     CubicBezierCurve.prototype.lineIntersectionTs = function (line) {
-        // THIS IS NEW
-        var I = new Array(new Vertex_1.Vertex(NaN, NaN), new Vertex_1.Vertex(NaN, NaN), new Vertex_1.Vertex(NaN, NaN));
-        var Y = Array();
-        var X = Array();
-        // var A = ly[1] - ly[0]; // A=y2-y1
-        // var B = lx[0] - lx[1]; // B=x1-x2
-        // var C = lx[0] * (ly[0] - ly[1]) + ly[0] * (lx[1] - lx[0]); //C=x1*(y1-y2)+y1*(x2-x1)
         var A = line.b.y - line.a.y; // A=y2-y1
         var B = line.a.x - line.b.x; // B=x1-x2
         var C = line.a.x * (line.a.y - line.b.y) + line.a.y * (line.b.x - line.a.x); //C=x1*(y1-y2)+y1*(x2-x1)
@@ -707,48 +697,13 @@ var CubicBezierCurve = /** @class */ (function () {
         // var by = bezierCoeffs(py[0], py[1], py[2], py[3]);
         var bx = CubicBezierCurve.utils.bezierCoeffs(this.startPoint.x, this.startControlPoint.x, this.endControlPoint.x, this.endPoint.x);
         var by = CubicBezierCurve.utils.bezierCoeffs(this.startPoint.y, this.startControlPoint.y, this.endControlPoint.y, this.endPoint.y);
-        var P = Array();
+        var P = Array(4);
         P[0] = A * bx[0] + B * by[0]; /*t^3*/
         P[1] = A * bx[1] + B * by[1]; /*t^2*/
         P[2] = A * bx[2] + B * by[2]; /*t*/
         P[3] = A * bx[3] + B * by[3] + C; /*1*/
         var r = CubicBezierCurve.utils.cubicRoots(P);
-        return r;
-        // /*verify the roots are in bounds of the linear segment*/
-        // for (var i = 0; i < 3; i++) {
-        //   // t = r[i];
-        //   var t = r[i];
-        //   X[0] = bx[0] * t * t * t + bx[1] * t * t + bx[2] * t + bx[3];
-        //   X[1] = by[0] * t * t * t + by[1] * t * t + by[2] * t + by[3];
-        //   //
-        //   // above is intersection point assuming infinitely long line segment,
-        //   //  make sure we are also in bounds of the line
-        //   var s;
-        //   // if (lx[1] - lx[0] != 0) {
-        //   if (line.b.x - line.a.x != 0) {
-        //     /*if not vertical line*/
-        //     // s = (X[0] - lx[0]) / (lx[1] - lx[0]);
-        //     s = (X[0] - line.a.x) / (line.b.x - line.a.x);
-        //   } else {
-        //     // s = (X[1] - ly[0]) / (ly[1] - ly[0]);
-        //     s = (X[1] - line.a.y) / (line.b.y - line.a.y);
-        //   }
-        //   // in bounds?
-        //   if (t < 0 || t > 1.0 || s < 0 || s > 1.0) {
-        //     X[0] = -100; /*move off screen*/
-        //     X[1] = -100;
-        //   }
-        //   // Store intersection point
-        //   // I[i].setAttributeNS(null, "cx", X[0]);
-        //   // I[i].setAttributeNS(null, "cy", X[1]);
-        //   I[i].set(X[0], Y[0]);
-        // }
-        // console.log("r", r);
-        // r.forEach(function (localT) {
-        //   var point = bezier.getPointAt(localT);
-        //   pb.draw.circle(point, 4, "red", 2);
-        // });
-        // return I;
+        return r.filter(function (root) { return root != -1; });
     };
     /**
      * Check if this and the specified curve are equal.<br>
@@ -983,34 +938,38 @@ var CubicBezierCurve = /** @class */ (function () {
                 t[2] = 2 * Math.sqrt(-Q) * Math.cos((th + 4 * Math.PI) / 3) - A / 3;
                 Im = 0.0;
             }
-            /*discard out of spec roots*/
-            for (var i = 0; i < 3; i++)
-                if (t[i] < 0 || t[i] > 1.0)
+            // Discard out of spec roots
+            for (var i = 0; i < 3; i++) {
+                if (t[i] < 0 || t[i] > 1.0) {
                     t[i] = -1;
+                }
+            }
             /*sort but place -1 at the end*/
             // t = sortSpecial(t);
             // t = CubicBezierCurve.utils.sortSpecial(t);
-            return CubicBezierCurve.utils.sortSpecial(t);
+            // return CubicBezierCurve.utils.sortSpecial(t);
+            return t.sort();
             // console.log(t[0] + " " + t[1] + " " + t[2]);
             // return t;
         },
         // TODO: no return value, this is IN-PLACE
-        sortSpecial: function (a) {
-            var flip;
-            var temp;
-            do {
-                flip = false;
-                for (var i = 0; i < a.length - 1; i++) {
-                    if ((a[i + 1] >= 0 && a[i] > a[i + 1]) || (a[i] < 0 && a[i + 1] >= 0)) {
-                        flip = true;
-                        temp = a[i];
-                        a[i] = a[i + 1];
-                        a[i + 1] = temp;
-                    }
-                }
-            } while (flip);
-            return a;
-        },
+        // TODO: use a normal sort here
+        // sortSpecial: (a: number[]): number[] => {
+        //   var flip;
+        //   var temp: number;
+        //   do {
+        //     flip = false;
+        //     for (var i = 0; i < a.length - 1; i++) {
+        //       if ((a[i + 1] >= 0 && a[i] > a[i + 1]) || (a[i] < 0 && a[i + 1] >= 0)) {
+        //         flip = true;
+        //         temp = a[i];
+        //         a[i] = a[i + 1];
+        //         a[i + 1] = temp;
+        //       }
+        //     }
+        //   } while (flip);
+        //   return a;
+        // },
         /**
          * Compute the Bézier coefficients from the given Bézier point coordinates.
          *
