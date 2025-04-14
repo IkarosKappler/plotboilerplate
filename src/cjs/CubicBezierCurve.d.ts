@@ -489,13 +489,13 @@ export declare class CubicBezierCurve implements Intersectable, PathSegment {
      */
     getEndTangent(): Vertex;
     /**
-     * Get all line intersections with this circle.
+     * Get all line intersections with this shape.
      *
      * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
      *
      * @param {VertTuple} line - The line to find intersections with.
      * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
-     * @returns {Array<Vertex>} - An array of all intersections with the circle outline.
+     * @returns {Array<Vertex>} - An array of all intersections with the shape outline.
      */
     lineIntersections(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vertex>;
     /**
@@ -602,6 +602,12 @@ export declare class CubicBezierCurve implements Intersectable, PathSegment {
         getSubCurvePointsAt: (curve: CubicBezierCurve, tStart: number, tEnd: number) => [Vertex, Vertex, Vertex, Vertex];
         /**
          * Compute the cubic roots for the given cubic polynomial coefficients.
+         *
+         * Based on
+         *   http://mysite.verizon.net/res148h4j/javascript/script_exact_cubic.html#the%20source%20code
+         * Inspired by
+         *   https://www.particleincell.com/2013/cubic-line-intersection/
+         * Thanks to Stephan Schmitt and Particle-In-Cell!
          *
          * @param poly
          * @returns

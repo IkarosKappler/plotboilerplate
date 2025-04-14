@@ -755,13 +755,13 @@ export class CubicBezierCurve implements Intersectable, PathSegment {
 
   //--- BEGIN --- Implement interface `Intersectable`
   /**
-   * Get all line intersections with this circle.
+   * Get all line intersections with this shape.
    *
    * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
    *
    * @param {VertTuple} line - The line to find intersections with.
    * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
-   * @returns {Array<Vertex>} - An array of all intersections with the circle outline.
+   * @returns {Array<Vertex>} - An array of all intersections with the shape outline.
    */
   lineIntersections(line: VertTuple<any>, inVectorBoundsOnly: boolean = false): Array<Vertex> {
     const intersectionTs: number[] = this.lineIntersectionTs(line);
@@ -786,17 +786,6 @@ export class CubicBezierCurve implements Intersectable, PathSegment {
    * @returns
    */
   lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly: boolean = false): Array<Vector> {
-    // // Find the intersections of all lines plus their tangents inside the circle bounds
-    // const interSectionPoints: Array<Vertex> = this.lineIntersections(line, inVectorBoundsOnly);
-    // return interSectionPoints.map((vert: Vertex) => {
-    //   // Calculate angle
-    //   const lineFromCenter = new Line(this.center, vert);
-    //   const angle: number = lineFromCenter.angle();
-    //   // console.log("angle", (angle / Math.PI) * 180.0);
-    //   // const angle = Math.random() * Math.PI * 2; // TODO
-    //   // Calculate tangent at angle
-    //   return this.tangentAt(angle);
-    // });
     const intersectionTs: number[] = this.lineIntersectionTs(line);
     const intersectionTangents: Array<Vector> = intersectionTs.map((t: number) => {
       const startPoint = this.getPointAt(t);
@@ -804,12 +793,10 @@ export class CubicBezierCurve implements Intersectable, PathSegment {
       return new Vector(startPoint, endPoint.add(startPoint));
     });
     if (inVectorBoundsOnly) {
-      // const maxDist = line.length();
       return intersectionTangents.filter((vec: Vector) => line.hasPoint(vec.a, true));
     } else {
       return intersectionTangents;
     }
-    // return []; // TODO
   }
   //--- END --- Implement interface `Intersectable`
 
@@ -833,15 +820,14 @@ export class CubicBezierCurve implements Intersectable, PathSegment {
       this.endPoint.y
     );
 
-    const P: number[] = Array<number>(4);
-    P[0] = A * bx[0] + B * by[0]; /*t^3*/
-    P[1] = A * bx[1] + B * by[1]; /*t^2*/
-    P[2] = A * bx[2] + B * by[2]; /*t*/
-    P[3] = A * bx[3] + B * by[3] + C; /*1*/
+    const poly: number[] = Array<number>(4);
+    poly[0] = A * bx[0] + B * by[0]; /*t^3*/
+    poly[1] = A * bx[1] + B * by[1]; /*t^2*/
+    poly[2] = A * bx[2] + B * by[2]; /*t*/
+    poly[3] = A * bx[3] + B * by[3] + C; /*1*/
 
-    var r = CubicBezierCurve.utils.cubicRoots(P);
-
-    return r.filter((root: number) => root != -1);
+    var roots = CubicBezierCurve.utils.cubicRoots(poly);
+    return roots.filter((root: number) => root != -1);
   }
 
   /**
@@ -1041,21 +1027,24 @@ export class CubicBezierCurve implements Intersectable, PathSegment {
     /**
      * Compute the cubic roots for the given cubic polynomial coefficients.
      *
+     * Based on
+     *   http://mysite.verizon.net/res148h4j/javascript/script_exact_cubic.html#the%20source%20code
+     * Inspired by
+     *   https://www.particleincell.com/2013/cubic-line-intersection/
+     * Thanks to Stephan Schmitt and Particle-In-Cell!
+     *
      * @param poly
      * @returns
      */
-    /*based on http://mysite.verizon.net/res148h4j/javascript/script_exact_cubic.html#the%20source%20code*/
-    // Inspired by
-    //    https://www.particleincell.com/2013/cubic-line-intersection/
     cubicRoots: (poly: number[]): number[] => {
       const a: number = poly[0];
-      const b = poly[1];
-      const c = poly[2];
-      const d = poly[3];
+      const b: number = poly[1];
+      const c: number = poly[2];
+      const d: number = poly[3];
 
-      const A = b / a;
-      const B = c / a;
-      const C = d / a;
+      const A: number = b / a;
+      const B: number = c / a;
+      const C: number = d / a;
 
       var S: number, T: number, Im: number;
 
@@ -1063,69 +1052,36 @@ export class CubicBezierCurve implements Intersectable, PathSegment {
       const R: number = (9 * A * B - 27 * C - 2 * Math.pow(A, 3)) / 54;
       const D: number = Math.pow(Q, 3) + Math.pow(R, 2); // polynomial discriminant
 
-      const t: Array<number> = []; // Array();
+      const ts: Array<number> = []; // Array();
 
       if (D >= 0) {
         // complex or duplicate roots
         S = CubicBezierCurve.utils.sgn(R + Math.sqrt(D)) * Math.pow(Math.abs(R + Math.sqrt(D)), 1 / 3);
         T = CubicBezierCurve.utils.sgn(R - Math.sqrt(D)) * Math.pow(Math.abs(R - Math.sqrt(D)), 1 / 3);
 
-        t[0] = -A / 3 + (S + T); // real root
-        t[1] = -A / 3 - (S + T) / 2; // real part of complex root
-        t[2] = -A / 3 - (S + T) / 2; // real part of complex root
+        ts[0] = -A / 3 + (S + T); // real root
+        ts[1] = -A / 3 - (S + T) / 2; // real part of complex root
+        ts[2] = -A / 3 - (S + T) / 2; // real part of complex root
         Im = Math.abs((Math.sqrt(3) * (S - T)) / 2); // complex part of root pair
 
-        /*discard complex roots*/
+        // Mark complex roots to be discarded
         if (Im != 0) {
-          t[1] = -1;
-          t[2] = -1;
+          ts[1] = -1;
+          ts[2] = -1;
         }
       } // distinct real roots
       else {
         const th: number = Math.acos(R / Math.sqrt(-Math.pow(Q, 3)));
 
-        t[0] = 2 * Math.sqrt(-Q) * Math.cos(th / 3) - A / 3;
-        t[1] = 2 * Math.sqrt(-Q) * Math.cos((th + 2 * Math.PI) / 3) - A / 3;
-        t[2] = 2 * Math.sqrt(-Q) * Math.cos((th + 4 * Math.PI) / 3) - A / 3;
+        ts[0] = 2 * Math.sqrt(-Q) * Math.cos(th / 3) - A / 3;
+        ts[1] = 2 * Math.sqrt(-Q) * Math.cos((th + 2 * Math.PI) / 3) - A / 3;
+        ts[2] = 2 * Math.sqrt(-Q) * Math.cos((th + 4 * Math.PI) / 3) - A / 3;
         Im = 0.0;
       }
 
-      // Discard out of spec roots
-      for (var i = 0; i < 3; i++) {
-        if (t[i] < 0 || t[i] > 1.0) {
-          t[i] = -1;
-        }
-      }
-
-      /*sort but place -1 at the end*/
-      // t = sortSpecial(t);
-      // t = CubicBezierCurve.utils.sortSpecial(t);
-      // return CubicBezierCurve.utils.sortSpecial(t);
-      return t.sort();
-
-      // console.log(t[0] + " " + t[1] + " " + t[2]);
-      // return t;
+      // Discard all t's out of spec and sort the rest
+      return ts.filter((t: number) => t >= 0 && t <= 1.0).sort();
     },
-
-    // TODO: no return value, this is IN-PLACE
-    // TODO: use a normal sort here
-    // sortSpecial: (a: number[]): number[] => {
-    //   var flip;
-    //   var temp: number;
-
-    //   do {
-    //     flip = false;
-    //     for (var i = 0; i < a.length - 1; i++) {
-    //       if ((a[i + 1] >= 0 && a[i] > a[i + 1]) || (a[i] < 0 && a[i + 1] >= 0)) {
-    //         flip = true;
-    //         temp = a[i];
-    //         a[i] = a[i + 1];
-    //         a[i + 1] = temp;
-    //       }
-    //     }
-    //   } while (flip);
-    //   return a;
-    // },
 
     /**
      * Compute the Bézier coefficients from the given Bézier point coordinates.
@@ -1149,8 +1105,7 @@ export class CubicBezierCurve implements Intersectable, PathSegment {
      * sign of number, but is division safe: no zero returned :)
      */
     sgn(x: number): number {
-      if (x < 0.0) return -1;
-      return 1;
+      return x < 0.0 ? -1 : 1;
     }
   };
 }

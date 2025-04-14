@@ -40,6 +40,9 @@
     pb.drawConfig.ellipseSector.lineWidth = 2;
     pb.drawConfig.circleSector.color = "rgba(128,128,128,0.5)";
     pb.drawConfig.circleSector.lineWidth = 2;
+    pb.drawConfig.bezier.color = "rgba(128,128,128,0.5)";
+    pb.drawConfig.bezier.lineWidth = 2;
+    // pb.drawConfig.drawHandleLines = false;
 
     // Array<Polygon | Circle | Ellipse>
     var shapes = [];
@@ -49,6 +52,7 @@
     var ellipseHelper;
     var cicleSectorHelper;
     var ellipseSectorHelper;
+    var bezierHelper;
     rays.push(mainRay);
 
     // Create a config: we want to have control about the arrow head size in this demo
@@ -71,6 +75,7 @@
       ellipseHelper.drawHandleLines(draw, fill);
       cicleSectorHelper.drawHandleLines(draw, fill);
       ellipseSectorHelper.drawHandleLines(draw, fill);
+      bezierHelper.drawHandleLines();
     };
 
     /**
@@ -108,7 +113,10 @@
         shape instanceof VEllipse ||
         shape instanceof CircleSector ||
         shape instanceof VEllipseSector ||
-        shape instanceof CubicBezierCurve // This is not a direct drawable!
+        shape instanceof BezierPath ||
+        // Note: this is not a direct drawable and cannot be directly added to the canvas,
+        // but let's also handle this case
+        shape instanceof CubicBezierCurve
       ) {
         // Array<Vector>
         var intersectionTangents = shape.lineIntersectionTangents(ray, true);
@@ -120,16 +128,13 @@
           return accu;
         }, null);
         if (closestIntersectionTangent) {
-          // pb.draw.arrow(closestIntersectionTangent.a, closestIntersectionTangent.b, "green");
           var angleBetween = closestIntersectionTangent.angle(ray);
-          rotateVector(closestIntersectionTangent, angleBetween);
+          // rotateVector(closestIntersectionTangent, angleBetween);
+          closestIntersectionTangent.rotate(angleBetween);
           reflectedRay = closestIntersectionTangent;
         } else {
           reflectedRay = null;
         }
-      } else if (shape instanceof BezierPath) {
-        // lineIntersections(shape.bezierCurves[0], mainRay, false);
-        return findReflectedRay(shape.bezierCurves[0], mainRay);
       } else {
         // ERR! (unrecognized shape)
         // In the end all shapes should have the same methods!
@@ -137,46 +142,6 @@
 
       return reflectedRay;
     };
-
-    // lineIntersections(ray: VertTuple<Vector>, inVectorBoundsOnly: boolean = false): Array<Vertex> {
-    var lineIntersections = function (bezierCurve, ray, inVectorBoundsOnly) {
-      console.log("lineIntersections bezier");
-
-      // Now solve this equation?
-      // 0 = (1-t)^3 * P0.y + 3(1-t)^2t * P1.y + 3(1-t)t^2 * P2.y + t^3 * P3.y
-
-      var ts = bezierCurve.lineIntersectionTs(ray);
-      console.log("ts", ts);
-      ts.forEach(function (localT) {
-        var point = bezierCurve.getPointAt(localT);
-        pb.draw.circle(point, 4, "red", 2);
-      });
-
-      var intersectionPoints = bezierCurve.lineIntersections(ray, inVectorBoundsOnly);
-      intersectionPoints.forEach(function (point) {
-        pb.draw.circle(point, 2, "green", 1);
-      });
-
-      var intersectionTangents = bezierCurve.lineIntersectionTangents(ray, inVectorBoundsOnly);
-      intersectionTangents.forEach(function (tangent) {
-        pb.draw.arrow(tangent.a, tangent.b, "orange", 2.0);
-      });
-
-      // var intersections = computeIntersections(bezierCurve, ray);
-      // intersections.forEach(function (point) {
-      //   pb.draw.circle(point, 7, "blue", 2);
-      // });
-    };
-
-    /**
-     * TODO: MOVE TO VECTOR CLASS.
-     *
-     * Rotate  vector by the given angle.
-     * @param angle
-     */
-    function rotateVector(vector, angle) {
-      vector.b.rotate(angle, vector.a);
-    }
 
     // +---------------------------------------------------------------------------------
     // | Just rebuilds the pattern on changes.
@@ -200,6 +165,7 @@
       var bezierPath = BezierPath.fromCurve(
         new CubicBezierCurve(tmpPolygon.vertices[0], tmpPolygon.vertices[1], tmpPolygon.vertices[2], tmpPolygon.vertices[3])
       );
+      bezierHelper = new BezierPathInteractionHelper(pb, [bezierPath]);
 
       shapes = [polygon, circle, ellipse, circleSector, ellipseSector, bezierPath];
       // Align all shapes on a circle :)

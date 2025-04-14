@@ -12,7 +12,8 @@
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Vector.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-10-25 Added the `getOrthogonal` method.
- * @version  1.5.0
+ * @modified 2025-04-14 Added the `Vector.rotate(number)` method.
+ * @version  1.6.0
  *
  * @file Vector
  * @public
@@ -84,6 +85,16 @@ export declare class Vector extends VertTuple<Vector> implements SVGSerializable
      * @memberof Vector
      **/
     getOrthogonal(): Vector;
+    /**
+     * Rotate this vector by the given angle around the first point `a`.
+     *
+     * @name rotate
+     * @method rotate
+     * @return {Vector} this - for chaining.
+     * @instance
+     * @memberof Vector
+     */
+    rotate(angle: number): Vector;
     static utils: {
         /**
          * Generate a four-point arrow head, starting at the vector end minus the

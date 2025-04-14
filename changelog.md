@@ -13,6 +13,12 @@ Imminent todos:
 - Create VEllipseHelper (only VEllipseSectorHelper exists)
 - Extend Demo '32-ellipse-to-bezier' with the new helper.
 
+* 2025-04-14
+  - Class `BezierPath` is now implementing interface `Intersectable`.
+  - Added the `Vector.rotate(number)` method.
+  - Added the `BezierPathInteractionHelper.drawHandleLines` method.
+  - Fixing correct event types for touch events in `BezierPathInteractionHelper`.
+  - BezierPathInteractionHelper: Changed default value of `HelperOptions.autoAdjustPaths` from `true` to `false`.
 * 2025-04-13
   - Adding the `Vertex.move(amount: XYCoords)` method (does the same as `add`, added by naming convention).
   - Changed visibility of `CubicBezierCurve.utils` from 'private' to 'public'.
