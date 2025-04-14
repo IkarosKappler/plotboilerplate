@@ -16,6 +16,7 @@
   // Fetch the GET params
   let GUP = gup();
   const RAD_TO_DEG = 180.0 / Math.PI;
+  const DEG_TO_RAD = Math.PI / 180.0;
   _context.addEventListener("load", function () {
     var params = new Params(GUP);
     var isDarkmode = detectDarkMode(GUP);
@@ -53,11 +54,13 @@
     var cicleSectorHelper;
     var ellipseSectorHelper;
     var bezierHelper;
-    rays.push(mainRay);
+    // rays.push(mainRay);
 
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
-      animate: params.getBoolean("animate", false)
+      animate: params.getBoolean("animate", false),
+      rayThickness: 5.0,
+      iterations: 3
     };
 
     // +---------------------------------------------------------------------------------
@@ -66,22 +69,38 @@
     var viewport = pb.viewport();
 
     var postDraw = function (draw, fill) {
-      var reflectedRaysByShapes = calculateAllReflections();
-      reflectedRaysByShapes.forEach(function (reflectedRays) {
-        reflectedRays.forEach(function (ray) {
-          draw.arrow(ray.a, ray.b, "orange", 5.0);
+      var initialRays = getRayCollection(mainRay);
+      drawRays(draw, fill, initialRays);
+      var numIter = Math.max(0, config.iterations); // Safeguard to avoid infinite loop
+      for (var i = 0; i < numIter; i++) {
+        var raysByShapes = getRayIteration(initialRays);
+        // console.log("next ray iteration", raysByShapes);
+        raysByShapes.forEach(function (rays) {
+          drawRays(draw, fill, rays);
         });
-      });
+      }
       ellipseHelper.drawHandleLines(draw, fill);
       cicleSectorHelper.drawHandleLines(draw, fill);
       ellipseSectorHelper.drawHandleLines(draw, fill);
       bezierHelper.drawHandleLines();
     };
 
+    var drawRays = function (draw, fill, rays) {
+      rays.forEach(function (ray) {
+        draw.arrow(ray.a, ray.b, "orange", config.rayThickness);
+      });
+    };
+
+    var getRayIteration = function (currentRays) {
+      var reflectedRaysByShapes = calculateAllReflections(currentRays);
+      return reflectedRaysByShapes;
+    };
+
     /**
      * @return {Array<Vector[]>} An two-dimensional array of vectors; each array for one of the base shapes.
      */
-    var calculateAllReflections = function () {
+    var calculateAllReflections = function (rays) {
+      // var rays = getRayCollection(mainRay);
       // Array<Vector[]>
       var resultVectors = [];
       shapes.forEach(function (shape) {
@@ -207,7 +226,19 @@
         [ellipseRotationControlPoint, controlPointA, controlPointB, startControlPoint, endControlPoint, rotationControlPoint],
         false
       );
-      pb.add(rays, true); // trigger redraw
+      // pb.add(rays, true); // trigger redraw
+      pb.add([mainRay], true); // trigger redraw
+    };
+
+    var getRayCollection = function (baseRay) {
+      var numRays = 10;
+      var rangeAngle = 35.0 * DEG_TO_RAD;
+      var rays = [];
+      for (var i = 0; i < numRays; i++) {
+        rays.push(baseRay.clone().rotate(-rangeAngle / 2.0 + rangeAngle * (i / numRays)));
+      }
+      // console.log("ray collection", rays);
+      return rays;
     };
 
     // +---------------------------------------------------------------------------------
@@ -246,7 +277,10 @@
       var gui = pb.createGUI();
       // prettier-ignore
       gui.add(config, "animate").name("animate").title("Animate the ray?")
-      .onChange( function() { toggleAnimation(); });
+        .onChange( function() { toggleAnimation(); });
+      // prettier-ignore
+      gui.add(config, "rayThickness").name("rayThickness").title("Line thickness of rays.")
+        .onChange( function() { pb.redraw() });
     }
 
     pb.config.postDraw = postDraw;
