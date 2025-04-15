@@ -9,10 +9,12 @@
  * @modified 2025-04-01 Adapting a the `toCubicBezier` calculation to match an underlying change in the vertAt and tangentAt calculation of ellipses (was required to hamonize both methods with circles).
  * @modified 2025-04-02 Adding `VEllipseSector.containsAngle` method.
  * @modified 2025-04-02 Adding `VEllipseSector.lineIntersections` and `VEllipseSector.lineIntersectionTangents` and implementing `Intersectable`.
+ * @modified 2025-04-07 Adding value wrapping (0 to TWO_PI) to the `VEllipseSector.containsAngle` method.
+ * @modified 2025-04-09 Adding the `VEllipseSector.move` method.
  * @version  1.2.0
  */
 import { CubicBezierCurve } from "./CubicBezierCurve";
-import { SVGPathParams, UID } from "./interfaces";
+import { SVGPathParams, UID, XYCoords } from "./interfaces";
 import { Vector } from "./Vector";
 import { VEllipse } from "./VEllipse";
 import { Vertex } from "./Vertex";
@@ -80,6 +82,16 @@ export declare class VEllipseSector {
      * @param {numner} endAngle - The end angle of the sector.
      */
     constructor(ellipse: VEllipse, startAngle: number, endAngle: number);
+    /**
+     * Move the ellipse sector by the given amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof VEllipseSector
+     * @return {VEllipseSector} this for chaining
+     **/
+    move(amount: XYCoords): VEllipseSector;
     /**
      * Checks wether the given angle (must be inside 0 and PI*2) is contained inside this sector.
      *

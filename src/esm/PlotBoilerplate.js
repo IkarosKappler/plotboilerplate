@@ -1071,11 +1071,9 @@ export class PlotBoilerplate {
             if (this.drawConfig.drawHandleLines) {
                 draw.setCurrentId(`${d.uid}_e0`);
                 draw.setCurrentClassName(`${d.className}-v-line`);
-                // draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
                 draw.handleLine(d.center.clone().add(0, d.signedRadiusV()).rotate(d.rotation, d.center), d.axis); // , "#c8c8c8");
                 draw.setCurrentId(`${d.uid}_e1`);
                 draw.setCurrentClassName(`${d.className}-h-line`);
-                // draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
                 draw.handleLine(d.center.clone().add(d.signedRadiusH(), 0).rotate(d.rotation, d.center), d.axis); // , "#c8c8c8");
             }
             draw.setCurrentId(d.uid);

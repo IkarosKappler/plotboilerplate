@@ -226,7 +226,6 @@ export class VEllipse implements Intersectable, SVGSerializable {
       this.rotation,
       this.center
     );
-    // return new Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle + this.rotation));
   }
 
   /**
@@ -243,7 +242,6 @@ export class VEllipse implements Intersectable, SVGSerializable {
    * @param {number=1.0} length - [optional, default=1] The length of the returned vector.
    */
   normalAt(angle: number, length?: number): Vector {
-    // const point: Vertex = this.vertAt(angle);
     const point: Vertex = this.vertAt(angle - this.rotation); // HERE IS THE CORRECT BEHAVIOR!
     const foci: [Vertex, Vertex] = this.getFoci();
     // Calculate the angle between [point,focusA] and [point,focusB]
@@ -283,11 +281,6 @@ export class VEllipse implements Intersectable, SVGSerializable {
    */
   tangentAt(angle: number, length?: number): Vector {
     const normal: Vector = this.normalAt(angle, length);
-    // TODO: cleanup
-    // const normal: Vector = this.normalAt(angle - this.rotation, length);
-    // Rotate the normal by 90 degrees, then it is the tangent.
-    // normal.b.rotate(Math.PI / 2, normal.a);
-    // return normal;
     return normal.inv().perp();
   }
 
@@ -428,8 +421,6 @@ export class VEllipse implements Intersectable, SVGSerializable {
       // Calculate angle
       const lineFromCenter = new Line(this.center, vert);
       const angle: number = lineFromCenter.angle();
-      // console.log("angle", (angle / Math.PI) * 180.0);
-      // const angle = Math.random() * Math.PI * 2; // TODO
       // Calculate tangent at angle
       return this.tangentAt(angle);
     });
@@ -449,7 +440,7 @@ export class VEllipse implements Intersectable, SVGSerializable {
     //    http://www.spaceroots.org/documents/ellipse/node22.html
 
     // Note that ellipses with radiusH=0 or radiusV=0 cannot be represented as Bézier curves.
-    // Return a single line here (as a Bézier curve)
+    // Return a single line here (as a Bézier curve)?
     // if (Math.abs(this.radiusV()) < 0.00001) {
     //   const radiusH = this.radiusH();
     //   return [

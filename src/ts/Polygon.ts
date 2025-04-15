@@ -522,23 +522,7 @@ export class Polygon implements Intersectable, SVGSerializable {
    * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
    */
   lineIntersections(line: VertTuple<any>, inVectorBoundsOnly: boolean = false): Array<Vertex> {
-    // // Find the intersections of all lines inside the edge bounds
-    // const intersectionPoints: Array<Vertex> = [];
-    // for (var i = 0; i < this.vertices.length; i++) {
-    //   const polyLine = new Line(this.vertices[i], this.vertices[(i + 1) % this.vertices.length]);
-    //   const intersection = polyLine.intersection(line);
-    //   // true => only inside bounds
-    //   // ignore last edge if open
-    //   if (
-    //     (!this.isOpen || i + 1 !== this.vertices.length) &&
-    //     intersection !== null &&
-    //     polyLine.hasPoint(intersection, true) &&
-    //     (!inVectorBoundsOnly || line.hasPoint(intersection, inVectorBoundsOnly))
-    //   ) {
-    //     intersectionPoints.push(intersection);
-    //   }
-    // }
-    // return intersectionPoints;
+    // Find the intersections of all lines inside the edge bounds
     return Polygon.utils
       .locateLineIntersecion(line, this.vertices, this.isOpen, inVectorBoundsOnly)
       .map(intersectionTuple => intersectionTuple.intersectionPoint);
@@ -554,25 +538,7 @@ export class Polygon implements Intersectable, SVGSerializable {
    * @returns
    */
   lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly: boolean = false): Array<Vector> {
-    // // Find the intersections of all lines inside the edge bounds
-    // const intersectionPoints: Array<Vector> = [];
-    // for (var i = 0; i < this.vertices.length; i++) {
-    //   const polyLine = new Line(this.vertices[i], this.vertices[(i + 1) % this.vertices.length]);
-    //   const intersection = polyLine.intersection(line);
-    //   // true => only inside bounds
-    //   // ignore last edge if open
-    //   if (
-    //     (!this.isOpen || i + 1 !== this.vertices.length) &&
-    //     intersection !== null &&
-    //     polyLine.hasPoint(intersection, true) &&
-    //     (!inVectorBoundsOnly || line.hasPoint(intersection, inVectorBoundsOnly))
-    //   ) {
-    //     const intersectionVector: Vector = new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersection) as Vector;
-    //     //  intersectionPoints.push(intersection);
-    //     intersectionPoints.push(intersectionVector);
-    //   }
-    // }
-    // return intersectionPoints;
+    // Find the intersection tangents of all lines inside the edge bounds
     return Polygon.utils.locateLineIntersecion(line, this.vertices, this.isOpen, inVectorBoundsOnly).map(intersectionTuple => {
       const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
       return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersectionPoint) as Vector;
@@ -755,7 +721,6 @@ export class Polygon implements Intersectable, SVGSerializable {
       // -> delete all vertices in between
       if (j - i > 2) {
         // Means: there have been 'colinear vertices' in between
-        // console.log("Splice", "i", i, "j", j, i + 1, j - i - 1);
         verts.splice(i + 1, j - i - 2);
       }
       i++;
@@ -967,6 +932,15 @@ export class Polygon implements Intersectable, SVGSerializable {
       return sum;
     },
 
+    /**
+     * Find intersections of a line with a polygon (vertices).
+     *
+     * @param {VertTuple<any>} line - The line to find intersections with.
+     * @param {Array<Vertex>} vertices - The polygon's vertices.
+     * @param {boolean} isOpen - True if the polygon is open, false otherwise.
+     * @param {boolean} inVectorBoundsOnly - If only intersections in strict vector bounds should be returned.
+     * @returns
+     */
     locateLineIntersecion(
       line: VertTuple<any>,
       vertices: Array<Vertex>,
@@ -982,13 +956,10 @@ export class Polygon implements Intersectable, SVGSerializable {
         // true => only inside bounds
         // ignore last edge if open
         if (
-          // (!isOpen || i + 1 !== vertices.length) &&
           intersection !== null &&
           polyLine.hasPoint(intersection, true) &&
           (!inVectorBoundsOnly || line.hasPoint(intersection, inVectorBoundsOnly))
         ) {
-          // const intersectionVector: Vector = new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersection) as Vector;
-          //  intersectionPoints.push(intersection);
           intersectionPoints.push({ edgeIndex: i, intersectionPoint: intersection });
         }
       }

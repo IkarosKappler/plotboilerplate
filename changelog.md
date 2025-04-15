@@ -9,13 +9,14 @@ Imminent todos:
 - Add googley eyes to the animated metaballs demo.
 - check automatic darkmode detection
 
-- VEllipse.normalAt(angle,length): length not used!!!
-- Create VEllipseHelper (only VEllipseSectorHelper exists)
 - Extend Demo '32-ellipse-to-bezier' with the new helper.
 
 * 2025-04-15
   - Demo basic-VEllipse: Removing custom handle lines and add VEllipseHelper.
   - Demo basic-VEllipseSector: Adding VEllipseSectorHelper and use its drawHandleLines method instead custom draw routine.
+  - Changed param of `VertTuple.moveTo` method from `Vertex` to `XYCoords`.
+  - Added method `VertTuple.move` method.
+  - Class `Line` now implements interface `Intersectable`.
 * 2025-04-14
   - Class `BezierPath` is now implementing interface `Intersectable`.
   - Added the `Vector.rotate(number)` method.

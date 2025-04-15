@@ -173,7 +173,6 @@ var VEllipse = /** @class */ (function () {
         var a = this.radiusH();
         var b = this.radiusV();
         return new Vertex_1.Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle)).rotate(this.rotation, this.center);
-        // return new Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle + this.rotation));
     };
     /**
      * Get the normal vector at the given angle.
@@ -189,7 +188,6 @@ var VEllipse = /** @class */ (function () {
      * @param {number=1.0} length - [optional, default=1] The length of the returned vector.
      */
     VEllipse.prototype.normalAt = function (angle, length) {
-        // const point: Vertex = this.vertAt(angle);
         var point = this.vertAt(angle - this.rotation); // HERE IS THE CORRECT BEHAVIOR!
         var foci = this.getFoci();
         // Calculate the angle between [point,focusA] and [point,focusB]
@@ -227,11 +225,6 @@ var VEllipse = /** @class */ (function () {
      */
     VEllipse.prototype.tangentAt = function (angle, length) {
         var normal = this.normalAt(angle, length);
-        // TODO: cleanup
-        // const normal: Vector = this.normalAt(angle - this.rotation, length);
-        // Rotate the normal by 90 degrees, then it is the tangent.
-        // normal.b.rotate(Math.PI / 2, normal.a);
-        // return normal;
         return normal.inv().perp();
     };
     /**
@@ -363,8 +356,6 @@ var VEllipse = /** @class */ (function () {
             // Calculate angle
             var lineFromCenter = new Line_1.Line(_this.center, vert);
             var angle = lineFromCenter.angle();
-            // console.log("angle", (angle / Math.PI) * 180.0);
-            // const angle = Math.random() * Math.PI * 2; // TODO
             // Calculate tangent at angle
             return _this.tangentAt(angle);
         });
@@ -382,7 +373,7 @@ var VEllipse = /** @class */ (function () {
         // Math by Luc Maisonobe
         //    http://www.spaceroots.org/documents/ellipse/node22.html
         // Note that ellipses with radiusH=0 or radiusV=0 cannot be represented as Bézier curves.
-        // Return a single line here (as a Bézier curve)
+        // Return a single line here (as a Bézier curve)?
         // if (Math.abs(this.radiusV()) < 0.00001) {
         //   const radiusH = this.radiusH();
         //   return [

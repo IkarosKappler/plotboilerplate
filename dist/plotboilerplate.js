@@ -450,7 +450,10 @@ class AlloyFinger {
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2023-10-06 Adding the `BezierPath.toPathPoints()` method.
  * @modified 2023-10-07 Adding the `BezierPath.fromCurve(CubicBezierCurve)` static function.
- * @version 2.6.0
+ * @modified 2025-04-09 Added the `BezierPath.move` method to match the convention – which just calls `translate`.
+ * @modified 2025-04-09 Modified the `BezierPath.translate` method: chaning parameter `Vertex` to more generalized `XYCoords`.
+ * @modified 2025-04-14 Class `BezierPath` is now implementing interface `Intersectable`.
+ * @version 2.7.0
  *
  * @file BezierPath
  * @public
@@ -661,7 +664,7 @@ var BezierPath = /** @class */ (function () {
      * Move the whole bezier path by the given (x,y)-amount.
      *
      * @method translate
-     * @param {Vertex} amount - The amount to be added (amount.x and amount.y)
+     * @param {XYCoords} amount - The amount to be added (amount.x and amount.y)
      *                          to each vertex of the curve.
      * @instance
      * @memberof BezierPath
@@ -679,6 +682,19 @@ var BezierPath = /** @class */ (function () {
         curve.getEndPoint().add(amount);
         this.updateArcLengths();
         return this;
+    };
+    /**
+     * Move the whole bezier path by the given (x,y)-amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to be added (amount.x and amount.y)
+     *                          to each vertex of the curve.
+     * @instance
+     * @memberof BezierPath
+     * @return {BezierPath} this for chaining
+     **/
+    BezierPath.prototype.move = function (amount) {
+        return this.translate(amount);
     };
     /**
      * Scale the whole bezier path by the given uniform factor.
@@ -890,6 +906,38 @@ var BezierPath = /** @class */ (function () {
         var relativeU = u - uResult.uPart;
         return bCurve.getPerpendicular(relativeU);
     };
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get all line intersections with this shape.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections with the shape's outline.
+     */
+    BezierPath.prototype.lineIntersections = function (line, inVectorBoundsOnly) {
+        if (inVectorBoundsOnly === void 0) { inVectorBoundsOnly = false; }
+        return this.bezierCurves.reduce(function (accu, curCurve) {
+            return accu.concat(curCurve.lineIntersections(line, inVectorBoundsOnly));
+        }, []);
+    };
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    BezierPath.prototype.lineIntersectionTangents = function (line, inVectorBoundsOnly) {
+        if (inVectorBoundsOnly === void 0) { inVectorBoundsOnly = false; }
+        return this.bezierCurves.reduce(function (accu, curCurve) {
+            return accu.concat(curCurve.lineIntersectionTangents(line, inVectorBoundsOnly));
+        }, []);
+    };
+    //--- END --- Implement interface `Intersectable`
     /**
      * This is a helper function to locate the curve index for a given
      * absolute path position u.
@@ -1692,7 +1740,8 @@ exports.Bounds = Bounds;
  * @modified 2022-08-15 Added the `containsPoint` function.
  * @modified 2022-08-23 Added the `lineIntersection` function.
  * @modified 2022-08-23 Added the `closestPoint` function.
- * @version  1.4.0
+ * @modified 2025-04-09 Added the `Circle.move(amount: XYCoords)` method.
+ * @version  1.5.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Circle = void 0;
@@ -1729,6 +1778,19 @@ var Circle = /** @class */ (function () {
         this.center = center;
         this.radius = radius;
     }
+    /**
+     * Move the circle by the given amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof Circle
+     * @return {Circle} this for chaining
+     **/
+    Circle.prototype.move = function (amount) {
+        this.center.add(amount);
+        return this;
+    };
     /**
      * Check if the given circle is fully contained inside this circle.
      *
@@ -2004,7 +2066,8 @@ exports.Circle = Circle;
  * @modified 2024-03-08 Added the `containsAngle` method.
  * @modified 2024-03-09 Added the `circleSectorIntersection` method to find coherent sector intersections..
  * @modified 2024-03-09 Added the `angleAt` method to determine any angle at some ratio.
- * @modified 2025-04-02 Adding `CircleSector.lineIntersections` and `CircleSector.lineIntersectionTangents` and implementing `Intersectable`.
+ * @modified 2025-04-02 Adding the `CircleSector.lineIntersections` and `CircleSector.lineIntersectionTangents` and implementing `Intersectable`.
+ * @modified 2025-04-09 Adding the `CircleSector.move()` method.
  * @version  1.2.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -2043,6 +2106,19 @@ var CircleSector = /** @class */ (function () {
         this.startAngle = startAngle;
         this.endAngle = endAngle;
     }
+    /**
+     * Move the circle sector by the given amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof CircleSector
+     * @return {CircleSector} this for chaining
+     **/
+    CircleSector.prototype.move = function (amount) {
+        this.circle.move(amount);
+        return this;
+    };
     /**
      * Checks wether the given angle (must be inside 0 and PI*2) is contained inside this sector.
      *
@@ -2305,7 +2381,13 @@ exports.CircleSector = CircleSector;
  * @modified 2022-10-17 The `CubicBezierCurve` class now implements the new `PathSegment` interface.
  * @modified 2023-09-30 Added the function `CubicbezierCurve.getSubCurve(number,number)` – similar to `getSubCurveAt(...)` but with absolute position parameters.
  * @modified 2023-10-07 Added the `trimEnd`, `trimEndAt`, `trimStart`, `trimStartAt` methods.
- * @version 2.8.0
+ * @modified 2025-04-09 Added the `CubicBezierCurve.move` method to match the convention – which just calls `translate`.
+ * @modified 2025-04-09 Modified the `CubicBezierCurve.translate` method: chaning parameter `Vertex` to more generalized `XYCoords`.
+ * @modified 2025-04-13 Changed visibility of `CubicBezierCurve.utils` from 'private' to  'public'.
+ * @modified 2025-04-13 Added helper function `CubicBezierCurve.utils.bezierCoeffs`.
+ * @modified 2025-04-13 Added helper functopn `CubicBezierCurve.utils.sgn(number)` for division safe sign calculation.
+ * @modified 2025-03-13 Class `CubicBezierCurve` is now implementing interface `Intersectable`.
+ * @version 2.9.0
  *
  * @file CubicBezierCurve
  * @public
@@ -2400,7 +2482,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * Translate the whole curve by the given {x,y} amount: moves all four points.
      *
      * @method translate
-     * @param {Vertex} amount - The amount to translate this curve by.
+     * @param {XYCoords} amount - The amount to translate this curve by.
      * @instance
      * @memberof CubicBezierCurve
      * @return {CubicBezierCurve} this (for chaining).
@@ -2411,6 +2493,18 @@ var CubicBezierCurve = /** @class */ (function () {
         this.endControlPoint.add(amount);
         this.endPoint.add(amount);
         return this;
+    };
+    /**
+     * Translate the whole curve by the given {x,y} amount: moves all four points.
+     *
+     * @method translate
+     * @param {XYCoords} amount - The amount to translate this curve by.
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {CubicBezierCurve} this (for chaining).
+     **/
+    CubicBezierCurve.prototype.move = function (amount) {
+        return this.translate(amount);
     };
     /**
      * Reverse this curve, means swapping start- and end-point and swapping
@@ -2796,17 +2890,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @return {CubicBezierCurve} The sub curve as a new curve.
      **/
     CubicBezierCurve.prototype.getSubCurveAt = function (tStart, tEnd) {
-        // const startVec: Vector = new Vector(this.getPointAt(tStart), this.getTangentAt(tStart));
-        // const endVec: Vector = new Vector(this.getPointAt(tEnd), this.getTangentAt(tEnd).inv());
-        // // Tangents are relative. Make absolute.
-        // startVec.b.add(startVec.a);
-        // endVec.b.add(endVec.a);
-        // // This 'splits' the curve at the given point at t.
-        // startVec.scale(0.33333333 * (tEnd - tStart));
-        // endVec.scale(0.33333333 * (tEnd - tStart));
-        // // Draw the bezier curve
-        // // pb.draw.cubicBezier( startVec.a, endVec.a, startVec.b, endVec.b, '#8800ff', 2 );
-        // return new CubicBezierCurve(startVec.a, endVec.a, startVec.b, endVec.b);
+        // This 'splits' the curve at the given point at t.
         var subCurbePoints = CubicBezierCurve.utils.getSubCurvePointsAt(this, tStart, tEnd);
         return new CubicBezierCurve(subCurbePoints[0], subCurbePoints[1], subCurbePoints[2], subCurbePoints[3]);
     };
@@ -2898,6 +2982,73 @@ var CubicBezierCurve = /** @class */ (function () {
         return this.endControlPoint;
     };
     //---END PathSegment-------------------------
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get all line intersections with this shape.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections with the shape outline.
+     */
+    CubicBezierCurve.prototype.lineIntersections = function (line, inVectorBoundsOnly) {
+        var _this = this;
+        if (inVectorBoundsOnly === void 0) { inVectorBoundsOnly = false; }
+        var intersectionTs = this.lineIntersectionTs(line);
+        var intersectionPoints = intersectionTs.map(function (t) {
+            return _this.getPointAt(t);
+        });
+        if (inVectorBoundsOnly) {
+            // const maxDist = line.length();
+            return intersectionPoints.filter(function (vert) { return line.hasPoint(vert, true); });
+        }
+        else {
+            return intersectionPoints;
+        }
+    };
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    CubicBezierCurve.prototype.lineIntersectionTangents = function (line, inVectorBoundsOnly) {
+        var _this = this;
+        if (inVectorBoundsOnly === void 0) { inVectorBoundsOnly = false; }
+        var intersectionTs = this.lineIntersectionTs(line);
+        var intersectionTangents = intersectionTs.map(function (t) {
+            var startPoint = _this.getPointAt(t);
+            var endPoint = _this.getTangentAt(t);
+            return new Vector_1.Vector(startPoint, endPoint.add(startPoint));
+        });
+        if (inVectorBoundsOnly) {
+            return intersectionTangents.filter(function (vec) { return line.hasPoint(vec.a, true); });
+        }
+        else {
+            return intersectionTangents;
+        }
+    };
+    //--- END --- Implement interface `Intersectable`
+    CubicBezierCurve.prototype.lineIntersectionTs = function (line) {
+        var A = line.b.y - line.a.y; // A=y2-y1
+        var B = line.a.x - line.b.x; // B=x1-x2
+        var C = line.a.x * (line.a.y - line.b.y) + line.a.y * (line.b.x - line.a.x); //C=x1*(y1-y2)+y1*(x2-x1)
+        // var bx = bezierCoeffs(px[0], px[1], px[2], px[3]);
+        // var by = bezierCoeffs(py[0], py[1], py[2], py[3]);
+        var bx = CubicBezierCurve.utils.bezierCoeffs(this.startPoint.x, this.startControlPoint.x, this.endControlPoint.x, this.endPoint.x);
+        var by = CubicBezierCurve.utils.bezierCoeffs(this.startPoint.y, this.startControlPoint.y, this.endControlPoint.y, this.endPoint.y);
+        var poly = Array(4);
+        poly[0] = A * bx[0] + B * by[0]; /*t^3*/
+        poly[1] = A * bx[1] + B * by[1]; /*t^2*/
+        poly[2] = A * bx[2] + B * by[2]; /*t*/
+        poly[3] = A * bx[3] + B * by[3] + C; /*1*/
+        var roots = CubicBezierCurve.utils.cubicRoots(poly);
+        return roots.filter(function (root) { return root != -1; });
+    };
     /**
      * Check if this and the specified curve are equal.<br>
      * <br>
@@ -3087,6 +3238,78 @@ var CubicBezierCurve = /** @class */ (function () {
             startVec.scale(0.33333333 * (tEnd - tStart));
             endVec.scale(0.33333333 * (tEnd - tStart));
             return [startVec.a, endVec.a, startVec.b, endVec.b];
+        },
+        /**
+         * Compute the cubic roots for the given cubic polynomial coefficients.
+         *
+         * Based on
+         *   http://mysite.verizon.net/res148h4j/javascript/script_exact_cubic.html#the%20source%20code
+         * Inspired by
+         *   https://www.particleincell.com/2013/cubic-line-intersection/
+         * Thanks to Stephan Schmitt and Particle-In-Cell!
+         *
+         * @param poly
+         * @returns
+         */
+        cubicRoots: function (poly) {
+            var a = poly[0];
+            var b = poly[1];
+            var c = poly[2];
+            var d = poly[3];
+            var A = b / a;
+            var B = c / a;
+            var C = d / a;
+            var S, T, Im;
+            var Q = (3 * B - Math.pow(A, 2)) / 9;
+            var R = (9 * A * B - 27 * C - 2 * Math.pow(A, 3)) / 54;
+            var D = Math.pow(Q, 3) + Math.pow(R, 2); // polynomial discriminant
+            var ts = []; // Array();
+            if (D >= 0) {
+                // complex or duplicate roots
+                S = CubicBezierCurve.utils.sgn(R + Math.sqrt(D)) * Math.pow(Math.abs(R + Math.sqrt(D)), 1 / 3);
+                T = CubicBezierCurve.utils.sgn(R - Math.sqrt(D)) * Math.pow(Math.abs(R - Math.sqrt(D)), 1 / 3);
+                ts[0] = -A / 3 + (S + T); // real root
+                ts[1] = -A / 3 - (S + T) / 2; // real part of complex root
+                ts[2] = -A / 3 - (S + T) / 2; // real part of complex root
+                Im = Math.abs((Math.sqrt(3) * (S - T)) / 2); // complex part of root pair
+                // Mark complex roots to be discarded
+                if (Im != 0) {
+                    ts[1] = -1;
+                    ts[2] = -1;
+                }
+            } // distinct real roots
+            else {
+                var th = Math.acos(R / Math.sqrt(-Math.pow(Q, 3)));
+                ts[0] = 2 * Math.sqrt(-Q) * Math.cos(th / 3) - A / 3;
+                ts[1] = 2 * Math.sqrt(-Q) * Math.cos((th + 2 * Math.PI) / 3) - A / 3;
+                ts[2] = 2 * Math.sqrt(-Q) * Math.cos((th + 4 * Math.PI) / 3) - A / 3;
+                Im = 0.0;
+            }
+            // Discard all t's out of spec and sort the rest
+            return ts.filter(function (t) { return t >= 0 && t <= 1.0; }).sort();
+        },
+        /**
+         * Compute the Bézier coefficients from the given Bézier point coordinates.
+         *
+         * @param {number} p0 - The start point coordinate.
+         * @param {number} p1 - The start point coordinate.
+         * @param {number} p2 - The start point coordinate.
+         * @param {number} p3 - The start point coordinate.
+         * @returns {Array<number>}
+         */
+        bezierCoeffs: function (p0, p1, p2, p3) {
+            var coeffs = Array(4);
+            coeffs[0] = -p0 + 3 * p1 + -3 * p2 + p3;
+            coeffs[1] = 3 * p0 - 6 * p1 + 3 * p2;
+            coeffs[2] = -3 * p0 + 3 * p1;
+            coeffs[3] = p0;
+            return coeffs;
+        },
+        /**
+         * sign of number, but is division safe: no zero returned :)
+         */
+        sgn: function (x) {
+            return x < 0.0 ? -1 : 1;
         }
     };
     return CubicBezierCurve;
@@ -5439,11 +5662,9 @@ var PlotBoilerplate = /** @class */ (function () {
             if (this.drawConfig.drawHandleLines) {
                 draw.setCurrentId("".concat(d.uid, "_e0"));
                 draw.setCurrentClassName("".concat(d.className, "-v-line"));
-                // draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
                 draw.handleLine(d.center.clone().add(0, d.signedRadiusV()).rotate(d.rotation, d.center), d.axis); // , "#c8c8c8");
                 draw.setCurrentId("".concat(d.uid, "_e1"));
                 draw.setCurrentClassName("".concat(d.className, "-h-line"));
-                // draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
                 draw.handleLine(d.center.clone().add(d.signedRadiusH(), 0).rotate(d.rotation, d.center), d.axis); // , "#c8c8c8");
             }
             draw.setCurrentId(d.uid);
@@ -6650,6 +6871,7 @@ exports["default"] = PlotBoilerplate;
  * @modified 2025-02-12 Added the `containsVerts` method to test multiple vertices for containment.
  * @modified 2025-03-28 Added the `Polygon.utils.locateLineIntersecion` static helper method.
  * @modified 2025-03-28 Added the `Polygon.lineIntersectionTangents` method.
+ * @modified 2025-04-09 Added the `Polygon.getCentroid` method.
  * @version 1.15.0
  *
  * @file Polygon
@@ -7031,6 +7253,38 @@ var Polygon = /** @class */ (function () {
         }
         center.x /= this.vertices.length;
         center.y /= this.vertices.length;
+        return center;
+    };
+    /**
+     * Get centroid.
+     * Centroids define the barycenter of any non self-intersecting convex polygon.
+     *
+     * If the polygon is self intersecting or non konvex then the barycenter is not well defined.
+     *
+     * https://mathworld.wolfram.com/PolygonCentroid.html
+     *
+     * @method getCentroid
+     * @instance
+     * @memberof Polygon
+     * @returns {Vertex|null}
+     */
+    Polygon.prototype.getCentroid = function () {
+        if (this.vertices.length === 0) {
+            return null;
+        }
+        var center = new Vertex_1.Vertex(0.0, 0.0);
+        var n = this.vertices.length;
+        for (var i = 0; i < n; i++) {
+            // center.add(this.vertices[i]);
+            var cur = this.vertices[i];
+            var next = this.vertices[(i + 1) % n];
+            var factor = cur.x * next.y - next.x * cur.y;
+            center.x += (cur.x + next.x) * factor;
+            center.y += (cur.y + next.y) * factor;
+        }
+        var area = this.area();
+        center.x *= 1 / (6 * area);
+        center.y *= 1 / (6 * area);
         return center;
     };
     //--- BEGIN --- Implement interface `Intersectable`
@@ -8126,7 +8380,6 @@ var VEllipse = /** @class */ (function () {
         var a = this.radiusH();
         var b = this.radiusV();
         return new Vertex_1.Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle)).rotate(this.rotation, this.center);
-        // return new Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle + this.rotation));
     };
     /**
      * Get the normal vector at the given angle.
@@ -8142,7 +8395,6 @@ var VEllipse = /** @class */ (function () {
      * @param {number=1.0} length - [optional, default=1] The length of the returned vector.
      */
     VEllipse.prototype.normalAt = function (angle, length) {
-        // const point: Vertex = this.vertAt(angle);
         var point = this.vertAt(angle - this.rotation); // HERE IS THE CORRECT BEHAVIOR!
         var foci = this.getFoci();
         // Calculate the angle between [point,focusA] and [point,focusB]
@@ -8180,10 +8432,6 @@ var VEllipse = /** @class */ (function () {
      */
     VEllipse.prototype.tangentAt = function (angle, length) {
         var normal = this.normalAt(angle, length);
-        // const normal: Vector = this.normalAt(angle - this.rotation, length);
-        // Rotate the normal by 90 degrees, then it is the tangent.
-        // normal.b.rotate(Math.PI / 2, normal.a);
-        // return normal;
         return normal.inv().perp();
     };
     /**
@@ -8315,8 +8563,6 @@ var VEllipse = /** @class */ (function () {
             // Calculate angle
             var lineFromCenter = new Line_1.Line(_this.center, vert);
             var angle = lineFromCenter.angle();
-            // console.log("angle", (angle / Math.PI) * 180.0);
-            // const angle = Math.random() * Math.PI * 2; // TODO
             // Calculate tangent at angle
             return _this.tangentAt(angle);
         });
@@ -8334,7 +8580,7 @@ var VEllipse = /** @class */ (function () {
         // Math by Luc Maisonobe
         //    http://www.spaceroots.org/documents/ellipse/node22.html
         // Note that ellipses with radiusH=0 or radiusV=0 cannot be represented as Bézier curves.
-        // Return a single line here (as a Bézier curve)
+        // Return a single line here (as a Bézier curve)?
         // if (Math.abs(this.radiusV()) < 0.00001) {
         //   const radiusH = this.radiusH();
         //   return [
@@ -8481,6 +8727,8 @@ exports.VEllipse = VEllipse;
  * @modified 2025-04-01 Adapting a the `toCubicBezier` calculation to match an underlying change in the vertAt and tangentAt calculation of ellipses (was required to hamonize both methods with circles).
  * @modified 2025-04-02 Adding `VEllipseSector.containsAngle` method.
  * @modified 2025-04-02 Adding `VEllipseSector.lineIntersections` and `VEllipseSector.lineIntersectionTangents` and implementing `Intersectable`.
+ * @modified 2025-04-07 Adding value wrapping (0 to TWO_PI) to the `VEllipseSector.containsAngle` method.
+ * @modified 2025-04-09 Adding the `VEllipseSector.move` method.
  * @version  1.2.0
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -8526,6 +8774,19 @@ var VEllipseSector = /** @class */ (function () {
         this.endAngle = geomutils_1.geomutils.wrapMinMax(endAngle, 0, Math.PI * 2);
     }
     /**
+     * Move the ellipse sector by the given amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof VEllipseSector
+     * @return {VEllipseSector} this for chaining
+     **/
+    VEllipseSector.prototype.move = function (amount) {
+        this.ellipse.move(amount);
+        return this;
+    };
+    /**
      * Checks wether the given angle (must be inside 0 and PI*2) is contained inside this sector.
      *
      * @param {number} angle - The numeric angle to check.
@@ -8535,14 +8796,22 @@ var VEllipseSector = /** @class */ (function () {
      * @return {boolean} True if (and only if) this sector contains the given angle.
      */
     VEllipseSector.prototype.containsAngle = function (angle) {
-        // angle -= this.ellipse.rotation;
-        angle = geomutils_1.geomutils.wrapMinMax(angle - this.ellipse.rotation, 0, Math.PI * 2);
-        if (this.startAngle <= this.endAngle) {
-            return angle >= this.startAngle && angle < this.endAngle;
+        angle = geomutils_1.geomutils.mapAngleTo2PI(angle); // wrapMinMax(angle, 0, Math.PI * 2);
+        var sAngle = geomutils_1.geomutils.mapAngleTo2PI(this.startAngle);
+        var eAngle = geomutils_1.geomutils.mapAngleTo2PI(this.endAngle);
+        // TODO: cleanup
+        // if (this.startAngle <= this.endAngle) {
+        //   return angle >= this.startAngle && angle < this.endAngle;
+        // } else {
+        //   // startAngle > endAngle
+        //   return angle >= this.startAngle || angle < this.endAngle;
+        // }
+        if (sAngle <= eAngle) {
+            return angle >= sAngle && angle < eAngle;
         }
         else {
             // startAngle > endAngle
-            return angle >= this.startAngle || angle < this.endAngle;
+            return angle >= sAngle || angle < eAngle;
         }
     };
     //--- BEGIN --- Implement interface `Intersectable`
@@ -8566,7 +8835,7 @@ var VEllipseSector = /** @class */ (function () {
         return ellipseIntersections.filter(function (intersectionPoint) {
             tmpLine.b.set(intersectionPoint);
             var lineAngle = tmpLine.angle();
-            return _this.containsAngle(lineAngle);
+            return _this.containsAngle(lineAngle - _this.ellipse.rotation);
         });
     };
     /**
@@ -8848,7 +9117,8 @@ exports.VEllipseSector = VEllipseSector;
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Vector.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-10-25 Added the `getOrthogonal` method.
- * @version  1.5.0
+ * @modified 2025-04-14 Added the `Vector.rotate(number)` method.
+ * @version  1.6.0
  *
  * @file Vector
  * @public
@@ -8978,6 +9248,19 @@ var Vector = /** @class */ (function (_super) {
         startPoint.y = tmp;
         return new Vector(linePoint, startPoint.add(this.a));
     };
+    /**
+     * Rotate this vector by the given angle around the first point `a`.
+     *
+     * @name rotate
+     * @method rotate
+     * @return {Vector} this - for chaining.
+     * @instance
+     * @memberof Vector
+     */
+    Vector.prototype.rotate = function (angle) {
+        this.b.rotate(angle, this.a);
+        return this;
+    };
     Vector.utils = {
         /**
          * Generate a four-point arrow head, starting at the vector end minus the
@@ -9041,6 +9324,8 @@ exports.Vector = Vector;
  * @modified 2024-09-10 Adding the optional `epsilon` param to the `hasPoint` method.
  * @modified 2024-12-02 Added the `epsilon` param to the `colinear` method. Default is 1.0e-6.
  * @modified 2025-03-31 Added the `VertTuple.revert` method.
+ * @modified 2025-04-15 Changed param of `VertTuple.moveTo` method from `Vertex` to `XYCoords`.
+ * @modified 2025-04-15 Added method `VertTuple.move` method.
  * @version 1.4.0
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -9164,7 +9449,7 @@ var VertTuple = /** @class */ (function () {
      * Move this line to a new location.
      *
      * @method moveTo
-     * @param {Vertex} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
+     * @param {XYCoords} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
      * @return {VertTuple} this
      * @instance
      * @memberof VertTuple
@@ -9173,6 +9458,20 @@ var VertTuple = /** @class */ (function () {
         var diff = this.a.difference(newA);
         this.a.add(diff);
         this.b.add(diff);
+        return this;
+    };
+    /**
+     * Move this line by the given amount
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move both point of this tuple.
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.move = function (amount) {
+        this.a.add(amount);
+        this.b.add(amount);
         return this;
     };
     /**
@@ -9399,7 +9698,8 @@ exports.VertTuple = VertTuple;
  * @modified 2024-03-08 Added the optional `precision` param to the `toString` method.
  * @modified 2024-12-17 Outsourced the euclidean distance calculation of `Vertex.distance` to `geomutils.dist4`.
  * @modified 2025-03-24 Making the second parameter `center` of the `Vertex.rotate` method optional.
- * @version  2.9.2
+ * @modified 2025-04-13 Adding the `Vertex.move(amount: XYCoords)` method (does the same as `add`, added by naming convention).
+ * @version  2.10.0
  *
  * @file Vertex
  * @public
@@ -9595,6 +9895,21 @@ var Vertex = /** @class */ (function () {
             }
         }
         return this;
+    };
+    /**
+     * Move this point by the given amount.
+     *
+     * This method just calls `add(amount).
+     *
+     *
+     * @method move
+     * @param {Vertex} amount - The amount to move this vertex.
+     * @return {Vertex} this - For chaining.
+     * @instance
+     * @memberof Vertex
+     */
+    Vertex.prototype.move = function (amount) {
+        return this.add(amount);
     };
     /**
      * Add the passed amounts to the x- and y- components of this vertex.

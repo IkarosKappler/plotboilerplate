@@ -16,14 +16,16 @@
  * @modified 2022-10-09 Changed the actual return value of the `intersection` function to null (was undefined before).
  * @modified 2022-10-17 Adding these methods from the `PathSegment` interface: getStartPoint, getEndPoint, revert.
  * @modified 2023-09-25 Changed param type of `intersection()` from Line to VertTuple.
- * @version  2.3.0
+ * @modified 2025-04-15 Class `Line` now implements interface `Intersectable`.
+ * @version  2.4.0
  *
  * @file Line
  * @public
  **/
+import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { PathSegment, SVGSerializable } from "./interfaces";
+import { Intersectable, PathSegment, SVGSerializable } from "./interfaces";
 /**
  * @classdesc A line consists of two vertices a and b.<br>
  * <br>
@@ -32,7 +34,7 @@ import { PathSegment, SVGSerializable } from "./interfaces";
  *
  * @requires Vertex
  */
-export declare class Line extends VertTuple<Line> implements SVGSerializable, PathSegment {
+export declare class Line extends VertTuple<Line> implements Intersectable, PathSegment, SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
      **/
@@ -96,4 +98,26 @@ export declare class Line extends VertTuple<Line> implements SVGSerializable, Pa
      * @return {PathSegment} This path segment instance (for chaining).
      */
     reverse(): Line;
+    /**
+     * Get all line intersections with this polygon.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+     *
+     * See demo `47-closest-vector-projection-on-polygon` for how it works.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     */
+    lineIntersections(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vertex>;
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param inVectorBoundsOnly
+     * @returns
+     */
+    lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vector>;
 }

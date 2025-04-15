@@ -170,7 +170,6 @@ export class VEllipse {
         const a = this.radiusH();
         const b = this.radiusV();
         return new Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle)).rotate(this.rotation, this.center);
-        // return new Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle + this.rotation));
     }
     /**
      * Get the normal vector at the given angle.
@@ -186,7 +185,6 @@ export class VEllipse {
      * @param {number=1.0} length - [optional, default=1] The length of the returned vector.
      */
     normalAt(angle, length) {
-        // const point: Vertex = this.vertAt(angle);
         const point = this.vertAt(angle - this.rotation); // HERE IS THE CORRECT BEHAVIOR!
         const foci = this.getFoci();
         // Calculate the angle between [point,focusA] and [point,focusB]
@@ -224,10 +222,6 @@ export class VEllipse {
      */
     tangentAt(angle, length) {
         const normal = this.normalAt(angle, length);
-        // const normal: Vector = this.normalAt(angle - this.rotation, length);
-        // Rotate the normal by 90 degrees, then it is the tangent.
-        // normal.b.rotate(Math.PI / 2, normal.a);
-        // return normal;
         return normal.inv().perp();
     }
     /**
@@ -356,8 +350,6 @@ export class VEllipse {
             // Calculate angle
             const lineFromCenter = new Line(this.center, vert);
             const angle = lineFromCenter.angle();
-            // console.log("angle", (angle / Math.PI) * 180.0);
-            // const angle = Math.random() * Math.PI * 2; // TODO
             // Calculate tangent at angle
             return this.tangentAt(angle);
         });
@@ -375,7 +367,7 @@ export class VEllipse {
         // Math by Luc Maisonobe
         //    http://www.spaceroots.org/documents/ellipse/node22.html
         // Note that ellipses with radiusH=0 or radiusV=0 cannot be represented as Bézier curves.
-        // Return a single line here (as a Bézier curve)
+        // Return a single line here (as a Bézier curve)?
         // if (Math.abs(this.radiusV()) < 0.00001) {
         //   const radiusH = this.radiusH();
         //   return [

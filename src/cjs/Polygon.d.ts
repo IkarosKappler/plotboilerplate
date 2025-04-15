@@ -483,6 +483,15 @@ export declare class Polygon implements Intersectable, SVGSerializable {
          * @return {number}
          */
         signedArea(vertices: Array<XYCoords>): number;
+        /**
+         * Find intersections of a line with a polygon (vertices).
+         *
+         * @param {VertTuple<any>} line - The line to find intersections with.
+         * @param {Array<Vertex>} vertices - The polygon's vertices.
+         * @param {boolean} isOpen - True if the polygon is open, false otherwise.
+         * @param {boolean} inVectorBoundsOnly - If only intersections in strict vector bounds should be returned.
+         * @returns
+         */
         locateLineIntersecion(line: VertTuple<any>, vertices: Array<Vertex>, isOpen: boolean, inVectorBoundsOnly: boolean): Array<{
             edgeIndex: number;
             intersectionPoint: Vertex;

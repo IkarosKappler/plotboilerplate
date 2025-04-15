@@ -22,7 +22,10 @@
  * @modified 2021-03-31 Fixed the issue with the new AlloyFinger (Typescript).
  * @modified 2022-02-03 Changing the element to catch events (eventCatcher instead of canvas).
  * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
- * @version  1.1.3
+ * @modified 2025-04-14 Added the `BezierPathInteractionHelper.drawHandleLines` method.
+ * @modified 2025-04-14 Fixing correct event types for touch events in `BezierPathInteractionHelper`.
+ * @modified 2025-04-14 BezierPathInteractionHelper: Changed default value of `HelperOptions.autoAdjustPaths` from `true` to `false`.
+ * @version  1.2.0
  *
  * @file BezierPathInteractionHelper
  * @public
@@ -165,6 +168,11 @@ export declare class BezierPathInteractionHelper {
      **/
     update(): void;
     /**
+     * Draw grey handle lines.
+     *
+     */
+    drawHandleLines(): void;
+    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used any more.
@@ -188,12 +196,6 @@ export declare class BezierPathInteractionHelper {
     private _removeDefaultPathListeners;
     private _updateMinDistance;
     static setPathAutoAdjust(path: BezierPath): void;
-    /**
-     * A helper function to add drag-start-listener to given vertices.
-     */
-    /**
-     * A helper function to remove drag-start-listener to given vertices.
-     */
     /**
      * A helper function to add drag-start listeners to all vertices of the given path.
      *

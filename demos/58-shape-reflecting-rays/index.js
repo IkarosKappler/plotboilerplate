@@ -43,24 +43,24 @@
     pb.drawConfig.circleSector.lineWidth = 2;
     pb.drawConfig.bezier.color = "rgba(128,128,128,0.5)";
     pb.drawConfig.bezier.lineWidth = 2;
+    pb.drawConfig.line.color = "rgba(128,128,128,0.5)";
+    pb.drawConfig.line.lineWidth = 2;
     // pb.drawConfig.drawHandleLines = false;
 
-    // Array<Polygon | Circle | Ellipse>
+    // Array<Polygon | Circle | VEllipse | Line | CircleSector | VEllipseSector | BezierPath>
     var shapes = [];
     var mainRay = new Vector(new Vertex(), new Vertex(250, 250).rotate(Math.random() * Math.PI));
-    // Array<Vector>
-    var rays = [];
     var ellipseHelper;
     var cicleSectorHelper;
     var ellipseSectorHelper;
     var bezierHelper;
-    // rays.push(mainRay);
 
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
       animate: params.getBoolean("animate", false),
-      rayThickness: 5.0,
-      iterations: 3
+      rayThickness: params.getNumber("rayThickness", 3.0),
+      iterations: params.getNumber("iterations", 6),
+      initialRayAngle: params.getNumber("initialRayAngle", 35.0)
     };
 
     // +---------------------------------------------------------------------------------
@@ -69,25 +69,58 @@
     var viewport = pb.viewport();
 
     var postDraw = function (draw, fill) {
-      var initialRays = getRayCollection(mainRay);
-      drawRays(draw, fill, initialRays);
+      var rayStepLength = mainRay.length();
+      var rayCollection = getRayCollection(mainRay);
+      var newRays = [];
       var numIter = Math.max(0, config.iterations); // Safeguard to avoid infinite loop
       for (var i = 0; i < numIter; i++) {
-        var raysByShapes = getRayIteration(initialRays);
-        // console.log("next ray iteration", raysByShapes);
-        raysByShapes.forEach(function (rays) {
-          drawRays(draw, fill, rays);
-        });
+        // console.log("numIter", numIter, "i", i, "rayCollection.length", rayCollection.length, "newRays.length", newRays.length);
+
+        // Set rays to normalized step
+        for (var j = 0; j < rayCollection.length; j++) {
+          rayCollection[j].setLength(rayStepLength);
+        }
+
+        drawRays(draw, fill, rayCollection, "rgba(192,192,192,0.25)");
+        newRays = getRayIteration(rayCollection);
+        // Crop original rays
+        for (var j = 0; j < rayCollection.length; j++) {
+          rayCollection[j].b.set(newRays[j].a);
+        }
+        if (i + 1 >= numIter) {
+          drawRays(draw, fill, rayCollection, "rgba(255,192,0,0.5)");
+        } else {
+          drawLines(draw, fill, rayCollection, "rgba(255,192,0,0.5)");
+        }
+        rayCollection = newRays;
+        // Move new rays one unit (pixel) into their new direction
+        // (avoid to reflect multiple times inside one single point)
+        for (var j = 0; j < rayCollection.length; j++) {
+          rayCollection[j].a.set(rayCollection[j].clone().setLength(1.0).b);
+        }
       }
+      // drawRays(draw, fill, rayCollection, "rgba(0,192,0,0.5)");
       ellipseHelper.drawHandleLines(draw, fill);
       cicleSectorHelper.drawHandleLines(draw, fill);
       ellipseSectorHelper.drawHandleLines(draw, fill);
       bezierHelper.drawHandleLines();
     };
 
-    var drawRays = function (draw, fill, rays) {
+    // var drawRayIteration = function (draw, fill, currentRays) {
+    //   var newRays = getRayIteration(currentRays);
+    //   // drawRays(draw, fill, newRays, "rgba(0,192,0,0.5)");
+    //   return newRays;
+    // };
+
+    var drawRays = function (draw, fill, rays, color) {
       rays.forEach(function (ray) {
-        draw.arrow(ray.a, ray.b, "orange", config.rayThickness);
+        draw.arrow(ray.a, ray.b, color, config.rayThickness);
+      });
+    };
+
+    var drawLines = function (draw, fill, rays, color) {
+      rays.forEach(function (ray) {
+        draw.line(ray.a, ray.b, color, config.rayThickness);
       });
     };
 
@@ -103,17 +136,34 @@
       // var rays = getRayCollection(mainRay);
       // Array<Vector[]>
       var resultVectors = [];
-      shapes.forEach(function (shape) {
+      rays.forEach(function (ray) {
         const reflectedRays = [];
-        rays.forEach(function (ray) {
+        shapes.forEach(function (shape) {
           var reflectedRay = findReflectedRay(shape, ray);
           if (reflectedRay != null) {
             reflectedRays.push(reflectedRay);
           }
         });
-        resultVectors.push(reflectedRays);
+        if (reflectedRays.length > 0) {
+          resultVectors.push(findClosestRay(ray.a, reflectedRays));
+        } else {
+          // Just expand input ray
+          resultVectors.push(ray.clone().moveTo(ray.b));
+        }
       });
       return resultVectors;
+    };
+
+    // Pre: rays.length > 0
+    var findClosestRay = function (sourcePoint, rays) {
+      var dist = sourcePoint.distance(rays[0].a);
+      var resultIndex = 0;
+      for (var i = 1; i < rays.length; i++) {
+        if (sourcePoint.distance(rays[i].a) < dist) {
+          resultIndex = i;
+        }
+      }
+      return rays[resultIndex];
     };
 
     /**
@@ -128,6 +178,7 @@
       // Find intersection with min distance
       if (
         shape instanceof Polygon ||
+        shape instanceof Line ||
         shape instanceof Circle ||
         shape instanceof VEllipse ||
         shape instanceof CircleSector ||
@@ -172,6 +223,8 @@
       var polygon = createRandomizedPolygon(4, viewport, true); // createClockwise=true
       polygon.scale(0.3, polygon.getCentroid());
 
+      var line = new Line(viewport.randomPoint(), viewport.randomPoint());
+
       // Create circle and ellpise
       var circle = new Circle(new Vertex(-25, -15), 90.0);
       var ellipse = new VEllipse(new Vertex(25, 15), new Vertex(150, 200), -Math.PI * 0.3);
@@ -186,7 +239,7 @@
       );
       bezierHelper = new BezierPathInteractionHelper(pb, [bezierPath]);
 
-      shapes = [polygon, circle, ellipse, circleSector, ellipseSector, bezierPath];
+      shapes = [polygon, circle, ellipse, circleSector, ellipseSector, bezierPath, line];
       // Align all shapes on a circle :)
       var alignCircle = new Circle(new Vertex(), viewport.getMinDimension() * 0.333);
       shapes.forEach(function (shape, i) {
@@ -232,7 +285,9 @@
 
     var getRayCollection = function (baseRay) {
       var numRays = 10;
-      var rangeAngle = 35.0 * DEG_TO_RAD;
+      // var rangeAngle = 35.0 * DEG_TO_RAD;
+      var rangeAngle = config.initialRayAngle * DEG_TO_RAD;
+
       var rays = [];
       for (var i = 0; i < numRays; i++) {
         rays.push(baseRay.clone().rotate(-rangeAngle / 2.0 + rangeAngle * (i / numRays)));
@@ -279,8 +334,14 @@
       gui.add(config, "animate").name("animate").title("Animate the ray?")
         .onChange( function() { toggleAnimation(); });
       // prettier-ignore
-      gui.add(config, "rayThickness").name("rayThickness").title("Line thickness of rays.")
+      gui.add(config, "rayThickness").min(1.0).max(10.0).step(0.5).name("rayThickness").title("Line thickness of rays.")
         .onChange( function() { pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "iterations").min(1).max(20).step(1).name("iterations").title("Number of iterations.")
+        .onChange( function() { pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "initialRayAngle").min(1.0).max(360).step(1).name("initialRayAngle").title("Angle between all initial rays.")
+      .onChange( function() { pb.redraw() });
     }
 
     pb.config.postDraw = postDraw;

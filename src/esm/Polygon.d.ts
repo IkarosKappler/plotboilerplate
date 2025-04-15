@@ -34,6 +34,7 @@
  * @modified 2025-02-12 Added the `containsVerts` method to test multiple vertices for containment.
  * @modified 2025-03-28 Added the `Polygon.utils.locateLineIntersecion` static helper method.
  * @modified 2025-03-28 Added the `Polygon.lineIntersectionTangents` method.
+ * @modified 2025-04-09 Added the `Polygon.getCentroid` method.
  * @version 1.15.0
  *
  * @file Polygon
@@ -302,7 +303,21 @@ export declare class Polygon implements Intersectable, SVGSerializable {
      * @memberof Polygon
      * @return {Vertex|null} `null` is no vertices are available.
      */
-    getMeanCenter(): Vertex;
+    getMeanCenter(): Vertex | null;
+    /**
+     * Get centroid.
+     * Centroids define the barycenter of any non self-intersecting convex polygon.
+     *
+     * If the polygon is self intersecting or non konvex then the barycenter is not well defined.
+     *
+     * https://mathworld.wolfram.com/PolygonCentroid.html
+     *
+     * @method getCentroid
+     * @instance
+     * @memberof Polygon
+     * @returns {Vertex|null}
+     */
+    getCentroid(): Vertex | null;
     /**
      * Get all line intersections with this polygon.
      *

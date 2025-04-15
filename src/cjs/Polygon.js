@@ -465,23 +465,7 @@ var Polygon = /** @class */ (function () {
      */
     Polygon.prototype.lineIntersections = function (line, inVectorBoundsOnly) {
         if (inVectorBoundsOnly === void 0) { inVectorBoundsOnly = false; }
-        // // Find the intersections of all lines inside the edge bounds
-        // const intersectionPoints: Array<Vertex> = [];
-        // for (var i = 0; i < this.vertices.length; i++) {
-        //   const polyLine = new Line(this.vertices[i], this.vertices[(i + 1) % this.vertices.length]);
-        //   const intersection = polyLine.intersection(line);
-        //   // true => only inside bounds
-        //   // ignore last edge if open
-        //   if (
-        //     (!this.isOpen || i + 1 !== this.vertices.length) &&
-        //     intersection !== null &&
-        //     polyLine.hasPoint(intersection, true) &&
-        //     (!inVectorBoundsOnly || line.hasPoint(intersection, inVectorBoundsOnly))
-        //   ) {
-        //     intersectionPoints.push(intersection);
-        //   }
-        // }
-        // return intersectionPoints;
+        // Find the intersections of all lines inside the edge bounds
         return Polygon.utils
             .locateLineIntersecion(line, this.vertices, this.isOpen, inVectorBoundsOnly)
             .map(function (intersectionTuple) { return intersectionTuple.intersectionPoint; });
@@ -498,25 +482,7 @@ var Polygon = /** @class */ (function () {
     Polygon.prototype.lineIntersectionTangents = function (line, inVectorBoundsOnly) {
         var _this = this;
         if (inVectorBoundsOnly === void 0) { inVectorBoundsOnly = false; }
-        // // Find the intersections of all lines inside the edge bounds
-        // const intersectionPoints: Array<Vector> = [];
-        // for (var i = 0; i < this.vertices.length; i++) {
-        //   const polyLine = new Line(this.vertices[i], this.vertices[(i + 1) % this.vertices.length]);
-        //   const intersection = polyLine.intersection(line);
-        //   // true => only inside bounds
-        //   // ignore last edge if open
-        //   if (
-        //     (!this.isOpen || i + 1 !== this.vertices.length) &&
-        //     intersection !== null &&
-        //     polyLine.hasPoint(intersection, true) &&
-        //     (!inVectorBoundsOnly || line.hasPoint(intersection, inVectorBoundsOnly))
-        //   ) {
-        //     const intersectionVector: Vector = new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersection) as Vector;
-        //     //  intersectionPoints.push(intersection);
-        //     intersectionPoints.push(intersectionVector);
-        //   }
-        // }
-        // return intersectionPoints;
+        // Find the intersection tangents of all lines inside the edge bounds
         return Polygon.utils.locateLineIntersecion(line, this.vertices, this.isOpen, inVectorBoundsOnly).map(function (intersectionTuple) {
             var polyLine = _this.getEdgeAt(intersectionTuple.edgeIndex);
             return new Vector_1.Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersectionPoint);
@@ -689,7 +655,6 @@ var Polygon = /** @class */ (function () {
             // -> delete all vertices in between
             if (j - i > 2) {
                 // Means: there have been 'colinear vertices' in between
-                // console.log("Splice", "i", i, "j", j, i + 1, j - i - 1);
                 verts.splice(i + 1, j - i - 2);
             }
             i++;
@@ -886,6 +851,15 @@ var Polygon = /** @class */ (function () {
             }
             return sum;
         },
+        /**
+         * Find intersections of a line with a polygon (vertices).
+         *
+         * @param {VertTuple<any>} line - The line to find intersections with.
+         * @param {Array<Vertex>} vertices - The polygon's vertices.
+         * @param {boolean} isOpen - True if the polygon is open, false otherwise.
+         * @param {boolean} inVectorBoundsOnly - If only intersections in strict vector bounds should be returned.
+         * @returns
+         */
         locateLineIntersecion: function (line, vertices, isOpen, inVectorBoundsOnly) {
             // Find the intersections of all lines inside the edge bounds
             var intersectionPoints = [];
@@ -895,13 +869,9 @@ var Polygon = /** @class */ (function () {
                 var intersection = polyLine.intersection(line);
                 // true => only inside bounds
                 // ignore last edge if open
-                if (
-                // (!isOpen || i + 1 !== vertices.length) &&
-                intersection !== null &&
+                if (intersection !== null &&
                     polyLine.hasPoint(intersection, true) &&
                     (!inVectorBoundsOnly || line.hasPoint(intersection, inVectorBoundsOnly))) {
-                    // const intersectionVector: Vector = new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersection) as Vector;
-                    //  intersectionPoints.push(intersection);
                     intersectionPoints.push({ edgeIndex: i, intersectionPoint: intersection });
                 }
             }

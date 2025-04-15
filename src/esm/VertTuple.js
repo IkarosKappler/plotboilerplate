@@ -14,6 +14,8 @@
  * @modified 2024-09-10 Adding the optional `epsilon` param to the `hasPoint` method.
  * @modified 2024-12-02 Added the `epsilon` param to the `colinear` method. Default is 1.0e-6.
  * @modified 2025-03-31 Added the `VertTuple.revert` method.
+ * @modified 2025-04-15 Changed param of `VertTuple.moveTo` method from `Vertex` to `XYCoords`.
+ * @modified 2025-04-15 Added method `VertTuple.move` method.
  * @version 1.4.0
  */
 import { Vertex } from "./Vertex";
@@ -135,7 +137,7 @@ export class VertTuple {
      * Move this line to a new location.
      *
      * @method moveTo
-     * @param {Vertex} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
+     * @param {XYCoords} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
      * @return {VertTuple} this
      * @instance
      * @memberof VertTuple
@@ -144,6 +146,20 @@ export class VertTuple {
         let diff = this.a.difference(newA);
         this.a.add(diff);
         this.b.add(diff);
+        return this;
+    }
+    /**
+     * Move this line by the given amount
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move both point of this tuple.
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    move(amount) {
+        this.a.add(amount);
+        this.b.add(amount);
         return this;
     }
     /**
