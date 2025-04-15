@@ -13,6 +13,9 @@ Imminent todos:
 - Create VEllipseHelper (only VEllipseSectorHelper exists)
 - Extend Demo '32-ellipse-to-bezier' with the new helper.
 
+* 2025-04-15
+  - Demo basic-VEllipse: Removing custom handle lines and add VEllipseHelper.
+  - Demo basic-VEllipseSector: Adding VEllipseSectorHelper and use its drawHandleLines method instead custom draw routine.
 * 2025-04-14
   - Class `BezierPath` is now implementing interface `Intersectable`.
   - Added the `Vector.rotate(number)` method.
