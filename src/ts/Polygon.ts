@@ -35,6 +35,7 @@
  * @modified 2025-03-28 Added the `Polygon.utils.locateLineIntersecion` static helper method.
  * @modified 2025-03-28 Added the `Polygon.lineIntersectionTangents` method.
  * @modified 2025-04-09 Added the `Polygon.getCentroid` method.
+ * @modified 2025-05-16 Class `Polygon` now implements `IBounded`.
  * @version 1.15.0
  *
  * @file Polygon
@@ -50,7 +51,7 @@ import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 import { geomutils } from "./geomutils";
-import { XYCoords, SVGSerializable, UID, Intersectable } from "./interfaces";
+import { XYCoords, SVGSerializable, UID, Intersectable, IBounded } from "./interfaces";
 
 /**
  * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
@@ -63,7 +64,7 @@ import { XYCoords, SVGSerializable, UID, Intersectable } from "./interfaces";
  * @requires Vertex
  * @requires XYCoords
  */
-export class Polygon implements Intersectable, SVGSerializable {
+export class Polygon implements IBounded, Intersectable, SVGSerializable {
   /**
    * Required to generate proper CSS classes and other class related IDs.
    **/
@@ -651,6 +652,7 @@ export class Polygon implements Intersectable, SVGSerializable {
     return result;
   }
 
+  //--- BEGIN --- Implement interface `IBounded`
   /**
    * Get the bounding box (bounds) of this polygon.
    *
@@ -662,6 +664,7 @@ export class Polygon implements Intersectable, SVGSerializable {
   getBounds(): Bounds {
     return Bounds.computeFromVertices(this.vertices);
   }
+  //--- END --- Implement interface `IBounded`
 
   /**
    * Create a deep copy of this polygon.

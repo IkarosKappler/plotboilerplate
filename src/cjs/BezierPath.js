@@ -727,6 +727,7 @@ var BezierPath = /** @class */ (function () {
         }
         neighbourCurve.updateArcLengths();
     };
+    //--- BEGIN --- Implement interface `IBounded`
     /**
      * Get the bounds of this Bézier path.
      *
@@ -748,6 +749,7 @@ var BezierPath = /** @class */ (function () {
         }
         return new Bounds_1.Bounds(min, max);
     };
+    //--- END --- Implement interface `IBounded`
     /**
      * Get n 'equally' distributed vertices along this Bézier path.
      *

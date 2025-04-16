@@ -17,16 +17,18 @@
  * @modified 2022-10-17 Adding these methods from the `PathSegment` interface: getStartPoint, getEndPoint, revert.
  * @modified 2023-09-25 Changed param type of `intersection()` from Line to VertTuple.
  * @modified 2025-04-15 Class `Line` now implements interface `Intersectable`.
+ * @modified 2025-04-16 Class `Line` now implements interface `IBounded`.
  * @version  2.4.0
  *
  * @file Line
  * @public
  **/
 
+import { Bounds } from "./Bounds";
 import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { Intersectable, PathSegment, SVGSerializable } from "./interfaces";
+import { IBounded, Intersectable, PathSegment, SVGSerializable } from "./interfaces";
 
 /**
  * @classdesc A line consists of two vertices a and b.<br>
@@ -36,7 +38,7 @@ import { Intersectable, PathSegment, SVGSerializable } from "./interfaces";
  *
  * @requires Vertex
  */
-export class Line extends VertTuple<Line> implements Intersectable, PathSegment, SVGSerializable {
+export class Line extends VertTuple<Line> implements IBounded, Intersectable, PathSegment, SVGSerializable {
   /**
    * Required to generate proper CSS classes and other class related IDs.
    **/
@@ -88,6 +90,20 @@ export class Line extends VertTuple<Line> implements Intersectable, PathSegment,
     // if we cast these lines infinitely in both directions, they intersect here:
     return new Vertex(x, y);
   }
+
+  //--- BEGIN --- Implement interface `IBounded`
+  /**
+   * Get the bounding box (bounds) of this Line.
+   *
+   * @method getBounds
+   * @instance
+   * @memberof Line
+   * @return {Bounds} The rectangular bounds of this Line.
+   **/
+  getBounds(): Bounds {
+    return Bounds.computeFromVertices([this.a, this.b]);
+  }
+  //--- END --- Implement interface `IBounded`
 
   //--- Implement PathSegment ---
   /**

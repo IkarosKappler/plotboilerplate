@@ -18,6 +18,7 @@
  * @modified 2022-10-17 Adding these methods from the `PathSegment` interface: getStartPoint, getEndPoint, revert.
  * @modified 2023-09-25 Changed param type of `intersection()` from Line to VertTuple.
  * @modified 2025-04-15 Class `Line` now implements interface `Intersectable`.
+ * @modified 2025-04-16 Class `Line` now implements interface `IBounded`.
  * @version  2.4.0
  *
  * @file Line
@@ -40,6 +41,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Line = void 0;
+var Bounds_1 = require("./Bounds");
 var Vector_1 = require("./Vector");
 var VertTuple_1 = require("./VertTuple");
 var Vertex_1 = require("./Vertex");
@@ -99,6 +101,19 @@ var Line = /** @class */ (function (_super) {
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex_1.Vertex(x, y);
     };
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Get the bounding box (bounds) of this Line.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof Line
+     * @return {Bounds} The rectangular bounds of this Line.
+     **/
+    Line.prototype.getBounds = function () {
+        return Bounds_1.Bounds.computeFromVertices([this.a, this.b]);
+    };
+    //--- END --- Implement interface `IBounded`
     //--- Implement PathSegment ---
     /**
      * Get the start point of this path segment.

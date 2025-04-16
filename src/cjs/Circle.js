@@ -14,10 +14,12 @@
  * @modified 2022-08-23 Added the `lineIntersection` function.
  * @modified 2022-08-23 Added the `closestPoint` function.
  * @modified 2025-04-09 Added the `Circle.move(amount: XYCoords)` method.
+ * @modified 2025-04-16 Class `Circle` now implements interface `Intersectable`.
  * @version  1.5.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Circle = void 0;
+var Bounds_1 = require("./Bounds");
 var Line_1 = require("./Line");
 var UIDGenerator_1 = require("./UIDGenerator");
 var Vector_1 = require("./Vector");
@@ -136,6 +138,19 @@ var Circle = /** @class */ (function () {
         return new Vector_1.Vector(pointA, new Vertex_1.Vertex(0, 0)).add(this.center).perp();
         // return (new Vector(this.center.clone(), pointA).add(pointA) as Vector).perp() as Vector;
     };
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get the bounding box (bounds) of this Circle.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof Circle
+     * @return {Bounds} The rectangular bounds of this Circle.
+     **/
+    Circle.prototype.getBounds = function () {
+        return new Bounds_1.Bounds(this.center.clone().subXY(Math.abs(this.radius), Math.abs(this.radius)), this.center.clone().addXY(Math.abs(this.radius), Math.abs(this.radius)));
+    };
+    //--- END --- Implement interface `Intersectable`
     /**
      * Calculate the intersection points (if exists) with the given circle.
      *

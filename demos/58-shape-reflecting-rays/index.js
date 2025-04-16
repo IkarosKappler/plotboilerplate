@@ -45,6 +45,8 @@
     pb.drawConfig.bezier.lineWidth = 2;
     pb.drawConfig.line.color = "rgba(128,128,128,0.5)";
     pb.drawConfig.line.lineWidth = 2;
+    pb.drawConfig.triangle.color = "rgba(128,128,128,0.5)";
+    pb.drawConfig.triangle.lineWidth = 2;
     // pb.drawConfig.drawHandleLines = false;
 
     // Array<Polygon | Circle | VEllipse | Line | CircleSector | VEllipseSector | BezierPath>
@@ -60,7 +62,8 @@
       animate: params.getBoolean("animate", false),
       rayThickness: params.getNumber("rayThickness", 3.0),
       iterations: params.getNumber("iterations", 6),
-      initialRayAngle: params.getNumber("initialRayAngle", 35.0)
+      initialRayAngle: params.getNumber("initialRayAngle", 35.0),
+      showBoundingBoxes: params.getBoolean("showBoundingBoxes", false)
     };
 
     // +---------------------------------------------------------------------------------
@@ -69,6 +72,11 @@
     var viewport = pb.viewport();
 
     var postDraw = function (draw, fill) {
+      console.log("config.showBoundingBoxes", config.showBoundingBoxes);
+      if (config.showBoundingBoxes) {
+        drawBoundingBoxes(draw, fill);
+      }
+
       var rayStepLength = mainRay.length();
       var rayCollection = getRayCollection(mainRay);
       var newRays = [];
@@ -81,7 +89,7 @@
           rayCollection[j].setLength(rayStepLength);
         }
 
-        drawRays(draw, fill, rayCollection, "rgba(192,192,192,0.25)");
+        drawLines(draw, fill, rayCollection, "rgba(192,192,192,0.25)");
         newRays = getRayIteration(rayCollection);
         // Crop original rays
         for (var j = 0; j < rayCollection.length; j++) {
@@ -96,21 +104,30 @@
         // Move new rays one unit (pixel) into their new direction
         // (avoid to reflect multiple times inside one single point)
         for (var j = 0; j < rayCollection.length; j++) {
-          rayCollection[j].a.set(rayCollection[j].clone().setLength(1.0).b);
+          rayCollection[j].a.set(rayCollection[j].clone().setLength(0.1).b);
         }
       }
-      // drawRays(draw, fill, rayCollection, "rgba(0,192,0,0.5)");
       ellipseHelper.drawHandleLines(draw, fill);
       cicleSectorHelper.drawHandleLines(draw, fill);
       ellipseSectorHelper.drawHandleLines(draw, fill);
       bezierHelper.drawHandleLines();
-    };
+    }; // END postDraw
 
-    // var drawRayIteration = function (draw, fill, currentRays) {
-    //   var newRays = getRayIteration(currentRays);
-    //   // drawRays(draw, fill, newRays, "rgba(0,192,0,0.5)");
-    //   return newRays;
-    // };
+    var drawBoundingBoxes = function (draw, fill) {
+      shapes.forEach(function (shape) {
+        if (typeof shape["getBounds"] !== "function") {
+          return;
+        }
+        var bounds = shape.getBounds();
+        draw.rect(
+          bounds.min, // position: XYCoords,
+          bounds.width, // : number,
+          bounds.height, // : number,
+          "black",
+          1
+        );
+      });
+    };
 
     var drawRays = function (draw, fill, rays, color) {
       rays.forEach(function (ray) {
@@ -133,7 +150,6 @@
      * @return {Array<Vector[]>} An two-dimensional array of vectors; each array for one of the base shapes.
      */
     var calculateAllReflections = function (rays) {
-      // var rays = getRayCollection(mainRay);
       // Array<Vector[]>
       var resultVectors = [];
       rays.forEach(function (ray) {
@@ -141,11 +157,12 @@
         shapes.forEach(function (shape) {
           var reflectedRay = findReflectedRay(shape, ray);
           if (reflectedRay != null) {
+            // && reflectedRay.length() > 0.1) {
             reflectedRays.push(reflectedRay);
           }
         });
         if (reflectedRays.length > 0) {
-          resultVectors.push(findClosestRay(ray.a, reflectedRays));
+          resultVectors.push(findClosestRay(ray, reflectedRays));
         } else {
           // Just expand input ray
           resultVectors.push(ray.clone().moveTo(ray.b));
@@ -155,11 +172,12 @@
     };
 
     // Pre: rays.length > 0
-    var findClosestRay = function (sourcePoint, rays) {
-      var dist = sourcePoint.distance(rays[0].a);
+    var findClosestRay = function (sourceRay, rays) {
+      var dist = sourceRay.a.distance(rays[0].a);
       var resultIndex = 0;
       for (var i = 1; i < rays.length; i++) {
-        if (sourcePoint.distance(rays[i].a) < dist) {
+        if (sourceRay.a.distance(rays[i].a) < dist) {
+          // && sourceRay.a.distance(rays[i].a) > 0.0001) {
           resultIndex = i;
         }
       }
@@ -186,7 +204,8 @@
         shape instanceof BezierPath ||
         // Note: this is not a direct drawable and cannot be directly added to the canvas,
         // but let's also handle this case
-        shape instanceof CubicBezierCurve
+        shape instanceof CubicBezierCurve ||
+        shape instanceof Triangle
       ) {
         // Array<Vector>
         var intersectionTangents = shape.lineIntersectionTangents(ray, true);
@@ -225,6 +244,8 @@
 
       var line = new Line(viewport.randomPoint(), viewport.randomPoint());
 
+      var triangle = new Triangle(viewport.randomPoint(), viewport.randomPoint(), viewport.randomPoint());
+
       // Create circle and ellpise
       var circle = new Circle(new Vertex(-25, -15), 90.0);
       var ellipse = new VEllipse(new Vertex(25, 15), new Vertex(150, 200), -Math.PI * 0.3);
@@ -239,7 +260,7 @@
       );
       bezierHelper = new BezierPathInteractionHelper(pb, [bezierPath]);
 
-      shapes = [polygon, circle, ellipse, circleSector, ellipseSector, bezierPath, line];
+      shapes = [polygon, circle, ellipse, circleSector, ellipseSector, bezierPath, line, triangle];
       // Align all shapes on a circle :)
       var alignCircle = new Circle(new Vertex(), viewport.getMinDimension() * 0.333);
       shapes.forEach(function (shape, i) {
@@ -341,6 +362,9 @@
         .onChange( function() { pb.redraw() });
       // prettier-ignore
       gui.add(config, "initialRayAngle").min(1.0).max(360).step(1).name("initialRayAngle").title("Angle between all initial rays.")
+      .onChange( function() { pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "showBoundingBoxes").name("showBoundingBoxes").title("Check to see shape's bounding boxes.")
       .onChange( function() { pb.redraw() });
     }
 

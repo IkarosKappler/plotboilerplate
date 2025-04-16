@@ -38,7 +38,7 @@ import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { XYCoords, SVGSerializable, UID } from "./interfaces";
+import { XYCoords, SVGSerializable, UID, Intersectable, IBounded } from "./interfaces";
 /**
  * @classdesc A BezierPath class.
  *
@@ -52,7 +52,7 @@ import { XYCoords, SVGSerializable, UID } from "./interfaces";
  * @requires UID
  * @requires UIDGenerator
  **/
-export declare class BezierPath implements SVGSerializable {
+export declare class BezierPath implements IBounded, Intersectable, SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
      **/

@@ -20,6 +20,8 @@
  * @modified 2023-02-10 All non-function attributes of the `Config` interface are now mandatory.
  * @modified 2023-09-29 Added the `randomPoint(...)` function declaration to the IBounds interface.
  * @modified 2024-08-25 Added the `CSSBackdropFilterParams` params to the global params (all optional).
+ * @modified 2025-03-29 Added interface `Intersectable`.
+ * @modified 2025-04-16 Added interface `IBounded`.
  **/
 import { Vertex } from "../Vertex";
 import { Vector } from "../Vector";
@@ -244,4 +246,13 @@ export interface Intersectable {
      * @returns {Array<Vector>} - An array of all intersection tangents within this shape's bounds.
      */
     lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vector>;
+}
+export interface IBounded {
+    /**
+     * Get the bounding box (bounds) of this shape.
+     *
+     * @method getBounds
+     * @return {Bounds} The rectangular bounds of this shape.
+     **/
+    getBounds(): IBounds;
 }

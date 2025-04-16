@@ -11,6 +11,15 @@ Imminent todos:
 
 - Extend Demo '32-ellipse-to-bezier' with the new helper.
 
+* 2025-05-16
+  - Added interface `IBounded`.
+  - Class `Polygon` now implements `IBounded`.
+  - Class `Line` now implements interface `IBounded`.
+  - Class `Triangle` now implements interface `Intersectable`.
+  - Class `Circle` now implements interface `Intersectable`.
+  - Class `Triangle` now implements interface `IBounded`.
+  - Class `Triangle` now implements interface `Intersectable`.
+  - Added method `Triangle.move`.
 * 2025-04-15
   - Demo basic-VEllipse: Removing custom handle lines and add VEllipseHelper.
   - Demo basic-VEllipseSector: Adding VEllipseSectorHelper and use its drawHandleLines method instead custom draw routine.

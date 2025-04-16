@@ -37,7 +37,7 @@
 import { Bounds } from "./Bounds";
 import { Vertex } from "./Vertex";
 import { Vector } from "./Vector";
-import { XYCoords, UID, PathSegment, Intersectable } from "./interfaces";
+import { XYCoords, UID, PathSegment, Intersectable, IBounded } from "./interfaces";
 import { VertTuple } from "./VertTuple";
 /**
  * @classdesc A refactored cubic bezier curve class.
@@ -49,7 +49,7 @@ import { VertTuple } from "./VertTuple";
  * @requires UID
  * @requires UIDGenerator
  */
-export declare class CubicBezierCurve implements Intersectable, PathSegment {
+export declare class CubicBezierCurve implements IBounded, Intersectable, PathSegment {
     /** @constant {number} */
     static readonly START_POINT: number;
     /** @constant {number} */

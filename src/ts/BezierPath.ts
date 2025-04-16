@@ -40,7 +40,7 @@ import { UIDGenerator } from "./UIDGenerator";
 import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { XYCoords, SVGSerializable, UID } from "./interfaces";
+import { XYCoords, SVGSerializable, UID, Intersectable, IBounded } from "./interfaces";
 
 /**
  * @classdesc A BezierPath class.
@@ -55,7 +55,7 @@ import { XYCoords, SVGSerializable, UID } from "./interfaces";
  * @requires UID
  * @requires UIDGenerator
  **/
-export class BezierPath implements SVGSerializable {
+export class BezierPath implements IBounded, Intersectable, SVGSerializable {
   /**
    * Required to generate proper CSS classes and other class related IDs.
    **/
@@ -867,6 +867,7 @@ export class BezierPath implements SVGSerializable {
     neighbourCurve.updateArcLengths();
   }
 
+  //--- BEGIN --- Implement interface `IBounded`
   /**
    * Get the bounds of this Bézier path.
    *
@@ -888,6 +889,7 @@ export class BezierPath implements SVGSerializable {
     }
     return new Bounds(min, max);
   }
+  //--- END --- Implement interface `IBounded`
 
   /**
    * Get n 'equally' distributed vertices along this Bézier path.

@@ -23,7 +23,11 @@
  * @modified  2022-02-02 Cleared the `Triangle.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified  2024-11-22 Added static utility function Triangle.utils.determinant; adapted method `determinant`.
  * @modified  2024-11-22 Changing visibility of `Triangle.utils` from `private` to `public`.
- * @version   2.8.0
+ * @modified  2025-14-16 Class `Triangle` now implements interface `Intersectable`.
+ * @modified  2025-14-16 Class `Triangle` now implements interface `IBounded`.
+ * @modified  2025-14-16 Class `Triangle` now implements interface `Intersectable`.
+ * @modified  2025-14-16 Added method `Triangle.move`.
+ * @version   2.10.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -35,9 +39,11 @@ import { Circle } from "./Circle";
 import { Line } from "./Line";
 import { Polygon } from "./Polygon";
 import { UIDGenerator } from "./UIDGenerator";
+import { Vector } from "./Vector";
+import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 import { geomutils } from "./geomutils";
-import { SVGSerializable, UID, XYCoords } from "./interfaces";
+import { IBounded, Intersectable, SVGSerializable, UID, XYCoords } from "./interfaces";
 
 /**
  * @classdesc A triangle class for triangulations.
@@ -56,7 +62,7 @@ import { SVGSerializable, UID, XYCoords } from "./interfaces";
  * @requires geomutils
  *
  */
-export class Triangle implements SVGSerializable {
+export class Triangle implements IBounded, SVGSerializable, Intersectable {
   /**
    * Required to generate proper CSS classes and other class related IDs.
    **/
@@ -215,6 +221,37 @@ export class Triangle implements SVGSerializable {
     return this;
   }
 
+  //--- BEGIN --- Implement interface `IBounded`
+  /**
+   * Get the bounding box (bounds) of this Triangle.
+   *
+   * @method getBounds
+   * @instance
+   * @memberof Triangle
+   * @return {Bounds} The rectangular bounds of this Triangle.
+   **/
+  getBounds(): Bounds {
+    // return Bounds.computeFromVertices([this.a, this.b, this.c]);
+    return this.bounds();
+  }
+  //--- END --- Implement interface `IBounded`
+
+  /**
+   * Move the Triangle's vertices by the given amount.
+   *
+   * @method move
+   * @param {XYCoords} amount - The amount to move.
+   * @instance
+   * @memberof Triangle
+   * @return {Triangle} this for chaining
+   **/
+  move(amount: XYCoords): Triangle {
+    this.a.add(amount);
+    this.b.add(amount);
+    this.c.add(amount);
+    return this;
+  }
+
   /**
    * Get the circumcircle of this triangle.
    *
@@ -350,6 +387,51 @@ export class Triangle implements SVGSerializable {
       new Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)),
       new Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y))
     );
+  }
+
+  //--- BEGIN --- Implement interface `Intersectable`
+  /**
+   * Get all line intersections with this polygon.
+   *
+   * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+   *
+   * See demo `47-closest-vector-projection-on-polygon` for how it works.
+   *
+   * @param {VertTuple} line - The line to find intersections with.
+   * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+   * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+   */
+  lineIntersections(line: VertTuple<any>, inVectorBoundsOnly: boolean = false): Array<Vertex> {
+    // Find the intersections of all lines inside the edge bounds
+    return Polygon.utils
+      .locateLineIntersecion(line, [this.a, this.b, this.c], false, inVectorBoundsOnly)
+      .map(intersectionTuple => intersectionTuple.intersectionPoint);
+  }
+
+  /**
+   * Get all line intersections of this polygon and their tangents along the shape.
+   *
+   * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+   *
+   * @param line
+   * @param inVectorBoundsOnly
+   * @returns
+   */
+  lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly: boolean = false): Array<Vector> {
+    // Find the intersection tangents of all lines inside the edge bounds
+    return Polygon.utils
+      .locateLineIntersecion(line, [this.a, this.b, this.c], false, inVectorBoundsOnly)
+      .map(intersectionTuple => {
+        // const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
+        const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
+        return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersectionPoint) as Vector;
+      });
+  }
+  //--- END --- Implement interface `Intersectable`
+
+  getEdgeAt(edgeIndex: number): Line {
+    var modIndex = edgeIndex % 3;
+    return modIndex === 0 ? new Line(this.a, this.b) : modIndex === 1 ? new Line(this.b, this.c) : new Line(this.c, this.a);
   }
 
   /**

@@ -278,6 +278,7 @@ var CubicBezierCurve = /** @class */ (function () {
             tNext: tStart + tDiff * (Math.min(stepCount, minIndex + 1) / stepCount)
         };
     };
+    //--- BEGIN --- Implement interface `IBounded`
     /**
      * Get the bounds of this bezier curve.
      *
@@ -299,6 +300,7 @@ var CubicBezierCurve = /** @class */ (function () {
         }
         return new Bounds_1.Bounds(min, max);
     };
+    //--- END --- Implement interface `IBounded`
     /**
      * Get the start point of the curve.<br>
      * <br>

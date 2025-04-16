@@ -39,7 +39,7 @@ import { Bounds } from "./Bounds";
 import { UIDGenerator } from "./UIDGenerator";
 import { Vertex } from "./Vertex";
 import { Vector } from "./Vector";
-import { XYCoords, UID, PathSegment, Intersectable } from "./interfaces";
+import { XYCoords, UID, PathSegment, Intersectable, IBounded } from "./interfaces";
 import { VertTuple } from "./VertTuple";
 
 /**
@@ -52,7 +52,7 @@ import { VertTuple } from "./VertTuple";
  * @requires UID
  * @requires UIDGenerator
  */
-export class CubicBezierCurve implements Intersectable, PathSegment {
+export class CubicBezierCurve implements IBounded, Intersectable, PathSegment {
   /** @constant {number} */
   static readonly START_POINT: number = 0;
   /** @constant {number} */
@@ -378,6 +378,7 @@ export class CubicBezierCurve implements Intersectable, PathSegment {
     };
   }
 
+  //--- BEGIN --- Implement interface `IBounded`
   /**
    * Get the bounds of this bezier curve.
    *
@@ -399,6 +400,7 @@ export class CubicBezierCurve implements Intersectable, PathSegment {
     }
     return new Bounds(min, max);
   }
+  //--- END --- Implement interface `IBounded`
 
   /**
    * Get the start point of the curve.<br>

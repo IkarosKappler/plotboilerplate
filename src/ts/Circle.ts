@@ -13,15 +13,17 @@
  * @modified 2022-08-23 Added the `lineIntersection` function.
  * @modified 2022-08-23 Added the `closestPoint` function.
  * @modified 2025-04-09 Added the `Circle.move(amount: XYCoords)` method.
+ * @modified 2025-04-16 Class `Circle` now implements interface `Intersectable`.
  * @version  1.5.0
  **/
 
+import { Bounds } from "./Bounds";
 import { Line } from "./Line";
 import { UIDGenerator } from "./UIDGenerator";
 import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { Intersectable, SVGSerializable, UID, XYCoords } from "./interfaces";
+import { IBounded, Intersectable, SVGSerializable, UID, XYCoords } from "./interfaces";
 
 /**
  * @classdesc A simple circle: center point and radius.
@@ -34,7 +36,7 @@ import { Intersectable, SVGSerializable, UID, XYCoords } from "./interfaces";
  * @requires UID
  * @requires UIDGenerator
  **/
-export class Circle implements Intersectable, SVGSerializable {
+export class Circle implements IBounded, Intersectable, SVGSerializable {
   /**
    * Required to generate proper CSS classes and other class related IDs.
    **/
@@ -176,6 +178,23 @@ export class Circle implements Intersectable, SVGSerializable {
     return (new Vector(pointA, new Vertex(0, 0)).add(this.center) as Vector).perp() as Vector;
     // return (new Vector(this.center.clone(), pointA).add(pointA) as Vector).perp() as Vector;
   }
+
+  //--- BEGIN --- Implement interface `Intersectable`
+  /**
+   * Get the bounding box (bounds) of this Circle.
+   *
+   * @method getBounds
+   * @instance
+   * @memberof Circle
+   * @return {Bounds} The rectangular bounds of this Circle.
+   **/
+  getBounds(): Bounds {
+    return new Bounds(
+      this.center.clone().subXY(Math.abs(this.radius), Math.abs(this.radius)),
+      this.center.clone().addXY(Math.abs(this.radius), Math.abs(this.radius))
+    );
+  }
+  //--- END --- Implement interface `Intersectable`
 
   /**
    * Calculate the intersection points (if exists) with the given circle.

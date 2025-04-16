@@ -36,6 +36,7 @@
  * @modified 2025-03-28 Added the `Polygon.utils.locateLineIntersecion` static helper method.
  * @modified 2025-03-28 Added the `Polygon.lineIntersectionTangents` method.
  * @modified 2025-04-09 Added the `Polygon.getCentroid` method.
+ * @modified 2025-05-16 Class `Polygon` now implements `IBounded`.
  * @version 1.15.0
  *
  * @file Polygon
@@ -590,6 +591,7 @@ var Polygon = /** @class */ (function () {
         }
         return result;
     };
+    //--- BEGIN --- Implement interface `IBounded`
     /**
      * Get the bounding box (bounds) of this polygon.
      *
@@ -601,6 +603,7 @@ var Polygon = /** @class */ (function () {
     Polygon.prototype.getBounds = function () {
         return Bounds_1.Bounds.computeFromVertices(this.vertices);
     };
+    //--- END --- Implement interface `IBounded`
     /**
      * Create a deep copy of this polygon.
      *

@@ -24,7 +24,11 @@
  * @modified  2022-02-02 Cleared the `Triangle.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified  2024-11-22 Added static utility function Triangle.utils.determinant; adapted method `determinant`.
  * @modified  2024-11-22 Changing visibility of `Triangle.utils` from `private` to `public`.
- * @version   2.8.0
+ * @modified  2025-14-16 Class `Triangle` now implements interface `Intersectable`.
+ * @modified  2025-14-16 Class `Triangle` now implements interface `IBounded`.
+ * @modified  2025-14-16 Class `Triangle` now implements interface `Intersectable`.
+ * @modified  2025-14-16 Added method `Triangle.move`.
+ * @version   2.10.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -37,6 +41,7 @@ var Circle_1 = require("./Circle");
 var Line_1 = require("./Line");
 var Polygon_1 = require("./Polygon");
 var UIDGenerator_1 = require("./UIDGenerator");
+var Vector_1 = require("./Vector");
 var Vertex_1 = require("./Vertex");
 var geomutils_1 = require("./geomutils");
 /**
@@ -136,6 +141,35 @@ var Triangle = /** @class */ (function () {
         this.a.scale(factor, centroid);
         this.b.scale(factor, centroid);
         this.c.scale(factor, centroid);
+        return this;
+    };
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Get the bounding box (bounds) of this Triangle.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof Triangle
+     * @return {Bounds} The rectangular bounds of this Triangle.
+     **/
+    Triangle.prototype.getBounds = function () {
+        // return Bounds.computeFromVertices([this.a, this.b, this.c]);
+        return this.bounds();
+    };
+    //--- END --- Implement interface `IBounded`
+    /**
+     * Move the Triangle's vertices by the given amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof Triangle
+     * @return {Triangle} this for chaining
+     **/
+    Triangle.prototype.move = function (amount) {
+        this.a.add(amount);
+        this.b.add(amount);
+        this.c.add(amount);
         return this;
     };
     /**
@@ -262,6 +296,51 @@ var Triangle = /** @class */ (function () {
      */
     Triangle.prototype.bounds = function () {
         return new Bounds_1.Bounds(new Vertex_1.Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)), new Vertex_1.Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y)));
+    };
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get all line intersections with this polygon.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+     *
+     * See demo `47-closest-vector-projection-on-polygon` for how it works.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     */
+    Triangle.prototype.lineIntersections = function (line, inVectorBoundsOnly) {
+        if (inVectorBoundsOnly === void 0) { inVectorBoundsOnly = false; }
+        // Find the intersections of all lines inside the edge bounds
+        return Polygon_1.Polygon.utils
+            .locateLineIntersecion(line, [this.a, this.b, this.c], false, inVectorBoundsOnly)
+            .map(function (intersectionTuple) { return intersectionTuple.intersectionPoint; });
+    };
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param inVectorBoundsOnly
+     * @returns
+     */
+    Triangle.prototype.lineIntersectionTangents = function (line, inVectorBoundsOnly) {
+        var _this = this;
+        if (inVectorBoundsOnly === void 0) { inVectorBoundsOnly = false; }
+        // Find the intersection tangents of all lines inside the edge bounds
+        return Polygon_1.Polygon.utils
+            .locateLineIntersecion(line, [this.a, this.b, this.c], false, inVectorBoundsOnly)
+            .map(function (intersectionTuple) {
+            // const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
+            var polyLine = _this.getEdgeAt(intersectionTuple.edgeIndex);
+            return new Vector_1.Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersectionPoint);
+        });
+    };
+    //--- END --- Implement interface `Intersectable`
+    Triangle.prototype.getEdgeAt = function (edgeIndex) {
+        var modIndex = edgeIndex % 3;
+        return modIndex === 0 ? new Line_1.Line(this.a, this.b) : modIndex === 1 ? new Line_1.Line(this.b, this.c) : new Line_1.Line(this.c, this.a);
     };
     /**
      * Convert this triangle to a polygon instance.
