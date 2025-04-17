@@ -49,7 +49,7 @@
     pb.drawConfig.triangle.lineWidth = 2;
     // pb.drawConfig.drawHandleLines = false;
 
-    // Array<Polygon | Circle | VEllipse | Line | CircleSector | VEllipseSector | BezierPath>
+    // Array<Polygon | Circle | VEllipse | Line | CircleSector | VEllipseSector | BezierPath | Triangle>
     var shapes = [];
     var mainRay = new Vector(new Vertex(), new Vertex(250, 250).rotate(Math.random() * Math.PI));
     var ellipseHelper;
@@ -126,6 +126,18 @@
           "black",
           1
         );
+
+        if( shape instanceof BezierPath ) {
+          console.log("is bezier path");
+          var bbox = findBB(shape.bezierCurves[0]);
+          draw.rect(
+            bbox.min, // position: XYCoords,
+            bbox.width, // : number,
+            bbox.height, // : number,
+            "red",
+            2
+          );
+        }
       });
     };
 
@@ -316,6 +328,82 @@
       // console.log("ray collection", rays);
       return rays;
     };
+
+
+    function findBB(bezierCurve) {
+      var P = [ 
+        { X : bezierCurve.startPoint.x, Y: bezierCurve.startPoint.y},
+        { X : bezierCurve.startControlPoint.x, Y: bezierCurve.startControlPoint.y},
+        { X : bezierCurve.endControlPoint.x, Y: bezierCurve.endControlPoint.y},
+        { X : bezierCurve.endPoint.x, Y: bezierCurve.endPoint.y}
+            ];
+      var a = 3 * P[3].X - 9 * P[2].X + 9 * P[1].X - 3 * P[0].X;
+      var b = 6 * P[0].X - 12 * P[1].X + 6 * P[2].X;
+      var c = 3 * P[1].X - 3 * P[0].X;
+      //alert("a "+a+" "+b+" "+c);
+      var disc = b * b - 4 * a * c;
+      var xl = P[0].X;
+      var xh = P[0].X;
+      if (P[3].X < xl) xl = P[3].X;
+      if (P[3].X > xh) xh = P[3].X;
+      if (disc >= 0) {
+          var t1 = (-b + Math.sqrt(disc)) / (2 * a);
+          // alert("t1 " + t1);
+          if (t1 > 0 && t1 < 1) {
+              // var x1 = evalBez(PX, t1);
+              var x1 = bezierCurve.getPointAt(t1).x; 
+              if (x1 < xl) xl = x1;
+              if (x1 > xh) xh = x1;
+          }
+  
+          var t2 = (-b - Math.sqrt(disc)) / (2 * a);
+          // alert("t2 " + t2);
+          if (t2 > 0 && t2 < 1) {
+              // var x2 = evalBez(PX, t2);
+              var x2 = bezierCurve.getPointAt(t2).x; 
+              if (x2 < xl) xl = x2;
+              if (x2 > xh) xh = x2;
+          }
+      }
+  
+      a = 3 * P[3].Y - 9 * P[2].Y + 9 * P[1].Y - 3 * P[0].Y;
+      b = 6 * P[0].Y - 12 * P[1].Y + 6 * P[2].Y;
+      c = 3 * P[1].Y - 3 * P[0].Y;
+      disc = b * b - 4 * a * c;
+      var yl = P[0].Y;
+      var yh = P[0].Y;
+      if (P[3].Y < yl) yl = P[3].Y;
+      if (P[3].Y > yh) yh = P[3].Y;
+      if (disc >= 0) {
+          var t1 = (-b + Math.sqrt(disc)) / (2 * a);
+          // alert("t3 " + t1);
+  
+          if (t1 > 0 && t1 < 1) {
+              // var y1 = evalBez(PY, t1);
+              var y1 = bezierCurve.getPointAt(t1).y; // evalBez(PY, t1);
+              if (y1 < yl) yl = y1;
+              if (y1 > yh) yh = y1;
+          }
+  
+          var t2 = (-b - Math.sqrt(disc)) / (2 * a);
+          // alert("t4 " + t2);
+  
+          if (t2 > 0 && t2 < 1) {
+              // var y2 = evalBez(PY, t2);
+              var y2 = bezierCurve.getPointAt(t2).y; 
+              if (y2 < yl) yl = y2;
+              if (y2 > yh) yh = y2;
+          }
+      }
+
+      // ctx.moveTo(xl, yl);
+      // ctx.lineTo(xl, yh);
+      // ctx.lineTo(xh, yh);
+      // ctx.lineTo(xh, yl);
+      // ctx.lineTo(xl, yl);
+
+      return Bounds.computeFromVertices( [ { x : xl, y: xl}, { x: xl, y : yh }, { x : xh, y : yh }, { x : xh, y: yl } ] );
+    }
 
     // +---------------------------------------------------------------------------------
     // | Render next animation step.
