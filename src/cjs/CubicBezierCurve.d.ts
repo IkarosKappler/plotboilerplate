@@ -586,6 +586,7 @@ export declare class CubicBezierCurve implements IBounded, Intersectable, PathSe
      * Helper utils.
      */
     static utils: {
+        evaluateT: (p0: number, p1: number, p2: number, p3: number, t: number) => number;
         /**
          * Get the points of a sub curve at the given start end end offsets (values between 0.0 and 1.0).
          *

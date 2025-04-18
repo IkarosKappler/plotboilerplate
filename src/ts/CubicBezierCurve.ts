@@ -29,6 +29,8 @@
  * @modified 2025-04-13 Added helper function `CubicBezierCurve.utils.bezierCoeffs`.
  * @modified 2025-04-13 Added helper functopn `CubicBezierCurve.utils.sgn(number)` for division safe sign calculation.
  * @modified 2025-03-13 Class `CubicBezierCurve` is now implementing interface `Intersectable`.
+ * @modified 2025-04-18 Added evaluation method for cubic Bézier curves `CubicBezierCurve.utils.evaluateT`.
+ * @modified 2025-04-18 Refactored method `CubicBezierCurve.getPointAt` to use `evaluateT`.
  * @version 2.9.0
  *
  * @file CubicBezierCurve
@@ -489,16 +491,19 @@ export class CubicBezierCurve implements IBounded, Intersectable, PathSegment {
    **/
   getPointAt(t: number): Vertex {
     // Perform some powerful math magic
-    const x: number =
-      this.startPoint.x * Math.pow(1.0 - t, 3) +
-      this.startControlPoint.x * 3 * t * Math.pow(1.0 - t, 2) +
-      this.endControlPoint.x * 3 * Math.pow(t, 2) * (1.0 - t) +
-      this.endPoint.x * Math.pow(t, 3);
-    const y: number =
-      this.startPoint.y * Math.pow(1.0 - t, 3) +
-      this.startControlPoint.y * 3 * t * Math.pow(1.0 - t, 2) +
-      this.endControlPoint.y * 3 * Math.pow(t, 2) * (1.0 - t) +
-      this.endPoint.y * Math.pow(t, 3);
+    // TODO: cleanup
+    // const x: number =
+    //   this.startPoint.x * Math.pow(1.0 - t, 3) +
+    //   this.startControlPoint.x * 3 * t * Math.pow(1.0 - t, 2) +
+    //   this.endControlPoint.x * 3 * Math.pow(t, 2) * (1.0 - t) +
+    //   this.endPoint.x * Math.pow(t, 3);
+    // const y: number =
+    //   this.startPoint.y * Math.pow(1.0 - t, 3) +
+    //   this.startControlPoint.y * 3 * t * Math.pow(1.0 - t, 2) +
+    //   this.endControlPoint.y * 3 * Math.pow(t, 2) * (1.0 - t) +
+    //   this.endPoint.y * Math.pow(t, 3);
+    const x: number = CubicBezierCurve.utils.evaluateT(this.startPoint.x, this.startControlPoint.x, this.endControlPoint.x, this.endPoint.x, t);
+    const y: number = CubicBezierCurve.utils.evaluateT(this.startPoint.y, this.startControlPoint.y, this.endControlPoint.y, this.endPoint.y, t);
     return new Vertex(x, y);
   }
 
@@ -998,6 +1003,14 @@ export class CubicBezierCurve implements IBounded, Intersectable, PathSegment {
    * Helper utils.
    */
   public static utils = {
+
+    evaluateT: (p0:number, p1:number, p2:number, p3:number, t:number) : number => {
+      return p0 * Math.pow(1.0 - t, 3) +
+        p1 * 3 * t * Math.pow(1.0 - t, 2) +
+        p2 * 3 * Math.pow(t, 2) * (1.0 - t) +
+        p3 * Math.pow(t, 3);
+    },
+
     /**
      * Get the points of a sub curve at the given start end end offsets (values between 0.0 and 1.0).
      *

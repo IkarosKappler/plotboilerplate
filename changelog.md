@@ -11,7 +11,10 @@ Imminent todos:
 
 - Extend Demo '32-ellipse-to-bezier' with the new helper.
 
-* 2025-05-16
+* 2025-04-18
+  - Added evaluation method for cubic Bézier curves `CubicBezierCurve.utils.evaluateT`.
+  - Refactored method `CubicBezierCurve.getPointAt` to use `evaluateT`.
+* 2025-04-16
   - Added interface `IBounded`.
   - Class `Polygon` now implements `IBounded`.
   - Class `Line` now implements interface `IBounded`.
