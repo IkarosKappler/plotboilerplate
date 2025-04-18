@@ -14,6 +14,8 @@ Imminent todos:
 * 2025-04-18
   - Added evaluation method for cubic Bézier curves `CubicBezierCurve.utils.evaluateT`.
   - Refactored method `CubicBezierCurve.getPointAt` to use `evaluateT`.
+  - Changed parameter type in `Bounds.computeFromVertices` from `Vertex` to more general `XYCoords`.
+  - Fixed the `CubicBezierCurve.getBounds` method: now returning the real bounding box. Before it was an approximated one.
 * 2025-04-16
   - Added interface `IBounded`.
   - Class `Polygon` now implements `IBounded`.

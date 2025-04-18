@@ -29,6 +29,9 @@
  * @modified 2025-04-13 Added helper function `CubicBezierCurve.utils.bezierCoeffs`.
  * @modified 2025-04-13 Added helper functopn `CubicBezierCurve.utils.sgn(number)` for division safe sign calculation.
  * @modified 2025-03-13 Class `CubicBezierCurve` is now implementing interface `Intersectable`.
+ * @modified 2025-04-18 Added evaluation method for cubic Bézier curves `CubicBezierCurve.utils.evaluateT`.
+ * @modified 2025-04-18 Refactored method `CubicBezierCurve.getPointAt` to use `evaluateT`.
+ * @modified 2025-04-18 Fixed the `CubicBezierCurve.getBounds` method: now returning the real bounding box. Before it was an approximated one.
  * @version 2.9.0
  *
  * @file CubicBezierCurve
@@ -587,6 +590,10 @@ export declare class CubicBezierCurve implements IBounded, Intersectable, PathSe
      */
     static utils: {
         evaluateT: (p0: number, p1: number, p2: number, p3: number, t: number) => number;
+        cubicPolyMinMax: (p0: number, p1: number, p2: number, p3: number) => {
+            min: number;
+            max: number;
+        };
         /**
          * Get the points of a sub curve at the given start end end offsets (values between 0.0 and 1.0).
          *
@@ -618,12 +625,22 @@ export declare class CubicBezierCurve implements IBounded, Intersectable, PathSe
          * Compute the Bézier coefficients from the given Bézier point coordinates.
          *
          * @param {number} p0 - The start point coordinate.
-         * @param {number} p1 - The start point coordinate.
-         * @param {number} p2 - The start point coordinate.
-         * @param {number} p3 - The start point coordinate.
-         * @returns {Array<number>}
+         * @param {number} p1 - The start control point coordinate.
+         * @param {number} p2 - The end control point coordinate.
+         * @param {number} p3 - The end point coordinate.
+         * @returns {[number,number,number,number]}
          */
-        bezierCoeffs: (p0: number, p1: number, p2: number, p3: number) => Array<number>;
+        bezierCoeffs: (p0: number, p1: number, p2: number, p3: number) => [number, number, number, number];
+        /**
+         * Calculate the cubic polynomial coefficients used to find the bounding box.
+         *
+         * @param {number} p0 - The start point coordinate.
+         * @param {number} p1 - The start control point coordinate.
+         * @param {number} p2 - The end control point coordinate.
+         * @param {number} p3 - The end point coordinate.
+         * @returns {[number,number,number]}
+         */
+        cubicPoly: (p0: number, p1: number, p2: number, p3: number) => [number, number, number];
         /**
          * sign of number, but is division safe: no zero returned :)
          */

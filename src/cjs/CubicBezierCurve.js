@@ -30,6 +30,9 @@
  * @modified 2025-04-13 Added helper function `CubicBezierCurve.utils.bezierCoeffs`.
  * @modified 2025-04-13 Added helper functopn `CubicBezierCurve.utils.sgn(number)` for division safe sign calculation.
  * @modified 2025-03-13 Class `CubicBezierCurve` is now implementing interface `Intersectable`.
+ * @modified 2025-04-18 Added evaluation method for cubic Bézier curves `CubicBezierCurve.utils.evaluateT`.
+ * @modified 2025-04-18 Refactored method `CubicBezierCurve.getPointAt` to use `evaluateT`.
+ * @modified 2025-04-18 Fixed the `CubicBezierCurve.getBounds` method: now returning the real bounding box. Before it was an approximated one.
  * @version 2.9.0
  *
  * @file CubicBezierCurve
@@ -288,17 +291,20 @@ var CubicBezierCurve = /** @class */ (function () {
      * @return {Bounds} The bounds of this curve.
      **/
     CubicBezierCurve.prototype.getBounds = function () {
-        var min = new Vertex_1.Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
-        var max = new Vertex_1.Vertex(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
-        var v;
-        for (var i = 0; i < this.segmentCache.length; i++) {
-            v = this.segmentCache[i];
-            min.x = Math.min(min.x, v.x);
-            min.y = Math.min(min.y, v.y);
-            max.x = Math.max(max.x, v.x);
-            max.y = Math.max(max.y, v.y);
-        }
-        return new Bounds_1.Bounds(min, max);
+        // Thanks to Richard "RM" for the Bézier bounds calculatin
+        //    https://jsfiddle.net/SalixAlba/QQnvm/4/
+        var xMinMax = CubicBezierCurve.utils.cubicPolyMinMax(this.startPoint.x, this.startControlPoint.x, this.endControlPoint.x, this.endPoint.x);
+        var xl = xMinMax.min;
+        var xh = xMinMax.max;
+        var yMinMax = CubicBezierCurve.utils.cubicPolyMinMax(this.startPoint.y, this.startControlPoint.y, this.endControlPoint.y, this.endPoint.y);
+        var yl = yMinMax.min;
+        var yh = yMinMax.max;
+        return Bounds_1.Bounds.computeFromVertices([
+            { x: xl, y: yl },
+            { x: xl, y: yh },
+            { x: xh, y: yh },
+            { x: xh, y: yl }
+        ]);
     };
     //--- END --- Implement interface `IBounded`
     /**
@@ -387,6 +393,7 @@ var CubicBezierCurve = /** @class */ (function () {
      **/
     CubicBezierCurve.prototype.getPointAt = function (t) {
         // Perform some powerful math magic
+        // TODO: cleanup
         // const x: number =
         //   this.startPoint.x * Math.pow(1.0 - t, 3) +
         //   this.startControlPoint.x * 3 * t * Math.pow(1.0 - t, 2) +
@@ -870,6 +877,65 @@ var CubicBezierCurve = /** @class */ (function () {
                 p2 * 3 * Math.pow(t, 2) * (1.0 - t) +
                 p3 * Math.pow(t, 3);
         },
+        cubicPolyMinMax: function (p0, p1, p2, p3) {
+            // var polyX = CubicBezierCurve.utils.cubicPoly2(
+            //   p0, // P[0].X, // bezierCurve.startPoint.x,
+            //   p1, // P[1].X, // bezierCurve.startControlPoint.x,
+            //   p2, // P[2].X, // bezierCurve.endControlPoint.x,
+            //   p3 // P[3].X // bezierCurve.endPoint.x
+            // );
+            // var a = polyX.a;
+            // var b = polyX.b;
+            // var c = polyX.c;
+            // var disc = polyX.b * polyX.b - 4 * polyX.a * polyX.c;
+            var polyX = CubicBezierCurve.utils.cubicPoly(p0, // P[0].X, // bezierCurve.startPoint.x,
+            p1, // P[1].X, // bezierCurve.startControlPoint.x,
+            p2, // P[2].X, // bezierCurve.endControlPoint.x,
+            p3 // P[3].X // bezierCurve.endPoint.x
+            );
+            var a = polyX[0]; // .a;
+            var b = polyX[1]; // .b;
+            var c = polyX[2]; // .c;
+            //alert("a "+a+" "+b+" "+c);
+            // var disc = b * b - 4 * a * c;
+            var disc = polyX[1] * polyX[1] - 4 * polyX[0] * polyX[2];
+            // var polyX = CubicBezierCurve.utils.bezierCoeffs(p3,p2,p1,p0);
+            // var a = polyX[0]; //polyX.a;
+            // var b = polyX[1]; // .b;
+            // var c = polyX[2]; //.c;
+            // var disc = polyX[1] * polyX[1] - 4 * polyX[0] * polyX[2];
+            // var xl = Math.min(bCurve.endPoint.x, bCurve.startPoint.x); // P[0].X;
+            // var xh = Math.max(bCurve.endPoint.x, bCurve.startPoint.x); // P[0].X;
+            var xl = Math.min(p3, p0); // P[0].X;
+            var xh = Math.max(p3, p0); // P[0].X;
+            // if (P[3].X < xl) xl = P[3].X;
+            // if (P[3].X > xh) xh = P[3].X;
+            if (disc >= 0) {
+                var t1 = (-b + Math.sqrt(disc)) / (2 * a);
+                // alert("t1 " + t1);
+                if (t1 > 0 && t1 < 1) {
+                    // var x1 = evalBez(PX, t1);
+                    // var x1 = bCurve.getPointAt(t1).x;
+                    var x1 = CubicBezierCurve.utils.evaluateT(p0, p1, p2, p3, t1); // bCurve.getPointAt(t1).x;
+                    if (x1 < xl)
+                        xl = x1;
+                    if (x1 > xh)
+                        xh = x1;
+                }
+                var t2 = (-b - Math.sqrt(disc)) / (2 * a);
+                // alert("t2 " + t2);
+                if (t2 > 0 && t2 < 1) {
+                    // var x2 = evalBez(PX, t2);
+                    // var x2 = bCurve.getPointAt(t2).x;
+                    var x2 = CubicBezierCurve.utils.evaluateT(p0, p1, p2, p3, t2); //
+                    if (x2 < xl)
+                        xl = x2;
+                    if (x2 > xh)
+                        xh = x2;
+                }
+            }
+            return { min: xl, max: xh };
+        },
         /**
          * Get the points of a sub curve at the given start end end offsets (values between 0.0 and 1.0).
          *
@@ -947,18 +1013,34 @@ var CubicBezierCurve = /** @class */ (function () {
          * Compute the Bézier coefficients from the given Bézier point coordinates.
          *
          * @param {number} p0 - The start point coordinate.
-         * @param {number} p1 - The start point coordinate.
-         * @param {number} p2 - The start point coordinate.
-         * @param {number} p3 - The start point coordinate.
-         * @returns {Array<number>}
+         * @param {number} p1 - The start control point coordinate.
+         * @param {number} p2 - The end control point coordinate.
+         * @param {number} p3 - The end point coordinate.
+         * @returns {[number,number,number,number]}
          */
         bezierCoeffs: function (p0, p1, p2, p3) {
-            var coeffs = Array(4);
+            var coeffs = [NaN, NaN, NaN, NaN]; //Array(4);
             coeffs[0] = -p0 + 3 * p1 + -3 * p2 + p3;
             coeffs[1] = 3 * p0 - 6 * p1 + 3 * p2;
             coeffs[2] = -3 * p0 + 3 * p1;
             coeffs[3] = p0;
             return coeffs;
+        },
+        /**
+         * Calculate the cubic polynomial coefficients used to find the bounding box.
+         *
+         * @param {number} p0 - The start point coordinate.
+         * @param {number} p1 - The start control point coordinate.
+         * @param {number} p2 - The end control point coordinate.
+         * @param {number} p3 - The end point coordinate.
+         * @returns {[number,number,number]}
+         */
+        cubicPoly: function (p0, p1, p2, p3) {
+            return [
+                3 * p3 - 9 * p2 + 9 * p1 - 3 * p0,
+                6 * p0 - 12 * p1 + 6 * p2,
+                3 * p1 - 3 * p0
+            ];
         },
         /**
          * sign of number, but is division safe: no zero returned :)

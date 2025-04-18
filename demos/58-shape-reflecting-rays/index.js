@@ -129,6 +129,7 @@
 
         if (shape instanceof BezierPath) {
           console.log("is bezier path");
+          // var bbox = shape.bezierCurves[0].getBounds(); //
           var bbox = findBB(shape.bezierCurves[0]);
           draw.rect(
             bbox.min, // position: XYCoords,
@@ -376,7 +377,12 @@
       //     if (x2 > xh) xh = x2;
       //   }
       // }
-      var xMinMax = cubicPolyMinMax(bCurve.startPoint.x, bCurve.startControlPoint.x, bCurve.endControlPoint.x, bCurve.endPoint.x);
+      var xMinMax = CubicBezierCurve.utils.cubicPolyMinMax(
+        bCurve.startPoint.x,
+        bCurve.startControlPoint.x,
+        bCurve.endControlPoint.x,
+        bCurve.endPoint.x
+      );
       var xl = xMinMax.min;
       var xh = xMinMax.max;
 
@@ -409,7 +415,12 @@
       //     if (y2 > yh) yh = y2;
       //   }
       // }
-      var yMinMax = cubicPolyMinMax(bCurve.startPoint.y, bCurve.startControlPoint.y, bCurve.endControlPoint.y, bCurve.endPoint.y);
+      var yMinMax = CubicBezierCurve.utils.cubicPolyMinMax(
+        bCurve.startPoint.y,
+        bCurve.startControlPoint.y,
+        bCurve.endControlPoint.y,
+        bCurve.endPoint.y
+      );
       var yl = yMinMax.min;
       var yh = yMinMax.max;
 
@@ -427,61 +438,61 @@
       ]);
     }
 
-    var cubicPolyMinMax = function (p0, p1, p2, p3) {
-      var polyX = cubicPoly(
-        p0, // P[0].X, // bezierCurve.startPoint.x,
-        p1, // P[1].X, // bezierCurve.startControlPoint.x,
-        p2, // P[2].X, // bezierCurve.endControlPoint.x,
-        p3 // P[3].X // bezierCurve.endPoint.x
-      );
-      var a = polyX.a;
-      var b = polyX.b;
-      var c = polyX.c;
-      //alert("a "+a+" "+b+" "+c);
-      // var disc = b * b - 4 * a * c;
-      // var disc = polyX.b * polyX.b - 4 * polyX.a * polyX.c;
-      var disc = polyX.b * polyX.b - 4 * polyX.a * polyX.c;
-      // var xl = Math.min(bCurve.endPoint.x, bCurve.startPoint.x); // P[0].X;
-      // var xh = Math.max(bCurve.endPoint.x, bCurve.startPoint.x); // P[0].X;
-      var xl = Math.min(p3, p0); // P[0].X;
-      var xh = Math.max(p3, p0); // P[0].X;
-      // if (P[3].X < xl) xl = P[3].X;
-      // if (P[3].X > xh) xh = P[3].X;
-      if (disc >= 0) {
-        var t1 = (-b + Math.sqrt(disc)) / (2 * a);
-        // alert("t1 " + t1);
-        if (t1 > 0 && t1 < 1) {
-          // var x1 = evalBez(PX, t1);
-          // var x1 = bCurve.getPointAt(t1).x;
-          var x1 = CubicBezierCurve.utils.evaluateT(p0, p1, p2, p3, t1); // bCurve.getPointAt(t1).x;
+    // var cubicPolyMinMax = function (p0, p1, p2, p3) {
+    //   var polyX = cubicPoly(
+    //     p0, // P[0].X, // bezierCurve.startPoint.x,
+    //     p1, // P[1].X, // bezierCurve.startControlPoint.x,
+    //     p2, // P[2].X, // bezierCurve.endControlPoint.x,
+    //     p3 // P[3].X // bezierCurve.endPoint.x
+    //   );
+    //   var a = polyX.a;
+    //   var b = polyX.b;
+    //   var c = polyX.c;
+    //   //alert("a "+a+" "+b+" "+c);
+    //   // var disc = b * b - 4 * a * c;
+    //   // var disc = polyX.b * polyX.b - 4 * polyX.a * polyX.c;
+    //   var disc = polyX.b * polyX.b - 4 * polyX.a * polyX.c;
+    //   // var xl = Math.min(bCurve.endPoint.x, bCurve.startPoint.x); // P[0].X;
+    //   // var xh = Math.max(bCurve.endPoint.x, bCurve.startPoint.x); // P[0].X;
+    //   var xl = Math.min(p3, p0); // P[0].X;
+    //   var xh = Math.max(p3, p0); // P[0].X;
+    //   // if (P[3].X < xl) xl = P[3].X;
+    //   // if (P[3].X > xh) xh = P[3].X;
+    //   if (disc >= 0) {
+    //     var t1 = (-b + Math.sqrt(disc)) / (2 * a);
+    //     // alert("t1 " + t1);
+    //     if (t1 > 0 && t1 < 1) {
+    //       // var x1 = evalBez(PX, t1);
+    //       // var x1 = bCurve.getPointAt(t1).x;
+    //       var x1 = CubicBezierCurve.utils.evaluateT(p0, p1, p2, p3, t1); // bCurve.getPointAt(t1).x;
 
-          if (x1 < xl) xl = x1;
-          if (x1 > xh) xh = x1;
-        }
+    //       if (x1 < xl) xl = x1;
+    //       if (x1 > xh) xh = x1;
+    //     }
 
-        var t2 = (-b - Math.sqrt(disc)) / (2 * a);
-        // alert("t2 " + t2);
-        if (t2 > 0 && t2 < 1) {
-          // var x2 = evalBez(PX, t2);
-          // var x2 = bCurve.getPointAt(t2).x;
-          var x2 = CubicBezierCurve.utils.evaluateT(p0, p1, p2, p3, t2); //
-          if (x2 < xl) xl = x2;
-          if (x2 > xh) xh = x2;
-        }
-      }
-      return { min: xl, max: xh };
-    };
+    //     var t2 = (-b - Math.sqrt(disc)) / (2 * a);
+    //     // alert("t2 " + t2);
+    //     if (t2 > 0 && t2 < 1) {
+    //       // var x2 = evalBez(PX, t2);
+    //       // var x2 = bCurve.getPointAt(t2).x;
+    //       var x2 = CubicBezierCurve.utils.evaluateT(p0, p1, p2, p3, t2); //
+    //       if (x2 < xl) xl = x2;
+    //       if (x2 > xh) xh = x2;
+    //     }
+    //   }
+    //   return { min: xl, max: xh };
+    // };
 
-    var cubicPoly = function (p0, p1, p2, p3) {
-      // var a = 3 * P[3].X - 9 * P[2].X + 9 * P[1].X - 3 * P[0].X;
-      // var b = 6 * P[0].X - 12 * P[1].X + 6 * P[2].X;
-      // var c = 3 * P[1].X - 3 * P[0].X;
-      return {
-        a: 3 * p3 - 9 * p2 + 9 * p1 - 3 * p0,
-        b: 6 * p0 - 12 * p1 + 6 * p2,
-        c: 3 * p1 - 3 * p0
-      };
-    };
+    // var cubicPoly = function (p0, p1, p2, p3) {
+    //   // var a = 3 * P[3].X - 9 * P[2].X + 9 * P[1].X - 3 * P[0].X;
+    //   // var b = 6 * P[0].X - 12 * P[1].X + 6 * P[2].X;
+    //   // var c = 3 * P[1].X - 3 * P[0].X;
+    //   return {
+    //     a: 3 * p3 - 9 * p2 + 9 * p1 - 3 * p0,
+    //     b: 6 * p0 - 12 * p1 + 6 * p2,
+    //     c: 3 * p1 - 3 * p0
+    //   };
+    // };
 
     // +---------------------------------------------------------------------------------
     // | Render next animation step.

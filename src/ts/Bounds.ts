@@ -10,6 +10,7 @@
  * @modified 2022-11-28 Added the `clone` method.
  * @modified 2023-09-29 Added the `randomPoint` method.
  * @modified 2025-03-23 Added the `getMinDimension` and `getMaxDimension` methods.
+ * @modified 2025-04-18 Change parameter type in `Bounds.computeFromVertices` from `Vertex` to more general `XYCoords`.
  * @version  1.8.0
  **/
 
@@ -174,10 +175,10 @@ export class Bounds implements IBounds, XYDimension {
    * @static
    * @method computeFromVertices
    * @memberof Bounds
-   * @param {Array<Vertex>} vertices - The set of vertices you want to get the bounding box for.
+   * @param {Array<XYCoords>} vertices - The set of vertices you want to get the bounding box for.
    * @return The minimal Bounds for the given vertices.
    **/
-  static computeFromVertices(vertices: Array<Vertex>): Bounds {
+  static computeFromVertices(vertices: Array<XYCoords>): Bounds {
     if (vertices.length == 0) return new Bounds(new Vertex(0, 0), new Vertex(0, 0));
 
     let xMin = vertices[0].x;
@@ -185,7 +186,7 @@ export class Bounds implements IBounds, XYDimension {
     let yMin = vertices[0].y;
     let yMax = vertices[0].y;
 
-    let vert: Vertex;
+    let vert: XYCoords;
     for (var i in vertices) {
       vert = vertices[i];
       xMin = Math.min(xMin, vert.x);
