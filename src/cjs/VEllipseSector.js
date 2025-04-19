@@ -97,6 +97,28 @@ var VEllipseSector = /** @class */ (function () {
             return angle >= sAngle || angle < eAngle;
         }
     };
+    /**
+     * Get the sectors starting point (on the underlying ellipse, located at the start angle).
+     *
+     * @method getStartPoint
+     * @instance
+     * @memberof VEllipseSector
+     * @return {Vertex} The sector's stating point.
+     */
+    VEllipseSector.prototype.getStartPoint = function () {
+        return this.ellipse.vertAt(this.startAngle);
+    };
+    /**
+     * Get the sectors ending point (on the underlying ellipse, located at the end angle).
+     *
+     * @method getEndPoint
+     * @instance
+     * @memberof VEllipseSector
+     * @return {Vertex} The sector's ending point.
+     */
+    VEllipseSector.prototype.getEndPoint = function () {
+        return this.ellipse.vertAt(this.endAngle);
+    };
     //--- BEGIN --- Implement interface `Intersectable`
     /**
      * Get the line intersections as vectors with this ellipse.

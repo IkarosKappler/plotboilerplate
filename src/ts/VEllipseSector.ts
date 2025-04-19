@@ -124,8 +124,8 @@ export class VEllipseSector {
    */
   containsAngle(angle: number) {
     angle = geomutils.mapAngleTo2PI(angle); // wrapMinMax(angle, 0, Math.PI * 2);
-    var sAngle = geomutils.mapAngleTo2PI(this.startAngle);
-    var eAngle = geomutils.mapAngleTo2PI(this.endAngle);
+    const sAngle : number = geomutils.mapAngleTo2PI(this.startAngle);
+    const eAngle : number = geomutils.mapAngleTo2PI(this.endAngle);
     // TODO: cleanup
     // if (this.startAngle <= this.endAngle) {
     //   return angle >= this.startAngle && angle < this.endAngle;
@@ -139,6 +139,31 @@ export class VEllipseSector {
       // startAngle > endAngle
       return angle >= sAngle || angle < eAngle;
     }
+  }
+
+
+  /**
+   * Get the sectors starting point (on the underlying ellipse, located at the start angle).
+   *
+   * @method getStartPoint
+   * @instance
+   * @memberof VEllipseSector
+   * @return {Vertex} The sector's stating point.
+   */
+  getStartPoint(): Vertex {
+    return this.ellipse.vertAt(this.startAngle);
+  }
+
+  /**
+   * Get the sectors ending point (on the underlying ellipse, located at the end angle).
+   *
+   * @method getEndPoint
+   * @instance
+   * @memberof VEllipseSector
+   * @return {Vertex} The sector's ending point.
+   */
+  getEndPoint(): Vertex {
+    return this.ellipse.vertAt(this.endAngle);
   }
 
   //--- BEGIN --- Implement interface `Intersectable`

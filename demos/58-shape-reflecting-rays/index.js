@@ -124,33 +124,48 @@
           );
         } // END if
 
-        // if (shape instanceof CircleSector) {
-        //   var bbox = circleSectorBBox(shape);
-        //   draw.rect(
-        //     bbox.min, // position: XYCoords,
-        //     bbox.width, // : number,
-        //     bbox.height, // : number,
-        //     "black",
-        //     1
-        //   );
-        // }
+        if (shape instanceof VEllipseSector) {
+          var bbox = ellipseSectorBBox(shape);
+          draw.rect(
+            bbox.min, // position: XYCoords,
+            bbox.width, // : number,
+            bbox.height, // : number,
+            "red",
+            1
+          );
+
+          var sp = shape.getStartPoint();
+          var ep = shape.getEndPoint();
+          draw.circleHandle(sp, 5, "red");
+          draw.circleHandle(ep, 5, "red");
+
+          // Ellipse bounds?
+          bounds = shape.ellipse.getBounds();
+          draw.rect(
+            bounds.min, // position: XYCoords,
+            bounds.width, // : number,
+            bounds.height, // : number,
+            "black",
+            1
+          );
+        }
       });
     };
 
-    // var circleSectorBBox = function (circleSector) {
-    //   var circleBounds = circleSector.circle.getBounds();
-    //   // Calculage angles from east, west, north and south box points and check if they are inside
-    //   var candidates = [
-    //     circleBounds.getNorthPoint(),
-    //     circleBounds.getSouthPoint(),
-    //     circleBounds.getWestPoint(),
-    //     circleBounds.getEastPoint()
-    //   ].filter(function (point) {
-    //     var angle = new Line(circleSector.circle.center, point).angle();
-    //     return circleSector.containsAngle(angle);
-    //   });
-    //   return Bounds.computeFromVertices([circleSector.getStartPoint(), circleSector.getEndPoint()].concat(candidates));
-    // };
+    var ellipseSectorBBox = function (ellipseSector) {
+      var circleBounds = ellipseSector.ellipse.getBounds();
+      // Calculage angles from east, west, north and south box points and check if they are inside
+      var candidates = [
+        circleBounds.getNorthPoint(),
+        circleBounds.getSouthPoint(),
+        circleBounds.getWestPoint(),
+        circleBounds.getEastPoint()
+      ].filter(function (point) {
+        var angle = new Line(ellipseSector.ellipse.center, point).angle(); //  - ellipseSector.rotation;
+        return ellipseSector.containsAngle(ellipseSector.rotation - angle);
+      });
+      return Bounds.computeFromVertices([ellipseSector.getStartPoint(), ellipseSector.getEndPoint()].concat(candidates));
+    };
 
     var drawRays = function (draw, fill, rays, color) {
       rays.forEach(function (ray) {

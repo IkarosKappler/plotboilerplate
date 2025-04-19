@@ -23,7 +23,7 @@ import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 import { geomutils } from "./geomutils";
-import { IBounded, IBounds, Intersectable, SVGPathParams, SVGSerializable, UID, XYCoords } from "./interfaces";
+import { IBounded, Intersectable, SVGPathParams, SVGSerializable, UID, XYCoords } from "./interfaces";
 
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.

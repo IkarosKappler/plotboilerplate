@@ -103,6 +103,24 @@ export declare class VEllipseSector {
      */
     containsAngle(angle: number): boolean;
     /**
+     * Get the sectors starting point (on the underlying ellipse, located at the start angle).
+     *
+     * @method getStartPoint
+     * @instance
+     * @memberof VEllipseSector
+     * @return {Vertex} The sector's stating point.
+     */
+    getStartPoint(): Vertex;
+    /**
+     * Get the sectors ending point (on the underlying ellipse, located at the end angle).
+     *
+     * @method getEndPoint
+     * @instance
+     * @memberof VEllipseSector
+     * @return {Vertex} The sector's ending point.
+     */
+    getEndPoint(): Vertex;
+    /**
      * Get the line intersections as vectors with this ellipse.
      *
      * @method lineIntersections
