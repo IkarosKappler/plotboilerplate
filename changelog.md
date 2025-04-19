@@ -16,6 +16,8 @@ Imminent todos:
   - Refactored method `CubicBezierCurve.getPointAt` to use `evaluateT`.
   - Changed parameter type in `Bounds.computeFromVertices` from `Vertex` to more general `XYCoords`.
   - Fixed the `CubicBezierCurve.getBounds` method: now returning the real bounding box. Before it was an approximated one.
+  - Added helper methods for bounding box calculation `CubucBezierCurve.util.cubicPolyMinMax` and `cubicPoly`.
+  - Addint the `VEllipse.getBounds()` method.
 * 2025-04-16
   - Added interface `IBounded`.
   - Class `Polygon` now implements `IBounded`.

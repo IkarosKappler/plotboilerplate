@@ -18,6 +18,7 @@
  * @modified 2022-02-02 Cleared the `VEllipse.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2025-03-31 ATTENTION: modified the winding direction of the `tangentAt` method to match with the Circle method. This is a breaking change!
  * @modified 2025-03-31 Adding the `VEllipse.move(amount: XYCoords)` method.
+ * @modified 2025-04-19 Adding the `VEllipse.getBounds()` method.
  * @version  1.4.0
  *
  * @file VEllipse
@@ -31,6 +32,7 @@ var Vertex_1 = require("./Vertex");
 var UIDGenerator_1 = require("./UIDGenerator");
 var CubicBezierCurve_1 = require("./CubicBezierCurve");
 var Circle_1 = require("./Circle");
+var Bounds_1 = require("./Bounds");
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -117,6 +119,42 @@ var VEllipse = /** @class */ (function () {
         // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).y - this.center.y);
         return new Vertex_1.Vertex(this.axis).rotate(-this.rotation, this.center).y - this.center.y;
     };
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Get the bounds of this ellipse.
+     *
+     * The bounds are approximated by the underlying segment buffer; the more segment there are,
+     * the more accurate will be the returned bounds.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof VEllipse
+     * @return {Bounds} The bounds of this curve.
+     **/
+    VEllipse.prototype.getBounds = function () {
+        // Thanks to Cuixiping
+        //    https://stackoverflow.com/questions/87734/how-do-you-calculate-the-axis-aligned-bounding-box-of-an-ellipse
+        var r1 = this.radiusH();
+        var r2 = this.radiusV();
+        var ux = r1 * Math.cos(this.rotation);
+        var uy = r1 * Math.sin(this.rotation);
+        var vx = r2 * Math.cos(this.rotation + Math.PI / 2);
+        var vy = r2 * Math.sin(this.rotation + Math.PI / 2);
+        var bbox_halfwidth = Math.sqrt(ux * ux + vx * vx);
+        var bbox_halfheight = Math.sqrt(uy * uy + vy * vy);
+        // var bbox = {
+        //   minx: center.x - bbox_halfwidth,
+        //   miny: center.y - bbox_halfheight,
+        //   maxx: center.x + bbox_halfwidth,
+        //   maxy: center.y + bbox_halfheight
+        // };
+        // return bbox;
+        return new Bounds_1.Bounds({ x: this.center.x - bbox_halfwidth, y: this.center.y - bbox_halfheight }, { x: this.center.x + bbox_halfwidth,
+            y: this.center.y + bbox_halfheight
+        });
+        // return bbox;
+    };
+    //--- BEGIN --- Implement interface `IBounded`
     /**
      * Move the ellipse by the given amount. This is equivalent by moving the `center` and `axis` points.
      *

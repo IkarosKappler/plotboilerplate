@@ -17,6 +17,7 @@
  * @modified 2022-02-02 Cleared the `VEllipse.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2025-03-31 ATTENTION: modified the winding direction of the `tangentAt` method to match with the Circle method. This is a breaking change!
  * @modified 2025-03-31 Adding the `VEllipse.move(amount: XYCoords)` method.
+ * @modified 2025-04-19 Adding the `VEllipse.getBounds()` method.
  * @version  1.4.0
  *
  * @file VEllipse
@@ -24,9 +25,10 @@
  **/
 import { Vector } from "./Vector";
 import { Vertex } from "./Vertex";
-import { Intersectable, SVGSerializable, UID, XYCoords } from "./interfaces";
+import { IBounded, Intersectable, SVGSerializable, UID, XYCoords } from "./interfaces";
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { VertTuple } from "./VertTuple";
+import { Bounds } from "./Bounds";
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -35,7 +37,7 @@ import { VertTuple } from "./VertTuple";
  * @requires UIDGenerator
  * @requires Vertex
  */
-export declare class VEllipse implements Intersectable, SVGSerializable {
+export declare class VEllipse implements IBounded, Intersectable, SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
      **/
@@ -126,6 +128,18 @@ export declare class VEllipse implements Intersectable, SVGSerializable {
      * @return {number} The signed vertical radius of this ellipse.
      */
     signedRadiusV(): number;
+    /**
+     * Get the bounds of this ellipse.
+     *
+     * The bounds are approximated by the underlying segment buffer; the more segment there are,
+     * the more accurate will be the returned bounds.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof VEllipse
+     * @return {Bounds} The bounds of this curve.
+     **/
+    getBounds(): Bounds;
     /**
      * Move the ellipse by the given amount. This is equivalent by moving the `center` and `axis` points.
      *

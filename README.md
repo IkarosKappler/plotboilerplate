@@ -563,6 +563,7 @@ new MouseHandler(document.getElementById("mycanvas"))
 - Stephen Schmitt for solvin cubic Beziér intersections with line segments http://mysite.verizon.net/res148h4j/javascript/script_exact_cubic.html
 - And _Particle in Cell Consulting LLC_ for refactoring Stephen Schmitt's solution: [Computing Intersections Between a Cubic Bezier Curve and a Line](https://www.particleincell.com/2013/cubic-line-intersection/)
 - Richard "RM" for the hints of how to calculate the bounding box of cubic Bézuer curves: [Bezier Area](https://jsfiddle.net/SalixAlba/QQnvm/4/)
+- [Cuixiping](https://stackoverflow.com/users/988089/cuixiping) for the helpful insights on cubic Bézier bounds at [Stackoverflow](https://stackoverflow.com/questions/24809978/calculating-the-bounding-box-of-cubic-bezier-curve)
 
 ## Todos
 
