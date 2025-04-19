@@ -12,6 +12,7 @@
  * @modified 2023-09-29 Added the `randomPoint` method.
  * @modified 2025-03-23 Added the `getMinDimension` and `getMaxDimension` methods.
  * @modified 2025-04-18 Change parameter type in `Bounds.computeFromVertices` from `Vertex` to more general `XYCoords`.
+ * @modified 2025-04-19 Added methods to `Bounds` class: `getNorthPoint`, `getSouthPoint`, `getEastPoint` and `getWestPoint`.
  * @version  1.8.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -40,6 +41,54 @@ var Bounds = /** @class */ (function () {
         this.width = max.x - min.x;
         this.height = max.y - min.y;
     }
+    /**
+     * Get the center point of the north bound.
+     *
+     * @method getNorthPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "northmost" centered point of this bounding box.
+     */
+    Bounds.prototype.getNorthPoint = function () {
+        return new Vertex_1.Vertex(this.min.x + this.width / 2.0, this.min.y);
+    };
+    ;
+    /**
+     * Get the center point of the south bound.
+     *
+     * @method getNorthPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "southhmost" centered point of this bounding box.
+     */
+    Bounds.prototype.getSouthPoint = function () {
+        return new Vertex_1.Vertex(this.min.x + this.width / 2.0, this.max.y);
+    };
+    ;
+    /**
+    * Get the center point of the west bound.
+    *
+    * @method getWestPoint
+    * @instance
+    * @memberof Bounds
+    * @return {Vertex} The "westhmost" centered point of this bounding box.
+    */
+    Bounds.prototype.getWestPoint = function () {
+        return new Vertex_1.Vertex(this.min.x, this.min.y + this.height / 2.0);
+    };
+    ;
+    /**
+    * Get the center point of the east bound.
+    *
+    * @method getEastPoint
+    * @instance
+    * @memberof Bounds
+    * @return {Vertex} The "easthmost" centered point of this bounding box.
+    */
+    Bounds.prototype.getEastPoint = function () {
+        return new Vertex_1.Vertex(this.max.x, this.min.y + this.height / 2.0);
+    };
+    ;
     /**
      * Convert this rectangular bounding box to a polygon with four vertices.
      *

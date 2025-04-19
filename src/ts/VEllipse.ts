@@ -167,44 +167,45 @@ export class VEllipse implements IBounded, Intersectable, SVGSerializable {
   }
 
   //--- BEGIN --- Implement interface `IBounded`
-    /**
-     * Get the bounds of this ellipse.
-     *
-     * The bounds are approximated by the underlying segment buffer; the more segment there are,
-     * the more accurate will be the returned bounds.
-     *
-     * @method getBounds
-     * @instance
-     * @memberof VEllipse
-     * @return {Bounds} The bounds of this curve.
-     **/
-    getBounds(): Bounds {
-      // Thanks to Cuixiping
-      //    https://stackoverflow.com/questions/87734/how-do-you-calculate-the-axis-aligned-bounding-box-of-an-ellipse
-      const r1 : number = this.radiusH();
-      const r2 : number = this.radiusV();
+  /**
+   * Get the bounds of this ellipse.
+   *
+   * The bounds are approximated by the underlying segment buffer; the more segment there are,
+   * the more accurate will be the returned bounds.
+   *
+   * @method getBounds
+   * @instance
+   * @memberof VEllipse
+   * @return {Bounds} The bounds of this curve.
+   **/
+  getBounds(): Bounds {
+    // Thanks to Cuixiping
+    //    https://stackoverflow.com/questions/87734/how-do-you-calculate-the-axis-aligned-bounding-box-of-an-ellipse
+    const r1 : number = this.radiusH();
+    const r2 : number = this.radiusV();
 
-      const ux : number = r1 * Math.cos(this.rotation);
-      const uy : number = r1 * Math.sin(this.rotation);
-      const vx : number = r2 * Math.cos(this.rotation + Math.PI / 2);
-      const vy : number = r2 * Math.sin(this.rotation + Math.PI / 2);
+    const ux : number = r1 * Math.cos(this.rotation);
+    const uy : number = r1 * Math.sin(this.rotation);
+    const vx : number = r2 * Math.cos(this.rotation + Math.PI / 2);
+    const vy : number = r2 * Math.sin(this.rotation + Math.PI / 2);
 
-      const bbox_halfwidth = Math.sqrt(ux * ux + vx * vx);
-      const bbox_halfheight = Math.sqrt(uy * uy + vy * vy);
+    const bbox_halfwidth = Math.sqrt(ux * ux + vx * vx);
+    const bbox_halfheight = Math.sqrt(uy * uy + vy * vy);
 
-      // var bbox = {
-      //   minx: center.x - bbox_halfwidth,
-      //   miny: center.y - bbox_halfheight,
-      //   maxx: center.x + bbox_halfwidth,
-      //   maxy: center.y + bbox_halfheight
-      // };
-      // return bbox;
-      return new Bounds( { x : this.center.x - bbox_halfwidth,  y : this.center.y - bbox_halfheight },
-        { x : this.center.x + bbox_halfwidth,
-         y : this.center.y + bbox_halfheight
-      } );
-      // return bbox;
-    }
+    // TODO: cleanup
+    // var bbox = {
+    //   minx: center.x - bbox_halfwidth,
+    //   miny: center.y - bbox_halfheight,
+    //   maxx: center.x + bbox_halfwidth,
+    //   maxy: center.y + bbox_halfheight
+    // };
+    // return bbox;
+    return new Bounds( { x : this.center.x - bbox_halfwidth,  y : this.center.y - bbox_halfheight },
+      { x : this.center.x + bbox_halfwidth,
+        y : this.center.y + bbox_halfheight
+    } );
+    // return bbox;
+  }
   //--- BEGIN --- Implement interface `IBounded`
 
 

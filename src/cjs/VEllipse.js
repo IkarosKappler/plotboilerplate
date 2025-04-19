@@ -142,6 +142,7 @@ var VEllipse = /** @class */ (function () {
         var vy = r2 * Math.sin(this.rotation + Math.PI / 2);
         var bbox_halfwidth = Math.sqrt(ux * ux + vx * vx);
         var bbox_halfheight = Math.sqrt(uy * uy + vy * vy);
+        // TODO: cleanup
         // var bbox = {
         //   minx: center.x - bbox_halfwidth,
         //   miny: center.y - bbox_halfheight,

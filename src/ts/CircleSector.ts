@@ -10,9 +10,12 @@
  * @modified 2024-03-09 Added the `angleAt` method to determine any angle at some ratio.
  * @modified 2025-04-02 Adding the `CircleSector.lineIntersections` and `CircleSector.lineIntersectionTangents` and implementing `Intersectable`.
  * @modified 2025-04-09 Adding the `CircleSector.move()` method.
+ * @modified 2025-04-19 Tweaking the `CircleSector.containsAngle` method: all values (input angle, start- and end- angle) are wrapped into [0,2*PI) now.
+ * @modified 2025-04-19 Class `CircleSector` implements interface `Bounded` now (method `getBounds` added).
  * @version  1.2.0
  **/
 
+import { Bounds } from "./Bounds";
 import { Circle } from "./Circle";
 import { Line } from "./Line";
 import { UIDGenerator } from "./UIDGenerator";
@@ -20,7 +23,7 @@ import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 import { geomutils } from "./geomutils";
-import { Intersectable, PathSegment, SVGPathParams, SVGSerializable, UID, XYCoords } from "./interfaces";
+import { IBounded, IBounds, Intersectable, SVGPathParams, SVGSerializable, UID, XYCoords } from "./interfaces";
 
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
@@ -31,7 +34,7 @@ import { Intersectable, PathSegment, SVGPathParams, SVGSerializable, UID, XYCoor
  * @requires UIDGenerator
  * @requires XYCoords
  **/
-export class CircleSector implements Intersectable, SVGSerializable {
+export class CircleSector implements IBounded, Intersectable, SVGSerializable {
   /**
    * Required to generate proper CSS classes and other class related IDs.
    **/
@@ -92,6 +95,38 @@ export class CircleSector implements Intersectable, SVGSerializable {
     this.endAngle = endAngle;
   }
 
+  //--- BEGIN --- Implement interface `IBounded`
+  /**
+   * Get the bounds of this ellipse.
+   *
+   * The bounds are approximated by the underlying segment buffer; the more segment there are,
+   * the more accurate will be the returned bounds.
+   *
+   * @method getBounds
+   * @instance
+   * @memberof VEllipse
+   * @return {Bounds} The bounds of this curve.
+   **/
+  getBounds(): Bounds {
+    const _self = this;
+    const circleBounds : Bounds = this.circle.getBounds();
+    // Calculage angles from east, west, north and south box points and check if they are inside
+    const candidates : Array<Vertex> = [
+      circleBounds.getNorthPoint(),
+      circleBounds.getSouthPoint(),
+      circleBounds.getWestPoint(),
+      circleBounds.getEastPoint()
+    ].filter( (point : Vertex) => {
+      // Check for each candidate points if they are contained in this sector. Drop if not.
+      const angle : number = new Line(_self.circle.center, point).angle();
+      return _self.containsAngle(angle);
+    });
+    // Compute bounds and inlcude start end end point (they are definitely part of the bounds)
+    return Bounds.computeFromVertices(candidates.concat([this.getStartPoint(), this.getEndPoint()]));
+  }
+  //--- BEGIN --- Implement interface `IBounded`
+
+
   /**
    * Move the circle sector by the given amount.
    *
@@ -116,11 +151,21 @@ export class CircleSector implements Intersectable, SVGSerializable {
    * @return {boolean} True if (and only if) this sector contains the given angle.
    */
   containsAngle(angle: number) {
-    if (this.startAngle <= this.endAngle) {
-      return angle >= this.startAngle && angle < this.endAngle;
+    var wrappedAngle = geomutils.mapAngleTo2PI(angle);
+    var wrappedStart = geomutils.mapAngleTo2PI(this.startAngle);
+    var wrappedEnd = geomutils.mapAngleTo2PI(this.endAngle);
+    // TODO: cleanup
+    // if (this.startAngle <= this.endAngle) {
+    //   return angle >= this.startAngle && angle < this.endAngle;
+    // } else {
+    //   // startAngle > endAngle
+    //   return angle >= this.startAngle || angle < this.endAngle;
+    // }
+    if (wrappedStart <= wrappedEnd) {
+      return wrappedAngle >= wrappedStart && wrappedAngle < wrappedEnd;
     } else {
       // startAngle > endAngle
-      return angle >= this.startAngle || angle < this.endAngle;
+      return wrappedAngle >= wrappedStart || wrappedAngle < wrappedEnd;
     }
   }
 

@@ -18,6 +18,9 @@ Imminent todos:
   - Fixed the `CubicBezierCurve.getBounds` method: now returning the real bounding box. Before it was an approximated one.
   - Added helper methods for bounding box calculation `CubucBezierCurve.util.cubicPolyMinMax` and `cubicPoly`.
   - Addint the `VEllipse.getBounds()` method.
+  - Added methods to `Bounds` class: `getNorthPoint`, `getSouthPoint`, `getEastPoint` and `getWestPoint`.
+  - Tweaking the `CircleSector.containsAngle` method: all values (input angle, start- and end- angle) are wrapped into [0,2\*PI) now.
+  - Class `CircleSector` implements interface `Bounded` now (method `getBounds` added).
 * 2025-04-16
   - Added interface `IBounded`.
   - Class `Polygon` now implements `IBounded`.

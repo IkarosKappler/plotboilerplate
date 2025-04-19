@@ -11,6 +11,7 @@
  * @modified 2023-09-29 Added the `randomPoint` method.
  * @modified 2025-03-23 Added the `getMinDimension` and `getMaxDimension` methods.
  * @modified 2025-04-18 Change parameter type in `Bounds.computeFromVertices` from `Vertex` to more general `XYCoords`.
+ * @modified 2025-04-19 Added methods to `Bounds` class: `getNorthPoint`, `getSouthPoint`, `getEastPoint` and `getWestPoint`.
  * @version  1.8.0
  **/
 import { Polygon } from "./Polygon";
@@ -61,6 +62,42 @@ export declare class Bounds implements IBounds, XYDimension {
      * @param {XYCoords} max - The max values (x,y) as a XYCoords tuple.
      **/
     constructor(min: XYCoords, max: XYCoords);
+    /**
+     * Get the center point of the north bound.
+     *
+     * @method getNorthPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "northmost" centered point of this bounding box.
+     */
+    getNorthPoint(): Vertex;
+    /**
+     * Get the center point of the south bound.
+     *
+     * @method getNorthPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "southhmost" centered point of this bounding box.
+     */
+    getSouthPoint(): Vertex;
+    /**
+    * Get the center point of the west bound.
+    *
+    * @method getWestPoint
+    * @instance
+    * @memberof Bounds
+    * @return {Vertex} The "westhmost" centered point of this bounding box.
+    */
+    getWestPoint(): Vertex;
+    /**
+    * Get the center point of the east bound.
+    *
+    * @method getEastPoint
+    * @instance
+    * @memberof Bounds
+    * @return {Vertex} The "easthmost" centered point of this bounding box.
+    */
+    getEastPoint(): Vertex;
     /**
      * Convert this rectangular bounding box to a polygon with four vertices.
      *
