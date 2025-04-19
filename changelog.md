@@ -21,6 +21,7 @@ Imminent todos:
   - Added methods to `Bounds` class: `getNorthPoint`, `getSouthPoint`, `getEastPoint` and `getWestPoint`.
   - Tweaking the `CircleSector.containsAngle` method: all values (input angle, start- and end- angle) are wrapped into [0,2\*PI) now.
   - Class `CircleSector` implements interface `Bounded` now (method `getBounds` added).
+  - Added the VEllipseSector.getStartPoint`and`getEndPoint` methods.
 * 2025-04-16
   - Added interface `IBounded`.
   - Class `Polygon` now implements `IBounded`.

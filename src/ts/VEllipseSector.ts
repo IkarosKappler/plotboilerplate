@@ -11,6 +11,7 @@
  * @modified 2025-04-02 Adding `VEllipseSector.lineIntersections` and `VEllipseSector.lineIntersectionTangents` and implementing `Intersectable`.
  * @modified 2025-04-07 Adding value wrapping (0 to TWO_PI) to the `VEllipseSector.containsAngle` method.
  * @modified 2025-04-09 Adding the `VEllipseSector.move` method.
+ * @modified 2025-04-19 Added the VEllipseSector.getStartPoint` and `getEndPoint` methods.
  * @version  1.2.0
  */
 
