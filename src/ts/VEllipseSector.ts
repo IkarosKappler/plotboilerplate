@@ -125,8 +125,8 @@ export class VEllipseSector {
    */
   containsAngle(angle: number) {
     angle = geomutils.mapAngleTo2PI(angle); // wrapMinMax(angle, 0, Math.PI * 2);
-    const sAngle : number = geomutils.mapAngleTo2PI(this.startAngle);
-    const eAngle : number = geomutils.mapAngleTo2PI(this.endAngle);
+    const sAngle: number = geomutils.mapAngleTo2PI(this.startAngle);
+    const eAngle: number = geomutils.mapAngleTo2PI(this.endAngle);
     // TODO: cleanup
     // if (this.startAngle <= this.endAngle) {
     //   return angle >= this.startAngle && angle < this.endAngle;
@@ -141,7 +141,6 @@ export class VEllipseSector {
       return angle >= sAngle || angle < eAngle;
     }
   }
-
 
   /**
    * Get the sectors starting point (on the underlying ellipse, located at the start angle).
@@ -380,23 +379,23 @@ export class VEllipseSector {
       endAngle: number,
       fullEllipsePointCount: number
     ): Array<number> => {
-      var ellipseAngles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, fullEllipsePointCount);
+      var ellipseAngles: number[] = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, fullEllipsePointCount);
       ellipseAngles = ellipseAngles.map((angle: number) => VEllipseSector.ellipseSectorUtils.normalizeAngle(angle));
 
-      var angleIsInRange = (angle: number) => {
+      const angleIsInRange = (angle: number) => {
         if (startAngle < endAngle) return angle >= startAngle && angle <= endAngle;
         else return angle >= startAngle || (angle <= endAngle && angle >= 0);
       };
       // Drop all angles outside the sector
-      var ellipseAngles = ellipseAngles.filter(angleIsInRange);
+      ellipseAngles = ellipseAngles.filter(angleIsInRange);
 
       // Now we need to sort the angles to the first one in the array is the closest to startAngle.
       // --> find the angle that is closest to the start angle
-      var startIndex = VEllipseSector.ellipseSectorUtils.findClosestToStartAngle(startAngle, endAngle, ellipseAngles);
+      const startIndex: number = VEllipseSector.ellipseSectorUtils.findClosestToStartAngle(startAngle, endAngle, ellipseAngles);
 
       // Bring all angles into the correct order
       //    Idea: use splice or slice here?
-      var angles: Array<number> = [];
+      const angles: Array<number> = [];
       for (var i = 0; i < ellipseAngles.length; i++) {
         angles.push(ellipseAngles[(startIndex + i) % ellipseAngles.length]);
       }

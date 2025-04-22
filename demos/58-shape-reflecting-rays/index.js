@@ -153,13 +153,19 @@
     };
 
     var ellipseSectorBBox = function (ellipseSector) {
-      var circleBounds = ellipseSector.ellipse.getBounds();
+      // var ellipseBounds = ellipseSector.getBounds();
       // Calculage angles from east, west, north and south box points and check if they are inside
+      const extremes = ellipseSector.ellipse.getExtremePoints();
+      console.log("extremes", extremes);
+      extremes.forEach(function (p) {
+        pb.draw.circleHandle(p, 6, "green");
+      });
       var candidates = [
-        circleBounds.getNorthPoint(),
-        circleBounds.getSouthPoint(),
-        circleBounds.getWestPoint(),
-        circleBounds.getEastPoint()
+        // ellipseBounds.getNorthPoint(),
+        // ellipseBounds.getSouthPoint(),
+        // ellipseBounds.getWestPoint(),
+        // ellipseBounds.getEastPoint()
+        // ellipseSector.ellipse.getNorthPoint()
       ].filter(function (point) {
         var angle = new Line(ellipseSector.ellipse.center, point).angle(); //  - ellipseSector.rotation;
         return ellipseSector.containsAngle(ellipseSector.rotation - angle);

@@ -160,11 +160,115 @@ export class VEllipse implements IBounded, Intersectable, SVGSerializable {
    * @return {number} The signed vertical radius of this ellipse.
    */
   signedRadiusV(): number {
-    // return Math.abs(this.axis.y - this.center.y);
     // Rotate axis back to origin before calculating radius
-    // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).y - this.center.y);
     return new Vertex(this.axis).rotate(-this.rotation, this.center).y - this.center.y;
   }
+
+  /**
+   * Get the the northmost point of this (rotated) ellipse.
+   *
+   * @method getExtremePoints
+   * @instance
+   * @memberof VEllipse
+   * @return {[Vertex, Vertex, Vertex, Vertex]} The "northmost" point of this (rotated) ellipse.
+   */
+  getExtremePoints(): Vertex[] {
+    // Thanks to Cuixiping
+    //    https://stackoverflow.com/questions/87734/how-do-you-calculate-the-axis-aligned-bounding-box-of-an-ellipse
+    const r1: number = this.radiusH();
+    const r2: number = this.radiusV();
+
+    const ux: number = r1 * Math.cos(this.rotation);
+    const uy: number = r1 * Math.sin(this.rotation);
+    const vx: number = r2 * Math.cos(this.rotation + Math.PI / 2);
+    const vy: number = r2 * Math.sin(this.rotation + Math.PI / 2);
+
+    const c = (ux * uy + vx * vy) / (ux * vy - vx * uy);
+
+    const bbox_halfwidth = Math.sqrt(ux * ux + vx * vx);
+    const bbox_halfheight = Math.sqrt(uy * uy + vy * vy);
+
+    const x0 = c / bbox_halfwidth;
+    const y0 = c / bbox_halfheight;
+
+    console.log("c", c, "bbox_halfwidth", bbox_halfwidth, "x0", x0);
+
+    // return [new Vertex(this.center.x - ux, this.center.y - uy), new Vertex(this.center.x + vx, this.center.y + vy)];
+
+    var cos = Math.cos(this.rotation);
+    var sin = Math.sin(this.rotation);
+    var t1 = Math.atan((-r2 * Math.tan(this.rotation)) / r1);
+    var t2 = Math.atan((r2 * (cos / sin)) / r1);
+
+    // return [
+    //   new Vertex(this.center.x - bbox_halfwidth, this.center.y - bbox_halfheight),
+    //   new Vertex(this.center.x + bbox_halfwidth, this.center.y + bbox_halfheight),
+    //   new Vertex(this.center.x - bbox_halfwidth, this.center.y + bbox_halfheight),
+    //   new Vertex(this.center.x + bbox_halfwidth, this.center.y - bbox_halfheight)
+    // ];
+    return [
+      this.vertAt(-t1 - this.rotation + (0 * Math.PI) / 2.0),
+      this.vertAt(-t2 - this.rotation + (0 * Math.PI) / 2.0)
+
+      // new Vertex(this.center.x - x0, this.center.y - t1),
+      // new Vertex(this.center.x + x0, this.center.y + t2)
+      // new Vertex(this.center.x - bbox_halfwidth, this.center.y + uy),
+      // new Vertex(this.center.x + bbox_halfwidth, this.center.y - vy)
+    ];
+    // const ux: number = r1 * Math.cos(this.rotation);
+    // const uy: number = r1 * Math.sin(this.rotation);
+    // const vx: number = r2 * Math.cos(this.rotation + Math.PI / 2);
+    // const vy: number = r2 * Math.sin(this.rotation + Math.PI / 2);
+    // const wx: number = r2 * Math.cos(this.rotation + Math.PI);
+    // const wy: number = r2 * Math.sin(this.rotation + Math.PI);
+    // const xx: number = r2 * Math.cos(this.rotation + Math.PI * 1.5);
+    // const xy: number = r2 * Math.sin(this.rotation + Math.PI * 1.5);
+
+    // return [new Vertex(ux, uy).add(this.center), new Vertex(vx, vy).add(this.center)]; // , new Vertex(wx, wy), new Vertex(xx, xy)];
+
+    // return [
+    //   this.vertAt(-this.rotation),
+    //   this.vertAt(-this.rotation + Math.PI / 2),
+    //   this.vertAt(-this.rotation + Math.PI),
+    //   this.vertAt(-this.rotation + Math.PI * 1.5)
+    // ];
+  }
+
+  // /**
+  //  * Get the center point of the south bound.
+  //  *
+  //  * @method getNorthPoint
+  //  * @instance
+  //  * @memberof Bounds
+  //  * @return {Vertex} The "southhmost" centered point of this bounding box.
+  //  */
+  // getSouthPoint(): Vertex {
+  //   return new Vertex(this.min.x + this.width / 2.0, this.max.y);
+  // }
+
+  // /**
+  //  * Get the center point of the west bound.
+  //  *
+  //  * @method getWestPoint
+  //  * @instance
+  //  * @memberof Bounds
+  //  * @return {Vertex} The "westhmost" centered point of this bounding box.
+  //  */
+  // getWestPoint(): Vertex {
+  //   return new Vertex(this.min.x, this.min.y + this.height / 2.0);
+  // }
+
+  // /**
+  //  * Get the center point of the east bound.
+  //  *
+  //  * @method getEastPoint
+  //  * @instance
+  //  * @memberof Bounds
+  //  * @return {Vertex} The "easthmost" centered point of this bounding box.
+  //  */
+  // getEastPoint(): Vertex {
+  //   return new Vertex(this.max.x, this.min.y + this.height / 2.0);
+  // }
 
   //--- BEGIN --- Implement interface `IBounded`
   /**
@@ -181,33 +285,23 @@ export class VEllipse implements IBounded, Intersectable, SVGSerializable {
   getBounds(): Bounds {
     // Thanks to Cuixiping
     //    https://stackoverflow.com/questions/87734/how-do-you-calculate-the-axis-aligned-bounding-box-of-an-ellipse
-    const r1 : number = this.radiusH();
-    const r2 : number = this.radiusV();
+    const r1: number = this.radiusH();
+    const r2: number = this.radiusV();
 
-    const ux : number = r1 * Math.cos(this.rotation);
-    const uy : number = r1 * Math.sin(this.rotation);
-    const vx : number = r2 * Math.cos(this.rotation + Math.PI / 2);
-    const vy : number = r2 * Math.sin(this.rotation + Math.PI / 2);
+    const ux: number = r1 * Math.cos(this.rotation);
+    const uy: number = r1 * Math.sin(this.rotation);
+    const vx: number = r2 * Math.cos(this.rotation + Math.PI / 2);
+    const vy: number = r2 * Math.sin(this.rotation + Math.PI / 2);
 
     const bbox_halfwidth = Math.sqrt(ux * ux + vx * vx);
     const bbox_halfheight = Math.sqrt(uy * uy + vy * vy);
 
-    // TODO: cleanup
-    // var bbox = {
-    //   minx: center.x - bbox_halfwidth,
-    //   miny: center.y - bbox_halfheight,
-    //   maxx: center.x + bbox_halfwidth,
-    //   maxy: center.y + bbox_halfheight
-    // };
-    // return bbox;
-    return new Bounds( { x : this.center.x - bbox_halfwidth,  y : this.center.y - bbox_halfheight },
-      { x : this.center.x + bbox_halfwidth,
-        y : this.center.y + bbox_halfheight
-    } );
-    // return bbox;
+    return new Bounds(
+      { x: this.center.x - bbox_halfwidth, y: this.center.y - bbox_halfheight },
+      { x: this.center.x + bbox_halfwidth, y: this.center.y + bbox_halfheight }
+    );
   }
   //--- BEGIN --- Implement interface `IBounded`
-
 
   /**
    * Move the ellipse by the given amount. This is equivalent by moving the `center` and `axis` points.

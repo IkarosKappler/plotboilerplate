@@ -12,6 +12,7 @@
  * @modified 2025-04-02 Adding `VEllipseSector.lineIntersections` and `VEllipseSector.lineIntersectionTangents` and implementing `Intersectable`.
  * @modified 2025-04-07 Adding value wrapping (0 to TWO_PI) to the `VEllipseSector.containsAngle` method.
  * @modified 2025-04-09 Adding the `VEllipseSector.move` method.
+ * @modified 2025-04-19 Added the VEllipseSector.getStartPoint` and `getEndPoint` methods.
  * @version  1.2.0
  */
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -308,7 +309,7 @@ var VEllipseSector = /** @class */ (function () {
                     return angle >= startAngle || (angle <= endAngle && angle >= 0);
             };
             // Drop all angles outside the sector
-            var ellipseAngles = ellipseAngles.filter(angleIsInRange);
+            ellipseAngles = ellipseAngles.filter(angleIsInRange);
             // Now we need to sort the angles to the first one in the array is the closest to startAngle.
             // --> find the angle that is closest to the start angle
             var startIndex = VEllipseSector.ellipseSectorUtils.findClosestToStartAngle(startAngle, endAngle, ellipseAngles);

@@ -129,6 +129,15 @@ export declare class VEllipse implements IBounded, Intersectable, SVGSerializabl
      */
     signedRadiusV(): number;
     /**
+     * Get the the northmost point of this (rotated) ellipse.
+     *
+     * @method getExtremePoints
+     * @instance
+     * @memberof VEllipse
+     * @return {[Vertex, Vertex, Vertex, Vertex]} The "northmost" point of this (rotated) ellipse.
+     */
+    getExtremePoints(): Vertex[];
+    /**
      * Get the bounds of this ellipse.
      *
      * The bounds are approximated by the underlying segment buffer; the more segment there are,

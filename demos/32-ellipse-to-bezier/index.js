@@ -193,6 +193,7 @@
 
     //---drawSectorBezier-----------------------------------------------------
     var drawSectorBezier = function (draw, fill) {
+      var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor)).cssRGB();
       var bezierCurves = new VEllipseSector(sector.ellipse.clone().scale(0.95), sector.startAngle, sector.endAngle).toCubicBezier(
         config.sectorBezierQuarterSegments,
         config.sectorBezierThreshold
@@ -201,7 +202,7 @@
         var curve = bezierCurves[i];
         if (config.sectorBezierDrawIntervals) {
           draw.circleHandle(curve.startPoint.clone().scale(1.1, sector.ellipse.center), 5, "orange");
-          draw.text("" + i, curve.startPoint.x, curve.startPoint.y, 0, "black");
+          draw.text("" + i, curve.startPoint.x, curve.startPoint.y, 0, contrastColor);
         }
         if (i + 1 == bezierCurves.length) {
           draw.circleHandle(curve.endPoint.clone().scale(1.1, sector.ellipse.center), 5, "orange");
