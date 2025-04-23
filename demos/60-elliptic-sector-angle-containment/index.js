@@ -150,13 +150,6 @@
           // console.log("Angle ", i, "vertAngle", vertAngle, "containedInSector", containedInSector);
           draw.diamondHandle(sectorVertex, 7, containedInSector ? "green" : "orange");
         }
-        // var vertices = sector.ellipse.getEquidistantVertices(24);
-        // for (var i = 0; i < vertices.length; i++) {
-        //   var vertAngle = new Line(sector.ellipse.center.clone(), vertices[i]).angle();
-        //   var containedInSector = sector.containsAngle(vertAngle);
-        //   // console.log("Angle ", i, "vertAngle", vertAngle, "containedInSector", containedInSector);
-        //   draw.diamondHandle(vertices[i].clone().scale(0.9, sector.ellipse.center), 7, containedInSector ? "green" : "orange");
-        // }
       }
     };
 
