@@ -11,6 +11,9 @@ Imminent todos:
 
 - Extend Demo '32-ellipse-to-bezier' with the new helper.
 
+* 2025-04-24
+  - Adding the `VEllipse.getExtremePoints()` method for calculating minima and maxima.
+  - Added the `VEllipseSector.getBounds` method.
 * 2025-04-18
   - Added evaluation method for cubic Bézier curves `CubicBezierCurve.utils.evaluateT`.
   - Refactored method `CubicBezierCurve.getPointAt` to use `evaluateT`.

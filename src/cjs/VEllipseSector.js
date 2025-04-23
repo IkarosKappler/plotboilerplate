@@ -12,11 +12,13 @@
  * @modified 2025-04-02 Adding `VEllipseSector.lineIntersections` and `VEllipseSector.lineIntersectionTangents` and implementing `Intersectable`.
  * @modified 2025-04-07 Adding value wrapping (0 to TWO_PI) to the `VEllipseSector.containsAngle` method.
  * @modified 2025-04-09 Adding the `VEllipseSector.move` method.
- * @modified 2025-04-19 Added the VEllipseSector.getStartPoint` and `getEndPoint` methods.
+ * @modified 2025-04-19 Added the `VEllipseSector.getStartPoint` and `getEndPoint` methods.
+ * @modified 2025-04-23 Added the `VEllipseSector.getBounds` method.
  * @version  1.2.0
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VEllipseSector = void 0;
+var Bounds_1 = require("./Bounds");
 var CubicBezierCurve_1 = require("./CubicBezierCurve");
 var geomutils_1 = require("./geomutils");
 var Line_1 = require("./Line");
@@ -119,6 +121,28 @@ var VEllipseSector = /** @class */ (function () {
      */
     VEllipseSector.prototype.getEndPoint = function () {
         return this.ellipse.vertAt(this.endAngle);
+    };
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Get the bounds of this elliptic sector.
+     *
+     * The bounds are approximated by the underlying segment buffer; the more segment there are,
+     * the more accurate will be the returned bounds.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof VEllipse
+     * @return {Bounds} The bounds of this elliptic sector.
+     **/
+    VEllipseSector.prototype.getBounds = function () {
+        var _this = this;
+        // Calculage angles from east, west, north and south box points and check if they are inside
+        var extremes = this.ellipse.getExtremePoints();
+        var candidates = extremes.filter(function (point) {
+            var angle = new Line_1.Line(_this.ellipse.center, point).angle() - _this.ellipse.rotation;
+            return _this.containsAngle(angle);
+        });
+        return Bounds_1.Bounds.computeFromVertices([this.getStartPoint(), this.getEndPoint()].concat(candidates));
     };
     //--- BEGIN --- Implement interface `Intersectable`
     /**

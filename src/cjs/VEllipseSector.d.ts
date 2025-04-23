@@ -11,9 +11,11 @@
  * @modified 2025-04-02 Adding `VEllipseSector.lineIntersections` and `VEllipseSector.lineIntersectionTangents` and implementing `Intersectable`.
  * @modified 2025-04-07 Adding value wrapping (0 to TWO_PI) to the `VEllipseSector.containsAngle` method.
  * @modified 2025-04-09 Adding the `VEllipseSector.move` method.
- * @modified 2025-04-19 Added the VEllipseSector.getStartPoint` and `getEndPoint` methods.
+ * @modified 2025-04-19 Added the `VEllipseSector.getStartPoint` and `getEndPoint` methods.
+ * @modified 2025-04-23 Added the `VEllipseSector.getBounds` method.
  * @version  1.2.0
  */
+import { Bounds } from "./Bounds";
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { SVGPathParams, UID, XYCoords } from "./interfaces";
 import { Vector } from "./Vector";
@@ -121,6 +123,18 @@ export declare class VEllipseSector {
      * @return {Vertex} The sector's ending point.
      */
     getEndPoint(): Vertex;
+    /**
+     * Get the bounds of this elliptic sector.
+     *
+     * The bounds are approximated by the underlying segment buffer; the more segment there are,
+     * the more accurate will be the returned bounds.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof VEllipse
+     * @return {Bounds} The bounds of this elliptic sector.
+     **/
+    getBounds(): Bounds;
     /**
      * Get the line intersections as vectors with this ellipse.
      *

@@ -18,6 +18,7 @@
  * @modified 2025-03-31 ATTENTION: modified the winding direction of the `tangentAt` method to match with the Circle method. This is a breaking change!
  * @modified 2025-03-31 Adding the `VEllipse.move(amount: XYCoords)` method.
  * @modified 2025-04-19 Adding the `VEllipse.getBounds()` method.
+ * @modified 2025-04-24 Adding the `VEllipse.getExtremePoints()` method for calculating minima and maxima.
  * @version  1.4.0
  *
  * @file VEllipse
@@ -129,14 +130,14 @@ export declare class VEllipse implements IBounded, Intersectable, SVGSerializabl
      */
     signedRadiusV(): number;
     /**
-     * Get the the northmost point of this (rotated) ellipse.
+     * Get the the minima and maxima (points) of this (rotated) ellipse.
      *
      * @method getExtremePoints
      * @instance
      * @memberof VEllipse
-     * @return {[Vertex, Vertex, Vertex, Vertex]} The "northmost" point of this (rotated) ellipse.
+     * @return {[Vertex, Vertex, Vertex, Vertex]} Get the the minima and maxima (points) of this (rotated) ellipse.
      */
-    getExtremePoints(): Vertex[];
+    getExtremePoints(): [Vertex, Vertex, Vertex, Vertex];
     /**
      * Get the bounds of this ellipse.
      *
@@ -146,7 +147,7 @@ export declare class VEllipse implements IBounded, Intersectable, SVGSerializabl
      * @method getBounds
      * @instance
      * @memberof VEllipse
-     * @return {Bounds} The bounds of this curve.
+     * @return {Bounds} The bounds of this ellipse.
      **/
     getBounds(): Bounds;
     /**

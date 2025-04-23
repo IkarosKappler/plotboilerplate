@@ -11,10 +11,12 @@
  * @modified 2025-04-02 Adding `VEllipseSector.lineIntersections` and `VEllipseSector.lineIntersectionTangents` and implementing `Intersectable`.
  * @modified 2025-04-07 Adding value wrapping (0 to TWO_PI) to the `VEllipseSector.containsAngle` method.
  * @modified 2025-04-09 Adding the `VEllipseSector.move` method.
- * @modified 2025-04-19 Added the VEllipseSector.getStartPoint` and `getEndPoint` methods.
+ * @modified 2025-04-19 Added the `VEllipseSector.getStartPoint` and `getEndPoint` methods.
+ * @modified 2025-04-23 Added the `VEllipseSector.getBounds` method.
  * @version  1.2.0
  */
 
+import { Bounds } from "./Bounds";
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { geomutils } from "./geomutils";
 import { SVGPathParams, UID, XYCoords } from "./interfaces";
@@ -164,6 +166,28 @@ export class VEllipseSector {
    */
   getEndPoint(): Vertex {
     return this.ellipse.vertAt(this.endAngle);
+  }
+
+  //--- BEGIN --- Implement interface `IBounded`
+  /**
+   * Get the bounds of this elliptic sector.
+   *
+   * The bounds are approximated by the underlying segment buffer; the more segment there are,
+   * the more accurate will be the returned bounds.
+   *
+   * @method getBounds
+   * @instance
+   * @memberof VEllipse
+   * @return {Bounds} The bounds of this elliptic sector.
+   **/
+  getBounds(): Bounds {
+    // Calculage angles from east, west, north and south box points and check if they are inside
+    const extremes = this.ellipse.getExtremePoints();
+    const candidates: Array<Vertex> = extremes.filter(point => {
+      const angle: number = new Line(this.ellipse.center, point).angle() - this.ellipse.rotation;
+      return this.containsAngle(angle);
+    });
+    return Bounds.computeFromVertices([this.getStartPoint(), this.getEndPoint()].concat(candidates));
   }
 
   //--- BEGIN --- Implement interface `Intersectable`

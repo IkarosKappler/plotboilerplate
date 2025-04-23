@@ -115,62 +115,9 @@
       shapes.forEach(function (shape) {
         if (typeof shape["getBounds"] === "function") {
           var bounds = shape.getBounds();
-          draw.rect(
-            bounds.min, // position: XYCoords,
-            bounds.width, // : number,
-            bounds.height, // : number,
-            "black",
-            1
-          );
+          draw.rect(bounds.min, bounds.width, bounds.height, "rgba(128,128,128)", 1, { dashOffset: 4, dashArray: [4, 3] });
         } // END if
-
-        if (shape instanceof VEllipseSector) {
-          var bbox = ellipseSectorBBox(shape);
-          draw.rect(
-            bbox.min, // position: XYCoords,
-            bbox.width, // : number,
-            bbox.height, // : number,
-            "red",
-            1
-          );
-
-          var sp = shape.getStartPoint();
-          var ep = shape.getEndPoint();
-          draw.circleHandle(sp, 5, "red");
-          draw.circleHandle(ep, 5, "red");
-
-          // Ellipse bounds?
-          bounds = shape.ellipse.getBounds();
-          draw.rect(
-            bounds.min, // position: XYCoords,
-            bounds.width, // : number,
-            bounds.height, // : number,
-            "black",
-            1
-          );
-        }
       });
-    };
-
-    var ellipseSectorBBox = function (ellipseSector) {
-      // var ellipseBounds = ellipseSector.getBounds();
-      // Calculage angles from east, west, north and south box points and check if they are inside
-      const extremes = ellipseSector.ellipse.getExtremePoints();
-      console.log("extremes", extremes);
-      extremes.forEach(function (p) {
-        pb.draw.circleHandle(p, 6, "green");
-      });
-      var candidates = [
-        // ellipseBounds.getNorthPoint(),
-        // ellipseBounds.getSouthPoint(),
-        // ellipseBounds.getWestPoint(),
-        // ellipseBounds.getEastPoint()
-        // ellipseSector.ellipse.getNorthPoint()
-      ].filter(function (point) {
-        var angle = new Line(ellipseSector.ellipse.center, point).angle(); //  - ellipseSector.rotation;
-        return ellipseSector.containsAngle(ellipseSector.rotation - angle);
-      });
-      return Bounds.computeFromVertices([ellipseSector.getStartPoint(), ellipseSector.getEndPoint()].concat(candidates));
     };
 
     var drawRays = function (draw, fill, rays, color) {
