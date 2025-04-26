@@ -183,8 +183,9 @@ var Bounds = /** @class */ (function () {
      * @return The minimal Bounds for the given vertices.
      **/
     Bounds.computeFromVertices = function (vertices) {
-        if (vertices.length == 0)
+        if (vertices.length == 0) {
             return new Bounds(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(0, 0));
+        }
         var xMin = vertices[0].x;
         var xMax = vertices[0].x;
         var yMin = vertices[0].y;
@@ -196,6 +197,35 @@ var Bounds = /** @class */ (function () {
             xMax = Math.max(xMax, vert.x);
             yMin = Math.min(yMin, vert.y);
             yMax = Math.max(yMax, vert.y);
+        }
+        return new Bounds(new Vertex_1.Vertex(xMin, yMin), new Vertex_1.Vertex(xMax, yMax));
+    };
+    /**
+    * Compute the minimal bounding box for a given set of existing bounding boxes.
+    *
+    * An empty vertex array will return an empty bounding box located at (0,0).
+    *
+    * @static
+    * @method computeFromBoundsSet
+    * @memberof Bounds
+    * @param {Array<IBounds>} boundingBoxes - The set of existing bounding boxes to get the containing bounding box for.
+    * @return The minimal Bounds for the given bounds instances.
+    **/
+    Bounds.computeFromBoundsSet = function (boundingBoxes) {
+        if (boundingBoxes.length == 0) {
+            return new Bounds(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(0, 0));
+        }
+        var xMin = boundingBoxes[0].min.x;
+        var xMax = boundingBoxes[0].max.x;
+        var yMin = boundingBoxes[0].min.y;
+        var yMax = boundingBoxes[0].min.y;
+        var bounds;
+        for (var i in boundingBoxes) {
+            bounds = boundingBoxes[i];
+            xMin = Math.min(xMin, bounds.min.x);
+            xMax = Math.max(xMax, bounds.max.x);
+            yMin = Math.min(yMin, bounds.min.y);
+            yMax = Math.max(yMax, bounds.min.y);
         }
         return new Bounds(new Vertex_1.Vertex(xMin, yMin), new Vertex_1.Vertex(xMax, yMax));
     };

@@ -58,10 +58,16 @@
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
       animate: params.getBoolean("animate", false),
+      numRays: params.getNumber("numRays", 10),
       rayThickness: params.getNumber("rayThickness", 3.0),
       iterations: params.getNumber("iterations", 6),
+      rayStepOffset: params.getNumber("rayStepOffset", 0.1),
+      rayCompareEpsilon: params.getNumber("rayStepOffset", 0.000001),
       initialRayAngle: params.getNumber("initialRayAngle", 35.0),
-      showBoundingBoxes: params.getBoolean("showBoundingBoxes", false)
+      useParallelLightSource: params.getBoolean("useParallelLightSource", false),
+      showBoundingBoxes: params.getBoolean("showBoundingBoxes", false),
+      rayLengthFromMaxBounds: params.getBoolean("rayLengthFromMaxBounds", false),
+      drawPreviewRays: params.getBoolean("drawPreviewRays", false)
     };
 
     // +---------------------------------------------------------------------------------
@@ -75,7 +81,7 @@
         drawBoundingBoxes(draw, fill);
       }
 
-      var rayStepLength = mainRay.length();
+      var rayStepLength = config.rayLengthFromMaxBounds ? getMaxShapeBounds().getMaxDimension() : mainRay.length();
       var rayCollection = getRayCollection(mainRay);
       var newRays = [];
       var numIter = Math.max(0, config.iterations); // Safeguard to avoid infinite loop
@@ -87,7 +93,9 @@
           rayCollection[j].setLength(rayStepLength);
         }
 
-        drawLines(draw, fill, rayCollection, "rgba(192,192,192,0.25)");
+        if (config.drawPreviewRays) {
+          drawLines(draw, fill, rayCollection, "rgba(192,192,192,0.25)");
+        }
         newRays = getRayIteration(rayCollection);
         // Crop original rays
         for (var j = 0; j < rayCollection.length; j++) {
@@ -102,7 +110,7 @@
         // Move new rays one unit (pixel) into their new direction
         // (avoid to reflect multiple times inside one single point)
         for (var j = 0; j < rayCollection.length; j++) {
-          rayCollection[j].a.set(rayCollection[j].clone().setLength(0.1).b);
+          rayCollection[j].a.set(rayCollection[j].clone().setLength(config.rayStepOffset).b);
         }
       }
       ellipseHelper.drawHandleLines(draw, fill);
@@ -110,6 +118,14 @@
       ellipseSectorHelper.drawHandleLines(draw, fill);
       bezierHelper.drawHandleLines();
     }; // END postDraw
+
+    var getMaxShapeBounds = function () {
+      return Bounds.computeFromBoundsSet(
+        shapes.map(function (shape) {
+          return shape.getBounds();
+        })
+      );
+    };
 
     var drawBoundingBoxes = function (draw, fill) {
       shapes.forEach(function (shape) {
@@ -147,7 +163,7 @@
         const reflectedRays = [];
         shapes.forEach(function (shape) {
           var reflectedRay = findReflectedRay(shape, ray);
-          if (reflectedRay != null) {
+          if (reflectedRay != null && ray.a.distance(reflectedRay.a) > config.rayCompareEpsilon) {
             // && reflectedRay.length() > 0.1) {
             reflectedRays.push(reflectedRay);
           }
@@ -296,16 +312,21 @@
     };
 
     var getRayCollection = function (baseRay) {
-      var numRays = 10;
-      // var rangeAngle = 35.0 * DEG_TO_RAD;
-      var rangeAngle = config.initialRayAngle * DEG_TO_RAD;
-
       var rays = [];
-      for (var i = 0; i < numRays; i++) {
-        rays.push(baseRay.clone().rotate(-rangeAngle / 2.0 + rangeAngle * (i / numRays)));
+      if (config.useParallelLightSource) {
+        var perpRay = baseRay.perp();
+        perpRay.moveTo(perpRay.vertAt(-0.5));
+        for (var i = 0; i < config.numRays; i++) {
+          rays.push(baseRay.clone().moveTo(perpRay.vertAt(i / config.numRays)));
+        }
+        return rays;
+      } else {
+        var rangeAngle = config.initialRayAngle * DEG_TO_RAD;
+        for (var i = 0; i < config.numRays; i++) {
+          rays.push(baseRay.clone().rotate(-rangeAngle / 2.0 + rangeAngle * (i / config.numRays)));
+        }
+        return rays;
       }
-      // console.log("ray collection", rays);
-      return rays;
     };
 
     // +---------------------------------------------------------------------------------
@@ -346,16 +367,34 @@
       gui.add(config, "animate").name("animate").title("Animate the ray?")
         .onChange( function() { toggleAnimation(); });
       // prettier-ignore
+      gui.add(config, "numRays").min(1).max(64).step(1).name("numRays").title("Number of rays to use.")
+       .onChange( function() { pb.redraw() });
+      // prettier-ignore
       gui.add(config, "rayThickness").min(1.0).max(10.0).step(0.5).name("rayThickness").title("Line thickness of rays.")
         .onChange( function() { pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "useParallelLightSource").name("useParallelLightSource").title("Use parallel source rays.")
+      .onChange( function() { pb.redraw() });
       // prettier-ignore
       gui.add(config, "iterations").min(1).max(20).step(1).name("iterations").title("Number of iterations.")
         .onChange( function() { pb.redraw() });
       // prettier-ignore
+      gui.add(config, "rayStepOffset").min(0.0).max(1.0).step(0.05).name("rayStepOffset").title("How far offsetting each next ray after reflection?")
+      .onChange( function() { pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "rayCompareEpsilon").min(0.0).max(1.0).step(0.00001).name("rayCompareEpsilon").title("Tolerance for comparing ray positions.")
+      .onChange( function() { pb.redraw() });
+      // prettier-ignore
       gui.add(config, "initialRayAngle").min(1.0).max(360).step(1).name("initialRayAngle").title("Angle between all initial rays.")
       .onChange( function() { pb.redraw() });
       // prettier-ignore
+      gui.add(config, "rayLengthFromMaxBounds").name("rayLengthFromMaxBounds").title("Check to use the maximal shape boundingbox for ray lengths.")
+      .onChange( function() { pb.redraw() });
+      // prettier-ignore
       gui.add(config, "showBoundingBoxes").name("showBoundingBoxes").title("Check to see shape's bounding boxes.")
+      .onChange( function() { pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "drawPreviewRays").name("drawPreviewRays").title("Check to see the next iteration of possible rays.")
       .onChange( function() { pb.redraw() });
     }
 

@@ -174,6 +174,18 @@ export declare class Bounds implements IBounds, XYDimension {
      **/
     static computeFromVertices(vertices: Array<XYCoords>): Bounds;
     /**
+    * Compute the minimal bounding box for a given set of existing bounding boxes.
+    *
+    * An empty vertex array will return an empty bounding box located at (0,0).
+    *
+    * @static
+    * @method computeFromBoundsSet
+    * @memberof Bounds
+    * @param {Array<IBounds>} boundingBoxes - The set of existing bounding boxes to get the containing bounding box for.
+    * @return The minimal Bounds for the given bounds instances.
+    **/
+    static computeFromBoundsSet(boundingBoxes: Array<IBounds>): Bounds;
+    /**
      * Create a new `Bounds` instance just from `width` and `height`, located at (0,0) or the optionally given origin.
      *
      * @param {number} width - The width of the bounds

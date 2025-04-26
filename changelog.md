@@ -1,16 +1,15 @@
 # Changelog
 
-Imminent todos:
+Next todos:
 
 - Optimize infinite pattern demo: compute inner polygons before drawing
-- demo 34: fail to compute foutier transform with array length != 8, whats going on here?
+- demo 34: fail to compute fourier transform with array length != 8, whats going on here?
 - check greiner hormann (27): doing weird stuff when "clearSelfIntersecting=true"
 - check if the old color class is still used anywhere
-- Add googley eyes to the animated metaballs demo.
 - check automatic darkmode detection
 
-- Extend Demo '32-ellipse-to-bezier' with the new helper.
-
+* 2025-04-26
+  - Added static method `Bounds.computeFromBoundsSet` to calculate containing bounds for a set of bounding boxes.
 * 2025-04-24
   - Adding the `VEllipse.getExtremePoints()` method for calculating minima and maxima.
   - Added the `VEllipseSector.getBounds` method.

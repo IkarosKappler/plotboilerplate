@@ -12,6 +12,7 @@
  * @modified 2025-03-23 Added the `getMinDimension` and `getMaxDimension` methods.
  * @modified 2025-04-18 Change parameter type in `Bounds.computeFromVertices` from `Vertex` to more general `XYCoords`.
  * @modified 2025-04-19 Added methods to `Bounds` class: `getNorthPoint`, `getSouthPoint`, `getEastPoint` and `getWestPoint`.
+ * @modified 2025-04-26 Added static method `Bounds.computeFromBoundsSet` to calculate containing bounds for a set of bounding boxes.
  * @version  1.8.0
  **/
 
@@ -229,7 +230,9 @@ export class Bounds implements IBounds, XYDimension {
    * @return The minimal Bounds for the given vertices.
    **/
   static computeFromVertices(vertices: Array<XYCoords>): Bounds {
-    if (vertices.length == 0) return new Bounds(new Vertex(0, 0), new Vertex(0, 0));
+    if (vertices.length == 0) { 
+      return new Bounds(new Vertex(0, 0), new Vertex(0, 0));
+    }
 
     let xMin = vertices[0].x;
     let xMax = vertices[0].x;
@@ -243,6 +246,38 @@ export class Bounds implements IBounds, XYDimension {
       xMax = Math.max(xMax, vert.x);
       yMin = Math.min(yMin, vert.y);
       yMax = Math.max(yMax, vert.y);
+    }
+    return new Bounds(new Vertex(xMin, yMin), new Vertex(xMax, yMax));
+  }
+
+   /**
+   * Compute the minimal bounding box for a given set of existing bounding boxes.
+   *
+   * An empty vertex array will return an empty bounding box located at (0,0).
+   *
+   * @static
+   * @method computeFromBoundsSet
+   * @memberof Bounds
+   * @param {Array<IBounds>} boundingBoxes - The set of existing bounding boxes to get the containing bounding box for.
+   * @return The minimal Bounds for the given bounds instances.
+   **/
+  static computeFromBoundsSet(boundingBoxes:Array<IBounds>) : Bounds {
+    if (boundingBoxes.length == 0) {
+      return new Bounds(new Vertex(0, 0), new Vertex(0, 0));
+    }
+
+    let xMin = boundingBoxes[0].min.x;
+    let xMax = boundingBoxes[0].max.x;
+    let yMin = boundingBoxes[0].min.y;
+    let yMax = boundingBoxes[0].min.y;
+
+    let bounds: IBounds;
+    for (var i in boundingBoxes) {
+      bounds = boundingBoxes[i];
+      xMin = Math.min(xMin, bounds.min.x);
+      xMax = Math.max(xMax, bounds.max.x);
+      yMin = Math.min(yMin, bounds.min.y);
+      yMax = Math.max(yMax, bounds.min.y);
     }
     return new Bounds(new Vertex(xMin, yMin), new Vertex(xMax, yMax));
   }
