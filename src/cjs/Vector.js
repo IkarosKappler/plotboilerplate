@@ -13,7 +13,8 @@
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Vector.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-10-25 Added the `getOrthogonal` method.
- * @version  1.5.0
+ * @modified 2025-04-14 Added the `Vector.rotate(number)` method.
+ * @version  1.6.0
  *
  * @file Vector
  * @public
@@ -68,7 +69,6 @@ var Vector = /** @class */ (function (_super) {
     /**
      * Get the perpendicular of this vector which is located at a.
      *
-     * @param {Number} t The position on the vector.
      * @return {Vector} A new vector being the perpendicular of this vector sitting on a.
      **/
     Vector.prototype.perp = function () {
@@ -143,6 +143,19 @@ var Vector = /** @class */ (function (_super) {
         startPoint.x = -startPoint.y;
         startPoint.y = tmp;
         return new Vector(linePoint, startPoint.add(this.a));
+    };
+    /**
+     * Rotate this vector by the given angle around the first point `a`.
+     *
+     * @name rotate
+     * @method rotate
+     * @return {Vector} this - for chaining.
+     * @instance
+     * @memberof Vector
+     */
+    Vector.prototype.rotate = function (angle) {
+        this.b.rotate(angle, this.a);
+        return this;
     };
     Vector.utils = {
         /**

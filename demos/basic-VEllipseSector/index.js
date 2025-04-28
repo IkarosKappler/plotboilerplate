@@ -5,7 +5,8 @@
  *
  * @author   Ikaros Kappler
  * @date     2021-02-24
- * @version  1.0.0
+ * @modified 2025-04-15 Adding VEllipseSectorHelper and use its drawHandleLines method instead custom draw routine.
+ * @version  1.1.0
  **/
 
 (function (_context) {
@@ -41,33 +42,13 @@
     var endControlPoint = ellipse.vertAt(endAngle);
     var rotationControlPoint = ellipse.vertAt(rotation).scale(1.2, ellipse.center);
 
-    new VEllipseSectorHelper(sector, startControlPoint, endControlPoint, rotationControlPoint);
+    var ellipseSectorHelper = new VEllipseSectorHelper(sector, startControlPoint, endControlPoint, rotationControlPoint);
 
     // +---------------------------------------------------------------------
     // | Draw additional lines to visualize what's happening.
     // +-------------------------------------------
-    pb.config.postDraw = function () {
-      pb.draw.line(sector.ellipse.center, startControlPoint, "rgba(192,128,128,0.5)", 2.0);
-      pb.draw.line(sector.ellipse.center, endControlPoint, "rgba(192,128,128,0.5)", 2.0);
-      pb.draw.line(sector.ellipse.center, rotationControlPoint, "rgba(64,192,128,0.333)", 1.0);
-
-      // Draw radii (axis helper)
-      pb.draw.line(
-        sector.ellipse.center
-          .clone()
-          .add(0, sector.ellipse.signedRadiusV())
-          .rotate(sector.ellipse.rotation, sector.ellipse.center),
-        sector.ellipse.axis,
-        "rgba(192,192,192,0.5)"
-      );
-      pb.draw.line(
-        sector.ellipse.center
-          .clone()
-          .add(sector.ellipse.signedRadiusH(), 0)
-          .rotate(sector.ellipse.rotation, sector.ellipse.center),
-        sector.ellipse.axis,
-        "rgba(192,192,192,0.5)"
-      );
+    pb.config.postDraw = function (draw, fill) {
+      ellipseSectorHelper.drawHandleLines(draw, fill);
     };
 
     // Now add the sector to your canvas

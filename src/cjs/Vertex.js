@@ -34,7 +34,9 @@
  * @modified 2023-09-29 Added the `Vertex.abs()` method as it seems useful.
  * @modified 2024-03-08 Added the optional `precision` param to the `toString` method.
  * @modified 2024-12-17 Outsourced the euclidean distance calculation of `Vertex.distance` to `geomutils.dist4`.
- * @version  2.9.1
+ * @modified 2025-03-24 Making the second parameter `center` of the `Vertex.rotate` method optional.
+ * @modified 2025-04-13 Adding the `Vertex.move(amount: XYCoords)` method (does the same as `add`, added by naming convention).
+ * @version  2.10.0
  *
  * @file Vertex
  * @public
@@ -230,6 +232,21 @@ var Vertex = /** @class */ (function () {
             }
         }
         return this;
+    };
+    /**
+     * Move this point by the given amount.
+     *
+     * This method just calls `add(amount).
+     *
+     *
+     * @method move
+     * @param {Vertex} amount - The amount to move this vertex.
+     * @return {Vertex} this - For chaining.
+     * @instance
+     * @memberof Vertex
+     */
+    Vertex.prototype.move = function (amount) {
+        return this.add(amount);
     };
     /**
      * Add the passed amounts to the x- and y- components of this vertex.

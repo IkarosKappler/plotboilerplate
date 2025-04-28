@@ -26,7 +26,10 @@
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2023-10-06 Adding the `BezierPath.toPathPoints()` method.
  * @modified 2023-10-07 Adding the `BezierPath.fromCurve(CubicBezierCurve)` static function.
- * @version 2.6.0
+ * @modified 2025-04-09 Added the `BezierPath.move` method to match the convention – which just calls `translate`.
+ * @modified 2025-04-09 Modified the `BezierPath.translate` method: chaning parameter `Vertex` to more generalized `XYCoords`.
+ * @modified 2025-04-14 Class `BezierPath` is now implementing interface `Intersectable`.
+ * @version 2.7.0
  *
  * @file BezierPath
  * @public
@@ -237,7 +240,7 @@ var BezierPath = /** @class */ (function () {
      * Move the whole bezier path by the given (x,y)-amount.
      *
      * @method translate
-     * @param {Vertex} amount - The amount to be added (amount.x and amount.y)
+     * @param {XYCoords} amount - The amount to be added (amount.x and amount.y)
      *                          to each vertex of the curve.
      * @instance
      * @memberof BezierPath
@@ -255,6 +258,19 @@ var BezierPath = /** @class */ (function () {
         curve.getEndPoint().add(amount);
         this.updateArcLengths();
         return this;
+    };
+    /**
+     * Move the whole bezier path by the given (x,y)-amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to be added (amount.x and amount.y)
+     *                          to each vertex of the curve.
+     * @instance
+     * @memberof BezierPath
+     * @return {BezierPath} this for chaining
+     **/
+    BezierPath.prototype.move = function (amount) {
+        return this.translate(amount);
     };
     /**
      * Scale the whole bezier path by the given uniform factor.
@@ -466,6 +482,38 @@ var BezierPath = /** @class */ (function () {
         var relativeU = u - uResult.uPart;
         return bCurve.getPerpendicular(relativeU);
     };
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get all line intersections with this shape.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections with the shape's outline.
+     */
+    BezierPath.prototype.lineIntersections = function (line, inVectorBoundsOnly) {
+        if (inVectorBoundsOnly === void 0) { inVectorBoundsOnly = false; }
+        return this.bezierCurves.reduce(function (accu, curCurve) {
+            return accu.concat(curCurve.lineIntersections(line, inVectorBoundsOnly));
+        }, []);
+    };
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    BezierPath.prototype.lineIntersectionTangents = function (line, inVectorBoundsOnly) {
+        if (inVectorBoundsOnly === void 0) { inVectorBoundsOnly = false; }
+        return this.bezierCurves.reduce(function (accu, curCurve) {
+            return accu.concat(curCurve.lineIntersectionTangents(line, inVectorBoundsOnly));
+        }, []);
+    };
+    //--- END --- Implement interface `Intersectable`
     /**
      * This is a helper function to locate the curve index for a given
      * absolute path position u.
@@ -679,6 +727,7 @@ var BezierPath = /** @class */ (function () {
         }
         neighbourCurve.updateArcLengths();
     };
+    //--- BEGIN --- Implement interface `IBounded`
     /**
      * Get the bounds of this Bézier path.
      *
@@ -700,6 +749,7 @@ var BezierPath = /** @class */ (function () {
         }
         return new Bounds_1.Bounds(min, max);
     };
+    //--- END --- Implement interface `IBounded`
     /**
      * Get n 'equally' distributed vertices along this Bézier path.
      *

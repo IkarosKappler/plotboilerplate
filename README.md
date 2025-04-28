@@ -558,6 +558,12 @@ new MouseHandler(document.getElementById("mycanvas"))
 - [Rick Moore for the useful javascript-synthesizer howto](https://medium.com/geekculture/building-a-modular-synth-with-web-audio-api-and-javascript-d38ccdeca9ea)
 - [marked Markdown compiler](https://marked.js.org/) by Christopher Jeffrey.
 - [Interactive Visualization of Molecular Surface Dynamics](https://www.computer.org/csdl/journal/tg/2009/06/ttg2009061391/13rRUwInvsI) for the illustration image which inspired the metaballs demo.
+- Darel Rex Finley for the Polygon Inset Calculation article [Inset A Polygon By A Fixed, Perpendicular Distance, With C Code Sample](https://alienryderflex.com/polygon_inset/ "Inset A Polygon By A Fixed, Perpendicular Distance, With C Code Sample")
+- Fernando Cacciola for [A Survey of Polygon Offseting Strategies](http://fcacciola.50webs.com/Offseting%20Methods.htm "A Survey of Polygon Offseting Strategies")
+- Stephen Schmitt for solvin cubic Beziér intersections with line segments http://mysite.verizon.net/res148h4j/javascript/script_exact_cubic.html
+- And _Particle in Cell Consulting LLC_ for refactoring Stephen Schmitt's solution: [Computing Intersections Between a Cubic Bezier Curve and a Line](https://www.particleincell.com/2013/cubic-line-intersection/)
+- Richard "RM" for the hints of how to calculate the bounding box of cubic Bézuer curves: [Bezier Area](https://jsfiddle.net/SalixAlba/QQnvm/4/)
+- [Cuixiping](https://stackoverflow.com/users/988089/cuixiping) for the helpful insights on cubic Bézier bounds at [Stackoverflow](https://stackoverflow.com/questions/24809978/calculating-the-bounding-box-of-cubic-bezier-curve)
 
 ## Todos
 

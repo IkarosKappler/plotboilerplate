@@ -1,14 +1,10 @@
 /**
- * A script for constructing polygon insets (perpendicular scaled down polygons).
- *
- * Invariant:
- *  - polygon must be clockwise!
- *  - no successive polygon lines must be co-linear!
+ * A script for eliminating co-linear edges from any polygon.
  *
  * @requires PlotBoilerplate, gup, dat.gui,
  *
  * @author   Ikaros Kappler
- * @date     2020-10-12
+ * @date     2024-12-02
  * @version  1.0.0
  **/
 
@@ -41,21 +37,6 @@
       eliminationTolerance: params.getNumber("eliminationTolerance", 1.0),
       drawVertexNumbers: params.getBoolean("drawVertexNumbers", false),
       useCustomMethod: params.getBoolean("useCustomMethod", true)
-    };
-
-    var buildRandomizedPolygon = function (numVertices) {
-      var polygon = new Polygon();
-      for (var i = 0; i < numVertices; i++) {
-        var vert = new Vertex(Math.min(viewport.width, viewport.height) * 0.33, 0.0);
-        vert.rotate(((Math.PI * 2) / numVertices) * i);
-        vert.addXY(viewport.width * 0.1 * (1.0 - Math.random() * 2), viewport.height * 0.1 * (1.0 - Math.random() * 2));
-        polygon.addVertex(vert);
-      }
-      if (!polygon.isClockwise()) {
-        // Reverse
-        polygon.vertices = polygon.vertices.reverse();
-      }
-      return polygon;
     };
 
     // Adds one vertex to the middle of each edge
@@ -134,7 +115,7 @@
     // +-------------------------------
     var rebuildPolygon = function () {
       // Create a new randomized polygon.
-      polygon = buildRandomizedPolygon(config.pointCount);
+      polygon = createRandomizedPolygon(config.pointCount, viewport, true); // createClockwise=true
       polygon = addColinearEdgesToPolygon(polygon);
 
       // Re-add the new polygon to trigger redraw.

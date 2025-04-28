@@ -32,7 +32,11 @@
  * @modified 2024-10-30 Added the `getEdges` method.
  * @modified 2024-12-02 Added the `elimitateColinearEdges` method.
  * @modified 2025-02-12 Added the `containsVerts` method to test multiple vertices for containment.
- * @version 1.14.0
+ * @modified 2025-03-28 Added the `Polygon.utils.locateLineIntersecion` static helper method.
+ * @modified 2025-03-28 Added the `Polygon.lineIntersectionTangents` method.
+ * @modified 2025-04-09 Added the `Polygon.getCentroid` method.
+ * @modified 2025-05-16 Class `Polygon` now implements `IBounded`.
+ * @version 1.15.0
  *
  * @file Polygon
  * @public
@@ -40,9 +44,10 @@
 import { BezierPath } from "./BezierPath";
 import { Bounds } from "./Bounds";
 import { Line } from "./Line";
+import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { XYCoords, SVGSerializable, UID } from "./interfaces";
+import { XYCoords, SVGSerializable, UID, Intersectable, IBounded } from "./interfaces";
 /**
  * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
  *
@@ -54,7 +59,7 @@ import { XYCoords, SVGSerializable, UID } from "./interfaces";
  * @requires Vertex
  * @requires XYCoords
  */
-export declare class Polygon implements SVGSerializable {
+export declare class Polygon implements IBounded, Intersectable, SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
      **/
@@ -299,9 +304,25 @@ export declare class Polygon implements SVGSerializable {
      * @memberof Polygon
      * @return {Vertex|null} `null` is no vertices are available.
      */
-    getMeanCenter(): Vertex;
+    getMeanCenter(): Vertex | null;
+    /**
+     * Get centroid.
+     * Centroids define the barycenter of any non self-intersecting convex polygon.
+     *
+     * If the polygon is self intersecting or non konvex then the barycenter is not well defined.
+     *
+     * https://mathworld.wolfram.com/PolygonCentroid.html
+     *
+     * @method getCentroid
+     * @instance
+     * @memberof Polygon
+     * @returns {Vertex|null}
+     */
+    getCentroid(): Vertex | null;
     /**
      * Get all line intersections with this polygon.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
      *
      * See demo `47-closest-vector-projection-on-polygon` for how it works.
      *
@@ -310,6 +331,16 @@ export declare class Polygon implements SVGSerializable {
      * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
      */
     lineIntersections(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vertex>;
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param inVectorBoundsOnly
+     * @returns
+     */
+    lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vector>;
     /**
      * Get the closest line-polygon-intersection point (closest the line point A).
      *
@@ -453,5 +484,18 @@ export declare class Polygon implements SVGSerializable {
          * @return {number}
          */
         signedArea(vertices: Array<XYCoords>): number;
+        /**
+         * Find intersections of a line with a polygon (vertices).
+         *
+         * @param {VertTuple<any>} line - The line to find intersections with.
+         * @param {Array<Vertex>} vertices - The polygon's vertices.
+         * @param {boolean} isOpen - True if the polygon is open, false otherwise.
+         * @param {boolean} inVectorBoundsOnly - If only intersections in strict vector bounds should be returned.
+         * @returns
+         */
+        locateLineIntersecion(line: VertTuple<any>, vertices: Array<Vertex>, isOpen: boolean, inVectorBoundsOnly: boolean): Array<{
+            edgeIndex: number;
+            intersectionPoint: Vertex;
+        }>;
     };
 }

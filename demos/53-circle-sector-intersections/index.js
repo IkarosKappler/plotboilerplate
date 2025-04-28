@@ -9,7 +9,8 @@
  *
  * @author   Ikaros Kappler
  * @date     2024-03-08
- * @version  1.0.0
+ * @modified 2025-04-02 Refactoring `randomCircleSector`.
+ * @version  1.0.1
  **/
 
 (function (_context) {
@@ -75,21 +76,6 @@
     var circleSectorHelpers = [];
     var anglePoint = pb.viewport().randomPoint(0.35, 0.35);
 
-    // +---------------------------------------------------------------------------------
-    // | Generate a random circle.
-    // +-------------------------------
-    var getRandomCircleSector = function () {
-      var vp = pb.viewport();
-      var circle = new Circle(vp.randomPoint(0.35, 0.35), (Math.random() * Math.min(vp.width, vp.height)) / 5);
-      var startAngle = Math.random() * Math.PI * 2;
-      var endAngle = Math.random() * Math.PI * 2;
-      return new CircleSector(circle, startAngle, endAngle);
-    };
-
-    var recalculateSectorIntersections = function () {
-      //
-    };
-
     var installCircleSectorHelpers = function () {
       // First: uninstall old listeners
       circleSectorHelpers.forEach(function (chelper) {
@@ -111,14 +97,10 @@
     };
 
     var reinit = function () {
-      arrayResize(circleSectors, config.numCircles, getRandomCircleSector);
-      recalculateSectorIntersections();
-      // Install move listeners
-      for (var i = 0; i < circleSectors.length; i++) {
-        circleSectors[i].circle.center.listeners.addDragListener(function (e) {
-          recalculateSectorIntersections();
-        });
-      }
+      var viewport = pb.viewport();
+      arrayResize(circleSectors, config.numCircles, function () {
+        return randomCircleSector(viewport);
+      });
       pb.removeAll();
       installCircleSectorHelpers();
       pb.add(anglePoint);

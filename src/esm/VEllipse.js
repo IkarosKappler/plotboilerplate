@@ -15,7 +15,11 @@
  * @modified 2021-03-19 Added the `VEllipse.rotate` function.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `VEllipse.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version  1.3.0
+ * @modified 2025-03-31 ATTENTION: modified the winding direction of the `tangentAt` method to match with the Circle method. This is a breaking change!
+ * @modified 2025-03-31 Adding the `VEllipse.move(amount: XYCoords)` method.
+ * @modified 2025-04-19 Adding the `VEllipse.getBounds()` method.
+ * @modified 2025-04-24 Adding the `VEllipse.getExtremePoints()` method for calculating minima and maxima.
+ * @version  1.4.0
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
@@ -25,6 +29,8 @@ import { Vector } from "./Vector";
 import { Vertex } from "./Vertex";
 import { UIDGenerator } from "./UIDGenerator";
 import { CubicBezierCurve } from "./CubicBezierCurve";
+import { Circle } from "./Circle";
+import { Bounds } from "./Bounds";
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -106,10 +112,95 @@ export class VEllipse {
      * @return {number} The signed vertical radius of this ellipse.
      */
     signedRadiusV() {
-        // return Math.abs(this.axis.y - this.center.y);
         // Rotate axis back to origin before calculating radius
-        // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).y - this.center.y);
         return new Vertex(this.axis).rotate(-this.rotation, this.center).y - this.center.y;
+    }
+    /**
+     * Get the the minima and maxima (points) of this (rotated) ellipse.
+     *
+     * @method getExtremePoints
+     * @instance
+     * @memberof VEllipse
+     * @return {[Vertex, Vertex, Vertex, Vertex]} Get the the minima and maxima (points) of this (rotated) ellipse.
+     */
+    getExtremePoints() {
+        const a = this.radiusH();
+        const b = this.radiusV();
+        // Calculate t_x values
+        const t_x1 = Math.atan2(-b * Math.sin(this.rotation), a * Math.cos(this.rotation));
+        const t_x2 = t_x1 + Math.PI;
+        // Calculate x values at t_x
+        const x_x1 = this.center.x + a * Math.cos(t_x1) * Math.cos(this.rotation) - b * Math.sin(t_x1) * Math.sin(this.rotation);
+        const y_x1 = this.center.y + a * Math.cos(t_x1) * Math.sin(this.rotation) + b * Math.sin(t_x1) * Math.cos(this.rotation);
+        const x_x2 = this.center.x + a * Math.cos(t_x2) * Math.cos(this.rotation) - b * Math.sin(t_x2) * Math.sin(this.rotation);
+        const y_x2 = this.center.y + a * Math.cos(t_x2) * Math.sin(this.rotation) + b * Math.sin(t_x2) * Math.cos(this.rotation);
+        let x_max, x_min;
+        if (x_x1 > x_x2) {
+            x_max = new Vertex(x_x1, y_x1);
+            x_min = new Vertex(x_x2, y_x2);
+        }
+        else {
+            x_max = new Vertex(x_x2, y_x2);
+            x_min = new Vertex(x_x1, y_x1);
+        }
+        // Calculate t_y values
+        const t_y1 = Math.atan2(b * Math.cos(this.rotation), a * Math.sin(this.rotation));
+        const t_y2 = t_y1 + Math.PI;
+        // Calculate y values at t_y
+        const x_y1 = this.center.x + a * Math.cos(t_y1) * Math.cos(this.rotation) - b * Math.sin(t_y1) * Math.sin(this.rotation);
+        const y_y1 = this.center.y + a * Math.cos(t_y1) * Math.sin(this.rotation) + b * Math.sin(t_y1) * Math.cos(this.rotation);
+        const x_y2 = this.center.x + a * Math.cos(t_y2) * Math.cos(this.rotation) - b * Math.sin(t_y2) * Math.sin(this.rotation);
+        const y_y2 = this.center.y + a * Math.cos(t_y2) * Math.sin(this.rotation) + b * Math.sin(t_y2) * Math.cos(this.rotation);
+        let y_max, y_min;
+        if (y_y1 > y_y2) {
+            y_max = new Vertex(x_y1, y_y1);
+            y_min = new Vertex(x_y2, y_y2);
+        }
+        else {
+            y_max = new Vertex(x_y2, y_y2);
+            y_min = new Vertex(x_y1, y_y1);
+        }
+        return [x_max, x_min, y_max, y_min];
+    }
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Get the bounds of this ellipse.
+     *
+     * The bounds are approximated by the underlying segment buffer; the more segment there are,
+     * the more accurate will be the returned bounds.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof VEllipse
+     * @return {Bounds} The bounds of this ellipse.
+     **/
+    getBounds() {
+        // Thanks to Cuixiping
+        //    https://stackoverflow.com/questions/87734/how-do-you-calculate-the-axis-aligned-bounding-box-of-an-ellipse
+        const r1 = this.radiusH();
+        const r2 = this.radiusV();
+        const ux = r1 * Math.cos(this.rotation);
+        const uy = r1 * Math.sin(this.rotation);
+        const vx = r2 * Math.cos(this.rotation + Math.PI / 2);
+        const vy = r2 * Math.sin(this.rotation + Math.PI / 2);
+        const bbox_halfwidth = Math.sqrt(ux * ux + vx * vx);
+        const bbox_halfheight = Math.sqrt(uy * uy + vy * vy);
+        return new Bounds({ x: this.center.x - bbox_halfwidth, y: this.center.y - bbox_halfheight }, { x: this.center.x + bbox_halfwidth, y: this.center.y + bbox_halfheight });
+    }
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Move the ellipse by the given amount. This is equivalent by moving the `center` and `axis` points.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof VEllipse
+     * @return {VEllipse} this for chaining
+     **/
+    move(amount) {
+        this.center.add(amount);
+        this.axis.add(amount);
+        return this;
     }
     /**
      * Scale this ellipse by the given factor from the center point. The factor will be applied to both radii.
@@ -168,7 +259,7 @@ export class VEllipse {
      * @param {number=1.0} length - [optional, default=1] The length of the returned vector.
      */
     normalAt(angle, length) {
-        const point = this.vertAt(angle);
+        const point = this.vertAt(angle - this.rotation); // HERE IS THE CORRECT BEHAVIOR!
         const foci = this.getFoci();
         // Calculate the angle between [point,focusA] and [point,focusB]
         const angleA = new Line(point, foci[0]).angle();
@@ -180,12 +271,13 @@ export class VEllipse {
             .addX(50)
             .clone()
             .rotate(Math.PI + centerAngle, point);
-        if (this.center.distance(endPointA) < this.center.distance(endPointB)) {
-            return new Vector(point, endPointB);
+        const resultVector = this.center.distance(endPointA) < this.center.distance(endPointB)
+            ? new Vector(point, endPointB)
+            : new Vector(point, endPointA);
+        if (typeof length === "number") {
+            resultVector.setLength(length);
         }
-        else {
-            return new Vector(point, endPointA);
-        }
+        return resultVector;
     }
     /**
      * Get the tangent vector at the given angle.
@@ -204,9 +296,7 @@ export class VEllipse {
      */
     tangentAt(angle, length) {
         const normal = this.normalAt(angle, length);
-        // Rotate the normal by 90 degrees, then it is the tangent.
-        normal.b.rotate(Math.PI / 2, normal.a);
-        return normal;
+        return normal.inv().perp();
     }
     /**
      * Get the perimeter of this ellipse.
@@ -257,6 +347,8 @@ export class VEllipse {
     /**
      * Get equally distributed points on the outline of this ellipse.
      *
+     * @method getEquidistantVertices
+     * @instance
      * @param {number} pointCount - The number of points.
      * @returns {Array<Vertex>}
      */
@@ -268,6 +360,75 @@ export class VEllipse {
         }
         return result;
     }
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get the line intersections as vectors with this ellipse.
+     *
+     * @method lineIntersections
+     * @instance
+     * @param {VertTuple<Vector> ray - The line/ray to intersect this ellipse with.
+     * @param {boolean} inVectorBoundsOnly - (default=false) Set to true if only intersections within the vector bounds are of interest.
+     * @returns
+     */
+    lineIntersections(ray, inVectorBoundsOnly = false) {
+        // Question: what happens to extreme versions when ellipse is a line (width or height is zero)?
+        //           This would result in a Division_by_Zero exception!
+        // Step A: create clones for operations (keep originals unchanged)
+        const ellipseCopy = this.clone(); // VEllipse
+        const rayCopy = ray.clone(); // Vector
+        // Step B: move both so ellipse's center is located at (0,0)
+        const moveAmount = ellipseCopy.center.clone().inv();
+        ellipseCopy.move(moveAmount);
+        rayCopy.add(moveAmount);
+        // Step C: rotate eclipse backwards it's rotation, so that rotation is zero (0.0).
+        //         Rotate together with ray!
+        const rotationAmount = -ellipseCopy.rotation;
+        ellipseCopy.rotate(rotationAmount); // Rotation around (0,0) = center of translated ellipse
+        rayCopy.a.rotate(rotationAmount, ellipseCopy.center);
+        rayCopy.b.rotate(rotationAmount, ellipseCopy.center);
+        // Step D: find x/y factors to use for scaling to transform the ellipse to a circle.
+        //         Scale together with vector ray.
+        const radiusH = ellipseCopy.radiusH();
+        const radiusV = ellipseCopy.radiusV();
+        const scalingFactors = radiusH > radiusV ? { x: radiusV / radiusH, y: 1.0 } : { x: 1.0, y: radiusH / radiusV };
+        // Step E: scale ellipse AND ray by calculated factors.
+        ellipseCopy.axis.scaleXY(scalingFactors);
+        rayCopy.a.scaleXY(scalingFactors);
+        rayCopy.b.scaleXY(scalingFactors);
+        // Intermediate result: now the ellipse is transformed to a circle and we can calculate intersections :)
+        // Step F: calculate circle+line intersecions
+        const tmpCircle = new Circle(new Vertex(), ellipseCopy.radiusH()); // radiusH() === radiusV()
+        const intersections = tmpCircle.lineIntersections(rayCopy, inVectorBoundsOnly);
+        // Step G: transform intersecions back to original configuration
+        intersections.forEach(function (intersectionPoint) {
+            // Reverse transformation from above.
+            intersectionPoint.scaleXY({ x: 1 / scalingFactors.x, y: 1 / scalingFactors.y }, ellipseCopy.center);
+            intersectionPoint.rotate(-rotationAmount, ellipseCopy.center);
+            intersectionPoint.sub(moveAmount);
+        });
+        return intersections;
+    }
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    lineIntersectionTangents(line, inVectorBoundsOnly = false) {
+        // Find the intersections of all lines plus their tangents inside the circle bounds
+        const interSectionPoints = this.lineIntersections(line, inVectorBoundsOnly);
+        return interSectionPoints.map((vert) => {
+            // Calculate angle
+            const lineFromCenter = new Line(this.center, vert);
+            const angle = lineFromCenter.angle();
+            // Calculate tangent at angle
+            return this.tangentAt(angle);
+        });
+    }
+    //--- END --- Implement interface `Intersectable`
     /**
      * Convert this ellipse into cubic Bézier curves.
      *
@@ -280,7 +441,7 @@ export class VEllipse {
         // Math by Luc Maisonobe
         //    http://www.spaceroots.org/documents/ellipse/node22.html
         // Note that ellipses with radiusH=0 or radiusV=0 cannot be represented as Bézier curves.
-        // Return a single line here (as a Bézier curve)
+        // Return a single line here (as a Bézier curve)?
         // if (Math.abs(this.radiusV()) < 0.00001) {
         //   const radiusH = this.radiusH();
         //   return [
@@ -310,10 +471,10 @@ export class VEllipse {
         const radiusV = this.radiusV();
         const curves = [];
         const angles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, segmentCount);
-        let curAngle = angles[0];
+        let curAngle = angles[0] + this.rotation;
         let startPoint = this.vertAt(curAngle);
         for (var i = 0; i < angles.length; i++) {
-            let nextAngle = angles[(i + 1) % angles.length];
+            let nextAngle = angles[(i + 1) % angles.length] + this.rotation;
             let endPoint = this.vertAt(nextAngle);
             if (Math.abs(radiusV) < 0.0001 || Math.abs(radiusH) < 0.0001) {
                 // Distorted ellipses can only be approximated by linear Bézier segments
@@ -322,8 +483,8 @@ export class VEllipse {
                 curves.push(curve);
             }
             else {
-                let startTangent = this.tangentAt(curAngle);
-                let endTangent = this.tangentAt(nextAngle);
+                let startTangent = this.tangentAt(curAngle + this.rotation);
+                let endTangent = this.tangentAt(nextAngle + this.rotation);
                 // Find intersection (ignore that the result might be null in some extreme cases)
                 let intersection = startTangent.intersection(endTangent);
                 // What if intersection is undefined?

@@ -8,14 +8,22 @@
  * @modified 2024-03-08 Added the `containsAngle` method.
  * @modified 2024-03-09 Added the `circleSectorIntersection` method to find coherent sector intersections..
  * @modified 2024-03-09 Added the `angleAt` method to determine any angle at some ratio.
+ * @modified 2025-04-02 Adding the `CircleSector.lineIntersections` and `CircleSector.lineIntersectionTangents` and implementing `Intersectable`.
+ * @modified 2025-04-09 Adding the `CircleSector.move()` method.
+ * @modified 2025-04-19 Tweaking the `CircleSector.containsAngle` method: all values (input angle, start- and end- angle) are wrapped into [0,2*PI) now.
+ * @modified 2025-04-19 Class `CircleSector` implements interface `Bounded` now (method `getBounds` added).
  * @version  1.2.0
  **/
 
+import { Bounds } from "./Bounds";
 import { Circle } from "./Circle";
 import { Line } from "./Line";
 import { UIDGenerator } from "./UIDGenerator";
+import { Vector } from "./Vector";
+import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { PathSegment, SVGPathParams, SVGSerializable, UID, XYCoords } from "./interfaces";
+import { geomutils } from "./geomutils";
+import { IBounded, Intersectable, SVGPathParams, SVGSerializable, UID, XYCoords } from "./interfaces";
 
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
@@ -26,7 +34,7 @@ import { PathSegment, SVGPathParams, SVGSerializable, UID, XYCoords } from "./in
  * @requires UIDGenerator
  * @requires XYCoords
  **/
-export class CircleSector implements SVGSerializable {
+export class CircleSector implements IBounded, Intersectable, SVGSerializable {
   /**
    * Required to generate proper CSS classes and other class related IDs.
    **/
@@ -87,6 +95,52 @@ export class CircleSector implements SVGSerializable {
     this.endAngle = endAngle;
   }
 
+  //--- BEGIN --- Implement interface `IBounded`
+  /**
+   * Get the bounds of this ellipse.
+   *
+   * The bounds are approximated by the underlying segment buffer; the more segment there are,
+   * the more accurate will be the returned bounds.
+   *
+   * @method getBounds
+   * @instance
+   * @memberof VEllipse
+   * @return {Bounds} The bounds of this curve.
+   **/
+  getBounds(): Bounds {
+    const _self = this;
+    const circleBounds : Bounds = this.circle.getBounds();
+    // Calculage angles from east, west, north and south box points and check if they are inside
+    const candidates : Array<Vertex> = [
+      circleBounds.getNorthPoint(),
+      circleBounds.getSouthPoint(),
+      circleBounds.getWestPoint(),
+      circleBounds.getEastPoint()
+    ].filter( (point : Vertex) => {
+      // Check for each candidate points if they are contained in this sector. Drop if not.
+      const angle : number = new Line(_self.circle.center, point).angle();
+      return _self.containsAngle(angle);
+    });
+    // Compute bounds and inlcude start end end point (they are definitely part of the bounds)
+    return Bounds.computeFromVertices(candidates.concat([this.getStartPoint(), this.getEndPoint()]));
+  }
+  //--- BEGIN --- Implement interface `IBounded`
+
+
+  /**
+   * Move the circle sector by the given amount.
+   *
+   * @method move
+   * @param {XYCoords} amount - The amount to move.
+   * @instance
+   * @memberof CircleSector
+   * @return {CircleSector} this for chaining
+   **/
+  move(amount: XYCoords): CircleSector {
+    this.circle.move(amount);
+    return this;
+  }
+
   /**
    * Checks wether the given angle (must be inside 0 and PI*2) is contained inside this sector.
    *
@@ -97,11 +151,21 @@ export class CircleSector implements SVGSerializable {
    * @return {boolean} True if (and only if) this sector contains the given angle.
    */
   containsAngle(angle: number) {
-    if (this.startAngle <= this.endAngle) {
-      return angle >= this.startAngle && angle < this.endAngle;
+    var wrappedAngle = geomutils.mapAngleTo2PI(angle);
+    var wrappedStart = geomutils.mapAngleTo2PI(this.startAngle);
+    var wrappedEnd = geomutils.mapAngleTo2PI(this.endAngle);
+    // TODO: cleanup
+    // if (this.startAngle <= this.endAngle) {
+    //   return angle >= this.startAngle && angle < this.endAngle;
+    // } else {
+    //   // startAngle > endAngle
+    //   return angle >= this.startAngle || angle < this.endAngle;
+    // }
+    if (wrappedStart <= wrappedEnd) {
+      return wrappedAngle >= wrappedStart && wrappedAngle < wrappedEnd;
     } else {
       // startAngle > endAngle
-      return angle >= this.startAngle || angle < this.endAngle;
+      return wrappedAngle >= wrappedStart || wrappedAngle < wrappedEnd;
     }
   }
 
@@ -205,6 +269,52 @@ export class CircleSector implements SVGSerializable {
     }
     return resultSector;
   }
+
+  //--- BEGIN --- Implement interface `Intersectable`
+  /**
+   * Get the line intersections as vectors with this ellipse.
+   *
+   * @method lineIntersections
+   * @instance
+   * @param {VertTuple<Vector> ray - The line/ray to intersect this ellipse with.
+   * @param {boolean} inVectorBoundsOnly - (default=false) Set to true if only intersections within the vector bounds are of interest.
+   * @returns
+   */
+  lineIntersections(ray: VertTuple<Vector>, inVectorBoundsOnly: boolean = false): Array<Vertex> {
+    // First get all line intersections from underlying ellipse.
+    const ellipseIntersections: Array<Vertex> = this.circle.lineIntersections(ray, inVectorBoundsOnly);
+    // Drop all intersection points that are not contained in the circle sectors bounds.
+    const tmpLine = new Line(this.circle.center, new Vertex());
+    return ellipseIntersections.filter((intersectionPoint: Vertex) => {
+      tmpLine.b.set(intersectionPoint);
+      const lineAngle = tmpLine.angle();
+      return this.containsAngle(geomutils.wrapMinMax(lineAngle, 0, Math.PI * 2));
+    });
+  }
+
+  /**
+   * Get all line intersections of this polygon and their tangents along the shape.
+   *
+   * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+   *
+   * @param line
+   * @param lineIntersectionTangents
+   * @returns
+   */
+  lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly: boolean = false): Array<Vector> {
+    // Find the intersections of all lines plus their tangents inside the circle bounds
+    const interSectionPoints: Array<Vertex> = this.lineIntersections(line, inVectorBoundsOnly);
+    return interSectionPoints.map((vert: Vertex) => {
+      // Calculate angle
+      const lineFromCenter = new Line(this.circle.center, vert);
+      const angle: number = lineFromCenter.angle();
+      // console.log("angle", (angle / Math.PI) * 180.0);
+      // const angle = Math.random() * Math.PI * 2; // TODO
+      // Calculate tangent at angle
+      return this.circle.tangentAt(angle);
+    });
+  }
+  //--- END --- Implement interface `Intersectable`
 
   /**
    * This function should invalidate any installed listeners and invalidate this object.

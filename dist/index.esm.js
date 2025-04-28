@@ -330,168 +330,6 @@ class VertexListeners {
 
 /**
  * @author   Ikaros Kappler
- * @date     2019-01-30
- * @modified 2019-02-23 Added the toSVGString function, overriding Line.toSVGString.
- * @modified 2019-03-20 Added JSDoc tags.
- * @modified 2019-04-19 Added the clone function (overriding Line.clone()).
- * @modified 2019-09-02 Added the Vector.perp() function.
- * @modified 2019-09-02 Added the Vector.inverse() function.
- * @modified 2019-12-04 Added the Vector.inv() function.
- * @modified 2020-03-23 Ported to Typescript from JS.
- * @modified 2021-01-20 Added UID.
- * @modified 2022-02-02 Added the `destroy` method.
- * @modified 2022-02-02 Cleared the `Vector.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @modified 2022-10-25 Added the `getOrthogonal` method.
- * @version  1.5.0
- *
- * @file Vector
- * @public
- **/
-/**
- * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
- *            <br>
- *            Vectors are drawn with an arrow at their end point.<br>
- *            <b>The Vector class extends the Line class.</b>
- *
- * @requires VertTuple
- * @requires Vertex
- **/
-class Vector extends VertTuple {
-    /**
-     * The constructor.
-     *
-     * @constructor
-     * @name Vector
-     * @extends Line
-     * @param {Vertex} vertA - The start vertex of the vector.
-     * @param {Vertex} vertB - The end vertex of the vector.
-     **/
-    constructor(vertA, vertB) {
-        super(vertA, vertB, (a, b) => new Vector(a, b));
-        /**
-         * Required to generate proper CSS classes and other class related IDs.
-         **/
-        this.className = "Vector";
-    }
-    /**
-     * Get the perpendicular of this vector which is located at a.
-     *
-     * @param {Number} t The position on the vector.
-     * @return {Vector} A new vector being the perpendicular of this vector sitting on a.
-     **/
-    perp() {
-        var v = this.clone();
-        v.sub(this.a);
-        v = new Vector(new Vertex(), new Vertex(-v.b.y, v.b.x));
-        v.a.add(this.a);
-        v.b.add(this.a);
-        return v;
-    }
-    /**
-     * The inverse of a vector is a vector with the same magnitude but oppose direction.
-     *
-     * Please not that the origin of this vector changes here: a->b becomes b->a.
-     *
-     * @return {Vector}
-     **/
-    inverse() {
-        var tmp = this.a;
-        this.a = this.b;
-        this.b = tmp;
-        return this;
-    }
-    /**
-     * This function computes the inverse of the vector, which means 'a' stays untouched.
-     *
-     * @return {Vector} this for chaining.
-     **/
-    inv() {
-        this.b.x = this.a.x - (this.b.x - this.a.x);
-        this.b.y = this.a.y - (this.b.y - this.a.y);
-        return this;
-    }
-    /**
-     * Get the intersection if this vector and the specified vector.
-     *
-     * @method intersection
-     * @param {Vector} line The second vector.
-     * @return {Vertex} The intersection (may lie outside the end-points).
-     * @instance
-     * @memberof Line
-     **/
-    intersection(line) {
-        var denominator = this.denominator(line);
-        if (denominator == 0)
-            return null;
-        var a = this.a.y - line.a.y;
-        var b = this.a.x - line.a.x;
-        var numerator1 = (line.b.x - line.a.x) * a - (line.b.y - line.a.y) * b;
-        var numerator2 = (this.b.x - this.a.x) * a - (this.b.y - this.a.y) * b;
-        a = numerator1 / denominator; // NaN if parallel lines
-        b = numerator2 / denominator;
-        // TODO:
-        // FOR A VECTOR THE LINE-INTERSECTION MUST BE ON BOTH VECTORS
-        // if we cast these lines infinitely in both directions, they intersect here:
-        return new Vertex(this.a.x + a * (this.b.x - this.a.x), this.a.y + a * (this.b.y - this.a.y));
-    }
-    /**
-     * Get the orthogonal "vector" of this vector (rotated by 90° clockwise).
-     *
-     * @name getOrthogonal
-     * @method getOrthogonal
-     * @return {Vector} A new vector with the same length that stands on this vector's point a.
-     * @instance
-     * @memberof Vector
-     **/
-    getOrthogonal() {
-        // Orthogonal of vector (0,0)->(x,y) is (0,0)->(-y,x)
-        const linePoint = this.a.clone();
-        const startPoint = this.b.clone().sub(this.a);
-        const tmp = startPoint.x;
-        startPoint.x = -startPoint.y;
-        startPoint.y = tmp;
-        return new Vector(linePoint, startPoint.add(this.a));
-    }
-}
-Vector.utils = {
-    /**
-     * Generate a four-point arrow head, starting at the vector end minus the
-     * arrow head length.
-     *
-     * The first vertex in the returned array is guaranteed to be the located
-     * at the vector line end minus the arrow head length.
-     *
-     *
-     * Due to performance all params are required.
-     *
-     * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
-     * scaling different). Arrow heads should not look distored on non-uniform scaling.
-     *
-     * If unsure use 1.0 for scaleX and scaleY (=no distortion).
-     * For headlen use 8, it's a good arrow head size.
-     *
-     * Example:
-     *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
-     *
-     * @param {XYCoords} zA - The start vertex of the vector to calculate the arrow head for.
-     * @param {XYCoords} zB - The end vertex of the vector.
-     * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
-     * @param {number} scaleX  - The horizontal scaling during draw.
-     * @param {number} scaleY  - the vertical scaling during draw.
-     **/
-    buildArrowHead: (zA, zB, headlen, scaleX, scaleY) => {
-        const angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
-        const vertices = [];
-        vertices.push(new Vertex(zB.x * scaleX - headlen * Math.cos(angle), zB.y * scaleY - headlen * Math.sin(angle)));
-        vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle - Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle - Math.PI / 8)));
-        vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
-        vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle + Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle + Math.PI / 8)));
-        return vertices;
-    }
-};
-
-/**
- * @author   Ikaros Kappler
  * @date     2020-05-04
  * @modified 2020-05-09 Ported to typescript.
  * @modified 2020-05-25 Added the vertAt and tangentAt functions.
@@ -504,7 +342,9 @@ Vector.utils = {
  * @modified 2022-08-15 Added the `containsPoint` function.
  * @modified 2022-08-23 Added the `lineIntersection` function.
  * @modified 2022-08-23 Added the `closestPoint` function.
- * @version  1.4.0
+ * @modified 2025-04-09 Added the `Circle.move(amount: XYCoords)` method.
+ * @modified 2025-04-16 Class `Circle` now implements interface `Intersectable`.
+ * @version  1.5.0
  **/
 /**
  * @classdesc A simple circle: center point and radius.
@@ -534,6 +374,19 @@ class Circle {
         this.uid = UIDGenerator.next();
         this.center = center;
         this.radius = radius;
+    }
+    /**
+     * Move the circle by the given amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof Circle
+     * @return {Circle} this for chaining
+     **/
+    move(amount) {
+        this.center.add(amount);
+        return this;
     }
     /**
      * Check if the given circle is fully contained inside this circle.
@@ -605,7 +458,21 @@ class Circle {
         const pointA = Circle.circleUtils.vertAt(angle, this.radius);
         // Construct the perpendicular of the line in point a. Then move relative to center.
         return new Vector(pointA, new Vertex(0, 0)).add(this.center).perp();
+        // return (new Vector(this.center.clone(), pointA).add(pointA) as Vector).perp() as Vector;
     }
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get the bounding box (bounds) of this Circle.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof Circle
+     * @return {Bounds} The rectangular bounds of this Circle.
+     **/
+    getBounds() {
+        return new Bounds(this.center.clone().subXY(Math.abs(this.radius), Math.abs(this.radius)), this.center.clone().addXY(Math.abs(this.radius), Math.abs(this.radius)));
+    }
+    //--- END --- Implement interface `Intersectable`
     /**
      * Calculate the intersection points (if exists) with the given circle.
      *
@@ -665,7 +532,7 @@ class Circle {
      * @instance
      * @memberof Circle
      * @param {Vertex} a- The first of the two points defining the line.
-     * @param {Vertex} b - The second of the two points defining the line.
+     * @param {XYCoords} b - The second of the two points defining the line.
      * @return {Line|null} The intersection points (as a line) or null if this circle does not intersect the line given.
      **/
     lineIntersection(a, b) {
@@ -698,8 +565,54 @@ class Circle {
         interA.y = (-det * diff.x + Math.abs(diff.y) * sqrt) / distSquared;
         interB.y = (-det * diff.x - Math.abs(diff.y) * sqrt) / distSquared;
         return new Line(interA.add(this.center), interB.add(this.center));
-        // return new Line(interA, interB);
     }
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get all line intersections with this circle.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections with the circle outline.
+     */
+    lineIntersections(line, inVectorBoundsOnly = false) {
+        // Find the intersections of all lines inside the edge bounds
+        const intersectioLine = this.lineIntersection(line.a, line.b);
+        if (!intersectioLine) {
+            return [];
+        }
+        if (inVectorBoundsOnly) {
+            // const maxDist = line.length();
+            return [intersectioLine.a, intersectioLine.b].filter((vert) => line.hasPoint(vert, true));
+        }
+        else {
+            return [intersectioLine.a, intersectioLine.b];
+        }
+    }
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    lineIntersectionTangents(line, inVectorBoundsOnly = false) {
+        // Find the intersections of all lines plus their tangents inside the circle bounds
+        const interSectionPoints = this.lineIntersections(line, inVectorBoundsOnly);
+        return interSectionPoints.map((vert) => {
+            // Calculate angle
+            const lineFromCenter = new Line(this.center, vert);
+            const angle = lineFromCenter.angle();
+            // console.log("angle", (angle / Math.PI) * 180.0);
+            // const angle = Math.random() * Math.PI * 2; // TODO
+            // Calculate tangent at angle
+            return this.tangentAt(angle);
+        });
+    }
+    //--- END --- Implement interface `Intersectable`
     /**
      * Calculate the closest point on the outline of this circle to the given point.
      *
@@ -766,7 +679,11 @@ Circle.circleUtils = {
  * @modified  2022-02-02 Cleared the `Triangle.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified  2024-11-22 Added static utility function Triangle.utils.determinant; adapted method `determinant`.
  * @modified  2024-11-22 Changing visibility of `Triangle.utils` from `private` to `public`.
- * @version   2.8.0
+ * @modified  2025-14-16 Class `Triangle` now implements interface `Intersectable`.
+ * @modified  2025-14-16 Class `Triangle` now implements interface `IBounded`.
+ * @modified  2025-14-16 Class `Triangle` now implements interface `Intersectable`.
+ * @modified  2025-14-16 Added method `Triangle.move`.
+ * @version   2.10.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -869,6 +786,35 @@ class Triangle {
         this.a.scale(factor, centroid);
         this.b.scale(factor, centroid);
         this.c.scale(factor, centroid);
+        return this;
+    }
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Get the bounding box (bounds) of this Triangle.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof Triangle
+     * @return {Bounds} The rectangular bounds of this Triangle.
+     **/
+    getBounds() {
+        // return Bounds.computeFromVertices([this.a, this.b, this.c]);
+        return this.bounds();
+    }
+    //--- END --- Implement interface `IBounded`
+    /**
+     * Move the Triangle's vertices by the given amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof Triangle
+     * @return {Triangle} this for chaining
+     **/
+    move(amount) {
+        this.a.add(amount);
+        this.b.add(amount);
+        this.c.add(amount);
         return this;
     }
     /**
@@ -995,6 +941,48 @@ class Triangle {
      */
     bounds() {
         return new Bounds(new Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)), new Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y)));
+    }
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get all line intersections with this polygon.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+     *
+     * See demo `47-closest-vector-projection-on-polygon` for how it works.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     */
+    lineIntersections(line, inVectorBoundsOnly = false) {
+        // Find the intersections of all lines inside the edge bounds
+        return Polygon.utils
+            .locateLineIntersecion(line, [this.a, this.b, this.c], false, inVectorBoundsOnly)
+            .map(intersectionTuple => intersectionTuple.intersectionPoint);
+    }
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param inVectorBoundsOnly
+     * @returns
+     */
+    lineIntersectionTangents(line, inVectorBoundsOnly = false) {
+        // Find the intersection tangents of all lines inside the edge bounds
+        return Polygon.utils
+            .locateLineIntersecion(line, [this.a, this.b, this.c], false, inVectorBoundsOnly)
+            .map(intersectionTuple => {
+            // const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
+            const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
+            return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersectionPoint);
+        });
+    }
+    //--- END --- Implement interface `Intersectable`
+    getEdgeAt(edgeIndex) {
+        var modIndex = edgeIndex % 3;
+        return modIndex === 0 ? new Line(this.a, this.b) : modIndex === 1 ? new Line(this.b, this.c) : new Line(this.c, this.a);
     }
     /**
      * Convert this triangle to a polygon instance.
@@ -1303,7 +1291,9 @@ const geomutils = {
  * @modified 2023-09-29 Added the `Vertex.abs()` method as it seems useful.
  * @modified 2024-03-08 Added the optional `precision` param to the `toString` method.
  * @modified 2024-12-17 Outsourced the euclidean distance calculation of `Vertex.distance` to `geomutils.dist4`.
- * @version  2.9.1
+ * @modified 2025-03-24 Making the second parameter `center` of the `Vertex.rotate` method optional.
+ * @modified 2025-04-13 Adding the `Vertex.move(amount: XYCoords)` method (does the same as `add`, added by naming convention).
+ * @version  2.10.0
  *
  * @file Vertex
  * @public
@@ -1493,6 +1483,21 @@ class Vertex {
             }
         }
         return this;
+    }
+    /**
+     * Move this point by the given amount.
+     *
+     * This method just calls `add(amount).
+     *
+     *
+     * @method move
+     * @param {Vertex} amount - The amount to move this vertex.
+     * @return {Vertex} this - For chaining.
+     * @instance
+     * @memberof Vertex
+     */
+    move(amount) {
+        return this.add(amount);
     }
     /**
      * Add the passed amounts to the x- and y- components of this vertex.
@@ -1943,7 +1948,10 @@ Vertex.utils = {
  * @modified 2024-09-10 Chaging the first param of `pointDistance` from `Vertex` to less strict type `XYCoords`. This should not break anything.
  * @modified 2024-09-10 Adding the optional `epsilon` param to the `hasPoint` method.
  * @modified 2024-12-02 Added the `epsilon` param to the `colinear` method. Default is 1.0e-6.
- * @version 1.3.0
+ * @modified 2025-03-31 Added the `VertTuple.revert` method.
+ * @modified 2025-04-15 Changed param of `VertTuple.moveTo` method from `Vertex` to `XYCoords`.
+ * @modified 2025-04-15 Added method `VertTuple.move` method.
+ * @version 1.4.0
  */
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
@@ -2008,13 +2016,29 @@ class VertTuple {
      *
      * @method add
      * @param {XYCoords} amount The amount (x,y) to add.
-     * @return {Line} this
      * @instance
      * @memberof VertTuple
+     * @return {VertTuple<T>} this
      **/
     add(amount) {
         this.a.add(amount);
         this.b.add(amount);
+        return this;
+    }
+    /**
+     * Reverse this vertex tuple: a becomes b, and b becomes a.
+     * This operation is in-place.
+     *
+     * @method add
+     * @param {XYCoords} amount The amount (x,y) to add.
+     * @instance
+     * @memberof VertTuple
+     * @return {VertTuple<T>} this
+     */
+    revert() {
+        const tmp = this.a;
+        this.a = this.b;
+        this.b = tmp;
         return this;
     }
     /**
@@ -2046,7 +2070,7 @@ class VertTuple {
      * Move this line to a new location.
      *
      * @method moveTo
-     * @param {Vertex} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
+     * @param {XYCoords} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
      * @return {VertTuple} this
      * @instance
      * @memberof VertTuple
@@ -2055,6 +2079,20 @@ class VertTuple {
         let diff = this.a.difference(newA);
         this.a.add(diff);
         this.b.add(diff);
+        return this;
+    }
+    /**
+     * Move this line by the given amount
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move both point of this tuple.
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    move(amount) {
+        this.a.add(amount);
+        this.b.add(amount);
         return this;
     }
     /**
@@ -2238,6 +2276,181 @@ VertTuple.vtutils = {
 
 /**
  * @author   Ikaros Kappler
+ * @date     2019-01-30
+ * @modified 2019-02-23 Added the toSVGString function, overriding Line.toSVGString.
+ * @modified 2019-03-20 Added JSDoc tags.
+ * @modified 2019-04-19 Added the clone function (overriding Line.clone()).
+ * @modified 2019-09-02 Added the Vector.perp() function.
+ * @modified 2019-09-02 Added the Vector.inverse() function.
+ * @modified 2019-12-04 Added the Vector.inv() function.
+ * @modified 2020-03-23 Ported to Typescript from JS.
+ * @modified 2021-01-20 Added UID.
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `Vector.toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @modified 2022-10-25 Added the `getOrthogonal` method.
+ * @modified 2025-04-14 Added the `Vector.rotate(number)` method.
+ * @version  1.6.0
+ *
+ * @file Vector
+ * @public
+ **/
+/**
+ * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
+ *            <br>
+ *            Vectors are drawn with an arrow at their end point.<br>
+ *            <b>The Vector class extends the Line class.</b>
+ *
+ * @requires VertTuple
+ * @requires Vertex
+ **/
+class Vector extends VertTuple {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name Vector
+     * @extends Line
+     * @param {Vertex} vertA - The start vertex of the vector.
+     * @param {Vertex} vertB - The end vertex of the vector.
+     **/
+    constructor(vertA, vertB) {
+        super(vertA, vertB, (a, b) => new Vector(a, b));
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "Vector";
+    }
+    /**
+     * Get the perpendicular of this vector which is located at a.
+     *
+     * @return {Vector} A new vector being the perpendicular of this vector sitting on a.
+     **/
+    perp() {
+        var v = this.clone();
+        v.sub(this.a);
+        v = new Vector(new Vertex(), new Vertex(-v.b.y, v.b.x));
+        v.a.add(this.a);
+        v.b.add(this.a);
+        return v;
+    }
+    /**
+     * The inverse of a vector is a vector with the same magnitude but oppose direction.
+     *
+     * Please not that the origin of this vector changes here: a->b becomes b->a.
+     *
+     * @return {Vector}
+     **/
+    inverse() {
+        var tmp = this.a;
+        this.a = this.b;
+        this.b = tmp;
+        return this;
+    }
+    /**
+     * This function computes the inverse of the vector, which means 'a' stays untouched.
+     *
+     * @return {Vector} this for chaining.
+     **/
+    inv() {
+        this.b.x = this.a.x - (this.b.x - this.a.x);
+        this.b.y = this.a.y - (this.b.y - this.a.y);
+        return this;
+    }
+    /**
+     * Get the intersection if this vector and the specified vector.
+     *
+     * @method intersection
+     * @param {Vector} line The second vector.
+     * @return {Vertex} The intersection (may lie outside the end-points).
+     * @instance
+     * @memberof Line
+     **/
+    intersection(line) {
+        var denominator = this.denominator(line);
+        if (denominator == 0)
+            return null;
+        var a = this.a.y - line.a.y;
+        var b = this.a.x - line.a.x;
+        var numerator1 = (line.b.x - line.a.x) * a - (line.b.y - line.a.y) * b;
+        var numerator2 = (this.b.x - this.a.x) * a - (this.b.y - this.a.y) * b;
+        a = numerator1 / denominator; // NaN if parallel lines
+        b = numerator2 / denominator;
+        // TODO:
+        // FOR A VECTOR THE LINE-INTERSECTION MUST BE ON BOTH VECTORS
+        // if we cast these lines infinitely in both directions, they intersect here:
+        return new Vertex(this.a.x + a * (this.b.x - this.a.x), this.a.y + a * (this.b.y - this.a.y));
+    }
+    /**
+     * Get the orthogonal "vector" of this vector (rotated by 90° clockwise).
+     *
+     * @name getOrthogonal
+     * @method getOrthogonal
+     * @return {Vector} A new vector with the same length that stands on this vector's point a.
+     * @instance
+     * @memberof Vector
+     **/
+    getOrthogonal() {
+        // Orthogonal of vector (0,0)->(x,y) is (0,0)->(-y,x)
+        const linePoint = this.a.clone();
+        const startPoint = this.b.clone().sub(this.a);
+        const tmp = startPoint.x;
+        startPoint.x = -startPoint.y;
+        startPoint.y = tmp;
+        return new Vector(linePoint, startPoint.add(this.a));
+    }
+    /**
+     * Rotate this vector by the given angle around the first point `a`.
+     *
+     * @name rotate
+     * @method rotate
+     * @return {Vector} this - for chaining.
+     * @instance
+     * @memberof Vector
+     */
+    rotate(angle) {
+        this.b.rotate(angle, this.a);
+        return this;
+    }
+}
+Vector.utils = {
+    /**
+     * Generate a four-point arrow head, starting at the vector end minus the
+     * arrow head length.
+     *
+     * The first vertex in the returned array is guaranteed to be the located
+     * at the vector line end minus the arrow head length.
+     *
+     *
+     * Due to performance all params are required.
+     *
+     * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
+     * scaling different). Arrow heads should not look distored on non-uniform scaling.
+     *
+     * If unsure use 1.0 for scaleX and scaleY (=no distortion).
+     * For headlen use 8, it's a good arrow head size.
+     *
+     * Example:
+     *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
+     *
+     * @param {XYCoords} zA - The start vertex of the vector to calculate the arrow head for.
+     * @param {XYCoords} zB - The end vertex of the vector.
+     * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
+     * @param {number} scaleX  - The horizontal scaling during draw.
+     * @param {number} scaleY  - the vertical scaling during draw.
+     **/
+    buildArrowHead: (zA, zB, headlen, scaleX, scaleY) => {
+        const angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
+        const vertices = [];
+        vertices.push(new Vertex(zB.x * scaleX - headlen * Math.cos(angle), zB.y * scaleY - headlen * Math.sin(angle)));
+        vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle - Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle - Math.PI / 8)));
+        vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
+        vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle + Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle + Math.PI / 8)));
+        return vertices;
+    }
+};
+
+/**
+ * @author   Ikaros Kappler
  * @date     2016-03-12
  * @modified 2018-12-05 Refactored the code from the morley-triangle script.
  * @modified 2019-03-20 Added JSDoc tags.
@@ -2254,7 +2467,9 @@ VertTuple.vtutils = {
  * @modified 2022-10-09 Changed the actual return value of the `intersection` function to null (was undefined before).
  * @modified 2022-10-17 Adding these methods from the `PathSegment` interface: getStartPoint, getEndPoint, revert.
  * @modified 2023-09-25 Changed param type of `intersection()` from Line to VertTuple.
- * @version  2.3.0
+ * @modified 2025-04-15 Class `Line` now implements interface `Intersectable`.
+ * @modified 2025-04-16 Class `Line` now implements interface `IBounded`.
+ * @version  2.4.0
  *
  * @file Line
  * @public
@@ -2313,6 +2528,19 @@ class Line extends VertTuple {
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex(x, y);
     }
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Get the bounding box (bounds) of this Line.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof Line
+     * @return {Bounds} The rectangular bounds of this Line.
+     **/
+    getBounds() {
+        return Bounds.computeFromVertices([this.a, this.b]);
+    }
+    //--- END --- Implement interface `IBounded`
     //--- Implement PathSegment ---
     /**
      * Get the start point of this path segment.
@@ -2367,6 +2595,50 @@ class Line extends VertTuple {
         this.b = tmp;
         return this;
     }
+    //--- END Implement PathSegment ---
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get all line intersections with this polygon.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+     *
+     * See demo `47-closest-vector-projection-on-polygon` for how it works.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     */
+    lineIntersections(line, inVectorBoundsOnly = false) {
+        // Find the intersections of all lines inside the edge bounds
+        const intersection = this.intersection(line);
+        if (!intersection) {
+            return []; // Both lines parallel
+        }
+        if (this.hasPoint(intersection, true) && (!inVectorBoundsOnly || line.hasPoint(intersection, inVectorBoundsOnly))) {
+            return [intersection];
+        }
+        else {
+            return [];
+        }
+    }
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param inVectorBoundsOnly
+     * @returns
+     */
+    lineIntersectionTangents(line, inVectorBoundsOnly = false) {
+        // Find the intersection tangents of all lines inside the edge bounds
+        const intersections = this.lineIntersections(line, inVectorBoundsOnly);
+        if (intersections.length === 0) {
+            return [];
+        }
+        const intrsctn = intersections[0];
+        return [new Vector(this.a.clone(), this.b.clone()).moveTo(intrsctn)];
+    }
 }
 
 /**
@@ -2403,7 +2675,11 @@ class Line extends VertTuple {
  * @modified 2024-10-30 Added the `getEdges` method.
  * @modified 2024-12-02 Added the `elimitateColinearEdges` method.
  * @modified 2025-02-12 Added the `containsVerts` method to test multiple vertices for containment.
- * @version 1.14.0
+ * @modified 2025-03-28 Added the `Polygon.utils.locateLineIntersecion` static helper method.
+ * @modified 2025-03-28 Added the `Polygon.lineIntersectionTangents` method.
+ * @modified 2025-04-09 Added the `Polygon.getCentroid` method.
+ * @modified 2025-05-16 Class `Polygon` now implements `IBounded`.
+ * @version 1.15.0
  *
  * @file Polygon
  * @public
@@ -2776,7 +3052,42 @@ class Polygon {
         return center;
     }
     /**
+     * Get centroid.
+     * Centroids define the barycenter of any non self-intersecting convex polygon.
+     *
+     * If the polygon is self intersecting or non konvex then the barycenter is not well defined.
+     *
+     * https://mathworld.wolfram.com/PolygonCentroid.html
+     *
+     * @method getCentroid
+     * @instance
+     * @memberof Polygon
+     * @returns {Vertex|null}
+     */
+    getCentroid() {
+        if (this.vertices.length === 0) {
+            return null;
+        }
+        const center = new Vertex(0.0, 0.0);
+        const n = this.vertices.length;
+        for (var i = 0; i < n; i++) {
+            // center.add(this.vertices[i]);
+            const cur = this.vertices[i];
+            const next = this.vertices[(i + 1) % n];
+            var factor = cur.x * next.y - next.x * cur.y;
+            center.x += (cur.x + next.x) * factor;
+            center.y += (cur.y + next.y) * factor;
+        }
+        const area = this.area();
+        center.x *= 1 / (6 * area);
+        center.y *= 1 / (6 * area);
+        return center;
+    }
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
      * Get all line intersections with this polygon.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
      *
      * See demo `47-closest-vector-projection-on-polygon` for how it works.
      *
@@ -2786,21 +3097,27 @@ class Polygon {
      */
     lineIntersections(line, inVectorBoundsOnly = false) {
         // Find the intersections of all lines inside the edge bounds
-        const intersectionPoints = [];
-        for (var i = 0; i < this.vertices.length; i++) {
-            const polyLine = new Line(this.vertices[i], this.vertices[(i + 1) % this.vertices.length]);
-            const intersection = polyLine.intersection(line);
-            // true => only inside bounds
-            // ignore last edge if open
-            if ((!this.isOpen || i + 1 !== this.vertices.length) &&
-                intersection !== null &&
-                polyLine.hasPoint(intersection, true) &&
-                (!inVectorBoundsOnly || line.hasPoint(intersection, inVectorBoundsOnly))) {
-                intersectionPoints.push(intersection);
-            }
-        }
-        return intersectionPoints;
+        return Polygon.utils
+            .locateLineIntersecion(line, this.vertices, this.isOpen, inVectorBoundsOnly)
+            .map(intersectionTuple => intersectionTuple.intersectionPoint);
     }
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param inVectorBoundsOnly
+     * @returns
+     */
+    lineIntersectionTangents(line, inVectorBoundsOnly = false) {
+        // Find the intersection tangents of all lines inside the edge bounds
+        return Polygon.utils.locateLineIntersecion(line, this.vertices, this.isOpen, inVectorBoundsOnly).map(intersectionTuple => {
+            const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
+            return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersectionPoint);
+        });
+    }
+    //--- END --- Implement interface `Intersectable`
     /**
      * Get the closest line-polygon-intersection point (closest the line point A).
      *
@@ -2901,6 +3218,7 @@ class Polygon {
         }
         return result;
     }
+    //--- BEGIN --- Implement interface `IBounded`
     /**
      * Get the bounding box (bounds) of this polygon.
      *
@@ -2912,6 +3230,7 @@ class Polygon {
     getBounds() {
         return Bounds.computeFromVertices(this.vertices);
     }
+    //--- END --- Implement interface `IBounded`
     /**
      * Create a deep copy of this polygon.
      *
@@ -2966,7 +3285,6 @@ class Polygon {
             // -> delete all vertices in between
             if (j - i > 2) {
                 // Means: there have been 'colinear vertices' in between
-                // console.log("Splice", "i", i, "j", j, i + 1, j - i - 1);
                 verts.splice(i + 1, j - i - 2);
             }
             i++;
@@ -3163,6 +3481,32 @@ Polygon.utils = {
             sum += (vertices[j].x - vertices[i].x) * (vertices[i].y + vertices[j].y);
         }
         return sum;
+    },
+    /**
+     * Find intersections of a line with a polygon (vertices).
+     *
+     * @param {VertTuple<any>} line - The line to find intersections with.
+     * @param {Array<Vertex>} vertices - The polygon's vertices.
+     * @param {boolean} isOpen - True if the polygon is open, false otherwise.
+     * @param {boolean} inVectorBoundsOnly - If only intersections in strict vector bounds should be returned.
+     * @returns
+     */
+    locateLineIntersecion(line, vertices, isOpen, inVectorBoundsOnly) {
+        // Find the intersections of all lines inside the edge bounds
+        const intersectionPoints = [];
+        var n = isOpen ? vertices.length - 1 : vertices.length;
+        for (var i = 0; i < n; i++) {
+            const polyLine = new Line(vertices[i % n], vertices[(i + 1) % n]);
+            const intersection = polyLine.intersection(line);
+            // true => only inside bounds
+            // ignore last edge if open
+            if (intersection !== null &&
+                polyLine.hasPoint(intersection, true) &&
+                (!inVectorBoundsOnly || line.hasPoint(intersection, inVectorBoundsOnly))) {
+                intersectionPoints.push({ edgeIndex: i, intersectionPoint: intersection });
+            }
+        }
+        return intersectionPoints;
     }
 };
 
@@ -3177,7 +3521,11 @@ Polygon.utils = {
  * @modified 2022-10-09 Added the `fromDimension` function.
  * @modified 2022-11-28 Added the `clone` method.
  * @modified 2023-09-29 Added the `randomPoint` method.
- * @version  1.7.0
+ * @modified 2025-03-23 Added the `getMinDimension` and `getMaxDimension` methods.
+ * @modified 2025-04-18 Change parameter type in `Bounds.computeFromVertices` from `Vertex` to more general `XYCoords`.
+ * @modified 2025-04-19 Added methods to `Bounds` class: `getNorthPoint`, `getSouthPoint`, `getEastPoint` and `getWestPoint`.
+ * @modified 2025-04-26 Added static method `Bounds.computeFromBoundsSet` to calculate containing bounds for a set of bounding boxes.
+ * @version  1.8.0
  **/
 /**
  * @classdesc A bounds class with min and max values. Implementing IBounds.
@@ -3202,6 +3550,54 @@ class Bounds {
         this.height = max.y - min.y;
     }
     /**
+     * Get the center point of the north bound.
+     *
+     * @method getNorthPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "northmost" centered point of this bounding box.
+     */
+    getNorthPoint() {
+        return new Vertex(this.min.x + this.width / 2.0, this.min.y);
+    }
+    ;
+    /**
+     * Get the center point of the south bound.
+     *
+     * @method getNorthPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "southhmost" centered point of this bounding box.
+     */
+    getSouthPoint() {
+        return new Vertex(this.min.x + this.width / 2.0, this.max.y);
+    }
+    ;
+    /**
+    * Get the center point of the west bound.
+    *
+    * @method getWestPoint
+    * @instance
+    * @memberof Bounds
+    * @return {Vertex} The "westhmost" centered point of this bounding box.
+    */
+    getWestPoint() {
+        return new Vertex(this.min.x, this.min.y + this.height / 2.0);
+    }
+    ;
+    /**
+    * Get the center point of the east bound.
+    *
+    * @method getEastPoint
+    * @instance
+    * @memberof Bounds
+    * @return {Vertex} The "easthmost" centered point of this bounding box.
+    */
+    getEastPoint() {
+        return new Vertex(this.max.x, this.min.y + this.height / 2.0);
+    }
+    ;
+    /**
      * Convert this rectangular bounding box to a polygon with four vertices.
      *
      * @method toPolygon
@@ -3222,6 +3618,22 @@ class Bounds {
      */
     getCenter() {
         return new Vertex(this.min.x + (this.max.x - this.min.x) / 2.0, this.min.y + (this.max.y - this.min.y) / 2);
+    }
+    /**
+     * Get the minimum of `width` and `height`.
+     *
+     * @returns {number} The value of Math.min( this.width, this.height )
+     */
+    getMinDimension() {
+        return Math.min(this.width, this.height);
+    }
+    /**
+     * Get the minimum of `width` and `height`.
+     *
+     * @returns {number} The value of Math.min( this.width, this.height )
+     */
+    getMaxDimension() {
+        return Math.max(this.width, this.height);
     }
     /**
      * Generate a random point inside this bounds object. Safe areas at the border to avoid
@@ -3273,12 +3685,13 @@ class Bounds {
      * @static
      * @method computeFromVertices
      * @memberof Bounds
-     * @param {Array<Vertex>} vertices - The set of vertices you want to get the bounding box for.
+     * @param {Array<XYCoords>} vertices - The set of vertices you want to get the bounding box for.
      * @return The minimal Bounds for the given vertices.
      **/
     static computeFromVertices(vertices) {
-        if (vertices.length == 0)
+        if (vertices.length == 0) {
             return new Bounds(new Vertex(0, 0), new Vertex(0, 0));
+        }
         let xMin = vertices[0].x;
         let xMax = vertices[0].x;
         let yMin = vertices[0].y;
@@ -3290,6 +3703,35 @@ class Bounds {
             xMax = Math.max(xMax, vert.x);
             yMin = Math.min(yMin, vert.y);
             yMax = Math.max(yMax, vert.y);
+        }
+        return new Bounds(new Vertex(xMin, yMin), new Vertex(xMax, yMax));
+    }
+    /**
+    * Compute the minimal bounding box for a given set of existing bounding boxes.
+    *
+    * An empty vertex array will return an empty bounding box located at (0,0).
+    *
+    * @static
+    * @method computeFromBoundsSet
+    * @memberof Bounds
+    * @param {Array<IBounds>} boundingBoxes - The set of existing bounding boxes to get the containing bounding box for.
+    * @return The minimal Bounds for the given bounds instances.
+    **/
+    static computeFromBoundsSet(boundingBoxes) {
+        if (boundingBoxes.length == 0) {
+            return new Bounds(new Vertex(0, 0), new Vertex(0, 0));
+        }
+        let xMin = boundingBoxes[0].min.x;
+        let xMax = boundingBoxes[0].max.x;
+        let yMin = boundingBoxes[0].min.y;
+        let yMax = boundingBoxes[0].min.y;
+        let bounds;
+        for (var i in boundingBoxes) {
+            bounds = boundingBoxes[i];
+            xMin = Math.min(xMin, bounds.min.x);
+            xMax = Math.max(xMax, bounds.max.x);
+            yMin = Math.min(yMin, bounds.min.y);
+            yMax = Math.max(yMax, bounds.min.y);
         }
         return new Bounds(new Vertex(xMin, yMin), new Vertex(xMax, yMax));
     }
@@ -3331,7 +3773,17 @@ class Bounds {
  * @modified 2022-10-17 The `CubicBezierCurve` class now implements the new `PathSegment` interface.
  * @modified 2023-09-30 Added the function `CubicbezierCurve.getSubCurve(number,number)` – similar to `getSubCurveAt(...)` but with absolute position parameters.
  * @modified 2023-10-07 Added the `trimEnd`, `trimEndAt`, `trimStart`, `trimStartAt` methods.
- * @version 2.8.0
+ * @modified 2025-04-09 Added the `CubicBezierCurve.move` method to match the convention – which just calls `translate`.
+ * @modified 2025-04-09 Modified the `CubicBezierCurve.translate` method: chaning parameter `Vertex` to more generalized `XYCoords`.
+ * @modified 2025-04-13 Changed visibility of `CubicBezierCurve.utils` from 'private' to  'public'.
+ * @modified 2025-04-13 Added helper function `CubicBezierCurve.utils.bezierCoeffs`.
+ * @modified 2025-04-13 Added helper functopn `CubicBezierCurve.utils.sgn(number)` for division safe sign calculation.
+ * @modified 2025-03-13 Class `CubicBezierCurve` is now implementing interface `Intersectable`.
+ * @modified 2025-04-18 Added evaluation method for cubic Bézier curves `CubicBezierCurve.utils.evaluateT`.
+ * @modified 2025-04-18 Refactored method `CubicBezierCurve.getPointAt` to use `evaluateT`.
+ * @modified 2025-04-18 Fixed the `CubicBezierCurve.getBounds` method: now returning the real bounding box. Before it was an approximated one.
+ * @modified 2025-ß4-18 Added helper methods for bounding box calculation `CubucBezierCurve.util.cubicPolyMinMax` and `cubicPoly`.
+ * @version 2.9.0
  *
  * @file CubicBezierCurve
  * @public
@@ -3420,7 +3872,7 @@ class CubicBezierCurve {
      * Translate the whole curve by the given {x,y} amount: moves all four points.
      *
      * @method translate
-     * @param {Vertex} amount - The amount to translate this curve by.
+     * @param {XYCoords} amount - The amount to translate this curve by.
      * @instance
      * @memberof CubicBezierCurve
      * @return {CubicBezierCurve} this (for chaining).
@@ -3431,6 +3883,18 @@ class CubicBezierCurve {
         this.endControlPoint.add(amount);
         this.endPoint.add(amount);
         return this;
+    }
+    /**
+     * Translate the whole curve by the given {x,y} amount: moves all four points.
+     *
+     * @method translate
+     * @param {XYCoords} amount - The amount to translate this curve by.
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {CubicBezierCurve} this (for chaining).
+     **/
+    move(amount) {
+        return this.translate(amount);
     }
     /**
      * Reverse this curve, means swapping start- and end-point and swapping
@@ -3512,6 +3976,9 @@ class CubicBezierCurve {
      *
      * This function uses a recursive approach by cutting the curve into several linear segments.
      *
+     * @method getClosestT
+     * @instance
+     * @memberof CubicBezierCurve
      * @param {Vertex} p - The point to find the closest position ('t' on the curve).
      * @return {number}
      **/
@@ -3561,27 +4028,35 @@ class CubicBezierCurve {
             tNext: tStart + tDiff * (Math.min(stepCount, minIndex + 1) / stepCount)
         };
     }
+    //--- BEGIN --- Implement interface `IBounded`
     /**
      * Get the bounds of this bezier curve.
      *
      * The bounds are approximated by the underlying segment buffer; the more segment there are,
      * the more accurate will be the returned bounds.
      *
-     * @return {Bounds} The bounds of this curve.
+     * @method getClosestT
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {Bounds} The bounds of this ellipse.
      **/
     getBounds() {
-        var min = new Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
-        var max = new Vertex(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
-        let v;
-        for (var i = 0; i < this.segmentCache.length; i++) {
-            v = this.segmentCache[i];
-            min.x = Math.min(min.x, v.x);
-            min.y = Math.min(min.y, v.y);
-            max.x = Math.max(max.x, v.x);
-            max.y = Math.max(max.y, v.y);
-        }
-        return new Bounds(min, max);
+        // Thanks to Richard "RM" for the Bézier bounds calculatin
+        //    https://jsfiddle.net/SalixAlba/QQnvm/4/
+        const xMinMax = CubicBezierCurve.utils.cubicPolyMinMax(this.startPoint.x, this.startControlPoint.x, this.endControlPoint.x, this.endPoint.x);
+        const xl = xMinMax.min;
+        const xh = xMinMax.max;
+        const yMinMax = CubicBezierCurve.utils.cubicPolyMinMax(this.startPoint.y, this.startControlPoint.y, this.endControlPoint.y, this.endPoint.y);
+        const yl = yMinMax.min;
+        const yh = yMinMax.max;
+        return Bounds.computeFromVertices([
+            { x: xl, y: yl },
+            { x: xl, y: yh },
+            { x: xh, y: yh },
+            { x: xh, y: yl }
+        ]);
     }
+    //--- END --- Implement interface `IBounded`
     /**
      * Get the start point of the curve.<br>
      * <br>
@@ -3668,14 +4143,19 @@ class CubicBezierCurve {
      **/
     getPointAt(t) {
         // Perform some powerful math magic
-        const x = this.startPoint.x * Math.pow(1.0 - t, 3) +
-            this.startControlPoint.x * 3 * t * Math.pow(1.0 - t, 2) +
-            this.endControlPoint.x * 3 * Math.pow(t, 2) * (1.0 - t) +
-            this.endPoint.x * Math.pow(t, 3);
-        const y = this.startPoint.y * Math.pow(1.0 - t, 3) +
-            this.startControlPoint.y * 3 * t * Math.pow(1.0 - t, 2) +
-            this.endControlPoint.y * 3 * Math.pow(t, 2) * (1.0 - t) +
-            this.endPoint.y * Math.pow(t, 3);
+        // TODO: cleanup
+        // const x: number =
+        //   this.startPoint.x * Math.pow(1.0 - t, 3) +
+        //   this.startControlPoint.x * 3 * t * Math.pow(1.0 - t, 2) +
+        //   this.endControlPoint.x * 3 * Math.pow(t, 2) * (1.0 - t) +
+        //   this.endPoint.x * Math.pow(t, 3);
+        // const y: number =
+        //   this.startPoint.y * Math.pow(1.0 - t, 3) +
+        //   this.startControlPoint.y * 3 * t * Math.pow(1.0 - t, 2) +
+        //   this.endControlPoint.y * 3 * Math.pow(t, 2) * (1.0 - t) +
+        //   this.endPoint.y * Math.pow(t, 3);
+        const x = CubicBezierCurve.utils.evaluateT(this.startPoint.x, this.startControlPoint.x, this.endControlPoint.x, this.endPoint.x, t);
+        const y = CubicBezierCurve.utils.evaluateT(this.startPoint.y, this.startControlPoint.y, this.endControlPoint.y, this.endPoint.y, t);
         return new Vertex(x, y);
     }
     /**
@@ -3816,17 +4296,7 @@ class CubicBezierCurve {
      * @return {CubicBezierCurve} The sub curve as a new curve.
      **/
     getSubCurveAt(tStart, tEnd) {
-        // const startVec: Vector = new Vector(this.getPointAt(tStart), this.getTangentAt(tStart));
-        // const endVec: Vector = new Vector(this.getPointAt(tEnd), this.getTangentAt(tEnd).inv());
-        // // Tangents are relative. Make absolute.
-        // startVec.b.add(startVec.a);
-        // endVec.b.add(endVec.a);
-        // // This 'splits' the curve at the given point at t.
-        // startVec.scale(0.33333333 * (tEnd - tStart));
-        // endVec.scale(0.33333333 * (tEnd - tStart));
-        // // Draw the bezier curve
-        // // pb.draw.cubicBezier( startVec.a, endVec.a, startVec.b, endVec.b, '#8800ff', 2 );
-        // return new CubicBezierCurve(startVec.a, endVec.a, startVec.b, endVec.b);
+        // This 'splits' the curve at the given point at t.
         const subCurbePoints = CubicBezierCurve.utils.getSubCurvePointsAt(this, tStart, tEnd);
         return new CubicBezierCurve(subCurbePoints[0], subCurbePoints[1], subCurbePoints[2], subCurbePoints[3]);
     }
@@ -3918,6 +4388,69 @@ class CubicBezierCurve {
         return this.endControlPoint;
     }
     //---END PathSegment-------------------------
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get all line intersections with this shape.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections with the shape outline.
+     */
+    lineIntersections(line, inVectorBoundsOnly = false) {
+        const intersectionTs = this.lineIntersectionTs(line);
+        const intersectionPoints = intersectionTs.map((t) => {
+            return this.getPointAt(t);
+        });
+        if (inVectorBoundsOnly) {
+            // const maxDist = line.length();
+            return intersectionPoints.filter((vert) => line.hasPoint(vert, true));
+        }
+        else {
+            return intersectionPoints;
+        }
+    }
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    lineIntersectionTangents(line, inVectorBoundsOnly = false) {
+        const intersectionTs = this.lineIntersectionTs(line);
+        const intersectionTangents = intersectionTs.map((t) => {
+            const startPoint = this.getPointAt(t);
+            const endPoint = this.getTangentAt(t);
+            return new Vector(startPoint, endPoint.add(startPoint));
+        });
+        if (inVectorBoundsOnly) {
+            return intersectionTangents.filter((vec) => line.hasPoint(vec.a, true));
+        }
+        else {
+            return intersectionTangents;
+        }
+    }
+    //--- END --- Implement interface `Intersectable`
+    lineIntersectionTs(line) {
+        var A = line.b.y - line.a.y; // A=y2-y1
+        var B = line.a.x - line.b.x; // B=x1-x2
+        var C = line.a.x * (line.a.y - line.b.y) + line.a.y * (line.b.x - line.a.x); //C=x1*(y1-y2)+y1*(x2-x1)
+        // var bx = bezierCoeffs(px[0], px[1], px[2], px[3]);
+        // var by = bezierCoeffs(py[0], py[1], py[2], py[3]);
+        var bx = CubicBezierCurve.utils.bezierCoeffs(this.startPoint.x, this.startControlPoint.x, this.endControlPoint.x, this.endPoint.x);
+        var by = CubicBezierCurve.utils.bezierCoeffs(this.startPoint.y, this.startControlPoint.y, this.endControlPoint.y, this.endPoint.y);
+        const poly = Array(4);
+        poly[0] = A * bx[0] + B * by[0]; /*t^3*/
+        poly[1] = A * bx[1] + B * by[1]; /*t^2*/
+        poly[2] = A * bx[2] + B * by[2]; /*t*/
+        poly[3] = A * bx[3] + B * by[3] + C; /*1*/
+        var roots = CubicBezierCurve.utils.cubicRoots(poly);
+        return roots.filter((root) => root != -1);
+    }
     /**
      * Check if this and the specified curve are equal.<br>
      * <br>
@@ -4085,6 +4618,71 @@ CubicBezierCurve.END_POINT = 3;
  * Helper utils.
  */
 CubicBezierCurve.utils = {
+    evaluateT: (p0, p1, p2, p3, t) => {
+        return p0 * Math.pow(1.0 - t, 3) +
+            p1 * 3 * t * Math.pow(1.0 - t, 2) +
+            p2 * 3 * Math.pow(t, 2) * (1.0 - t) +
+            p3 * Math.pow(t, 3);
+    },
+    cubicPolyMinMax: (p0, p1, p2, p3) => {
+        // var polyX = CubicBezierCurve.utils.cubicPoly2(
+        //   p0, // P[0].X, // bezierCurve.startPoint.x,
+        //   p1, // P[1].X, // bezierCurve.startControlPoint.x,
+        //   p2, // P[2].X, // bezierCurve.endControlPoint.x,
+        //   p3 // P[3].X // bezierCurve.endPoint.x
+        // );
+        // var a = polyX.a;
+        // var b = polyX.b;
+        // var c = polyX.c;
+        // var disc = polyX.b * polyX.b - 4 * polyX.a * polyX.c;
+        var polyX = CubicBezierCurve.utils.cubicPoly(p0, // P[0].X, // bezierCurve.startPoint.x,
+        p1, // P[1].X, // bezierCurve.startControlPoint.x,
+        p2, // P[2].X, // bezierCurve.endControlPoint.x,
+        p3 // P[3].X // bezierCurve.endPoint.x
+        );
+        var a = polyX[0]; // .a;
+        var b = polyX[1]; // .b;
+        polyX[2]; // .c;
+        //alert("a "+a+" "+b+" "+c);
+        // var disc = b * b - 4 * a * c;
+        var disc = polyX[1] * polyX[1] - 4 * polyX[0] * polyX[2];
+        // var polyX = CubicBezierCurve.utils.bezierCoeffs(p3,p2,p1,p0);
+        // var a = polyX[0]; //polyX.a;
+        // var b = polyX[1]; // .b;
+        // var c = polyX[2]; //.c;
+        // var disc = polyX[1] * polyX[1] - 4 * polyX[0] * polyX[2];
+        // var xl = Math.min(bCurve.endPoint.x, bCurve.startPoint.x); // P[0].X;
+        // var xh = Math.max(bCurve.endPoint.x, bCurve.startPoint.x); // P[0].X;
+        var xl = Math.min(p3, p0); // P[0].X;
+        var xh = Math.max(p3, p0); // P[0].X;
+        // if (P[3].X < xl) xl = P[3].X;
+        // if (P[3].X > xh) xh = P[3].X;
+        if (disc >= 0) {
+            var t1 = (-b + Math.sqrt(disc)) / (2 * a);
+            // alert("t1 " + t1);
+            if (t1 > 0 && t1 < 1) {
+                // var x1 = evalBez(PX, t1);
+                // var x1 = bCurve.getPointAt(t1).x;
+                var x1 = CubicBezierCurve.utils.evaluateT(p0, p1, p2, p3, t1); // bCurve.getPointAt(t1).x;
+                if (x1 < xl)
+                    xl = x1;
+                if (x1 > xh)
+                    xh = x1;
+            }
+            var t2 = (-b - Math.sqrt(disc)) / (2 * a);
+            // alert("t2 " + t2);
+            if (t2 > 0 && t2 < 1) {
+                // var x2 = evalBez(PX, t2);
+                // var x2 = bCurve.getPointAt(t2).x;
+                var x2 = CubicBezierCurve.utils.evaluateT(p0, p1, p2, p3, t2); //
+                if (x2 < xl)
+                    xl = x2;
+                if (x2 > xh)
+                    xh = x2;
+            }
+        }
+        return { min: xl, max: xh };
+    },
     /**
      * Get the points of a sub curve at the given start end end offsets (values between 0.0 and 1.0).
      *
@@ -4108,6 +4706,94 @@ CubicBezierCurve.utils = {
         startVec.scale(0.33333333 * (tEnd - tStart));
         endVec.scale(0.33333333 * (tEnd - tStart));
         return [startVec.a, endVec.a, startVec.b, endVec.b];
+    },
+    /**
+     * Compute the cubic roots for the given cubic polynomial coefficients.
+     *
+     * Based on
+     *   http://mysite.verizon.net/res148h4j/javascript/script_exact_cubic.html#the%20source%20code
+     * Inspired by
+     *   https://www.particleincell.com/2013/cubic-line-intersection/
+     * Thanks to Stephan Schmitt and Particle-In-Cell!
+     *
+     * @param poly
+     * @returns
+     */
+    cubicRoots: (poly) => {
+        const a = poly[0];
+        const b = poly[1];
+        const c = poly[2];
+        const d = poly[3];
+        const A = b / a;
+        const B = c / a;
+        const C = d / a;
+        var S, T, Im;
+        const Q = (3 * B - Math.pow(A, 2)) / 9;
+        const R = (9 * A * B - 27 * C - 2 * Math.pow(A, 3)) / 54;
+        const D = Math.pow(Q, 3) + Math.pow(R, 2); // polynomial discriminant
+        const ts = []; // Array();
+        if (D >= 0) {
+            // complex or duplicate roots
+            S = CubicBezierCurve.utils.sgn(R + Math.sqrt(D)) * Math.pow(Math.abs(R + Math.sqrt(D)), 1 / 3);
+            T = CubicBezierCurve.utils.sgn(R - Math.sqrt(D)) * Math.pow(Math.abs(R - Math.sqrt(D)), 1 / 3);
+            ts[0] = -A / 3 + (S + T); // real root
+            ts[1] = -A / 3 - (S + T) / 2; // real part of complex root
+            ts[2] = -A / 3 - (S + T) / 2; // real part of complex root
+            Im = Math.abs((Math.sqrt(3) * (S - T)) / 2); // complex part of root pair
+            // Mark complex roots to be discarded
+            if (Im != 0) {
+                ts[1] = -1;
+                ts[2] = -1;
+            }
+        } // distinct real roots
+        else {
+            const th = Math.acos(R / Math.sqrt(-Math.pow(Q, 3)));
+            ts[0] = 2 * Math.sqrt(-Q) * Math.cos(th / 3) - A / 3;
+            ts[1] = 2 * Math.sqrt(-Q) * Math.cos((th + 2 * Math.PI) / 3) - A / 3;
+            ts[2] = 2 * Math.sqrt(-Q) * Math.cos((th + 4 * Math.PI) / 3) - A / 3;
+            Im = 0.0;
+        }
+        // Discard all t's out of spec and sort the rest
+        return ts.filter((t) => t >= 0 && t <= 1.0).sort();
+    },
+    /**
+     * Compute the Bézier coefficients from the given Bézier point coordinates.
+     *
+     * @param {number} p0 - The start point coordinate.
+     * @param {number} p1 - The start control point coordinate.
+     * @param {number} p2 - The end control point coordinate.
+     * @param {number} p3 - The end point coordinate.
+     * @returns {[number,number,number,number]}
+     */
+    bezierCoeffs: (p0, p1, p2, p3) => {
+        const coeffs = [NaN, NaN, NaN, NaN]; //Array(4);
+        coeffs[0] = -p0 + 3 * p1 + -3 * p2 + p3;
+        coeffs[1] = 3 * p0 - 6 * p1 + 3 * p2;
+        coeffs[2] = -3 * p0 + 3 * p1;
+        coeffs[3] = p0;
+        return coeffs;
+    },
+    /**
+     * Calculate the cubic polynomial coefficients used to find the bounding box.
+     *
+     * @param {number} p0 - The start point coordinate.
+     * @param {number} p1 - The start control point coordinate.
+     * @param {number} p2 - The end control point coordinate.
+     * @param {number} p3 - The end point coordinate.
+     * @returns {[number,number,number]}
+     */
+    cubicPoly: (p0, p1, p2, p3) => {
+        return [
+            3 * p3 - 9 * p2 + 9 * p1 - 3 * p0,
+            6 * p0 - 12 * p1 + 6 * p2,
+            3 * p1 - 3 * p0
+        ];
+    },
+    /**
+     * sign of number, but is division safe: no zero returned :)
+     */
+    sgn(x) {
+        return x < 0.0 ? -1 : 1;
     }
 };
 
@@ -4138,7 +4824,10 @@ CubicBezierCurve.utils = {
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2023-10-06 Adding the `BezierPath.toPathPoints()` method.
  * @modified 2023-10-07 Adding the `BezierPath.fromCurve(CubicBezierCurve)` static function.
- * @version 2.6.0
+ * @modified 2025-04-09 Added the `BezierPath.move` method to match the convention – which just calls `translate`.
+ * @modified 2025-04-09 Modified the `BezierPath.translate` method: chaning parameter `Vertex` to more generalized `XYCoords`.
+ * @modified 2025-04-14 Class `BezierPath` is now implementing interface `Intersectable`.
+ * @version 2.7.0
  *
  * @file BezierPath
  * @public
@@ -4343,7 +5032,7 @@ class BezierPath {
      * Move the whole bezier path by the given (x,y)-amount.
      *
      * @method translate
-     * @param {Vertex} amount - The amount to be added (amount.x and amount.y)
+     * @param {XYCoords} amount - The amount to be added (amount.x and amount.y)
      *                          to each vertex of the curve.
      * @instance
      * @memberof BezierPath
@@ -4361,6 +5050,19 @@ class BezierPath {
         curve.getEndPoint().add(amount);
         this.updateArcLengths();
         return this;
+    }
+    /**
+     * Move the whole bezier path by the given (x,y)-amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to be added (amount.x and amount.y)
+     *                          to each vertex of the curve.
+     * @instance
+     * @memberof BezierPath
+     * @return {BezierPath} this for chaining
+     **/
+    move(amount) {
+        return this.translate(amount);
     }
     /**
      * Scale the whole bezier path by the given uniform factor.
@@ -4572,6 +5274,36 @@ class BezierPath {
         var relativeU = u - uResult.uPart;
         return bCurve.getPerpendicular(relativeU);
     }
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get all line intersections with this shape.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections with the shape's outline.
+     */
+    lineIntersections(line, inVectorBoundsOnly = false) {
+        return this.bezierCurves.reduce((accu, curCurve) => {
+            return accu.concat(curCurve.lineIntersections(line, inVectorBoundsOnly));
+        }, []);
+    }
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    lineIntersectionTangents(line, inVectorBoundsOnly = false) {
+        return this.bezierCurves.reduce((accu, curCurve) => {
+            return accu.concat(curCurve.lineIntersectionTangents(line, inVectorBoundsOnly));
+        }, []);
+    }
+    //--- END --- Implement interface `Intersectable`
     /**
      * This is a helper function to locate the curve index for a given
      * absolute path position u.
@@ -4785,6 +5517,7 @@ class BezierPath {
         }
         neighbourCurve.updateArcLengths();
     }
+    //--- BEGIN --- Implement interface `IBounded`
     /**
      * Get the bounds of this Bézier path.
      *
@@ -4806,6 +5539,7 @@ class BezierPath {
         }
         return new Bounds(min, max);
     }
+    //--- END --- Implement interface `IBounded`
     /**
      * Get n 'equally' distributed vertices along this Bézier path.
      *
@@ -5189,6 +5923,10 @@ BezierPath.END_POINT = 3;
  * @modified 2024-03-08 Added the `containsAngle` method.
  * @modified 2024-03-09 Added the `circleSectorIntersection` method to find coherent sector intersections..
  * @modified 2024-03-09 Added the `angleAt` method to determine any angle at some ratio.
+ * @modified 2025-04-02 Adding the `CircleSector.lineIntersections` and `CircleSector.lineIntersectionTangents` and implementing `Intersectable`.
+ * @modified 2025-04-09 Adding the `CircleSector.move()` method.
+ * @modified 2025-04-19 Tweaking the `CircleSector.containsAngle` method: all values (input angle, start- and end- angle) are wrapped into [0,2*PI) now.
+ * @modified 2025-04-19 Class `CircleSector` implements interface `Bounded` now (method `getBounds` added).
  * @version  1.2.0
  **/
 /**
@@ -5220,6 +5958,49 @@ class CircleSector {
         this.startAngle = startAngle;
         this.endAngle = endAngle;
     }
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Get the bounds of this ellipse.
+     *
+     * The bounds are approximated by the underlying segment buffer; the more segment there are,
+     * the more accurate will be the returned bounds.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof VEllipse
+     * @return {Bounds} The bounds of this curve.
+     **/
+    getBounds() {
+        const _self = this;
+        const circleBounds = this.circle.getBounds();
+        // Calculage angles from east, west, north and south box points and check if they are inside
+        const candidates = [
+            circleBounds.getNorthPoint(),
+            circleBounds.getSouthPoint(),
+            circleBounds.getWestPoint(),
+            circleBounds.getEastPoint()
+        ].filter((point) => {
+            // Check for each candidate points if they are contained in this sector. Drop if not.
+            const angle = new Line(_self.circle.center, point).angle();
+            return _self.containsAngle(angle);
+        });
+        // Compute bounds and inlcude start end end point (they are definitely part of the bounds)
+        return Bounds.computeFromVertices(candidates.concat([this.getStartPoint(), this.getEndPoint()]));
+    }
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Move the circle sector by the given amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof CircleSector
+     * @return {CircleSector} this for chaining
+     **/
+    move(amount) {
+        this.circle.move(amount);
+        return this;
+    }
     /**
      * Checks wether the given angle (must be inside 0 and PI*2) is contained inside this sector.
      *
@@ -5230,12 +6011,22 @@ class CircleSector {
      * @return {boolean} True if (and only if) this sector contains the given angle.
      */
     containsAngle(angle) {
-        if (this.startAngle <= this.endAngle) {
-            return angle >= this.startAngle && angle < this.endAngle;
+        var wrappedAngle = geomutils.mapAngleTo2PI(angle);
+        var wrappedStart = geomutils.mapAngleTo2PI(this.startAngle);
+        var wrappedEnd = geomutils.mapAngleTo2PI(this.endAngle);
+        // TODO: cleanup
+        // if (this.startAngle <= this.endAngle) {
+        //   return angle >= this.startAngle && angle < this.endAngle;
+        // } else {
+        //   // startAngle > endAngle
+        //   return angle >= this.startAngle || angle < this.endAngle;
+        // }
+        if (wrappedStart <= wrappedEnd) {
+            return wrappedAngle >= wrappedStart && wrappedAngle < wrappedEnd;
         }
         else {
             // startAngle > endAngle
-            return angle >= this.startAngle || angle < this.endAngle;
+            return wrappedAngle >= wrappedStart || wrappedAngle < wrappedEnd;
         }
     }
     /**
@@ -5329,6 +6120,50 @@ class CircleSector {
         }
         return resultSector;
     }
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get the line intersections as vectors with this ellipse.
+     *
+     * @method lineIntersections
+     * @instance
+     * @param {VertTuple<Vector> ray - The line/ray to intersect this ellipse with.
+     * @param {boolean} inVectorBoundsOnly - (default=false) Set to true if only intersections within the vector bounds are of interest.
+     * @returns
+     */
+    lineIntersections(ray, inVectorBoundsOnly = false) {
+        // First get all line intersections from underlying ellipse.
+        const ellipseIntersections = this.circle.lineIntersections(ray, inVectorBoundsOnly);
+        // Drop all intersection points that are not contained in the circle sectors bounds.
+        const tmpLine = new Line(this.circle.center, new Vertex());
+        return ellipseIntersections.filter((intersectionPoint) => {
+            tmpLine.b.set(intersectionPoint);
+            const lineAngle = tmpLine.angle();
+            return this.containsAngle(geomutils.wrapMinMax(lineAngle, 0, Math.PI * 2));
+        });
+    }
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    lineIntersectionTangents(line, inVectorBoundsOnly = false) {
+        // Find the intersections of all lines plus their tangents inside the circle bounds
+        const interSectionPoints = this.lineIntersections(line, inVectorBoundsOnly);
+        return interSectionPoints.map((vert) => {
+            // Calculate angle
+            const lineFromCenter = new Line(this.circle.center, vert);
+            const angle = lineFromCenter.angle();
+            // console.log("angle", (angle / Math.PI) * 180.0);
+            // const angle = Math.random() * Math.PI * 2; // TODO
+            // Calculate tangent at angle
+            return this.circle.tangentAt(angle);
+        });
+    }
+    //--- END --- Implement interface `Intersectable`
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
@@ -10445,7 +11280,11 @@ class AlloyFinger {
  * @modified 2021-03-19 Added the `VEllipse.rotate` function.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `VEllipse.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version  1.3.0
+ * @modified 2025-03-31 ATTENTION: modified the winding direction of the `tangentAt` method to match with the Circle method. This is a breaking change!
+ * @modified 2025-03-31 Adding the `VEllipse.move(amount: XYCoords)` method.
+ * @modified 2025-04-19 Adding the `VEllipse.getBounds()` method.
+ * @modified 2025-04-24 Adding the `VEllipse.getExtremePoints()` method for calculating minima and maxima.
+ * @version  1.4.0
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
@@ -10531,10 +11370,95 @@ class VEllipse {
      * @return {number} The signed vertical radius of this ellipse.
      */
     signedRadiusV() {
-        // return Math.abs(this.axis.y - this.center.y);
         // Rotate axis back to origin before calculating radius
-        // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).y - this.center.y);
         return new Vertex(this.axis).rotate(-this.rotation, this.center).y - this.center.y;
+    }
+    /**
+     * Get the the minima and maxima (points) of this (rotated) ellipse.
+     *
+     * @method getExtremePoints
+     * @instance
+     * @memberof VEllipse
+     * @return {[Vertex, Vertex, Vertex, Vertex]} Get the the minima and maxima (points) of this (rotated) ellipse.
+     */
+    getExtremePoints() {
+        const a = this.radiusH();
+        const b = this.radiusV();
+        // Calculate t_x values
+        const t_x1 = Math.atan2(-b * Math.sin(this.rotation), a * Math.cos(this.rotation));
+        const t_x2 = t_x1 + Math.PI;
+        // Calculate x values at t_x
+        const x_x1 = this.center.x + a * Math.cos(t_x1) * Math.cos(this.rotation) - b * Math.sin(t_x1) * Math.sin(this.rotation);
+        const y_x1 = this.center.y + a * Math.cos(t_x1) * Math.sin(this.rotation) + b * Math.sin(t_x1) * Math.cos(this.rotation);
+        const x_x2 = this.center.x + a * Math.cos(t_x2) * Math.cos(this.rotation) - b * Math.sin(t_x2) * Math.sin(this.rotation);
+        const y_x2 = this.center.y + a * Math.cos(t_x2) * Math.sin(this.rotation) + b * Math.sin(t_x2) * Math.cos(this.rotation);
+        let x_max, x_min;
+        if (x_x1 > x_x2) {
+            x_max = new Vertex(x_x1, y_x1);
+            x_min = new Vertex(x_x2, y_x2);
+        }
+        else {
+            x_max = new Vertex(x_x2, y_x2);
+            x_min = new Vertex(x_x1, y_x1);
+        }
+        // Calculate t_y values
+        const t_y1 = Math.atan2(b * Math.cos(this.rotation), a * Math.sin(this.rotation));
+        const t_y2 = t_y1 + Math.PI;
+        // Calculate y values at t_y
+        const x_y1 = this.center.x + a * Math.cos(t_y1) * Math.cos(this.rotation) - b * Math.sin(t_y1) * Math.sin(this.rotation);
+        const y_y1 = this.center.y + a * Math.cos(t_y1) * Math.sin(this.rotation) + b * Math.sin(t_y1) * Math.cos(this.rotation);
+        const x_y2 = this.center.x + a * Math.cos(t_y2) * Math.cos(this.rotation) - b * Math.sin(t_y2) * Math.sin(this.rotation);
+        const y_y2 = this.center.y + a * Math.cos(t_y2) * Math.sin(this.rotation) + b * Math.sin(t_y2) * Math.cos(this.rotation);
+        let y_max, y_min;
+        if (y_y1 > y_y2) {
+            y_max = new Vertex(x_y1, y_y1);
+            y_min = new Vertex(x_y2, y_y2);
+        }
+        else {
+            y_max = new Vertex(x_y2, y_y2);
+            y_min = new Vertex(x_y1, y_y1);
+        }
+        return [x_max, x_min, y_max, y_min];
+    }
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Get the bounds of this ellipse.
+     *
+     * The bounds are approximated by the underlying segment buffer; the more segment there are,
+     * the more accurate will be the returned bounds.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof VEllipse
+     * @return {Bounds} The bounds of this ellipse.
+     **/
+    getBounds() {
+        // Thanks to Cuixiping
+        //    https://stackoverflow.com/questions/87734/how-do-you-calculate-the-axis-aligned-bounding-box-of-an-ellipse
+        const r1 = this.radiusH();
+        const r2 = this.radiusV();
+        const ux = r1 * Math.cos(this.rotation);
+        const uy = r1 * Math.sin(this.rotation);
+        const vx = r2 * Math.cos(this.rotation + Math.PI / 2);
+        const vy = r2 * Math.sin(this.rotation + Math.PI / 2);
+        const bbox_halfwidth = Math.sqrt(ux * ux + vx * vx);
+        const bbox_halfheight = Math.sqrt(uy * uy + vy * vy);
+        return new Bounds({ x: this.center.x - bbox_halfwidth, y: this.center.y - bbox_halfheight }, { x: this.center.x + bbox_halfwidth, y: this.center.y + bbox_halfheight });
+    }
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Move the ellipse by the given amount. This is equivalent by moving the `center` and `axis` points.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof VEllipse
+     * @return {VEllipse} this for chaining
+     **/
+    move(amount) {
+        this.center.add(amount);
+        this.axis.add(amount);
+        return this;
     }
     /**
      * Scale this ellipse by the given factor from the center point. The factor will be applied to both radii.
@@ -10593,7 +11517,7 @@ class VEllipse {
      * @param {number=1.0} length - [optional, default=1] The length of the returned vector.
      */
     normalAt(angle, length) {
-        const point = this.vertAt(angle);
+        const point = this.vertAt(angle - this.rotation); // HERE IS THE CORRECT BEHAVIOR!
         const foci = this.getFoci();
         // Calculate the angle between [point,focusA] and [point,focusB]
         const angleA = new Line(point, foci[0]).angle();
@@ -10605,12 +11529,13 @@ class VEllipse {
             .addX(50)
             .clone()
             .rotate(Math.PI + centerAngle, point);
-        if (this.center.distance(endPointA) < this.center.distance(endPointB)) {
-            return new Vector(point, endPointB);
+        const resultVector = this.center.distance(endPointA) < this.center.distance(endPointB)
+            ? new Vector(point, endPointB)
+            : new Vector(point, endPointA);
+        if (typeof length === "number") {
+            resultVector.setLength(length);
         }
-        else {
-            return new Vector(point, endPointA);
-        }
+        return resultVector;
     }
     /**
      * Get the tangent vector at the given angle.
@@ -10629,9 +11554,7 @@ class VEllipse {
      */
     tangentAt(angle, length) {
         const normal = this.normalAt(angle, length);
-        // Rotate the normal by 90 degrees, then it is the tangent.
-        normal.b.rotate(Math.PI / 2, normal.a);
-        return normal;
+        return normal.inv().perp();
     }
     /**
      * Get the perimeter of this ellipse.
@@ -10682,6 +11605,8 @@ class VEllipse {
     /**
      * Get equally distributed points on the outline of this ellipse.
      *
+     * @method getEquidistantVertices
+     * @instance
      * @param {number} pointCount - The number of points.
      * @returns {Array<Vertex>}
      */
@@ -10693,6 +11618,75 @@ class VEllipse {
         }
         return result;
     }
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get the line intersections as vectors with this ellipse.
+     *
+     * @method lineIntersections
+     * @instance
+     * @param {VertTuple<Vector> ray - The line/ray to intersect this ellipse with.
+     * @param {boolean} inVectorBoundsOnly - (default=false) Set to true if only intersections within the vector bounds are of interest.
+     * @returns
+     */
+    lineIntersections(ray, inVectorBoundsOnly = false) {
+        // Question: what happens to extreme versions when ellipse is a line (width or height is zero)?
+        //           This would result in a Division_by_Zero exception!
+        // Step A: create clones for operations (keep originals unchanged)
+        const ellipseCopy = this.clone(); // VEllipse
+        const rayCopy = ray.clone(); // Vector
+        // Step B: move both so ellipse's center is located at (0,0)
+        const moveAmount = ellipseCopy.center.clone().inv();
+        ellipseCopy.move(moveAmount);
+        rayCopy.add(moveAmount);
+        // Step C: rotate eclipse backwards it's rotation, so that rotation is zero (0.0).
+        //         Rotate together with ray!
+        const rotationAmount = -ellipseCopy.rotation;
+        ellipseCopy.rotate(rotationAmount); // Rotation around (0,0) = center of translated ellipse
+        rayCopy.a.rotate(rotationAmount, ellipseCopy.center);
+        rayCopy.b.rotate(rotationAmount, ellipseCopy.center);
+        // Step D: find x/y factors to use for scaling to transform the ellipse to a circle.
+        //         Scale together with vector ray.
+        const radiusH = ellipseCopy.radiusH();
+        const radiusV = ellipseCopy.radiusV();
+        const scalingFactors = radiusH > radiusV ? { x: radiusV / radiusH, y: 1.0 } : { x: 1.0, y: radiusH / radiusV };
+        // Step E: scale ellipse AND ray by calculated factors.
+        ellipseCopy.axis.scaleXY(scalingFactors);
+        rayCopy.a.scaleXY(scalingFactors);
+        rayCopy.b.scaleXY(scalingFactors);
+        // Intermediate result: now the ellipse is transformed to a circle and we can calculate intersections :)
+        // Step F: calculate circle+line intersecions
+        const tmpCircle = new Circle(new Vertex(), ellipseCopy.radiusH()); // radiusH() === radiusV()
+        const intersections = tmpCircle.lineIntersections(rayCopy, inVectorBoundsOnly);
+        // Step G: transform intersecions back to original configuration
+        intersections.forEach(function (intersectionPoint) {
+            // Reverse transformation from above.
+            intersectionPoint.scaleXY({ x: 1 / scalingFactors.x, y: 1 / scalingFactors.y }, ellipseCopy.center);
+            intersectionPoint.rotate(-rotationAmount, ellipseCopy.center);
+            intersectionPoint.sub(moveAmount);
+        });
+        return intersections;
+    }
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    lineIntersectionTangents(line, inVectorBoundsOnly = false) {
+        // Find the intersections of all lines plus their tangents inside the circle bounds
+        const interSectionPoints = this.lineIntersections(line, inVectorBoundsOnly);
+        return interSectionPoints.map((vert) => {
+            // Calculate angle
+            const lineFromCenter = new Line(this.center, vert);
+            const angle = lineFromCenter.angle();
+            // Calculate tangent at angle
+            return this.tangentAt(angle);
+        });
+    }
+    //--- END --- Implement interface `Intersectable`
     /**
      * Convert this ellipse into cubic Bézier curves.
      *
@@ -10705,7 +11699,7 @@ class VEllipse {
         // Math by Luc Maisonobe
         //    http://www.spaceroots.org/documents/ellipse/node22.html
         // Note that ellipses with radiusH=0 or radiusV=0 cannot be represented as Bézier curves.
-        // Return a single line here (as a Bézier curve)
+        // Return a single line here (as a Bézier curve)?
         // if (Math.abs(this.radiusV()) < 0.00001) {
         //   const radiusH = this.radiusH();
         //   return [
@@ -10735,10 +11729,10 @@ class VEllipse {
         const radiusV = this.radiusV();
         const curves = [];
         const angles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, segmentCount);
-        let curAngle = angles[0];
+        let curAngle = angles[0] + this.rotation;
         let startPoint = this.vertAt(curAngle);
         for (var i = 0; i < angles.length; i++) {
-            let nextAngle = angles[(i + 1) % angles.length];
+            let nextAngle = angles[(i + 1) % angles.length] + this.rotation;
             let endPoint = this.vertAt(nextAngle);
             if (Math.abs(radiusV) < 0.0001 || Math.abs(radiusH) < 0.0001) {
                 // Distorted ellipses can only be approximated by linear Bézier segments
@@ -10747,8 +11741,8 @@ class VEllipse {
                 curves.push(curve);
             }
             else {
-                let startTangent = this.tangentAt(curAngle);
-                let endTangent = this.tangentAt(nextAngle);
+                let startTangent = this.tangentAt(curAngle + this.rotation);
+                let endTangent = this.tangentAt(nextAngle + this.rotation);
                 // Find intersection (ignore that the result might be null in some extreme cases)
                 let intersection = startTangent.intersection(endTangent);
                 // What if intersection is undefined?
@@ -10840,7 +11834,14 @@ VEllipse.utils = {
  * @date     2021-02-26
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-11-01 Tweaked the `endpointToCenterParameters` function to handle negative values, too, without errors.
- * @version  1.1.1
+ * @modified 2025-04-01 Adapting a the `toCubicBezier` calculation to match an underlying change in the vertAt and tangentAt calculation of ellipses (was required to hamonize both methods with circles).
+ * @modified 2025-04-02 Adding `VEllipseSector.containsAngle` method.
+ * @modified 2025-04-02 Adding `VEllipseSector.lineIntersections` and `VEllipseSector.lineIntersectionTangents` and implementing `Intersectable`.
+ * @modified 2025-04-07 Adding value wrapping (0 to TWO_PI) to the `VEllipseSector.containsAngle` method.
+ * @modified 2025-04-09 Adding the `VEllipseSector.move` method.
+ * @modified 2025-04-19 Added the `VEllipseSector.getStartPoint` and `getEndPoint` methods.
+ * @modified 2025-04-23 Added the `VEllipseSector.getBounds` method.
+ * @version  1.2.0
  */
 /**
  * @classdesc A class for elliptic sectors.
@@ -10877,6 +11878,137 @@ class VEllipseSector {
         this.endAngle = geomutils.wrapMinMax(endAngle, 0, Math.PI * 2);
     }
     /**
+     * Move the ellipse sector by the given amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof VEllipseSector
+     * @return {VEllipseSector} this for chaining
+     **/
+    move(amount) {
+        this.ellipse.move(amount);
+        return this;
+    }
+    /**
+     * Checks wether the given angle (must be inside 0 and PI*2) is contained inside this sector.
+     *
+     * @param {number} angle - The numeric angle to check.
+     * @method containsAngle
+     * @instance
+     * @memberof VEllipseSectpr
+     * @return {boolean} True if (and only if) this sector contains the given angle.
+     */
+    containsAngle(angle) {
+        angle = geomutils.mapAngleTo2PI(angle); // wrapMinMax(angle, 0, Math.PI * 2);
+        const sAngle = geomutils.mapAngleTo2PI(this.startAngle);
+        const eAngle = geomutils.mapAngleTo2PI(this.endAngle);
+        // TODO: cleanup
+        // if (this.startAngle <= this.endAngle) {
+        //   return angle >= this.startAngle && angle < this.endAngle;
+        // } else {
+        //   // startAngle > endAngle
+        //   return angle >= this.startAngle || angle < this.endAngle;
+        // }
+        if (sAngle <= eAngle) {
+            return angle >= sAngle && angle < eAngle;
+        }
+        else {
+            // startAngle > endAngle
+            return angle >= sAngle || angle < eAngle;
+        }
+    }
+    /**
+     * Get the sectors starting point (on the underlying ellipse, located at the start angle).
+     *
+     * @method getStartPoint
+     * @instance
+     * @memberof VEllipseSector
+     * @return {Vertex} The sector's stating point.
+     */
+    getStartPoint() {
+        return this.ellipse.vertAt(this.startAngle);
+    }
+    /**
+     * Get the sectors ending point (on the underlying ellipse, located at the end angle).
+     *
+     * @method getEndPoint
+     * @instance
+     * @memberof VEllipseSector
+     * @return {Vertex} The sector's ending point.
+     */
+    getEndPoint() {
+        return this.ellipse.vertAt(this.endAngle);
+    }
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Get the bounds of this elliptic sector.
+     *
+     * The bounds are approximated by the underlying segment buffer; the more segment there are,
+     * the more accurate will be the returned bounds.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof VEllipse
+     * @return {Bounds} The bounds of this elliptic sector.
+     **/
+    getBounds() {
+        // Calculage angles from east, west, north and south box points and check if they are inside
+        const extremes = this.ellipse.getExtremePoints();
+        const candidates = extremes.filter(point => {
+            const angle = new Line(this.ellipse.center, point).angle() - this.ellipse.rotation;
+            return this.containsAngle(angle);
+        });
+        return Bounds.computeFromVertices([this.getStartPoint(), this.getEndPoint()].concat(candidates));
+    }
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get the line intersections as vectors with this ellipse.
+     *
+     * @method lineIntersections
+     * @instance
+     * @memberof VEllipseSectpr
+     * @param {VertTuple<Vector>} ray - The line/ray to intersect this ellipse with.
+     * @param {boolean} inVectorBoundsOnly - (default=false) Set to true if only intersections within the vector bounds are of interest.
+     * @returns
+     */
+    lineIntersections(ray, inVectorBoundsOnly = false) {
+        // First get all line intersections from underlying ellipse.
+        const ellipseIntersections = this.ellipse.lineIntersections(ray, inVectorBoundsOnly);
+        // Drop all intersection points that are not contained in the circle sectors bounds.
+        const tmpLine = new Line(this.ellipse.center, new Vertex());
+        return ellipseIntersections.filter((intersectionPoint) => {
+            tmpLine.b.set(intersectionPoint);
+            const lineAngle = tmpLine.angle();
+            return this.containsAngle(lineAngle - this.ellipse.rotation);
+        });
+    }
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @method lineIntersections
+     * @memberof VEllipseSectpr
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    lineIntersectionTangents(line, inVectorBoundsOnly = false) {
+        // Find the intersections of all lines plus their tangents inside the circle bounds
+        const interSectionPoints = this.lineIntersections(line, inVectorBoundsOnly);
+        return interSectionPoints.map((vert) => {
+            // Calculate angle
+            const lineFromCenter = new Line(this.ellipse.center, vert);
+            const angle = lineFromCenter.angle();
+            // console.log("angle", (angle / Math.PI) * 180.0);
+            // const angle = Math.random() * Math.PI * 2; // TODO
+            // Calculate tangent at angle
+            return this.ellipse.tangentAt(angle);
+        });
+    }
+    //--- END --- Implement interface `Intersectable`
+    /**
      * Convert this elliptic sector into cubic Bézier curves.
      *
      * @param {number=3} quarterSegmentCount - The number of segments per base elliptic quarter (default is 3, min is 1).
@@ -10903,8 +12035,8 @@ class VEllipseSector {
         for (var i = 0; i + 1 < angles.length; i++) {
             let nextAngle = angles[(i + 1) % angles.length];
             let endPoint = this.ellipse.vertAt(nextAngle);
-            let startTangent = this.ellipse.tangentAt(curAngle);
-            let endTangent = this.ellipse.tangentAt(nextAngle);
+            let startTangent = this.ellipse.tangentAt(curAngle + this.ellipse.rotation);
+            let endTangent = this.ellipse.tangentAt(nextAngle + this.ellipse.rotation);
             // Distorted ellipses can only be approximated by linear Bézier segments
             if (Math.abs(radiusV) < 0.0001 || Math.abs(radiusH) < 0.0001) {
                 let diff = startPoint.difference(endPoint);
@@ -11008,20 +12140,20 @@ VEllipseSector.ellipseSectorUtils = {
     equidistantVertAngles: (radiusH, radiusV, startAngle, endAngle, fullEllipsePointCount) => {
         var ellipseAngles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, fullEllipsePointCount);
         ellipseAngles = ellipseAngles.map((angle) => VEllipseSector.ellipseSectorUtils.normalizeAngle(angle));
-        var angleIsInRange = (angle) => {
+        const angleIsInRange = (angle) => {
             if (startAngle < endAngle)
                 return angle >= startAngle && angle <= endAngle;
             else
                 return angle >= startAngle || (angle <= endAngle && angle >= 0);
         };
         // Drop all angles outside the sector
-        var ellipseAngles = ellipseAngles.filter(angleIsInRange);
+        ellipseAngles = ellipseAngles.filter(angleIsInRange);
         // Now we need to sort the angles to the first one in the array is the closest to startAngle.
         // --> find the angle that is closest to the start angle
-        var startIndex = VEllipseSector.ellipseSectorUtils.findClosestToStartAngle(startAngle, endAngle, ellipseAngles);
+        const startIndex = VEllipseSector.ellipseSectorUtils.findClosestToStartAngle(startAngle, endAngle, ellipseAngles);
         // Bring all angles into the correct order
         //    Idea: use splice or slice here?
-        var angles = [];
+        const angles = [];
         for (var i = 0; i < ellipseAngles.length; i++) {
             angles.push(ellipseAngles[(startIndex + i) % ellipseAngles.length]);
         }
@@ -12149,18 +13281,17 @@ class PlotBoilerplate {
         }
         else if (d instanceof Triangle) {
             draw.polyline([d.a, d.b, d.c], false, this.drawConfig.triangle.color, this.drawConfig.triangle.lineWidth);
-            if (!this.drawConfig.drawHandlePoints)
+            if (!this.drawConfig.drawHandlePoints) {
                 d.a.attr.renderTime = d.b.attr.renderTime = d.c.attr.renderTime = renderTime;
+            }
         }
         else if (d instanceof VEllipse) {
             if (this.drawConfig.drawHandleLines) {
                 draw.setCurrentId(`${d.uid}_e0`);
                 draw.setCurrentClassName(`${d.className}-v-line`);
-                // draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
                 draw.handleLine(d.center.clone().add(0, d.signedRadiusV()).rotate(d.rotation, d.center), d.axis); // , "#c8c8c8");
                 draw.setCurrentId(`${d.uid}_e1`);
                 draw.setCurrentClassName(`${d.className}-h-line`);
-                // draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
                 draw.handleLine(d.center.clone().add(d.signedRadiusH(), 0).rotate(d.rotation, d.center), d.axis); // , "#c8c8c8");
             }
             draw.setCurrentId(d.uid);
@@ -12176,12 +13307,6 @@ class PlotBoilerplate {
         else if (d instanceof VEllipseSector) {
             draw.setCurrentId(d.uid);
             draw.setCurrentClassName(`${d.className}`);
-            /* draw.ellipse( d.center,
-                    // Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y),
-                    d.radiusH(), d.radiusV(),
-                    this.drawConfig.ellipse.color,
-                    this.drawConfig.ellipse.lineWidth,
-                    d.rotation ); */
             const data = VEllipseSector.ellipseSectorUtils.describeSVGArc(d.ellipse.center.x, d.ellipse.center.y, d.ellipse.radiusH(), d.ellipse.radiusV(), d.startAngle, d.endAngle, d.ellipse.rotation, { moveToStart: true });
             draw.path(data, this.drawConfig.ellipseSector.color, this.drawConfig.ellipseSector.lineWidth);
         }

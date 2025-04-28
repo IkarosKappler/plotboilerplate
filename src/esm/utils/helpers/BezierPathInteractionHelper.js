@@ -22,15 +22,17 @@
  * @modified 2021-03-31 Fixed the issue with the new AlloyFinger (Typescript).
  * @modified 2022-02-03 Changing the element to catch events (eventCatcher instead of canvas).
  * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
- * @version  1.1.3
+ * @modified 2025-04-14 Added the `BezierPathInteractionHelper.drawHandleLines` method.
+ * @modified 2025-04-14 Fixing correct event types for touch events in `BezierPathInteractionHelper`.
+ * @modified 2025-04-14 BezierPathInteractionHelper: Changed default value of `HelperOptions.autoAdjustPaths` from `true` to `false`.
+ * @version  1.2.0
  *
  * @file BezierPathInteractionHelper
  * @public
  **/
-// import { AlloyFinger } from "alloyfinger"; // node_modules
 // I would like to use AlloyFinger from the node_modules, but it seems
 // AlloyTeam has forgotten to publish their d.ts file.
-import { AlloyFinger } from "../../../../lib/alloy_finger";
+import AlloyFinger from "alloyfinger-typescript";
 import { BezierPath } from "../../BezierPath";
 import { KeyHandler } from "../../KeyHandler";
 import { MouseHandler } from "../../MouseHandler";
@@ -75,7 +77,9 @@ export class BezierPathInteractionHelper {
         this.pb = pb;
         this.paths = [];
         this.onPointerMoved =
-            typeof options.onPointerMoved === "function" ? options.onPointerMoved : (i, a, b, t) => { };
+            typeof options.onPointerMoved === "function"
+                ? options.onPointerMoved
+                : (i, a, b, t) => { };
         this.onVertexInserted =
             typeof options.onVertexInserted === "function"
                 ? options.onVertexInserted
@@ -85,7 +89,7 @@ export class BezierPathInteractionHelper {
                 ? options.onVerticesDeleted
                 : (i, r, n, o) => { };
         this.onPathRemoved = typeof options.onPathRemoved === "function" ? options.onPathRemoved : (i, o) => { };
-        this.autoAdjustPaths = typeof options.autoAdjustPaths === "boolean" ? options.autoAdjustPaths : true;
+        this.autoAdjustPaths = typeof options.autoAdjustPaths === "boolean" ? options.autoAdjustPaths : false; // true;
         this.allowPathRemoval = typeof options.allowPathRemoval === "boolean" ? options.allowPathRemoval : true;
         this.maxDetectDistance = typeof options.maxDetectDistance === "number" ? options.maxDetectDistance : Number.MAX_VALUE;
         this.mouseIsOver = false;
@@ -109,8 +113,9 @@ export class BezierPathInteractionHelper {
         this._touchHandler = this._installTouchListener();
         this._keyHandler = this._installKeyListener();
         // Paths might have changed by auto-adjustment.
-        if (this.autoAdjustPaths)
+        if (this.autoAdjustPaths) {
             pb.redraw();
+        }
     }
     /**
      * Manually add a path to this helper.
@@ -178,6 +183,24 @@ export class BezierPathInteractionHelper {
     update() {
         // Just re-run the calculation with the recent mouse/touch position
         this._handleMoveEvent(this.currentB.x, this.currentB.y);
+    }
+    /**
+     * Draw grey handle lines.
+     *
+     */
+    drawHandleLines() {
+        this.paths.forEach((path) => {
+            path.bezierCurves.forEach((curve) => {
+                this.pb.draw.line(curve.startPoint, curve.startControlPoint, "rgba(64,192,128,0.333)", 1.0, {
+                    dashOffset: 0.0,
+                    dashArray: [4, 2]
+                });
+                this.pb.draw.line(curve.endPoint, curve.endControlPoint, "rgba(64,192,128,0.333)", 1.0, {
+                    dashOffset: 0.0,
+                    dashArray: [4, 2]
+                });
+            });
+        });
     }
     /**
      * This function should invalidate any installed listeners and invalidate this object.
@@ -347,16 +370,22 @@ export class BezierPathInteractionHelper {
         var _self = this;
         const afProps = {
             // Todo: which event types does AlloyFinger use?
+            // touchStart: function (_event: TouchEvent) {
+            //   _self.mouseIsOver = true;
+            // },
+            // /* TouchMoveEvent , AFTouchEvent<"touchStart"> */
             touchStart: function (_event) {
                 _self.mouseIsOver = true;
             },
             touchMove: function (event) {
+                // TouchEvent) {
                 if (_self.pb.getDraggedElementCount() == 0 && event.touches.length > 0) {
                     // console.log('touchmove');
                     _self._handleMoveEvent(event.touches[0].clientX, event.touches[0].clientY);
                 }
             },
             touchEnd: function (_event) {
+                // TouchEvent) {
                 _self.mouseIsOver = false;
                 _self._clearMoveEvent();
             }
@@ -482,22 +511,6 @@ export class BezierPathInteractionHelper {
         }
         path.updateArcLengths();
     }
-    /**
-     * A helper function to add drag-start-listener to given vertices.
-     */
-    /* private static _addVertsDragStartListener( verts:Array<Vertex>, dragStartListener:VertListener ) : void {
-      for( var i in verts ) {
-          verts[i].addDragStartListener( dragStartListener );
-      }
-      }; */
-    /**
-     * A helper function to remove drag-start-listener to given vertices.
-     */
-    /* private static _removeVertsDragStartListener( verts:Array<Vertex>, dragEndListener:VertListener ) : void {
-      for( var i in verts ) {
-          verts[i].removeDragStartListener( dragStartListener );
-      }
-      }; */
     /**
      * A helper function to add drag-start listeners to all vertices of the given path.
      *

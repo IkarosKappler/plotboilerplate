@@ -9,7 +9,11 @@
  * @modified 2022-10-09 Added the `fromDimension` function.
  * @modified 2022-11-28 Added the `clone` method.
  * @modified 2023-09-29 Added the `randomPoint` method.
- * @version  1.7.0
+ * @modified 2025-03-23 Added the `getMinDimension` and `getMaxDimension` methods.
+ * @modified 2025-04-18 Change parameter type in `Bounds.computeFromVertices` from `Vertex` to more general `XYCoords`.
+ * @modified 2025-04-19 Added methods to `Bounds` class: `getNorthPoint`, `getSouthPoint`, `getEastPoint` and `getWestPoint`.
+ * @modified 2025-04-26 Added static method `Bounds.computeFromBoundsSet` to calculate containing bounds for a set of bounding boxes.
+ * @version  1.8.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -36,6 +40,54 @@ export class Bounds {
         this.height = max.y - min.y;
     }
     /**
+     * Get the center point of the north bound.
+     *
+     * @method getNorthPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "northmost" centered point of this bounding box.
+     */
+    getNorthPoint() {
+        return new Vertex(this.min.x + this.width / 2.0, this.min.y);
+    }
+    ;
+    /**
+     * Get the center point of the south bound.
+     *
+     * @method getNorthPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "southhmost" centered point of this bounding box.
+     */
+    getSouthPoint() {
+        return new Vertex(this.min.x + this.width / 2.0, this.max.y);
+    }
+    ;
+    /**
+    * Get the center point of the west bound.
+    *
+    * @method getWestPoint
+    * @instance
+    * @memberof Bounds
+    * @return {Vertex} The "westhmost" centered point of this bounding box.
+    */
+    getWestPoint() {
+        return new Vertex(this.min.x, this.min.y + this.height / 2.0);
+    }
+    ;
+    /**
+    * Get the center point of the east bound.
+    *
+    * @method getEastPoint
+    * @instance
+    * @memberof Bounds
+    * @return {Vertex} The "easthmost" centered point of this bounding box.
+    */
+    getEastPoint() {
+        return new Vertex(this.max.x, this.min.y + this.height / 2.0);
+    }
+    ;
+    /**
      * Convert this rectangular bounding box to a polygon with four vertices.
      *
      * @method toPolygon
@@ -56,6 +108,22 @@ export class Bounds {
      */
     getCenter() {
         return new Vertex(this.min.x + (this.max.x - this.min.x) / 2.0, this.min.y + (this.max.y - this.min.y) / 2);
+    }
+    /**
+     * Get the minimum of `width` and `height`.
+     *
+     * @returns {number} The value of Math.min( this.width, this.height )
+     */
+    getMinDimension() {
+        return Math.min(this.width, this.height);
+    }
+    /**
+     * Get the minimum of `width` and `height`.
+     *
+     * @returns {number} The value of Math.min( this.width, this.height )
+     */
+    getMaxDimension() {
+        return Math.max(this.width, this.height);
     }
     /**
      * Generate a random point inside this bounds object. Safe areas at the border to avoid
@@ -107,12 +175,13 @@ export class Bounds {
      * @static
      * @method computeFromVertices
      * @memberof Bounds
-     * @param {Array<Vertex>} vertices - The set of vertices you want to get the bounding box for.
+     * @param {Array<XYCoords>} vertices - The set of vertices you want to get the bounding box for.
      * @return The minimal Bounds for the given vertices.
      **/
     static computeFromVertices(vertices) {
-        if (vertices.length == 0)
+        if (vertices.length == 0) {
             return new Bounds(new Vertex(0, 0), new Vertex(0, 0));
+        }
         let xMin = vertices[0].x;
         let xMax = vertices[0].x;
         let yMin = vertices[0].y;
@@ -124,6 +193,35 @@ export class Bounds {
             xMax = Math.max(xMax, vert.x);
             yMin = Math.min(yMin, vert.y);
             yMax = Math.max(yMax, vert.y);
+        }
+        return new Bounds(new Vertex(xMin, yMin), new Vertex(xMax, yMax));
+    }
+    /**
+    * Compute the minimal bounding box for a given set of existing bounding boxes.
+    *
+    * An empty vertex array will return an empty bounding box located at (0,0).
+    *
+    * @static
+    * @method computeFromBoundsSet
+    * @memberof Bounds
+    * @param {Array<IBounds>} boundingBoxes - The set of existing bounding boxes to get the containing bounding box for.
+    * @return The minimal Bounds for the given bounds instances.
+    **/
+    static computeFromBoundsSet(boundingBoxes) {
+        if (boundingBoxes.length == 0) {
+            return new Bounds(new Vertex(0, 0), new Vertex(0, 0));
+        }
+        let xMin = boundingBoxes[0].min.x;
+        let xMax = boundingBoxes[0].max.x;
+        let yMin = boundingBoxes[0].min.y;
+        let yMax = boundingBoxes[0].min.y;
+        let bounds;
+        for (var i in boundingBoxes) {
+            bounds = boundingBoxes[i];
+            xMin = Math.min(xMin, bounds.min.x);
+            xMax = Math.max(xMax, bounds.max.x);
+            yMin = Math.min(yMin, bounds.min.y);
+            yMax = Math.max(yMax, bounds.min.y);
         }
         return new Bounds(new Vertex(xMin, yMin), new Vertex(xMax, yMax));
     }

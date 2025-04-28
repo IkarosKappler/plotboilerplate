@@ -5,7 +5,8 @@
  *
  * @author   Ikaros Kappler
  * @date     2020-05-18
- * @version  1.0.0
+ * @modified 2025-04-15 Removing custom handle lines and add VEllipseHelper.
+ * @version  1.1.0
  **/
 
 (function (_context) {
@@ -19,6 +20,7 @@
     var pb = new PlotBoilerplate(
       PlotBoilerplate.utils.safeMergeByKeys({ canvas: document.getElementById("my-canvas"), fullSize: true }, GUP)
     );
+    pb.drawConfig.drawHandleLines = false; // We want the helper to draw the helper lines
 
     // Create center
     var center = new Vertex(10, 10);
@@ -32,31 +34,18 @@
     // Create the (vertex-based) ellipse
     var ellipse = new VEllipse(center, radii, rotation);
 
-    // Now add the ellipse to your canvas
-    pb.add(ellipse);
+    // Add a rotation control
+    var ellipseRotationControlPoint = ellipse.vertAt(0.0).scale(1.2, ellipse.center);
+    var ellipseHelper = new VEllipseHelper(ellipse, ellipseRotationControlPoint);
+
+    // Now add the ellipse and rotation point to your canvas
+    pb.add([ellipse, ellipseRotationControlPoint]);
 
     // Note: the center point and radii are draggable now :)
 
-    // Add a rotation control
-    // TODO: refactor this to an 'VEllipseRotationHelper'?
-    (function () {
-      var rotationControlPoint = ellipse.vertAt(rotation).scale(1.2, ellipse.center);
-      var rotationLine = new Line(ellipse.center, rotationControlPoint);
-      ellipse.center.listeners.addDragListener(function (event) {
-        rotationControlPoint.add(event.params.dragAmount);
-      });
-      rotationControlPoint.listeners.addDragListener(function (event) {
-        var newRotation = rotationLine.angle();
-        var rDiff = newRotation - ellipse.rotation;
-        ellipse.rotation = newRotation;
-        ellipse.axis.rotate(rDiff, ellipse.center);
-      });
-      pb.add(rotationControlPoint);
-      pb.config.postDraw = function () {
-        pb.draw.line(ellipse.center, rotationControlPoint, "rgba(128,128,255,0.5)", 1);
-      };
-
-      pb.redraw();
-    })();
+    pb.config.preDraw = function (draw, fill) {
+      ellipseHelper.drawHandleLines(draw, fill);
+    };
+    pb.redraw();
   });
 })(window);

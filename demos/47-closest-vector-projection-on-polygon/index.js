@@ -96,7 +96,9 @@
     // +-------------------------------
     var postDraw = function (draw, fill) {
       // Find closest intersection point between vector and polygon
+      // var intersections = polygon.lineIntersections(vec, config.insideVectorBoundsOnly);
       var intersections = polygon.lineIntersections(vec, config.insideVectorBoundsOnly);
+
       for (var i = 0; i < intersections.length; i++) {
         draw.circle(intersections[i], 5, "orange", 2.0);
       }

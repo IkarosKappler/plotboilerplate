@@ -23,7 +23,11 @@
  * @modified  2022-02-02 Cleared the `Triangle.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified  2024-11-22 Added static utility function Triangle.utils.determinant; adapted method `determinant`.
  * @modified  2024-11-22 Changing visibility of `Triangle.utils` from `private` to `public`.
- * @version   2.8.0
+ * @modified  2025-14-16 Class `Triangle` now implements interface `Intersectable`.
+ * @modified  2025-14-16 Class `Triangle` now implements interface `IBounded`.
+ * @modified  2025-14-16 Class `Triangle` now implements interface `Intersectable`.
+ * @modified  2025-14-16 Added method `Triangle.move`.
+ * @version   2.10.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -31,9 +35,12 @@
  **/
 import { Bounds } from "./Bounds";
 import { Circle } from "./Circle";
+import { Line } from "./Line";
 import { Polygon } from "./Polygon";
+import { Vector } from "./Vector";
+import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { SVGSerializable, UID, XYCoords } from "./interfaces";
+import { IBounded, Intersectable, SVGSerializable, UID, XYCoords } from "./interfaces";
 /**
  * @classdesc A triangle class for triangulations.
  *
@@ -51,7 +58,7 @@ import { SVGSerializable, UID, XYCoords } from "./interfaces";
  * @requires geomutils
  *
  */
-export declare class Triangle implements SVGSerializable {
+export declare class Triangle implements IBounded, SVGSerializable, Intersectable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
      **/
@@ -176,6 +183,25 @@ export declare class Triangle implements SVGSerializable {
      */
     scaleToCentroid(factor: number): Triangle;
     /**
+     * Get the bounding box (bounds) of this Triangle.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof Triangle
+     * @return {Bounds} The rectangular bounds of this Triangle.
+     **/
+    getBounds(): Bounds;
+    /**
+     * Move the Triangle's vertices by the given amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof Triangle
+     * @return {Triangle} this for chaining
+     **/
+    move(amount: XYCoords): Triangle;
+    /**
      * Get the circumcircle of this triangle.
      *
      * The circumcircle is that unique circle on which all three
@@ -250,6 +276,29 @@ export declare class Triangle implements SVGSerializable {
      * @memberof Triangle
      */
     bounds(): Bounds;
+    /**
+     * Get all line intersections with this polygon.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+     *
+     * See demo `47-closest-vector-projection-on-polygon` for how it works.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     */
+    lineIntersections(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vertex>;
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param inVectorBoundsOnly
+     * @returns
+     */
+    lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vector>;
+    getEdgeAt(edgeIndex: number): Line;
     /**
      * Convert this triangle to a polygon instance.
      *

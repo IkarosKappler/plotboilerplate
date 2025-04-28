@@ -235,7 +235,9 @@ function createDemoDrawables(pb, imagePath, drawCallback) {
   var addEllipticSectorHelper = function (ellipticSector) {
     var startControlPoint = ellipticSector.ellipse.vertAt(ellipticSector.startAngle);
     var endControlPoint = ellipticSector.ellipse.vertAt(ellipticSector.endAngle);
-    var rotationControlPoint = ellipticSector.ellipse.vertAt(ellipticSector.rotation).scale(1.2, ellipticSector.ellipse.center);
+    // var rotationControlPoint = ellipticSector.ellipse.vertAt(ellipticSector.rotation).scale(1.2, ellipticSector.ellipse.center);
+    var rotationControlPoint = ellipticSector.ellipse.vertAt(0).scale(1.2, ellipticSector.ellipse.center);
+
     new VEllipseSectorHelper(ellipticSector, startControlPoint, endControlPoint, rotationControlPoint);
     pb.add(startControlPoint);
     pb.add(endControlPoint);

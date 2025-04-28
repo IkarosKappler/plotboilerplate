@@ -2,7 +2,8 @@
  * @author   mbostock, extended and ported to TypeScript by Ikaros Kappler
  * @date     2020-05-19
  * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
- * @version  1.0.2
+ * @modified 2024-03-24 Fixing some unstrict types to match with the new Typescript settings.
+ * @version  1.0.3
  * @file     contextPolygonIncircle
  * @public
  */

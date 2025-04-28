@@ -14,7 +14,10 @@
  * @modified 2024-09-10 Chaging the first param of `pointDistance` from `Vertex` to less strict type `XYCoords`. This should not break anything.
  * @modified 2024-09-10 Adding the optional `epsilon` param to the `hasPoint` method.
  * @modified 2024-12-02 Added the `epsilon` param to the `colinear` method. Default is 1.0e-6.
- * @version 1.3.0
+ * @modified 2025-03-31 Added the `VertTuple.revert` method.
+ * @modified 2025-04-15 Changed param of `VertTuple.moveTo` method from `Vertex` to `XYCoords`.
+ * @modified 2025-04-15 Added method `VertTuple.move` method.
+ * @version 1.4.0
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VertTuple = void 0;
@@ -83,13 +86,29 @@ var VertTuple = /** @class */ (function () {
      *
      * @method add
      * @param {XYCoords} amount The amount (x,y) to add.
-     * @return {Line} this
      * @instance
      * @memberof VertTuple
+     * @return {VertTuple<T>} this
      **/
     VertTuple.prototype.add = function (amount) {
         this.a.add(amount);
         this.b.add(amount);
+        return this;
+    };
+    /**
+     * Reverse this vertex tuple: a becomes b, and b becomes a.
+     * This operation is in-place.
+     *
+     * @method add
+     * @param {XYCoords} amount The amount (x,y) to add.
+     * @instance
+     * @memberof VertTuple
+     * @return {VertTuple<T>} this
+     */
+    VertTuple.prototype.revert = function () {
+        var tmp = this.a;
+        this.a = this.b;
+        this.b = tmp;
         return this;
     };
     /**
@@ -121,7 +140,7 @@ var VertTuple = /** @class */ (function () {
      * Move this line to a new location.
      *
      * @method moveTo
-     * @param {Vertex} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
+     * @param {XYCoords} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
      * @return {VertTuple} this
      * @instance
      * @memberof VertTuple
@@ -130,6 +149,20 @@ var VertTuple = /** @class */ (function () {
         var diff = this.a.difference(newA);
         this.a.add(diff);
         this.b.add(diff);
+        return this;
+    };
+    /**
+     * Move this line by the given amount
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move both point of this tuple.
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.move = function (amount) {
+        this.a.add(amount);
+        this.b.add(amount);
         return this;
     };
     /**

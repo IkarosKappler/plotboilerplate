@@ -12,13 +12,16 @@
  * @modified 2022-08-15 Added the `containsPoint` function.
  * @modified 2022-08-23 Added the `lineIntersection` function.
  * @modified 2022-08-23 Added the `closestPoint` function.
- * @version  1.4.0
+ * @modified 2025-04-09 Added the `Circle.move(amount: XYCoords)` method.
+ * @modified 2025-04-16 Class `Circle` now implements interface `Intersectable`.
+ * @version  1.5.0
  **/
+import { Bounds } from "./Bounds";
 import { Line } from "./Line";
 import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { SVGSerializable, UID, XYCoords } from "./interfaces";
+import { IBounded, Intersectable, SVGSerializable, UID, XYCoords } from "./interfaces";
 /**
  * @classdesc A simple circle: center point and radius.
  *
@@ -30,7 +33,7 @@ import { SVGSerializable, UID, XYCoords } from "./interfaces";
  * @requires UID
  * @requires UIDGenerator
  **/
-export declare class Circle implements SVGSerializable {
+export declare class Circle implements IBounded, Intersectable, SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
      **/
@@ -72,6 +75,16 @@ export declare class Circle implements SVGSerializable {
      * @param {number} radius - The radius of the circle.
      */
     constructor(center: Vertex, radius: number);
+    /**
+     * Move the circle by the given amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof Circle
+     * @return {Circle} this for chaining
+     **/
+    move(amount: XYCoords): Circle;
     /**
      * Check if the given circle is fully contained inside this circle.
      *
@@ -130,6 +143,15 @@ export declare class Circle implements SVGSerializable {
      **/
     tangentAt(angle: number): Vector;
     /**
+     * Get the bounding box (bounds) of this Circle.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof Circle
+     * @return {Bounds} The rectangular bounds of this Circle.
+     **/
+    getBounds(): Bounds;
+    /**
      * Calculate the intersection points (if exists) with the given circle.
      *
      * @method circleIntersection
@@ -146,10 +168,30 @@ export declare class Circle implements SVGSerializable {
      * @instance
      * @memberof Circle
      * @param {Vertex} a- The first of the two points defining the line.
-     * @param {Vertex} b - The second of the two points defining the line.
+     * @param {XYCoords} b - The second of the two points defining the line.
      * @return {Line|null} The intersection points (as a line) or null if this circle does not intersect the line given.
      **/
     lineIntersection(a: Vertex, b: XYCoords): Line | null;
+    /**
+     * Get all line intersections with this circle.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections with the circle outline.
+     */
+    lineIntersections(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vertex>;
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param lineIntersectionTangents
+     * @returns
+     */
+    lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vector>;
     /**
      * Calculate the closest point on the outline of this circle to the given point.
      *

@@ -1065,18 +1065,17 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         else if (d instanceof Triangle_1.Triangle) {
             draw.polyline([d.a, d.b, d.c], false, this.drawConfig.triangle.color, this.drawConfig.triangle.lineWidth);
-            if (!this.drawConfig.drawHandlePoints)
+            if (!this.drawConfig.drawHandlePoints) {
                 d.a.attr.renderTime = d.b.attr.renderTime = d.c.attr.renderTime = renderTime;
+            }
         }
         else if (d instanceof VEllipse_1.VEllipse) {
             if (this.drawConfig.drawHandleLines) {
                 draw.setCurrentId("".concat(d.uid, "_e0"));
                 draw.setCurrentClassName("".concat(d.className, "-v-line"));
-                // draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
                 draw.handleLine(d.center.clone().add(0, d.signedRadiusV()).rotate(d.rotation, d.center), d.axis); // , "#c8c8c8");
                 draw.setCurrentId("".concat(d.uid, "_e1"));
                 draw.setCurrentClassName("".concat(d.className, "-h-line"));
-                // draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
                 draw.handleLine(d.center.clone().add(d.signedRadiusH(), 0).rotate(d.rotation, d.center), d.axis); // , "#c8c8c8");
             }
             draw.setCurrentId(d.uid);
@@ -1092,12 +1091,6 @@ var PlotBoilerplate = /** @class */ (function () {
         else if (d instanceof VEllipseSector_1.VEllipseSector) {
             draw.setCurrentId(d.uid);
             draw.setCurrentClassName("".concat(d.className));
-            /* draw.ellipse( d.center,
-                    // Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y),
-                    d.radiusH(), d.radiusV(),
-                    this.drawConfig.ellipse.color,
-                    this.drawConfig.ellipse.lineWidth,
-                    d.rotation ); */
             var data = VEllipseSector_1.VEllipseSector.ellipseSectorUtils.describeSVGArc(d.ellipse.center.x, d.ellipse.center.y, d.ellipse.radiusH(), d.ellipse.radiusV(), d.startAngle, d.endAngle, d.ellipse.rotation, { moveToStart: true });
             draw.path(data, this.drawConfig.ellipseSector.color, this.drawConfig.ellipseSector.lineWidth);
         }
