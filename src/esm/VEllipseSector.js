@@ -11,8 +11,11 @@
  * @modified 2025-04-02 Adding `VEllipseSector.lineIntersections` and `VEllipseSector.lineIntersectionTangents` and implementing `Intersectable`.
  * @modified 2025-04-07 Adding value wrapping (0 to TWO_PI) to the `VEllipseSector.containsAngle` method.
  * @modified 2025-04-09 Adding the `VEllipseSector.move` method.
+ * @modified 2025-04-19 Added the `VEllipseSector.getStartPoint` and `getEndPoint` methods.
+ * @modified 2025-04-23 Added the `VEllipseSector.getBounds` method.
  * @version  1.2.0
  */
+import { Bounds } from "./Bounds";
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { geomutils } from "./geomutils";
 import { Line } from "./Line";
@@ -77,8 +80,8 @@ export class VEllipseSector {
      */
     containsAngle(angle) {
         angle = geomutils.mapAngleTo2PI(angle); // wrapMinMax(angle, 0, Math.PI * 2);
-        var sAngle = geomutils.mapAngleTo2PI(this.startAngle);
-        var eAngle = geomutils.mapAngleTo2PI(this.endAngle);
+        const sAngle = geomutils.mapAngleTo2PI(this.startAngle);
+        const eAngle = geomutils.mapAngleTo2PI(this.endAngle);
         // TODO: cleanup
         // if (this.startAngle <= this.endAngle) {
         //   return angle >= this.startAngle && angle < this.endAngle;
@@ -93,6 +96,49 @@ export class VEllipseSector {
             // startAngle > endAngle
             return angle >= sAngle || angle < eAngle;
         }
+    }
+    /**
+     * Get the sectors starting point (on the underlying ellipse, located at the start angle).
+     *
+     * @method getStartPoint
+     * @instance
+     * @memberof VEllipseSector
+     * @return {Vertex} The sector's stating point.
+     */
+    getStartPoint() {
+        return this.ellipse.vertAt(this.startAngle);
+    }
+    /**
+     * Get the sectors ending point (on the underlying ellipse, located at the end angle).
+     *
+     * @method getEndPoint
+     * @instance
+     * @memberof VEllipseSector
+     * @return {Vertex} The sector's ending point.
+     */
+    getEndPoint() {
+        return this.ellipse.vertAt(this.endAngle);
+    }
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Get the bounds of this elliptic sector.
+     *
+     * The bounds are approximated by the underlying segment buffer; the more segment there are,
+     * the more accurate will be the returned bounds.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof VEllipse
+     * @return {Bounds} The bounds of this elliptic sector.
+     **/
+    getBounds() {
+        // Calculage angles from east, west, north and south box points and check if they are inside
+        const extremes = this.ellipse.getExtremePoints();
+        const candidates = extremes.filter(point => {
+            const angle = new Line(this.ellipse.center, point).angle() - this.ellipse.rotation;
+            return this.containsAngle(angle);
+        });
+        return Bounds.computeFromVertices([this.getStartPoint(), this.getEndPoint()].concat(candidates));
     }
     //--- BEGIN --- Implement interface `Intersectable`
     /**
@@ -273,20 +319,20 @@ VEllipseSector.ellipseSectorUtils = {
     equidistantVertAngles: (radiusH, radiusV, startAngle, endAngle, fullEllipsePointCount) => {
         var ellipseAngles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, fullEllipsePointCount);
         ellipseAngles = ellipseAngles.map((angle) => VEllipseSector.ellipseSectorUtils.normalizeAngle(angle));
-        var angleIsInRange = (angle) => {
+        const angleIsInRange = (angle) => {
             if (startAngle < endAngle)
                 return angle >= startAngle && angle <= endAngle;
             else
                 return angle >= startAngle || (angle <= endAngle && angle >= 0);
         };
         // Drop all angles outside the sector
-        var ellipseAngles = ellipseAngles.filter(angleIsInRange);
+        ellipseAngles = ellipseAngles.filter(angleIsInRange);
         // Now we need to sort the angles to the first one in the array is the closest to startAngle.
         // --> find the angle that is closest to the start angle
-        var startIndex = VEllipseSector.ellipseSectorUtils.findClosestToStartAngle(startAngle, endAngle, ellipseAngles);
+        const startIndex = VEllipseSector.ellipseSectorUtils.findClosestToStartAngle(startAngle, endAngle, ellipseAngles);
         // Bring all angles into the correct order
         //    Idea: use splice or slice here?
-        var angles = [];
+        const angles = [];
         for (var i = 0; i < ellipseAngles.length; i++) {
             angles.push(ellipseAngles[(startIndex + i) % ellipseAngles.length]);
         }

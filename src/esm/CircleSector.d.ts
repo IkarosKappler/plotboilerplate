@@ -10,13 +10,16 @@
  * @modified 2024-03-09 Added the `angleAt` method to determine any angle at some ratio.
  * @modified 2025-04-02 Adding the `CircleSector.lineIntersections` and `CircleSector.lineIntersectionTangents` and implementing `Intersectable`.
  * @modified 2025-04-09 Adding the `CircleSector.move()` method.
+ * @modified 2025-04-19 Tweaking the `CircleSector.containsAngle` method: all values (input angle, start- and end- angle) are wrapped into [0,2*PI) now.
+ * @modified 2025-04-19 Class `CircleSector` implements interface `Bounded` now (method `getBounds` added).
  * @version  1.2.0
  **/
+import { Bounds } from "./Bounds";
 import { Circle } from "./Circle";
 import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { Intersectable, SVGPathParams, SVGSerializable, UID, XYCoords } from "./interfaces";
+import { IBounded, Intersectable, SVGPathParams, SVGSerializable, UID, XYCoords } from "./interfaces";
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
  *
@@ -26,7 +29,7 @@ import { Intersectable, SVGPathParams, SVGSerializable, UID, XYCoords } from "./
  * @requires UIDGenerator
  * @requires XYCoords
  **/
-export declare class CircleSector implements Intersectable, SVGSerializable {
+export declare class CircleSector implements IBounded, Intersectable, SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
      **/
@@ -75,6 +78,18 @@ export declare class CircleSector implements Intersectable, SVGSerializable {
      * @param {number} endAngle - The end angle of the sector.
      */
     constructor(circle: Circle, startAngle: number, endAngle: number);
+    /**
+     * Get the bounds of this ellipse.
+     *
+     * The bounds are approximated by the underlying segment buffer; the more segment there are,
+     * the more accurate will be the returned bounds.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof VEllipse
+     * @return {Bounds} The bounds of this curve.
+     **/
+    getBounds(): Bounds;
     /**
      * Move the circle sector by the given amount.
      *

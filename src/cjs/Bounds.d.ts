@@ -12,6 +12,7 @@
  * @modified 2025-03-23 Added the `getMinDimension` and `getMaxDimension` methods.
  * @modified 2025-04-18 Change parameter type in `Bounds.computeFromVertices` from `Vertex` to more general `XYCoords`.
  * @modified 2025-04-19 Added methods to `Bounds` class: `getNorthPoint`, `getSouthPoint`, `getEastPoint` and `getWestPoint`.
+ * @modified 2025-04-26 Added static method `Bounds.computeFromBoundsSet` to calculate containing bounds for a set of bounding boxes.
  * @version  1.8.0
  **/
 import { Polygon } from "./Polygon";

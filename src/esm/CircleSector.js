@@ -10,8 +10,11 @@
  * @modified 2024-03-09 Added the `angleAt` method to determine any angle at some ratio.
  * @modified 2025-04-02 Adding the `CircleSector.lineIntersections` and `CircleSector.lineIntersectionTangents` and implementing `Intersectable`.
  * @modified 2025-04-09 Adding the `CircleSector.move()` method.
+ * @modified 2025-04-19 Tweaking the `CircleSector.containsAngle` method: all values (input angle, start- and end- angle) are wrapped into [0,2*PI) now.
+ * @modified 2025-04-19 Class `CircleSector` implements interface `Bounded` now (method `getBounds` added).
  * @version  1.2.0
  **/
+import { Bounds } from "./Bounds";
 import { Circle } from "./Circle";
 import { Line } from "./Line";
 import { UIDGenerator } from "./UIDGenerator";
@@ -46,6 +49,36 @@ export class CircleSector {
         this.startAngle = startAngle;
         this.endAngle = endAngle;
     }
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Get the bounds of this ellipse.
+     *
+     * The bounds are approximated by the underlying segment buffer; the more segment there are,
+     * the more accurate will be the returned bounds.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof VEllipse
+     * @return {Bounds} The bounds of this curve.
+     **/
+    getBounds() {
+        const _self = this;
+        const circleBounds = this.circle.getBounds();
+        // Calculage angles from east, west, north and south box points and check if they are inside
+        const candidates = [
+            circleBounds.getNorthPoint(),
+            circleBounds.getSouthPoint(),
+            circleBounds.getWestPoint(),
+            circleBounds.getEastPoint()
+        ].filter((point) => {
+            // Check for each candidate points if they are contained in this sector. Drop if not.
+            const angle = new Line(_self.circle.center, point).angle();
+            return _self.containsAngle(angle);
+        });
+        // Compute bounds and inlcude start end end point (they are definitely part of the bounds)
+        return Bounds.computeFromVertices(candidates.concat([this.getStartPoint(), this.getEndPoint()]));
+    }
+    //--- BEGIN --- Implement interface `IBounded`
     /**
      * Move the circle sector by the given amount.
      *
@@ -69,12 +102,22 @@ export class CircleSector {
      * @return {boolean} True if (and only if) this sector contains the given angle.
      */
     containsAngle(angle) {
-        if (this.startAngle <= this.endAngle) {
-            return angle >= this.startAngle && angle < this.endAngle;
+        var wrappedAngle = geomutils.mapAngleTo2PI(angle);
+        var wrappedStart = geomutils.mapAngleTo2PI(this.startAngle);
+        var wrappedEnd = geomutils.mapAngleTo2PI(this.endAngle);
+        // TODO: cleanup
+        // if (this.startAngle <= this.endAngle) {
+        //   return angle >= this.startAngle && angle < this.endAngle;
+        // } else {
+        //   // startAngle > endAngle
+        //   return angle >= this.startAngle || angle < this.endAngle;
+        // }
+        if (wrappedStart <= wrappedEnd) {
+            return wrappedAngle >= wrappedStart && wrappedAngle < wrappedEnd;
         }
         else {
             // startAngle > endAngle
-            return angle >= this.startAngle || angle < this.endAngle;
+            return wrappedAngle >= wrappedStart || wrappedAngle < wrappedEnd;
         }
     }
     /**

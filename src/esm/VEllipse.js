@@ -17,6 +17,8 @@
  * @modified 2022-02-02 Cleared the `VEllipse.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2025-03-31 ATTENTION: modified the winding direction of the `tangentAt` method to match with the Circle method. This is a breaking change!
  * @modified 2025-03-31 Adding the `VEllipse.move(amount: XYCoords)` method.
+ * @modified 2025-04-19 Adding the `VEllipse.getBounds()` method.
+ * @modified 2025-04-24 Adding the `VEllipse.getExtremePoints()` method for calculating minima and maxima.
  * @version  1.4.0
  *
  * @file VEllipse
@@ -28,6 +30,7 @@ import { Vertex } from "./Vertex";
 import { UIDGenerator } from "./UIDGenerator";
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Circle } from "./Circle";
+import { Bounds } from "./Bounds";
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -109,11 +112,82 @@ export class VEllipse {
      * @return {number} The signed vertical radius of this ellipse.
      */
     signedRadiusV() {
-        // return Math.abs(this.axis.y - this.center.y);
         // Rotate axis back to origin before calculating radius
-        // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).y - this.center.y);
         return new Vertex(this.axis).rotate(-this.rotation, this.center).y - this.center.y;
     }
+    /**
+     * Get the the minima and maxima (points) of this (rotated) ellipse.
+     *
+     * @method getExtremePoints
+     * @instance
+     * @memberof VEllipse
+     * @return {[Vertex, Vertex, Vertex, Vertex]} Get the the minima and maxima (points) of this (rotated) ellipse.
+     */
+    getExtremePoints() {
+        const a = this.radiusH();
+        const b = this.radiusV();
+        // Calculate t_x values
+        const t_x1 = Math.atan2(-b * Math.sin(this.rotation), a * Math.cos(this.rotation));
+        const t_x2 = t_x1 + Math.PI;
+        // Calculate x values at t_x
+        const x_x1 = this.center.x + a * Math.cos(t_x1) * Math.cos(this.rotation) - b * Math.sin(t_x1) * Math.sin(this.rotation);
+        const y_x1 = this.center.y + a * Math.cos(t_x1) * Math.sin(this.rotation) + b * Math.sin(t_x1) * Math.cos(this.rotation);
+        const x_x2 = this.center.x + a * Math.cos(t_x2) * Math.cos(this.rotation) - b * Math.sin(t_x2) * Math.sin(this.rotation);
+        const y_x2 = this.center.y + a * Math.cos(t_x2) * Math.sin(this.rotation) + b * Math.sin(t_x2) * Math.cos(this.rotation);
+        let x_max, x_min;
+        if (x_x1 > x_x2) {
+            x_max = new Vertex(x_x1, y_x1);
+            x_min = new Vertex(x_x2, y_x2);
+        }
+        else {
+            x_max = new Vertex(x_x2, y_x2);
+            x_min = new Vertex(x_x1, y_x1);
+        }
+        // Calculate t_y values
+        const t_y1 = Math.atan2(b * Math.cos(this.rotation), a * Math.sin(this.rotation));
+        const t_y2 = t_y1 + Math.PI;
+        // Calculate y values at t_y
+        const x_y1 = this.center.x + a * Math.cos(t_y1) * Math.cos(this.rotation) - b * Math.sin(t_y1) * Math.sin(this.rotation);
+        const y_y1 = this.center.y + a * Math.cos(t_y1) * Math.sin(this.rotation) + b * Math.sin(t_y1) * Math.cos(this.rotation);
+        const x_y2 = this.center.x + a * Math.cos(t_y2) * Math.cos(this.rotation) - b * Math.sin(t_y2) * Math.sin(this.rotation);
+        const y_y2 = this.center.y + a * Math.cos(t_y2) * Math.sin(this.rotation) + b * Math.sin(t_y2) * Math.cos(this.rotation);
+        let y_max, y_min;
+        if (y_y1 > y_y2) {
+            y_max = new Vertex(x_y1, y_y1);
+            y_min = new Vertex(x_y2, y_y2);
+        }
+        else {
+            y_max = new Vertex(x_y2, y_y2);
+            y_min = new Vertex(x_y1, y_y1);
+        }
+        return [x_max, x_min, y_max, y_min];
+    }
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Get the bounds of this ellipse.
+     *
+     * The bounds are approximated by the underlying segment buffer; the more segment there are,
+     * the more accurate will be the returned bounds.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof VEllipse
+     * @return {Bounds} The bounds of this ellipse.
+     **/
+    getBounds() {
+        // Thanks to Cuixiping
+        //    https://stackoverflow.com/questions/87734/how-do-you-calculate-the-axis-aligned-bounding-box-of-an-ellipse
+        const r1 = this.radiusH();
+        const r2 = this.radiusV();
+        const ux = r1 * Math.cos(this.rotation);
+        const uy = r1 * Math.sin(this.rotation);
+        const vx = r2 * Math.cos(this.rotation + Math.PI / 2);
+        const vy = r2 * Math.sin(this.rotation + Math.PI / 2);
+        const bbox_halfwidth = Math.sqrt(ux * ux + vx * vx);
+        const bbox_halfheight = Math.sqrt(uy * uy + vy * vy);
+        return new Bounds({ x: this.center.x - bbox_halfwidth, y: this.center.y - bbox_halfheight }, { x: this.center.x + bbox_halfwidth, y: this.center.y + bbox_halfheight });
+    }
+    //--- BEGIN --- Implement interface `IBounded`
     /**
      * Move the ellipse by the given amount. This is equivalent by moving the `center` and `axis` points.
      *

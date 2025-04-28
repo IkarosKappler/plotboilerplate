@@ -35,6 +35,7 @@
  * @modified 2025-03-28 Added the `Polygon.utils.locateLineIntersecion` static helper method.
  * @modified 2025-03-28 Added the `Polygon.lineIntersectionTangents` method.
  * @modified 2025-04-09 Added the `Polygon.getCentroid` method.
+ * @modified 2025-05-16 Class `Polygon` now implements `IBounded`.
  * @version 1.15.0
  *
  * @file Polygon
@@ -46,7 +47,7 @@ import { Line } from "./Line";
 import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { XYCoords, SVGSerializable, UID, Intersectable } from "./interfaces";
+import { XYCoords, SVGSerializable, UID, Intersectable, IBounded } from "./interfaces";
 /**
  * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
  *
@@ -58,7 +59,7 @@ import { XYCoords, SVGSerializable, UID, Intersectable } from "./interfaces";
  * @requires Vertex
  * @requires XYCoords
  */
-export declare class Polygon implements Intersectable, SVGSerializable {
+export declare class Polygon implements IBounded, Intersectable, SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
      **/
@@ -483,6 +484,15 @@ export declare class Polygon implements Intersectable, SVGSerializable {
          * @return {number}
          */
         signedArea(vertices: Array<XYCoords>): number;
+        /**
+         * Find intersections of a line with a polygon (vertices).
+         *
+         * @param {VertTuple<any>} line - The line to find intersections with.
+         * @param {Array<Vertex>} vertices - The polygon's vertices.
+         * @param {boolean} isOpen - True if the polygon is open, false otherwise.
+         * @param {boolean} inVectorBoundsOnly - If only intersections in strict vector bounds should be returned.
+         * @returns
+         */
         locateLineIntersecion(line: VertTuple<any>, vertices: Array<Vertex>, isOpen: boolean, inVectorBoundsOnly: boolean): Array<{
             edgeIndex: number;
             intersectionPoint: Vertex;

@@ -13,13 +13,15 @@
  * @modified 2022-08-23 Added the `lineIntersection` function.
  * @modified 2022-08-23 Added the `closestPoint` function.
  * @modified 2025-04-09 Added the `Circle.move(amount: XYCoords)` method.
+ * @modified 2025-04-16 Class `Circle` now implements interface `Intersectable`.
  * @version  1.5.0
  **/
+import { Bounds } from "./Bounds";
 import { Line } from "./Line";
 import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { Intersectable, SVGSerializable, UID, XYCoords } from "./interfaces";
+import { IBounded, Intersectable, SVGSerializable, UID, XYCoords } from "./interfaces";
 /**
  * @classdesc A simple circle: center point and radius.
  *
@@ -31,7 +33,7 @@ import { Intersectable, SVGSerializable, UID, XYCoords } from "./interfaces";
  * @requires UID
  * @requires UIDGenerator
  **/
-export declare class Circle implements Intersectable, SVGSerializable {
+export declare class Circle implements IBounded, Intersectable, SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
      **/
@@ -140,6 +142,15 @@ export declare class Circle implements Intersectable, SVGSerializable {
      * @memberof Circle
      **/
     tangentAt(angle: number): Vector;
+    /**
+     * Get the bounding box (bounds) of this Circle.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof Circle
+     * @return {Bounds} The rectangular bounds of this Circle.
+     **/
+    getBounds(): Bounds;
     /**
      * Calculate the intersection points (if exists) with the given circle.
      *

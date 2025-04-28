@@ -16,11 +16,15 @@
  * @modified 2022-10-09 Changed the actual return value of the `intersection` function to null (was undefined before).
  * @modified 2022-10-17 Adding these methods from the `PathSegment` interface: getStartPoint, getEndPoint, revert.
  * @modified 2023-09-25 Changed param type of `intersection()` from Line to VertTuple.
- * @version  2.3.0
+ * @modified 2025-04-15 Class `Line` now implements interface `Intersectable`.
+ * @modified 2025-04-16 Class `Line` now implements interface `IBounded`.
+ * @version  2.4.0
  *
  * @file Line
  * @public
  **/
+import { Bounds } from "./Bounds";
+import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 /**
@@ -77,6 +81,19 @@ export class Line extends VertTuple {
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex(x, y);
     }
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Get the bounding box (bounds) of this Line.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof Line
+     * @return {Bounds} The rectangular bounds of this Line.
+     **/
+    getBounds() {
+        return Bounds.computeFromVertices([this.a, this.b]);
+    }
+    //--- END --- Implement interface `IBounded`
     //--- Implement PathSegment ---
     /**
      * Get the start point of this path segment.
@@ -130,6 +147,50 @@ export class Line extends VertTuple {
         this.a = this.b;
         this.b = tmp;
         return this;
+    }
+    //--- END Implement PathSegment ---
+    //--- BEGIN --- Implement interface `Intersectable`
+    /**
+     * Get all line intersections with this polygon.
+     *
+     * This method returns all intersections (as vertices) with this shape. The returned array of vertices is in no specific order.
+     *
+     * See demo `47-closest-vector-projection-on-polygon` for how it works.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     */
+    lineIntersections(line, inVectorBoundsOnly = false) {
+        // Find the intersections of all lines inside the edge bounds
+        const intersection = this.intersection(line);
+        if (!intersection) {
+            return []; // Both lines parallel
+        }
+        if (this.hasPoint(intersection, true) && (!inVectorBoundsOnly || line.hasPoint(intersection, inVectorBoundsOnly))) {
+            return [intersection];
+        }
+        else {
+            return [];
+        }
+    }
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param inVectorBoundsOnly
+     * @returns
+     */
+    lineIntersectionTangents(line, inVectorBoundsOnly = false) {
+        // Find the intersection tangents of all lines inside the edge bounds
+        const intersections = this.lineIntersections(line, inVectorBoundsOnly);
+        if (intersections.length === 0) {
+            return [];
+        }
+        const intrsctn = intersections[0];
+        return [new Vector(this.a.clone(), this.b.clone()).moveTo(intrsctn)];
     }
 }
 //# sourceMappingURL=Line.js.map

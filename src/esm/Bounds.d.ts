@@ -10,6 +10,9 @@
  * @modified 2022-11-28 Added the `clone` method.
  * @modified 2023-09-29 Added the `randomPoint` method.
  * @modified 2025-03-23 Added the `getMinDimension` and `getMaxDimension` methods.
+ * @modified 2025-04-18 Change parameter type in `Bounds.computeFromVertices` from `Vertex` to more general `XYCoords`.
+ * @modified 2025-04-19 Added methods to `Bounds` class: `getNorthPoint`, `getSouthPoint`, `getEastPoint` and `getWestPoint`.
+ * @modified 2025-04-26 Added static method `Bounds.computeFromBoundsSet` to calculate containing bounds for a set of bounding boxes.
  * @version  1.8.0
  **/
 import { Polygon } from "./Polygon";
@@ -60,6 +63,42 @@ export declare class Bounds implements IBounds, XYDimension {
      * @param {XYCoords} max - The max values (x,y) as a XYCoords tuple.
      **/
     constructor(min: XYCoords, max: XYCoords);
+    /**
+     * Get the center point of the north bound.
+     *
+     * @method getNorthPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "northmost" centered point of this bounding box.
+     */
+    getNorthPoint(): Vertex;
+    /**
+     * Get the center point of the south bound.
+     *
+     * @method getNorthPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "southhmost" centered point of this bounding box.
+     */
+    getSouthPoint(): Vertex;
+    /**
+    * Get the center point of the west bound.
+    *
+    * @method getWestPoint
+    * @instance
+    * @memberof Bounds
+    * @return {Vertex} The "westhmost" centered point of this bounding box.
+    */
+    getWestPoint(): Vertex;
+    /**
+    * Get the center point of the east bound.
+    *
+    * @method getEastPoint
+    * @instance
+    * @memberof Bounds
+    * @return {Vertex} The "easthmost" centered point of this bounding box.
+    */
+    getEastPoint(): Vertex;
     /**
      * Convert this rectangular bounding box to a polygon with four vertices.
      *
@@ -131,10 +170,22 @@ export declare class Bounds implements IBounds, XYDimension {
      * @static
      * @method computeFromVertices
      * @memberof Bounds
-     * @param {Array<Vertex>} vertices - The set of vertices you want to get the bounding box for.
+     * @param {Array<XYCoords>} vertices - The set of vertices you want to get the bounding box for.
      * @return The minimal Bounds for the given vertices.
      **/
-    static computeFromVertices(vertices: Array<Vertex>): Bounds;
+    static computeFromVertices(vertices: Array<XYCoords>): Bounds;
+    /**
+    * Compute the minimal bounding box for a given set of existing bounding boxes.
+    *
+    * An empty vertex array will return an empty bounding box located at (0,0).
+    *
+    * @static
+    * @method computeFromBoundsSet
+    * @memberof Bounds
+    * @param {Array<IBounds>} boundingBoxes - The set of existing bounding boxes to get the containing bounding box for.
+    * @return The minimal Bounds for the given bounds instances.
+    **/
+    static computeFromBoundsSet(boundingBoxes: Array<IBounds>): Bounds;
     /**
      * Create a new `Bounds` instance just from `width` and `height`, located at (0,0) or the optionally given origin.
      *

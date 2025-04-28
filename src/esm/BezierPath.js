@@ -722,6 +722,7 @@ export class BezierPath {
         }
         neighbourCurve.updateArcLengths();
     }
+    //--- BEGIN --- Implement interface `IBounded`
     /**
      * Get the bounds of this Bézier path.
      *
@@ -743,6 +744,7 @@ export class BezierPath {
         }
         return new Bounds(min, max);
     }
+    //--- END --- Implement interface `IBounded`
     /**
      * Get n 'equally' distributed vertices along this Bézier path.
      *

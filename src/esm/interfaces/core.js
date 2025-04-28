@@ -20,6 +20,8 @@
  * @modified 2023-02-10 All non-function attributes of the `Config` interface are now mandatory.
  * @modified 2023-09-29 Added the `randomPoint(...)` function declaration to the IBounds interface.
  * @modified 2024-08-25 Added the `CSSBackdropFilterParams` params to the global params (all optional).
+ * @modified 2025-03-29 Added interface `Intersectable`.
+ * @modified 2025-04-16 Added interface `IBounded`.
  **/
 export {};
 //# sourceMappingURL=core.js.map

@@ -29,6 +29,10 @@
  * @modified 2025-04-13 Added helper function `CubicBezierCurve.utils.bezierCoeffs`.
  * @modified 2025-04-13 Added helper functopn `CubicBezierCurve.utils.sgn(number)` for division safe sign calculation.
  * @modified 2025-03-13 Class `CubicBezierCurve` is now implementing interface `Intersectable`.
+ * @modified 2025-04-18 Added evaluation method for cubic Bézier curves `CubicBezierCurve.utils.evaluateT`.
+ * @modified 2025-04-18 Refactored method `CubicBezierCurve.getPointAt` to use `evaluateT`.
+ * @modified 2025-04-18 Fixed the `CubicBezierCurve.getBounds` method: now returning the real bounding box. Before it was an approximated one.
+ * @modified 2025-ß4-18 Added helper methods for bounding box calculation `CubucBezierCurve.util.cubicPolyMinMax` and `cubicPoly`.
  * @version 2.9.0
  *
  * @file CubicBezierCurve
@@ -37,7 +41,7 @@
 import { Bounds } from "./Bounds";
 import { Vertex } from "./Vertex";
 import { Vector } from "./Vector";
-import { XYCoords, UID, PathSegment, Intersectable } from "./interfaces";
+import { XYCoords, UID, PathSegment, Intersectable, IBounded } from "./interfaces";
 import { VertTuple } from "./VertTuple";
 /**
  * @classdesc A refactored cubic bezier curve class.
@@ -49,7 +53,7 @@ import { VertTuple } from "./VertTuple";
  * @requires UID
  * @requires UIDGenerator
  */
-export declare class CubicBezierCurve implements Intersectable, PathSegment {
+export declare class CubicBezierCurve implements IBounded, Intersectable, PathSegment {
     /** @constant {number} */
     static readonly START_POINT: number;
     /** @constant {number} */
@@ -221,6 +225,9 @@ export declare class CubicBezierCurve implements Intersectable, PathSegment {
      *
      * This function uses a recursive approach by cutting the curve into several linear segments.
      *
+     * @method getClosestT
+     * @instance
+     * @memberof CubicBezierCurve
      * @param {Vertex} p - The point to find the closest position ('t' on the curve).
      * @return {number}
      **/
@@ -246,7 +253,10 @@ export declare class CubicBezierCurve implements Intersectable, PathSegment {
      * The bounds are approximated by the underlying segment buffer; the more segment there are,
      * the more accurate will be the returned bounds.
      *
-     * @return {Bounds} The bounds of this curve.
+     * @method getClosestT
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {Bounds} The bounds of this ellipse.
      **/
     getBounds(): Bounds;
     /**
@@ -586,6 +596,11 @@ export declare class CubicBezierCurve implements Intersectable, PathSegment {
      * Helper utils.
      */
     static utils: {
+        evaluateT: (p0: number, p1: number, p2: number, p3: number, t: number) => number;
+        cubicPolyMinMax: (p0: number, p1: number, p2: number, p3: number) => {
+            min: number;
+            max: number;
+        };
         /**
          * Get the points of a sub curve at the given start end end offsets (values between 0.0 and 1.0).
          *
@@ -617,12 +632,22 @@ export declare class CubicBezierCurve implements Intersectable, PathSegment {
          * Compute the Bézier coefficients from the given Bézier point coordinates.
          *
          * @param {number} p0 - The start point coordinate.
-         * @param {number} p1 - The start point coordinate.
-         * @param {number} p2 - The start point coordinate.
-         * @param {number} p3 - The start point coordinate.
-         * @returns {Array<number>}
+         * @param {number} p1 - The start control point coordinate.
+         * @param {number} p2 - The end control point coordinate.
+         * @param {number} p3 - The end point coordinate.
+         * @returns {[number,number,number,number]}
          */
-        bezierCoeffs: (p0: number, p1: number, p2: number, p3: number) => Array<number>;
+        bezierCoeffs: (p0: number, p1: number, p2: number, p3: number) => [number, number, number, number];
+        /**
+         * Calculate the cubic polynomial coefficients used to find the bounding box.
+         *
+         * @param {number} p0 - The start point coordinate.
+         * @param {number} p1 - The start control point coordinate.
+         * @param {number} p2 - The end control point coordinate.
+         * @param {number} p3 - The end point coordinate.
+         * @returns {[number,number,number]}
+         */
+        cubicPoly: (p0: number, p1: number, p2: number, p3: number) => [number, number, number];
         /**
          * sign of number, but is division safe: no zero returned :)
          */
