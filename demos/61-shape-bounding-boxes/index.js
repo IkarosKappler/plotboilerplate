@@ -43,6 +43,7 @@
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
       showBoundingBoxes: params.getBoolean("showBoundingBoxes", true),
+      showEllipseExtremes: params.getBoolean("showEllipseExtremes", true),
       readme: function () {
         globalThis.displayDemoMeta();
       }
@@ -62,6 +63,18 @@
       cicleSectorHelper.drawHandleLines(draw, fill);
       ellipseSectorHelper.drawHandleLines(draw, fill);
       bezierHelper.drawHandleLines();
+
+      // Draw extreme points from ellipse?
+      if (config.showEllipseExtremes) {
+        for (var i in shapes) {
+          if (shapes[i] instanceof VEllipse) {
+            var extremes = shapes[i].getExtremePoints();
+            for (var p in extremes) {
+              draw.circle(extremes[p], 5, "orange");
+            }
+          }
+        }
+      }
     }; // END postDraw
 
     var drawBoundingBoxes = function (draw, fill) {
@@ -150,6 +163,9 @@
       var gui = pb.createGUI();
       // prettier-ignore
       gui.add(config, "showBoundingBoxes").name("showBoundingBoxes").title("Check to see shape's bounding boxes.")
+        .onChange( function() { pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "showEllipseExtremes").name("showEllipseExtremes").title("Check to see elliptic extreme points.")
         .onChange( function() { pb.redraw() });
       // prettier-ignore
       gui.add(config, "readme").name('readme').title("Display this demo's readme.");
