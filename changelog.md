@@ -1,6 +1,6 @@
 # Changelog
 
-- 2025-04-26
+- 2025-04-26 [v1.24.0]
   - Added static method `Bounds.computeFromBoundsSet` to calculate containing bounds for a set of bounding boxes.
 - 2025-04-24
   - Adding the `VEllipse.getExtremePoints()` method for calculating minima and maxima.
