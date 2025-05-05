@@ -58,7 +58,9 @@ often use for the visualization of 2D geometries. Basic features are
   - drag and select elements
 - keyboard interaction customizable
 
-The compressed library has 135kb.
+The compressed library has 159kb.
+It once has been my aim to keep the base library less than 80kb – but the more powerful the lib gets
+the more difficult this turned out.
 
 ## Install the package via npm
 

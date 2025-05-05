@@ -126,42 +126,45 @@
     // Array<Vector>
     var intersectionTangents = shape.lineIntersectionTangents(ray.vector, true);
     // Find closest intersection vector
-    var closestIntersectionTangent = intersectionTangents.reduce(function (accu, curVal) {
+    var closestIntersectionTangent = findClosestTangent(intersectionTangents, ray);
+    if (!closestIntersectionTangent) {
+      return null;
+    }
+    var angleBetweenTangentAndRay = closestIntersectionTangent.angle(ray.vector);
+    //   closestIntersectionTangent.rotate(angleBetween);
+    var reflectedRay = new Ray(
+      closestIntersectionTangent.clone().rotate(angleBetweenTangentAndRay),
+      lens,
+      shape,
+      // This requires that no lenses overlap!
+      ray.rayStartingInsideLens ? null : lens
+    );
+    var incomingAngle = closestIntersectionTangent.angle(ray.vector) + Math.PI;
+    var refractedAngle = Math.asin(incomingRefractiveIndex * Math.sin(incomingAngle)) / outgoingRefractiveIndex;
+    // if (isGoingOut) {
+    //   incomingAngle -= Math.PI / 2.0;
+    // }
+    console.log("refractedAngle", (refractedAngle / Math.PI) * 180);
+    var refractedRay = new Ray(
+      ray.vector
+        .clone()
+        .moveTo(closestIntersectionTangent.a)
+        // .rotate(angleBetweenTangentAndRay + incomingAngle, closestIntersectionTangent.a),
+        .rotate(refractedAngle - Math.PI / 2, closestIntersectionTangent.a),
+      lens,
+      shape,
+      // This requires that no lenses overlap!
+      ray.rayStartingInsideLens ? null : lens
+    );
+    return new SnelliusRays(reflectedRay, refractedRay, lens, shape);
+  };
+
+  var findClosestTangent = function (intersectionTangents, ray) {
+    return intersectionTangents.reduce(function (accu, curVal) {
       if (accu === null || curVal.a.distance(ray.vector.a) < accu.a.distance(ray.vector.a)) {
         accu = curVal;
       }
       return accu;
     }, null);
-    if (closestIntersectionTangent) {
-      var angleBetweenTangentAndRay = closestIntersectionTangent.angle(ray.vector);
-      //   closestIntersectionTangent.rotate(angleBetween);
-      var reflectedRay = new Ray(
-        closestIntersectionTangent.clone().rotate(angleBetweenTangentAndRay),
-        lens,
-        shape,
-        // This requires that no lenses overlap!
-        ray.rayStartingInsideLens ? null : lens
-      );
-      var incomingAngle = closestIntersectionTangent.angle(ray.vector) + Math.PI;
-      var refractedAngle = Math.asin(incomingRefractiveIndex * Math.sin(incomingAngle)) / outgoingRefractiveIndex;
-      // if (isGoingOut) {
-      //   incomingAngle -= Math.PI / 2.0;
-      // }
-      console.log("refractedAngle", (refractedAngle / Math.PI) * 180);
-      var refractedRay = new Ray(
-        ray.vector
-          .clone()
-          .moveTo(closestIntersectionTangent.a)
-          // .rotate(angleBetweenTangentAndRay + incomingAngle, closestIntersectionTangent.a),
-          .rotate(refractedAngle - Math.PI / 2, closestIntersectionTangent.a),
-        lens,
-        shape,
-        // This requires that no lenses overlap!
-        ray.rayStartingInsideLens ? null : lens
-      );
-      return new SnelliusRays(reflectedRay, refractedRay, lens, shape);
-    } else {
-      return null;
-    }
   };
 })(globalThis);
