@@ -80,8 +80,8 @@
       showBoundingBoxes: params.getBoolean("showBoundingBoxes", false),
       rayLengthFromMaxBounds: params.getBoolean("rayLengthFromMaxBounds", false),
       drawPreviewRays: params.getBoolean("drawPreviewRays", false),
-      baseRefractiveIndex: params.getNumber("baseRefractiveIndex", 1.000293),
-      lensRefractiveIndex: params.getNumber("baseRefractiveIndex", 1.000293)
+      baseRefractiveIndex: params.getNumber("baseRefractiveIndex", 1.000293), // Air
+      lensRefractiveIndex: params.getNumber("lensRefractiveIndex", 1.333) // Water
     };
 
     // +---------------------------------------------------------------------------------
@@ -176,7 +176,7 @@
       var polygon = createRandomizedPolygon(4, viewport, true); // createClockwise=true
       polygon.scale(0.3, polygon.getCentroid());
 
-      lenses = [new Lens(polygon, 1, 3330)]; // Water
+      lenses = [new Lens(polygon, config.lensRefractiveIndex)]; // 1.3330)]; // Water
 
       // shapes = lenses.rpolygon.getEdges();
       // Destroy old helpers to release all unused listeners.
@@ -286,6 +286,12 @@
       // prettier-ignore
       gui.add(config, "drawPreviewRays").name("drawPreviewRays").title("Check to see the next iteration of possible rays.")
       .onChange( function() { pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "baseRefractiveIndex").min(0.1).max(2.0).step(0.1).name("baseRefractiveIndex").title("The refractive index of the containing medium.")
+      .onChange( function() { pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "lensRefractiveIndex").min(0.1).max(2.0).step(0.1).name("lensRefractiveIndex").title("The refractive index of the lens.")
+      .onChange( function() { lenses.forEach( function(lens) {lens.refractiveIndex = config.lensRefractiveIndex; } ); pb.redraw() });
     }
 
     pb.config.postDraw = postDraw;
