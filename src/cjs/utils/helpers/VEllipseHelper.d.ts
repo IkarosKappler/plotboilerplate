@@ -5,12 +5,14 @@
  * @date     2025-03-31
  * @modified 2025-04-02 Adding `VEllipseHelper.drawHandleLines()`.
  * @modified 2025-04-09 Adding `VEllipseHelper.destroy()`.
- * @version  1.0.0
+ * @modified 2025-05-05 Fixed a typo in the `VEllipseHelper.destroy` method (was named `detroy`).
+ * @modified 2025-05-05 `VEllipseHelper` is now implementing `IShapeInteractionHelper`.
+ * @version  1.0.1
  */
 import { VEllipse } from "../../VEllipse";
 import { Vertex } from "../../Vertex";
-import { DrawLib } from "../../interfaces";
-export declare class VEllipseHelper {
+import { DrawLib, IShapeInteractionHelper } from "../../interfaces";
+export declare class VEllipseHelper implements IShapeInteractionHelper {
     private readonly ellipse;
     private readonly rotationControlPoint;
     private _rotationControlLine;
@@ -26,5 +28,5 @@ export declare class VEllipseHelper {
      * @param {DrawLib<any>} fill - The fill library instance to use.
      */
     drawHandleLines(draw: DrawLib<any>, fill: DrawLib<any>): void;
-    detroy(): void;
+    destroy(): void;
 }

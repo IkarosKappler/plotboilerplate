@@ -26,7 +26,9 @@
  * @modified 2025-04-14 Added the `BezierPathInteractionHelper.drawHandleLines` method.
  * @modified 2025-04-14 Fixing correct event types for touch events in `BezierPathInteractionHelper`.
  * @modified 2025-04-14 BezierPathInteractionHelper: Changed default value of `HelperOptions.autoAdjustPaths` from `true` to `false`.
- * @version  1.2.0
+ * @modified 2025-05-05 Added optional params `draw` and `fill` to BezierPathInteractionHelper.drawHandleLines` method.
+ * @modified 2025-05-05 Class `BezierPathInteractionHelper` now implementing `IShapeInteractionHelper`.
+ * @version  1.2.1
  *
  * @file BezierPathInteractionHelper
  * @public
@@ -191,9 +193,13 @@ var BezierPathInteractionHelper = /** @class */ (function () {
     /**
      * Draw grey handle lines.
      *
+     * @param {DrawLib<any>} draw - (optional) The draw library to use. If not provided then `pb.draw` will be used.
+     * @param {DrawLib<any>} fill - (optional) The fill library to use. If not provided then `pb.fill` will be used.
      */
-    BezierPathInteractionHelper.prototype.drawHandleLines = function () {
+    BezierPathInteractionHelper.prototype.drawHandleLines = function (draw, fill) {
         var _this = this;
+        draw = draw || this.pb.draw;
+        fill = fill || this.pb.fill;
         this.paths.forEach(function (path) {
             path.bezierCurves.forEach(function (curve) {
                 _this.pb.draw.line(curve.startPoint, curve.startControlPoint, "rgba(64,192,128,0.333)", 1.0, {

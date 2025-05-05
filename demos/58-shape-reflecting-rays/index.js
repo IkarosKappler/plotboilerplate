@@ -5,6 +5,7 @@
  *
  * @author   Ikaros Kappler
  * @date     2025-03-24
+ * @modified 2025-05-05 Refactored `rebuildShapes` and moved to external funcion `createRandomShapes`.
  * @version  1.0.0
  **/
 
@@ -50,6 +51,7 @@
     // Array<Polygon | Circle | VEllipse | Line | CircleSector | VEllipseSector | BezierPath | Triangle>
     var shapes = [];
     var mainRay = new Vector(new Vertex(), new Vertex(250, 250).rotate(Math.random() * Math.PI));
+    var interactionHelpers = []; // Helpers
     var ellipseHelper;
     var cicleSectorHelper;
     var ellipseSectorHelper;
@@ -113,10 +115,13 @@
           rayCollection[j].a.set(rayCollection[j].clone().setLength(config.rayStepOffset).b);
         }
       }
-      ellipseHelper.drawHandleLines(draw, fill);
-      cicleSectorHelper.drawHandleLines(draw, fill);
-      ellipseSectorHelper.drawHandleLines(draw, fill);
-      bezierHelper.drawHandleLines();
+      // ellipseHelper.drawHandleLines(draw, fill);
+      // cicleSectorHelper.drawHandleLines(draw, fill);
+      // ellipseSectorHelper.drawHandleLines(draw, fill);
+      // bezierHelper.drawHandleLines(draw, fill);
+      interactionHelpers.forEach(function (helper) {
+        helper.drawHandleLines(draw, fill);
+      });
     }; // END postDraw
 
     var getMaxShapeBounds = function () {
@@ -244,70 +249,16 @@
     // +-------------------------------
     var rebuildShape = function () {
       pb.removeAll(false, false); // Don't trigger redraw
+      var randomShapesAndHelpers = createRandomShapes(pb, viewport);
 
-      // Create a new randomized polygon.
-      var polygon = createRandomizedPolygon(4, viewport, true); // createClockwise=true
-      polygon.scale(0.3, polygon.getCentroid());
-
-      var line = new Line(viewport.randomPoint(), viewport.randomPoint());
-
-      var triangle = new Triangle(viewport.randomPoint(), viewport.randomPoint(), viewport.randomPoint());
-
-      // Create circle and ellpise
-      var circle = new Circle(new Vertex(-25, -15), 90.0);
-      var ellipse = new VEllipse(new Vertex(25, 15), new Vertex(150, 200), -Math.PI * 0.3);
-      var circleSector = randomCircleSector(viewport);
-      var ellipseSector = randomEllipseSector(viewport);
-
-      // Create a new randomized Bézier curve.
-      var tmpPolygon = createRandomizedPolygon(4, viewport, true); // createClockwise=true
-      tmpPolygon.scale(0.3, polygon.getCentroid());
-      var bezierPath = BezierPath.fromCurve(
-        new CubicBezierCurve(tmpPolygon.vertices[0], tmpPolygon.vertices[1], tmpPolygon.vertices[2], tmpPolygon.vertices[3])
-      );
-      bezierHelper = new BezierPathInteractionHelper(pb, [bezierPath]);
-
-      shapes = [polygon, circle, ellipse, circleSector, ellipseSector, bezierPath, line, triangle];
-      // Align all shapes on a circle :)
-      var alignCircle = new Circle(new Vertex(), viewport.getMinDimension() * 0.333);
-      shapes.forEach(function (shape, i) {
-        var newPosition = alignCircle.vertAt((i * Math.PI * 2) / shapes.length);
-        // console.log("shape ", i, typeof shape);
-        shape.move(newPosition);
+      // Destroy old helpers to release all unused listeners.
+      interactionHelpers.forEach(function (helper) {
+        helper.destroy();
       });
-
-      // We want to change the ellipse's radii and rotation by dragging points around
-      var ellipseRotationControlPoint = ellipse.vertAt(0.0).scale(1.2, ellipse.center);
-      if (ellipseHelper) {
-        ellipseHelper.destroy();
-      }
-      ellipseHelper = new VEllipseHelper(ellipse, ellipseRotationControlPoint);
-
-      // Further: add a circle sector helper to edit angles and radius manually (mouse or touch)
-      var controlPointA = circleSector.circle.vertAt(circleSector.startAngle);
-      var controlPointB = circleSector.circle.vertAt(circleSector.endAngle);
-      if (cicleSectorHelper) {
-        cicleSectorHelper.destroy();
-      }
-      cicleSectorHelper = new CircleSectorHelper(circleSector, controlPointA, controlPointB, pb);
-
-      // We want to change the ellipse's radii and rotation by dragging points around
-      var startControlPoint = ellipseSector.ellipse.vertAt(ellipseSector.startAngle);
-      var endControlPoint = ellipseSector.ellipse.vertAt(ellipseSector.endAngle);
-      var rotationControlPoint = ellipseSector.ellipse
-        .vertAt(0) // ellipseSector.ellipse.rotation)
-        .scale(1.2, ellipseSector.ellipse.center);
-      if (ellipseSectorHelper) {
-        ellipseSectorHelper.destroy();
-      }
-      ellipseSectorHelper = new VEllipseSectorHelper(ellipseSector, startControlPoint, endControlPoint, rotationControlPoint);
-
-      pb.add(shapes, false);
-      pb.add(
-        [ellipseRotationControlPoint, controlPointA, controlPointB, startControlPoint, endControlPoint, rotationControlPoint],
-        false
-      );
-      // pb.add(rays, true); // trigger redraw
+      interactionHelpers = randomShapesAndHelpers.helpers;
+      shapes = randomShapesAndHelpers.shapes;
+      pb.add(randomShapesAndHelpers.shapes, false);
+      pb.add(randomShapesAndHelpers.helperPoints, false);
       pb.add([mainRay], true); // trigger redraw
     };
 

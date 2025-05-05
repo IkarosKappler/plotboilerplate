@@ -10,17 +10,20 @@
  * @modified 2024-02-26 Removed the constructor param `pb` (unused).
  * @modified 2024-02-25 Added `circle` and `radiusPoint` attributes.
  * @modified 2024-03-10 Fixed some issues in the `destroy` method; listeners were not properly removed.
+ * @modified 2025-05-05 Class `BezierPathInteractionHelper` now implementing `IShapeInteractionHelper`.
  * @version  1.2.1
  **/
 
 import { Circle } from "../../Circle";
 import { VertEvent, VertListener } from "../../VertexListeners";
 import { Vertex } from "../../Vertex";
+import { IShapeInteractionHelper } from "../../interfaces/core";
+import { DrawLib } from "../../interfaces/DrawLib";
 
 /**
  * @classdesc A helper for handling circles with an additional radius-control-point.
  */
-export class CircleHelper {
+export class CircleHelper implements IShapeInteractionHelper {
   circle: Circle;
   radiusPoint: Vertex;
 
@@ -40,8 +43,18 @@ export class CircleHelper {
     this.circle = circle;
     this.radiusPoint = radiusPoint;
 
-    circle.center.listeners.addDragListener( this.centerHandler = this._handleDragCenter());
-    radiusPoint.listeners.addDragListener(this.radiusHandler = this._handleDragRadiusPoint());
+    circle.center.listeners.addDragListener((this.centerHandler = this._handleDragCenter()));
+    radiusPoint.listeners.addDragListener((this.radiusHandler = this._handleDragRadiusPoint()));
+  }
+
+  //--- BEGIN --- Implement ISHapeInteractionHelper ---
+  /**
+   * Let this shape helper draw it's handle lines. It's up to the helper what they look like.
+   * @param {DrawLib<any>} draw - The draw library to use.
+   * @param {DrawLib<any>} fill - The fill library to use.
+   */
+  drawHandleLines(_draw: DrawLib<any>, _fill: DrawLib<any>): void {
+    // NOOP
   }
 
   /**
@@ -56,6 +69,7 @@ export class CircleHelper {
     this.circle.center.listeners.removeDragListener(this.centerHandler);
     this.radiusPoint.listeners.removeDragListener(this.radiusHandler);
   }
+  //--- END --- Implement ISHapeInteractionHelper ---
 
   /**
    * Creates a new drag handler for the circle's center point.

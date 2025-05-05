@@ -25,7 +25,8 @@
  * @modified 2025-04-14 Added the `BezierPathInteractionHelper.drawHandleLines` method.
  * @modified 2025-04-14 Fixing correct event types for touch events in `BezierPathInteractionHelper`.
  * @modified 2025-04-14 BezierPathInteractionHelper: Changed default value of `HelperOptions.autoAdjustPaths` from `true` to `false`.
- * @version  1.2.0
+ * @modified 2025-05-05 Added optional params `draw` and `fill` to BezierPathInteractionHelper.drawHandleLines` method.
+ * @version  1.2.1
  *
  * @file BezierPathInteractionHelper
  * @public
@@ -34,6 +35,7 @@ import { BezierPath } from "../../BezierPath";
 import { PlotBoilerplate } from "../../PlotBoilerplate";
 import { VertListener } from "../../VertexListeners";
 import { Vertex } from "../../Vertex";
+import { DrawLib } from "../../interfaces";
 /**
  * Handler type for mouse-pointer-moved listeners.
  */
@@ -170,8 +172,10 @@ export declare class BezierPathInteractionHelper {
     /**
      * Draw grey handle lines.
      *
+     * @param {DrawLib<any>} draw - (optional) The draw library to use. If not provided then `pb.draw` will be used.
+     * @param {DrawLib<any>} fill - (optional) The fill library to use. If not provided then `pb.fill` will be used.
      */
-    drawHandleLines(): void;
+    drawHandleLines(draw?: DrawLib<any>, fill?: DrawLib<any>): void;
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and

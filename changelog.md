@@ -1,5 +1,19 @@
 # Changelog
 
+## Todos
+
+- Create a helper for triangles.
+
+- 2025-05-05
+  - Added optional params `draw` and `fill` to BezierPathInteractionHelper.drawHandleLines`method.
+  - Demo 58-shape-reflecting-rays: Refactored`rebuildShapes`and moved to external funcion`createRandomShapes`.
+  - Added new inerface to core: `IShapeInteractionHelper`.
+  - Class `CircleHelper` now implementing `IShapeInteractionHelper`.
+  - Class `BezierPathInteractionHelper` now implementing `IShapeInteractionHelper`.
+  - Fixed a typo in the `VEllipseHelper.destroy` method (was named `detroy`).
+  - Class `VEllipseHelper` is now implementing `IShapeInteractionHelper`.
+  - Class `VEllipseSectorHelper` is now implementing `IShapeInteractionHelper`.
+  - Added class `TriangleHelper`.
 - 2025-04-26 [v1.24.0]
   - Added static method `Bounds.computeFromBoundsSet` to calculate containing bounds for a set of bounding boxes.
 - 2025-04-24

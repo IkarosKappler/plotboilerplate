@@ -303,3 +303,18 @@ export interface IBounded {
    **/
   getBounds(): IBounds;
 }
+
+export interface IShapeInteractionHelper {
+  /**
+   * Let this shape helper draw it's handle lines. It's up to the helper what they look like.
+   * @param {DrawLib<any>} draw - The draw library to use.
+   * @param {DrawLib<any>} fill - The fill library to use.
+   */
+  drawHandleLines(draw: DrawLib<any>, fill: DrawLib<any>): void;
+
+  /**
+   * Destroys this helper. This means that all listeners get released and this helper
+   * will not receive or handle any events.
+   */
+  destroy(): void;
+}
