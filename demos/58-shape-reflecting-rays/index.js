@@ -48,12 +48,6 @@
     pb.drawConfig.triangle.lineWidth = 2;
     // pb.drawConfig.drawHandleLines = false;
 
-    // A helper class to help keeping track of rays and their sources.
-    var Ray = function (vector, sourceShape) {
-      this.vector = vector;
-      this.sourceShape = sourceShape; // May be null (initial rays have no source)
-    };
-
     // Array<Polygon | Circle | VEllipse | Line | CircleSector | VEllipseSector | BezierPath | Triangle>
     var shapes = [];
     var mainRay = new Vector(new Vertex(), new Vertex(250, 250).rotate(Math.random() * Math.PI));
@@ -80,7 +74,6 @@
     var viewport = pb.viewport();
 
     var postDraw = function (draw, fill) {
-      // console.log("config.showBoundingBoxes", config.showBoundingBoxes);
       if (config.showBoundingBoxes) {
         drawBoundingBoxes(draw, fill);
       }
@@ -90,17 +83,7 @@
       var newRays = [];
       var numIter = Math.max(0, config.iterations); // Safeguard to avoid infinite loop
       for (var i = 0; i < numIter; i++) {
-        // console.log("numIter", numIter, "i", i, "rayCollection.length", rayCollection.length, "newRays.length", newRays.length);
-
-        // Set rays to normalized step
-        for (var j = 0; j < rayCollection.length; j++) {
-          rayCollection[j].vector.setLength(rayStepLength);
-        }
-
-        if (config.drawPreviewRays) {
-          drawLines(draw, fill, rayCollection, "rgba(192,192,192,0.25)");
-        }
-        newRays = calculateAllReflections(rayCollection);
+        newRays = RayShapeReflections(rayCollection, config, rayStepLength);
         // Crop original rays
         for (var j = 0; j < rayCollection.length; j++) {
           rayCollection[j].vector.b.set(newRays[j].vector.a);
@@ -116,7 +99,7 @@
         for (var j = 0; j < rayCollection.length; j++) {
           rayCollection[j].vector.a.set(rayCollection[j].vector.clone().setLength(config.rayStepOffset).b);
         }
-      }
+      } // END for
       interactionHelpers.forEach(function (helper) {
         helper.drawHandleLines(draw, fill);
       });
@@ -163,82 +146,10 @@
       });
     };
 
-    /**
-     * @param {Array<Ray>} rays
-     * @return {Array<Ray[]>} An two-dimensional array of vectors; each array for one of the base shapes.
-     */
-    var calculateAllReflections = function (rays) {
-      // Array<Vector[]>
-      var resultVectors = [];
-      rays.forEach(function (ray) {
-        const reflectedRays = [];
-        shapes.forEach(function (shape) {
-          var reflectedRay = findReflectedRay(shape, ray);
-          // if (reflectedRay != null && ray.vector.a.distance(reflectedRay.vector.a) > config.rayCompareEpsilon) {
-          if (
-            reflectedRay != null &&
-            reflectedRay.sourceShape !== ray.sourceShape &&
-            ray.vector.a.distance(reflectedRay.vector.a) > config.rayCompareEpsilon
-          ) {
-            reflectedRays.push(reflectedRay);
-          }
-        });
-        if (reflectedRays.length > 0) {
-          resultVectors.push(findClosestRay(ray, reflectedRays));
-        } else {
-          // Just expand input ray
-          resultVectors.push(new Ray(ray.vector.clone().moveTo(ray.vector.b), null));
-        }
-      });
-      return resultVectors;
-    };
-
-    // Pre: rays.length > 0
-    var findClosestRay = function (sourceRay, rays) {
-      var dist = sourceRay.vector.a.distance(rays[0].vector.a);
-      var resultIndex = 0;
-      for (var i = 1; i < rays.length; i++) {
-        if (sourceRay.vector.a.distance(rays[i].vector.a) < dist) {
-          // && sourceRay.a.distance(rays[i].a) > 0.0001) {
-          resultIndex = i;
-        }
-      }
-      return rays[resultIndex];
-    };
-
-    /**
-     * TODO: also allow circle sectors, elliptic sectors, bezier curves??
-     * @param {Polygon | Circle | VEllipse | Triangle | CircleSector | VEllipseSector | Line} shape
-     * @param {Vector} ray
-     * @returns
-     */
-    var findReflectedRay = function (shape, ray) {
-      var reflectedRay = null;
-      // Find intersection with min distance
-
-      // Array<Vector>
-      var intersectionTangents = shape.lineIntersectionTangents(ray.vector, true);
-      // Find closest intersection vector
-      var closestIntersectionTangent = intersectionTangents.reduce(function (accu, curVal) {
-        if (accu === null || curVal.a.distance(ray.vector.a) < accu.a.distance(ray.vector.a)) {
-          accu = curVal;
-        }
-        return accu;
-      }, null);
-      if (closestIntersectionTangent) {
-        var angleBetween = closestIntersectionTangent.angle(ray.vector);
-        closestIntersectionTangent.rotate(angleBetween);
-        reflectedRay = new Ray(closestIntersectionTangent, shape);
-      } else {
-        reflectedRay = null;
-      }
-      return reflectedRay;
-    };
-
     // +---------------------------------------------------------------------------------
     // | Just rebuilds the pattern on changes.
     // +-------------------------------
-    var rebuildShape = function () {
+    var rebuildShapes = function () {
       pb.removeAll(false, false); // Don't trigger redraw
       var randomShapesAndHelpers = createRandomShapes(pb, viewport);
 
@@ -253,7 +164,12 @@
       pb.add([mainRay], true); // trigger redraw
     };
 
-    // Return: Array<Ray>
+    // +---------------------------------------------------------------------------------
+    // | Create a new set of initial rays – depending on the main 'ray' and
+    // | the config settings.
+    // |
+    // | @return {Array<Ray>}
+    // +-------------------------------
     var getRayCollection = function (baseRay) {
       var rays = [];
       if (config.useParallelLightSource) {
@@ -342,7 +258,7 @@
     }
 
     pb.config.postDraw = postDraw;
-    rebuildShape();
+    rebuildShapes();
     toggleAnimation();
   });
 })(globalThis);
