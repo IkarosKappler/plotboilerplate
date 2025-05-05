@@ -10,10 +10,11 @@
   "use strict";
 
   // A helper class to help keeping track of rays and their sources.
-  globalThis.Ray = function (vector, sourceLens, sourceShape) {
+  globalThis.Ray = function (vector, sourceLens, sourceShape, rayStartingInsideLens) {
     this.vector = vector;
     this.sourceLens = sourceLens; // May be null (initial rays have no source)
     this.sourceShape = sourceShape; // May be null (initial rays have no source)
+    this.rayStartingInsideLens = rayStartingInsideLens;
   };
 
   // Snellius refraction results in two result rays:
@@ -116,9 +117,11 @@
   var findSnelliusRays = function (config, lens, shape, ray) {
     // Find intersection with min distance
 
+    var isGoingOut = !!ray.rayStartingInsideLens;
+
     // TODO: evaluate if ray is going in or out if the lens
-    var incomingRefractiveIndex = config.baseRefractiveIndex; // 1.000293; // Air
-    var outgoingRefractiveIndex = lens.refractiveIndex;
+    var incomingRefractiveIndex = isGoingOut ? lens.refractiveIndex : config.baseRefractiveIndex; // 1.000293; // Air
+    var outgoingRefractiveIndex = isGoingOut ? config.baseRefractiveIndex : lens.refractiveIndex;
 
     // Array<Vector>
     var intersectionTangents = shape.lineIntersectionTangents(ray.vector, true);
@@ -132,17 +135,29 @@
     if (closestIntersectionTangent) {
       var angleBetweenTangentAndRay = closestIntersectionTangent.angle(ray.vector);
       //   closestIntersectionTangent.rotate(angleBetween);
-      var reflectedRay = new Ray(closestIntersectionTangent.clone().rotate(angleBetweenTangentAndRay), lens, shape);
+      var reflectedRay = new Ray(
+        closestIntersectionTangent.clone().rotate(angleBetweenTangentAndRay),
+        lens,
+        shape,
+        // This requires that no lenses overlap!
+        ray.rayStartingInsideLens ? null : lens
+      );
       var incomingAngle = closestIntersectionTangent.angle(ray.vector) + Math.PI;
       var refractedAngle = Math.asin(incomingRefractiveIndex * Math.sin(incomingAngle)) / outgoingRefractiveIndex;
-      console.log("refractedAngle", refractedAngle);
+      // if (isGoingOut) {
+      //   incomingAngle -= Math.PI / 2.0;
+      // }
+      console.log("refractedAngle", (refractedAngle / Math.PI) * 180);
       var refractedRay = new Ray(
         ray.vector
           .clone()
           .moveTo(closestIntersectionTangent.a)
-          .rotate(angleBetweenTangentAndRay + incomingAngle, closestIntersectionTangent.a),
+          // .rotate(angleBetweenTangentAndRay + incomingAngle, closestIntersectionTangent.a),
+          .rotate(refractedAngle - Math.PI / 2, closestIntersectionTangent.a),
         lens,
-        shape
+        shape,
+        // This requires that no lenses overlap!
+        ray.rayStartingInsideLens ? null : lens
       );
       return new SnelliusRays(reflectedRay, refractedRay, lens, shape);
     } else {

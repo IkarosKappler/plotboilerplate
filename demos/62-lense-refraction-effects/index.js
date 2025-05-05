@@ -23,6 +23,13 @@
       throw "Error, `Lens.getShapes()` not yet implemented. Only on Polygon.";
     }
   };
+  Lens.prototype.containsPoint = function (point) {
+    if (this.shape instanceof Polygon) {
+      return this.shape.containsVert(point);
+    } else {
+      throw "Error, `Lens.containsPoint()` not yet implemented. Only on Polygon.";
+    }
+  };
 
   // Fetch the GET params
   let GUP = gup();
@@ -87,7 +94,7 @@
     // +---------------------------------------------------------------------------------
     // | Global vars
     // +-------------------------------
-    var viewport = pb.viewport();
+    // NONE
 
     var postDraw = function (draw, fill) {
       if (config.showBoundingBoxes) {
@@ -170,6 +177,9 @@
     // | Just rebuilds the pattern on changes.
     // +-------------------------------
     var rebuildShapes = function () {
+      var viewport = pb.viewport();
+      console.log("viewport", viewport);
+
       pb.removeAll(false, false); // Don't trigger redraw
       // var randomShapesAndHelpers = createRandomShapes(pb, viewport);
 
@@ -207,16 +217,41 @@
         var perpRay = baseRay.perp();
         perpRay.moveTo(perpRay.vertAt(-0.5));
         for (var i = 0; i < config.numRays; i++) {
-          rays.push(new Ray(baseRay.clone().moveTo(perpRay.vertAt(i / config.numRays)), null));
+          var raysVector = baseRay.clone().moveTo(perpRay.vertAt(i / config.numRays));
+          rays.push(
+            new Ray(
+              raysVector,
+              null, // sourceLens
+              null, // sourceShape,
+              getLensContainingPoint(raysVector.a) // rayStartingInsideLens
+            )
+          );
         }
         return rays;
       } else {
         var rangeAngle = config.initialRayAngle * DEG_TO_RAD;
         for (var i = 0; i < config.numRays; i++) {
-          rays.push(new Ray(baseRay.clone().rotate(-rangeAngle / 2.0 + rangeAngle * (i / config.numRays)), null));
+          var raysVector = baseRay.clone().rotate(-rangeAngle / 2.0 + rangeAngle * (i / config.numRays));
+          rays.push(
+            new Ray(
+              raysVector,
+              null, // sourceLens
+              null, // sourceShape,
+              getLensContainingPoint(raysVector.a) // rayStartingInsideLens
+            )
+          );
         }
         return rays;
       }
+    };
+
+    var getLensContainingPoint = function (point) {
+      for (var i = 0; i < lenses.length; i++) {
+        if (lenses[i].containsPoint(point)) {
+          return lenses[i];
+        }
+      }
+      return null;
     };
 
     // +---------------------------------------------------------------------------------
@@ -293,9 +328,9 @@
       gui.add(config, "lensRefractiveIndex").min(0.1).max(2.0).step(0.1).name("lensRefractiveIndex").title("The refractive index of the lens.")
       .onChange( function() { lenses.forEach( function(lens) {lens.refractiveIndex = config.lensRefractiveIndex; } ); pb.redraw() });
     }
-
     pb.config.postDraw = postDraw;
     rebuildShapes();
+
     toggleAnimation();
   });
 })(globalThis);

@@ -3,6 +3,7 @@
 ## Todos
 
 - Create a helper for triangles.
+- Resize/bestfit seems to fail in Firefoxe's dark mode (plugin).
 
 - 2025-05-05
   - Added optional params `draw` and `fill` to BezierPathInteractionHelper.drawHandleLines`method.
