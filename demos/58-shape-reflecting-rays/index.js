@@ -115,10 +115,6 @@
           rayCollection[j].a.set(rayCollection[j].clone().setLength(config.rayStepOffset).b);
         }
       }
-      // ellipseHelper.drawHandleLines(draw, fill);
-      // cicleSectorHelper.drawHandleLines(draw, fill);
-      // ellipseSectorHelper.drawHandleLines(draw, fill);
-      // bezierHelper.drawHandleLines(draw, fill);
       interactionHelpers.forEach(function (helper) {
         helper.drawHandleLines(draw, fill);
       });
@@ -204,43 +200,24 @@
      */
     var findReflectedRay = function (shape, ray) {
       var reflectedRay = null;
-
       // Find intersection with min distance
-      if (
-        shape instanceof Polygon ||
-        shape instanceof Line ||
-        shape instanceof Circle ||
-        shape instanceof VEllipse ||
-        shape instanceof CircleSector ||
-        shape instanceof VEllipseSector ||
-        shape instanceof BezierPath ||
-        // Note: this is not a direct drawable and cannot be directly added to the canvas,
-        // but let's also handle this case
-        shape instanceof CubicBezierCurve ||
-        shape instanceof Triangle
-      ) {
-        // Array<Vector>
-        var intersectionTangents = shape.lineIntersectionTangents(ray, true);
-        // Find closest intersection vector
-        var closestIntersectionTangent = intersectionTangents.reduce(function (accu, curVal) {
-          if (accu === null || curVal.a.distance(ray.a) < accu.a.distance(ray.a)) {
-            accu = curVal;
-          }
-          return accu;
-        }, null);
-        if (closestIntersectionTangent) {
-          var angleBetween = closestIntersectionTangent.angle(ray);
-          // rotateVector(closestIntersectionTangent, angleBetween);
-          closestIntersectionTangent.rotate(angleBetween);
-          reflectedRay = closestIntersectionTangent;
-        } else {
-          reflectedRay = null;
-        }
-      } else {
-        // ERR! (unrecognized shape)
-        // In the end all shapes should have the same methods!
-      }
 
+      // Array<Vector>
+      var intersectionTangents = shape.lineIntersectionTangents(ray, true);
+      // Find closest intersection vector
+      var closestIntersectionTangent = intersectionTangents.reduce(function (accu, curVal) {
+        if (accu === null || curVal.a.distance(ray.a) < accu.a.distance(ray.a)) {
+          accu = curVal;
+        }
+        return accu;
+      }, null);
+      if (closestIntersectionTangent) {
+        var angleBetween = closestIntersectionTangent.angle(ray);
+        closestIntersectionTangent.rotate(angleBetween);
+        reflectedRay = closestIntersectionTangent;
+      } else {
+        reflectedRay = null;
+      }
       return reflectedRay;
     };
 
