@@ -111,11 +111,12 @@
    *
    * @param {Intersectable} shape - Some instance of Polygon | Circle | VEllipse | Triangle | CircleSector | VEllipseSector | Line.
    * @param {Ray} ray
-   * @returns {null | { reflectedRay : Ray, refractedRay : Ray }}
+   * @returns {null | { reflectedRay : Ray, refractedRay : Ray, sourceLens: Lens, sourceShape : Shape }}
    */
   var findSnelliusRays = function (config, lens, shape, ray) {
     // Find intersection with min distance
 
+    // TODO: evaluate if ray is going in or out if the lens
     var incomingRefractiveIndex = config.baseRefractiveIndex; // 1.000293; // Air
     var outgoingRefractiveIndex = lens.refractiveIndex;
 
@@ -129,17 +130,17 @@
       return accu;
     }, null);
     if (closestIntersectionTangent) {
-      var angleBetween = closestIntersectionTangent.angle(ray.vector);
+      var angleBetweenTangentAndRay = closestIntersectionTangent.angle(ray.vector);
       //   closestIntersectionTangent.rotate(angleBetween);
-      var reflectedRay = new Ray(closestIntersectionTangent.clone().rotate(angleBetween), lens, shape);
-      var incomingAngle = closestIntersectionTangent.angle() - ray.vector.angle();
+      var reflectedRay = new Ray(closestIntersectionTangent.clone().rotate(angleBetweenTangentAndRay), lens, shape);
+      var incomingAngle = closestIntersectionTangent.angle(ray.vector) + Math.PI;
       var refractedAngle = Math.asin(incomingRefractiveIndex * Math.sin(incomingAngle)) / outgoingRefractiveIndex;
       console.log("refractedAngle", refractedAngle);
       var refractedRay = new Ray(
         ray.vector
           .clone()
           .moveTo(closestIntersectionTangent.a)
-          .rotate(-Math.PI / 2.0 - angleBetween - refractedAngle, closestIntersectionTangent.a),
+          .rotate(angleBetweenTangentAndRay + incomingAngle, closestIntersectionTangent.a),
         lens,
         shape
       );
