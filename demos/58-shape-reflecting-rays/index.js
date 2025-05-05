@@ -52,10 +52,6 @@
     var shapes = [];
     var mainRay = new Vector(new Vertex(), new Vertex(250, 250).rotate(Math.random() * Math.PI));
     var interactionHelpers = []; // Helpers
-    var ellipseHelper;
-    var cicleSectorHelper;
-    var ellipseSectorHelper;
-    var bezierHelper;
 
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
@@ -98,7 +94,7 @@
         if (config.drawPreviewRays) {
           drawLines(draw, fill, rayCollection, "rgba(192,192,192,0.25)");
         }
-        newRays = getRayIteration(rayCollection);
+        newRays = calculateAllReflections(rayCollection);
         // Crop original rays
         for (var j = 0; j < rayCollection.length; j++) {
           rayCollection[j].b.set(newRays[j].a);
@@ -120,6 +116,9 @@
       });
     }; // END postDraw
 
+    // +---------------------------------------------------------------------------------
+    // | Get the minimal bounding box for all shapes in the scene.
+    // +-------------------------------
     var getMaxShapeBounds = function () {
       return Bounds.computeFromBoundsSet(
         shapes.map(function (shape) {
@@ -128,6 +127,9 @@
       );
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Draws all shapes' bounding boxes.
+    // +-------------------------------
     var drawBoundingBoxes = function (draw, fill) {
       shapes.forEach(function (shape) {
         if (typeof shape["getBounds"] === "function") {
@@ -137,21 +139,22 @@
       });
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Draws the given rays as arrows.
+    // +-------------------------------
     var drawRays = function (draw, fill, rays, color) {
       rays.forEach(function (ray) {
         draw.arrow(ray.a, ray.b, color, config.rayThickness);
       });
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Draws the given lines (not arrows).
+    // +-------------------------------
     var drawLines = function (draw, fill, rays, color) {
       rays.forEach(function (ray) {
         draw.line(ray.a, ray.b, color, config.rayThickness);
       });
-    };
-
-    var getRayIteration = function (currentRays) {
-      var reflectedRaysByShapes = calculateAllReflections(currentRays);
-      return reflectedRaysByShapes;
     };
 
     /**
