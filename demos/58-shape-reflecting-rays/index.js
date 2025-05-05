@@ -48,6 +48,12 @@
     pb.drawConfig.triangle.lineWidth = 2;
     // pb.drawConfig.drawHandleLines = false;
 
+    // A helper class to help keeping track of rays and their sources.
+    var Ray = function (vector, sourceShape) {
+      this.vector = vector;
+      this.sourceShape = sourceShape; // May be null (initial rays have no source)
+    };
+
     // Array<Polygon | Circle | VEllipse | Line | CircleSector | VEllipseSector | BezierPath | Triangle>
     var shapes = [];
     var mainRay = new Vector(new Vertex(), new Vertex(250, 250).rotate(Math.random() * Math.PI));
@@ -88,7 +94,7 @@
 
         // Set rays to normalized step
         for (var j = 0; j < rayCollection.length; j++) {
-          rayCollection[j].setLength(rayStepLength);
+          rayCollection[j].vector.setLength(rayStepLength);
         }
 
         if (config.drawPreviewRays) {
@@ -97,7 +103,7 @@
         newRays = calculateAllReflections(rayCollection);
         // Crop original rays
         for (var j = 0; j < rayCollection.length; j++) {
-          rayCollection[j].b.set(newRays[j].a);
+          rayCollection[j].vector.b.set(newRays[j].vector.a);
         }
         if (i + 1 >= numIter) {
           drawRays(draw, fill, rayCollection, "rgba(255,192,0,0.5)");
@@ -108,7 +114,7 @@
         // Move new rays one unit (pixel) into their new direction
         // (avoid to reflect multiple times inside one single point)
         for (var j = 0; j < rayCollection.length; j++) {
-          rayCollection[j].a.set(rayCollection[j].clone().setLength(config.rayStepOffset).b);
+          rayCollection[j].vector.a.set(rayCollection[j].vector.clone().setLength(config.rayStepOffset).b);
         }
       }
       interactionHelpers.forEach(function (helper) {
@@ -144,7 +150,7 @@
     // +-------------------------------
     var drawRays = function (draw, fill, rays, color) {
       rays.forEach(function (ray) {
-        draw.arrow(ray.a, ray.b, color, config.rayThickness);
+        draw.arrow(ray.vector.a, ray.vector.b, color, config.rayThickness);
       });
     };
 
@@ -153,12 +159,13 @@
     // +-------------------------------
     var drawLines = function (draw, fill, rays, color) {
       rays.forEach(function (ray) {
-        draw.line(ray.a, ray.b, color, config.rayThickness);
+        draw.line(ray.vector.a, ray.vector.b, color, config.rayThickness);
       });
     };
 
     /**
-     * @return {Array<Vector[]>} An two-dimensional array of vectors; each array for one of the base shapes.
+     * @param {Array<Ray>} rays
+     * @return {Array<Ray[]>} An two-dimensional array of vectors; each array for one of the base shapes.
      */
     var calculateAllReflections = function (rays) {
       // Array<Vector[]>
@@ -167,8 +174,12 @@
         const reflectedRays = [];
         shapes.forEach(function (shape) {
           var reflectedRay = findReflectedRay(shape, ray);
-          if (reflectedRay != null && ray.a.distance(reflectedRay.a) > config.rayCompareEpsilon) {
-            // && reflectedRay.length() > 0.1) {
+          // if (reflectedRay != null && ray.vector.a.distance(reflectedRay.vector.a) > config.rayCompareEpsilon) {
+          if (
+            reflectedRay != null &&
+            reflectedRay.sourceShape !== ray.sourceShape &&
+            ray.vector.a.distance(reflectedRay.vector.a) > config.rayCompareEpsilon
+          ) {
             reflectedRays.push(reflectedRay);
           }
         });
@@ -176,7 +187,7 @@
           resultVectors.push(findClosestRay(ray, reflectedRays));
         } else {
           // Just expand input ray
-          resultVectors.push(ray.clone().moveTo(ray.b));
+          resultVectors.push(new Ray(ray.vector.clone().moveTo(ray.vector.b), null));
         }
       });
       return resultVectors;
@@ -184,10 +195,10 @@
 
     // Pre: rays.length > 0
     var findClosestRay = function (sourceRay, rays) {
-      var dist = sourceRay.a.distance(rays[0].a);
+      var dist = sourceRay.vector.a.distance(rays[0].vector.a);
       var resultIndex = 0;
       for (var i = 1; i < rays.length; i++) {
-        if (sourceRay.a.distance(rays[i].a) < dist) {
+        if (sourceRay.vector.a.distance(rays[i].vector.a) < dist) {
           // && sourceRay.a.distance(rays[i].a) > 0.0001) {
           resultIndex = i;
         }
@@ -197,7 +208,7 @@
 
     /**
      * TODO: also allow circle sectors, elliptic sectors, bezier curves??
-     * @param {Polygon | Circle | Ellipse} shape
+     * @param {Polygon | Circle | VEllipse | Triangle | CircleSector | VEllipseSector | Line} shape
      * @param {Vector} ray
      * @returns
      */
@@ -206,18 +217,18 @@
       // Find intersection with min distance
 
       // Array<Vector>
-      var intersectionTangents = shape.lineIntersectionTangents(ray, true);
+      var intersectionTangents = shape.lineIntersectionTangents(ray.vector, true);
       // Find closest intersection vector
       var closestIntersectionTangent = intersectionTangents.reduce(function (accu, curVal) {
-        if (accu === null || curVal.a.distance(ray.a) < accu.a.distance(ray.a)) {
+        if (accu === null || curVal.a.distance(ray.vector.a) < accu.a.distance(ray.vector.a)) {
           accu = curVal;
         }
         return accu;
       }, null);
       if (closestIntersectionTangent) {
-        var angleBetween = closestIntersectionTangent.angle(ray);
+        var angleBetween = closestIntersectionTangent.angle(ray.vector);
         closestIntersectionTangent.rotate(angleBetween);
-        reflectedRay = closestIntersectionTangent;
+        reflectedRay = new Ray(closestIntersectionTangent, shape);
       } else {
         reflectedRay = null;
       }
@@ -242,19 +253,20 @@
       pb.add([mainRay], true); // trigger redraw
     };
 
+    // Return: Array<Ray>
     var getRayCollection = function (baseRay) {
       var rays = [];
       if (config.useParallelLightSource) {
         var perpRay = baseRay.perp();
         perpRay.moveTo(perpRay.vertAt(-0.5));
         for (var i = 0; i < config.numRays; i++) {
-          rays.push(baseRay.clone().moveTo(perpRay.vertAt(i / config.numRays)));
+          rays.push(new Ray(baseRay.clone().moveTo(perpRay.vertAt(i / config.numRays)), null));
         }
         return rays;
       } else {
         var rangeAngle = config.initialRayAngle * DEG_TO_RAD;
         for (var i = 0; i < config.numRays; i++) {
-          rays.push(baseRay.clone().rotate(-rangeAngle / 2.0 + rangeAngle * (i / config.numRays)));
+          rays.push(new Ray(baseRay.clone().rotate(-rangeAngle / 2.0 + rangeAngle * (i / config.numRays)), null));
         }
         return rays;
       }
