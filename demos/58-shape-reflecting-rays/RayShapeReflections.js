@@ -19,7 +19,7 @@
    * @param {Array<Vector>} rayCollection
    * @param {number} config.rayCompareEpsilon
    */
-  globalThis.RayShapeReflections = function (rayCollection, config, rayStepLength) {
+  globalThis.RayShapeReflections = function (shapes, rayCollection, config, rayStepLength) {
     var newRays = [];
     // Set rays to normalized step
     for (var j = 0; j < rayCollection.length; j++) {
@@ -29,7 +29,7 @@
     if (config.drawPreviewRays) {
       drawLines(draw, fill, rayCollection, "rgba(192,192,192,0.25)");
     }
-    newRays = calculateAllReflections(rayCollection, config);
+    newRays = calculateAllReflections(shapes, rayCollection, config);
     return newRays;
   }; // END postDraw
 
@@ -37,7 +37,7 @@
    * @param {Array<Ray>} rays
    * @return {Array<Ray[]>} An two-dimensional array of vectors; each array for one of the base shapes.
    */
-  var calculateAllReflections = function (rays, config) {
+  var calculateAllReflections = function (shapes, rays, config) {
     // Array<Vector[]>
     var resultVectors = [];
     rays.forEach(function (ray) {

@@ -12,6 +12,18 @@
 (function (_context) {
   "use strict";
 
+  var Lens = function (shape, refractiveIndex) {
+    this.shape = shape;
+    this.refractiveIndex = refractiveIndex;
+  };
+  Lens.prototype.getShapes = function () {
+    if (this.shape instanceof Polygon) {
+      return this.shape.getEdges();
+    } else {
+      throw "Error, `Lens.getShapes()` not yet implemented. Only on Polygon.";
+    }
+  };
+
   // Fetch the GET params
   let GUP = gup();
   const RAD_TO_DEG = 180.0 / Math.PI;
@@ -48,6 +60,8 @@
     pb.drawConfig.triangle.lineWidth = 2;
     // pb.drawConfig.drawHandleLines = false;
 
+    // Array<Polygon or any other closed shape>
+    var lenses = [];
     // Array<Polygon | Circle | VEllipse | Line | CircleSector | VEllipseSector | BezierPath | Triangle>
     var shapes = [];
     var mainRay = new Vector(new Vertex(), new Vertex(250, 250).rotate(Math.random() * Math.PI));
@@ -65,7 +79,9 @@
       useParallelLightSource: params.getBoolean("useParallelLightSource", false),
       showBoundingBoxes: params.getBoolean("showBoundingBoxes", false),
       rayLengthFromMaxBounds: params.getBoolean("rayLengthFromMaxBounds", false),
-      drawPreviewRays: params.getBoolean("drawPreviewRays", false)
+      drawPreviewRays: params.getBoolean("drawPreviewRays", false),
+      baseRefractiveIndex: params.getNumber("baseRefractiveIndex", 1.000293),
+      lensRefractiveIndex: params.getNumber("baseRefractiveIndex", 1.000293)
     };
 
     // +---------------------------------------------------------------------------------
@@ -80,20 +96,24 @@
 
       var rayStepLength = config.rayLengthFromMaxBounds ? getMaxShapeBounds().getMaxDimension() : mainRay.length();
       var rayCollection = getRayCollection(mainRay);
-      var newRays = [];
+      var newSnelliusRays = [];
       var numIter = Math.max(0, config.iterations); // Safeguard to avoid infinite loop
       for (var i = 0; i < numIter; i++) {
-        newRays = RayShapeReflections(shapes, rayCollection, config, rayStepLength);
+        // Array<SnennliusRays>
+        newSnelliusRays = RayShapeRefractions(lenses, rayCollection, config, rayStepLength);
         // Crop original rays
+        // console.log("newSnelliusRays", newSnelliusRays);
         for (var j = 0; j < rayCollection.length; j++) {
-          rayCollection[j].vector.b.set(newRays[j].vector.a);
+          rayCollection[j].vector.b.set(newSnelliusRays[j].refractedRay.vector.a);
         }
         if (i + 1 >= numIter) {
           drawRays(draw, fill, rayCollection, "rgba(255,192,0,0.5)");
         } else {
           drawLines(draw, fill, rayCollection, "rgba(255,192,0,0.5)");
         }
-        rayCollection = newRays;
+        rayCollection = newSnelliusRays.map(function (snelliusRay) {
+          return snelliusRay.refractedRay;
+        });
         // Move new rays one unit (pixel) into their new direction
         // (avoid to reflect multiple times inside one single point)
         for (var j = 0; j < rayCollection.length; j++) {
@@ -151,16 +171,27 @@
     // +-------------------------------
     var rebuildShapes = function () {
       pb.removeAll(false, false); // Don't trigger redraw
-      var randomShapesAndHelpers = createRandomShapes(pb, viewport);
+      // var randomShapesAndHelpers = createRandomShapes(pb, viewport);
 
+      var polygon = createRandomizedPolygon(4, viewport, true); // createClockwise=true
+      polygon.scale(0.3, polygon.getCentroid());
+
+      lenses = [new Lens(polygon, 1, 3330)]; // Water
+
+      // shapes = lenses.rpolygon.getEdges();
       // Destroy old helpers to release all unused listeners.
       interactionHelpers.forEach(function (helper) {
         helper.destroy();
       });
-      interactionHelpers = randomShapesAndHelpers.helpers;
-      shapes = randomShapesAndHelpers.shapes;
-      pb.add(randomShapesAndHelpers.shapes, false);
-      pb.add(randomShapesAndHelpers.helperPoints, false);
+      interactionHelpers = []; // randomShapesAndHelpers.helpers;
+      // shapes = randomShapesAndHelpers.shapes;
+      pb.add(
+        lenses.map(function (lens) {
+          return lens.shape;
+        }),
+        false
+      );
+      // pb.add(randomShapesAndHelpers.helperPoints, false);
       pb.add([mainRay], true); // trigger redraw
     };
 
