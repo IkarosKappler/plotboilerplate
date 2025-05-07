@@ -12,9 +12,9 @@ var randomEllipseSector = function (viewport) {
   // Create the ellipse
   var ellipse = new VEllipse(center, new Vertex(center.x + radiusH, center.y + radiusV), rotation);
 
-  // Now create a sector from the circle
-  var startAngle = (12 / 180) * Math.PI;
-  var endAngle = (89 / 180) * Math.PI;
+  // Now create a sector from the ellipse
+  var startAngle = Math.random() * Math.PI; // (12 / 180) * Math.PI;
+  var endAngle = startAngle + Math.PI / 2.0 + Math.random() * Math.PI; // (89 / 180) * Math.PI;
   var sector = new VEllipseSector(ellipse, startAngle, endAngle);
 
   return sector;

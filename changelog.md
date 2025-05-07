@@ -4,7 +4,13 @@
 
 - Create a helper for triangles.
 - Resize/bestfit seems to fail in Firefoxe's dark mode (plugin).
+- Extend demo 07-voronoi: "randomize" could be a smooth transition :)
 
+- 2025-05-07
+  - Added `PBContentChangeListener` to PB to track if the drawable content changed.
+  - Added `PlogBoilerplate.addContentChangeListener` and `PlogBoilerplate.removeContentChangeListener`.
+  - Moving full vectors now by default when vector point a is moved.
+  - (Demos) Adding a tiny content manager pane.
 - 2025-05-05
   - Added optional params `draw` and `fill` to BezierPathInteractionHelper.drawHandleLines`method.
   - Demo 58-shape-reflecting-rays: Refactored`rebuildShapes`and moved to external funcion`createRandomShapes`.

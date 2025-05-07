@@ -86,8 +86,12 @@
  * @modified 2024-07-08 Adding `PlotBoilerplate.getGUI()` to retrieve the GUI instance.
  * @modified 2024-08-25 Extending main class `PlotBoilerplate` optional param `isBackdropFiltersEnabled`.
  * @modified 2024-12-02 Adding the `triggerRedraw` to the `removeAll` method.
+ * @modified 2025-05-07 Changing the return type of `removeVertex` from `void` to `boolean`.
+ * @modified 2025-05-07 Handling content changes now with `contentChangeListeners`.
+ * @modified 2025-05-07 Added `PlogBoilerplate.addContentChangeListener` and `.removeContentChangeListener`.
+ * @modified 2025-05-07 Moving full vectors now by default when vector point a is moved.
  *
- * @version  1.20.0
+ * @version  1.21.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -100,7 +104,7 @@ import { Grid } from "./Grid";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
 import { IDraggable, Config, DrawLib, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension, DatGuiProps, // DEPRECATED. Please do not use any more.
-LilGuiProps } from "./interfaces";
+LilGuiProps, PBContentChangeListener } from "./interfaces";
 /**
  * @classdesc The main class of the PlotBoilerplate.
  *
@@ -253,6 +257,10 @@ export declare class PlotBoilerplate {
      */
     hooks: IHooks;
     /**
+     * A list of content change listeners.
+     */
+    contentChangeListeners: Array<PBContentChangeListener>;
+    /**
      * @member {KeyHandler|undefined}
      * @memberof PlotBoilerplate
      * @instance
@@ -390,6 +398,27 @@ export declare class PlotBoilerplate {
      **/
     private updateCSSscale;
     /**
+     * Adds a new content change listener to this instance. Adding duplicates is not possible.
+     *
+     * @param {PBContentChangeListener} listener - The listenre to add.
+     * @method addContentChangeListener
+     * @instance
+     * @memberof PlotBoilerplate
+     * @returns {void}
+     */
+    addContentChangeListener(listener: PBContentChangeListener): void;
+    /**
+     * Removes an existing content change listener from this instance.
+     *
+     * @param {PBContentChangeListener} listener - The listenre to add.
+     * @method removeContentChangeListener
+     * @instance
+     * @memberof PlotBoilerplate
+     * @returns {void}
+     */
+    removeContentChangeListener(listener: PBContentChangeListener): void;
+    private _fireContentChanged;
+    /**
      * Add a drawable object.<br>
      * <br>
      * This must be either:<br>
@@ -413,7 +442,7 @@ export declare class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    add(drawable: Drawable | Array<Drawable>, redraw?: boolean): void;
+    add(drawable: Drawable | Array<Drawable>, redraw?: boolean, doNotFireEvent?: boolean): void;
     /**
      * Remove a drawable object.<br>
      * <br>
@@ -432,12 +461,13 @@ export declare class PlotBoilerplate {
      *
      * @param {Drawable|Array<Drawable>} drawable - The drawable (of one of the allowed class instance) to remove.
      * @param {boolean} [redraw=false]
+     * @param {removeWidth}
      * @method remove
      * @instance
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    remove(drawable: Drawable | Array<Drawable>, redraw?: boolean, removeWithVertices?: boolean): void;
+    remove(drawable: Drawable | Array<Drawable>, redraw?: boolean, removeWithVertices?: boolean, doNotFireEvent?: boolean): boolean;
     /**
      * Remove a vertex from the vertex list.<br>
      *
@@ -446,9 +476,9 @@ export declare class PlotBoilerplate {
      * @method removeVertex
      * @instance
      * @memberof PlotBoilerplate
-     * @return {void}
+     * @return {boolean}
      **/
-    removeVertex(vert: Vertex, redraw?: boolean): void;
+    removeVertex(vert: Vertex, redraw?: boolean, doNotFireEvent?: boolean): boolean;
     /**
      * Remove all elements.
      *

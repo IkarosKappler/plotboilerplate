@@ -97,6 +97,7 @@
     // NONE
 
     var postDraw = function (draw, fill) {
+      console.log("post draw");
       if (config.showBoundingBoxes) {
         drawBoundingBoxes(draw, fill);
       }
@@ -130,6 +131,9 @@
       interactionHelpers.forEach(function (helper) {
         helper.drawHandleLines(draw, fill);
       });
+
+      // Maybe the content list has someting nice to draw.
+      contentList.drawHighlighted(draw, fill);
     }; // END postDraw
 
     // +---------------------------------------------------------------------------------
@@ -199,7 +203,7 @@
         lenses.map(function (lens) {
           return lens.shape;
         }),
-        false
+        false // Do not redraw yet
       );
       // pb.add(randomShapesAndHelpers.helperPoints, false);
       pb.add([mainRay], true); // trigger redraw
@@ -329,8 +333,10 @@
       .onChange( function() { lenses.forEach( function(lens) {lens.refractiveIndex = config.lensRefractiveIndex; } ); pb.redraw() });
     }
     pb.config.postDraw = postDraw;
-    rebuildShapes();
 
+    var contentList = new PBContentList(pb);
+
+    rebuildShapes();
     toggleAnimation();
   });
 })(globalThis);

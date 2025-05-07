@@ -344,6 +344,14 @@ var pb = new PlotBoilerplate({
     console.log("after drawing.");
   },
 
+  // function
+  //   A callback function that will be triggered after content changed.
+  onContentChanged: function (event) {
+    console.log("Event type (DRAWABLES_ADDED or DRAWABLES_REMOVED)", event.type);
+    console.log("Added drawables:", event.addedDrawables);
+    console.log("Removed drawables:", event.removedDrawables);
+  },
+
   // boolean
   //   Indicates if the application should handle mouse events for you.
 

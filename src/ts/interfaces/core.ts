@@ -22,6 +22,7 @@
  * @modified 2024-08-25 Added the `CSSBackdropFilterParams` params to the global params (all optional).
  * @modified 2025-03-29 Added interface `Intersectable`.
  * @modified 2025-04-16 Added interface `IBounded`.
+ * @modified 2025-05-07 Added callback `onContentChanged` to PB to track if the drawable content changed.
  **/
 
 import { Vertex } from "../Vertex";
@@ -114,6 +115,18 @@ export interface CanvasWrapper {
   setSize: (width: number, height: number) => void;
   element: HTMLCanvasElement | SVGElement;
 }
+
+/**
+ * The interface for PB change events.
+ */
+export interface IPBChangeEvent {
+  type: "DRAWABLES_ADDED" | "DRAWABLES_REMOVED";
+  addedDrawables: Array<Drawable>;
+  removedDrawables: Array<Drawable>;
+}
+
+export type PBContentChangeListener = (event: IPBChangeEvent) => void; // A callback function that will be triggered after content changed.
+
 /**
  * The config that's used by PB.
  */

@@ -86,8 +86,12 @@
  * @modified 2024-07-08 Adding `PlotBoilerplate.getGUI()` to retrieve the GUI instance.
  * @modified 2024-08-25 Extending main class `PlotBoilerplate` optional param `isBackdropFiltersEnabled`.
  * @modified 2024-12-02 Adding the `triggerRedraw` to the `removeAll` method.
+ * @modified 2025-05-07 Changing the return type of `removeVertex` from `void` to `boolean`.
+ * @modified 2025-05-07 Handling content changes now with `contentChangeListeners`.
+ * @modified 2025-05-07 Added `PlogBoilerplate.addContentChangeListener` and `.removeContentChangeListener`.
+ * @modified 2025-05-07 Moving full vectors now by default when vector point a is moved.
  *
- * @version  1.20.0
+ * @version  1.21.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -131,7 +135,8 @@ import {
   XYCoords,
   XYDimension,
   DatGuiProps, // DEPRECATED. Please do not use any more.
-  LilGuiProps
+  LilGuiProps,
+  PBContentChangeListener
 } from "./interfaces";
 import { PBText } from "./PBText";
 import { AlloyFingerOptions } from "alloyfinger-typescript/src/cjs/alloy_finger";
@@ -312,6 +317,11 @@ export class PlotBoilerplate {
    * @instance
    */
   hooks: IHooks;
+
+  /**
+   * A list of content change listeners.
+   */
+  contentChangeListeners: Array<PBContentChangeListener> = [];
 
   /**
    * @member {KeyHandler|undefined}
@@ -805,6 +815,55 @@ export class PlotBoilerplate {
   }
 
   /**
+   * Adds a new content change listener to this instance. Adding duplicates is not possible.
+   *
+   * @param {PBContentChangeListener} listener - The listenre to add.
+   * @method addContentChangeListener
+   * @instance
+   * @memberof PlotBoilerplate
+   * @returns {void}
+   */
+  addContentChangeListener(listener: PBContentChangeListener) {
+    for (var i in this.contentChangeListeners) {
+      if (this.contentChangeListeners[i] === listener) {
+        return;
+      }
+    }
+    this.contentChangeListeners.push(listener);
+  }
+
+  /**
+   * Removes an existing content change listener from this instance.
+   *
+   * @param {PBContentChangeListener} listener - The listenre to add.
+   * @method removeContentChangeListener
+   * @instance
+   * @memberof PlotBoilerplate
+   * @returns {void}
+   */
+  removeContentChangeListener(listener: PBContentChangeListener) {
+    for (var i = 0; i < this.contentChangeListeners.length; i++) {
+      if (this.contentChangeListeners[i] === listener) {
+        this.contentChangeListeners.splice(i, 1);
+        return;
+      }
+    }
+  }
+
+  private _fireContentChanged(addedDrawables: Drawable[], removedDrawables: Drawable[]): void {
+    for (var i in this.contentChangeListeners) {
+      const listener = this.contentChangeListeners[i];
+      if (listener && typeof listener === "function") {
+        listener({
+          type: addedDrawables.length > 0 ? "DRAWABLES_ADDED" : "DRAWABLES_REMOVED",
+          addedDrawables: addedDrawables,
+          removedDrawables: removedDrawables
+        });
+      }
+    }
+  }
+
+  /**
    * Add a drawable object.<br>
    * <br>
    * This must be either:<br>
@@ -828,87 +887,115 @@ export class PlotBoilerplate {
    * @memberof PlotBoilerplate
    * @return {void}
    **/
-  add(drawable: Drawable | Array<Drawable>, redraw?: boolean) {
+  add(drawable: Drawable | Array<Drawable>, redraw?: boolean, doNotFireEvent?: boolean) {
     if (Array.isArray(drawable)) {
       const arr: Array<Drawable> = drawable as Array<Drawable>;
       for (var i = 0; i < arr.length; i++) {
-        this.add(arr[i], false);
+        this.add(arr[i], false, doNotFireEvent);
       }
-    } else if (drawable instanceof Vertex) {
-      this.drawables.push(drawable);
-      this.vertices.push(drawable);
-    } else if (drawable instanceof Line) {
-      // Add some lines
-      this.drawables.push(drawable);
-      this.vertices.push(drawable.a);
-      this.vertices.push(drawable.b);
-    } else if (drawable instanceof Vector) {
-      this.drawables.push(drawable);
-      this.vertices.push(drawable.a);
-      this.vertices.push(drawable.b);
-    } else if (drawable instanceof VEllipse) {
-      this.vertices.push(drawable.center);
-      this.vertices.push(drawable.axis);
-      this.drawables.push(drawable);
-      drawable.center.listeners.addDragListener((event: VertEvent) => {
-        drawable.axis.add(event.params.dragAmount);
-      });
-    } else if (drawable instanceof VEllipseSector) {
-      this.vertices.push(drawable.ellipse.center);
-      this.vertices.push(drawable.ellipse.axis);
-      this.drawables.push(drawable);
-      drawable.ellipse.center.listeners.addDragListener((event: VertEvent) => {
-        drawable.ellipse.axis.add(event.params.dragAmount);
-      });
-    } else if (drawable instanceof Circle) {
-      this.vertices.push(drawable.center);
-      this.drawables.push(drawable);
-    } else if (drawable instanceof CircleSector) {
-      this.vertices.push(drawable.circle.center);
-      this.drawables.push(drawable);
-    } else if (drawable instanceof Polygon) {
-      this.drawables.push(drawable);
-      for (var i = 0; i < drawable.vertices.length; i++) {
-        this.vertices.push(drawable.vertices[i]);
-      }
-    } else if (drawable instanceof Triangle) {
-      this.drawables.push(drawable);
-      this.vertices.push(drawable.a);
-      this.vertices.push(drawable.b);
-      this.vertices.push(drawable.c);
-    } else if (drawable instanceof BezierPath) {
-      this.drawables.push(drawable);
-      const bezierPath: BezierPath = drawable as BezierPath;
-      for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
-        if (!drawable.adjustCircular && i == 0) {
-          this.vertices.push(bezierPath.bezierCurves[i].startPoint);
-        }
-        this.vertices.push(bezierPath.bezierCurves[i].endPoint);
-        this.vertices.push(bezierPath.bezierCurves[i].startControlPoint);
-        this.vertices.push(bezierPath.bezierCurves[i].endControlPoint);
-        bezierPath.bezierCurves[i].startControlPoint.attr.selectable = false;
-        bezierPath.bezierCurves[i].endControlPoint.attr.selectable = false;
-      }
-      PlotBoilerplate.utils.enableBezierPathAutoAdjust(drawable);
-    } else if (drawable instanceof PBImage) {
-      this.vertices.push(drawable.upperLeft);
-      this.vertices.push(drawable.lowerRight);
-      this.drawables.push(drawable);
-      // Todo: think about a IDragEvent interface
-      drawable.upperLeft.listeners.addDragListener((e: VertEvent) => {
-        drawable.lowerRight.add(e.params.dragAmount);
-      });
-      drawable.lowerRight.attr.selectable = false;
-    } else if (drawable instanceof PBText) {
-      this.vertices.push(drawable.anchor);
-      this.drawables.push(drawable);
-      drawable.anchor.attr.selectable = false;
+      // !doNotFireEvent && this._fireContentChanged(arr, []);
     } else {
-      throw "Cannot add drawable of unrecognized type: " + typeof drawable + ".";
+      const addedDrawables: Array<Drawable> = [drawable];
+      if (drawable instanceof Vertex) {
+        this.drawables.push(drawable);
+        this.vertices.push(drawable);
+      } else if (drawable instanceof Line) {
+        // Add some lines
+        this.drawables.push(drawable);
+        this.vertices.push(drawable.a);
+        this.vertices.push(drawable.b);
+        addedDrawables.push(drawable.a, drawable.b);
+      } else if (drawable instanceof Vector) {
+        this.drawables.push(drawable);
+        this.vertices.push(drawable.a);
+        this.vertices.push(drawable.b);
+        addedDrawables.push(drawable.a, drawable.b);
+        drawable.a.listeners.addDragListener((event: VertEvent) => {
+          drawable.b.add(event.params.dragAmount);
+        });
+      } else if (drawable instanceof VEllipse) {
+        this.vertices.push(drawable.center);
+        this.vertices.push(drawable.axis);
+        addedDrawables.push(drawable.center, drawable.axis);
+        this.drawables.push(drawable);
+        drawable.center.listeners.addDragListener((event: VertEvent) => {
+          drawable.axis.add(event.params.dragAmount);
+        });
+      } else if (drawable instanceof VEllipseSector) {
+        this.vertices.push(drawable.ellipse.center);
+        this.vertices.push(drawable.ellipse.axis);
+        addedDrawables.push(drawable.ellipse.center, drawable.ellipse.axis);
+
+        this.drawables.push(drawable);
+        drawable.ellipse.center.listeners.addDragListener((event: VertEvent) => {
+          drawable.ellipse.axis.add(event.params.dragAmount);
+        });
+      } else if (drawable instanceof Circle) {
+        this.vertices.push(drawable.center);
+        addedDrawables.push(drawable.center);
+        this.drawables.push(drawable);
+      } else if (drawable instanceof CircleSector) {
+        this.vertices.push(drawable.circle.center);
+        addedDrawables.push(drawable.circle.center);
+        this.drawables.push(drawable);
+      } else if (drawable instanceof Polygon) {
+        this.drawables.push(drawable);
+        for (var i = 0; i < drawable.vertices.length; i++) {
+          this.vertices.push(drawable.vertices[i]);
+          addedDrawables.push(drawable.vertices[i]);
+        }
+      } else if (drawable instanceof Triangle) {
+        this.drawables.push(drawable);
+        this.vertices.push(drawable.a);
+        this.vertices.push(drawable.b);
+        this.vertices.push(drawable.c);
+        addedDrawables.push(drawable.a, drawable.b, drawable.c);
+      } else if (drawable instanceof BezierPath) {
+        this.drawables.push(drawable);
+        const bezierPath: BezierPath = drawable as BezierPath;
+        for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
+          if (!drawable.adjustCircular && i == 0) {
+            this.vertices.push(bezierPath.bezierCurves[i].startPoint);
+            addedDrawables.push(bezierPath.bezierCurves[i].startPoint);
+          }
+          this.vertices.push(bezierPath.bezierCurves[i].endPoint);
+          this.vertices.push(bezierPath.bezierCurves[i].startControlPoint);
+          this.vertices.push(bezierPath.bezierCurves[i].endControlPoint);
+          addedDrawables.push(
+            bezierPath.bezierCurves[i].endPoint,
+            bezierPath.bezierCurves[i].startControlPoint,
+            bezierPath.bezierCurves[i].endControlPoint
+          );
+          bezierPath.bezierCurves[i].startControlPoint.attr.selectable = false;
+          bezierPath.bezierCurves[i].endControlPoint.attr.selectable = false;
+        }
+        PlotBoilerplate.utils.enableBezierPathAutoAdjust(drawable);
+      } else if (drawable instanceof PBImage) {
+        this.vertices.push(drawable.upperLeft);
+        this.vertices.push(drawable.lowerRight);
+        addedDrawables.push(drawable.upperLeft, drawable.lowerRight);
+        this.drawables.push(drawable);
+        // Todo: think about a IDragEvent interface
+        drawable.upperLeft.listeners.addDragListener((e: VertEvent) => {
+          drawable.lowerRight.add(e.params.dragAmount);
+        });
+        drawable.lowerRight.attr.selectable = false;
+      } else if (drawable instanceof PBText) {
+        this.vertices.push(drawable.anchor);
+        addedDrawables.push(drawable.anchor);
+        this.drawables.push(drawable);
+        drawable.anchor.attr.selectable = false;
+      } else {
+        throw "Cannot add drawable of unrecognized type: " + typeof drawable + ".";
+      }
+
+      !doNotFireEvent && this._fireContentChanged(addedDrawables, []);
     }
 
     // This is a workaround for backwards compatibility when the 'redraw' param was not yet present.
-    if (redraw || typeof redraw == "undefined") this.redraw();
+    if (redraw || typeof redraw == "undefined") {
+      this.redraw();
+    }
   }
 
   /**
@@ -929,79 +1016,114 @@ export class PlotBoilerplate {
    *
    * @param {Drawable|Array<Drawable>} drawable - The drawable (of one of the allowed class instance) to remove.
    * @param {boolean} [redraw=false]
+   * @param {removeWidth}
    * @method remove
    * @instance
    * @memberof PlotBoilerplate
    * @return {void}
    **/
-  remove(drawable: Drawable | Array<Drawable>, redraw?: boolean, removeWithVertices?: boolean): void {
+  remove(
+    drawable: Drawable | Array<Drawable>,
+    redraw?: boolean,
+    removeWithVertices?: boolean,
+    doNotFireEvent?: boolean
+  ): boolean {
     if (Array.isArray(drawable)) {
+      const removedDrawables: Array<Drawable> = [];
       for (var i = 0; i < drawable.length; i++) {
-        this.remove(drawable[i], false, removeWithVertices);
+        if (this.remove(drawable[i], false, removeWithVertices, true)) {
+          removedDrawables.push(drawable[i]);
+        }
       }
       if (redraw) {
         this.redraw();
       }
-      return;
+      !doNotFireEvent && this._fireContentChanged([], removedDrawables);
+      return removedDrawables.length > 0;
     }
     if (drawable instanceof Vertex) {
-      this.removeVertex(drawable, false);
+      const wasRemoved: boolean = this.removeVertex(drawable, false, false);
       if (redraw) {
         this.redraw();
       }
+      !doNotFireEvent && this._fireContentChanged([], [drawable]);
+      return wasRemoved;
     }
+    let wasRemoved: boolean = false;
+    const removedDrawables: Array<Drawable> = [];
     for (var i = 0; i < this.drawables.length; i++) {
       if (this.drawables[i] === drawable || this.drawables[i].uid === drawable.uid) {
         this.drawables.splice(i, 1);
+        removedDrawables.push(drawable);
 
         if (removeWithVertices) {
           // Check if some listeners need to be removed
           if (drawable instanceof Line) {
             // Add some lines
-            this.removeVertex(drawable.a, false);
-            this.removeVertex(drawable.b, false);
+            this.removeVertex(drawable.a, false, true);
+            this.removeVertex(drawable.b, false, true);
+            removedDrawables.push(drawable.a, drawable.b);
           } else if (drawable instanceof Vector) {
-            this.removeVertex(drawable.a, false);
-            this.removeVertex(drawable.b, false);
+            this.removeVertex(drawable.a, false, true);
+            this.removeVertex(drawable.b, false, true);
+            removedDrawables.push(drawable.a, drawable.b);
           } else if (drawable instanceof VEllipse) {
-            this.removeVertex(drawable.center, false);
-            this.removeVertex(drawable.axis, false);
+            this.removeVertex(drawable.center, false, true);
+            this.removeVertex(drawable.axis, false, true);
+            removedDrawables.push(drawable.center, drawable.axis);
           } else if (drawable instanceof VEllipseSector) {
-            this.removeVertex(drawable.ellipse.center);
-            this.removeVertex(drawable.ellipse.axis);
+            this.removeVertex(drawable.ellipse.center, false, true);
+            this.removeVertex(drawable.ellipse.axis, false, true);
+            removedDrawables.push(drawable.ellipse.center, drawable.ellipse.axis);
           } else if (drawable instanceof Circle) {
-            this.removeVertex(drawable.center, false);
+            this.removeVertex(drawable.center, false, true);
           } else if (drawable instanceof CircleSector) {
-            this.removeVertex(drawable.circle.center, false);
+            this.removeVertex(drawable.circle.center, false, true);
+            removedDrawables.push(drawable.circle.center);
           } else if (drawable instanceof Polygon) {
             // for( var i in drawable.vertices )
-            for (var i = 0; i < drawable.vertices.length; i++) this.removeVertex(drawable.vertices[i], false);
+            for (var i = 0; i < drawable.vertices.length; i++) {
+              this.removeVertex(drawable.vertices[i], false, true);
+              removedDrawables.push(drawable.vertices[i]);
+            }
           } else if (drawable instanceof Triangle) {
-            this.removeVertex(drawable.a, false);
-            this.removeVertex(drawable.b, false);
-            this.removeVertex(drawable.c, false);
+            this.removeVertex(drawable.a, false, true);
+            this.removeVertex(drawable.b, false, true);
+            this.removeVertex(drawable.c, false, true);
+            removedDrawables.push(drawable.a, drawable.b, drawable.c);
           } else if (drawable instanceof BezierPath) {
             for (var i = 0; i < drawable.bezierCurves.length; i++) {
-              this.removeVertex(drawable.bezierCurves[i].startPoint, false);
-              this.removeVertex(drawable.bezierCurves[i].startControlPoint, false);
-              this.removeVertex(drawable.bezierCurves[i].endControlPoint, false);
+              this.removeVertex(drawable.bezierCurves[i].startPoint, false, true);
+              this.removeVertex(drawable.bezierCurves[i].startControlPoint, false, true);
+              this.removeVertex(drawable.bezierCurves[i].endControlPoint, false, true);
+              removedDrawables.push(
+                drawable.bezierCurves[i].startPoint,
+                drawable.bezierCurves[i].startControlPoint,
+                drawable.bezierCurves[i].endControlPoint
+              );
               if (i + 1 == drawable.bezierCurves.length) {
-                this.removeVertex(drawable.bezierCurves[i].endPoint, false);
+                this.removeVertex(drawable.bezierCurves[i].endPoint, false, true);
+                removedDrawables.push(drawable.bezierCurves[i].endPoint);
               }
             }
           } else if (drawable instanceof PBImage) {
-            this.removeVertex(drawable.upperLeft, false);
-            this.removeVertex(drawable.lowerRight, false);
+            this.removeVertex(drawable.upperLeft, false, true);
+            this.removeVertex(drawable.lowerRight, false, true);
+            removedDrawables.push(drawable.upperLeft, drawable.lowerRight);
           } else if (drawable instanceof PBText) {
-            this.removeVertex(drawable.anchor, false);
+            this.removeVertex(drawable.anchor, false, true);
+            removedDrawables.push(drawable.anchor);
           }
         } // END removeWithVertices
 
         if (redraw) {
           this.redraw();
         }
-      }
-    }
+        !doNotFireEvent && this._fireContentChanged([], removedDrawables);
+        wasRemoved = true;
+      } // END if
+    } // END for
+    return wasRemoved;
   }
 
   /**
@@ -1012,18 +1134,20 @@ export class PlotBoilerplate {
    * @method removeVertex
    * @instance
    * @memberof PlotBoilerplate
-   * @return {void}
+   * @return {boolean}
    **/
-  removeVertex(vert: Vertex, redraw?: boolean): void {
+  removeVertex(vert: Vertex, redraw?: boolean, doNotFireEvent?: boolean): boolean {
     for (var i = 0; i < this.vertices.length; i++) {
       if (this.vertices[i] === vert) {
         this.vertices.splice(i, 1);
         if (redraw) {
           this.redraw();
         }
-        return;
+        !doNotFireEvent && this._fireContentChanged([], [vert]);
+        return true;
       }
     }
+    return false;
   }
 
   /**
@@ -1039,13 +1163,16 @@ export class PlotBoilerplate {
    * @return {void}
    */
   removeAll(keepVertices?: boolean, triggerRedraw?: boolean) {
+    let removedDrawables: Array<Drawable> = this.drawables;
     this.drawables = [];
     if (!Boolean(keepVertices)) {
+      removedDrawables = removedDrawables.concat(this.vertices);
       this.vertices = [];
     }
     if (triggerRedraw || typeof triggerRedraw === "undefined") {
       this.redraw();
     }
+    removedDrawables.length > 0 && this._fireContentChanged([], removedDrawables);
   }
 
   /**
