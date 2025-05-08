@@ -149,7 +149,10 @@
 
     // Button for Circle
     this._addNewShapeButton("◯", "Circle ◯", function () {
-      var circle = new Circle(_self.pb.viewport().randomPoint(), _self.pb.viewport().getMinDimension() / 4);
+      var circle = new Circle(
+        _self.pb.viewport().randomPoint(0.25, 0.25),
+        _self.pb.viewport().getMinDimension() / 8 + (Math.random() * _self.pb.viewport().getMinDimension()) / 4
+      );
       var circleRadiusPoint = circle.vertAt(0.0);
       var circleHelper = new CircleHelper(circle, circleRadiusPoint);
       _self.pb.add([circle, circleRadiusPoint]);
@@ -205,7 +208,9 @@
     this._addNewShapeButton("∿", "Bezier Path ∿", function () {
       // Create a new randomized Bézier curve.
       var bezierPath = randomBezierPath(_self.pb.viewport());
-      var bezierHelper = new BezierPathInteractionHelper(_self.pb, [bezierPath]);
+      var bezierHelper = new BezierPathInteractionHelper(_self.pb, [bezierPath], {
+        maxDetectDistance: 32.0 // maxDetectionDistance
+      });
       _self.pb.add(bezierPath);
     });
 

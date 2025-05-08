@@ -97,7 +97,7 @@
     // NONE
 
     var postDraw = function (draw, fill) {
-      console.log("post draw");
+      console.log("post draw", count);
       if (config.showBoundingBoxes) {
         drawBoundingBoxes(draw, fill);
       }

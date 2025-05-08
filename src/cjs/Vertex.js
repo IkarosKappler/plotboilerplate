@@ -36,7 +36,8 @@
  * @modified 2024-12-17 Outsourced the euclidean distance calculation of `Vertex.distance` to `geomutils.dist4`.
  * @modified 2025-03-24 Making the second parameter `center` of the `Vertex.rotate` method optional.
  * @modified 2025-04-13 Adding the `Vertex.move(amount: XYCoords)` method (does the same as `add`, added by naming convention).
- * @version  2.10.0
+ * @modified 2025-05-07 Class `Vertex` is now implementing interface `IBounded` (to meet convention).
+ * @version  2.11.0
  *
  * @file Vertex
  * @public
@@ -47,6 +48,7 @@ var VertexAttr_1 = require("./VertexAttr");
 var UIDGenerator_1 = require("./UIDGenerator");
 var VertexListeners_1 = require("./VertexListeners");
 var geomutils_1 = require("./geomutils");
+var Bounds_1 = require("./Bounds");
 /**
  * @classdesc A vertex is a pair of two numbers.<br>
  * <br>
@@ -587,6 +589,21 @@ var Vertex = /** @class */ (function () {
         this.y = Math.abs(this.y);
         return this;
     };
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Get the bounding box (bounds) of this Vertex.
+     * This is just by convention – any vertex is just a position without any useful with or height (0).
+     *
+     * @method getBounds
+     * @instance
+     * @memberof Vertex
+     * @return {Bounds} The rectangular bounds of this Vertex (width and height are zero).
+     **/
+    Vertex.prototype.getBounds = function () {
+        // return Bounds.computeFromVertices([this.a, this.b, this.c]);
+        return Bounds_1.Bounds.computeFromVertices([this]);
+    };
+    //--- END --- Implement interface `IBounded`
     /**
      * Get a string representation of this vertex.
      *

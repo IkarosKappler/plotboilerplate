@@ -12,6 +12,8 @@
 - Todo: TBImage should implement Bounds.
 - Todo: check if BezierPathInteractionHelper can work without every possible redraw (event mouseIsOver)
 
+- 2025-05-08
+  - Tweaking performance of `BezierPathInteractionHelper`: only triggering redraw now when mouse move within given detect range.
 - 2025-05-07
   - Added `PBContentChangeListener` to PB to track if the drawable content changed.
   - Added `PlogBoilerplate.addContentChangeListener` and `PlogBoilerplate.removeContentChangeListener`.

@@ -27,6 +27,7 @@
  * @modified 2025-04-14 BezierPathInteractionHelper: Changed default value of `HelperOptions.autoAdjustPaths` from `true` to `false`.
  * @modified 2025-05-05 Added optional params `draw` and `fill` to BezierPathInteractionHelper.drawHandleLines` method.
  * @modified 2025-05-05 Class `BezierPathInteractionHelper` now implementing `IShapeInteractionHelper`.
+ * @modified 2025-05-07 Tweaking performance of `BezierPathInteractionHelper`: only triggering redraw now when mouse move within given detect range.
  * @version  1.2.1
  *
  * @file BezierPathInteractionHelper
