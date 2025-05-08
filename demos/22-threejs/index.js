@@ -221,7 +221,7 @@
     var preDraw = function () {
       // Draw bounds
       var pathBounds = outline.getBounds();
-      pb.draw.rect(pathBounds.min, pathBounds.width, pathBounds.height, "rgba(0,0,0,0.5)", 1);
+      pb.draw.rect(pathBounds.min, pathBounds.width, pathBounds.height, "rgba(128,128,128,0.5)", 1);
 
       // Fill inner area
       var polyline = [
@@ -233,7 +233,7 @@
       for (var i = 0; i < pathSteps; i++) {
         polyline.push(outline.getPointAt(i / pathSteps));
       }
-      pb.fill.polyline(polyline, false, "rgba(0,0,0,0.25)");
+      pb.fill.polyline(polyline, false, "rgba(128,128,128,0.25)");
     };
 
     // +---------------------------------------------------------------------------------
