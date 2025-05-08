@@ -6,12 +6,21 @@
  */
 
 (function (_context) {
-  var PBContentList = function (pb) {
+  /**
+   *
+   * @param {PlotBoilerplate} pb
+   * @param {boolean} options.initiallyOpen
+   */
+  var PBContentList = function (pb, options) {
     this.pb = pb;
     this._addButtons = [];
     this.initComponents(pb);
-    this._isToggled = false;
+    this._isToggled = true;
     this._highlightedShapes = [];
+
+    if (options && options.initiallyOpen) {
+      this.toggleExpanded();
+    }
   };
 
   PBContentList.prototype.initComponents = function () {
@@ -23,10 +32,9 @@
       bottom: 0,
       "max-height": "95%",
       width: "20%",
-      "border-bottom": "1px solid grey",
       margin: "6px 0px",
       padding: "0px 5px 3px",
-      "background-color": "rgba(255,255,255,0.5)",
+      // "background-color": "rgba(192,192,192,0.75)",
       "display": "flex",
       "flex-direction": "column"
     });
@@ -37,11 +45,12 @@
     // +-------------------------------
     this._listWrapper = document.createElement("div");
     _setStyles(this._listWrapper, {
-      display: "flex",
+      "display": "none", // initially invisible. Else: "flex"
       "flex-direction": "column",
       "font-family": "Arial",
       "font-size": "9pt",
       "justify-content": "space-between",
+      "background-color": "rgba(192,192,192,0.75)",
       "max-height": "50%",
       "overflow": "scroll"
     });
@@ -85,8 +94,7 @@
     this._toggleButton.innerHTML = "⚙";
     var _self = this;
     this._toggleButton.addEventListener("click", function () {
-      _self._isToggled = !_self._isToggled;
-      _setStyles(_self._listWrapper, { "display": _self._isToggled ? "none" : "flex" });
+      _self.toggleExpanded();
     });
     this._mainWrapper.appendChild(this._toggleButton);
 
@@ -105,6 +113,11 @@
     // | Init the list with current content.
     // +-------------------------------
     this._updateList(this.pb.drawables.concat(this.pb.vertices), []);
+  };
+
+  PBContentList.prototype.toggleExpanded = function () {
+    this._isToggled = !this._isToggled;
+    _setStyles(this._listWrapper, { "display": this._isToggled ? "none" : "flex" });
   };
 
   // +---------------------------------------------------------------------------------
@@ -278,7 +291,8 @@
 
     _setStyleToAll([iconWrapper, uidWrapper, classNameWrapper, actionsWrapper], {
       display: "flex",
-      "flex-direction": "row"
+      "flex-direction": "row",
+      "padding-left": "8px"
     });
     _setStyles(iconWrapper, {
       "min-width": "24px",
@@ -288,18 +302,22 @@
     _setStyles(uidWrapper, {
       "text-overflow": "ellipsis",
       "min-width": "24px",
-      "max-width": "40%",
-      "width": "40%"
+      "max-width": "30%",
+      "width": "40%",
+      "justify-content": "flex-end"
     });
     _setStyles(classNameWrapper, {
       "text-overflow": "ellipsis",
+      "overflow": "hidden",
       "max-width": "40%",
-      "width": "40%"
+      "width": "60%",
+      "padding-left": "8px"
     });
     _setStyles(actionsWrapper, {
       "min-width": "24px",
       "max-width": "10%",
-      "width": "10%"
+      "width": "10%",
+      "justify-content": "flex-end"
     });
 
     var deleteButton = document.createElement("button");
@@ -429,6 +447,10 @@
         return "▵";
       case "BezierPath":
         return "∿";
+      case "PBImage":
+        return "IMG";
+      case "PBText":
+        return "TXT";
       default:
         return "?";
     }

@@ -6,6 +6,7 @@
  * @author   Ikaros Kappler
  * @date     2025-03-24
  * @modified 2025-05-05 Refactored `rebuildShapes` and moved to external funcion `createRandomShapes`.
+ * @modified 2025-05-07 Tweaking the demo `57-shape-reflecting-rays` to interact with the new content manager tool. Adding removing shapes is now possible.
  * @version  1.0.0
  **/
 
@@ -103,6 +104,9 @@
       interactionHelpers.forEach(function (helper) {
         helper.drawHandleLines(draw, fill);
       });
+
+      // Maybe the content list has someting nice to draw.
+      contentList.drawHighlighted(draw, fill);
     }; // END postDraw
 
     // +---------------------------------------------------------------------------------
@@ -258,6 +262,33 @@
     }
 
     pb.config.postDraw = postDraw;
+    // +---------------------------------------------------------------------------------
+    // | This renders a content list component on top, allowing to delete or add
+    // | new shapes.
+    // |
+    // | You should add `contentList.drawHighlighted(draw, fill)`  to your draw
+    // | routine to see what's currently highlighted.
+    // +-------------------------------
+    var contentList = new PBContentList(pb);
+
+    // Filter shapes; keep only those that can reflect rays.
+    pb.addContentChangeListener(function (_shapesAdded, _shapesRemoved) {
+      // Drop everything we cannot handle with reflections
+      shapes = pb.drawables.filter(function (drwbl) {
+        return (
+          drwbl instanceof Line ||
+          // drwbl instanceof Vector ||  // Currently doesn't support intersections. Why?
+          drwbl instanceof Triangle ||
+          drwbl instanceof Polygon ||
+          drwbl instanceof Circle ||
+          drwbl instanceof CircleSector ||
+          drwbl instanceof VEllipse ||
+          drwbl instanceof VEllipseSector ||
+          drwbl instanceof BezierPath
+        );
+      });
+    });
+
     rebuildShapes();
     toggleAnimation();
   });

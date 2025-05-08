@@ -71,6 +71,8 @@
           }
         }
       }
+
+      contentList.drawHighlighted(draw, fill);
     }; // END postDraw
 
     var drawBoundingBoxes = function (draw, fill) {
@@ -115,6 +117,34 @@
     }
 
     pb.config.postDraw = postDraw;
+
+    // +---------------------------------------------------------------------------------
+    // | This renders a content list component on top, allowing to delete or add
+    // | new shapes.
+    // |
+    // | You should add `contentList.drawHighlighted(draw, fill)`  to your draw
+    // | routine to see what's currently highlighted.
+    // +-------------------------------
+    var contentList = new PBContentList(pb, { initiallyOpen: true });
+
+    // Filter shapes; keep only those that can reflect rays.
+    pb.addContentChangeListener(function (_shapesAdded, _shapesRemoved) {
+      // Drop everything we cannot handle with reflections
+      shapes = pb.drawables.filter(function (drwbl) {
+        return (
+          drwbl instanceof Line ||
+          drwbl instanceof Vector || // Currently doesn't support intersections. Why?
+          drwbl instanceof Triangle ||
+          drwbl instanceof Polygon ||
+          drwbl instanceof Circle ||
+          drwbl instanceof CircleSector ||
+          drwbl instanceof VEllipse ||
+          drwbl instanceof VEllipseSector ||
+          drwbl instanceof BezierPath
+        );
+      });
+    });
+
     rebuildShape();
   });
 })(globalThis);

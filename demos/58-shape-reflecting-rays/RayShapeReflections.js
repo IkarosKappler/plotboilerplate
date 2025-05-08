@@ -84,6 +84,7 @@
     // Find intersection with min distance
 
     // Array<Vector>
+    console.log("shape", shape);
     var intersectionTangents = shape.lineIntersectionTangents(ray.vector, true);
     // Find closest intersection vector
     var closestIntersectionTangent = intersectionTangents.reduce(function (accu, curVal) {

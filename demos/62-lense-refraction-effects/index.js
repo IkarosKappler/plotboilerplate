@@ -334,6 +334,13 @@
     }
     pb.config.postDraw = postDraw;
 
+    // +---------------------------------------------------------------------------------
+    // | This renders a content list component on top, allowing to delete or add
+    // | new shapes.
+    // |
+    // | You should add `contentList.drawHighlighted(draw, fill)`  to your draw
+    // | routine to see what's currently highlighted.
+    // +-------------------------------
     var contentList = new PBContentList(pb);
 
     rebuildShapes();
