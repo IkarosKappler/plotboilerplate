@@ -3,7 +3,8 @@
  * @author   Ikaros Kappler
  * @date     2025-03-24
  * @modified 2025-05-05 Refactored and moved to a separate file.
- * @version  1.0.0
+ * @modified 2025-05-09 Fixing an error on muliple self-reflecting shapes.
+ * @version  1.0.1
  **/
 
 (function (_context) {
@@ -46,8 +47,8 @@
         var reflectedRay = findReflectedRay(shape, ray);
         if (
           reflectedRay != null &&
-          reflectedRay.sourceShape !== ray.sourceShape &&
-          ray.vector.a.distance(reflectedRay.vector.a) > config.rayCompareEpsilon
+          (reflectedRay.sourceShape !== ray.sourceShape ||
+            ray.vector.a.distance(reflectedRay.vector.a) > config.rayCompareEpsilon)
         ) {
           reflectedRays.push(reflectedRay);
         }
