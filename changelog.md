@@ -14,6 +14,7 @@
 
 - 2025-05-08
   - Tweaking performance of `BezierPathInteractionHelper`: only triggering redraw now when mouse move within given detect range.
+  - demo-58-rays-reflecting-shapes: Fixing an calculation error on multiple consecutive reflections on the same shape.
 - 2025-05-07
   - Added `PBContentChangeListener` to PB to track if the drawable content changed.
   - Added `PlogBoilerplate.addContentChangeListener` and `PlogBoilerplate.removeContentChangeListener`.
