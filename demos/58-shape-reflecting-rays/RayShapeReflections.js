@@ -48,6 +48,7 @@
         if (
           reflectedRay != null &&
           (reflectedRay.sourceShape !== ray.sourceShape ||
+            Math.abs(reflectedRay.vector.angle() - ray.vector.angle()) > config.rayCompareEpsilon ||
             ray.vector.a.distance(reflectedRay.vector.a) > config.rayCompareEpsilon)
         ) {
           reflectedRays.push(reflectedRay);
