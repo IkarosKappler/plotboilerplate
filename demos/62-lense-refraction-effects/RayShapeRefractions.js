@@ -9,13 +9,13 @@
 (function (_context) {
   "use strict";
 
-  // A helper class to help keeping track of rays and their sources.
+  /* // A helper class to help keeping track of rays and their sources.
   globalThis.Ray = function (vector, sourceLens, sourceShape, rayStartingInsideLens) {
     this.vector = vector;
     this.sourceLens = sourceLens; // May be null (initial rays have no source)
     this.sourceShape = sourceShape; // May be null (initial rays have no source)
     this.rayStartingInsideLens = rayStartingInsideLens;
-  };
+  }; */
 
   // Snellius refraction results in two result rays:
   //  - one is reflected
@@ -85,9 +85,9 @@
         resultVectors.push(findClosestSnelliusRays(ray, reflectedRays));
       } else {
         // Just expand input ray
-        var extendedRay = new Ray(ray.vector.clone().moveTo(ray.vector.b), null, null);
+        var extendedRay = new Ray(ray.vector.clone().moveTo(ray.vector.b), null, null, ray.properties);
         // Add fake entry
-        resultVectors.push(new SnelliusRays(extendedRay, extendedRay, null, null));
+        resultVectors.push(new SnelliusRays(extendedRay, extendedRay, null, null, ray.properties));
       }
     });
     return resultVectors;
@@ -137,14 +137,14 @@
       lens,
       shape,
       // This requires that no lenses overlap!
-      ray.rayStartingInsideLens ? null : lens
+      { rayStatringInsideLens: ray.rayStartingInsideLens ? null : lens, color: ray.properties.color }
     );
     var incomingAngle = closestIntersectionTangent.angle(ray.vector) + Math.PI;
     var refractedAngle = Math.asin(incomingRefractiveIndex * Math.sin(incomingAngle)) / outgoingRefractiveIndex;
     // if (isGoingOut) {
     //   incomingAngle -= Math.PI / 2.0;
     // }
-    console.log("refractedAngle", (refractedAngle / Math.PI) * 180);
+    // console.log("refractedAngle", (refractedAngle / Math.PI) * 180);
     var refractedRay = new Ray(
       ray.vector
         .clone()
@@ -154,7 +154,7 @@
       lens,
       shape,
       // This requires that no lenses overlap!
-      ray.rayStartingInsideLens ? null : lens
+      { rayStatringInsideLens: ray.rayStartingInsideLens ? null : lens, color: ray.properties.color }
     );
     return new SnelliusRays(reflectedRay, refractedRay, lens, shape);
   };

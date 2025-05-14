@@ -88,8 +88,12 @@
       rayLengthFromMaxBounds: params.getBoolean("rayLengthFromMaxBounds", false),
       drawPreviewRays: params.getBoolean("drawPreviewRays", false),
       baseRefractiveIndex: params.getNumber("baseRefractiveIndex", 1.000293), // Air
-      lensRefractiveIndex: params.getNumber("lensRefractiveIndex", 1.333) // Water
+      lensRefractiveIndex: params.getNumber("lensRefractiveIndex", 1.333), // Water
+      rayStartColor: params.getString("rayStartColor", "rgb(255,192,0)"),
+      rayEndColor: params.getString("rayEndColor", "rgb(0,192,255)")
     };
+    var rayStartColor = Color.parse(config.rayStartColor);
+    var rayEndColor = Color.parse(config.rayEndColor);
 
     // +---------------------------------------------------------------------------------
     // | Global vars
@@ -115,9 +119,9 @@
           rayCollection[j].vector.b.set(newSnelliusRays[j].refractedRay.vector.a);
         }
         if (i + 1 >= numIter) {
-          drawRays(draw, fill, rayCollection, "rgba(255,192,0,0.5)");
+          drawRays(draw, fill, rayCollection);
         } else {
-          drawLines(draw, fill, rayCollection, "rgba(255,192,0,0.5)");
+          drawLines(draw, fill, rayCollection);
         }
         rayCollection = newSnelliusRays.map(function (snelliusRay) {
           return snelliusRay.refractedRay;
@@ -162,18 +166,18 @@
     // +---------------------------------------------------------------------------------
     // | Draws the given rays as arrows.
     // +-------------------------------
-    var drawRays = function (draw, fill, rays, color) {
+    var drawRays = function (draw, fill, rays) {
       rays.forEach(function (ray) {
-        draw.arrow(ray.vector.a, ray.vector.b, color, config.rayThickness);
+        draw.arrow(ray.vector.a, ray.vector.b, ray.properties.color, config.rayThickness);
       });
     };
 
     // +---------------------------------------------------------------------------------
     // | Draws the given lines (not arrows).
     // +-------------------------------
-    var drawLines = function (draw, fill, rays, color) {
+    var drawLines = function (draw, fill, rays) {
       rays.forEach(function (ray) {
-        draw.line(ray.vector.a, ray.vector.b, color, config.rayThickness);
+        draw.line(ray.vector.a, ray.vector.b, ray.properties.color, config.rayThickness);
       });
     };
 
@@ -227,7 +231,13 @@
               raysVector,
               null, // sourceLens
               null, // sourceShape,
-              getLensContainingPoint(raysVector.a) // rayStartingInsideLens
+              {
+                rayStartingInsideLens: getLensContainingPoint(raysVector.a),
+                color: rayStartColor
+                  .clone()
+                  .interpolate(rayEndColor, i / config.numRays)
+                  .cssRGB()
+              }
             )
           );
         }
@@ -241,7 +251,13 @@
               raysVector,
               null, // sourceLens
               null, // sourceShape,
-              getLensContainingPoint(raysVector.a) // rayStartingInsideLens
+              {
+                rayStartingInsideLens: getLensContainingPoint(raysVector.a),
+                color: rayStartColor
+                  .clone()
+                  .interpolate(rayEndColor, i / config.numRays)
+                  .cssRGB()
+              }
             )
           );
         }
@@ -331,6 +347,13 @@
       // prettier-ignore
       gui.add(config, "lensRefractiveIndex").min(0.1).max(2.0).step(0.1).name("lensRefractiveIndex").title("The refractive index of the lens.")
       .onChange( function() { lenses.forEach( function(lens) {lens.refractiveIndex = config.lensRefractiveIndex; } ); pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "useRayColorGradient").name("useRayColorGradient").title("Check to use ray colors.")
+      .onChange( function() { pb.redraw() });
+      // prettier-ignore
+      gui.addColor(config, 'rayStartColor').onChange( function() { rayStartColor = Color.parse(config.rayStartColor); } );
+      // prettier-ignore
+      gui.addColor(config, 'rayEndColor').onChange( function() { rayEndColor = Color.parse(config.rayEndColor); } );
     }
     pb.config.postDraw = postDraw;
 

@@ -1,20 +1,18 @@
 /**
  * A script for calculating ray reflections on any shape.
+ *
+ * @require Ray
+ *
  * @author   Ikaros Kappler
  * @date     2025-03-24
  * @modified 2025-05-05 Refactored and moved to a separate file.
  * @modified 2025-05-09 Fixing an error on muliple self-reflecting shapes.
+ * @modified 2025-05-14 Moved the Ray class one level up for re-use.
  * @version  1.0.1
  **/
 
 (function (_context) {
   "use strict";
-
-  // A helper class to help keeping track of rays and their sources.
-  globalThis.Ray = function (vector, sourceShape) {
-    this.vector = vector;
-    this.sourceShape = sourceShape; // May be null (initial rays have no source)
-  };
 
   /**
    * @param {Array<Vector>} rayCollection
@@ -44,13 +42,18 @@
     rays.forEach(function (ray) {
       const reflectedRays = [];
       shapes.forEach(function (shape) {
+        // var reflectedRay = findReflectedRay(shape, ray);
+        // if (
+        //   reflectedRay != null &&
+        //   (reflectedRay.sourceShape !== ray.sourceShape ||
+        //     Math.abs(reflectedRay.vector.angle() - ray.vector.angle()) > config.rayCompareEpsilon ||
+        //     ray.vector.a.distance(reflectedRay.vector.a) > config.rayCompareEpsilon)
+        // ) {
+        //   reflectedRays.push(reflectedRay);
+        // }
         var reflectedRay = findReflectedRay(shape, ray);
-        if (
-          reflectedRay != null &&
-          (reflectedRay.sourceShape !== ray.sourceShape ||
-            Math.abs(reflectedRay.vector.angle() - ray.vector.angle()) > config.rayCompareEpsilon ||
-            ray.vector.a.distance(reflectedRay.vector.a) > config.rayCompareEpsilon)
-        ) {
+        if (reflectedRay != null && ray.vector.a.distance(reflectedRay.vector.a) > config.rayCompareEpsilon) {
+          // && reflectedRay.length() > 0.1) {
           reflectedRays.push(reflectedRay);
         }
       });
@@ -58,7 +61,7 @@
         resultVectors.push(findClosestRay(ray, reflectedRays));
       } else {
         // Just expand input ray
-        resultVectors.push(new Ray(ray.vector.clone().moveTo(ray.vector.b), null));
+        resultVectors.push(new Ray(ray.vector.clone().moveTo(ray.vector.b), null, null, ray.properties));
       }
     });
     return resultVectors;
@@ -98,7 +101,7 @@
     if (closestIntersectionTangent) {
       var angleBetween = closestIntersectionTangent.angle(ray.vector);
       closestIntersectionTangent.rotate(angleBetween);
-      reflectedRay = new Ray(closestIntersectionTangent, shape);
+      reflectedRay = new Ray(closestIntersectionTangent, null, shape, ray.properties);
     } else {
       reflectedRay = null;
     }

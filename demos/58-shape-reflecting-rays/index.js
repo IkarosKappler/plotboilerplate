@@ -66,8 +66,12 @@
       useParallelLightSource: params.getBoolean("useParallelLightSource", false),
       showBoundingBoxes: params.getBoolean("showBoundingBoxes", false),
       rayLengthFromMaxBounds: params.getBoolean("rayLengthFromMaxBounds", false),
-      drawPreviewRays: params.getBoolean("drawPreviewRays", false)
+      drawPreviewRays: params.getBoolean("drawPreviewRays", false),
+      rayStartColor: params.getString("rayStartColor", "rgb(255,192,0)"),
+      rayEndColor: params.getString("rayEndColor", "rgb(0,192,255)")
     };
+    var rayStartColor = Color.parse(config.rayStartColor);
+    var rayEndColor = Color.parse(config.rayEndColor);
 
     // +---------------------------------------------------------------------------------
     // | Global vars
@@ -90,9 +94,9 @@
           rayCollection[j].vector.b.set(newRays[j].vector.a);
         }
         if (i + 1 >= numIter) {
-          drawRays(draw, fill, rayCollection, "rgba(255,192,0,0.5)");
+          drawRays(draw, fill, rayCollection); // , "rgba(255,192,0,0.5)");
         } else {
-          drawLines(draw, fill, rayCollection, "rgba(255,192,0,0.5)");
+          drawLines(draw, fill, rayCollection); // , "rgba(255,192,0,0.5)");
         }
         rayCollection = newRays;
         // Move new rays one unit (pixel) into their new direction
@@ -137,7 +141,7 @@
     // +-------------------------------
     var drawRays = function (draw, fill, rays, color) {
       rays.forEach(function (ray) {
-        draw.arrow(ray.vector.a, ray.vector.b, color, config.rayThickness);
+        draw.arrow(ray.vector.a, ray.vector.b, ray.properties.color, config.rayThickness);
       });
     };
 
@@ -146,7 +150,7 @@
     // +-------------------------------
     var drawLines = function (draw, fill, rays, color) {
       rays.forEach(function (ray) {
-        draw.line(ray.vector.a, ray.vector.b, color, config.rayThickness);
+        draw.line(ray.vector.a, ray.vector.b, ray.properties.color, config.rayThickness);
       });
     };
 
@@ -176,17 +180,33 @@
     // +-------------------------------
     var getRayCollection = function (baseRay) {
       var rays = [];
+      // console.log("rayStartColor", rayStartColor, "rayEndColor", rayEndColor);
       if (config.useParallelLightSource) {
         var perpRay = baseRay.perp();
         perpRay.moveTo(perpRay.vertAt(-0.5));
         for (var i = 0; i < config.numRays; i++) {
-          rays.push(new Ray(baseRay.clone().moveTo(perpRay.vertAt(i / config.numRays)), null));
+          // "rgba(255,192,0,0.5)"
+          rays.push(
+            new Ray(baseRay.clone().moveTo(perpRay.vertAt(i / config.numRays)), null, null, {
+              color: rayStartColor
+                .clone()
+                .interpolate(rayEndColor, i / config.numRays)
+                .cssRGB()
+            })
+          );
         }
         return rays;
       } else {
         var rangeAngle = config.initialRayAngle * DEG_TO_RAD;
         for (var i = 0; i < config.numRays; i++) {
-          rays.push(new Ray(baseRay.clone().rotate(-rangeAngle / 2.0 + rangeAngle * (i / config.numRays)), null));
+          rays.push(
+            new Ray(baseRay.clone().rotate(-rangeAngle / 2.0 + rangeAngle * (i / config.numRays)), null, null, {
+              color: rayStartColor
+                .clone()
+                .interpolate(rayEndColor, i / config.numRays)
+                .cssRGB()
+            })
+          );
         }
         return rays;
       }
@@ -259,6 +279,10 @@
       // prettier-ignore
       gui.add(config, "drawPreviewRays").name("drawPreviewRays").title("Check to see the next iteration of possible rays.")
       .onChange( function() { pb.redraw() });
+      // prettier-ignore
+      gui.addColor(config, 'rayStartColor').onChange( function() { rayStartColor = Color.parse(config.rayStartColor); } );
+      // prettier-ignore
+      gui.addColor(config, 'rayEndColor').onChange( function() { rayEndColor = Color.parse(config.rayEndColor); } );
     }
 
     pb.config.postDraw = postDraw;
