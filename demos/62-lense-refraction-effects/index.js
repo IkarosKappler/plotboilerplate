@@ -348,9 +348,6 @@
       gui.add(config, "lensRefractiveIndex").min(0.1).max(2.0).step(0.1).name("lensRefractiveIndex").title("The refractive index of the lens.")
       .onChange( function() { lenses.forEach( function(lens) {lens.refractiveIndex = config.lensRefractiveIndex; } ); pb.redraw() });
       // prettier-ignore
-      gui.add(config, "useRayColorGradient").name("useRayColorGradient").title("Check to use ray colors.")
-      .onChange( function() { pb.redraw() });
-      // prettier-ignore
       gui.addColor(config, 'rayStartColor').onChange( function() { rayStartColor = Color.parse(config.rayStartColor); } );
       // prettier-ignore
       gui.addColor(config, 'rayEndColor').onChange( function() { rayEndColor = Color.parse(config.rayEndColor); } );
