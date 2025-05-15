@@ -62,23 +62,24 @@
           if (!snelliusRays) {
             return; // Skip
           }
-          var reflectedRay = snelliusRays.reflectedRay;
+          // var reflectedRay = snelliusRays.reflectedRay;
+          // if (
+          //   reflectedRay != null &&
+          //   // reflectedRay.sourceShape !== ray.sourceShape &&
+          //   ray.vector.a.distance(reflectedRay.vector.a) > config.rayCompareEpsilon
+          // ) {
+          //   // reflectedRays.push(reflectedRay);
+          //   reflectedRays.push(snelliusRays);
+          // }
+          var refractedRay = snelliusRays.refractedRay;
           if (
-            reflectedRay != null &&
-            reflectedRay.sourceShape !== ray.sourceShape &&
-            ray.vector.a.distance(reflectedRay.vector.a) > config.rayCompareEpsilon
+            refractedRay != null &&
+            refractedRay.sourceShape !== ray.sourceShape &&
+            ray.vector.a.distance(refractedRay.vector.a) > config.rayCompareEpsilon
           ) {
-            // reflectedRays.push(reflectedRay);
+            // reflectedRays.push(refractedRay);
             reflectedRays.push(snelliusRays);
           }
-          //   var refractedRay = snelliusRays.refractedRay;
-          //   if (
-          //     refractedRay != null &&
-          //     refractedRay.sourceShape !== ray.sourceShape &&
-          //     ray.vector.a.distance(refractedRay.vector.a) > config.rayCompareEpsilon
-          //   ) {
-          //     reflectedRays.push(refractedRay);
-          //   }
         });
       });
       if (reflectedRays.length > 0) {
@@ -97,6 +98,7 @@
   // @param {Ray} sourceRay
   // @param {Array<SnelliusRays>} rays
   var findClosestSnelliusRays = function (sourceRay, rays) {
+    console.log("findClosestSnelliusRays", rays[0].reflectedRay);
     var dist = sourceRay.vector.a.distance(rays[0].reflectedRay.vector.a);
     var resultIndex = 0;
     for (var i = 1; i < rays.length; i++) {
@@ -117,7 +119,7 @@
   var findSnelliusRays = function (config, lens, shape, ray) {
     // Find intersection with min distance
 
-    var isGoingOut = !!ray.rayStartingInsideLens;
+    var isGoingOut = Boolean(ray.rayStartingInsideLens);
 
     // TODO: evaluate if ray is going in or out if the lens
     var incomingRefractiveIndex = isGoingOut ? lens.refractiveIndex : config.baseRefractiveIndex; // 1.000293; // Air
@@ -150,7 +152,7 @@
         .clone()
         .moveTo(closestIntersectionTangent.a)
         // .rotate(angleBetweenTangentAndRay + incomingAngle, closestIntersectionTangent.a),
-        .rotate(refractedAngle - Math.PI / 2, closestIntersectionTangent.a),
+        .rotate((refractedAngle - Math.PI / 2) * 1.0, closestIntersectionTangent.a),
       lens,
       shape,
       // This requires that no lenses overlap!

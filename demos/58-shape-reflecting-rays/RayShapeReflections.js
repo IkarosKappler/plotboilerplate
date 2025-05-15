@@ -92,12 +92,13 @@
     // console.log("shape", shape);
     var intersectionTangents = shape.lineIntersectionTangents(ray.vector, true);
     // Find closest intersection vector
-    var closestIntersectionTangent = intersectionTangents.reduce(function (accu, curVal) {
-      if (accu === null || curVal.a.distance(ray.vector.a) < accu.a.distance(ray.vector.a)) {
-        accu = curVal;
-      }
-      return accu;
-    }, null);
+    // var closestIntersectionTangent = intersectionTangents.reduce(function (accu, curVal) {
+    //   if (accu === null || curVal.a.distance(ray.vector.a) < accu.a.distance(ray.vector.a)) {
+    //     accu = curVal;
+    //   }
+    //   return accu;
+    // }, null);
+    var closestIntersectionTangent = findClosestTangent(intersectionTangents, ray);
     if (closestIntersectionTangent) {
       var angleBetween = closestIntersectionTangent.angle(ray.vector);
       closestIntersectionTangent.rotate(angleBetween);
@@ -106,5 +107,14 @@
       reflectedRay = null;
     }
     return reflectedRay;
+  };
+
+  var findClosestTangent = function (intersectionTangents, ray) {
+    return intersectionTangents.reduce(function (accu, curVal) {
+      if (accu === null || curVal.a.distance(ray.vector.a) < accu.a.distance(ray.vector.a)) {
+        accu = curVal;
+      }
+      return accu;
+    }, null);
   };
 })(globalThis);

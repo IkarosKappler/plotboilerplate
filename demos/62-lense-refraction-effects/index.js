@@ -117,6 +117,7 @@
         // console.log("newSnelliusRays", newSnelliusRays);
         for (var j = 0; j < rayCollection.length; j++) {
           rayCollection[j].vector.b.set(newSnelliusRays[j].refractedRay.vector.a);
+          // rayCollection[j].vector.b.set(newSnelliusRays[j].refractedRay.vector.a);
         }
         if (i + 1 >= numIter) {
           drawRays(draw, fill, rayCollection);
@@ -125,6 +126,7 @@
         }
         rayCollection = newSnelliusRays.map(function (snelliusRay) {
           return snelliusRay.refractedRay;
+          // return snelliusRay.reflectedRay;
         });
         // Move new rays one unit (pixel) into their new direction
         // (avoid to reflect multiple times inside one single point)
