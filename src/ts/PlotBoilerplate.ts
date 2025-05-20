@@ -90,8 +90,9 @@
  * @modified 2025-05-07 Handling content changes now with `contentChangeListeners`.
  * @modified 2025-05-07 Added `PlogBoilerplate.addContentChangeListener` and `.removeContentChangeListener`.
  * @modified 2025-05-07 Moving full vectors now by default when vector point a is moved.
+ * @modified 2025-05-20 Applying `lineWith` parameter in the draw routine for vectors (had been missing).
  *
- * @version  1.21.0
+ * @version  1.21.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -1492,7 +1493,7 @@ export class PlotBoilerplate {
       if (!this.drawConfig.drawHandlePoints || !d.a.attr.selectable) d.a.attr.renderTime = renderTime;
       if (!this.drawConfig.drawHandlePoints || !d.b.attr.selectable) d.b.attr.renderTime = renderTime;
     } else if (d instanceof Vector) {
-      draw.arrow(d.a, d.b, this.drawConfig.vector.color);
+      draw.arrow(d.a, d.b, this.drawConfig.vector.color, this.drawConfig.vector.lineWidth);
       if (this.drawConfig.drawHandlePoints && d.b.attr.selectable && d.b.attr.visible) {
         draw.setCurrentId(`${d.uid}_h0`);
         draw.setCurrentClassName(`${d.className}-handle`);

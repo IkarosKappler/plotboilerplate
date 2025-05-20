@@ -113,8 +113,8 @@
     var isGoingOut = Boolean(ray.rayStartingInsideLens);
 
     // TODO: evaluate if ray is going in or out if the lens
-    var incomingRefractiveIndex = isGoingOut ? lens.refractiveIndex : config.baseRefractiveIndex; // 1.000293; // Air
-    var outgoingRefractiveIndex = isGoingOut ? config.baseRefractiveIndex : lens.refractiveIndex;
+    var incomingRefractiveIndex = 1.0; // isGoingOut ? lens.refractiveIndex : config.baseRefractiveIndex; // 1.000293; // Air
+    var outgoingRefractiveIndex = 1.0; // isGoingOut ? config.baseRefractiveIndex : lens.refractiveIndex;
     console.log("incomingRefractiveIndex", incomingRefractiveIndex, "outgoingRefractiveIndex", outgoingRefractiveIndex);
 
     // Array<Vector>
@@ -134,8 +134,8 @@
       { rayStartingInsideLens: ray.rayStartingInsideLens ? null : lens, color: ray.properties.color }
     );
     var tangendAngle = closestIntersectionTangent.angle();
-    var incomingAngle = closestIntersectionTangent.angle(ray.vector); // - tangendAngle; // + Math.PI;
-    var refractedAngle = Math.asin((incomingRefractiveIndex * Math.sin(incomingAngle)) / outgoingRefractiveIndex);
+    var incomingAngle = closestIntersectionTangent.angle(ray.vector); //- tangendAngle; // + Math.PI;
+    var refractedAngle = Math.asin((incomingRefractiveIndex * Math.sin(incomingAngle)) / outgoingRefractiveIndex); //  tangendAngle;
     // if (isGoingOut) {
     //   incomingAngle -= Math.PI / 2.0;
     // }

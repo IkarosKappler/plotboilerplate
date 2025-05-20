@@ -22,6 +22,7 @@
  * @modified 2024-08-25 Added the `CSSBackdropFilterParams` params to the global params (all optional).
  * @modified 2025-03-29 Added interface `Intersectable`.
  * @modified 2025-04-16 Added interface `IBounded`.
+ * @modified 2025-05-07 Added callback `onContentChanged` to PB to track if the drawable content changed.
  **/
 export {};
 //# sourceMappingURL=core.js.map

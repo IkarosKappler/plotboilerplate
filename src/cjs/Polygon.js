@@ -154,7 +154,7 @@ var Polygon = /** @class */ (function () {
      * @returns {boolean} `true` is angle is acute, `false` is obtuse.
      */
     Polygon.prototype.getInnerAngleAt = function (vertIndex) {
-        var p2 = this.vertices[vertIndex];
+        var p2 = this.vertices[vertIndex % this.vertices.length];
         var p1 = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
         var p3 = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
         // See
@@ -190,7 +190,7 @@ var Polygon = /** @class */ (function () {
      */
     Polygon.prototype.isAngleAcute = function (vertIndex) {
         var A = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
-        var B = this.vertices[vertIndex];
+        var B = this.vertices[vertIndex % this.vertices.length];
         var C = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
         // Find local winding number for triangle A B C
         var windingNumber = Triangle_1.Triangle.utils.determinant(A, B, C);

@@ -151,7 +151,7 @@ export class Polygon {
      * @returns {boolean} `true` is angle is acute, `false` is obtuse.
      */
     getInnerAngleAt(vertIndex) {
-        const p2 = this.vertices[vertIndex];
+        const p2 = this.vertices[vertIndex % this.vertices.length];
         const p1 = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
         const p3 = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
         // See
@@ -187,7 +187,7 @@ export class Polygon {
      */
     isAngleAcute(vertIndex) {
         const A = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
-        const B = this.vertices[vertIndex];
+        const B = this.vertices[vertIndex % this.vertices.length];
         const C = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
         // Find local winding number for triangle A B C
         const windingNumber = Triangle.utils.determinant(A, B, C);

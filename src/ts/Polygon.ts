@@ -36,7 +36,8 @@
  * @modified 2025-03-28 Added the `Polygon.lineIntersectionTangents` method.
  * @modified 2025-04-09 Added the `Polygon.getCentroid` method.
  * @modified 2025-05-16 Class `Polygon` now implements `IBounded`.
- * @version 1.15.0
+ * @modified 2025-05-20 Tweaking `Polygon.getInnerAngleAt` and `Polygo.isAngleAcute` to handle indices out of array bounds as well.
+ * @version 1.15.1
  *
  * @file Polygon
  * @public
@@ -195,7 +196,7 @@ export class Polygon implements IBounded, Intersectable, SVGSerializable {
    * @returns {boolean} `true` is angle is acute, `false` is obtuse.
    */
   getInnerAngleAt(vertIndex: number): number {
-    const p2: Vertex = this.vertices[vertIndex];
+    const p2: Vertex = this.vertices[vertIndex % this.vertices.length];
     const p1: Vertex = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
     const p3: Vertex = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
 
@@ -235,7 +236,7 @@ export class Polygon implements IBounded, Intersectable, SVGSerializable {
    */
   isAngleAcute(vertIndex: number): boolean {
     const A: Vertex = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
-    const B: Vertex = this.vertices[vertIndex];
+    const B: Vertex = this.vertices[vertIndex % this.vertices.length];
     const C: Vertex = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
 
     // Find local winding number for triangle A B C

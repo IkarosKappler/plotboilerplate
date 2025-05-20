@@ -26,6 +26,8 @@
  * @modified 2025-04-14 Fixing correct event types for touch events in `BezierPathInteractionHelper`.
  * @modified 2025-04-14 BezierPathInteractionHelper: Changed default value of `HelperOptions.autoAdjustPaths` from `true` to `false`.
  * @modified 2025-05-05 Added optional params `draw` and `fill` to BezierPathInteractionHelper.drawHandleLines` method.
+ * @modified 2025-05-05 Class `BezierPathInteractionHelper` now implementing `IShapeInteractionHelper`.
+ * @modified 2025-05-07 Tweaking performance of `BezierPathInteractionHelper`: only triggering redraw now when mouse move within given detect range.
  * @version  1.2.1
  *
  * @file BezierPathInteractionHelper
@@ -35,7 +37,7 @@ import { BezierPath } from "../../BezierPath";
 import { PlotBoilerplate } from "../../PlotBoilerplate";
 import { VertListener } from "../../VertexListeners";
 import { Vertex } from "../../Vertex";
-import { DrawLib } from "../../interfaces";
+import { DrawLib, IShapeInteractionHelper } from "../../interfaces";
 /**
  * Handler type for mouse-pointer-moved listeners.
  */
@@ -75,7 +77,7 @@ interface HelperOptions {
  *
  * @public
  **/
-export declare class BezierPathInteractionHelper {
+export declare class BezierPathInteractionHelper implements IShapeInteractionHelper {
     /**
      * @member {PlotBoilerplate} pb
      * @memberof BezierPathInteractionHelper

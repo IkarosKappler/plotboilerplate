@@ -12,6 +12,10 @@
 - Todo: TBImage should implement Bounds.
 - Todo: check if BezierPathInteractionHelper can work without every possible redraw (event mouseIsOver)
 
+- 2025-05-20
+  - PlotBoilerplate.drawDrawable: Applying `lineWith` parameter in the draw routine for vectors (had been missing).
+  - Adding a demo to show angles of polygon.
+  - Tweaking `Polygon.getInnerAngleAt` and `Polygo.isAngleAcute` to handle indices out of array bounds as well.
 - 2025-05-08
   - Tweaking performance of `BezierPathInteractionHelper`: only triggering redraw now when mouse move within given detect range.
   - demo-58-rays-reflecting-shapes: Fixing an calculation error on multiple consecutive reflections on the same shape.

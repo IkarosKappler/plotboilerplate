@@ -19,11 +19,11 @@
 import { CircleSector } from "../../CircleSector";
 import { PlotBoilerplate } from "../../PlotBoilerplate";
 import { Vertex } from "../../Vertex";
-import { DrawLib } from "../../interfaces";
+import { DrawLib, IShapeInteractionHelper } from "../../interfaces";
 /**
  * @classdesc A helper for handling circles with an additional radius-control-point.
  */
-export declare class CircleSectorHelper {
+export declare class CircleSectorHelper implements IShapeInteractionHelper {
     private circleSector;
     private controlPointStart;
     private controlPointEnd;
