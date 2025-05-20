@@ -89,8 +89,8 @@
       drawPreviewRays: params.getBoolean("drawPreviewRays", false),
       baseRefractiveIndex: params.getNumber("baseRefractiveIndex", 1.000293), // Air
       lensRefractiveIndex: params.getNumber("lensRefractiveIndex", 1.333), // Water
-      rayStartColor: params.getString("rayStartColor", "rgb(255,192,0)"),
-      rayEndColor: params.getString("rayEndColor", "rgb(0,192,255)")
+      rayStartColor: params.getString("rayStartColor", "rgb(0,192,255)"),
+      rayEndColor: params.getString("rayEndColor", "rgb(255,192,0)")
     };
     var rayStartColor = Color.parse(config.rayStartColor);
     var rayEndColor = Color.parse(config.rayEndColor);
@@ -107,7 +107,17 @@
       }
 
       var rayStepLength = config.rayLengthFromMaxBounds ? getMaxShapeBounds().getMaxDimension() : mainRay.length();
-      var rayCollection = getRayCollection(mainRay);
+      // var rayCollection = getRayCollection(mainRay);
+      var rayCollection = createRayCollection(mainRay, config.numRays, {
+        createParallelRays: config.useParallelLightSource,
+        initialRayAngle: config.initialRayAngle * DEG_TO_RAD,
+        startColor: rayStartColor,
+        endColor: rayEndColor
+      }).map(function (ray) {
+        // Add containing lenses (if ray starts in one)
+        ray.properties.rayStartingInsideLens = getLensContainingPoint(ray.vector.a);
+        return ray;
+      });
       var newSnelliusRays = [];
       var numIter = Math.max(0, config.iterations); // Safeguard to avoid infinite loop
       for (var i = 0; i < numIter; i++) {
@@ -221,51 +231,51 @@
     // |
     // | @return {Array<Ray>}
     // +-------------------------------
-    var getRayCollection = function (baseRay) {
-      var rays = [];
-      if (config.useParallelLightSource) {
-        var perpRay = baseRay.perp();
-        perpRay.moveTo(perpRay.vertAt(-0.5));
-        for (var i = 0; i < config.numRays; i++) {
-          var raysVector = baseRay.clone().moveTo(perpRay.vertAt(i / config.numRays));
-          rays.push(
-            new Ray(
-              raysVector,
-              null, // sourceLens
-              null, // sourceShape,
-              {
-                rayStartingInsideLens: getLensContainingPoint(raysVector.a),
-                color: rayStartColor
-                  .clone()
-                  .interpolate(rayEndColor, i / config.numRays)
-                  .cssRGB()
-              }
-            )
-          );
-        }
-        return rays;
-      } else {
-        var rangeAngle = config.initialRayAngle * DEG_TO_RAD;
-        for (var i = 0; i < config.numRays; i++) {
-          var raysVector = baseRay.clone().rotate(-rangeAngle / 2.0 + rangeAngle * (i / config.numRays));
-          rays.push(
-            new Ray(
-              raysVector,
-              null, // sourceLens
-              null, // sourceShape,
-              {
-                rayStartingInsideLens: getLensContainingPoint(raysVector.a),
-                color: rayStartColor
-                  .clone()
-                  .interpolate(rayEndColor, i / config.numRays)
-                  .cssRGB()
-              }
-            )
-          );
-        }
-        return rays;
-      }
-    };
+    // var getRayCollection = function (baseRay) {
+    //   var rays = [];
+    //   if (config.useParallelLightSource) {
+    //     var perpRay = baseRay.perp();
+    //     perpRay.moveTo(perpRay.vertAt(-0.5));
+    //     for (var i = 0; i < config.numRays; i++) {
+    //       var raysVector = baseRay.clone().moveTo(perpRay.vertAt((i + 1) / (config.numRays + 1)));
+    //       rays.push(
+    //         new Ray(
+    //           raysVector,
+    //           null, // sourceLens
+    //           null, // sourceShape,
+    //           {
+    //             rayStartingInsideLens: getLensContainingPoint(raysVector.a),
+    //             color: rayStartColor
+    //               .clone()
+    //               .interpolate(rayEndColor, i / config.numRays)
+    //               .cssRGB()
+    //           }
+    //         )
+    //       );
+    //     }
+    //     return rays;
+    //   } else {
+    //     var rangeAngle = config.initialRayAngle * DEG_TO_RAD;
+    //     for (var i = 0; i < config.numRays; i++) {
+    //       var raysVector = baseRay.clone().rotate(-rangeAngle / 2.0 + rangeAngle * (i / config.numRays));
+    //       rays.push(
+    //         new Ray(
+    //           raysVector,
+    //           null, // sourceLens
+    //           null, // sourceShape,
+    //           {
+    //             rayStartingInsideLens: getLensContainingPoint(raysVector.a),
+    //             color: rayStartColor
+    //               .clone()
+    //               .interpolate(rayEndColor, i / config.numRays)
+    //               .cssRGB()
+    //           }
+    //         )
+    //       );
+    //     }
+    //     return rays;
+    //   }
+    // };
 
     var getLensContainingPoint = function (point) {
       for (var i = 0; i < lenses.length; i++) {

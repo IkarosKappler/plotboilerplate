@@ -67,8 +67,8 @@
       showBoundingBoxes: params.getBoolean("showBoundingBoxes", false),
       rayLengthFromMaxBounds: params.getBoolean("rayLengthFromMaxBounds", false),
       drawPreviewRays: params.getBoolean("drawPreviewRays", false),
-      rayStartColor: params.getString("rayStartColor", "rgb(255,192,0)"),
-      rayEndColor: params.getString("rayEndColor", "rgb(0,192,255)")
+      rayStartColor: params.getString("rayStartColor", "rgb(0,192,255)"),
+      rayEndColor: params.getString("rayEndColor", "rgb(255,192,0)")
     };
     var rayStartColor = Color.parse(config.rayStartColor);
     var rayEndColor = Color.parse(config.rayEndColor);
@@ -84,7 +84,13 @@
       }
 
       var rayStepLength = config.rayLengthFromMaxBounds ? getMaxShapeBounds().getMaxDimension() : mainRay.length();
-      var rayCollection = getRayCollection(mainRay);
+      var rayCollection = createRayCollection(mainRay, config.numRays, {
+        createParallelRays: config.useParallelLightSource,
+        initialRayAngle: config.initialRayAngle * DEG_TO_RAD,
+        startColor: rayStartColor,
+        endColor: rayEndColor
+      });
+
       var newRays = [];
       var numIter = Math.max(0, config.iterations); // Safeguard to avoid infinite loop
       for (var i = 0; i < numIter; i++) {
@@ -170,46 +176,6 @@
       pb.add(randomShapesAndHelpers.shapes, false);
       pb.add(randomShapesAndHelpers.helperPoints, false);
       pb.add([mainRay], true); // trigger redraw
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | Create a new set of initial rays – depending on the main 'ray' and
-    // | the config settings.
-    // |
-    // | @return {Array<Ray>}
-    // +-------------------------------
-    var getRayCollection = function (baseRay) {
-      var rays = [];
-      // console.log("rayStartColor", rayStartColor, "rayEndColor", rayEndColor);
-      if (config.useParallelLightSource) {
-        var perpRay = baseRay.perp();
-        perpRay.moveTo(perpRay.vertAt(-0.5));
-        for (var i = 0; i < config.numRays; i++) {
-          // "rgba(255,192,0,0.5)"
-          rays.push(
-            new Ray(baseRay.clone().moveTo(perpRay.vertAt(i / config.numRays)), null, null, {
-              color: rayStartColor
-                .clone()
-                .interpolate(rayEndColor, i / config.numRays)
-                .cssRGB()
-            })
-          );
-        }
-        return rays;
-      } else {
-        var rangeAngle = config.initialRayAngle * DEG_TO_RAD;
-        for (var i = 0; i < config.numRays; i++) {
-          rays.push(
-            new Ray(baseRay.clone().rotate(-rangeAngle / 2.0 + rangeAngle * (i / config.numRays)), null, null, {
-              color: rayStartColor
-                .clone()
-                .interpolate(rayEndColor, i / config.numRays)
-                .cssRGB()
-            })
-          );
-        }
-        return rays;
-      }
     };
 
     // +---------------------------------------------------------------------------------

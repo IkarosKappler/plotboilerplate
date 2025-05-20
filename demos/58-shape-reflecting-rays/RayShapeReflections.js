@@ -42,15 +42,6 @@
     rays.forEach(function (ray) {
       const reflectedRays = [];
       shapes.forEach(function (shape) {
-        // var reflectedRay = findReflectedRay(shape, ray);
-        // if (
-        //   reflectedRay != null &&
-        //   (reflectedRay.sourceShape !== ray.sourceShape ||
-        //     Math.abs(reflectedRay.vector.angle() - ray.vector.angle()) > config.rayCompareEpsilon ||
-        //     ray.vector.a.distance(reflectedRay.vector.a) > config.rayCompareEpsilon)
-        // ) {
-        //   reflectedRays.push(reflectedRay);
-        // }
         var reflectedRay = findReflectedRay(shape, ray);
         if (reflectedRay != null && ray.vector.a.distance(reflectedRay.vector.a) > config.rayCompareEpsilon) {
           // && reflectedRay.length() > 0.1) {
@@ -91,13 +82,6 @@
     // Array<Vector>
     // console.log("shape", shape);
     var intersectionTangents = shape.lineIntersectionTangents(ray.vector, true);
-    // Find closest intersection vector
-    // var closestIntersectionTangent = intersectionTangents.reduce(function (accu, curVal) {
-    //   if (accu === null || curVal.a.distance(ray.vector.a) < accu.a.distance(ray.vector.a)) {
-    //     accu = curVal;
-    //   }
-    //   return accu;
-    // }, null);
     var closestIntersectionTangent = findClosestTangent(intersectionTangents, ray);
     if (closestIntersectionTangent) {
       var angleBetween = closestIntersectionTangent.angle(ray.vector);

@@ -62,15 +62,6 @@
           if (!snelliusRays) {
             return; // Skip
           }
-          // var reflectedRay = snelliusRays.reflectedRay;
-          // if (
-          //   reflectedRay != null &&
-          //   // reflectedRay.sourceShape !== ray.sourceShape &&
-          //   ray.vector.a.distance(reflectedRay.vector.a) > config.rayCompareEpsilon
-          // ) {
-          //   // reflectedRays.push(reflectedRay);
-          //   reflectedRays.push(snelliusRays);
-          // }
           var refractedRay = snelliusRays.refractedRay;
           if (
             refractedRay != null &&
@@ -124,6 +115,7 @@
     // TODO: evaluate if ray is going in or out if the lens
     var incomingRefractiveIndex = isGoingOut ? lens.refractiveIndex : config.baseRefractiveIndex; // 1.000293; // Air
     var outgoingRefractiveIndex = isGoingOut ? config.baseRefractiveIndex : lens.refractiveIndex;
+    console.log("incomingRefractiveIndex", incomingRefractiveIndex, "outgoingRefractiveIndex", outgoingRefractiveIndex);
 
     // Array<Vector>
     var intersectionTangents = shape.lineIntersectionTangents(ray.vector, true);
@@ -139,10 +131,11 @@
       lens,
       shape,
       // This requires that no lenses overlap!
-      { rayStatringInsideLens: ray.rayStartingInsideLens ? null : lens, color: ray.properties.color }
+      { rayStartingInsideLens: ray.rayStartingInsideLens ? null : lens, color: ray.properties.color }
     );
-    var incomingAngle = closestIntersectionTangent.angle(ray.vector) + Math.PI;
-    var refractedAngle = Math.asin(incomingRefractiveIndex * Math.sin(incomingAngle)) / outgoingRefractiveIndex;
+    var tangendAngle = closestIntersectionTangent.angle();
+    var incomingAngle = closestIntersectionTangent.angle(ray.vector); // - tangendAngle; // + Math.PI;
+    var refractedAngle = Math.asin((incomingRefractiveIndex * Math.sin(incomingAngle)) / outgoingRefractiveIndex);
     // if (isGoingOut) {
     //   incomingAngle -= Math.PI / 2.0;
     // }
@@ -151,12 +144,14 @@
       ray.vector
         .clone()
         .moveTo(closestIntersectionTangent.a)
-        // .rotate(angleBetweenTangentAndRay + incomingAngle, closestIntersectionTangent.a),
-        .rotate((refractedAngle - Math.PI / 2) * 1.0, closestIntersectionTangent.a),
+        // .rotate(Math.PI - angleBetweenTangentAndRay, closestIntersectionTangent.a),
+        // .rotate((refractedAngle - Math.PI / 2) * 1.0, closestIntersectionTangent.a),
+        // .rotate((Math.PI / 2 - refractedAngle) * 1.0, closestIntersectionTangent.a),
+        .rotate((refractedAngle + tangendAngle * 0 + 0.0) * 1.0, closestIntersectionTangent.a),
       lens,
       shape,
       // This requires that no lenses overlap!
-      { rayStatringInsideLens: ray.rayStartingInsideLens ? null : lens, color: ray.properties.color }
+      { rayStartingInsideLens: ray.rayStartingInsideLens ? null : lens, color: ray.properties.color }
     );
     return new SnelliusRays(reflectedRay, refractedRay, lens, shape);
   };
