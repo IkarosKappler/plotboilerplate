@@ -113,8 +113,8 @@
     var isGoingOut = Boolean(ray.rayStartingInsideLens);
 
     // TODO: evaluate if ray is going in or out if the lens
-    var incomingRefractiveIndex = 1.0; // isGoingOut ? lens.refractiveIndex : config.baseRefractiveIndex; // 1.000293; // Air
-    var outgoingRefractiveIndex = 1.0; // isGoingOut ? config.baseRefractiveIndex : lens.refractiveIndex;
+    var incomingRefractiveIndex = isGoingOut ? lens.refractiveIndex : config.baseRefractiveIndex; // 1.000293; // Air
+    var outgoingRefractiveIndex = isGoingOut ? config.baseRefractiveIndex : lens.refractiveIndex;
     console.log("incomingRefractiveIndex", incomingRefractiveIndex, "outgoingRefractiveIndex", outgoingRefractiveIndex);
 
     // Array<Vector>
@@ -124,6 +124,9 @@
     if (!closestIntersectionTangent) {
       return null;
     }
+    // if (!isGoingOut) {
+    //   closestIntersectionTangent = closestIntersectionTangent.inv();
+    // }
     var angleBetweenTangentAndRay = closestIntersectionTangent.angle(ray.vector);
     //   closestIntersectionTangent.rotate(angleBetween);
     var reflectedRay = new Ray(

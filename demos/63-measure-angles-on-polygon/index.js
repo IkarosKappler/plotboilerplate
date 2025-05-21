@@ -27,25 +27,9 @@
     // Let's set up some colors.
     pb.drawConfig.polygon.color = "rgba(128,128,128,0.5)";
     pb.drawConfig.polygon.lineWidth = 2;
-    // pb.drawConfig.ellipse.color = "rgba(128,128,128,0.5)";
-    // pb.drawConfig.ellipse.lineWidth = 2;
-    // pb.drawConfig.circle.color = "rgba(128,128,128,0.5)";
-    // pb.drawConfig.circle.lineWidth = 2;
-    // pb.drawConfig.ellipseSector.color = "rgba(128,128,128,0.5)";
-    // pb.drawConfig.ellipseSector.lineWidth = 2;
-    // pb.drawConfig.circleSector.color = "rgba(128,128,128,0.5)";
-    // pb.drawConfig.circleSector.lineWidth = 2;
-    // pb.drawConfig.bezier.color = "rgba(128,128,128,0.5)";
-    // pb.drawConfig.bezier.lineWidth = 2;
-    // pb.drawConfig.line.color = "rgba(128,128,128,0.5)";
-    // pb.drawConfig.line.lineWidth = 2;
-    // pb.drawConfig.triangle.color = "rgba(128,128,128,0.5)";
-    // pb.drawConfig.triangle.lineWidth = 2;
     pb.drawConfig.vector.color = "rgba(0,192,255,0.5)";
     pb.drawConfig.vector.lineWidth = 4;
-    // pb.drawConfig.drawHandleLines = false;
 
-    // Array<Polygon | Circle | VEllipse | Line | CircleSector | VEllipseSector | BezierPath | Triangle>
     var polygon = null;
     var mainRay = new Vector(new Vertex(), new Vertex(250, 250).rotate(Math.random() * Math.PI));
 
@@ -60,6 +44,9 @@
     // NONE
 
     var postDraw = function (draw, fill) {
+      if (!polygon) {
+        return;
+      }
       for (var i = 0; i < polygon.vertices.length; i++) {
         var polyEdge = polygon.getEdgeAt(i);
         var nextPolyEdge = polygon.getEdgeAt(i + 1);
@@ -83,15 +70,51 @@
           1.0 // lineWidth
         );
 
-        var intersections = polyEdge.lineIntersections(mainRay, true);
-        if (intersections.length === 0) {
-          continue;
+        if (mainRay) {
+          var intersections = polyEdge.lineIntersections(mainRay, true);
+          if (intersections.length === 0) {
+            continue;
+          }
+          drawIntersectionAngles(draw, fill, intersections[0]);
         }
-        draw.circleHandle(intersections[0], 4, "red", 2);
 
         // Get Angle
       }
+
+      // Maybe the content list has someting nice to draw.
+      contentList.drawHighlighted(draw, fill);
     }; // END postDraw
+
+    var drawIntersectionAngles = function (draw, fill, intersection) {
+      draw.circleHandle(intersection, 4, "red", 2);
+
+      for (var j = 0; j < polygon.vertices.length; j++) {
+        var polyEdge2 = polygon.getEdgeAt(j);
+        if (!polyEdge2.hasPoint(intersection, true)) {
+          continue;
+        }
+        var vectorAngleA = polyEdge2.angle(mainRay);
+        fill.text(
+          "[" + j + "] " + (geomutils.mapAngleTo2PI(vectorAngleA) * RAD_TO_DEG).toFixed(2) + "°",
+          intersection.x,
+          intersection.y,
+          {
+            color: "orange",
+            fontFamily: "Monospace",
+            fontSize: 12
+          }
+        );
+        // Draw arc
+        draw.circleArc(
+          intersection,
+          16, // radius
+          mainRay.angle(), // startAngle
+          polyEdge2.angle(), // startAngle
+          "orange", // color
+          1.0 // lineWidth
+        );
+      }
+    };
 
     // +---------------------------------------------------------------------------------
     // | Just rebuilds the pattern on changes.
@@ -100,7 +123,7 @@
       var viewport = pb.viewport();
       pb.removeAll(false, false); // Don't trigger redraw
       polygon = createRandomizedPolygon(4, viewport, true); // createClockwise=true
-      polygon.scale(0.3, polygon.getCentroid());
+      polygon.scale(0.9, polygon.getCentroid());
       pb.add([polygon, mainRay], true); // trigger redraw
     };
 
@@ -155,6 +178,18 @@
     // | routine to see what's currently highlighted.
     // +-------------------------------
     var contentList = new PBContentList(pb);
+
+    // Filter shapes; keep only those that can reflect rays.
+    pb.addContentChangeListener(function (_shapesAdded, _shapesRemoved) {
+      // Drop everything we cannot handle with reflections
+      polygon = pb.drawables.find(function (drwbl) {
+        return drwbl instanceof Polygon;
+      });
+
+      mainRay = pb.drawables.find(function (drwbl) {
+        return drwbl instanceof Vector;
+      });
+    });
 
     rebuildShapes();
     toggleAnimation();

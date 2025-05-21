@@ -92,8 +92,8 @@
         drawCircumCircles: false,
         drawCubicCurves: false,
         fillVoronoiCells: true,
-        voronoiOutlineColor: "#00a828ff", // "rgba(0,168,40,1.0)",
-        voronoiCellColor: "#0080c080", // "rgba(0,128,192, 0.5)",
+        voronoiOutlineColor: "#00a828", // "rgba(0,168,40,1.0)",
+        voronoiCellColor: "#0080c0", // "rgba(0,128,192, 0.5)",
         voronoiCubicThreshold: 1.0,
         voronoiCellScale: 0.8,
         clipVoronoiCells: false,
@@ -217,8 +217,11 @@
         if ((!cell.isOpen() || config.clipVoronoiCells) && cell.triangles.length >= 3) {
           if (config.drawCubicCurves) {
             var cbezier = polygon.toCubicBezierData(config.voronoiCubicThreshold);
-            if (config.fillVoronoiCells) fill.cubicBezierPath(cbezier, config.voronoiCellColor);
-            else draw.cubicBezierPath(cbezier, config.voronoiCellColor);
+            if (config.fillVoronoiCells) {
+              fill.cubicBezierPath(cbezier, config.voronoiCellColor);
+            } else {
+              draw.cubicBezierPath(cbezier, config.voronoiCellColor);
+            }
           }
           if (config.drawVoronoiIncircles) {
             var result = convexPolygonIncircle(polygon);

@@ -2,4 +2,4 @@
 
 TODO
 
-![Polygon angles](../../screenshots/NA.png)
+![Polygon angles](../../screenshots/screenshot-20250521-0-angles-of-polygon-and-ray.png)
