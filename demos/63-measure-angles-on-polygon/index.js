@@ -43,32 +43,30 @@
     // +-------------------------------
     // NONE
 
+    var preDraw = function (_draw, _fill) {
+      if (!polygon || !mainRay) {
+        return;
+      }
+      if (polygon.containsVert(mainRay.a)) {
+        pb.drawConfig.vector.color = "rgba(255,192,255,0.5)";
+      } else {
+        pb.drawConfig.vector.color = "rgba(0,192,255,0.5)";
+      }
+    };
+
     var postDraw = function (draw, fill) {
       if (!polygon) {
         return;
       }
       for (var i = 0; i < polygon.vertices.length; i++) {
         var polyEdge = polygon.getEdgeAt(i);
-        var nextPolyEdge = polygon.getEdgeAt(i + 1);
-        var vertex = polygon.getVertexAt(i + 1);
+        // var nextPolyEdge = polygon.getEdgeAt(i + 1);
+        // var vertex = polygon.getVertexAt(i + 1);
+
+        drawEdgeAngle(draw, fill, polygon, i);
 
         // Calculate angle at polygon vertex
-        var angleInCorner = polygon.getInnerAngleAt(i + 1);
-        fill.text("[" + i + "] " + (geomutils.mapAngleTo2PI(angleInCorner) * RAD_TO_DEG).toFixed(2) + "°", vertex.x, vertex.y, {
-          color: "orange",
-          fontFamily: "Monospace",
-          fontSize: 12
-        });
-
-        // Draw arc
-        draw.circleArc(
-          vertex,
-          16, // radius
-          nextPolyEdge.angle(), // startAngle
-          polyEdge.reverse().angle(), // startAngle
-          "red", // color
-          1.0 // lineWidth
-        );
+        drawAngleInCorner(draw, fill, polygon, i);
 
         if (mainRay) {
           var intersections = polyEdge.lineIntersections(mainRay, true);
@@ -77,14 +75,57 @@
           }
           drawIntersectionAngles(draw, fill, intersections[0]);
         }
-
-        // Get Angle
-      }
+      } // END for
 
       // Maybe the content list has someting nice to draw.
       contentList.drawHighlighted(draw, fill);
     }; // END postDraw
 
+    // +---------------------------------------------------------------------------------
+    // | Draw the inner polygon angle at the given corner angle.
+    // +-------------------------------
+    var drawAngleInCorner = function (draw, fill, polygon, index) {
+      var polyEdge = polygon.getEdgeAt(index);
+      var nextPolyEdge = polygon.getEdgeAt(index + 1);
+      var vertex = polygon.getVertexAt(index + 1);
+      // Calculate angle at polygon vertex
+      var angleInCorner = polygon.getInnerAngleAt(index + 1);
+      fill.text("[" + index + "] " + (geomutils.mapAngleTo2PI(angleInCorner) * RAD_TO_DEG).toFixed(2) + "°", vertex.x, vertex.y, {
+        color: "orange",
+        fontFamily: "Monospace",
+        fontSize: 12
+      });
+
+      // Draw arc
+      draw.circleArc(
+        vertex,
+        16, // radius
+        nextPolyEdge.angle(), // startAngle
+        polyEdge.reverse().angle(), // startAngle
+        "red", // color
+        1.0 // lineWidth
+      );
+    };
+
+    var drawEdgeAngle = function (draw, fill, polygon, index) {
+      var polyEdge = polygon.getEdgeAt(index);
+      var centerPoint = polyEdge.vertAt(0.5);
+      var angleOfEdge = polyEdge.angle();
+      fill.text(
+        "[" + index + "] " + (geomutils.mapAngleTo2PI(angleOfEdge) * RAD_TO_DEG).toFixed(2) + "°",
+        centerPoint.x,
+        centerPoint.y,
+        {
+          color: "rgba(0,128,192,0.75)",
+          fontFamily: "Monospace",
+          fontSize: 12
+        }
+      );
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Draw angles between main ray and polygon edge.
+    // +-------------------------------
     var drawIntersectionAngles = function (draw, fill, intersection) {
       draw.circleHandle(intersection, 4, "red", 2);
 
@@ -168,6 +209,7 @@
       // gui.add(config, "numRays").min(1).max(64).step(1).name("numRays").title("Number of rays to use.")
       //  .onChange( function() { pb.redraw() });
     }
+    pb.config.preDraw = preDraw;
     pb.config.postDraw = postDraw;
 
     // +---------------------------------------------------------------------------------
@@ -179,7 +221,7 @@
     // +-------------------------------
     var contentList = new PBContentList(pb);
 
-    // Filter shapes; keep only those that can reflect rays.
+    // Filter shapes; keep only those of interest here
     pb.addContentChangeListener(function (_shapesAdded, _shapesRemoved) {
       // Drop everything we cannot handle with reflections
       polygon = pb.drawables.find(function (drwbl) {
