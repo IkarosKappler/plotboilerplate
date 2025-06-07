@@ -31,7 +31,12 @@
     pb.drawConfig.vector.lineWidth = 4;
 
     var polygon = null;
-    var mainRay = new Vector(new Vertex(), new Vertex(250, 250).rotate(Math.random() * Math.PI));
+    var mainRay = new Ray(
+      new Vector(new Vertex(), new Vertex(250, 250).rotate(Math.random() * Math.PI)),
+      null, // sourceLens,
+      null, // sourceShape,
+      {} // properties
+    );
 
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
@@ -47,9 +52,11 @@
       if (!polygon || !mainRay) {
         return;
       }
-      if (polygon.containsVert(mainRay.a)) {
+      if (polygon.containsVert(mainRay.vector.a)) {
+        mainRay.sourceLens = polygon;
         pb.drawConfig.vector.color = "rgba(255,192,255,0.5)";
       } else {
+        mainRay.sourceLens = null;
         pb.drawConfig.vector.color = "rgba(0,192,255,0.5)";
       }
     };
@@ -68,14 +75,18 @@
         // Calculate angle at polygon vertex
         drawAngleInCorner(draw, fill, polygon, i);
 
-        if (mainRay) {
-          var intersections = polyEdge.lineIntersections(mainRay, true);
-          if (intersections.length === 0) {
-            continue;
-          }
-          drawIntersectionAngles(draw, fill, intersections[0]);
-        }
+        // if (mainRay) {
+        //   var intersections = polyEdge.lineIntersections(mainRay.vector, true);
+        //   if (intersections.length === 0) {
+        //     continue;
+        //   }
+        //   drawIntersectionAngles(draw, fill, intersections[0]);
+        // }
       } // END for
+
+      if (mainRay) {
+        drawIntersectionAngles(draw, fill);
+      }
 
       // Maybe the content list has someting nice to draw.
       contentList.drawHighlighted(draw, fill);
@@ -126,17 +137,65 @@
     // +---------------------------------------------------------------------------------
     // | Draw angles between main ray and polygon edge.
     // +-------------------------------
-    var drawIntersectionAngles = function (draw, fill, intersection) {
-      draw.circleHandle(intersection, 4, "red", 2);
+    // var drawIntersectionAngles = function (draw, fill, intersection) {
+    //   draw.circleHandle(intersection, 4, "red", 2);
 
-      for (var j = 0; j < polygon.vertices.length; j++) {
-        var polyEdge2 = polygon.getEdgeAt(j);
-        if (!polyEdge2.hasPoint(intersection, true)) {
-          continue;
+    //   for (var j = 0; j < polygon.vertices.length; j++) {
+    //     var polyEdge2 = polygon.getEdgeAt(j);
+    //     if (!polyEdge2.hasPoint(intersection, true)) {
+    //       continue;
+    //     }
+    //     var vectorAngleA = polyEdge2.angle(mainRay.vector);
+    //     fill.text(
+    //       "[" + j + "] " + (geomutils.mapAngleTo2PI(vectorAngleA) * RAD_TO_DEG).toFixed(2) + "°",
+    //       intersection.x,
+    //       intersection.y,
+    //       {
+    //         color: "orange",
+    //         fontFamily: "Monospace",
+    //         fontSize: 12
+    //       }
+    //     );
+    //     // Draw arc
+    //     draw.circleArc(
+    //       intersection,
+    //       16, // radius
+    //       mainRay.vector.angle(), // startAngle
+    //       polyEdge2.angle(), // startAngle
+    //       "orange", // color
+    //       1.0 // lineWidth
+    //     );
+    //   }
+    // };
+
+    // +---------------------------------------------------------------------------------
+    // | Draw angles between main ray and polygon edge.
+    // +-------------------------------
+    var drawIntersectionAngles = function (draw, fill) {
+      // Get all intersections and sort them by distance on main ray
+      var intersectionTuples = polygon.lineIntersectionTangentsIndices(mainRay.vector, true).sort(function (tupleA, tupleB) {
+        return mainRay.vector.a.distance(tupleA.intersection.a) - mainRay.vector.a.distance(tupleB.intersection.a);
+      });
+
+      var rayIsInsidePolygon = polygon.containsVert(mainRay.vector.a);
+
+      for (var i = 0; i < intersectionTuples.length; i++) {
+        var polyEdge2 = polygon.getEdgeAt(intersectionTuples[i].edgeIndex);
+        var intersectionVector = intersectionTuples[i].intersection;
+        var intersection = intersectionVector.a;
+
+        if (rayIsInsidePolygon) {
+          intersectionVector.inv();
         }
-        var vectorAngleA = polyEdge2.angle(mainRay);
+
+        draw.circleHandle(intersection, 4, "red", 2);
+        draw.arrow(intersectionVector.a, intersectionVector.b, "rgba(255,64,0,0.5)", 3);
+
+        // var vectorAngleA = intersectionVector.angle(mainRay.vector);
+        var vectorAngleA = mainRay.vector.angle(intersectionVector);
+
         fill.text(
-          "[" + j + "] " + (geomutils.mapAngleTo2PI(vectorAngleA) * RAD_TO_DEG).toFixed(2) + "°",
+          "[" + i + "] " + (geomutils.mapAngleTo2PI(vectorAngleA) * RAD_TO_DEG).toFixed(2) + "°",
           intersection.x,
           intersection.y,
           {
@@ -146,14 +205,19 @@
           }
         );
         // Draw arc
+        var arcStartAngle = rayIsInsidePolygon ? Math.PI + intersectionVector.angle() : intersectionVector.angle();
+        var arcEndAngle = rayIsInsidePolygon ? Math.PI + mainRay.vector.angle() : mainRay.vector.angle();
+
         draw.circleArc(
           intersection,
           16, // radius
-          mainRay.angle(), // startAngle
-          polyEdge2.angle(), // startAngle
+          arcStartAngle, // startAngle
+          arcEndAngle, // endAngle
           "orange", // color
           1.0 // lineWidth
         );
+
+        rayIsInsidePolygon = !rayIsInsidePolygon;
       }
     };
 
@@ -165,37 +229,8 @@
       pb.removeAll(false, false); // Don't trigger redraw
       polygon = createRandomizedPolygon(4, viewport, true); // createClockwise=true
       polygon.scale(0.9, polygon.getCentroid());
-      pb.add([polygon, mainRay], true); // trigger redraw
+      pb.add([polygon, mainRay.vector], true); // trigger redraw
     };
-
-    // +---------------------------------------------------------------------------------
-    // | Render next animation step.
-    // +-------------------------------
-    function animateStep(time) {
-      var animationCircle = new Circle(new Vertex(), viewport.getMinDimension() * 0.5);
-      mainRay.b.set(animationCircle.vertAt(time / 5000));
-      pb.redraw();
-      if (isAnimationRunning) {
-        globalThis.requestAnimationFrame(animateStep);
-      }
-    }
-
-    // +---------------------------------------------------------------------------------
-    // | Toggle animation of main ray.
-    // +-------------------------------
-    var isAnimationRunning = false;
-    function toggleAnimation() {
-      if (config.animate) {
-        if (!isAnimationRunning) {
-          isAnimationRunning = true;
-          animateStep(0);
-        }
-      } else {
-        if (isAnimationRunning) {
-          isAnimationRunning = false;
-        }
-      }
-    }
 
     // +---------------------------------------------------------------------------------
     // | Create a GUI.
@@ -228,12 +263,11 @@
         return drwbl instanceof Polygon;
       });
 
-      mainRay = pb.drawables.find(function (drwbl) {
+      mainRay.vector = pb.drawables.find(function (drwbl) {
         return drwbl instanceof Vector;
       });
     });
 
     rebuildShapes();
-    toggleAnimation();
   });
 })(globalThis);

@@ -36,7 +36,9 @@
  * @modified 2025-03-28 Added the `Polygon.lineIntersectionTangents` method.
  * @modified 2025-04-09 Added the `Polygon.getCentroid` method.
  * @modified 2025-05-16 Class `Polygon` now implements `IBounded`.
- * @version 1.15.0
+ * @modified 2025-05-20 Tweaking `Polygon.getInnerAngleAt` and `Polygo.isAngleAcute` to handle indices out of array bounds as well.
+ * @modified 2025-06-07 Adding `Polygon.closestLineIntersectionIndex` to determine line intersections plus detected edge index.
+ * @version 1.16.0
  *
  * @file Polygon
  * @public
@@ -47,7 +49,7 @@ import { Line } from "./Line";
 import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { XYCoords, SVGSerializable, UID, Intersectable, IBounded } from "./interfaces";
+import { XYCoords, SVGSerializable, UID, Intersectable, IBounded, PolygonIntersectionTuple } from "./interfaces";
 /**
  * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
  *
@@ -342,15 +344,35 @@ export declare class Polygon implements IBounded, Intersectable, SVGSerializable
      */
     lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vector>;
     /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param inVectorBoundsOnly
+     * @returns
+     */
+    lineIntersectionTangentsIndices(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<PolygonIntersectionTuple<Vector>>;
+    /**
      * Get the closest line-polygon-intersection point (closest the line point A).
      *
      * See demo `47-closest-vector-projection-on-polygon` for how it works.
      *
      * @param {VertTuple} line - The line to find intersections with.
      * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are considered (located strictly between start and end vertex).
-     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     * @returns {Vertex | null} - The intersection point within the polygon bounds.
      */
     closestLineIntersection(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Vertex | null;
+    /**
+     * Get the closest line-polygon-intersection point (closest the line point A) plus the edge index..
+     *
+     * See demo `63-measure-angles-on-polygon` for how it works.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are considered (located strictly between start and end vertex).
+     * @returns {PolygonIntersectionTuple| null} - A pair containing the intersection point and the affected polygon edge index.
+     */
+    closestLineIntersectionIndex(line: VertTuple<any>, inVectorBoundsOnly?: boolean): PolygonIntersectionTuple<Vertex> | null;
     /**
      * Construct a new polygon from this polygon with more vertices on each edge. The
      * interpolation count determines the number of additional vertices on each edge.
@@ -493,9 +515,6 @@ export declare class Polygon implements IBounded, Intersectable, SVGSerializable
          * @param {boolean} inVectorBoundsOnly - If only intersections in strict vector bounds should be returned.
          * @returns
          */
-        locateLineIntersecion(line: VertTuple<any>, vertices: Array<Vertex>, isOpen: boolean, inVectorBoundsOnly: boolean): Array<{
-            edgeIndex: number;
-            intersectionPoint: Vertex;
-        }>;
+        locateLineIntersecion(line: VertTuple<any>, vertices: Array<Vertex>, isOpen: boolean, inVectorBoundsOnly: boolean): Array<PolygonIntersectionTuple<Vertex>>;
     };
 }

@@ -405,7 +405,7 @@ export class Triangle implements IBounded, SVGSerializable, Intersectable {
     // Find the intersections of all lines inside the edge bounds
     return Polygon.utils
       .locateLineIntersecion(line, [this.a, this.b, this.c], false, inVectorBoundsOnly)
-      .map(intersectionTuple => intersectionTuple.intersectionPoint);
+      .map(intersectionTuple => intersectionTuple.intersection);
   }
 
   /**
@@ -424,7 +424,7 @@ export class Triangle implements IBounded, SVGSerializable, Intersectable {
       .map(intersectionTuple => {
         // const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
         const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
-        return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersectionPoint) as Vector;
+        return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersection) as Vector;
       });
   }
   //--- END --- Implement interface `Intersectable`

@@ -23,6 +23,7 @@
  * @modified 2025-03-29 Added interface `Intersectable`.
  * @modified 2025-04-16 Added interface `IBounded`.
  * @modified 2025-05-07 Added callback `onContentChanged` to PB to track if the drawable content changed.
+ * @modified 2025-06-07 Adding helper type `PolygonIntersectionTuple` for re-usability.
  **/
 
 import { Vertex } from "../Vertex";
@@ -331,3 +332,5 @@ export interface IShapeInteractionHelper {
    */
   destroy(): void;
 }
+
+export type PolygonIntersectionTuple<T> = { edgeIndex: number; intersection: T };

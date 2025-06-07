@@ -958,7 +958,7 @@ class Triangle {
         // Find the intersections of all lines inside the edge bounds
         return Polygon.utils
             .locateLineIntersecion(line, [this.a, this.b, this.c], false, inVectorBoundsOnly)
-            .map(intersectionTuple => intersectionTuple.intersectionPoint);
+            .map(intersectionTuple => intersectionTuple.intersection);
     }
     /**
      * Get all line intersections of this polygon and their tangents along the shape.
@@ -976,7 +976,7 @@ class Triangle {
             .map(intersectionTuple => {
             // const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
             const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
-            return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersectionPoint);
+            return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersection);
         });
     }
     //--- END --- Implement interface `Intersectable`
@@ -2695,7 +2695,9 @@ class Line extends VertTuple {
  * @modified 2025-03-28 Added the `Polygon.lineIntersectionTangents` method.
  * @modified 2025-04-09 Added the `Polygon.getCentroid` method.
  * @modified 2025-05-16 Class `Polygon` now implements `IBounded`.
- * @version 1.15.0
+ * @modified 2025-05-20 Tweaking `Polygon.getInnerAngleAt` and `Polygo.isAngleAcute` to handle indices out of array bounds as well.
+ * @modified 2025-06-07 Adding `Polygon.closestLineIntersectionIndex` to determine line intersections plus detected edge index.
+ * @version 1.16.0
  *
  * @file Polygon
  * @public
@@ -2904,8 +2906,9 @@ class Polygon {
             let xi = this.vertices[i].x, yi = this.vertices[i].y;
             let xj = this.vertices[j].x, yj = this.vertices[j].y;
             var intersect = yi > vert.y != yj > vert.y && vert.x < ((xj - xi) * (vert.y - yi)) / (yj - yi) + xi;
-            if (intersect)
+            if (intersect) {
                 inside = !inside;
+            }
         }
         return inside;
     }
@@ -3115,7 +3118,7 @@ class Polygon {
         // Find the intersections of all lines inside the edge bounds
         return Polygon.utils
             .locateLineIntersecion(line, this.vertices, this.isOpen, inVectorBoundsOnly)
-            .map(intersectionTuple => intersectionTuple.intersectionPoint);
+            .map(intersectionTuple => intersectionTuple.intersection);
     }
     /**
      * Get all line intersections of this polygon and their tangents along the shape.
@@ -3130,10 +3133,29 @@ class Polygon {
         // Find the intersection tangents of all lines inside the edge bounds
         return Polygon.utils.locateLineIntersecion(line, this.vertices, this.isOpen, inVectorBoundsOnly).map(intersectionTuple => {
             const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
-            return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersectionPoint);
+            return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersection);
         });
     }
     //--- END --- Implement interface `Intersectable`
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param inVectorBoundsOnly
+     * @returns
+     */
+    lineIntersectionTangentsIndices(line, inVectorBoundsOnly = false) {
+        // Find the intersection tangents of all lines inside the edge bounds
+        return Polygon.utils.locateLineIntersecion(line, this.vertices, this.isOpen, inVectorBoundsOnly).map(intersectionTuple => {
+            const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
+            return {
+                intersection: new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersection),
+                edgeIndex: intersectionTuple.edgeIndex
+            };
+        });
+    }
     /**
      * Get the closest line-polygon-intersection point (closest the line point A).
      *
@@ -3141,9 +3163,27 @@ class Polygon {
      *
      * @param {VertTuple} line - The line to find intersections with.
      * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are considered (located strictly between start and end vertex).
-     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     * @returns {Vertex | null} - The intersection point within the polygon bounds.
      */
     closestLineIntersection(line, inVectorBoundsOnly = false) {
+        var closestInterSectionIndex = this.closestLineIntersectionIndex(line, inVectorBoundsOnly);
+        if (closestInterSectionIndex) {
+            return closestInterSectionIndex.intersection;
+        }
+        else {
+            return null;
+        }
+    }
+    /**
+     * Get the closest line-polygon-intersection point (closest the line point A) plus the edge index..
+     *
+     * See demo `63-measure-angles-on-polygon` for how it works.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are considered (located strictly between start and end vertex).
+     * @returns {PolygonIntersectionTuple| null} - A pair containing the intersection point and the affected polygon edge index.
+     */
+    closestLineIntersectionIndex(line, inVectorBoundsOnly = false) {
         const allIntersections = this.lineIntersections(line, inVectorBoundsOnly);
         if (allIntersections.length <= 0) {
             // Empty polygon -> no intersections
@@ -3151,17 +3191,20 @@ class Polygon {
         }
         // Find the closest intersection
         let closestIntersection = new Vertex(Number.MAX_VALUE, Number.MAX_VALUE);
+        let closestInterSectionIndex = -1;
         let curDist = Number.MAX_VALUE;
-        for (var i in allIntersections) {
+        for (var i = 0; i < allIntersections.length; i++) {
             const curVert = allIntersections[i];
             const dist = curVert.distance(line.a);
             if (dist < curDist) {
                 // && line.hasPoint(curVert)) {
                 curDist = dist;
                 closestIntersection = curVert;
+                closestInterSectionIndex = i;
             }
         }
-        return closestIntersection;
+        // return [closestIntersection, closestInterSectionIndex];
+        return { edgeIndex: closestInterSectionIndex, intersection: closestIntersection };
     }
     /**
      * Construct a new polygon from this polygon with more vertices on each edge. The
@@ -3519,7 +3562,7 @@ Polygon.utils = {
             if (intersection !== null &&
                 polyLine.hasPoint(intersection, true) &&
                 (!inVectorBoundsOnly || line.hasPoint(intersection, inVectorBoundsOnly))) {
-                intersectionPoints.push({ edgeIndex: i, intersectionPoint: intersection });
+                intersectionPoints.push({ edgeIndex: i, intersection: intersection });
             }
         }
         return intersectionPoints;

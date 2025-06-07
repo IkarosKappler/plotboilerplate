@@ -310,7 +310,7 @@ export class Triangle {
         // Find the intersections of all lines inside the edge bounds
         return Polygon.utils
             .locateLineIntersecion(line, [this.a, this.b, this.c], false, inVectorBoundsOnly)
-            .map(intersectionTuple => intersectionTuple.intersectionPoint);
+            .map(intersectionTuple => intersectionTuple.intersection);
     }
     /**
      * Get all line intersections of this polygon and their tangents along the shape.
@@ -328,7 +328,7 @@ export class Triangle {
             .map(intersectionTuple => {
             // const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
             const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
-            return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersectionPoint);
+            return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersection);
         });
     }
     //--- END --- Implement interface `Intersectable`
