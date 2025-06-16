@@ -5,6 +5,9 @@
  */
 export class ColorGradientPicker {
     constructor(containerID) {
+        this.sliderMin = 0;
+        this.sliderMax = 100;
+        this.COLORSET = ["red", "orange", "yellow", "green", "blue", "purple"];
         if (containerID) {
             const cont = document.getElementById(containerID);
             if (!cont) {
@@ -22,7 +25,7 @@ export class ColorGradientPicker {
         this.__addCustomStyles();
         this.__setContainerLayout();
         console.log("Init");
-        const stepCount = 5;
+        const stepCount = 6;
         this.sliderElements = [];
         for (var i = 0; i < stepCount; i++) {
             this.__createRangeSlider((100 / (stepCount - 1)) * i, i);
@@ -36,11 +39,12 @@ export class ColorGradientPicker {
         this.container.style.position = "relative";
     }
     __createRangeSlider(value, index) {
+        const initialColor = this.COLORSET[index % this.COLORSET.length];
         const rangeSlider = document.createElement("input");
         rangeSlider.setAttribute("id", `rage-slider-${index}`);
         rangeSlider.setAttribute("type", "range");
-        rangeSlider.setAttribute("min", "0");
-        rangeSlider.setAttribute("max", "100");
+        rangeSlider.setAttribute("min", `${this.sliderMin}`);
+        rangeSlider.setAttribute("max", `${this.sliderMax}`);
         rangeSlider.setAttribute("value", `${value}`);
         this.container.appendChild(rangeSlider);
         this.sliderElements.push(rangeSlider);
@@ -48,9 +52,78 @@ export class ColorGradientPicker {
         rangeSlider.style.left = "0";
         rangeSlider.style.top = "0";
         rangeSlider.style.width = "100%";
-        rangeSlider.addEventListener("change", e => {
-            console.log("Clicked", e.target ? e.target.getAttribute("id") : null);
-        });
+        rangeSlider.dataset["rangeSliderIndex"] = `${index}`;
+        rangeSlider.dataset["colorValue"] = initialColor;
+        rangeSlider.addEventListener("change", this.__createSliderHandler());
+    }
+    getColorGradient() {
+        // Example:
+        //    linear-gradient(90deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 38%, rgba(161, 210, 108, 1) 68%, rgba(237, 221, 83, 1) 100%)
+        const buffer = ["linear-gradient( 90deg, "];
+        for (var i = 0; i < this.sliderElements.length; i++) {
+            if (i > 0) {
+                buffer.push(",");
+            }
+            const colorValue = this.__getSliderColor(i, "black");
+            buffer.push(colorValue);
+            const sliderValue = this.__getSliderValue(i, 0.0);
+            const percentage = (this.sliderMin + sliderValue) / (this.sliderMax - this.sliderMin);
+            buffer.push(`${percentage * 100}%`);
+        }
+        buffer.push(")");
+        return buffer.join(" ");
+    }
+    __createSliderHandler() {
+        const _self = this;
+        return (e) => {
+            const targetSlider = e.target;
+            console.log("Clicked", targetSlider ? targetSlider.getAttribute("id") : null);
+            if (!targetSlider) {
+                return false;
+            }
+            const currentSliderValue = Number.parseFloat(targetSlider.value);
+            const rangeSliderIndexRaw = targetSlider.dataset["rangeSliderIndex"];
+            if (!rangeSliderIndexRaw) {
+                return false;
+            }
+            const rangeSliderIndex = Number.parseInt(rangeSliderIndexRaw);
+            var leftSliderValue = this.__getSliderValue(rangeSliderIndex - 1, _self.sliderMin);
+            var rightSliderValue = this.__getSliderValue(rangeSliderIndex + 1, _self.sliderMax);
+            if (leftSliderValue >= currentSliderValue) {
+                targetSlider.value = `${leftSliderValue}`;
+                _self.__updateBackgroundGradient();
+                return false;
+            }
+            else if (rightSliderValue <= currentSliderValue) {
+                targetSlider.value = `${rightSliderValue}`;
+                _self.__updateBackgroundGradient();
+                return false;
+            }
+            else {
+                _self.__updateBackgroundGradient();
+                return true;
+            }
+        };
+    }
+    __updateBackgroundGradient() {
+        const colorGradient = this.getColorGradient();
+        console.log(colorGradient);
+        this.container.style["background"] = colorGradient;
+        console.log(this.container);
+        // document.body.style["background-color"] = colorGradient;
+    }
+    __getSliderValue(sliderIndex, fallback) {
+        if (sliderIndex < 0 || sliderIndex >= this.sliderElements.length) {
+            return fallback;
+        }
+        return Number.parseFloat(this.sliderElements[sliderIndex].value);
+    }
+    __getSliderColor(sliderIndex, fallback) {
+        if (sliderIndex < 0 || sliderIndex >= this.sliderElements.length) {
+            return fallback;
+        }
+        const colorValue = this.sliderElements[sliderIndex].dataset["colorValue"];
+        return colorValue ? colorValue : fallback;
     }
     __addCustomStyles() {
         const headElements = document.querySelector("head");
@@ -113,6 +186,17 @@ export class ColorGradientPicker {
         pointer-events: auto; /* catch clicks */
         width: 1em; 
         height: 1em;
+      }
+
+      input[type='range'] {
+        /* same as before */
+        z-index: 1;
+      }
+      
+      input[type='range']:focus {
+          z-index: 2;
+          outline: dotted 1px orange;
+          color: darkorange;
       }
       `;
             headElements.appendChild(styleElement);
