@@ -5,13 +5,30 @@
  */
 
 export class ColorGradientPicker {
+  private baseID: number;
+
   private container: HTMLElement;
   private sliderElements: Array<HTMLInputElement>;
+  private colorInput: HTMLInputElement;
+  private indicatorContainer: HTMLDivElement;
+  private colorIndicatorButton: HTMLButtonElement;
   private sliderMin: number = 0;
   private sliderMax: number = 100;
+  private indicatorWidth_num = 1.0;
+  private indicatorWidth = "1em";
+  private indicatorWidth_half = "0.5em";
+  private indicatorHeight = "1em";
 
   private COLORSET: Array<string> = ["red", "orange", "yellow", "green", "blue", "purple"];
 
+  /**
+   * The constructor.
+   *
+   * Pass a container ID or nothing – in the latter case the constructor will create
+   * a new DIV element.
+   *
+   * @param {string?} containerID
+   */
   constructor(containerID?: string) {
     if (containerID) {
       const cont = document.getElementById(containerID);
@@ -22,11 +39,18 @@ export class ColorGradientPicker {
     } else {
       this.container = document.createElement("div");
     }
-    console.log("created", this.container);
+    // console.log("created", this.container);
+    this.baseID = Math.floor(Math.random() * 65535);
 
     this.__init();
+    this.__updateBackgroundGradient();
   }
 
+  /**
+   * Init the container contents.
+   *
+   * @private
+   */
   private __init() {
     this.__addCustomStyles();
     this.__setContainerLayout();
@@ -36,8 +60,14 @@ export class ColorGradientPicker {
     for (var i = 0; i < stepCount; i++) {
       this.__createRangeSlider((100 / (stepCount - 1)) * i, i);
     }
+    this.__createColorIndicator();
   }
 
+  /**
+   * Apply style settings to the main container.
+   *
+   * @private
+   */
   private __setContainerLayout() {
     this.container.style.display = "flex";
     this.container.style.flexDirection = "column";
@@ -46,15 +76,21 @@ export class ColorGradientPicker {
     this.container.style.position = "relative";
   }
 
-  private __createRangeSlider(value: number, index: number) {
+  /**
+   * Create a new range slider for this color gradient picker.
+   *
+   * @param {number} initialValue
+   * @param {number} index
+   */
+  private __createRangeSlider(initialValue: number, index: number) {
     const initialColor: string = this.COLORSET[index % this.COLORSET.length];
 
     const rangeSlider = document.createElement("input");
-    rangeSlider.setAttribute("id", `rage-slider-${index}`);
+    rangeSlider.setAttribute("id", `rage-slider-${this.baseID}-${index}`);
     rangeSlider.setAttribute("type", "range");
     rangeSlider.setAttribute("min", `${this.sliderMin}`);
     rangeSlider.setAttribute("max", `${this.sliderMax}`);
-    rangeSlider.setAttribute("value", `${value}`);
+    rangeSlider.setAttribute("value", `${initialValue}`);
     this.container.appendChild(rangeSlider);
     this.sliderElements.push(rangeSlider);
 
@@ -65,9 +101,53 @@ export class ColorGradientPicker {
 
     rangeSlider.dataset["rangeSliderIndex"] = `${index}`;
     rangeSlider.dataset["colorValue"] = initialColor;
-    rangeSlider.addEventListener("change", this.__createSliderHandler());
+    const sliderHandler = this.__createSliderChangeHandler();
+    // rangeSlider.addEventListener("change", this.__createSliderChangeHandler());
+    rangeSlider.addEventListener("change", sliderHandler);
+    rangeSlider.addEventListener("click", sliderHandler);
   }
 
+  private __createColorIndicator() {
+    this.indicatorContainer = document.createElement("div");
+    this.indicatorContainer.style["width"] = "100%";
+    // this.indicatorContainer.style["position"] = "100%";
+
+    this.colorIndicatorButton = document.createElement("button");
+    this.colorIndicatorButton.style["position"] = "absolute";
+    this.colorIndicatorButton.style["bottom"] = "0";
+    this.colorIndicatorButton.style["left"] = "0%";
+    this.colorIndicatorButton.style["background-color"] = "grey";
+    this.colorIndicatorButton.style["border-radius"] = "3px";
+    this.colorIndicatorButton.style["border"] = "1px solid grey";
+    this.colorIndicatorButton.style["width"] = this.indicatorWidth;
+    this.colorIndicatorButton.style["height"] = this.indicatorHeight;
+    this.colorIndicatorButton.style["transform"] = "translate(-50%,100%)";
+
+    this.colorInput = document.createElement("input");
+    this.colorInput.setAttribute("type", "color");
+    this.colorInput.style["visibility"] = "hidden";
+    this.colorInput.dataset["activeSliderIndex"] = "";
+    this.colorInput.addEventListener("input", this.__colorChangeHandler());
+
+    const _self = this;
+    this.colorIndicatorButton.addEventListener("click", () => {
+      console.log("clicked");
+      // _self.colorInput.dispatchEvent(new Event("input"));
+      _self.colorInput.click();
+    });
+
+    this.indicatorContainer.appendChild(this.colorIndicatorButton);
+    this.container.appendChild(this.indicatorContainer);
+    this.container.appendChild(this.colorInput);
+  }
+
+  /**
+   * Get a color gradient CSS value string from the current editor settings.
+   *
+   * @instance
+   * @memberof ColorGradientPicker
+   * @returns {string}
+   */
   public getColorGradient(): string {
     // Example:
     //    linear-gradient(90deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 38%, rgba(161, 210, 108, 1) 68%, rgba(237, 221, 83, 1) 100%)
@@ -78,8 +158,9 @@ export class ColorGradientPicker {
       }
       const colorValue: string = this.__getSliderColor(i, "black");
       buffer.push(colorValue);
-      const sliderValue: number = this.__getSliderValue(i, 0.0);
-      const percentage: number = (this.sliderMin + sliderValue) / (this.sliderMax - this.sliderMin);
+      // const sliderValue: number = this.__getSliderValue(i, 0.0);
+      // const percentage: number = (this.sliderMin + sliderValue) / (this.sliderMax - this.sliderMin);
+      const percentage = this.__getSliderPercentage(i);
       buffer.push(`${percentage * 100}%`);
     }
     buffer.push(")");
@@ -87,7 +168,12 @@ export class ColorGradientPicker {
     return buffer.join(" ");
   }
 
-  private __createSliderHandler(): (e: Event) => boolean {
+  /**
+   * Creates a callback function for range slider.
+   *
+   * @returns
+   */
+  private __createSliderChangeHandler(): (e: Event) => boolean {
     const _self = this;
     return (e: Event): boolean => {
       const targetSlider: HTMLInputElement = e.target as HTMLInputElement;
@@ -106,18 +192,53 @@ export class ColorGradientPicker {
       if (leftSliderValue >= currentSliderValue) {
         targetSlider.value = `${leftSliderValue}`;
         _self.__updateBackgroundGradient();
+        _self.__updateColorIndicator(rangeSliderIndex);
         return false;
       } else if (rightSliderValue <= currentSliderValue) {
         targetSlider.value = `${rightSliderValue}`;
         _self.__updateBackgroundGradient();
+        _self.__updateColorIndicator(rangeSliderIndex);
+
         return false;
       } else {
         _self.__updateBackgroundGradient();
+        _self.__updateColorIndicator(rangeSliderIndex);
         return true;
       }
     };
   }
 
+  private __colorChangeHandler(): (_evt: Event) => boolean {
+    const _self = this;
+    return (_evt: Event): boolean => {
+      // const colorInput : HTMLInputElement | null = evt.target;
+      const activeSliderIndex_raw = this.colorInput.dataset["activeSliderIndex"];
+      if (!activeSliderIndex_raw) {
+        console.warn("Cannot update color indicator; no active range slider set.");
+        return false;
+      }
+      const activeSliderIndex = Number.parseInt(activeSliderIndex_raw);
+      if (Number.isNaN(activeSliderIndex) || activeSliderIndex < 0 || activeSliderIndex >= _self.sliderElements.length) {
+        console.warn("Cannot update color indicator; active index invalid or out of bounds.", activeSliderIndex);
+        return false;
+      }
+
+      const newColor: string = _self.colorInput.value;
+      const rangeSlider: HTMLInputElement = _self.sliderElements[activeSliderIndex];
+      rangeSlider.dataset["colorValue"] = newColor;
+      // rangeSlider.dataset["colorValue"] = newColor;
+      this.colorIndicatorButton.style["background-color"] = newColor;
+      _self.__updateBackgroundGradient();
+
+      return true;
+    };
+  }
+
+  /**
+   * Updates the container's background to display the configured color gradient.
+   *
+   * @private
+   */
   private __updateBackgroundGradient() {
     const colorGradient = this.getColorGradient();
     console.log(colorGradient);
@@ -126,6 +247,25 @@ export class ColorGradientPicker {
     // document.body.style["background-color"] = colorGradient;
   }
 
+  private __updateColorIndicator(rangeSliderIndex: number) {
+    const colorValue = this.__getSliderColor(rangeSliderIndex, "grey");
+    const ratio = this.__getSliderPercentage(rangeSliderIndex);
+    this.colorIndicatorButton.style["left"] = `calc( ${ratio * 100}% + ${(1.0 - ratio) * this.indicatorWidth_num * 0.5}em - ${
+      ratio * this.indicatorWidth_num * 0.5
+    }em)`;
+
+    this.colorIndicatorButton.style["background-color"] = colorValue;
+    this.colorInput.value = colorValue;
+    this.colorInput.dataset["activeSliderIndex"] = `${rangeSliderIndex}`;
+  }
+
+  /**
+   * Get the value of the n-th rangel slider.
+   *
+   * @param {number} sliderIndex
+   * @param {number} fallback
+   * @returns
+   */
   private __getSliderValue(sliderIndex: number, fallback: number): number {
     if (sliderIndex < 0 || sliderIndex >= this.sliderElements.length) {
       return fallback;
@@ -133,6 +273,25 @@ export class ColorGradientPicker {
     return Number.parseFloat(this.sliderElements[sliderIndex].value);
   }
 
+  /**
+   * Get the slider's value in a mapped range of 0.0 ... 1.0.
+   *
+   * @param sliderIndex
+   * @returns
+   */
+  private __getSliderPercentage(sliderIndex): number {
+    const sliderValue: number = this.__getSliderValue(sliderIndex, 0.0);
+    const percentage: number = (this.sliderMin + sliderValue) / (this.sliderMax - this.sliderMin);
+    return percentage;
+  }
+
+  /**
+   * Get the configured color value of the n-th rangel slider.
+   *
+   * @param {number} sliderIndex
+   * @param {string} fallback
+   * @returns
+   */
   private __getSliderColor(sliderIndex: number, fallback: string): string {
     if (sliderIndex < 0 || sliderIndex >= this.sliderElements.length) {
       return fallback;
@@ -141,9 +300,16 @@ export class ColorGradientPicker {
     return colorValue ? colorValue : fallback;
   }
 
+  /**
+   * Adds custom styles (global STYLE tag).
+   *
+   * @private
+   */
   private __addCustomStyles() {
     const headElements = document.querySelector("head");
     if (headElements) {
+      const thumbWidth = "0.5em";
+      const thumbHeight = "1.333em";
       const styleElement = document.createElement("style");
       // Thanks to Ana Tudor
       //    https://css-tricks.com/multi-thumb-sliders-particular-two-thumb-case/
@@ -177,31 +343,36 @@ export class ColorGradientPicker {
         -webkit-appearance: none;
         background: currentcolor;
         border: none; /* get rid of Firefox thumb border */
-        border-radius: 0; /* get rid of Firefox corner rounding */
+        border-radius: 6px; /* get rid of Firefox corner rounding */
         pointer-events: auto; /* catch clicks */
-        width: 1em; 
-        height: 1em;
+        width: ${thumbWidth}; 
+        height: ${thumbHeight};
+      }
+
+      input[type='range']:focus::-webkit-slider-thumb {
+        border: 2px solid white;
       }
 
       input[type='range']::-moz-range-track {
         -webkit-appearance: none;
-
         background: none; /* get rid of Firefox track background */
         height: 100%;
         width: 100%;
-
         pointer-events: none;
-
       }
 
       input[type='range']::-moz-range-thumb {
         /* -webkit-appearance: none; */
         background: currentcolor;
         border: none; /* get rid of Firefox thumb border */
-        border-radius: 0; /* get rid of Firefox corner rounding */
+        border-radius: 6px; /* get rid of Firefox corner rounding */
         pointer-events: auto; /* catch clicks */
-        width: 1em; 
-        height: 1em;
+        width: ${thumbWidth}; 
+        height: ${thumbHeight};
+      }
+
+      input[type='range']:focus::-moz-range-thumb {
+        border: 2px solid white;
       }
 
       input[type='range'] {
