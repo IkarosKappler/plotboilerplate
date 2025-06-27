@@ -14,8 +14,8 @@
     "build": "npm run build-module && npm run build-browser",
     "build-browser": "npm run compile-typescript-browser && npm run webpack-browser && cp dist/plotboilerplate.browser.min.js dist/plotboilerplate.min.js",
     "build-module": "npm run compile-typescript-module && npm run rollup-module",
-    "compile-typescript-browser": "tsc -p tsconfig.browser.json",
-    "compile-typescript-module": "tsc -p tsconfig.module.json",
+    "compile-typescript-browser": "tsc --p tsconfig.browser.json",
+    "compile-typescript-module": "tsc --p tsconfig.json",
     "compile-typescript-demo": "cd bin && ./run-compile-demo-ts.sh",
     "mkdocs": "cd bin && ./run-mk-typedocs.sh",
     "mk-release": "cd bin && ./run-mk-zippackage.sh",
@@ -67,6 +67,7 @@
   "homepage": "https://plotboilerplate.io",
   "devDependencies": {
     "@babel/core": "^7.9.0",
+    "@rollup/plugin-json": "^6.1.0",
     "@types/dat.gui": "^0.7.7",
     "@typescript-eslint/eslint-plugin": "^4.7.0",
     "@typescript-eslint/parser": "^4.7.0",
@@ -96,6 +97,7 @@
     "alloyfinger-typescript": "^0.1.19",
     "greiner-hormann-typescript": "^1.4.1",
     "lil-gui": "^0.19.2",
+    "noreact": "file:../noreact",
     "path2d-polyfill": "^1.1.0"
   }
 }
