@@ -1,0 +1,1 @@
+var exports = (globalThis.export = globalThis);

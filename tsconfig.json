@@ -1,0 +1,32 @@
+{
+    "compilerOptions": {
+	"outDir": "./src/esm",
+	
+	"target": "ES2015",
+	"module": "ES2015",
+
+	"moduleResolution": "node",
+
+	"esModuleInterop": true,
+	
+	"sourceMap": true,
+	"declaration": true,
+
+	"allowJs": false,
+
+	"jsx": "react",
+	"reactNamespace": "NoReact",
+
+	"forceConsistentCasingInFileNames": true,
+	"noImplicitReturns": true,
+	"noImplicitThis": true,
+	"noImplicitAny": false,
+	"strictNullChecks": false,
+	"noUnusedLocals": false,
+	"noUnusedParameters": false
+
+    },
+    "include": ["./src/ts/**/*.ts", "./src/ts/**/*.tsx", "./src/external.d.ts"],
+    "exclude": ["./dist", "./tmp","./src/js","./src/_js","./src/cjs","./src/esm","./src/vanilla", "./npm-package", "demos"],
+    "removeComments": false
+}

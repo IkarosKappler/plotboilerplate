@@ -11,12 +11,13 @@
     "src"
   ],
   "scripts": {
-    "build": "npm run build-module && npm run build-browser",
+    "build": "npm run build-module && npm run build-browser && npm run post-build-cleanup",
     "build-browser": "npm run compile-typescript-browser && npm run webpack-browser && cp dist/plotboilerplate.browser.min.js dist/plotboilerplate.min.js",
     "build-module": "npm run compile-typescript-module && npm run rollup-module",
     "compile-typescript-browser": "tsc --p tsconfig.browser.json",
     "compile-typescript-module": "tsc --p tsconfig.json",
     "compile-typescript-demo": "cd bin && ./run-compile-demo-ts.sh",
+    "post-build-cleanup": "rm ./dist/*.d.ts && rm -rf ./dist/interfaces && rm -rf ./dist/utils",
     "mkdocs": "cd bin && ./run-mk-typedocs.sh",
     "mk-release": "cd bin && ./run-mk-zippackage.sh",
     "server": "npx http-server",
