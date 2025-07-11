@@ -4,13 +4,13 @@
  * @version 1.0.0
  */
 import { JsxElement } from "typescript";
+import { Color } from "../../datastructures/Color";
 export declare class ColorGradientPicker {
     private baseID;
     private container;
     private containerRef;
     private _sliderElementRefs;
     private colorInputRef;
-    private indicatorContainer;
     private colorIndicatorButtonRef;
     private sliderMin;
     private sliderMax;
@@ -36,6 +36,10 @@ export declare class ColorGradientPicker {
      */
     __createSliderChangeHandler: () => (e: Event) => boolean;
     __colorChangeHandler(): (_evt: Event) => boolean;
+    __containerClickHandler(): (evt: MouseEvent) => void;
+    private _addSliderAt;
+    __getSliderColorAt(relativePosition: number): Color;
+    __locateIntervalAt(relativePosition: number): number;
     /**
      * Get the value of the n-th rangel slider.
      *
@@ -44,6 +48,7 @@ export declare class ColorGradientPicker {
      * @returns
      */
     __getSliderValue(sliderIndex: number, fallback: number): number;
+    __getAllSliderValues(): Array<number>;
     /**
      * Updates the container's background to display the configured color gradient.
      *

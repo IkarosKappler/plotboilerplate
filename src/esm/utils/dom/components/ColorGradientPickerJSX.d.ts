@@ -3,13 +3,15 @@
  * @date    2025-06-27
  * @version 1.0.0
  */
+import { JsxElement } from "typescript";
+import { Color } from "../../datastructures/Color";
 export declare class ColorGradientPicker {
     private baseID;
     private container;
-    private sliderElements;
-    private colorInput;
-    private indicatorContainer;
-    private colorIndicatorButton;
+    private containerRef;
+    private _sliderElementRefs;
+    private colorInputRef;
+    private colorIndicatorButtonRef;
     private sliderMin;
     private sliderMax;
     private indicatorWidth_num;
@@ -26,10 +28,61 @@ export declare class ColorGradientPicker {
      * @param {string?} containerID
      */
     constructor(containerID?: string);
+    createColorRangeInput(baseID: number, index: number, sliderMin: number, sliderMax: number, initialValue: number, initialColor: string): JsxElement;
+    /**
+     * Creates a callback function for range slider.
+     *
+     * @returns
+     */
+    __createSliderChangeHandler: () => (e: Event) => boolean;
+    __colorChangeHandler(): (_evt: Event) => boolean;
+    __containerClickHandler(): (evt: MouseEvent) => void;
+    private _addSliderAt;
+    __getSliderColorAt(relativePosition: number): Color;
+    __locateIntervalAt(relativePosition: number): number;
+    /**
+     * Get the value of the n-th rangel slider.
+     *
+     * @param {number} sliderIndex
+     * @param {number} fallback
+     * @returns
+     */
+    __getSliderValue(sliderIndex: number, fallback: number): number;
+    __getAllSliderValues(): Array<number>;
+    /**
+     * Updates the container's background to display the configured color gradient.
+     *
+     * @private
+     */
+    __updateBackgroundGradient(): void;
+    __updateColorIndicator(rangeSliderIndex: number): void;
+    /**
+     * Get a color gradient CSS value string from the current editor settings.
+     *
+     * @instance
+     * @memberof ColorGradientPicker
+     * @returns {string}
+     */
+    getColorGradient(): string;
+    /**
+     * Get the configured color value of the n-th rangel slider.
+     *
+     * @param {number} sliderIndex
+     * @param {string} fallback
+     * @returns
+     */
+    private __getSliderColor;
+    /**
+     * Get the slider's value in a mapped range of 0.0 ... 1.0.
+     *
+     * @param sliderIndex
+     * @returns
+     */
+    private __getSliderPercentage;
     /**
      * Init the container contents.
      *
      * @private
      */
-    render(name: string): HTMLElement;
+    private _render;
 }

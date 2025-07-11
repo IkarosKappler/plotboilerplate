@@ -7,6 +7,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ColorGradientPicker = void 0;
 var NoReact = require("noreact");
+var Color_1 = require("../../datastructures/Color");
 var ColorGradientPicker = /** @class */ (function () {
     /**
      * The constructor.
@@ -18,7 +19,6 @@ var ColorGradientPicker = /** @class */ (function () {
      */
     function ColorGradientPicker(containerID) {
         var _this = this;
-        // private sliderElements: Array<HTMLInputElement>;
         this._sliderElementRefs = [];
         this.sliderMin = 0;
         this.sliderMax = 100;
@@ -26,7 +26,7 @@ var ColorGradientPicker = /** @class */ (function () {
         this.indicatorWidth = "1em";
         this.indicatorWidth_half = "0.5em";
         this.indicatorHeight = "1em";
-        this.COLORSET = ["red", "orange", "yellow", "green", "blue", "purple"];
+        this.COLORSET = ["#ff0000", "#ff8800", "#ffff00", "#00ff00", "#0000ff", "#8800ff"];
         /**
          * Creates a callback function for range slider.
          *
@@ -77,9 +77,7 @@ var ColorGradientPicker = /** @class */ (function () {
         else {
             this.container = document.createElement("div");
         }
-        // console.log("created", this.container);
         this.baseID = Math.floor(Math.random() * 65535);
-        // this.__init();
         this.container.append(this._render("test"));
         this.__updateColorIndicator(0);
         this.__updateBackgroundGradient();
@@ -87,7 +85,12 @@ var ColorGradientPicker = /** @class */ (function () {
     ColorGradientPicker.prototype.createColorRangeInput = function (baseID, index, sliderMin, sliderMax, initialValue, initialColor) {
         var sliderHandler = this.__createSliderChangeHandler();
         var ref = NoReact.useRef();
-        this._sliderElementRefs.push(ref);
+        // this._sliderElementRefs.push(ref);
+        this._sliderElementRefs.splice(index, 0, ref);
+        for (var i = index + 1; i < this._sliderElementRefs.length; i++) {
+            this._sliderElementRefs[i].current.setAttribute("data-range-slider-index", "".concat(i));
+            this._sliderElementRefs[i].current.setAttribute("id", "rage-slider-".concat(baseID, "-").concat(i));
+        }
         return (NoReact.createElement("input", { id: "rage-slider-".concat(baseID, "-").concat(index), type: "range", min: sliderMin, max: sliderMax, value: initialValue, style: { position: "absolute", left: "0px", top: "0px", width: "100%" }, "data-range-slider-index": index, "data-color-value": initialColor, onChange: sliderHandler, onClick: sliderHandler, ref: ref }));
     };
     ColorGradientPicker.prototype.__colorChangeHandler = function () {
@@ -115,6 +118,77 @@ var ColorGradientPicker = /** @class */ (function () {
             return true;
         };
     };
+    ColorGradientPicker.prototype.__containerClickHandler = function () {
+        var _self = this;
+        var maxDifference = 0.01;
+        return function (evt) {
+            console.log("click");
+            // e = Mouse click event.
+            var target = evt.target;
+            var rect = target.getBoundingClientRect();
+            var x = evt.clientX - rect.left; //x position within the element.
+            var width = rect.width; // target.clientWidth;
+            var relativeValue = x / width;
+            // TODO: check if ratio is far enough away from any slider
+            var allSliderValues = _self.__getAllSliderValues();
+            if (allSliderValues.length === 0) {
+                return; // This should not happen: at least two values must be present in a gradient
+            }
+            console.log("width", width, "x", x, "relativeValue", relativeValue, "allSliderValues", allSliderValues);
+            // Todo: Find closest ratio value
+            // let closestSliderValue = Number.MAX_VALUE;
+            var leftSliderIndex = 0;
+            var closestSliderValue = allSliderValues[leftSliderIndex];
+            for (var i = 1; i < allSliderValues.length; i++) {
+                var curVal = allSliderValues[i];
+                if (Math.abs(closestSliderValue - relativeValue) > Math.abs(curVal - relativeValue)) {
+                    closestSliderValue = curVal;
+                    leftSliderIndex = i - 1;
+                }
+            }
+            var diff = Math.abs(closestSliderValue - relativeValue);
+            console.log("closestSliderValue", closestSliderValue, "relativeValue", relativeValue, "difference", diff);
+            if (diff >= maxDifference) {
+                console.log("Add slider here");
+                _self._addSliderAt(relativeValue, leftSliderIndex);
+            }
+            else {
+                console.log("Don't add slider here.");
+            }
+        };
+    };
+    ColorGradientPicker.prototype._addSliderAt = function (relativeValue, leftSliderIndex) {
+        var leftSlider = this._sliderElementRefs[leftSliderIndex].current;
+        // const colorAtPosition = this.__getSliderColorAt(relativeValue);
+        var newColor = this.__getSliderColorAt(relativeValue);
+        var newSlider = this.createColorRangeInput(this.baseID, leftSliderIndex + 1, this.sliderMin, this.sliderMax, relativeValue, //  initialValue
+        newColor.cssRGB() // initialColor: string
+        );
+        var sliderRef = this._sliderElementRefs[leftSliderIndex + 1];
+        leftSlider.after(sliderRef.current);
+    };
+    ColorGradientPicker.prototype.__getSliderColorAt = function (relativePosition) {
+        // Locate interval
+        var leftIndex = this.__locateIntervalAt(relativePosition);
+        var leftSliderValue = this.__getSliderValue(leftIndex, 0.5);
+        var rightSliderValue = this.__getSliderValue(leftIndex + 1, 0.5);
+        var positionInsideInterval = (relativePosition - leftSliderValue) / (rightSliderValue - leftSliderValue);
+        var leftColorString = this.__getSliderColor(leftIndex, "#000000");
+        var rightColorString = this.__getSliderColor(leftIndex + 1, "#000000");
+        console.log("leftColorString", leftColorString, "rightColorString", rightColorString);
+        var leftColorObject = Color_1.Color.parse(leftColorString);
+        var rightColorObject = Color_1.Color.parse(rightColorString);
+        var newColor = leftColorObject.interpolate(rightColorObject, positionInsideInterval);
+        return newColor;
+    };
+    ColorGradientPicker.prototype.__locateIntervalAt = function (relativePosition) {
+        for (var i = 0; i < this._sliderElementRefs.length; i++) {
+            if (this.__getSliderValue(i, 1.0) <= relativePosition) {
+                return i;
+            }
+        }
+        return -1;
+    };
     /**
      * Get the value of the n-th rangel slider.
      *
@@ -128,6 +202,10 @@ var ColorGradientPicker = /** @class */ (function () {
         }
         return Number.parseFloat(this._sliderElementRefs[sliderIndex].current.value);
     };
+    ColorGradientPicker.prototype.__getAllSliderValues = function () {
+        var _this = this;
+        return this._sliderElementRefs.map(function (ref, index) { return _this.__getSliderPercentage(index); });
+    };
     /**
      * Updates the container's background to display the configured color gradient.
      *
@@ -135,12 +213,7 @@ var ColorGradientPicker = /** @class */ (function () {
      */
     ColorGradientPicker.prototype.__updateBackgroundGradient = function () {
         var colorGradient = this.getColorGradient();
-        // console.log("__updateBackgroundGradient", colorGradient);
-        // this.container.style["background"] = colorGradient;
-        // console.log("this.containerRef.current", this.containerRef.current);
         this.containerRef.current.style["background"] = colorGradient;
-        // console.log(this.container);
-        // document.body.style["background"] = colorGradient;
     };
     ColorGradientPicker.prototype.__updateColorIndicator = function (rangeSliderIndex) {
         var colorValue = this.__getSliderColor(rangeSliderIndex, "grey");
@@ -214,8 +287,6 @@ var ColorGradientPicker = /** @class */ (function () {
         this.colorInputRef = NoReact.useRef();
         this.containerRef = NoReact.useRef();
         var handleIndicatorButtonClick = function () {
-            console.log("clicked");
-            // _self.colorInput.dispatchEvent(new Event("input"));
             _self.colorInputRef.current.click();
         };
         var currentColors = [0, 1, 2, 3, 4, 5];
@@ -226,9 +297,8 @@ var ColorGradientPicker = /** @class */ (function () {
                 flexDirection: "column",
                 width: "100%",
                 height: "32px",
-                position: "relative",
-                background: "linear-gradient(90deg, red 0%, orange 20%, yellow 40%, green 60%, blue 80%, purple 100%)"
-            }, ref: this.containerRef },
+                position: "relative"
+            }, ref: this.containerRef, onClick: this.__containerClickHandler() },
             createCustomStylesElement(elementId),
             currentColors.map(function (index) {
                 var initialColor = _this.COLORSET[index % _this.COLORSET.length];
@@ -264,35 +334,4 @@ var createCustomStylesElement = function (elementId) {
     //    https://css-tricks.com/multi-thumb-sliders-particular-two-thumb-case/
     return (NoReact.createElement("style", null, "\n    #".concat(elementId, " input[type='range'] {\n\n      -webkit-appearance: none;\n\n      grid-column: 1;\n      grid-row: 2;\n      \n      /* same as before */\n      background: none; /* get rid of white Chrome background */\n      color: #000;\n      font: inherit; /* fix too small font-size in both Chrome & Firefox */\n      margin: 0;\n      pointer-events: none; /* let clicks pass through */\n    }\n\n    #").concat(elementId, " input[type='range']::-webkit-slider-runnable-track {\n      -webkit-appearance: none;\n\n      background: none; /* get rid of Firefox track background */\n      height: 100%;\n      width: 100%;\n\n      pointer-events: none;\n    }\n\n    #").concat(elementId, " input[type='range']::-webkit-slider-thumb {\n      -webkit-appearance: none;\n      background: currentcolor;\n      border: none; /* get rid of Firefox thumb border */\n      border-radius: 6px; /* get rid of Firefox corner rounding */\n      pointer-events: auto; /* catch clicks */\n      width: ").concat(thumbWidth, "; \n      height: ").concat(thumbHeight, ";\n    }\n\n    #").concat(elementId, " input[type='range']:focus::-webkit-slider-thumb {\n      border: 2px solid white;\n    }\n\n    #").concat(elementId, " input[type='range']::-moz-range-track {\n      -webkit-appearance: none;\n      background: none; /* get rid of Firefox track background */\n      height: 100%;\n      width: 100%;\n      pointer-events: none;\n    }\n\n    #").concat(elementId, " input[type='range']::-moz-range-thumb {\n      /* -webkit-appearance: none; */\n      background: currentcolor;\n      border: none; /* get rid of Firefox thumb border */\n      border-radius: 6px; /* get rid of Firefox corner rounding */\n      pointer-events: auto; /* catch clicks */\n      width: ").concat(thumbWidth, "; \n      height: ").concat(thumbHeight, ";\n    }\n\n    #").concat(elementId, " input[type='range']:focus::-moz-range-thumb {\n      border: 2px solid white;\n    }\n\n    #").concat(elementId, " input[type='range'] {\n      /* same as before */\n      z-index: 1;\n    }\n    \n    #").concat(elementId, " input[type='range']:focus {\n        z-index: 2;\n        /* outline: dotted 1px orange; */\n        color: darkorange;\n    }\n    ")));
 };
-// const Test = (name: string): JsxElement => {
-//   const click1 = () => {
-//     console.log("First clicked");
-//   };
-//   const click2 = () => {
-//     console.log("Second clicked");
-//   };
-//   const mouseEnter = (event: Event) => {
-//     (event.target as HTMLDivElement).style["background-color"] = "grey";
-//   };
-//   const mouseOut = (event: Event) => {
-//     (event.target as HTMLDivElement).style["background-color"] = "DeepSkyBlue";
-//   };
-//   return (
-//     <div className="NoReact-main">
-//       Hello {name}
-//       <div className="NoReact-child-1" onClick={click1}>
-//         Hello Nested
-//       </div>
-//       <div
-//         className="NoReact-child-2"
-//         onClick={click2}
-//         onMouseEnter={mouseEnter}
-//         onMouseOut={mouseOut}
-//         style={{ backgroundColor: "yellow" }}
-//       >
-//         Hello Nested 2
-//       </div>
-//     </div>
-//   );
-// };
 //# sourceMappingURL=ColorGradientPickerJSX.js.map
