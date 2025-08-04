@@ -41,3 +41,8 @@ demos/48-contour-plot/src/js/src
 .vscode/
 THINGS_TO_TEST_.md
 npm-package
+src/ts/utils/dom/components/_ColorGradientPicker_raw.ts_
+_tsconfig.browser.json
+tests/_test_colorgradientpicker.html
+tests/_test_colorgradientpicker.js
+steps-to-publish.md

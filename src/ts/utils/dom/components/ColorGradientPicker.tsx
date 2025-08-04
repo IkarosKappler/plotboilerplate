@@ -1,6 +1,11 @@
 /**
  * Approach for a 'simple' color gradient picker for my PlotBoilerplate library.
  *
+ * As it turned out a bit more complex in the end – due to the fact that color gradient
+ * picking is not a super simple task – so I used JSX here. Thus a JSX library is required
+ * to get this running: NoReact.
+ *
+ *
  * @author  Ikaros Kappler
  * @date    2025-06-27
  * @version 1.0.0
@@ -10,6 +15,9 @@ import * as NoReact from "noreact";
 import { JsxElement } from "typescript";
 
 import { Color } from "../../datastructures/Color";
+
+export type ColorGradient = Array<{ color: Color; position: number }>;
+export type ColorGradientChangeListener = (colorGradient: ColorGradient) => void;
 
 export class ColorGradientPicker {
   private readonly baseID: number;
@@ -29,6 +37,8 @@ export class ColorGradientPicker {
   private indicatorHeight = "1em";
 
   private COLORSET: Array<string> = ["#ff0000", "#ff8800", "#ffff00", "#00ff00", "#0000ff", "#8800ff"];
+
+  private installedChangeListeners: Array<ColorGradientChangeListener> = [];
 
   /**
    * The constructor: creates a new color gradient picker in the given container.
@@ -55,6 +65,26 @@ export class ColorGradientPicker {
     this.__updateColorIndicator(0);
     this.__updateBackgroundGradient();
   } // END constructor
+
+  addChangeListener(listener: ColorGradientChangeListener): boolean {
+    for (var i = 0; i < this.installedChangeListeners.length; i++) {
+      if (this.installedChangeListeners[i] === listener) {
+        return false;
+      }
+    }
+    this.installedChangeListeners.push(listener);
+    return true;
+  }
+
+  removeChangeListener(listener: ColorGradientChangeListener): boolean {
+    for (var i = 0; i < this.installedChangeListeners.length; i++) {
+      if (this.installedChangeListeners[i] === listener) {
+        this.installedChangeListeners.splice(i, 1);
+        return true;
+      }
+    }
+    return false;
+  }
 
   /**
    * Creates a new color range input element.
