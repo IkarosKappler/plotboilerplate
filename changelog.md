@@ -12,6 +12,9 @@
 - Todo: TBImage should implement Bounds.
 - Todo: check if BezierPathInteractionHelper can work without every possible redraw (event mouseIsOver)
 
+- 2025-08-04
+  - Adding the `ColorGradient` class.
+  - Adding more features to the `ColorGradientPicker` class: removing color is now possible.
 - 2025-06-07
   - Adding `Polygon.closestLineIntersectionIndex` to determine line intersections plus detected edge index.
   - Adding helper type `PolygonIntersectionTuple` for re-usability.

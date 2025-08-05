@@ -10,12 +10,8 @@
  * @date    2025-06-27
  * @version 1.0.0
  */
-import { Color } from "../../datastructures/Color";
-export type ColorGradient = Array<{
-    color: Color;
-    position: number;
-}>;
-export type ColorGradientChangeListener = (colorGradient: ColorGradient) => void;
+import { ColorGradient } from "../../datastructures/ColorGradient";
+export type ColorGradientChangeListener = (colorGradient: ColorGradient, source: ColorGradientPicker) => void;
 export declare class ColorGradientPicker {
     private readonly baseID;
     private container;
@@ -43,8 +39,20 @@ export declare class ColorGradientPicker {
      * @param {string?} containerID - (optional) If you want to use an existing container (should be a DIV).
      */
     constructor(containerID?: string);
+    /**
+     * Adds a new color gradient change listener to this ColorGradientPicker.
+     *
+     * @param {ColorGradientChangeListener} listener - The listener to add.
+     * @returns {boolean} True, if the listener was added and did not exist before.
+     */
     addChangeListener(listener: ColorGradientChangeListener): boolean;
+    /**
+     *
+     * @param {ColorGradientChangeListener} listener The listener to remove.
+     * @returns {boolean} True, if the listener existed and has been removed.
+     */
     removeChangeListener(listener: ColorGradientChangeListener): boolean;
+    private __fireChangeEvent;
     /**
      * Creates a new color range input element.
      *
@@ -74,7 +82,19 @@ export declare class ColorGradientPicker {
     __updateSliderDataSetIndices(startIndex: number): void;
     __containerClickHandler(): (evt: MouseEvent) => void;
     private __locateClosestSliderValue;
-    __clickEventToRelativeValue(evt: MouseEvent): number;
+    /**
+     * Convert the click event to the relative x value in [0..1].
+     *
+     * @param {MouseEvent} evt - The mouse event.
+     * @returns {number} The relative x value.
+     */
+    private __clickEventToRelativeValue;
+    /**
+     * Adds a slider at the given interval index.
+     *
+     * @param {number} absoluteValue - The absolute new slider value.
+     * @param {number} leftSliderIndex - The new slider's position (interval index).
+     */
     private __addSliderAt;
     /**
      * Get the slider color at the given absolute value. That value must be inside the [MIN_VALUE, MAX_VALUE] interval.
@@ -103,6 +123,10 @@ export declare class ColorGradientPicker {
      * @returns
      */
     private __getSliderValue;
+    /**
+     * Get all current slider values as an array.
+     * @returns
+     */
     private __getAllSliderValues;
     /**
      * Updates the container's background to display the configured color gradient.
@@ -110,20 +134,33 @@ export declare class ColorGradientPicker {
      * @private
      */
     private __updateBackgroundGradient;
+    /**
+     * After changes this function updates the color indicator button.
+     *
+     * @param {number} rangeSliderIndex - The new active slider index.
+     */
     private __updateColorIndicator;
     /**
      * Get a color gradient CSS value string from the current editor settings.
      *
      * @instance
      * @memberof ColorGradientPicker
-     * @returns {string}
+     * @returns {ColorGradient}
      */
-    getColorGradient(): string;
+    getColorGradient(): ColorGradient;
     /**
      * Get the configured color value of the n-th rangel slider.
      *
      * @param {number} sliderIndex
      * @param {string} fallback
+     * @returns
+     */
+    private __getSliderColorString;
+    /**
+     * Get get color of this gradient picker at the given slider index.
+     *
+     * @param {number} sliderIndex - The index to get the slider color from. Something between 0 and _sliderElementRefs.length.
+     * @param {Color} fallback
      * @returns
      */
     private __getSliderColor;
