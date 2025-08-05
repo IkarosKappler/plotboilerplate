@@ -34,5 +34,8 @@ export class ColorGradient {
         buffer.push(")");
         return buffer.join(" ");
     }
+    static parse(inputString) {
+        return null;
+    }
 }
 //# sourceMappingURL=ColorGradient.js.map

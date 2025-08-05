@@ -23,4 +23,5 @@ export declare class ColorGradient {
      * @returns {string}
      */
     toColorGradientString(): string;
+    static parse(inputString: string): ColorGradient;
 }

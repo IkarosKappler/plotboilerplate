@@ -37,6 +37,9 @@ var ColorGradient = /** @class */ (function () {
         buffer.push(")");
         return buffer.join(" ");
     };
+    ColorGradient.parse = function (inputString) {
+        return null;
+    };
     return ColorGradient;
 }());
 exports.ColorGradient = ColorGradient;

@@ -228,7 +228,7 @@ var ColorGradientPicker = /** @class */ (function () {
     ColorGradientPicker.prototype.__containerClickHandler = function () {
         var _this = this;
         var _self = this;
-        var maxDifference = _self.getRangeLength() * 0.01;
+        var maxDifference = _self.getRangeLength() * 0.03;
         return function (evt) {
             var relativeValue = _this.__clickEventToRelativeValue(evt);
             if (relativeValue < 0 || relativeValue > 1.0) {
@@ -529,7 +529,8 @@ var ColorGradientPicker = /** @class */ (function () {
                 flexDirection: "column",
                 width: "100%",
                 height: "32px",
-                position: "relative"
+                position: "relative",
+                marginBottom: "3em"
             }, ref: this.containerRef, onClick: this.__containerClickHandler() },
             createCustomStylesElement(elementId),
             currentColors.map(function (index) {

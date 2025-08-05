@@ -46,4 +46,9 @@ export class ColorGradient {
 
     return buffer.join(" ");
   }
+
+  public static parse(inputString: string): ColorGradient {
+    // TODO: parse color gradient string
+    return null;
+  }
 }

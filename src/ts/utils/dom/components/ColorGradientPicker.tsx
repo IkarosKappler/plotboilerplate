@@ -275,7 +275,7 @@ export class ColorGradientPicker {
 
   __containerClickHandler(): (evt: MouseEvent) => void {
     const _self = this;
-    const maxDifference = _self.getRangeLength() * 0.01;
+    const maxDifference = _self.getRangeLength() * 0.03;
     return (evt: MouseEvent): void => {
       const relativeValue: number = this.__clickEventToRelativeValue(evt);
       if (relativeValue < 0 || relativeValue > 1.0) {
@@ -607,7 +607,8 @@ export class ColorGradientPicker {
           flexDirection: "column",
           width: "100%",
           height: "32px",
-          position: "relative"
+          position: "relative",
+          marginBottom: "3em"
         }}
         ref={this.containerRef}
         onClick={this.__containerClickHandler()}
