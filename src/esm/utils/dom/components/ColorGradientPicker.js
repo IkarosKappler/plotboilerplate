@@ -40,6 +40,7 @@ export class ColorGradientPicker {
             { color: Color.PURPLE, ratio: 1.0 }
         ];
         this.installedChangeListeners = [];
+        this.__mouseDownPosition = null;
         /**
          * Creates a callback function for range slider.
          *
@@ -93,9 +94,6 @@ export class ColorGradientPicker {
         }
         this.baseID = Math.floor(Math.random() * 65535);
         this.colorGradient = new ColorGradient(this.DEFAULT_COLORSET, Math.PI / 2.0);
-        // const values: Array<ColorGradientItem> = this._sliderElementRefs.map((_ref: NoReact.Ref<HTMLInputElement>, index: number) => {
-        //   return { color: this.__getSliderColor(index, null), ratio: this.__getSliderPercentage(index) };
-        // });
         this.container.append(this._render());
         this.__updateColorIndicator(0);
         this.__updateBackgroundGradient();
@@ -154,19 +152,24 @@ export class ColorGradientPicker {
         this._sliderElementRefs.splice(index, 0, ref);
         console.log("new _sliderElementRefs", this._sliderElementRefs);
         // Update all elements to the right of the new elelemt
-        // for (var i = index + 1; i < this._sliderElementRefs.length; i++) {
-        //   this._sliderElementRefs[i].current.setAttribute("data-range-slider-index", `${i}`);
-        //   this._sliderElementRefs[i].current.setAttribute("id", `rage-slider-${this.baseID}-${i}`);
-        // }
         this.__updateSliderDataSetIndices(index + 1);
         return (NoReact.createElement("input", { id: `rage-slider-${this.baseID}-${index}`, type: "range", min: sliderMin, max: sliderMax, value: initialValue, style: { position: "absolute", left: "0px", top: "0px", width: "100%" }, "data-range-slider-index": index, "data-color-value": initialColor.cssRGB(), onChange: sliderHandler, onClick: sliderHandler, 
-            // onMouseDown={mouseDownHandler}
-            // onMouseUp={mouseUpHandler}
+            // onMouseDown={this.__handleMouseDownEvent()}
+            // onMouseUp={this.__handleMouseUpEvent()}
             ref: ref }));
     }
+    /**
+     * Get the absolute length of this range, in slider units.
+     * @returns
+     */
     getRangeLength() {
         return this.sliderMax - this.sliderMin;
     }
+    /**
+     * Handles color value changes.
+     *
+     * @returns
+     */
     __colorChangeHandler() {
         const _self = this;
         return (_evt) => {
@@ -231,13 +234,35 @@ export class ColorGradientPicker {
             this._sliderElementRefs[i].current.setAttribute("id", `rage-slider-${this.baseID}-${i}`);
         }
     }
+    __containerMouseDownHandler() {
+        const _self = this;
+        return (event) => {
+            _self.__mouseDownPosition = { x: event.clientX, y: event.clientY };
+            console.log("__containerMouseDownHandler _self.__mouseDownPosition", _self.__mouseDownPosition);
+        };
+    }
+    // private __containerMouseUpHandler(): (event: MouseEvent) => void {
+    //   const _self = this;
+    //   return (_event: MouseEvent) => {
+    //     _self.__mouseDownPosition = null;
+    //     console.log("__containerMouseUpHandler");
+    //   };
+    // }
     __containerClickHandler() {
         const _self = this;
         const maxDifference = _self.getRangeLength() * 0.03;
         return (evt) => {
-            const relativeValue = this.__clickEventToRelativeValue(evt);
+            console.log("Container click handler");
+            const relativeValue = _self.__clickEventToRelativeValue(evt);
             if (relativeValue < 0 || relativeValue > 1.0) {
                 // Clicked somewhere outside the range
+                return;
+            }
+            // Check if element was moved in the meantime
+            if (_self.__mouseDownPosition && Math.abs(_self.__mouseDownPosition.x - evt.clientX) >= 10.0) {
+                // Ignore event if mouse was moved more than 10 pixels between down- and up-event
+                console.log("Mouse was moved more than 10 px. Cancelling.");
+                _self.__mouseDownPosition = null;
                 return;
             }
             const absoluteValue = this.__relativeToAbsolute(relativeValue);
@@ -262,6 +287,8 @@ export class ColorGradientPicker {
             else {
                 // console.debug("Don't add slider here.");
             }
+            // Finally clear mousedown-position
+            _self.__mouseDownPosition = null;
         };
     }
     __locateClosestSliderValue(absoluteValue) {
@@ -545,7 +572,9 @@ export class ColorGradientPicker {
                 height: "32px",
                 position: "relative",
                 marginBottom: "3em"
-            }, ref: this.containerRef, onClick: this.__containerClickHandler() },
+            }, ref: this.containerRef, onMouseDown: this.__containerMouseDownHandler(), 
+            // onMouseUp={this.__containerMouseUpHandler()}
+            onClick: this.__containerClickHandler() },
             createCustomStylesElement(elementId),
             this.colorGradient.values.map((colorGradientItem, index) => {
                 // const initialColor: string = this.DEFAULT_COLORSET[index % this.DEFAULT_COLORSET.length];

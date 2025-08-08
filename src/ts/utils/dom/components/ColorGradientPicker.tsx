@@ -49,6 +49,8 @@ export class ColorGradientPicker {
 
   private installedChangeListeners: Array<ColorGradientChangeListener> = [];
 
+  private __mouseDownPosition: { x: number; y: number } = null;
+
   /**
    * The constructor: creates a new color gradient picker in the given container.
    * If no container or ID is given then a new unbound `container` will be created (DIV).
@@ -140,10 +142,6 @@ export class ColorGradientPicker {
     console.log("new _sliderElementRefs", this._sliderElementRefs);
 
     // Update all elements to the right of the new elelemt
-    // for (var i = index + 1; i < this._sliderElementRefs.length; i++) {
-    //   this._sliderElementRefs[i].current.setAttribute("data-range-slider-index", `${i}`);
-    //   this._sliderElementRefs[i].current.setAttribute("id", `rage-slider-${this.baseID}-${i}`);
-    // }
     this.__updateSliderDataSetIndices(index + 1);
 
     return (
@@ -158,13 +156,17 @@ export class ColorGradientPicker {
         data-color-value={initialColor.cssRGB()}
         onChange={sliderHandler}
         onClick={sliderHandler}
-        // onMouseDown={mouseDownHandler}
-        // onMouseUp={mouseUpHandler}
+        // onMouseDown={this.__handleMouseDownEvent()}
+        // onMouseUp={this.__handleMouseUpEvent()}
         ref={ref}
       />
     );
   }
 
+  /**
+   * Get the absolute length of this range, in slider units.
+   * @returns
+   */
   getRangeLength(): number {
     return this.sliderMax - this.sliderMin;
   }
@@ -174,7 +176,7 @@ export class ColorGradientPicker {
    *
    * @returns
    */
-  __createSliderChangeHandler = (): ((e: Event) => boolean) => {
+  private __createSliderChangeHandler = (): ((e: Event) => boolean) => {
     const _self = this;
     return (e: Event): boolean => {
       const targetSlider: HTMLInputElement = e.target as HTMLInputElement;
@@ -210,6 +212,11 @@ export class ColorGradientPicker {
     };
   };
 
+  /**
+   * Handles color value changes.
+   *
+   * @returns
+   */
   __colorChangeHandler(): (_evt: Event) => boolean {
     const _self = this;
     return (_evt: Event): boolean => {
@@ -283,15 +290,41 @@ export class ColorGradientPicker {
     }
   }
 
-  __containerClickHandler(): (evt: MouseEvent) => void {
+  private __containerMouseDownHandler(): (event: MouseEvent) => void {
+    const _self = this;
+    return (event: MouseEvent) => {
+      _self.__mouseDownPosition = { x: event.clientX, y: event.clientY };
+      console.log("__containerMouseDownHandler _self.__mouseDownPosition", _self.__mouseDownPosition);
+    };
+  }
+
+  // private __containerMouseUpHandler(): (event: MouseEvent) => void {
+  //   const _self = this;
+  //   return (_event: MouseEvent) => {
+  //     _self.__mouseDownPosition = null;
+  //     console.log("__containerMouseUpHandler");
+  //   };
+  // }
+
+  private __containerClickHandler(): (evt: MouseEvent) => void {
     const _self = this;
     const maxDifference = _self.getRangeLength() * 0.03;
     return (evt: MouseEvent): void => {
-      const relativeValue: number = this.__clickEventToRelativeValue(evt);
+      console.log("Container click handler");
+      const relativeValue: number = _self.__clickEventToRelativeValue(evt);
       if (relativeValue < 0 || relativeValue > 1.0) {
         // Clicked somewhere outside the range
         return;
       }
+
+      // Check if element was moved in the meantime
+      if (_self.__mouseDownPosition && Math.abs(_self.__mouseDownPosition.x - evt.clientX) >= 10.0) {
+        // Ignore event if mouse was moved more than 10 pixels between down- and up-event
+        console.log("Mouse was moved more than 10 px. Cancelling.");
+        _self.__mouseDownPosition = null;
+        return;
+      }
+
       const absoluteValue: number = this.__relativeToAbsolute(relativeValue);
       console.log("click", "relativeValue", relativeValue, "absoluteValue", absoluteValue);
       // Check if click position (ratio) is far enough away from any slider
@@ -313,6 +346,8 @@ export class ColorGradientPicker {
       } else {
         // console.debug("Don't add slider here.");
       }
+      // Finally clear mousedown-position
+      _self.__mouseDownPosition = null;
     };
   }
 
@@ -637,6 +672,8 @@ export class ColorGradientPicker {
           marginBottom: "3em"
         }}
         ref={this.containerRef}
+        onMouseDown={this.__containerMouseDownHandler()}
+        // onMouseUp={this.__containerMouseUpHandler()}
         onClick={this.__containerClickHandler()}
       >
         {createCustomStylesElement(elementId)}

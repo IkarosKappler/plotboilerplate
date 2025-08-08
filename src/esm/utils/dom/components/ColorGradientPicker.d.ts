@@ -29,6 +29,7 @@ export declare class ColorGradientPicker {
     private DEFAULT_COLORSET;
     private colorGradient;
     private installedChangeListeners;
+    private __mouseDownPosition;
     /**
      * The constructor: creates a new color gradient picker in the given container.
      * If no container or ID is given then a new unbound `container` will be created (DIV).
@@ -66,13 +67,22 @@ export declare class ColorGradientPicker {
      * @returns
      */
     private __createColorRangeInput;
+    /**
+     * Get the absolute length of this range, in slider units.
+     * @returns
+     */
     getRangeLength(): number;
     /**
      * Creates a callback function for range slider.
      *
      * @returns
      */
-    __createSliderChangeHandler: () => (e: Event) => boolean;
+    private __createSliderChangeHandler;
+    /**
+     * Handles color value changes.
+     *
+     * @returns
+     */
     __colorChangeHandler(): (_evt: Event) => boolean;
     /**
      * Removed the current color slider from the DOM and highlights the left neighbour.
@@ -80,7 +90,8 @@ export declare class ColorGradientPicker {
      */
     __handleRemoveColor(): boolean;
     __updateSliderDataSetIndices(startIndex: number): void;
-    __containerClickHandler(): (evt: MouseEvent) => void;
+    private __containerMouseDownHandler;
+    private __containerClickHandler;
     private __locateClosestSliderValue;
     /**
      * Convert the click event to the relative x value in [0..1].
