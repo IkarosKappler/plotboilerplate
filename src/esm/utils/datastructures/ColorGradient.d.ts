@@ -36,4 +36,9 @@ export declare class ColorGradient {
      * @returns {ColorGradient}
      */
     clone(): ColorGradient;
+    /**
+     * Create a default color gradient with six color: red, orange, yellow, green, blue, purple.
+     * @returns
+     */
+    static createDefault(): ColorGradient;
 }

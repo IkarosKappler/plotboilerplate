@@ -23,10 +23,13 @@ export declare class ColorGradientPicker {
     private colorInputContainerRef;
     private sliderMin;
     private sliderMax;
-    private indicatorWidth_num;
-    private indicatorWidth;
-    private indicatorHeight;
-    private DEFAULT_COLORSET;
+    private isMobileMode;
+    private css_indicatorWidth_num;
+    private css_indicatorWidth;
+    private css_indicatorHeight;
+    private css_thumbWidth;
+    private css_thumbHeight;
+    private css_containerHeight;
     private colorGradient;
     private installedChangeListeners;
     private __mouseDownPosition;
@@ -39,7 +42,7 @@ export declare class ColorGradientPicker {
      *
      * @param {string?} containerID - (optional) If you want to use an existing container (should be a DIV).
      */
-    constructor(containerID?: string);
+    constructor(containerID?: string, isMobileMode?: boolean);
     /**
      * Adds a new color gradient change listener to this ColorGradientPicker.
      *
@@ -86,12 +89,36 @@ export declare class ColorGradientPicker {
     __colorChangeHandler(): (_evt: Event) => boolean;
     /**
      * Removed the current color slider from the DOM and highlights the left neighbour.
+     *
+     * @returns {boolean} True if the element could be successfully removed.
+     */
+    private __handleRemoveColor;
+    /**
+     * Once a slider element was added or removed then the following indices must be updated.
+     *
+     * @param {number} startIndex - The slider index to start updating at.
+     */
+    __updateSliderDataSetIndices(startIndex: number): void;
+    /**
+     * To avoid too many sliders added on each click, check if the mouse was moved in the meantime (detect drag event).
+     *
      * @returns
      */
-    __handleRemoveColor(): boolean;
-    __updateSliderDataSetIndices(startIndex: number): void;
     private __containerMouseDownHandler;
+    /**
+     * Creates a handler for click events on the container. If the click event is far
+     * enough from existing sliders, then it can be added.
+     *
+     * @returns
+     */
     private __containerClickHandler;
+    /**
+     * Find that slider (index) that's value is closest to the given absolute value. The function will return
+     * the closest value and the left index, indicating the containing interval index.
+     *
+     * @param {number} absoluteValue - The value to look for.
+     * @returns {[number,number]} A pair of left slider index and closest value.
+     */
     private __locateClosestSliderValue;
     /**
      * Convert the click event to the relative x value in [0..1].

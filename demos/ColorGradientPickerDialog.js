@@ -10,10 +10,16 @@
  */
 
 (function (_context) {
-  var ColorGradientPickerDialog = function (modalDialog) {
+  /**
+   * Creates a new ColorGradientPickerDialog from a given modal dialog.
+   *
+   * @param {Modal} modalDialog
+   * @param {boolean} options.isMobileMode - In mobile mode the picker element will be rendered bigger for better usability.
+   */
+  var ColorGradientPickerDialog = function (modalDialog, options) {
     // var modal = new Modal({ closeOnBackdropClick: true });
     this.modalDialog = modalDialog;
-    this.colorGradientPicker = new ColorGradientPicker(null);
+    this.colorGradientPicker = new ColorGradientPicker(null, options.isMobileMode);
   };
 
   /**
@@ -21,6 +27,7 @@
    *
    * @param {function} options.onAcceptGradient
    * @param {ColorGradient} options.colorGradient
+   * @param {boolean} options.isMobileMode
    */
   ColorGradientPickerDialog.prototype.show = function (options) {
     var _self = this;

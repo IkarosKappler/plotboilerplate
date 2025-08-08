@@ -14,6 +14,15 @@ import { Color } from "./Color";
 
 const RAD_TO_DEG = 180.0 / Math.PI;
 
+const DEFAULT_COLORSET: Array<ColorGradientItem> = [
+  { color: Color.RED, ratio: 0.0 },
+  { color: Color.GOLD, ratio: 0.2 },
+  { color: Color.YELLOW, ratio: 0.4 },
+  { color: Color.LIME_GREEN, ratio: 0.6 },
+  { color: Color.MEDIUM_BLUE, ratio: 0.8 },
+  { color: Color.PURPLE, ratio: 1.0 }
+];
+
 export interface ColorGradientItem {
   color: Color;
   ratio: number; // A percentage value in [0.0 .. 1.0]
@@ -29,7 +38,8 @@ export class ColorGradient {
    */
   constructor(values: Array<ColorGradientItem>, angleInRadians?: number) {
     this.values = values;
-    this.angle = angleInRadians ?? 0.0;
+    // Default: left to right
+    this.angle = typeof angleInRadians === "undefined" ? Math.PI / 2.0 : angleInRadians;
   }
 
   /**
@@ -69,5 +79,13 @@ export class ColorGradient {
       }),
       this.angle
     );
+  }
+
+  /**
+   * Create a default color gradient with six color: red, orange, yellow, green, blue, purple.
+   * @returns
+   */
+  public static createDefault(): ColorGradient {
+    return new ColorGradient(DEFAULT_COLORSET.map((item: ColorGradientItem) => ({ color: item.color, ratio: item.ratio })));
   }
 }

@@ -12,7 +12,16 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ColorGradient = void 0;
+var Color_1 = require("./Color");
 var RAD_TO_DEG = 180.0 / Math.PI;
+var DEFAULT_COLORSET = [
+    { color: Color_1.Color.RED, ratio: 0.0 },
+    { color: Color_1.Color.GOLD, ratio: 0.2 },
+    { color: Color_1.Color.YELLOW, ratio: 0.4 },
+    { color: Color_1.Color.LIME_GREEN, ratio: 0.6 },
+    { color: Color_1.Color.MEDIUM_BLUE, ratio: 0.8 },
+    { color: Color_1.Color.PURPLE, ratio: 1.0 }
+];
 var ColorGradient = /** @class */ (function () {
     /**
      *
@@ -20,7 +29,8 @@ var ColorGradient = /** @class */ (function () {
      */
     function ColorGradient(values, angleInRadians) {
         this.values = values;
-        this.angle = angleInRadians !== null && angleInRadians !== void 0 ? angleInRadians : 0.0;
+        // Default: left to right
+        this.angle = typeof angleInRadians === "undefined" ? Math.PI / 2.0 : angleInRadians;
     }
     /**
      * Get a color gradient CSS value string from these gradient settings.
@@ -54,6 +64,13 @@ var ColorGradient = /** @class */ (function () {
         return new ColorGradient(this.values.map(function (item) {
             return { color: item.color, ratio: item.ratio };
         }), this.angle);
+    };
+    /**
+     * Create a default color gradient with six color: red, orange, yellow, green, blue, purple.
+     * @returns
+     */
+    ColorGradient.createDefault = function () {
+        return new ColorGradient(DEFAULT_COLORSET.map(function (item) { return ({ color: item.color, ratio: item.ratio }); }));
     };
     return ColorGradient;
 }());

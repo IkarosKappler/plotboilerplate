@@ -26,23 +26,19 @@ var ColorGradientPicker = /** @class */ (function () {
      *
      * @param {string?} containerID - (optional) If you want to use an existing container (should be a DIV).
      */
-    function ColorGradientPicker(containerID) {
+    function ColorGradientPicker(containerID, isMobileMode) {
         var _this = this;
         this._sliderElementRefs = [];
         this.sliderMin = 0;
         this.sliderMax = 100;
-        this.indicatorWidth_num = 1.0;
-        this.indicatorWidth = "1em";
-        // private indicatorWidth_half = "0.5em";
-        this.indicatorHeight = "1em";
-        this.DEFAULT_COLORSET = [
-            { color: Color_1.Color.RED, ratio: 0.0 },
-            { color: Color_1.Color.GOLD, ratio: 0.2 },
-            { color: Color_1.Color.YELLOW, ratio: 0.4 },
-            { color: Color_1.Color.LIME_GREEN, ratio: 0.6 },
-            { color: Color_1.Color.MEDIUM_BLUE, ratio: 0.8 },
-            { color: Color_1.Color.PURPLE, ratio: 1.0 }
-        ];
+        // Only used during initialization!
+        this.isMobileMode = false;
+        this.css_indicatorWidth_num = 1.0;
+        this.css_indicatorWidth = "1em";
+        this.css_indicatorHeight = "1em";
+        this.css_thumbWidth = "0.5em";
+        this.css_thumbHeight = "1.333em";
+        this.css_containerHeight = "32px";
         this.installedChangeListeners = [];
         this.__mouseDownPosition = null;
         /**
@@ -54,13 +50,13 @@ var ColorGradientPicker = /** @class */ (function () {
             var _self = _this;
             return function (e) {
                 var targetSlider = e.target;
-                console.log("Clicked", targetSlider ? targetSlider.getAttribute("id") : null);
+                // console.log("Clicked", targetSlider ? targetSlider.getAttribute("id") : null);
                 if (!targetSlider) {
                     return false;
                 }
                 var currentSliderValue = Number.parseFloat(targetSlider.value);
                 var rangeSliderIndexRaw = targetSlider.dataset["rangeSliderIndex"];
-                console.log("rangeSliderIndexRaw", rangeSliderIndexRaw);
+                // console.log("rangeSliderIndexRaw", rangeSliderIndexRaw);
                 if (!rangeSliderIndexRaw) {
                     return false;
                 }
@@ -97,7 +93,17 @@ var ColorGradientPicker = /** @class */ (function () {
             this.container = document.createElement("div");
         }
         this.baseID = Math.floor(Math.random() * 65535);
-        this.colorGradient = new ColorGradient_1.ColorGradient(this.DEFAULT_COLORSET, Math.PI / 2.0);
+        this.colorGradient = ColorGradient_1.ColorGradient.createDefault();
+        this.isMobileMode = isMobileMode;
+        if (isMobileMode) {
+            // Double size :)
+            this.css_indicatorWidth_num = 2.0;
+            this.css_indicatorWidth = "2em";
+            this.css_indicatorHeight = "2em";
+            this.css_thumbWidth = "1.0em";
+            this.css_thumbHeight = "2.666em";
+            this.css_containerHeight = "64px";
+        }
         this.container.append(this._render());
         this.__updateColorIndicator(0);
         this.__updateBackgroundGradient();
@@ -154,13 +160,10 @@ var ColorGradientPicker = /** @class */ (function () {
         var ref = NoReact.useRef();
         // this._sliderElementRefs.push(ref);
         this._sliderElementRefs.splice(index, 0, ref);
-        console.log("new _sliderElementRefs", this._sliderElementRefs);
+        // console.log("new _sliderElementRefs", this._sliderElementRefs);
         // Update all elements to the right of the new elelemt
         this.__updateSliderDataSetIndices(index + 1);
-        return (NoReact.createElement("input", { id: "rage-slider-".concat(this.baseID, "-").concat(index), type: "range", min: sliderMin, max: sliderMax, value: initialValue, style: { position: "absolute", left: "0px", top: "0px", width: "100%" }, "data-range-slider-index": index, "data-color-value": initialColor.cssRGB(), onChange: sliderHandler, onClick: sliderHandler, 
-            // onMouseDown={this.__handleMouseDownEvent()}
-            // onMouseUp={this.__handleMouseUpEvent()}
-            ref: ref }));
+        return (NoReact.createElement("input", { id: "rage-slider-".concat(this.baseID, "-").concat(index), type: "range", min: sliderMin, max: sliderMax, value: initialValue, style: { position: "absolute", left: "0px", top: "0px", width: "100%", height: "60%" }, "data-range-slider-index": index, "data-color-value": initialColor.cssRGB(), onChange: sliderHandler, onClick: sliderHandler, ref: ref }));
     };
     /**
      * Get the absolute length of this range, in slider units.
@@ -178,16 +181,15 @@ var ColorGradientPicker = /** @class */ (function () {
         var _this = this;
         var _self = this;
         return function (_evt) {
-            // const colorInput : HTMLInputElement | null = evt.target;
-            console.log("__colorChangeHandler");
+            // console.log("__colorChangeHandler");
             var activeSliderIndex_raw = _this.colorInputRef.current.dataset["activeSliderIndex"];
             if (!activeSliderIndex_raw) {
-                console.warn("Cannot update color indicator; no active range slider set.");
+                console.warn("Cannot update color indicator; no active range slider set. This is likely a program error and should not happen.");
                 return false;
             }
             var activeSliderIndex = Number.parseInt(activeSliderIndex_raw);
             if (Number.isNaN(activeSliderIndex) || activeSliderIndex < 0 || activeSliderIndex >= _self._sliderElementRefs.length) {
-                console.warn("Cannot update color indicator; active index invalid or out of bounds.", activeSliderIndex);
+                console.warn("Cannot update color indicator; active index invalid or out of bounds. This is likely a program error and should not happen.", activeSliderIndex);
                 return false;
             }
             var newColor = _self.colorInputRef.current.value;
@@ -202,7 +204,8 @@ var ColorGradientPicker = /** @class */ (function () {
     };
     /**
      * Removed the current color slider from the DOM and highlights the left neighbour.
-     * @returns
+     *
+     * @returns {boolean} True if the element could be successfully removed.
      */
     ColorGradientPicker.prototype.__handleRemoveColor = function () {
         // const colorInput : HTMLInputElement | null = evt.target;
@@ -232,6 +235,11 @@ var ColorGradientPicker = /** @class */ (function () {
         this.__fireChangeEvent();
         return true;
     };
+    /**
+     * Once a slider element was added or removed then the following indices must be updated.
+     *
+     * @param {number} startIndex - The slider index to start updating at.
+     */
     ColorGradientPicker.prototype.__updateSliderDataSetIndices = function (startIndex) {
         // Update all elements to the right of the new elelemt
         for (var i = startIndex; i < this._sliderElementRefs.length; i++) {
@@ -239,26 +247,30 @@ var ColorGradientPicker = /** @class */ (function () {
             this._sliderElementRefs[i].current.setAttribute("id", "rage-slider-".concat(this.baseID, "-").concat(i));
         }
     };
+    /**
+     * To avoid too many sliders added on each click, check if the mouse was moved in the meantime (detect drag event).
+     *
+     * @returns
+     */
     ColorGradientPicker.prototype.__containerMouseDownHandler = function () {
         var _self = this;
         return function (event) {
             _self.__mouseDownPosition = { x: event.clientX, y: event.clientY };
-            console.log("__containerMouseDownHandler _self.__mouseDownPosition", _self.__mouseDownPosition);
+            // console.log("__containerMouseDownHandler _self.__mouseDownPosition", _self.__mouseDownPosition);
         };
     };
-    // private __containerMouseUpHandler(): (event: MouseEvent) => void {
-    //   const _self = this;
-    //   return (_event: MouseEvent) => {
-    //     _self.__mouseDownPosition = null;
-    //     console.log("__containerMouseUpHandler");
-    //   };
-    // }
+    /**
+     * Creates a handler for click events on the container. If the click event is far
+     * enough from existing sliders, then it can be added.
+     *
+     * @returns
+     */
     ColorGradientPicker.prototype.__containerClickHandler = function () {
         var _this = this;
         var _self = this;
         var maxDifference = _self.getRangeLength() * 0.03;
         return function (evt) {
-            console.log("Container click handler");
+            // console.log("Container click handler");
             var relativeValue = _self.__clickEventToRelativeValue(evt);
             if (relativeValue < 0 || relativeValue > 1.0) {
                 // Clicked somewhere outside the range
@@ -272,22 +284,12 @@ var ColorGradientPicker = /** @class */ (function () {
                 return;
             }
             var absoluteValue = _this.__relativeToAbsolute(relativeValue);
-            console.log("click", "relativeValue", relativeValue, "absoluteValue", absoluteValue);
+            // console.log("click", "relativeValue", relativeValue, "absoluteValue", absoluteValue);
             // Check if click position (ratio) is far enough away from any slider
             var _a = _self.__locateClosestSliderValue(absoluteValue), leftSliderIndex = _a[0], closestSliderValue = _a[1];
             var diff = Math.abs(closestSliderValue - absoluteValue);
-            // console.log(
-            //   "[__containerClickHandler] closestSliderValue",
-            //   closestSliderValue,
-            //   "leftSliderIndex",
-            //   leftSliderIndex,
-            //   "relativeValue",
-            //   relativeValue,
-            //   "difference",
-            //   diff
-            // );
             if (diff >= maxDifference) {
-                console.log("Add slider here");
+                // console.log("Add slider here");
                 _self.__addSliderAt(absoluteValue, leftSliderIndex);
             }
             else {
@@ -297,16 +299,21 @@ var ColorGradientPicker = /** @class */ (function () {
             _self.__mouseDownPosition = null;
         };
     };
+    /**
+     * Find that slider (index) that's value is closest to the given absolute value. The function will return
+     * the closest value and the left index, indicating the containing interval index.
+     *
+     * @param {number} absoluteValue - The value to look for.
+     * @returns {[number,number]} A pair of left slider index and closest value.
+     */
     ColorGradientPicker.prototype.__locateClosestSliderValue = function (absoluteValue) {
         var allSliderValues = this.__getAllSliderValues();
-        console.log("allSliderValues", allSliderValues);
+        // console.log("allSliderValues", allSliderValues);
         if (allSliderValues.length === 0) {
             console.warn("[Warn] All slider values array is empty. This should not happen, cannot proceed.");
             return [NaN, NaN]; // This should not happen: at least two values must be present in a gradient
         }
-        console.log("__locateClosestSliderValue", "allSliderValues", allSliderValues);
-        // Todo: Find closest ratio value
-        // let closestSliderValue = Number.MAX_VALUE;
+        // console.log("__locateClosestSliderValue", "allSliderValues", allSliderValues);
         var leftSliderIndex = 0;
         var closestSliderValue = allSliderValues[leftSliderIndex];
         for (var i = 1; i < allSliderValues.length; i++) {
@@ -335,7 +342,7 @@ var ColorGradientPicker = /** @class */ (function () {
         var x = evt.clientX - rect.left; //x position within the element.
         var width = rect.width; // target.clientWidth;
         var relativeValue = x / width;
-        console.log("width", width, "x", x, "relativeValue", relativeValue);
+        // console.log("width", width, "x", x, "relativeValue", relativeValue);
         return relativeValue;
     };
     /**
@@ -345,7 +352,7 @@ var ColorGradientPicker = /** @class */ (function () {
      * @param {number} leftSliderIndex - The new slider's position (interval index).
      */
     ColorGradientPicker.prototype.__addSliderAt = function (absoluteValue, leftSliderIndex) {
-        console.log("__addSliderAt", "absoluteValue", absoluteValue, "leftSliderIndex", leftSliderIndex);
+        // console.log("__addSliderAt", "absoluteValue", absoluteValue, "leftSliderIndex", leftSliderIndex);
         var leftSlider = this._sliderElementRefs[leftSliderIndex].current;
         // const colorAtPosition = this.__getSliderColorAt(relativeValue);
         var newColor = this.__getSliderColorAt(absoluteValue);
@@ -366,7 +373,7 @@ var ColorGradientPicker = /** @class */ (function () {
      * @returns
      */
     ColorGradientPicker.prototype.__getSliderColorAt = function (absoluteValue) {
-        console.log("__getSliderColorAt", "absoluteValue", absoluteValue);
+        // console.log("__getSliderColorAt", "absoluteValue", absoluteValue);
         // Locate interval
         var leftIndex = this.__locateIntervalAt(absoluteValue);
         var leftSliderValue = this.__getSliderValue(leftIndex, NaN);
@@ -382,28 +389,10 @@ var ColorGradientPicker = /** @class */ (function () {
             return null;
         }
         var positionInsideInterval = (absoluteValue - leftSliderValue) / (rightSliderValue - leftSliderValue);
-        console.log("leftColorString", leftColorString, "rightColorString", rightColorString);
+        // console.log("leftColorString", leftColorString, "rightColorString", rightColorString);
         var leftColorObject = Color_1.Color.parse(leftColorString);
         var rightColorObject = Color_1.Color.parse(rightColorString);
         var newColor = leftColorObject.interpolate(rightColorObject, positionInsideInterval);
-        // console.log(
-        //   "absoluteValue",
-        //   absoluteValue,
-        //   "leftIndex",
-        //   leftIndex,
-        //   "leftSliderValue",
-        //   leftSliderValue,
-        //   "leftColorObject",
-        //   leftColorObject.cssRGB(),
-        //   "rightSliderValue",
-        //   rightSliderValue,
-        //   "rightColorObject",
-        //   rightColorObject.cssRGB(),
-        //   "positionInsideInterval",
-        //   positionInsideInterval,
-        //   "newColor",
-        //   newColor.cssRGB()
-        // );
         return newColor;
     };
     /**
@@ -479,11 +468,14 @@ var ColorGradientPicker = /** @class */ (function () {
     ColorGradientPicker.prototype.__updateColorIndicator = function (rangeSliderIndex) {
         var colorValue = this.__getSliderColorString(rangeSliderIndex, "grey");
         var ratio = this.__getSliderPercentage(rangeSliderIndex);
-        this.colorInputContainerRef.current.style["left"] = "calc( ".concat(ratio * 100, "% + ").concat((1.0 - ratio) * this.indicatorWidth_num * 0.5, "em - ").concat(ratio * this.indicatorWidth_num * 0.5, "em)");
+        // Set left offset of color input container
+        this.colorInputContainerRef.current.style["left"] = "calc( ".concat(ratio * 100, "% + ").concat((1.0 - ratio) * this.css_indicatorWidth_num * 0.5, "em - ").concat(ratio * this.css_indicatorWidth_num * 0.5, "em)");
+        // Also set offset of colot input element (safari will open the native color dialog at this position)
+        this.colorInputRef.current.style["left"] = "calc( ".concat(ratio * 100, "% + ").concat((1.0 - ratio) * this.css_indicatorWidth_num * 0.5, "em - ").concat(ratio * this.css_indicatorWidth_num * 0.5, "em)");
         this.colorIndicatorColorButtonRef.current.style["background-color"] = colorValue;
         this.colorInputRef.current.value = colorValue;
         this.colorInputRef.current.dataset["activeSliderIndex"] = "".concat(rangeSliderIndex);
-        if (rangeSliderIndex <= 0 || rangeSliderIndex + 1 >= this.getRangeLength()) {
+        if (rangeSliderIndex <= 0 || rangeSliderIndex + 1 >= this._sliderElementRefs.length) {
             this.colorIndicatorRemoveButtonRef.current.style["visibility"] = "hidden";
         }
         else {
@@ -498,10 +490,6 @@ var ColorGradientPicker = /** @class */ (function () {
      * @returns {ColorGradient}
      */
     ColorGradientPicker.prototype.getColorGradient = function () {
-        // const values: Array<ColorGradientItem> = this._sliderElementRefs.map((_ref: NoReact.Ref<HTMLInputElement>, index: number) => {
-        //   return { color: this.__getSliderColor(index, null), ratio: this.__getSliderPercentage(index) };
-        // });
-        // return new ColorGradient(values); //.toColorGradientString();
         return this.colorGradient;
     };
     /**
@@ -552,7 +540,7 @@ var ColorGradientPicker = /** @class */ (function () {
     ColorGradientPicker.prototype._render = function () {
         var _this = this;
         var _self = this;
-        console.log("Rendering ...", NoReact);
+        // console.log("Rendering ...", NoReact);
         this.colorIndicatorColorButtonRef = NoReact.useRef();
         this.colorIndicatorRemoveButtonRef = NoReact.useRef();
         this.colorInputRef = NoReact.useRef();
@@ -567,24 +555,18 @@ var ColorGradientPicker = /** @class */ (function () {
         var handleRemoveColorButtonClick = function (evt) {
             evt.preventDefault(); // Prevent other inputs to react to this event.
             evt.stopPropagation();
-            console.log("Todo: remove color");
-            // TODO
             _self.__handleRemoveColor();
         };
-        // const currentColors = [0, 1, 2, 3, 4, 5];
-        // const stepCount = this.colorGradient.values.length;
         var elementId = "color-gradient-container-".concat(this.baseID);
         return (NoReact.createElement("div", { id: elementId, style: {
                 display: "flex",
                 flexDirection: "column",
                 width: "100%",
-                height: "32px",
+                height: this.css_containerHeight,
                 position: "relative",
-                marginBottom: "3em"
-            }, ref: this.containerRef, onMouseDown: this.__containerMouseDownHandler(), 
-            // onMouseUp={this.__containerMouseUpHandler()}
-            onClick: this.__containerClickHandler() },
-            createCustomStylesElement(elementId),
+                marginBottom: this.isMobileMode ? "6em" : "3em"
+            }, ref: this.containerRef, onMouseDown: this.__containerMouseDownHandler(), onClick: this.__containerClickHandler() },
+            createCustomStylesElement(elementId, this.css_thumbWidth, this.css_thumbHeight),
             this.colorGradient.values.map(function (colorGradientItem, index) {
                 // const initialColor: string = this.DEFAULT_COLORSET[index % this.DEFAULT_COLORSET.length];
                 // const initialValue: number = (100 / (stepCount - 1)) * index;
@@ -593,7 +575,7 @@ var ColorGradientPicker = /** @class */ (function () {
                 return _this.__createColorRangeInput(index, _this.sliderMin, _this.sliderMax, initialValue, colorGradientItem.color);
             }),
             NoReact.createElement("div", { style: { width: "100%" } },
-                NoReact.createElement("input", { id: "color-indicator-input-".concat(this.baseID), type: "color", style: { visibility: "hidden" }, "data-active-slider-index": "", ref: this.colorInputRef, onInput: this.__colorChangeHandler() }),
+                NoReact.createElement("input", { id: "color-indicator-input-".concat(this.baseID), type: "color", style: { visibility: "hidden", position: "absolute", left: 0 }, "data-active-slider-index": "", ref: this.colorInputRef, onInput: this.__colorChangeHandler() }),
                 NoReact.createElement("div", { ref: this.colorInputContainerRef, style: {
                         position: "absolute",
                         bottom: "0px",
@@ -604,23 +586,23 @@ var ColorGradientPicker = /** @class */ (function () {
                     } },
                     NoReact.createElement("button", { id: "color-indicator-button-".concat(this.baseID), style: {
                             backgroundColor: "grey",
-                            borderRadius: "3px",
+                            borderRadius: "10%",
                             border: "1px solid grey",
-                            width: this.indicatorWidth, // "1em",
-                            height: this.indicatorHeight, // "1em",
+                            width: this.css_indicatorWidth, // "1em",
+                            height: this.css_indicatorHeight, // "1em",
                             transform: "translate(-50%, 0%)"
                         }, onClick: handleIndicatorButtonClick, ref: this.colorIndicatorColorButtonRef }),
                     NoReact.createElement("button", { id: "color-remove-button-".concat(this.baseID), className: "color-remove-button", style: {
                             backgroundColor: "grey",
-                            borderRadius: "3px",
+                            borderRadius: "10%",
                             border: "1px solid grey",
-                            width: this.indicatorWidth, // "1em",
-                            height: this.indicatorHeight, // "1em",
+                            width: this.css_indicatorWidth, // "1em",
+                            height: this.css_indicatorHeight, // "1em",
                             transform: "translate(-50%, 50%)",
                             lineHeight: "0.5em",
                             padding: 0
                         }, onClick: handleRemoveColorButtonClick, ref: this.colorIndicatorRemoveButtonRef },
-                        NoReact.createElement("span", { style: { fontSize: "0.5em" } }, "\uD83D\uDDD1"))))));
+                        NoReact.createElement("span", { style: { fontSize: this.isMobileMode ? "1.0em" : "0.5em" } }, "\uD83D\uDDD1"))))));
     };
     return ColorGradientPicker;
 }());
@@ -630,9 +612,7 @@ exports.ColorGradientPicker = ColorGradientPicker;
  *
  * @private
  */
-var createCustomStylesElement = function (elementId) {
-    var thumbWidth = "0.5em";
-    var thumbHeight = "1.333em";
+var createCustomStylesElement = function (elementId, thumbWidth, thumbHeight) {
     // Thanks to Ana Tudor
     //    https://css-tricks.com/multi-thumb-sliders-particular-two-thumb-case/
     return (NoReact.createElement("style", null, "\n    #".concat(elementId, " input[type='range'] {\n\n      -webkit-appearance: none;\n\n      grid-column: 1;\n      grid-row: 2;\n      \n      /* same as before */\n      background: none; /* get rid of white Chrome background */\n      color: #000;\n      font: inherit; /* fix too small font-size in both Chrome & Firefox */\n      margin: 0;\n      pointer-events: none; /* let clicks pass through */\n    }\n\n    #").concat(elementId, " input[type='range']::-webkit-slider-runnable-track {\n      -webkit-appearance: none;\n\n      background: none; /* get rid of Firefox track background */\n      height: 100%;\n      width: 100%;\n\n      pointer-events: none;\n    }\n\n    #").concat(elementId, " input[type='range']::-webkit-slider-thumb {\n      -webkit-appearance: none;\n      background: currentcolor;\n      border: none; /* get rid of Firefox thumb border */\n      border-radius: 6px; /* get rid of Firefox corner rounding */\n      pointer-events: auto; /* catch clicks */\n      width: ").concat(thumbWidth, "; \n      height: ").concat(thumbHeight, ";\n    }\n\n    #").concat(elementId, " input[type='range']:focus::-webkit-slider-thumb {\n      border: 2px solid white;\n    }\n\n    #").concat(elementId, " input[type='range']::-moz-range-track {\n      -webkit-appearance: none;\n      background: none; /* get rid of Firefox track background */\n      height: 100%;\n      width: 100%;\n      pointer-events: none;\n    }\n\n    #").concat(elementId, " input[type='range']::-moz-range-thumb {\n      /* -webkit-appearance: none; */\n      background: currentcolor;\n      border: none; /* get rid of Firefox thumb border */\n      border-radius: 6px; /* get rid of Firefox corner rounding */\n      pointer-events: auto; /* catch clicks */\n      width: ").concat(thumbWidth, "; \n      height: ").concat(thumbHeight, ";\n    }\n\n    #").concat(elementId, " input[type='range']:focus::-moz-range-thumb {\n      border: 2px solid white;\n    }\n\n    #").concat(elementId, " input[type='range'] {\n      /* same as before */\n      z-index: 1;\n    }\n    \n    #").concat(elementId, " input[type='range']:focus {\n        z-index: 2;\n        /* outline: dotted 1px orange; */\n        color: darkorange;\n    }\n    ")));

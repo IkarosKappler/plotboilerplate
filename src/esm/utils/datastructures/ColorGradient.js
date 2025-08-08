@@ -9,7 +9,16 @@
  * @version 1.0.0
  * @date    2025-08-05
  */
+import { Color } from "./Color";
 const RAD_TO_DEG = 180.0 / Math.PI;
+const DEFAULT_COLORSET = [
+    { color: Color.RED, ratio: 0.0 },
+    { color: Color.GOLD, ratio: 0.2 },
+    { color: Color.YELLOW, ratio: 0.4 },
+    { color: Color.LIME_GREEN, ratio: 0.6 },
+    { color: Color.MEDIUM_BLUE, ratio: 0.8 },
+    { color: Color.PURPLE, ratio: 1.0 }
+];
 export class ColorGradient {
     /**
      *
@@ -17,7 +26,8 @@ export class ColorGradient {
      */
     constructor(values, angleInRadians) {
         this.values = values;
-        this.angle = angleInRadians !== null && angleInRadians !== void 0 ? angleInRadians : 0.0;
+        // Default: left to right
+        this.angle = typeof angleInRadians === "undefined" ? Math.PI / 2.0 : angleInRadians;
     }
     /**
      * Get a color gradient CSS value string from these gradient settings.
@@ -51,6 +61,13 @@ export class ColorGradient {
         return new ColorGradient(this.values.map((item) => {
             return { color: item.color, ratio: item.ratio };
         }), this.angle);
+    }
+    /**
+     * Create a default color gradient with six color: red, orange, yellow, green, blue, purple.
+     * @returns
+     */
+    static createDefault() {
+        return new ColorGradient(DEFAULT_COLORSET.map((item) => ({ color: item.color, ratio: item.ratio })));
     }
 }
 //# sourceMappingURL=ColorGradient.js.map
