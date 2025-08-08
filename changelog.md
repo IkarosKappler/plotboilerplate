@@ -22,6 +22,7 @@
 - 2025-08-04
   - Adding the `ColorGradient` class.
   - Adding more features to the `ColorGradientPicker` class: removing color is now possible.
+  - Adding ColorGradients to lil-gui, `addColorGradient(object,name,dialog)`. Added tests for this.
 - 2025-06-07
   - Adding `Polygon.closestLineIntersectionIndex` to determine line intersections plus detected edge index.
   - Adding helper type `PolygonIntersectionTuple` for re-usability.

@@ -73,23 +73,22 @@
         onAcceptGradient: function (updatedColorGradient) {
           const outputGradientString = updatedColorGradient.toColorGradientString();
           console.log(outputGradientString);
-          gradientButton.style["background"] = outputGradientString;
-          _self._fireOnChange();
+          // gradientButton.style["background"] = outputGradientString;
+          _self._handleColorGradientChange(updatedColorGradient);
+          _self._fireOnChange(updatedColorGradient, outputGradientString);
         },
         inputGradient: object[gradientProperty]
       });
     });
 
     /** This is just a dummy function so we don't need to check for null */
-    _self._handleChange = function () {
+    _self._handleChange = function (colorGradient, outputGradientString) {
       /* NOOP */
-      console.log("_handleChange");
-      gradientButton.style["background"] = outputGradientString;
     };
 
-    _self._fireOnChange = function () {
+    _self._fireOnChange = function (updatedColorGradient, updatedGradientString) {
       if (this._handleChange) {
-        this._handleChange(object[gradientProperty]);
+        this._handleChange(updatedColorGradient, updatedGradientString);
       }
     };
 
@@ -102,6 +101,9 @@
      * @param {ColorGradient} colorGradient
      */
     _self._handleColorGradientChange = function (colorGradient) {
+      console.log("_handleChange");
+      // gradientButton.style["background"] = outputGradientString;
+      object[gradientProperty] = colorGradient;
       gradientButton.style["background"] = colorGradient.toColorGradientString();
     };
 

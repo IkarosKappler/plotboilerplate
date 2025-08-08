@@ -30,7 +30,7 @@
 
     var showColorGradient = function () {
       console.log("showColorGradient", config.gradient);
-      document.getElementById("color-display").style.background = config.gradient.toColorGradientString();
+      document.getElementById("color-display").style["background"] = config.gradient.toColorGradientString();
     };
 
     const colorGradientDialog = new ColorGradientPickerDialog(new Modal({ closeOnBackdropClick: true }), {
