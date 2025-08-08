@@ -18,7 +18,9 @@
  * @modified 2022-05-11 Fixed the `interpolate` function.
  * @modified 2023-01-23 Added `Color.set(Color)` function to set all values (r,g,b,h,s,l,a) simultanoeusly.
  * @modified 2024-03-10 Fixed some NaN type check for Typescript 5 compatibility.
- * @version 0.0.13
+ * @modified 2025-08-08 Fixed an issue in the static `fromRGB` method: values in [0..1] are now correctly reconized (1.0 was excluded).
+ * @modified 2025-08-08 Added static color instances (singletons): Color.RED, Color.GOLD, Color.YELLOW, Color.GREEN, Color.LIME_GREEN, Color.BLUE, Color.MEDIUM_BLUE, Color.PURPLE.
+ * @version 0.0.14
  **/
 /**
  * @classdesc A color class, inspired by neolitec's Javascript class.
@@ -242,4 +244,12 @@ export declare class Color {
      * @return {Color} A clone of this color (in RGB mode).
      */
     interpolate(c: Color, t: number): Color;
+    static RED: Color;
+    static GOLD: Color;
+    static YELLOW: Color;
+    static GREEN: Color;
+    static LIME_GREEN: Color;
+    static BLUE: Color;
+    static MEDIUM_BLUE: Color;
+    static PURPLE: Color;
 }

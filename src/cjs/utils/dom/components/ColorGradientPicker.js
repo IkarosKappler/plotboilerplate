@@ -33,9 +33,16 @@ var ColorGradientPicker = /** @class */ (function () {
         this.sliderMax = 100;
         this.indicatorWidth_num = 1.0;
         this.indicatorWidth = "1em";
-        this.indicatorWidth_half = "0.5em";
+        // private indicatorWidth_half = "0.5em";
         this.indicatorHeight = "1em";
-        this.COLORSET = ["#ff0000", "#ff8800", "#ffff00", "#00ff00", "#0000ff", "#8800ff"];
+        this.DEFAULT_COLORSET = [
+            { color: Color_1.Color.RED, ratio: 0.0 },
+            { color: Color_1.Color.GOLD, ratio: 0.2 },
+            { color: Color_1.Color.YELLOW, ratio: 0.4 },
+            { color: Color_1.Color.LIME_GREEN, ratio: 0.6 },
+            { color: Color_1.Color.MEDIUM_BLUE, ratio: 0.8 },
+            { color: Color_1.Color.PURPLE, ratio: 1.0 }
+        ];
         this.installedChangeListeners = [];
         /**
          * Creates a callback function for range slider.
@@ -89,7 +96,11 @@ var ColorGradientPicker = /** @class */ (function () {
             this.container = document.createElement("div");
         }
         this.baseID = Math.floor(Math.random() * 65535);
-        this.container.append(this._render("test"));
+        this.colorGradient = new ColorGradient_1.ColorGradient(this.DEFAULT_COLORSET, Math.PI / 2.0);
+        // const values: Array<ColorGradientItem> = this._sliderElementRefs.map((_ref: NoReact.Ref<HTMLInputElement>, index: number) => {
+        //   return { color: this.__getSliderColor(index, null), ratio: this.__getSliderPercentage(index) };
+        // });
+        this.container.append(this._render());
         this.__updateColorIndicator(0);
         this.__updateBackgroundGradient();
     } // END constructor
@@ -152,7 +163,7 @@ var ColorGradientPicker = /** @class */ (function () {
         //   this._sliderElementRefs[i].current.setAttribute("id", `rage-slider-${this.baseID}-${i}`);
         // }
         this.__updateSliderDataSetIndices(index + 1);
-        return (NoReact.createElement("input", { id: "rage-slider-".concat(this.baseID, "-").concat(index), type: "range", min: sliderMin, max: sliderMax, value: initialValue, style: { position: "absolute", left: "0px", top: "0px", width: "100%" }, "data-range-slider-index": index, "data-color-value": initialColor, onChange: sliderHandler, onClick: sliderHandler, 
+        return (NoReact.createElement("input", { id: "rage-slider-".concat(this.baseID, "-").concat(index), type: "range", min: sliderMin, max: sliderMax, value: initialValue, style: { position: "absolute", left: "0px", top: "0px", width: "100%" }, "data-range-slider-index": index, "data-color-value": initialColor.cssRGB(), onChange: sliderHandler, onClick: sliderHandler, 
             // onMouseDown={mouseDownHandler}
             // onMouseUp={mouseUpHandler}
             ref: ref }));
@@ -312,7 +323,7 @@ var ColorGradientPicker = /** @class */ (function () {
         // const colorAtPosition = this.__getSliderColorAt(relativeValue);
         var newColor = this.__getSliderColorAt(absoluteValue);
         var newSliderIndex = leftSliderIndex + 1;
-        var _newSlider = this.__createColorRangeInput(newSliderIndex, this.sliderMin, this.sliderMax, absoluteValue, newColor.cssRGB() // initialColor: string
+        var _newSlider = this.__createColorRangeInput(newSliderIndex, this.sliderMin, this.sliderMax, absoluteValue, newColor // initialColor: string
         );
         var sliderRef = this._sliderElementRefs[newSliderIndex];
         leftSlider.after(sliderRef.current);
@@ -392,6 +403,13 @@ var ColorGradientPicker = /** @class */ (function () {
         return this.sliderMin + (this.sliderMax - this.sliderMin) * relativeValue;
     };
     /**
+     * Converts a relative value in [0..1] to [min..max].
+     * @param relativeValue
+     */
+    ColorGradientPicker.prototype.__absoluteToRelative = function (absolute) {
+        return (absolute - this.sliderMin) / (this.sliderMax - this.sliderMin);
+    };
+    /**
      * Get the value of the n-th rangel slider.
      *
      * @param {number} sliderIndex
@@ -418,8 +436,13 @@ var ColorGradientPicker = /** @class */ (function () {
      * @private
      */
     ColorGradientPicker.prototype.__updateBackgroundGradient = function () {
-        var colorGradient = this.getColorGradient();
-        this.containerRef.current.style["background"] = colorGradient.toColorGradientString();
+        var _this = this;
+        // const colorGradient = this.getColorGradient();
+        this.colorGradient = new ColorGradient_1.ColorGradient(this.__getAllSliderValues().map(function (sliderValue, sliderIndex) { return ({
+            color: _this.__getSliderColor(sliderIndex, null),
+            ratio: _this.__absoluteToRelative(sliderValue)
+        }); }), this.colorGradient.angle);
+        this.containerRef.current.style["background"] = this.colorGradient.toColorGradientString();
     };
     /**
      * After changes this function updates the color indicator button.
@@ -448,11 +471,11 @@ var ColorGradientPicker = /** @class */ (function () {
      * @returns {ColorGradient}
      */
     ColorGradientPicker.prototype.getColorGradient = function () {
-        var _this = this;
-        var values = this._sliderElementRefs.map(function (_ref, index) {
-            return { color: _this.__getSliderColor(index, null), percentage: _this.__getSliderPercentage(index) };
-        });
-        return new ColorGradient_1.ColorGradient(values); //.toColorGradientString();
+        // const values: Array<ColorGradientItem> = this._sliderElementRefs.map((_ref: NoReact.Ref<HTMLInputElement>, index: number) => {
+        //   return { color: this.__getSliderColor(index, null), ratio: this.__getSliderPercentage(index) };
+        // });
+        // return new ColorGradient(values); //.toColorGradientString();
+        return this.colorGradient;
     };
     /**
      * Get the configured color value of the n-th rangel slider.
@@ -499,7 +522,7 @@ var ColorGradientPicker = /** @class */ (function () {
      *
      * @private
      */
-    ColorGradientPicker.prototype._render = function (name) {
+    ColorGradientPicker.prototype._render = function () {
         var _this = this;
         var _self = this;
         console.log("Rendering ...", NoReact);
@@ -521,8 +544,8 @@ var ColorGradientPicker = /** @class */ (function () {
             // TODO
             _self.__handleRemoveColor();
         };
-        var currentColors = [0, 1, 2, 3, 4, 5];
-        var stepCount = currentColors.length;
+        // const currentColors = [0, 1, 2, 3, 4, 5];
+        // const stepCount = this.colorGradient.values.length;
         var elementId = "color-gradient-container-".concat(this.baseID);
         return (NoReact.createElement("div", { id: elementId, style: {
                 display: "flex",
@@ -533,10 +556,12 @@ var ColorGradientPicker = /** @class */ (function () {
                 marginBottom: "3em"
             }, ref: this.containerRef, onClick: this.__containerClickHandler() },
             createCustomStylesElement(elementId),
-            currentColors.map(function (index) {
-                var initialColor = _this.COLORSET[index % _this.COLORSET.length];
-                var initialValue = (100 / (stepCount - 1)) * index;
-                return _this.__createColorRangeInput(index, _this.sliderMin, _this.sliderMax, initialValue, initialColor);
+            this.colorGradient.values.map(function (colorGradientItem, index) {
+                // const initialColor: string = this.DEFAULT_COLORSET[index % this.DEFAULT_COLORSET.length];
+                // const initialValue: number = (100 / (stepCount - 1)) * index;
+                var initialValue = _self.__relativeToAbsolute(colorGradientItem.ratio);
+                // return this.__createColorRangeInput(index, this.sliderMin, this.sliderMax, initialValue, initialColor);
+                return _this.__createColorRangeInput(index, _this.sliderMin, _this.sliderMax, initialValue, colorGradientItem.color);
             }),
             NoReact.createElement("div", { style: { width: "100%" } },
                 NoReact.createElement("input", { id: "color-indicator-input-".concat(this.baseID), type: "color", style: { visibility: "hidden" }, "data-active-slider-index": "", ref: this.colorInputRef, onInput: this.__colorChangeHandler() }),

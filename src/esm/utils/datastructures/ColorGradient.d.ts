@@ -1,7 +1,9 @@
 /**
- * A simple color gradient implementation.
+ * A simple linear color gradient implementation.
  *
  * A color gradient is just an array of color objects paired with position values on the gradient.
+ *
+ * TODO: add `angle`
  *
  * @author  Ikaros Kappler
  * @version 1.0.0
@@ -10,11 +12,16 @@
 import { Color } from "./Color";
 export interface ColorGradientItem {
     color: Color;
-    percentage: number;
+    ratio: number;
 }
 export declare class ColorGradient {
-    private values;
-    constructor(values: Array<ColorGradientItem>);
+    values: Array<ColorGradientItem>;
+    angle: number;
+    /**
+     *
+     * @param values
+     */
+    constructor(values: Array<ColorGradientItem>, angleInRadians?: number);
     /**
      * Get a color gradient CSS value string from these gradient settings.
      *
@@ -23,5 +30,10 @@ export declare class ColorGradient {
      * @returns {string}
      */
     toColorGradientString(): string;
-    static parse(inputString: string): ColorGradient;
+    /**
+     * Clone this linear color gradient. Returns a deep clone.
+     *
+     * @returns {ColorGradient}
+     */
+    clone(): ColorGradient;
 }

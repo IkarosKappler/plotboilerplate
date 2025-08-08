@@ -25,9 +25,9 @@ export declare class ColorGradientPicker {
     private sliderMax;
     private indicatorWidth_num;
     private indicatorWidth;
-    private indicatorWidth_half;
     private indicatorHeight;
-    private COLORSET;
+    private DEFAULT_COLORSET;
+    private colorGradient;
     private installedChangeListeners;
     /**
      * The constructor: creates a new color gradient picker in the given container.
@@ -115,6 +115,11 @@ export declare class ColorGradientPicker {
      * @param relativeValue
      */
     private __relativeToAbsolute;
+    /**
+     * Converts a relative value in [0..1] to [min..max].
+     * @param relativeValue
+     */
+    private __absoluteToRelative;
     /**
      * Get the value of the n-th rangel slider.
      *

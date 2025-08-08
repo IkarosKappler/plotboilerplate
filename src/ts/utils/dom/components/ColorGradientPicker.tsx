@@ -15,7 +15,7 @@ import * as NoReact from "noreact";
 import { JsxElement } from "typescript";
 
 import { Color } from "../../datastructures/Color";
-import { ColorGradient } from "../../datastructures/ColorGradient";
+import { ColorGradient, ColorGradientItem } from "../../datastructures/ColorGradient";
 
 export type ColorGradientChangeListener = (colorGradient: ColorGradient, source: ColorGradientPicker) => void;
 
@@ -33,10 +33,19 @@ export class ColorGradientPicker {
   private sliderMax: number = 100;
   private indicatorWidth_num = 1.0;
   private indicatorWidth = "1em";
-  private indicatorWidth_half = "0.5em";
+  // private indicatorWidth_half = "0.5em";
   private indicatorHeight = "1em";
 
-  private COLORSET: Array<string> = ["#ff0000", "#ff8800", "#ffff00", "#00ff00", "#0000ff", "#8800ff"];
+  private DEFAULT_COLORSET: Array<ColorGradientItem> = [
+    { color: Color.RED, ratio: 0.0 },
+    { color: Color.GOLD, ratio: 0.2 },
+    { color: Color.YELLOW, ratio: 0.4 },
+    { color: Color.LIME_GREEN, ratio: 0.6 },
+    { color: Color.MEDIUM_BLUE, ratio: 0.8 },
+    { color: Color.PURPLE, ratio: 1.0 }
+  ];
+
+  private colorGradient: ColorGradient;
 
   private installedChangeListeners: Array<ColorGradientChangeListener> = [];
 
@@ -60,8 +69,9 @@ export class ColorGradientPicker {
       this.container = document.createElement("div");
     }
     this.baseID = Math.floor(Math.random() * 65535);
+    this.colorGradient = new ColorGradient(this.DEFAULT_COLORSET, Math.PI / 2.0);
 
-    this.container.append(this._render("test"));
+    this.container.append(this._render());
     this.__updateColorIndicator(0);
     this.__updateBackgroundGradient();
   } // END constructor
@@ -121,7 +131,7 @@ export class ColorGradientPicker {
     sliderMin: number,
     sliderMax: number,
     initialValue: number,
-    initialColor: string
+    initialColor: Color
   ): JsxElement {
     const sliderHandler = this.__createSliderChangeHandler();
     const ref: NoReact.Ref<HTMLInputElement> = NoReact.useRef<HTMLInputElement>();
@@ -145,7 +155,7 @@ export class ColorGradientPicker {
         value={initialValue}
         style={{ position: "absolute", left: "0px", top: "0px", width: "100%" }}
         data-range-slider-index={index}
-        data-color-value={initialColor}
+        data-color-value={initialColor.cssRGB()}
         onChange={sliderHandler}
         onClick={sliderHandler}
         // onMouseDown={mouseDownHandler}
@@ -365,7 +375,7 @@ export class ColorGradientPicker {
       this.sliderMin,
       this.sliderMax,
       absoluteValue,
-      newColor.cssRGB() // initialColor: string
+      newColor // initialColor: string
     );
     const sliderRef = this._sliderElementRefs[newSliderIndex];
     leftSlider.after(sliderRef.current);
@@ -455,6 +465,14 @@ export class ColorGradientPicker {
   }
 
   /**
+   * Converts a relative value in [0..1] to [min..max].
+   * @param relativeValue
+   */
+  private __absoluteToRelative(absolute: number): number {
+    return (absolute - this.sliderMin) / (this.sliderMax - this.sliderMin);
+  }
+
+  /**
    * Get the value of the n-th rangel slider.
    *
    * @param {number} sliderIndex
@@ -482,8 +500,15 @@ export class ColorGradientPicker {
    * @private
    */
   private __updateBackgroundGradient() {
-    const colorGradient = this.getColorGradient();
-    this.containerRef.current.style["background"] = colorGradient.toColorGradientString();
+    // const colorGradient = this.getColorGradient();
+    this.colorGradient = new ColorGradient(
+      this.__getAllSliderValues().map((sliderValue: number, sliderIndex: number) => ({
+        color: this.__getSliderColor(sliderIndex, null),
+        ratio: this.__absoluteToRelative(sliderValue)
+      })),
+      this.colorGradient.angle
+    );
+    this.containerRef.current.style["background"] = this.colorGradient.toColorGradientString();
   }
 
   /**
@@ -518,10 +543,11 @@ export class ColorGradientPicker {
    * @returns {ColorGradient}
    */
   public getColorGradient(): ColorGradient {
-    const values = this._sliderElementRefs.map((_ref: NoReact.Ref<HTMLInputElement>, index: number) => {
-      return { color: this.__getSliderColor(index, null), percentage: this.__getSliderPercentage(index) };
-    });
-    return new ColorGradient(values); //.toColorGradientString();
+    // const values: Array<ColorGradientItem> = this._sliderElementRefs.map((_ref: NoReact.Ref<HTMLInputElement>, index: number) => {
+    //   return { color: this.__getSliderColor(index, null), ratio: this.__getSliderPercentage(index) };
+    // });
+    // return new ColorGradient(values); //.toColorGradientString();
+    return this.colorGradient;
   }
 
   /**
@@ -572,7 +598,7 @@ export class ColorGradientPicker {
    *
    * @private
    */
-  private _render(name: string): HTMLElement {
+  private _render(): HTMLElement {
     const _self = this;
     console.log("Rendering ...", NoReact);
     this.colorIndicatorColorButtonRef = NoReact.useRef<HTMLButtonElement>();
@@ -596,8 +622,8 @@ export class ColorGradientPicker {
       _self.__handleRemoveColor();
     };
 
-    const currentColors = [0, 1, 2, 3, 4, 5];
-    const stepCount = currentColors.length;
+    // const currentColors = [0, 1, 2, 3, 4, 5];
+    // const stepCount = this.colorGradient.values.length;
     const elementId = `color-gradient-container-${this.baseID}`;
     return (
       <div
@@ -614,10 +640,12 @@ export class ColorGradientPicker {
         onClick={this.__containerClickHandler()}
       >
         {createCustomStylesElement(elementId)}
-        {currentColors.map((index: number) => {
-          const initialColor: string = this.COLORSET[index % this.COLORSET.length];
-          const initialValue: number = (100 / (stepCount - 1)) * index;
-          return this.__createColorRangeInput(index, this.sliderMin, this.sliderMax, initialValue, initialColor);
+        {this.colorGradient.values.map((colorGradientItem: ColorGradientItem, index: number) => {
+          // const initialColor: string = this.DEFAULT_COLORSET[index % this.DEFAULT_COLORSET.length];
+          // const initialValue: number = (100 / (stepCount - 1)) * index;
+          const initialValue: number = _self.__relativeToAbsolute(colorGradientItem.ratio);
+          // return this.__createColorRangeInput(index, this.sliderMin, this.sliderMax, initialValue, initialColor);
+          return this.__createColorRangeInput(index, this.sliderMin, this.sliderMax, initialValue, colorGradientItem.color);
         })}
         <div style={{ width: "100%" }}>
           <input
