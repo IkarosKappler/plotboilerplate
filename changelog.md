@@ -12,13 +12,16 @@
 - Todo: TBImage should implement Bounds.
 - Todo: check if BezierPathInteractionHelper can work without every possible redraw (event mouseIsOver)
 
+- 2025-08-11
+  - Finalizing `ColorGradient` class with `getColorAt(ratio:number)` method.
+  - Adding optional `colorGradient` option to the `createRayCollection` helper method.
+  - Tweaking the `ColorGradientPicker` class to better handle dataset attributes.
+  - Extending `lil-gui` to properly handle color gradients now.
+  - Tweaking demo `58-shape-reflecting-rays`: adding ColorGradientPicker to select ray colors.
 - 2025-08-06
   - Added `ColorGradientItem` interface.
   - Fixed an issue in the static `Color.fromRGB` method: values in [0..1] are now correctly reconized (1.0 was excluded).
-
-* Added static color instances (singletons): Color.RED, Color.GOLD, Color.YELLOW, Color.GREEN, Color.LIME_GREEN, Color.BLUE, Color.MEDIUM_BLUE, Color.PURPLE.
-
--
+  - Added static color instances (singletons): Color.RED, Color.GOLD, Color.YELLOW, Color.GREEN, Color.LIME_GREEN, Color.BLUE, Color.MEDIUM_BLUE, Color.PURPLE.
 - 2025-08-04
   - Adding the `ColorGradient` class.
   - Adding more features to the `ColorGradientPicker` class: removing color is now possible.

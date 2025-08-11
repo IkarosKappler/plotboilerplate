@@ -17,9 +17,12 @@
    * @param {boolean} options.isMobileMode - In mobile mode the picker element will be rendered bigger for better usability.
    */
   var ColorGradientPickerDialog = function (modalDialog, options) {
-    // var modal = new Modal({ closeOnBackdropClick: true });
+    if (!modalDialog) {
+      throw Error("Cannot create ColorGradientPickerDialog. `modalDialog` is null.");
+    }
+    options = options || {};
     this.modalDialog = modalDialog;
-    this.colorGradientPicker = new ColorGradientPicker(null, options.isMobileMode);
+    this.colorGradientPicker = new ColorGradientPicker(null, options.isMobileMode ?? false);
   };
 
   /**

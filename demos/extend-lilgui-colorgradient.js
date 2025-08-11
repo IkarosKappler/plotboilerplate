@@ -6,14 +6,15 @@
  * Demo: https://www.int2byte.de/public/plotboilerplate/tests/test_lilgui_addcolorwithalpha.html
  *
  * Adds a new controller which can be called like
- *  `const colorGradientDialog = new ColorGradientPickerDialog(new Modal({ closeOnBackdropClick: true }), {
-      isMobileMode: isMobile
-    });
-
+ *  `
+ *    const colorGradientDialog = new ColorGradientPickerDialog(new Modal({ closeOnBackdropClick: true }), {
+ *       isMobileMode: isMobile
+ *    });
+ *
  *   new lil.GUI()
  *    .addColorGradient( { myGradient: ColorGradient.createDefaultGradient() },
  *                        "myGradient",
- *                        "colorGradientDialog )
+ *                        colorGradientDialog )
  *    .onChange( function(newGradient) { document.body.style["background"] = newGradient.toColorGradientString() } )
  * `
  *
@@ -62,11 +63,20 @@
     };
   };
 
-  var initChildController = function (_self, parent, object, gradientProperty, colorGradientDialog) {
-    // var _self = this;
+  /**
+   * @private
+   */
+  var initChildController = function (_self, parent, object, gradientPropertyName, colorGradientDialog) {
+    /** Create a new dialog if none is passed by the user */
+    colorGradientDialog =
+      colorGradientDialog ||
+      new ColorGradientPickerDialog(new Modal({ closeOnBackdropClick: true }), {
+        isMobileMode: isMobile
+      });
+
     /** Create a new input element like this (lil-gui style checkbox) */
     const gradientButton = document.createElement("button");
-    gradientButton.innerHTML = "Gradient";
+    // gradientButton.innerHTML = gradientProperty;
     gradientButton.addEventListener("click", function () {
       // Open the dialog
       colorGradientDialog.show({
@@ -77,7 +87,7 @@
           _self._handleColorGradientChange(updatedColorGradient);
           _self._fireOnChange(updatedColorGradient, outputGradientString);
         },
-        inputGradient: object[gradientProperty]
+        inputGradient: object[gradientPropertyName]
       });
     });
 
@@ -87,23 +97,18 @@
     };
 
     _self._fireOnChange = function (updatedColorGradient, updatedGradientString) {
-      if (this._handleChange) {
-        this._handleChange(updatedColorGradient, updatedGradientString);
+      if (_self._handleChange) {
+        _self._handleChange(updatedColorGradient, updatedGradientString);
       }
     };
-
-    _self.baseController.onChange(function () {
-      _self._fireOnChange();
-    });
 
     /**
      *
      * @param {ColorGradient} colorGradient
      */
     _self._handleColorGradientChange = function (colorGradient) {
-      console.log("_handleChange");
       // gradientButton.style["background"] = outputGradientString;
-      object[gradientProperty] = colorGradient;
+      object[gradientPropertyName] = colorGradient;
       gradientButton.style["background"] = colorGradient.toColorGradientString();
     };
 
@@ -113,35 +118,35 @@
     }
     // Add the new one
     _self.baseController.$widget.prepend(gradientButton);
-    _self._handleColorGradientChange(object[gradientProperty]);
+    _self._handleColorGradientChange(object[gradientPropertyName]);
   };
 
   /**
+   * Creates a new ColorGradientController as a child controller.
    *
-   * @param {*} parent
-   * @param {object} object
-   * @param {string} gradientProperty
-   * @param {ColorGradientDialog} colorGradientDialog
+   * @param {*} parent - The lil-gui internal parent element.
+   * @param {object} object - Any general object that holds a color gradient value.
+   * @param {string} gradientPropertyName - The name of the gradient property in the `object`.
+   * @param {ColorGradientDialog?} colorGradientDialog - (optional) The dialog to use; if null then a new dialog will be created.
    */
-  lil.ColorGradientController = function (parent, object, gradientProperty, colorGradientDialog) {
-    this.baseController = new lil.ColorController(parent, object, gradientProperty);
-    initChildController(this, parent, object, gradientProperty, colorGradientDialog);
+  lil.ColorGradientController = function (parent, object, gradientPropertyName, colorGradientDialog) {
+    this.baseController = new lil.ColorController(parent, object, gradientPropertyName);
+    initChildController(this, parent, object, gradientPropertyName, colorGradientDialog);
   };
 
   /** 'Inherit' from lilgui's default ColorController */
   lil.ColorGradientController.prototype = Object.assign({}, lil.ColorController.prototype);
 
-  /** Finally add the new method 'addColorWithCheckbox' to lil.GUI */
+  /** Finally add the new method 'addColorGradient' to lil.GUI */
   /**
    *
-   * @param {*} parent
-   * @param {object} object
-   * @param {string} gradientProperty
-   * @param {ColorGradientDialog} colorGradientDialog
+   * @param {object} object - Any general object that holds a color gradient value.
+   * @param {string} gradientPropertyName - The name of the gradient property in the `object`.
+   * @param {ColorGradientDialog?} colorGradientDialog - (optional) The dialog to use; if null then a new dialog will be created.
    * @returns
    */
-  lil.GUI.prototype.addColorGradient = function (object, gradientProperty, colorGradientDialog) {
-    var cntrlr = new lil.ColorGradientController(this, object, gradientProperty, colorGradientDialog);
+  lil.GUI.prototype.addColorGradient = function (object, gradientPropertyName, colorGradientDialog) {
+    var cntrlr = new lil.ColorGradientController(this, object, gradientPropertyName, colorGradientDialog);
     copyEssentialControllerProps(cntrlr, cntrlr.baseController);
     return cntrlr;
   };

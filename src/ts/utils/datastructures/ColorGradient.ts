@@ -33,8 +33,11 @@ export class ColorGradient {
   angle: number;
 
   /**
+   * Creates a new ColorGradient with the given values. Please be sure that the values appear in the correct
+   * order regarding the `ratio` information. This will not be validated.
    *
-   * @param values
+   * @param {Array<ColorGradientItem>} values - The values to use.
+   * @param {number?} angleInRadians - (optional) An optional angle for the gradient; if no specified `PI/2.0` will be used (vertical from left to right).
    */
   constructor(values: Array<ColorGradientItem>, angleInRadians?: number) {
     this.values = values;
@@ -68,6 +71,49 @@ export class ColorGradient {
   }
 
   /**
+   * Get the color at the specific relative position.
+   *
+   * @param {number} ratio - Any value between 0.0 and 1.0.
+   */
+  getColorAt(ratio: number): Color {
+    // Locate interval first
+    const intervalLocation: [number, ColorGradientItem] = this.locateClosestSliderValue(ratio);
+    const leftItem: ColorGradientItem = this.values[intervalLocation[0]];
+    const rightItem: ColorGradientItem = this.values[intervalLocation[0] + 1];
+    const relativeInnerIntervalPosition: number = (ratio - leftItem.ratio) / (rightItem.ratio - leftItem.ratio);
+    return leftItem.color.clone().interpolate(rightItem.color, relativeInnerIntervalPosition);
+  }
+
+  /**
+   * Find that gradient record (index) that's value is closest to the given relative value. The function will return
+   * the closest value and the left index, indicating the containing interval index.
+   *
+   * @param {number} ratio - The value to look for.
+   * @returns {[number,number]} A pair of left interval boundary index and closest value.
+   */
+  locateClosestSliderValue(ratio: number): [number, ColorGradientItem] {
+    if (this.values.length === 0) {
+      console.warn("[Warn] All slider values array is empty. This should not happen, cannot proceed.");
+      return [NaN, null]; // This should not happen: at least two values must be present in a gradient
+    }
+    // console.log("__locateClosestSliderValue", "allSliderValues", allSliderValues);
+    let leftSliderIndex: number = 0;
+    let closestSliderValue: ColorGradientItem = this.values[leftSliderIndex];
+    for (var i = 1; i < this.values.length; i++) {
+      const curVal: ColorGradientItem = this.values[i];
+      if (Math.abs(curVal.ratio - ratio) < Math.abs(closestSliderValue.ratio - ratio)) {
+        closestSliderValue = curVal;
+        if (curVal.ratio > ratio) {
+          leftSliderIndex = i - 1;
+        } else {
+          leftSliderIndex = i;
+        }
+      }
+    }
+    return [leftSliderIndex, closestSliderValue];
+  }
+
+  /**
    * Clone this linear color gradient. Returns a deep clone.
    *
    * @returns {ColorGradient}
@@ -87,5 +133,23 @@ export class ColorGradient {
    */
   public static createDefault(): ColorGradient {
     return new ColorGradient(DEFAULT_COLORSET.map((item: ColorGradientItem) => ({ color: item.color, ratio: item.ratio })));
+  }
+
+  /**
+   * Create a basic color gradient from only two colors.
+   *
+   * @param {Color} startColor - The leftmost color.
+   * @param {Color} endColor - The rightmost color.
+   * @param {number?} angleInRadians - (optional) An optional angle for the gradient; if no specified `PI/2.0` will be used (vertical from left to right).
+   * @returns
+   */
+  public static createFrom(startColor: Color, endColor: Color, angleInRadians?: number): ColorGradient {
+    return new ColorGradient(
+      [
+        { ratio: 0.0, color: startColor },
+        { ratio: 1.0, color: endColor }
+      ],
+      angleInRadians
+    );
   }
 }

@@ -43,6 +43,7 @@ export declare class ColorGradientPicker {
      * @param {string?} containerID - (optional) If you want to use an existing container (should be a DIV).
      */
     constructor(containerID?: string, isMobileMode?: boolean);
+    private __initializeDataSets;
     /**
      * Adds a new color gradient change listener to this ColorGradientPicker.
      *
@@ -199,6 +200,14 @@ export declare class ColorGradientPicker {
      * @returns
      */
     private __getSliderColorString;
+    /**
+     * Get the configured color value of the n-th rangel slider.
+     *
+     * @param {number} sliderIndex
+     * @param {string} fallback
+     * @returns
+     */
+    private __getSliderColorHEXString;
     /**
      * Get get color of this gradient picker at the given slider index.
      *

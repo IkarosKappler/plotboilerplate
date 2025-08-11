@@ -82,9 +82,19 @@ export class ColorGradientPicker {
     }
 
     this.container.append(this._render());
+    this.__initializeDataSets();
     this.__updateColorIndicator(0);
     this.__updateBackgroundGradient();
   } // END constructor
+
+  private __initializeDataSets() {
+    for (var i = 0; i < this._sliderElementRefs.length; i++) {
+      const sliderColor = this.colorGradient.values[i].color;
+      console.log("Setting up slider color data set", i, sliderColor, sliderColor.cssRGB(), sliderColor.cssHEX());
+      this._sliderElementRefs[i].current.dataset.colorValue = sliderColor.cssRGB();
+      this._sliderElementRefs[i].current.dataset.colorValueHEX = sliderColor.cssHEX();
+    }
+  }
 
   /**
    * Adds a new color gradient change listener to this ColorGradientPicker.
@@ -161,7 +171,8 @@ export class ColorGradientPicker {
         value={initialValue}
         style={{ position: "absolute", left: "0px", top: "0px", width: "100%", height: "60%" }}
         data-range-slider-index={index}
-        data-color-value={initialColor.cssRGB()}
+        data-colorValue={initialColor.cssRGB()}
+        data-colorValueHEX={initialColor.cssHEX()}
         onChange={sliderHandler}
         onClick={sliderHandler}
         ref={ref}
@@ -227,7 +238,7 @@ export class ColorGradientPicker {
     const _self = this;
     return (_evt: Event): boolean => {
       // console.log("__colorChangeHandler");
-      const activeSliderIndex_raw = this.colorInputRef.current.dataset["activeSliderIndex"];
+      const activeSliderIndex_raw = this.colorInputRef.current.dataset.activeSliderIndex;
       if (!activeSliderIndex_raw) {
         console.warn(
           "Cannot update color indicator; no active range slider set. This is likely a program error and should not happen."
@@ -245,7 +256,7 @@ export class ColorGradientPicker {
 
       const newColor: string = _self.colorInputRef.current.value;
       const rangeSlider: HTMLInputElement = _self._sliderElementRefs[activeSliderIndex].current;
-      rangeSlider.dataset["colorValue"] = newColor;
+      rangeSlider.dataset.colorValue = newColor;
       // rangeSlider.dataset["colorValue"] = newColor;
       this.colorIndicatorColorButtonRef.current.style["background-color"] = newColor;
       _self.__updateBackgroundGradient();
@@ -262,8 +273,8 @@ export class ColorGradientPicker {
    */
   private __handleRemoveColor(): boolean {
     // const colorInput : HTMLInputElement | null = evt.target;
-    console.log("__colorChangeHandler");
-    const activeSliderIndex_raw = this.colorInputRef.current.dataset["activeSliderIndex"];
+    // console.log("__colorChangeHandler");
+    const activeSliderIndex_raw = this.colorInputRef.current.dataset.activeSliderIndex;
     if (!activeSliderIndex_raw) {
       console.warn("Cannot remove color indicator; no active range slider set.");
       return false;
@@ -368,27 +379,10 @@ export class ColorGradientPicker {
    * @returns {[number,number]} A pair of left slider index and closest value.
    */
   private __locateClosestSliderValue(absoluteValue: number): [number, number] {
-    const allSliderValues: number[] = this.__getAllSliderValues();
-    // console.log("allSliderValues", allSliderValues);
-    if (allSliderValues.length === 0) {
-      console.warn("[Warn] All slider values array is empty. This should not happen, cannot proceed.");
-      return [NaN, NaN]; // This should not happen: at least two values must be present in a gradient
-    }
-    // console.log("__locateClosestSliderValue", "allSliderValues", allSliderValues);
-    let leftSliderIndex: number = 0;
-    let closestSliderValue: number = allSliderValues[leftSliderIndex];
-    for (var i = 1; i < allSliderValues.length; i++) {
-      const curVal: number = allSliderValues[i];
-      if (Math.abs(curVal - absoluteValue) < Math.abs(closestSliderValue - absoluteValue)) {
-        closestSliderValue = curVal;
-        if (curVal > absoluteValue) {
-          leftSliderIndex = i - 1;
-        } else {
-          leftSliderIndex = i;
-        }
-      }
-    }
-    return [leftSliderIndex, closestSliderValue];
+    // As the colorGradient always reflects the slider values we can just ust the color gradient itself to search.
+    const relativeValue: number = this.__absoluteToRelative(absoluteValue);
+    const colorGradientEntry: [number, ColorGradientItem] = this.colorGradient.locateClosestSliderValue(relativeValue);
+    return [colorGradientEntry[0], this.__relativeToAbsolute(colorGradientEntry[1].ratio)];
   }
 
   /**
@@ -428,6 +422,8 @@ export class ColorGradientPicker {
     );
     const sliderRef = this._sliderElementRefs[newSliderIndex];
     leftSlider.after(sliderRef.current);
+    sliderRef.current.dataset.colorValue = newColor.cssRGB();
+    sliderRef.current.dataset.colorValueHEX = newColor.cssRGB();
     // No visible change, but let's reflect this in the output gradient anyway
     this.__updateBackgroundGradient();
     // Highlight the newly added range slider
@@ -548,7 +544,7 @@ export class ColorGradientPicker {
    * @param {number} rangeSliderIndex - The new active slider index.
    */
   private __updateColorIndicator(rangeSliderIndex: number) {
-    const colorValue = this.__getSliderColorString(rangeSliderIndex, "grey");
+    const colorValue = this.__getSliderColorHEXString(rangeSliderIndex, "#808080");
     const ratio = this.__getSliderPercentage(rangeSliderIndex);
 
     // Set left offset of color input container
@@ -562,7 +558,8 @@ export class ColorGradientPicker {
     }em - ${ratio * this.css_indicatorWidth_num * 0.5}em)`;
     this.colorIndicatorColorButtonRef.current.style["background-color"] = colorValue;
     this.colorInputRef.current.value = colorValue;
-    this.colorInputRef.current.dataset["activeSliderIndex"] = `${rangeSliderIndex}`;
+    // console.log("Setting new color value", this.colorInputRef.current.value, colorValue);
+    this.colorInputRef.current.dataset.activeSliderIndex = `${rangeSliderIndex}`;
 
     if (rangeSliderIndex <= 0 || rangeSliderIndex + 1 >= this._sliderElementRefs.length) {
       this.colorIndicatorRemoveButtonRef.current.style["visibility"] = "hidden";
@@ -593,7 +590,22 @@ export class ColorGradientPicker {
     if (sliderIndex < 0 || sliderIndex >= this._sliderElementRefs.length) {
       return fallback;
     }
-    const colorValue = this._sliderElementRefs[sliderIndex].current.dataset["colorValue"];
+    const colorValue = this._sliderElementRefs[sliderIndex].current.dataset.colorValue;
+    return colorValue ? colorValue : fallback;
+  }
+
+  /**
+   * Get the configured color value of the n-th rangel slider.
+   *
+   * @param {number} sliderIndex
+   * @param {string} fallback
+   * @returns
+   */
+  private __getSliderColorHEXString(sliderIndex: number, fallback: string): string {
+    if (sliderIndex < 0 || sliderIndex >= this._sliderElementRefs.length) {
+      return fallback;
+    }
+    const colorValue = this._sliderElementRefs[sliderIndex].current.dataset.colorValueHEX;
     return colorValue ? colorValue : fallback;
   }
 
@@ -639,13 +651,25 @@ export class ColorGradientPicker {
     this.colorInputContainerRef = NoReact.useRef<HTMLInputElement>();
     this.containerRef = NoReact.useRef<HTMLDivElement>();
 
+    /**
+     * This helper method is called when the tiny color button below the active slider is clicked. The method
+     * triggers the colorInput dialog to be triggered.
+     *
+     * @param {Event} evt
+     */
     const handleIndicatorButtonClick = (evt: Event) => {
       evt.preventDefault(); // Prevent other inputs to react to this event.
       evt.stopPropagation();
       // But fake a click on the input element
+      // console.log("Current selected color: " + _self.colorInputRef.current.value);
       _self.colorInputRef.current.click();
     };
 
+    /**
+     * This helper method is called when the remove-color button is clicked. It removes the
+     * currently active color slider – if possible (leftmost and rightmost slider cannot be removed).
+     * @param evt
+     */
     const handleRemoveColorButtonClick = (evt: Event) => {
       evt.preventDefault(); // Prevent other inputs to react to this event.
       evt.stopPropagation();
@@ -669,11 +693,9 @@ export class ColorGradientPicker {
         onClick={this.__containerClickHandler()}
       >
         {createCustomStylesElement(elementId, this.css_thumbWidth, this.css_thumbHeight)}
+        {/* For each color gradient value create a range slider. */}
         {this.colorGradient.values.map((colorGradientItem: ColorGradientItem, index: number) => {
-          // const initialColor: string = this.DEFAULT_COLORSET[index % this.DEFAULT_COLORSET.length];
-          // const initialValue: number = (100 / (stepCount - 1)) * index;
           const initialValue: number = _self.__relativeToAbsolute(colorGradientItem.ratio);
-          // return this.__createColorRangeInput(index, this.sliderMin, this.sliderMax, initialValue, initialColor);
           return this.__createColorRangeInput(index, this.sliderMin, this.sliderMax, initialValue, colorGradientItem.color);
         })}
         <div style={{ width: "100%" }}>

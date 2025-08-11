@@ -18,8 +18,11 @@ export declare class ColorGradient {
     values: Array<ColorGradientItem>;
     angle: number;
     /**
+     * Creates a new ColorGradient with the given values. Please be sure that the values appear in the correct
+     * order regarding the `ratio` information. This will not be validated.
      *
-     * @param values
+     * @param {Array<ColorGradientItem>} values - The values to use.
+     * @param {number?} angleInRadians - (optional) An optional angle for the gradient; if no specified `PI/2.0` will be used (vertical from left to right).
      */
     constructor(values: Array<ColorGradientItem>, angleInRadians?: number);
     /**
@@ -31,6 +34,20 @@ export declare class ColorGradient {
      */
     toColorGradientString(): string;
     /**
+     * Get the color at the specific relative position.
+     *
+     * @param {number} ratio - Any value between 0.0 and 1.0.
+     */
+    getColorAt(ratio: number): Color;
+    /**
+     * Find that gradient record (index) that's value is closest to the given relative value. The function will return
+     * the closest value and the left index, indicating the containing interval index.
+     *
+     * @param {number} ratio - The value to look for.
+     * @returns {[number,number]} A pair of left interval boundary index and closest value.
+     */
+    locateClosestSliderValue(ratio: number): [number, ColorGradientItem];
+    /**
      * Clone this linear color gradient. Returns a deep clone.
      *
      * @returns {ColorGradient}
@@ -41,4 +58,13 @@ export declare class ColorGradient {
      * @returns
      */
     static createDefault(): ColorGradient;
+    /**
+     * Create a basic color gradient from only two colors.
+     *
+     * @param {Color} startColor - The leftmost color.
+     * @param {Color} endColor - The rightmost color.
+     * @param {number?} angleInRadians - (optional) An optional angle for the gradient; if no specified `PI/2.0` will be used (vertical from left to right).
+     * @returns
+     */
+    static createFrom(startColor: Color, endColor: Color, angleInRadians?: number): ColorGradient;
 }

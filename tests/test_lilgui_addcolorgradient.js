@@ -15,6 +15,7 @@
   var GUP = gup();
   var params = new Params(GUP);
   var isMobile = isMobileDevice();
+  // Todo: replace by global function
   if (params.hasParam("isMobile")) {
     if (params.getBoolean("isMobile", true) === false) {
       isMobile = false;

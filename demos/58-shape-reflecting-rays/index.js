@@ -7,7 +7,8 @@
  * @date     2025-03-24
  * @modified 2025-05-05 Refactored `rebuildShapes` and moved to external funcion `createRandomShapes`.
  * @modified 2025-05-07 Tweaking the demo `57-shape-reflecting-rays` to interact with the new content manager tool. Adding removing shapes is now possible.
- * @version  1.0.0
+ * @modified 2025-08-11 Replacing start- and end-color by color gradient.
+ * @version  1.1.0
  **/
 
 (function (_context) {
@@ -20,6 +21,8 @@
   _context.addEventListener("load", function () {
     var params = new Params(GUP);
     var isDarkmode = detectDarkMode(GUP);
+    var modal = new Modal({ closeOnBackdropClick: true });
+    var isMobileMode = detectMobileMode(params);
 
     // All config params except the canvas are optional.
     var pb = new PlotBoilerplate(
@@ -67,11 +70,12 @@
       showBoundingBoxes: params.getBoolean("showBoundingBoxes", false),
       rayLengthFromMaxBounds: params.getBoolean("rayLengthFromMaxBounds", false),
       drawPreviewRays: params.getBoolean("drawPreviewRays", false),
-      rayStartColor: params.getString("rayStartColor", "rgb(0,192,255)"),
-      rayEndColor: params.getString("rayEndColor", "rgb(255,192,0)")
+      // rayStartColor: params.getString("rayStartColor", "rgb(0,192,255)"),
+      // rayEndColor: params.getString("rayEndColor", "rgb(255,192,0)")
+      rayColorGradient: ColorGradient.createDefault()
     };
-    var rayStartColor = Color.parse(config.rayStartColor);
-    var rayEndColor = Color.parse(config.rayEndColor);
+    // var rayStartColor = Color.parse(config.rayStartColor);
+    // var rayEndColor = Color.parse(config.rayEndColor);
 
     // +---------------------------------------------------------------------------------
     // | Global vars
@@ -87,8 +91,9 @@
       var rayCollection = createRayCollection(mainRay, config.numRays, {
         createParallelRays: config.useParallelLightSource,
         initialRayAngle: config.initialRayAngle * DEG_TO_RAD,
-        startColor: rayStartColor,
-        endColor: rayEndColor
+        colorGradient: config.rayColorGradient
+        // startColor: rayStartColor,
+        // endColor: rayEndColor
       });
 
       var newRays = [];
@@ -245,10 +250,9 @@
       // prettier-ignore
       gui.add(config, "drawPreviewRays").name("drawPreviewRays").title("Check to see the next iteration of possible rays.")
       .onChange( function() { pb.redraw() });
+      const colorGradientDialog = new ColorGradientPickerDialog(modal, isMobileMode);
       // prettier-ignore
-      gui.addColor(config, 'rayStartColor').onChange( function() { rayStartColor = Color.parse(config.rayStartColor); } );
-      // prettier-ignore
-      gui.addColor(config, 'rayEndColor').onChange( function() { rayEndColor = Color.parse(config.rayEndColor); } );
+      gui.addColorGradient(config, "rayColorGradient", colorGradientDialog).onChange(function (newGradient) { pb.redraw(); });
     }
 
     pb.config.postDraw = postDraw;

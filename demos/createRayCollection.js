@@ -1,40 +1,58 @@
 /**
  * Create a set of rays (starting in one point, or parallel ones).
  *
- * @require Ray, Color
- * @author Ikaros Kappler
- * @date    2025-
+ * @require  Ray, Color, ColorGradient
+ * @author   Ikaros Kappler
+ * @date     2025-06-07
+ * @modified Adding optional `colorGradient` option.
  */
 
 // +---------------------------------------------------------------------------------
 // | Create a new set of initial rays – depending on the main 'ray' and
 // | the config settings.
 // |
-// | @param  {Ray} baseRay
-// | @param  {number} options.createParallelRays
-// | @param  {number} options.initialRayAngle
-// | @param  {Color} options.startColor
-// | @param  {Color} options.endColor
+// | @param  {Ray}           baseRay
+// | @param  {number}        options.createParallelRays
+// | @param  {number}        options.initialRayAngle
+// | @param  {Color}         options.startColor - A color for the first ray; can be used instead of `colorGradient`.
+// | @param  {Color}         options.endColor - A color for the last ray; can be used instead of `colorGradient`.
+// | @param  {ColorGradient} options.colorGradient - Can be used instead of `startColor` and `endColor`.
 // | @return {Array<Ray>}
 // +-------------------------------
 var createRayCollection = function (baseRay, numRays, options) {
-  var rayStartColor = options && options.startColor ? options.startColor : null;
-  var rayEndColor = options && options.endColor ? options.endColor : null;
+  if (options.colorGradient) {
+    return createRayCollectionByGradient(baseRay, numRays, options.colorGradient, options);
+  } else if (options.startColor && options.endColor) {
+    return createRayCollectionByGradient(
+      baseRay,
+      numRays,
+      ColorGradient.createFrom(options.startColor, options.endColor),
+      options
+    );
+  } else if (options.startColor && !options.endColor) {
+    return createRayCollectionByGradient(
+      baseRay,
+      numRays,
+      ColorGradient.createFrom(options.startColor, options.startColor),
+      options
+    );
+  } else if (!options.startColor && options.endColor) {
+    return createRayCollectionByGradient(baseRay, numRays, ColorGradient.createFrom(options.endColor, options.endColor), options);
+  } else {
+    return createRayCollectionByGradient(baseRay, numRays, null, options);
+  }
+};
+
+var createRayCollectionByGradient = function (baseRay, numRays, gradient, options) {
   var rays = [];
-  // console.log("rayStartColor", rayStartColor, "rayEndColor", rayEndColor);
+  console.log("gradient", gradient);
   if (options && options.createParallelRays) {
     var perpRay = baseRay.perp();
     perpRay.moveTo(perpRay.vertAt(-0.5));
     for (var i = 0; i < numRays; i++) {
-      // "rgba(255,192,0,0.5)"
       rays.push(
         new Ray(baseRay.clone().moveTo(perpRay.vertAt((i + 1) / (numRays + 1))), null, null, {
-          color: rayStartColor
-            ? rayStartColor
-                .clone()
-                .interpolate(rayEndColor, i / numRays)
-                .cssRGB()
-            : null
+          color: gradient ? gradient.getColorAt(i / numRays).cssRGB() : null
         })
       );
     }
@@ -44,12 +62,7 @@ var createRayCollection = function (baseRay, numRays, options) {
     for (var i = 0; i < numRays; i++) {
       rays.push(
         new Ray(baseRay.clone().rotate(-rangeAngle / 2.0 + rangeAngle * (i / numRays)), null, null, {
-          color: rayStartColor
-            ? rayStartColor
-                .clone()
-                .interpolate(rayEndColor, i / numRays)
-                .cssRGB()
-            : null
+          color: gradient ? gradient.getColorAt(i / numRays).cssRGB() : null
         })
       );
     }

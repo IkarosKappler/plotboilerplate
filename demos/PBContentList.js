@@ -103,9 +103,9 @@
     // +-------------------------------
     var _self = this;
     this.pb.addContentChangeListener(function (event) {
-      console.log("Event type (DRAWABLES_ADDED or DRAWABLES_REMOVED)", event.type);
-      console.log("Added drawables:", event.addedDrawables);
-      console.log("Removed drawables:", event.removedDrawables);
+      // console.log("Event type (DRAWABLES_ADDED or DRAWABLES_REMOVED)", event.type);
+      // console.log("Added drawables:", event.addedDrawables);
+      // console.log("Removed drawables:", event.removedDrawables);
 
       _self._updateList(event.addedDrawables, event.removedDrawables);
     });
@@ -268,7 +268,7 @@
   // | Remvoe list element with given UID.
   // +-------------------------------
   PBContentList.prototype._removeListElementByUID = function (uid) {
-    console.log("Remove uid ", uid);
+    // console.log("Remove uid ", uid);
     // Array.from(nodes).find(node => node.isEqualNode(nodeToFind));
     var childNode = Array.from(this._list.childNodes).find(function (node) {
       //   console.log("find node", uid, node);
