@@ -27,7 +27,8 @@
     "rollup-module": "npx rollup -c",
     "tslint": "npx eslint ./src/ts/",
     "start-python-server": "python3 -m http.server 8000",
-    "serve": "npm run start-python-server"
+    "serve": "npm run start-python-server",
+    "reinstall": "npm install-clean"
   },
   "repository": {
     "type": "git",

@@ -14,6 +14,7 @@ import { ColorGradient } from "../../datastructures/ColorGradient";
 export type ColorGradientChangeListener = (colorGradient: ColorGradient, source: ColorGradientPicker) => void;
 export declare class ColorGradientPicker {
     private readonly baseID;
+    private readonly elementID;
     private container;
     private containerRef;
     private _sliderElementRefs;
@@ -41,6 +42,7 @@ export declare class ColorGradientPicker {
      * a new DIV element.
      *
      * @param {string?} containerID - (optional) If you want to use an existing container (should be a DIV).
+     * @param {boolean?} isMobileMode - (optional) If `true` then the elements are rendered in double size.
      */
     constructor(containerID?: string, isMobileMode?: boolean);
     private __initializeDataSets;
@@ -229,4 +231,10 @@ export declare class ColorGradientPicker {
      * @private
      */
     private _render;
+    /**
+     * Adds custom styles (global STYLE tag).
+     *
+     * @private
+     */
+    private __createCustomStylesElement;
 }

@@ -3,6 +3,7 @@
  *
  * @require ./modal.js
  * @require ./src/cjs/utils/dom/components/ColorGradientPicker.js
+ * @require ./src/cjs/utils/dom/components/ColorGradientSelector.js
  *
  * @author  Ikaros Kappler
  * @date    2025-08-05
@@ -23,6 +24,7 @@
     options = options || {};
     this.modalDialog = modalDialog;
     this.colorGradientPicker = new ColorGradientPicker(null, options.isMobileMode ?? false);
+    this.colorGradientSelector = new ColorGradientSelector(null);
   };
 
   /**
@@ -46,6 +48,7 @@
 
     var modalBody = document.createElement("div");
     modalBody.appendChild(this.colorGradientPicker.container);
+    modalBody.appendChild(this.colorGradientSelector.container);
     this.modalDialog.setTitle("Color Gradient Picker Dialog");
     this.modalDialog.setFooter("");
     this.modalDialog.setActions([{ label: "Accept", action: handleAcceptColor }, Modal.ACTION_CLOSE]);

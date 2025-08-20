@@ -25,6 +25,7 @@ var ColorGradientPicker = /** @class */ (function () {
      * a new DIV element.
      *
      * @param {string?} containerID - (optional) If you want to use an existing container (should be a DIV).
+     * @param {boolean?} isMobileMode - (optional) If `true` then the elements are rendered in double size.
      */
     function ColorGradientPicker(containerID, isMobileMode) {
         var _this = this;
@@ -38,7 +39,7 @@ var ColorGradientPicker = /** @class */ (function () {
         this.css_indicatorHeight = "1em";
         this.css_thumbWidth = "0.5em";
         this.css_thumbHeight = "1.333em";
-        this.css_containerHeight = "32px";
+        this.css_containerHeight = "20px";
         this.installedChangeListeners = [];
         this.__mouseDownPosition = null;
         /**
@@ -82,6 +83,16 @@ var ColorGradientPicker = /** @class */ (function () {
                 }
             };
         };
+        /**
+         * Adds custom styles (global STYLE tag).
+         *
+         * @private
+         */
+        this.__createCustomStylesElement = function () {
+            // Thanks to Ana Tudor
+            //    https://css-tricks.com/multi-thumb-sliders-particular-two-thumb-case/
+            return (NoReact.createElement("style", null, "\n    #".concat(_this.elementID, " input[type='range'] {\n\n      -webkit-appearance: none;\n\n      grid-column: 1;\n      grid-row: 2;\n      \n      /* same as before */\n      background: none; /* get rid of white Chrome background */\n      color: #000;\n      font: inherit; /* fix too small font-size in both Chrome & Firefox */\n      margin: 0;\n      pointer-events: none; /* let clicks pass through */\n    }\n\n    #").concat(_this.elementID, " input[type='range']::-webkit-slider-runnable-track {\n      -webkit-appearance: none;\n\n      background: none; /* get rid of Firefox track background */\n      height: 100%;\n      width: 100%;\n\n      pointer-events: none;\n    }\n\n    #").concat(_this.elementID, " input[type='range']::-webkit-slider-thumb {\n      -webkit-appearance: none;\n      background: currentcolor;\n      border: none; /* get rid of Firefox thumb border */\n      border-radius: 6px; /* get rid of Firefox corner rounding */\n      pointer-events: auto; /* catch clicks */\n      width: ").concat(_this.css_thumbWidth, "; \n      height: ").concat(_this.css_thumbHeight, ";\n    }\n\n    #").concat(_this.elementID, " input[type='range']:focus::-webkit-slider-thumb {\n      border: 2px solid white;\n    }\n\n    #").concat(_this.elementID, " input[type='range']::-moz-range-track {\n      -webkit-appearance: none;\n      background: none; /* get rid of Firefox track background */\n      height: 100%;\n      width: 100%;\n      pointer-events: none;\n    }\n\n    #").concat(_this.elementID, " input[type='range']::-moz-range-thumb {\n      /* -webkit-appearance: none; */\n      background: currentcolor;\n      border: none; /* get rid of Firefox thumb border */\n      border-radius: 6px; /* get rid of Firefox corner rounding */\n      pointer-events: auto; /* catch clicks */\n      width: ").concat(_this.css_thumbWidth, "; \n      height: ").concat(_this.css_thumbHeight, ";\n    }\n\n    #").concat(_this.elementID, " input[type='range']:focus::-moz-range-thumb {\n      border: 2px solid white;\n    }\n\n    #").concat(_this.elementID, " input[type='range'] {\n      /* same as before */\n      z-index: 1;\n    }\n    \n    #").concat(_this.elementID, " input[type='range']:focus {\n        z-index: 2;\n        /* outline: dotted 1px orange; */\n        color: darkorange;\n    }\n    ")));
+        };
         if (containerID) {
             var cont = document.getElementById(containerID);
             if (!cont) {
@@ -93,6 +104,7 @@ var ColorGradientPicker = /** @class */ (function () {
             this.container = document.createElement("div");
         }
         this.baseID = Math.floor(Math.random() * 65535);
+        this.elementID = "color-gradient-picker-".concat(this.baseID);
         this.colorGradient = ColorGradient_1.ColorGradient.createDefault();
         this.isMobileMode = isMobileMode;
         if (isMobileMode) {
@@ -102,8 +114,9 @@ var ColorGradientPicker = /** @class */ (function () {
             this.css_indicatorHeight = "2em";
             this.css_thumbWidth = "1.0em";
             this.css_thumbHeight = "2.666em";
-            this.css_containerHeight = "64px";
+            this.css_containerHeight = "40px";
         }
+        document.head.appendChild(this.__createCustomStylesElement());
         this.container.append(this._render());
         this.__initializeDataSets();
         this.__updateColorIndicator(0);
@@ -172,7 +185,7 @@ var ColorGradientPicker = /** @class */ (function () {
         // console.log("new _sliderElementRefs", this._sliderElementRefs);
         // Update all elements to the right of the new elelemt
         this.__updateSliderDataSetIndices(index + 1);
-        return (NoReact.createElement("input", { id: "rage-slider-".concat(this.baseID, "-").concat(index), type: "range", min: sliderMin, max: sliderMax, value: initialValue, style: { position: "absolute", left: "0px", top: "0px", width: "100%", height: "60%" }, "data-range-slider-index": index, "data-colorValue": initialColor.cssRGB(), "data-colorValueHEX": initialColor.cssHEX(), onChange: sliderHandler, onClick: sliderHandler, ref: ref }));
+        return (NoReact.createElement("input", { id: "rage-slider-".concat(this.baseID, "-").concat(index), type: "range", min: sliderMin, max: sliderMax, value: initialValue, style: { pos: "absolute", l: "0px", t: "0px", w: "100%", h: "60%" }, "data-range-slider-index": index, "data-colorValue": initialColor.cssRGB(), "data-colorValueHEX": initialColor.cssHEX(), onChange: sliderHandler, onClick: sliderHandler, ref: ref }));
     };
     /**
      * Get the absolute length of this range, in slider units.
@@ -318,7 +331,7 @@ var ColorGradientPicker = /** @class */ (function () {
     ColorGradientPicker.prototype.__locateClosestSliderValue = function (absoluteValue) {
         // As the colorGradient always reflects the slider values we can just ust the color gradient itself to search.
         var relativeValue = this.__absoluteToRelative(absoluteValue);
-        var colorGradientEntry = this.colorGradient.locateClosestSliderValue(relativeValue);
+        var colorGradientEntry = this.colorGradient.locateClosestRatio(relativeValue);
         return [colorGradientEntry[0], this.__relativeToAbsolute(colorGradientEntry[1].ratio)];
     };
     /**
@@ -577,61 +590,49 @@ var ColorGradientPicker = /** @class */ (function () {
             evt.stopPropagation();
             _self.__handleRemoveColor();
         };
-        var elementId = "color-gradient-container-".concat(this.baseID);
-        return (NoReact.createElement("div", { id: elementId, style: {
-                display: "flex",
-                flexDirection: "column",
-                width: "100%",
-                height: this.css_containerHeight,
-                position: "relative",
-                marginBottom: this.isMobileMode ? "6em" : "3em"
+        return (NoReact.createElement("div", { id: this.elementID, style: {
+                d: "flex",
+                fd: "column",
+                w: "100%",
+                h: this.css_containerHeight,
+                pos: "relative",
+                mb: this.isMobileMode ? "6em" : "3em"
             }, ref: this.containerRef, onMouseDown: this.__containerMouseDownHandler(), onClick: this.__containerClickHandler() },
-            createCustomStylesElement(elementId, this.css_thumbWidth, this.css_thumbHeight),
             this.colorGradient.values.map(function (colorGradientItem, index) {
                 var initialValue = _self.__relativeToAbsolute(colorGradientItem.ratio);
                 return _this.__createColorRangeInput(index, _this.sliderMin, _this.sliderMax, initialValue, colorGradientItem.color);
             }),
-            NoReact.createElement("div", { style: { width: "100%" } },
-                NoReact.createElement("input", { id: "color-indicator-input-".concat(this.baseID), type: "color", style: { visibility: "hidden", position: "absolute", left: 0 }, "data-active-slider-index": "", ref: this.colorInputRef, onInput: this.__colorChangeHandler() }),
+            NoReact.createElement("div", { style: { w: "100%" } },
+                NoReact.createElement("input", { id: "color-indicator-input-".concat(this.baseID), type: "color", style: { v: "hidden", pos: "absolute", l: 0 }, "data-active-slider-index": "", ref: this.colorInputRef, onInput: this.__colorChangeHandler() }),
                 NoReact.createElement("div", { ref: this.colorInputContainerRef, style: {
-                        position: "absolute",
-                        bottom: "0px",
-                        left: "0%",
-                        display: "flex",
-                        flexDirection: "column",
+                        pos: "absolute",
+                        b: "0px",
+                        l: "0%",
+                        d: "flex",
+                        fd: "column",
                         transform: "translate(0%, 100%)"
                     } },
                     NoReact.createElement("button", { id: "color-indicator-button-".concat(this.baseID), style: {
                             backgroundColor: "grey",
                             borderRadius: "10%",
                             border: "1px solid grey",
-                            width: this.css_indicatorWidth, // "1em",
-                            height: this.css_indicatorHeight, // "1em",
+                            w: this.css_indicatorWidth, // "1em",
+                            h: this.css_indicatorHeight, // "1em",
                             transform: "translate(-50%, 0%)"
                         }, onClick: handleIndicatorButtonClick, ref: this.colorIndicatorColorButtonRef }),
                     NoReact.createElement("button", { id: "color-remove-button-".concat(this.baseID), className: "color-remove-button", style: {
                             backgroundColor: "grey",
                             borderRadius: "10%",
                             border: "1px solid grey",
-                            width: this.css_indicatorWidth, // "1em",
-                            height: this.css_indicatorHeight, // "1em",
+                            w: this.css_indicatorWidth, // "1em",
+                            h: this.css_indicatorHeight, // "1em",
                             transform: "translate(-50%, 50%)",
                             lineHeight: "0.5em",
-                            padding: 0
+                            p: 0
                         }, onClick: handleRemoveColorButtonClick, ref: this.colorIndicatorRemoveButtonRef },
                         NoReact.createElement("span", { style: { fontSize: this.isMobileMode ? "1.0em" : "0.5em" } }, "\uD83D\uDDD1"))))));
-    };
+    }; // END function render()
     return ColorGradientPicker;
 }());
 exports.ColorGradientPicker = ColorGradientPicker;
-/**
- * Adds custom styles (global STYLE tag).
- *
- * @private
- */
-var createCustomStylesElement = function (elementId, thumbWidth, thumbHeight) {
-    // Thanks to Ana Tudor
-    //    https://css-tricks.com/multi-thumb-sliders-particular-two-thumb-case/
-    return (NoReact.createElement("style", null, "\n    #".concat(elementId, " input[type='range'] {\n\n      -webkit-appearance: none;\n\n      grid-column: 1;\n      grid-row: 2;\n      \n      /* same as before */\n      background: none; /* get rid of white Chrome background */\n      color: #000;\n      font: inherit; /* fix too small font-size in both Chrome & Firefox */\n      margin: 0;\n      pointer-events: none; /* let clicks pass through */\n    }\n\n    #").concat(elementId, " input[type='range']::-webkit-slider-runnable-track {\n      -webkit-appearance: none;\n\n      background: none; /* get rid of Firefox track background */\n      height: 100%;\n      width: 100%;\n\n      pointer-events: none;\n    }\n\n    #").concat(elementId, " input[type='range']::-webkit-slider-thumb {\n      -webkit-appearance: none;\n      background: currentcolor;\n      border: none; /* get rid of Firefox thumb border */\n      border-radius: 6px; /* get rid of Firefox corner rounding */\n      pointer-events: auto; /* catch clicks */\n      width: ").concat(thumbWidth, "; \n      height: ").concat(thumbHeight, ";\n    }\n\n    #").concat(elementId, " input[type='range']:focus::-webkit-slider-thumb {\n      border: 2px solid white;\n    }\n\n    #").concat(elementId, " input[type='range']::-moz-range-track {\n      -webkit-appearance: none;\n      background: none; /* get rid of Firefox track background */\n      height: 100%;\n      width: 100%;\n      pointer-events: none;\n    }\n\n    #").concat(elementId, " input[type='range']::-moz-range-thumb {\n      /* -webkit-appearance: none; */\n      background: currentcolor;\n      border: none; /* get rid of Firefox thumb border */\n      border-radius: 6px; /* get rid of Firefox corner rounding */\n      pointer-events: auto; /* catch clicks */\n      width: ").concat(thumbWidth, "; \n      height: ").concat(thumbHeight, ";\n    }\n\n    #").concat(elementId, " input[type='range']:focus::-moz-range-thumb {\n      border: 2px solid white;\n    }\n\n    #").concat(elementId, " input[type='range'] {\n      /* same as before */\n      z-index: 1;\n    }\n    \n    #").concat(elementId, " input[type='range']:focus {\n        z-index: 2;\n        /* outline: dotted 1px orange; */\n        color: darkorange;\n    }\n    ")));
-};
 //# sourceMappingURL=ColorGradientPicker.js.map

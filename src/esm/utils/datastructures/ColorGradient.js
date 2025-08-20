@@ -62,7 +62,7 @@ export class ColorGradient {
      */
     getColorAt(ratio) {
         // Locate interval first
-        const intervalLocation = this.locateClosestSliderValue(ratio);
+        const intervalLocation = this.locateClosestRatio(ratio);
         const leftItem = this.values[intervalLocation[0]];
         const rightItem = this.values[intervalLocation[0] + 1];
         const relativeInnerIntervalPosition = (ratio - leftItem.ratio) / (rightItem.ratio - leftItem.ratio);
@@ -75,7 +75,7 @@ export class ColorGradient {
      * @param {number} ratio - The value to look for.
      * @returns {[number,number]} A pair of left interval boundary index and closest value.
      */
-    locateClosestSliderValue(ratio) {
+    locateClosestRatio(ratio) {
         if (this.values.length === 0) {
             console.warn("[Warn] All slider values array is empty. This should not happen, cannot proceed.");
             return [NaN, null]; // This should not happen: at least two values must be present in a gradient

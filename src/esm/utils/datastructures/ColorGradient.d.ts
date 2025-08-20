@@ -46,7 +46,7 @@ export declare class ColorGradient {
      * @param {number} ratio - The value to look for.
      * @returns {[number,number]} A pair of left interval boundary index and closest value.
      */
-    locateClosestSliderValue(ratio: number): [number, ColorGradientItem];
+    locateClosestRatio(ratio: number): [number, ColorGradientItem];
     /**
      * Clone this linear color gradient. Returns a deep clone.
      *
