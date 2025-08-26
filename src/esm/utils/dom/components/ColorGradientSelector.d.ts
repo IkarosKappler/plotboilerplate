@@ -14,7 +14,14 @@ export declare class ColorGradientSelector {
     private containerRef;
     private mainButtonContainerRef;
     private positioningContainerRef;
+    private isMobileMode;
     private isDropdownOpen;
+    private css_buttonWidth;
+    private css_buttonHeight;
+    private css_buttonFontSize;
+    private colorGradients;
+    private colorGradientOptionRefs;
+    private selectedGradientIndex;
     /**
      * The constructor: creates a new color gradient picker in the given container.
      * If no container or ID is given then a new unbound `container` will be created (DIV).
@@ -24,7 +31,7 @@ export declare class ColorGradientSelector {
      *
      * @param {string?} containerID - (optional) If you want to use an existing container (should be a DIV).
      */
-    constructor(containerID?: string);
+    constructor(containerID?: string, isMobileMode?: boolean);
     /**
      * Adds a new color gradient change listener to this ColorGradientPicker.
      *

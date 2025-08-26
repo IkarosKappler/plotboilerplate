@@ -18,8 +18,14 @@ export class ColorGradientSelector {
      *
      * @param {string?} containerID - (optional) If you want to use an existing container (should be a DIV).
      */
-    constructor(containerID) {
+    constructor(containerID, isMobileMode) {
         this.isDropdownOpen = false;
+        this.css_buttonWidth = "100px";
+        this.css_buttonHeight = "1.25em";
+        this.css_buttonFontSize = "0.625em";
+        this.colorGradients = [];
+        this.colorGradientOptionRefs = [];
+        this.selectedGradientIndex = -1;
         /**
          * Adds custom styles (global STYLE tag).
          *
@@ -32,6 +38,21 @@ export class ColorGradientSelector {
     #${this.elementID} {
 
     }
+
+    #${this.elementID} button {
+      border: 1px solid lightgray;
+      padding: 0.25em;
+      background-color: rgba(255,255,255,0.9);
+    }
+
+    #${this.elementID} .main-button:hover {
+      background-color: rgba(216,216,216,0.9);
+    }
+
+    #${this.elementID} .option-gradient-button:hover {
+      background-color: rgba(216,216,216,0.9);
+    }
+
     `));
         };
         if (containerID) {
@@ -44,8 +65,21 @@ export class ColorGradientSelector {
         else {
             this.container = document.createElement("div");
         }
+        this.isMobileMode = Boolean(isMobileMode);
+        if (this.isMobileMode) {
+            this.css_buttonWidth = "200px";
+            this.css_buttonHeight = "2.5em";
+            this.css_buttonFontSize = "1.25em";
+        }
         this.baseID = Math.floor(Math.random() * 65535);
         this.elementID = `color-gradient-selector-${this.baseID}`;
+        const tmpColorGradients = [
+            ColorGradient.createDefault(),
+            ColorGradient.createFrom(Color.RED, Color.GREEN),
+            ColorGradient.createFrom(Color.BLUE, Color.GOLD)
+        ];
+        this.colorGradients = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map((num) => tmpColorGradients[num % tmpColorGradients.length]);
+        this.selectedGradientIndex = 0;
         document.head.appendChild(this.__createCustomStylesElement());
         this.container.append(this._render());
     } // END constructor
@@ -104,10 +138,15 @@ export class ColorGradientSelector {
      */
     __optionButtonClickHandler() {
         const _self = this;
-        return (_evt) => {
+        return (evt) => {
             // _self.mainButtonContainerRef.current.style.visibility = "visible";
             _self.positioningContainerRef.current.style.visibility = "hidden";
             _self.isDropdownOpen = false;
+            const targetButton = evt.target;
+            const clickedIndex_raw = targetButton.dataset.gradientIndex;
+            const clickedIndex = Number.parseInt(clickedIndex_raw);
+            console.log("clickedIndex", clickedIndex, clickedIndex_raw);
+            // option-gradient-radio-circle
         };
     }
     /**
@@ -116,10 +155,10 @@ export class ColorGradientSelector {
      * @param {ColorGradient} gradient
      * @returns {JsxElement}
      */
-    __renderOptionButton(gradient, index) {
-        return (NoReact.createElement("button", { className: "option-gradient", onClick: this.__optionButtonClickHandler(), style: { d: "flex", w: "100%" } },
-            NoReact.createElement("div", { sx: { w: "2em", flexShrink: 2 } }, index == 0 ? "🞊" : "🞅"),
-            NoReact.createElement("div", { sx: { w: "calc( 100% - 2em )", background: gradient.toColorGradientString() } }, "\u00A0")));
+    __renderOptionButton(gradient, index, ref) {
+        return (NoReact.createElement("button", { className: "option-gradient-button", onClick: this.__optionButtonClickHandler(), style: { d: "flex", w: "100%", fontSize: this.css_buttonFontSize }, ref: ref },
+            NoReact.createElement("div", { className: "option-gradient-radio-circle", sx: { w: "2em", flexShrink: 2 } }, index === 0 ? "🞊" : "🞅"),
+            NoReact.createElement("div", { sx: { w: "calc( 100% - 2em )", mr: "1em", background: gradient.toColorGradientString() } }, "\u00A0")));
     }
     /**
      * Init the container contents.
@@ -129,25 +168,22 @@ export class ColorGradientSelector {
     _render() {
         const _self = this;
         // console.log("Rendering ...", NoReact);
-        // this.colorIndicatorColorButtonRef = NoReact.useRef<HTMLButtonElement>();
-        // this.colorIndicatorRemoveButtonRef = NoReact.useRef<HTMLButtonElement>();
-        // this.colorInputRef = NoReact.useRef<HTMLInputElement>();
-        // this.colorInputContainerRef = NoReact.useRef<HTMLInputElement>();
         this.containerRef = NoReact.useRef();
         this.mainButtonContainerRef = NoReact.useRef();
         this.positioningContainerRef = NoReact.useRef();
-        const gradients = [
-            ColorGradient.createDefault(),
-            ColorGradient.createFrom(Color.RED, Color.GREEN),
-            ColorGradient.createFrom(Color.BLUE, Color.GOLD)
-        ];
-        const selectedGradient = gradients[0];
-        return (NoReact.createElement("div", { id: this.elementID, className: "color-gradient-selector", style: { minWidth: "100px", pos: "relative" }, ref: this.containerRef },
-            NoReact.createElement("button", { className: "main-button", ref: this.mainButtonContainerRef, style: { /* pos: "absolute", l: 0, t: 0, */ d: "flex", minWidth: "100px" }, onClick: this.__mainButtonClickHandler() },
+        const selectedGradient = this.colorGradients[this.selectedGradientIndex];
+        return (NoReact.createElement("div", { id: this.elementID, className: "color-gradient-selector", style: { minWidth: this.css_buttonWidth, maxWidth: this.css_buttonWidth, pos: "relative" }, ref: this.containerRef },
+            NoReact.createElement("button", { className: "main-button", ref: this.mainButtonContainerRef, style: {
+                    d: "flex",
+                    minWidth: this.css_buttonWidth,
+                    maxWidth: this.css_buttonWidth,
+                    minHeight: this.css_buttonHeight,
+                    maxHeight: this.css_buttonHeight
+                }, onClick: this.__mainButtonClickHandler() },
                 NoReact.createElement("div", { sx: { w: "calc( 100% - 2em )", background: selectedGradient.toColorGradientString() } }, "\u00A0"),
-                NoReact.createElement("div", { sx: { w: "2em", flexShrink: 2 } }, "\u25BE")),
+                NoReact.createElement("div", { sx: { w: this.css_buttonHeight, flexShrink: 2, fontSize: this.css_buttonFontSize } }, "\u25BE")),
             NoReact.createElement("div", { className: "positioning-container", ref: this.positioningContainerRef, style: {
-                    minWidth: "100px",
+                    minWidth: this.css_buttonWidth,
                     maxHeight: "25vh",
                     overflowY: "scroll",
                     v: "hidden",
@@ -155,10 +191,14 @@ export class ColorGradientSelector {
                     fd: "column",
                     pos: "absolute",
                     l: 0
-                    // t: 0
-                } }, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map((num, index) => {
+                } }, this.colorGradients.map((colorGradient, index) => {
                 // console.log("num", num, index);
-                return this.__renderOptionButton(gradients[index % gradients.length], index);
+                const ref = NoReact.useRef();
+                _self.colorGradientOptionRefs.push(ref);
+                // return this.__renderOptionButton(this.colorGradients[index % this.colorGradients.length], index, ref);
+                const optionButton = this.__renderOptionButton(colorGradient, index, ref);
+                ref.current.dataset.gradientIndex = `${index}`;
+                return optionButton;
             }))));
     } // END functionrender()
 }

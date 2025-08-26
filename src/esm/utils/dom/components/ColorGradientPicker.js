@@ -174,7 +174,7 @@ export class ColorGradientPicker {
         this.baseID = Math.floor(Math.random() * 65535);
         this.elementID = `color-gradient-picker-${this.baseID}`;
         this.colorGradient = ColorGradient.createDefault();
-        this.isMobileMode = isMobileMode;
+        this.isMobileMode = Boolean(isMobileMode);
         if (isMobileMode) {
             // Double size :)
             this.css_indicatorWidth_num = 2.0;

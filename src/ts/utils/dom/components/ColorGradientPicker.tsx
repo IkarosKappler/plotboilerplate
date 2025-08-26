@@ -35,7 +35,7 @@ export class ColorGradientPicker {
 
   // Only used during initialization!
 
-  private isMobileMode = false;
+  private isMobileMode: boolean = false;
   private css_indicatorWidth_num = 1.0;
   private css_indicatorWidth = "1em";
   private css_indicatorHeight = "1em";
@@ -73,7 +73,7 @@ export class ColorGradientPicker {
     this.elementID = `color-gradient-picker-${this.baseID}`;
     this.colorGradient = ColorGradient.createDefault();
 
-    this.isMobileMode = isMobileMode;
+    this.isMobileMode = Boolean(isMobileMode);
     if (isMobileMode) {
       // Double size :)
       this.css_indicatorWidth_num = 2.0;

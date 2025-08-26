@@ -24,7 +24,7 @@
     options = options || {};
     this.modalDialog = modalDialog;
     this.colorGradientPicker = new ColorGradientPicker(null, options.isMobileMode ?? false);
-    this.colorGradientSelector = new ColorGradientSelector(null);
+    this.colorGradientSelector = new ColorGradientSelector(null, options.isMobileMode ?? false);
   };
 
   /**
