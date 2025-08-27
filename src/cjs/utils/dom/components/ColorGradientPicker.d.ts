@@ -45,6 +45,8 @@ export declare class ColorGradientPicker {
      * @param {boolean?} isMobileMode - (optional) If `true` then the elements are rendered in double size.
      */
     constructor(containerID?: string, isMobileMode?: boolean);
+    setGradient(gradient: ColorGradient, fireChangeEvent?: boolean): void;
+    private __removeAllChildNodes;
     private __initializeDataSets;
     /**
      * Adds a new color gradient change listener to this ColorGradientPicker.

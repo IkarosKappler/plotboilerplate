@@ -88,6 +88,10 @@ export class ColorGradientPicker {
             // Thanks to Ana Tudor
             //    https://css-tricks.com/multi-thumb-sliders-particular-two-thumb-case/
             return (NoReact.createElement("style", null, `
+    #${this.elementID} {
+      margin-top: 1em;
+    }
+
     #${this.elementID} input[type='range'] {
 
       -webkit-appearance: none;
@@ -190,6 +194,26 @@ export class ColorGradientPicker {
         this.__updateColorIndicator(0);
         this.__updateBackgroundGradient();
     } // END constructor
+    setGradient(gradient, fireChangeEvent) {
+        // We are lazy: just throw away everything and rebuild all.
+        this.__removeAllChildNodes(this.container);
+        this.colorGradient = gradient;
+        this.container.append(this._render());
+        this.__initializeDataSets();
+        this.__updateColorIndicator(0);
+        this.__updateBackgroundGradient();
+        if (fireChangeEvent) {
+            this.__fireChangeEvent();
+        }
+    }
+    // +---------------------------------------------------------------------------------
+    // | A helper function to remove all child nodes.
+    // +-------------------------------
+    __removeAllChildNodes(node) {
+        while (node.lastChild) {
+            node.removeChild(node.lastChild);
+        }
+    }
     __initializeDataSets() {
         for (var i = 0; i < this._sliderElementRefs.length; i++) {
             const sliderColor = this.colorGradient.values[i].color;
@@ -625,6 +649,7 @@ export class ColorGradientPicker {
     _render() {
         const _self = this;
         // console.log("Rendering ...", NoReact);
+        this._sliderElementRefs = [];
         this.colorIndicatorColorButtonRef = NoReact.useRef();
         this.colorIndicatorRemoveButtonRef = NoReact.useRef();
         this.colorInputRef = NoReact.useRef();
@@ -659,7 +684,7 @@ export class ColorGradientPicker {
                 w: "100%",
                 h: this.css_containerHeight,
                 pos: "relative",
-                mb: this.isMobileMode ? "6em" : "3em"
+                mb: this.isMobileMode ? "5em" : "3em"
             }, ref: this.containerRef, onMouseDown: this.__containerMouseDownHandler(), onClick: this.__containerClickHandler() },
             this.colorGradient.values.map((colorGradientItem, index) => {
                 const initialValue = _self.__relativeToAbsolute(colorGradientItem.ratio);

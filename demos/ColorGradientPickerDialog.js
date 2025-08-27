@@ -34,6 +34,20 @@
       initialGradients: initialGradients,
       selectedGradientIndex: 0
     });
+    var _self = this;
+    this.colorGradientSelector.addChangeListener(function (newGradient, _newSelectedIndex, _sourceSelector) {
+      _self.colorGradientPicker.setGradient(newGradient);
+    });
+  };
+
+  ColorGradientPickerDialog.prototype.__handleAddGradientClick = function () {
+    var _self = this;
+    return function (evt) {
+      console.log("Adding current color gradient");
+      // Fetch the currently configured gradient from the picker and add it to the selector.
+      var currentGradient = _self.colorGradientPicker.getColorGradient();
+      _self.colorGradientSelector.addGradient(currentGradient);
+    };
   };
 
   /**
@@ -55,9 +69,21 @@
       this.colorGradientPicker.setGradient(options.colorGradient);
     }
 
+    const addGradientButton = document.createElement("button");
+    addGradientButton.innerHTML = "+";
+    addGradientButton.addEventListener("click", this.__handleAddGradientClick());
+
+    var selectorContainer = document.createElement("div");
+    selectorContainer.style.display = "flex";
+    selectorContainer.style.flexDirection = "row";
+    selectorContainer.style.justifyContent = "space-between";
+    selectorContainer.appendChild(this.colorGradientSelector.container);
+    selectorContainer.appendChild(addGradientButton);
+
     var modalBody = document.createElement("div");
+    // modalBody.appendChild(this.colorGradientSelector.container);
+    modalBody.appendChild(selectorContainer);
     modalBody.appendChild(this.colorGradientPicker.container);
-    modalBody.appendChild(this.colorGradientSelector.container);
     this.modalDialog.setTitle("Color Gradient Picker Dialog");
     this.modalDialog.setFooter("");
     this.modalDialog.setActions([{ label: "Accept", action: handleAcceptColor }, Modal.ACTION_CLOSE]);
