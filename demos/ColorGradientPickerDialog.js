@@ -24,7 +24,16 @@
     options = options || {};
     this.modalDialog = modalDialog;
     this.colorGradientPicker = new ColorGradientPicker(null, options.isMobileMode ?? false);
-    this.colorGradientSelector = new ColorGradientSelector(null, options.isMobileMode ?? false);
+
+    var initialGradients = [0, 1, 2].map(function (num) {
+      return ColorGradientSelector.DEFAULT_COLOR_GRADIENTS[num % ColorGradientSelector.DEFAULT_COLOR_GRADIENTS.length];
+    });
+    this.colorGradientSelector = new ColorGradientSelector({
+      containerID: null,
+      isMobileMode: options.isMobileMode,
+      initialGradients: initialGradients,
+      selectedGradientIndex: 0
+    });
   };
 
   /**

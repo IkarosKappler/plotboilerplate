@@ -94,7 +94,7 @@ export class ColorGradientPicker {
   private __initializeDataSets() {
     for (var i = 0; i < this._sliderElementRefs.length; i++) {
       const sliderColor = this.colorGradient.values[i].color;
-      console.log("Setting up slider color data set", i, sliderColor, sliderColor.cssRGB(), sliderColor.cssHEX());
+      // console.log("Setting up slider color data set", i, sliderColor, sliderColor.cssRGB(), sliderColor.cssHEX());
       this._sliderElementRefs[i].current.dataset.colorValue = sliderColor.cssRGB();
       this._sliderElementRefs[i].current.dataset.colorValueHEX = sliderColor.cssHEX();
     }
@@ -174,7 +174,7 @@ export class ColorGradientPicker {
         max={sliderMax}
         value={initialValue}
         style={{ pos: "absolute", l: "0px", t: "0px", w: "100%", h: "60%" }}
-        data-range-slider-index={index}
+        data-range-slider-index={`${index}`}
         data-colorValue={initialColor.cssRGB()}
         data-colorValueHEX={initialColor.cssHEX()}
         onChange={sliderHandler}
@@ -706,7 +706,7 @@ export class ColorGradientPicker {
             id={`color-indicator-input-${this.baseID}`}
             type="color"
             style={{ v: "hidden", pos: "absolute", l: 0 }}
-            data-active-slider-index=""
+            // data-active-slider-index=""
             ref={this.colorInputRef}
             onInput={this.__colorChangeHandler()}
           />

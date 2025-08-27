@@ -125,7 +125,7 @@ var ColorGradientPicker = /** @class */ (function () {
     ColorGradientPicker.prototype.__initializeDataSets = function () {
         for (var i = 0; i < this._sliderElementRefs.length; i++) {
             var sliderColor = this.colorGradient.values[i].color;
-            console.log("Setting up slider color data set", i, sliderColor, sliderColor.cssRGB(), sliderColor.cssHEX());
+            // console.log("Setting up slider color data set", i, sliderColor, sliderColor.cssRGB(), sliderColor.cssHEX());
             this._sliderElementRefs[i].current.dataset.colorValue = sliderColor.cssRGB();
             this._sliderElementRefs[i].current.dataset.colorValueHEX = sliderColor.cssHEX();
         }
@@ -185,7 +185,7 @@ var ColorGradientPicker = /** @class */ (function () {
         // console.log("new _sliderElementRefs", this._sliderElementRefs);
         // Update all elements to the right of the new elelemt
         this.__updateSliderDataSetIndices(index + 1);
-        return (NoReact.createElement("input", { id: "rage-slider-".concat(this.baseID, "-").concat(index), type: "range", min: sliderMin, max: sliderMax, value: initialValue, style: { pos: "absolute", l: "0px", t: "0px", w: "100%", h: "60%" }, "data-range-slider-index": index, "data-colorValue": initialColor.cssRGB(), "data-colorValueHEX": initialColor.cssHEX(), onChange: sliderHandler, onClick: sliderHandler, ref: ref }));
+        return (NoReact.createElement("input", { id: "rage-slider-".concat(this.baseID, "-").concat(index), type: "range", min: sliderMin, max: sliderMax, value: initialValue, style: { pos: "absolute", l: "0px", t: "0px", w: "100%", h: "60%" }, "data-range-slider-index": "".concat(index), "data-colorValue": initialColor.cssRGB(), "data-colorValueHEX": initialColor.cssHEX(), onChange: sliderHandler, onClick: sliderHandler, ref: ref }));
     };
     /**
      * Get the absolute length of this range, in slider units.
@@ -603,7 +603,9 @@ var ColorGradientPicker = /** @class */ (function () {
                 return _this.__createColorRangeInput(index, _this.sliderMin, _this.sliderMax, initialValue, colorGradientItem.color);
             }),
             NoReact.createElement("div", { style: { w: "100%" } },
-                NoReact.createElement("input", { id: "color-indicator-input-".concat(this.baseID), type: "color", style: { v: "hidden", pos: "absolute", l: 0 }, "data-active-slider-index": "", ref: this.colorInputRef, onInput: this.__colorChangeHandler() }),
+                NoReact.createElement("input", { id: "color-indicator-input-".concat(this.baseID), type: "color", style: { v: "hidden", pos: "absolute", l: 0 }, 
+                    // data-active-slider-index=""
+                    ref: this.colorInputRef, onInput: this.__colorChangeHandler() }),
                 NoReact.createElement("div", { ref: this.colorInputContainerRef, style: {
                         pos: "absolute",
                         b: "0px",

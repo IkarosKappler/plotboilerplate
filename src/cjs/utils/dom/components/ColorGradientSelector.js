@@ -21,12 +21,12 @@ var ColorGradientSelector = /** @class */ (function () {
      *
      * @param {string?} containerID - (optional) If you want to use an existing container (should be a DIV).
      */
-    function ColorGradientSelector(containerID, isMobileMode) {
+    function ColorGradientSelector(options) {
         var _this = this;
         this.isDropdownOpen = false;
         this.css_buttonWidth = "100px";
-        this.css_buttonHeight = "1.25em";
-        this.css_buttonFontSize = "0.625em";
+        this.css_buttonHeight = "1.8em";
+        this.css_buttonFontSize = "0.725em";
         this.colorGradients = [];
         this.colorGradientOptionRefs = [];
         this.selectedGradientIndex = -1;
@@ -40,8 +40,9 @@ var ColorGradientSelector = /** @class */ (function () {
             //    https://css-tricks.com/multi-thumb-sliders-particular-two-thumb-case/
             return (NoReact.createElement("style", null, "\n    #".concat(_this.elementID, " {\n\n    }\n\n    #").concat(_this.elementID, " button {\n      border: 1px solid lightgray;\n      padding: 0.25em;\n      background-color: rgba(255,255,255,0.9);\n    }\n\n    #").concat(_this.elementID, " .main-button:hover {\n      background-color: rgba(216,216,216,0.9);\n    }\n\n    #").concat(_this.elementID, " .option-gradient-button:hover {\n      background-color: rgba(216,216,216,0.9);\n    }\n\n    ")));
         };
-        if (containerID) {
-            var cont = document.getElementById(containerID);
+        options = options || {};
+        if (options.containerID) {
+            var cont = document.getElementById(options.containerID);
             if (!cont) {
                 throw "Cannot create ColorGradientPicker. Component ID does not exist.";
             }
@@ -50,7 +51,7 @@ var ColorGradientSelector = /** @class */ (function () {
         else {
             this.container = document.createElement("div");
         }
-        this.isMobileMode = Boolean(isMobileMode);
+        this.isMobileMode = Boolean(options.isMobileMode);
         if (this.isMobileMode) {
             this.css_buttonWidth = "200px";
             this.css_buttonHeight = "2.5em";
@@ -58,16 +59,37 @@ var ColorGradientSelector = /** @class */ (function () {
         }
         this.baseID = Math.floor(Math.random() * 65535);
         this.elementID = "color-gradient-selector-".concat(this.baseID);
-        var tmpColorGradients = [
-            ColorGradient_1.ColorGradient.createDefault(),
-            ColorGradient_1.ColorGradient.createFrom(Color_1.Color.RED, Color_1.Color.GREEN),
-            ColorGradient_1.ColorGradient.createFrom(Color_1.Color.BLUE, Color_1.Color.GOLD)
-        ];
-        this.colorGradients = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map(function (num) { return tmpColorGradients[num % tmpColorGradients.length]; });
-        this.selectedGradientIndex = 0;
+        this.colorGradients =
+            typeof options.initialGradients === "undefined" ? ColorGradientSelector.DEFAULT_COLOR_GRADIENTS : options.initialGradients;
+        this.selectedGradientIndex = typeof options.selectedGradientIndex === "undefined" ? 0 : options.selectedGradientIndex;
         document.head.appendChild(this.__createCustomStylesElement());
         this.container.append(this._render());
     } // END constructor
+    ColorGradientSelector.prototype.setGradients = function (gradients, selectedIndex) {
+        var _this = this;
+        // First empty the container
+        this.__removeAllChildNodes(this.positioningContainerRef.current);
+        // Clone the array
+        this.colorGradients = gradients.map(function (gradient) { return gradient; });
+        // Re-render button array
+        // const newChildNodes: Array<NoReact.Ref<HTMLButtonElement>> = this._renderAllOptionButtons();
+        this._renderAllOptionButtons();
+        // Re-fill container with new nodes
+        // newChildNodes.forEach((nodeRef: NoReact.Ref<HTMLButtonElement>) => {
+        //   this.positioningContainerRef.current.appendChild(nodeRef.current);
+        // });
+        this.colorGradientOptionRefs.forEach(function (nodeRef) {
+            _this.positioningContainerRef.current.appendChild(nodeRef.current);
+        });
+    };
+    // +---------------------------------------------------------------------------------
+    // | A helper function to remove all child nodes.
+    // +-------------------------------
+    ColorGradientSelector.prototype.__removeAllChildNodes = function (node) {
+        while (node.lastChild) {
+            node.removeChild(node.lastChild);
+        }
+    };
     /**
      * Adds a new color gradient change listener to this ColorGradientPicker.
      *
@@ -124,15 +146,39 @@ var ColorGradientSelector = /** @class */ (function () {
     ColorGradientSelector.prototype.__optionButtonClickHandler = function () {
         var _self = this;
         return function (evt) {
-            // _self.mainButtonContainerRef.current.style.visibility = "visible";
+            // console.log("__optionButtonClickHandler", evt.currentTarget);
+            // if( evt.target.)
             _self.positioningContainerRef.current.style.visibility = "hidden";
             _self.isDropdownOpen = false;
-            var targetButton = evt.target;
-            var clickedIndex_raw = targetButton.dataset.gradientIndex;
+            var targetButton = evt.currentTarget;
+            var clickedIndex_raw = targetButton.dataset["gradientIndex"];
             var clickedIndex = Number.parseInt(clickedIndex_raw);
-            console.log("clickedIndex", clickedIndex, clickedIndex_raw);
-            // option-gradient-radio-circle
+            console.log("clickedIndex", clickedIndex, clickedIndex_raw, targetButton.dataset, targetButton);
+            if (Number.isNaN(clickedIndex)) {
+                // Stop here. This is not what we want.
+                return;
+            }
+            // Find child: and set selected.
+            // targetButton.querySelectorAll(".option-gradient-radio-circle")[0].innerHTML = "X";
+            // _self.selectedGradientIndex = clickedIndex;
+            _self.__setSelectedIndex(clickedIndex);
+            _self.__fireChangeEvent();
         };
+    };
+    ColorGradientSelector.prototype.__setSelectedIndex = function (newSelectedIndex) {
+        for (var i = 0; i < this.colorGradientOptionRefs.length; i++) {
+            var ref = this.colorGradientOptionRefs[i];
+            // Find child: and set selected.
+            ref.current.querySelectorAll(".option-gradient-radio-circle")[0].innerHTML = newSelectedIndex === i ? "🞊" : "🞅";
+        }
+        this.selectedGradientIndex = newSelectedIndex;
+        var selectedGradient = this.colorGradients[this.selectedGradientIndex];
+        // Display new gradient in the main button
+        this.__setMainButtonGradient(selectedGradient);
+    };
+    ColorGradientSelector.prototype.__setMainButtonGradient = function (gradient) {
+        var colorDisplay = this.mainButtonContainerRef.current.querySelectorAll(".main-button-gradient-display")[0];
+        colorDisplay.style["background"] = gradient.toColorGradientString();
     };
     /**
      * Renders a new option button for the dropdown menu.
@@ -141,9 +187,36 @@ var ColorGradientSelector = /** @class */ (function () {
      * @returns {JsxElement}
      */
     ColorGradientSelector.prototype.__renderOptionButton = function (gradient, index, ref) {
-        return (NoReact.createElement("button", { className: "option-gradient-button", onClick: this.__optionButtonClickHandler(), style: { d: "flex", w: "100%", fontSize: this.css_buttonFontSize }, ref: ref },
+        return (NoReact.createElement("button", { className: "option-gradient-button", onClick: this.__optionButtonClickHandler(), style: {
+                d: "flex",
+                w: "100%",
+                fontSize: this.css_buttonFontSize,
+                minHeight: this.css_buttonHeight,
+                maxHeight: this.css_buttonHeight
+            }, ref: ref, "data-gradientIndex": "".concat(index) },
             NoReact.createElement("div", { className: "option-gradient-radio-circle", sx: { w: "2em", flexShrink: 2 } }, index === 0 ? "🞊" : "🞅"),
             NoReact.createElement("div", { sx: { w: "calc( 100% - 2em )", mr: "1em", background: gradient.toColorGradientString() } }, "\u00A0")));
+    };
+    /**
+     * Creates a new array of option buttons (refs).
+     * @returns
+     */
+    ColorGradientSelector.prototype._renderAllOptionButtons = function () {
+        var _this = this;
+        var _self = this;
+        // First clear all references
+        _self.colorGradientOptionRefs = [];
+        return this.colorGradients.map(function (colorGradient, index) {
+            // console.log("num", num, index);
+            var ref = NoReact.useRef();
+            _self.colorGradientOptionRefs.push(ref);
+            // return this.__renderOptionButton(this.colorGradients[index % this.colorGradients.length], index, ref);
+            var optionButton = _this.__renderOptionButton(colorGradient, index, ref);
+            // ref.current.dataset.gradientIndex = `${index}`;
+            console.log("New data set for button", ref.current.dataset);
+            return optionButton;
+            // return ref;
+        });
     };
     /**
      * Init the container contents.
@@ -151,7 +224,6 @@ var ColorGradientSelector = /** @class */ (function () {
      * @private
      */
     ColorGradientSelector.prototype._render = function () {
-        var _this = this;
         var _self = this;
         // console.log("Rendering ...", NoReact);
         this.containerRef = NoReact.useRef();
@@ -166,7 +238,7 @@ var ColorGradientSelector = /** @class */ (function () {
                     minHeight: this.css_buttonHeight,
                     maxHeight: this.css_buttonHeight
                 }, onClick: this.__mainButtonClickHandler() },
-                NoReact.createElement("div", { sx: { w: "calc( 100% - 2em )", background: selectedGradient.toColorGradientString() } }, "\u00A0"),
+                NoReact.createElement("div", { className: "main-button-gradient-display", sx: { w: "calc( 100% - ".concat(this.css_buttonFontSize, " )"), background: selectedGradient.toColorGradientString() } }, "\u00A0"),
                 NoReact.createElement("div", { sx: { w: this.css_buttonHeight, flexShrink: 2, fontSize: this.css_buttonFontSize } }, "\u25BE")),
             NoReact.createElement("div", { className: "positioning-container", ref: this.positioningContainerRef, style: {
                     minWidth: this.css_buttonWidth,
@@ -177,16 +249,13 @@ var ColorGradientSelector = /** @class */ (function () {
                     fd: "column",
                     pos: "absolute",
                     l: 0
-                } }, this.colorGradients.map(function (colorGradient, index) {
-                // console.log("num", num, index);
-                var ref = NoReact.useRef();
-                _self.colorGradientOptionRefs.push(ref);
-                // return this.__renderOptionButton(this.colorGradients[index % this.colorGradients.length], index, ref);
-                var optionButton = _this.__renderOptionButton(colorGradient, index, ref);
-                ref.current.dataset.gradientIndex = "".concat(index);
-                return optionButton;
-            }))));
+                } }, _self._renderAllOptionButtons())));
     }; // END functionrender()
+    ColorGradientSelector.DEFAULT_COLOR_GRADIENTS = [
+        ColorGradient_1.ColorGradient.createDefault(),
+        ColorGradient_1.ColorGradient.createFrom(Color_1.Color.RED, Color_1.Color.GREEN),
+        ColorGradient_1.ColorGradient.createFrom(Color_1.Color.BLUE, Color_1.Color.GOLD)
+    ];
     return ColorGradientSelector;
 }());
 exports.ColorGradientSelector = ColorGradientSelector;

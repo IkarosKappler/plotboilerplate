@@ -7,6 +7,12 @@
  */
 import { ColorGradient } from "../../datastructures/ColorGradient";
 export type ColorGradientSelectorChangeListener = (colorGradient: ColorGradient, source: ColorGradientSelector) => void;
+export interface ColorGradientSelectorProps {
+    containerID?: string;
+    initialGradients?: Array<ColorGradient>;
+    selectedGradientIndex?: number;
+    isMobileMode?: boolean;
+}
 export declare class ColorGradientSelector {
     private readonly baseID;
     private readonly elementID;
@@ -22,6 +28,7 @@ export declare class ColorGradientSelector {
     private colorGradients;
     private colorGradientOptionRefs;
     private selectedGradientIndex;
+    static readonly DEFAULT_COLOR_GRADIENTS: Array<ColorGradient>;
     /**
      * The constructor: creates a new color gradient picker in the given container.
      * If no container or ID is given then a new unbound `container` will be created (DIV).
@@ -31,7 +38,9 @@ export declare class ColorGradientSelector {
      *
      * @param {string?} containerID - (optional) If you want to use an existing container (should be a DIV).
      */
-    constructor(containerID?: string, isMobileMode?: boolean);
+    constructor(options?: ColorGradientSelectorProps);
+    setGradients(gradients: Array<ColorGradient>, selectedIndex: number): void;
+    private __removeAllChildNodes;
     /**
      * Adds a new color gradient change listener to this ColorGradientPicker.
      *
@@ -58,6 +67,8 @@ export declare class ColorGradientSelector {
      * @returns
      */
     private __optionButtonClickHandler;
+    private __setSelectedIndex;
+    private __setMainButtonGradient;
     /**
      * Renders a new option button for the dropdown menu.
      *
@@ -65,6 +76,11 @@ export declare class ColorGradientSelector {
      * @returns {JsxElement}
      */
     private __renderOptionButton;
+    /**
+     * Creates a new array of option buttons (refs).
+     * @returns
+     */
+    private _renderAllOptionButtons;
     /**
      * Init the container contents.
      *
