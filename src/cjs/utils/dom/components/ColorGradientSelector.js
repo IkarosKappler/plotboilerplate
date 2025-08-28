@@ -31,6 +31,7 @@ var ColorGradientSelector = /** @class */ (function () {
         this.css_buttonHeight = "1.8em";
         this.css_buttonFontSize = "0.725em";
         this.colorGradients = [];
+        // TODO: this does not really need to be a pair, does it?
         this.colorGradientOptionRefs = [];
         this.selectedGradientIndex = -1;
         this.installedChangeListeners = [];
@@ -42,7 +43,7 @@ var ColorGradientSelector = /** @class */ (function () {
         this.__createCustomStylesElement = function () {
             // Thanks to Ana Tudor
             //    https://css-tricks.com/multi-thumb-sliders-particular-two-thumb-case/
-            return (NoReact.createElement("style", null, "\n    #".concat(_this.elementID, " {\n\n    }\n\n    #").concat(_this.elementID, " button {\n      border: 1px solid lightgray;\n      padding: 0.25em;\n      background-color: rgba(255,255,255,0.9);\n    }\n\n    #").concat(_this.elementID, " .main-button:hover {\n      background-color: rgba(216,216,216,0.9);\n    }\n\n    #").concat(_this.elementID, " .option-gradient-button:hover {\n      background-color: rgba(216,216,216,0.9);\n    }\n\n    ")));
+            return (NoReact.createElement("style", null, "\n    #".concat(_this.elementID, " {\n\n    }\n\n    #").concat(_this.elementID, " button {\n      border: 1px solid lightgray;\n      padding: 0.25em;\n      background-color: rgba(255,255,255,0.9);\n    }\n\n    #").concat(_this.elementID, " .main-button:hover {\n      background-color: rgba(216,216,216,0.9);\n    }\n\n    #").concat(_this.elementID, " .option-gradient-button:hover, #").concat(_this.elementID, " .option-delete-button:hover {\n      background-color: rgba(216,216,216,0.9);\n    }\n\n    ")));
         };
         options = options || {};
         if (options.containerID) {
@@ -87,12 +88,14 @@ var ColorGradientSelector = /** @class */ (function () {
         console.log("addGradient");
         // Render a new button
         var index = this.colorGradients.length;
-        var ref = NoReact.useRef();
-        this.__renderOptionButton(gradient, index, ref);
+        var refMainContainer = NoReact.useRef();
+        var refActionButton = NoReact.useRef();
+        var refDeleteButton = NoReact.useRef();
+        this.__renderOptionButton(gradient, index, refMainContainer, refActionButton, refDeleteButton);
         this.colorGradients.push(gradient);
-        this.colorGradientOptionRefs.push(ref);
+        this.colorGradientOptionRefs.push({ mainButton: refActionButton, deleteButton: refDeleteButton });
         // Add to container
-        this.positioningContainerRef.current.appendChild(ref.current);
+        this.positioningContainerRef.current.appendChild(refMainContainer.current);
     };
     // public removeGradient
     // +---------------------------------------------------------------------------------
@@ -155,15 +158,13 @@ var ColorGradientSelector = /** @class */ (function () {
         };
     };
     /**
-     * Creates a handler for click events on the main button.
+     * Creates a handler for click events on one of the option button in the dropdown.
      *
      * @returns
      */
     ColorGradientSelector.prototype.__optionButtonClickHandler = function () {
         var _self = this;
         return function (evt) {
-            // console.log("__optionButtonClickHandler", evt.currentTarget);
-            // if( evt.target.)
             _self.positioningContainerRef.current.style.visibility = "hidden";
             _self.isDropdownOpen = false;
             var targetButton = evt.currentTarget;
@@ -175,15 +176,52 @@ var ColorGradientSelector = /** @class */ (function () {
                 return;
             }
             // Find child: and set selected.
-            // targetButton.querySelectorAll(".option-gradient-radio-circle")[0].innerHTML = "X";
-            // _self.selectedGradientIndex = clickedIndex;
             _self.__setSelectedIndex(clickedIndex);
             _self.__fireChangeEvent();
         };
     };
+    ColorGradientSelector.prototype.__optionButtonDeleteHandler = function () {
+        var _this = this;
+        var _self = this;
+        return function (evt) {
+            var targetButton = evt.currentTarget;
+            var clickedIndex_raw = targetButton.dataset["gradientIndex"];
+            var clickedIndex = Number.parseInt(clickedIndex_raw);
+            console.log("clickedIndex", clickedIndex, clickedIndex_raw, targetButton.dataset, targetButton);
+            if (Number.isNaN(clickedIndex)) {
+                // Stop here. This is not what we want.
+                return;
+            }
+            // Find child: and remove from DOM
+            console.log("this.colorGradientOptionRefs", _this.colorGradientOptionRefs, "clickedIndex", clickedIndex);
+            var refPair = _this.colorGradientOptionRefs[clickedIndex];
+            // TODO: find containing parent and remove that!
+            // ...
+            refPair.mainButton.current.parentElement.remove();
+            // Remove from logic
+            _this.colorGradients.splice(clickedIndex, 1); // Remove 1 element at the given index
+            _this.colorGradientOptionRefs.splice(clickedIndex, 1);
+            // Update all following elements in the list.
+            _this.__updateOptionDataSetIndices(clickedIndex);
+            console.log("All refs", _this.colorGradientOptionRefs);
+        };
+    };
+    /**
+     * Once a slider element was added or removed then the following indices must be updated.
+     *
+     * @param {number} startIndex - The slider index to start updating at.
+     */
+    ColorGradientSelector.prototype.__updateOptionDataSetIndices = function (startIndex) {
+        // Update all elements to the right of the new elelemt
+        for (var i = startIndex; i < this.colorGradientOptionRefs.length; i++) {
+            // this.colorGradientOptionRefs[i].current.setAttribute("gradientIndex", `${i}`);
+            this.colorGradientOptionRefs[i].mainButton.current.dataset["gradientIndex"] = "".concat(i);
+            this.colorGradientOptionRefs[i].mainButton.current.querySelector;
+        }
+    };
     ColorGradientSelector.prototype.__setSelectedIndex = function (newSelectedIndex) {
         for (var i = 0; i < this.colorGradientOptionRefs.length; i++) {
-            var ref = this.colorGradientOptionRefs[i];
+            var ref = this.colorGradientOptionRefs[i].mainButton;
             // Find child: and set selected.
             ref.current.querySelectorAll(".option-gradient-radio-circle")[0].innerHTML = newSelectedIndex === i ? "🞊" : "🞅";
         }
@@ -207,16 +245,19 @@ var ColorGradientSelector = /** @class */ (function () {
      * @param {ColorGradient} gradient
      * @returns {JsxElement}
      */
-    ColorGradientSelector.prototype.__renderOptionButton = function (gradient, index, ref) {
-        return (NoReact.createElement("button", { className: "option-gradient-button", onClick: this.__optionButtonClickHandler(), style: {
-                d: "flex",
-                w: "100%",
-                fontSize: this.css_buttonFontSize,
-                minHeight: this.css_buttonHeight,
-                maxHeight: this.css_buttonHeight
-            }, ref: ref, "data-gradientIndex": "".concat(index) },
-            NoReact.createElement("div", { className: "option-gradient-radio-circle", sx: { w: "2em", flexShrink: 2, alignContent: "center" } }, index === 0 ? "🞊" : "🞅"),
-            NoReact.createElement("div", { sx: { w: "calc( 100% - 2em )", mr: "1em", background: gradient.toColorGradientString() } }, "\u00A0")));
+    ColorGradientSelector.prototype.__renderOptionButton = function (gradient, index, refMainContainer, refActionButton, refDelButton) {
+        return (NoReact.createElement("div", { sx: { d: "flex", flexDirection: "row" }, ref: refMainContainer },
+            NoReact.createElement("button", { className: "option-gradient-button", onClick: this.__optionButtonClickHandler(), style: {
+                    d: "flex",
+                    w: "100%",
+                    fontSize: this.css_buttonFontSize,
+                    minHeight: this.css_buttonHeight,
+                    maxHeight: this.css_buttonHeight
+                }, ref: refActionButton, "data-gradientIndex": "".concat(index) },
+                NoReact.createElement("div", { className: "option-gradient-radio-circle", sx: { w: "2em", flexShrink: 2, alignContent: "center" } }, index === 0 ? "🞊" : "🞅"),
+                NoReact.createElement("div", { sx: { w: "calc( 100% - 2em )", mr: "1em", background: gradient.toColorGradientString() } }, "\u00A0")),
+            NoReact.createElement("button", { classname: "option-delete-button", sx: { fontSize: this.css_buttonFontSize, minHeight: this.css_buttonHeight, maxHeight: this.css_buttonHeight }, onClick: this.__optionButtonDeleteHandler(), "data-gradientIndex": "".concat(index), ref: refDelButton },
+                NoReact.createElement("div", { sx: { w: "2em", flexShrink: 2, alignContent: "center" } }, "\uD83D\uDDD1"))));
     };
     /**
      * Creates a new array of option buttons (refs).
@@ -229,9 +270,11 @@ var ColorGradientSelector = /** @class */ (function () {
         _self.colorGradientOptionRefs = [];
         return this.colorGradients.map(function (colorGradient, index) {
             // console.log("num", num, index);
-            var ref = NoReact.useRef();
-            _self.colorGradientOptionRefs.push(ref);
-            return _this.__renderOptionButton(colorGradient, index, ref);
+            var refMainContainer = NoReact.useRef();
+            var refActionButton = NoReact.useRef();
+            var refDelButton = NoReact.useRef();
+            _self.colorGradientOptionRefs.push({ mainButton: refActionButton, deleteButton: refDelButton });
+            return _this.__renderOptionButton(colorGradient, index, refMainContainer, refActionButton, refDelButton);
         });
     };
     /**

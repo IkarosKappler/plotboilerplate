@@ -70,11 +70,18 @@ export declare class ColorGradientSelector {
      */
     private __mainButtonClickHandler;
     /**
-     * Creates a handler for click events on the main button.
+     * Creates a handler for click events on one of the option button in the dropdown.
      *
      * @returns
      */
     private __optionButtonClickHandler;
+    private __optionButtonDeleteHandler;
+    /**
+     * Once a slider element was added or removed then the following indices must be updated.
+     *
+     * @param {number} startIndex - The slider index to start updating at.
+     */
+    __updateOptionDataSetIndices(startIndex: number): void;
     private __setSelectedIndex;
     /**
      * Sets the backround color of the main button (of this dropdown) element.

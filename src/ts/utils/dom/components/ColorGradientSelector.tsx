@@ -48,7 +48,11 @@ export class ColorGradientSelector {
   private css_buttonFontSize = "0.725em";
 
   private colorGradients: Array<ColorGradient> = [];
-  private colorGradientOptionRefs: Array<NoReact.Ref<HTMLButtonElement>> = [];
+  // TODO: this does not really need to be a pair, does it?
+  private colorGradientOptionRefs: Array<{
+    mainButton: NoReact.Ref<HTMLButtonElement>;
+    deleteButton: NoReact.Ref<HTMLButtonElement>;
+  }> = [];
   private selectedGradientIndex: number = -1;
 
   private readonly installedChangeListeners: Array<ColorGradientSelectorChangeListener> = [];
@@ -115,12 +119,15 @@ export class ColorGradientSelector {
     console.log("addGradient");
     // Render a new button
     const index: number = this.colorGradients.length;
-    const ref: NoReact.Ref<HTMLButtonElement> = NoReact.useRef<HTMLButtonElement>();
-    this.__renderOptionButton(gradient, index, ref);
+    const refMainContainer: NoReact.Ref<HTMLDivElement> = NoReact.useRef<HTMLDivElement>();
+    const refActionButton: NoReact.Ref<HTMLButtonElement> = NoReact.useRef<HTMLButtonElement>();
+    const refDeleteButton: NoReact.Ref<HTMLButtonElement> = NoReact.useRef<HTMLButtonElement>();
+
+    this.__renderOptionButton(gradient, index, refMainContainer, refActionButton, refDeleteButton);
     this.colorGradients.push(gradient);
-    this.colorGradientOptionRefs.push(ref);
+    this.colorGradientOptionRefs.push({ mainButton: refActionButton, deleteButton: refDeleteButton });
     // Add to container
-    this.positioningContainerRef.current.appendChild(ref.current);
+    this.positioningContainerRef.current.appendChild(refMainContainer.current);
   }
 
   // public removeGradient
@@ -191,15 +198,13 @@ export class ColorGradientSelector {
   }
 
   /**
-   * Creates a handler for click events on the main button.
+   * Creates a handler for click events on one of the option button in the dropdown.
    *
    * @returns
    */
   private __optionButtonClickHandler(): (evt: MouseEvent) => void {
     const _self = this;
     return (evt: MouseEvent): void => {
-      // console.log("__optionButtonClickHandler", evt.currentTarget);
-      // if( evt.target.)
       _self.positioningContainerRef.current.style.visibility = "hidden";
       _self.isDropdownOpen = false;
       const targetButton: HTMLButtonElement = evt.currentTarget as HTMLButtonElement;
@@ -211,16 +216,54 @@ export class ColorGradientSelector {
         return;
       }
       // Find child: and set selected.
-      // targetButton.querySelectorAll(".option-gradient-radio-circle")[0].innerHTML = "X";
-      // _self.selectedGradientIndex = clickedIndex;
       _self.__setSelectedIndex(clickedIndex);
       _self.__fireChangeEvent();
     };
   }
 
+  private __optionButtonDeleteHandler(): (evt: MouseEvent) => void {
+    const _self = this;
+    return (evt: MouseEvent): void => {
+      const targetButton: HTMLButtonElement = evt.currentTarget as HTMLButtonElement;
+      const clickedIndex_raw: string = targetButton.dataset["gradientIndex"];
+      const clickedIndex: number = Number.parseInt(clickedIndex_raw);
+      console.log("clickedIndex", clickedIndex, clickedIndex_raw, targetButton.dataset, targetButton);
+      if (Number.isNaN(clickedIndex)) {
+        // Stop here. This is not what we want.
+        return;
+      }
+      // Find child: and remove from DOM
+      console.log("this.colorGradientOptionRefs", this.colorGradientOptionRefs, "clickedIndex", clickedIndex);
+      const refPair = this.colorGradientOptionRefs[clickedIndex];
+      // TODO: find containing parent and remove that!
+      // ...
+      refPair.mainButton.current.parentElement.remove();
+      // Remove from logic
+      this.colorGradients.splice(clickedIndex, 1); // Remove 1 element at the given index
+      this.colorGradientOptionRefs.splice(clickedIndex, 1);
+      // Update all following elements in the list.
+      this.__updateOptionDataSetIndices(clickedIndex);
+      console.log("All refs", this.colorGradientOptionRefs);
+    };
+  }
+
+  /**
+   * Once a slider element was added or removed then the following indices must be updated.
+   *
+   * @param {number} startIndex - The slider index to start updating at.
+   */
+  __updateOptionDataSetIndices(startIndex: number) {
+    // Update all elements to the right of the new elelemt
+    for (var i = startIndex; i < this.colorGradientOptionRefs.length; i++) {
+      // this.colorGradientOptionRefs[i].current.setAttribute("gradientIndex", `${i}`);
+      this.colorGradientOptionRefs[i].mainButton.current.dataset["gradientIndex"] = `${i}`;
+      this.colorGradientOptionRefs[i].mainButton.current.querySelector;
+    }
+  }
+
   private __setSelectedIndex(newSelectedIndex: number): void {
     for (var i = 0; i < this.colorGradientOptionRefs.length; i++) {
-      const ref: NoReact.Ref<HTMLButtonElement> = this.colorGradientOptionRefs[i];
+      const ref: NoReact.Ref<HTMLButtonElement> = this.colorGradientOptionRefs[i].mainButton;
       // Find child: and set selected.
       ref.current.querySelectorAll(".option-gradient-radio-circle")[0].innerHTML = newSelectedIndex === i ? "🞊" : "🞅";
     }
@@ -248,26 +291,43 @@ export class ColorGradientSelector {
    * @param {ColorGradient} gradient
    * @returns {JsxElement}
    */
-  private __renderOptionButton(gradient: ColorGradient, index: number, ref: NoReact.Ref<HTMLButtonElement>): JsxElement {
+  private __renderOptionButton(
+    gradient: ColorGradient,
+    index: number,
+    refMainContainer: NoReact.Ref<HTMLDivElement>,
+    refActionButton: NoReact.Ref<HTMLButtonElement>,
+    refDelButton: NoReact.Ref<HTMLButtonElement>
+  ): JsxElement {
     return (
-      <button
-        className="option-gradient-button"
-        onClick={this.__optionButtonClickHandler()}
-        style={{
-          d: "flex",
-          w: "100%",
-          fontSize: this.css_buttonFontSize,
-          minHeight: this.css_buttonHeight,
-          maxHeight: this.css_buttonHeight
-        }}
-        ref={ref}
-        data-gradientIndex={`${index}`}
-      >
-        <div className="option-gradient-radio-circle" sx={{ w: "2em", flexShrink: 2, alignContent: "center" }}>
-          {index === 0 ? "🞊" : "🞅"}
-        </div>
-        <div sx={{ w: "calc( 100% - 2em )", mr: "1em", background: gradient.toColorGradientString() }}>&nbsp;</div>
-      </button>
+      <div sx={{ d: "flex", flexDirection: "row" }} ref={refMainContainer}>
+        <button
+          className="option-gradient-button"
+          onClick={this.__optionButtonClickHandler()}
+          style={{
+            d: "flex",
+            w: "100%",
+            fontSize: this.css_buttonFontSize,
+            minHeight: this.css_buttonHeight,
+            maxHeight: this.css_buttonHeight
+          }}
+          ref={refActionButton}
+          data-gradientIndex={`${index}`}
+        >
+          <div className="option-gradient-radio-circle" sx={{ w: "2em", flexShrink: 2, alignContent: "center" }}>
+            {index === 0 ? "🞊" : "🞅"}
+          </div>
+          <div sx={{ w: "calc( 100% - 2em )", mr: "1em", background: gradient.toColorGradientString() }}>&nbsp;</div>
+        </button>
+        <button
+          classname="option-delete-button"
+          sx={{ fontSize: this.css_buttonFontSize, minHeight: this.css_buttonHeight, maxHeight: this.css_buttonHeight }}
+          onClick={this.__optionButtonDeleteHandler()}
+          data-gradientIndex={`${index}`}
+          ref={refDelButton}
+        >
+          <div sx={{ w: "2em", flexShrink: 2, alignContent: "center" }}>🗑</div>
+        </button>
+      </div>
     );
   }
 
@@ -281,9 +341,11 @@ export class ColorGradientSelector {
     _self.colorGradientOptionRefs = [];
     return this.colorGradients.map((colorGradient: ColorGradient, index: number) => {
       // console.log("num", num, index);
-      const ref: NoReact.Ref<HTMLButtonElement> = NoReact.useRef<HTMLButtonElement>();
-      _self.colorGradientOptionRefs.push(ref);
-      return this.__renderOptionButton(colorGradient, index, ref);
+      const refMainContainer: NoReact.Ref<HTMLDivElement> = NoReact.useRef<HTMLDivElement>();
+      const refActionButton: NoReact.Ref<HTMLButtonElement> = NoReact.useRef<HTMLButtonElement>();
+      const refDelButton: NoReact.Ref<HTMLButtonElement> = NoReact.useRef<HTMLButtonElement>();
+      _self.colorGradientOptionRefs.push({ mainButton: refActionButton, deleteButton: refDelButton });
+      return this.__renderOptionButton(colorGradient, index, refMainContainer, refActionButton, refDelButton);
     });
   }
 
@@ -385,7 +447,7 @@ export class ColorGradientSelector {
       background-color: rgba(216,216,216,0.9);
     }
 
-    #${this.elementID} .option-gradient-button:hover {
+    #${this.elementID} .option-gradient-button:hover, #${this.elementID} .option-delete-button:hover {
       background-color: rgba(216,216,216,0.9);
     }
 
