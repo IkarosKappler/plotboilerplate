@@ -20,6 +20,8 @@
  * @modified 2024-03-10 Fixed some NaN type check for Typescript 5 compatibility.
  * @modified 2025-08-08 Fixed an issue in the static `fromRGB` method: values in [0..1] are now correctly reconized (1.0 was excluded).
  * @modified 2025-08-08 Added static color instances (singletons): Color.RED, Color.GOLD, Color.YELLOW, Color.GREEN, Color.LIME_GREEN, Color.BLUE, Color.MEDIUM_BLUE, Color.PURPLE.
+ * @modified 2025-09-01 Adding all standard web colors. Source: https://en.wikipedia.org/wiki/Web_colors
+ * @modified 2025-09-01 Modifying the Sanitizer.RGB helper method: recognoizing 0 to 255 as valid values (not only 1 to 255).
  * @version 0.0.14
  **/
 /**
@@ -448,15 +450,15 @@ export class Color {
     static makeRGB(...args) {
         const c = new Color();
         let sanitized;
-        if (arguments.length < 3 || arguments.length > 4) {
+        if (args.length < 3 || args.length > 4) {
             throw new Error("error: 3 or 4 arguments");
         }
-        sanitized = Color.Sanitizer.RGB(arguments[0], arguments[1], arguments[2]);
+        sanitized = Color.Sanitizer.RGB(args[0], args[1], args[2]);
         c.r = sanitized[0];
         c.g = sanitized[1];
         c.b = sanitized[2];
-        if (arguments.length == 4) {
-            c.a = arguments[3];
+        if (args.length == 4) {
+            c.a = args[3];
         }
         else {
             c.a = 1.0;
@@ -467,17 +469,19 @@ export class Color {
     static makeHSL(...args) {
         const c = new Color();
         let sanitized;
-        if (arguments.length < 3 || arguments.length > 4) {
+        if (args.length < 3 || args.length > 4) {
             throw new Error("error: 3 or 4 arguments");
         }
-        sanitized = Color.Sanitizer.HSL(arguments[0], arguments[1], arguments[2]);
+        sanitized = Color.Sanitizer.HSL(args[0], args[1], args[2]);
         c.h = sanitized[0];
         c.s = sanitized[1];
         c.l = sanitized[2];
-        if (arguments.length == 4)
-            c.a = arguments[3];
-        else
+        if (args.length == 4) {
+            c.a = typeof args[3] === "string" ? Number.parseFloat(args[3]) : args[3];
+        }
+        else {
             c.a = 1.0;
+        }
         Color.Converter.HSLToRGB(c);
         return c;
     }
@@ -521,8 +525,9 @@ export class Color {
         if ((str = str.trim().toLowerCase()).length == 0) {
             return null;
         }
-        if (str.startsWith("#"))
+        if (str.startsWith("#")) {
             return Color.makeHEX(str.substring(1, str.length));
+        }
         if (str.startsWith("rgb")) {
             var parts = str.match(/^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,?\s*(\d*(?:\.\d+\s*)?)\)$/);
             if (!parts) {
@@ -537,9 +542,23 @@ export class Color {
                 return Color.makeRGB(parts[1], parts[2], parts[3], Number(parts[4]));
             }
         }
-        else {
-            throw "Unrecognized color format (1): " + str;
+        // Try to locate by CSS color name
+        const keys = Object.keys(Color.CSS_COLORS);
+        const cssColorKey = keys.reduce((prevKey, curKey) => {
+            if (curKey && curKey.toLowerCase() === str.toLowerCase()) {
+                return curKey;
+            }
+            return prevKey;
+        }, null);
+        if (cssColorKey) {
+            const cssColor = Color.CSS_COLORS[cssColorKey];
+            // console.log("cssColor?", cssColor, str, cssColorKey);
+            if (cssColor) {
+                // console.log("CONSTRUCTOR?", cssColor.constructor);
+                return cssColor.clone();
+            }
         }
+        throw "Unrecognized color format (1): " + str;
     }
     /**
      * Create a clone of this color (RGB).
@@ -580,14 +599,14 @@ export class Color {
     }
 } // END class
 Color.Sanitizer = {
-    RGB: function (...args) {
+    RGB: (...args) => {
         var o = [];
-        if (arguments.length == 0) {
+        if (args.length == 0) {
             return [];
         }
         // const allAreFrac = Color.testFrac( arguments );
-        for (var i = 0; i < arguments.length; i++) {
-            var c = arguments[i];
+        for (var i = 0; i < args.length; i++) {
+            var c = args[i];
             if ("string" == typeof c && c.indexOf("%") > -1) {
                 // if ((c = parseInt(c)) == NaN) throw new Error("Bad format");
                 if (Number.isNaN((c = parseInt(c)))) {
@@ -610,7 +629,7 @@ Color.Sanitizer = {
                     o[i] = c;
                 }
                 // else if(c >= 0.0 && c <= 1.0) o[i] = c;
-                else if (c >= 1 && c < 256) {
+                else if (c >= 0 && c < 256) {
                     o[i] = c / 255;
                 }
                 // ???
@@ -622,9 +641,10 @@ Color.Sanitizer = {
         return o;
     },
     HSL: function (...args) {
-        if (arguments.length < 3 || arguments.length > 4)
+        if (args.length < 3 || args.length > 4) {
             throw new Error("3 or 4 arguments required");
-        var h = arguments[0], s = arguments[1], l = arguments[2];
+        }
+        var h = args[0], s = args[1], l = args[2];
         // if ("string" == typeof h && (h = parseFloat(h)) == NaN) throw new Error("Bad format for hue");
         if ("string" == typeof h && Number.isNaN((h = parseFloat(h)))) {
             throw new Error("Bad format for hue");
@@ -643,8 +663,11 @@ Color.Sanitizer = {
             }
             s /= 100;
         }
-        else if (s < 0 || s > 1) {
-            throw new Error("Bad format for saturation");
+        else {
+            s = typeof s === "string" ? Number.parseFloat(s) : s;
+            if (s < 0 || s > 1) {
+                throw new Error("Bad format for saturation");
+            }
         }
         if ("string" == typeof l && l.indexOf("%") > -1) {
             // if ((l = parseInt(l)) == NaN) throw new Error("Bad format for lightness");
@@ -656,8 +679,11 @@ Color.Sanitizer = {
             }
             l /= 100;
         }
-        else if (l < 0 || l > 1) {
-            throw new Error("Bad format for lightness");
+        else {
+            l = typeof l === "string" ? Number.parseFloat(l) : l;
+            if (l < 0 || l > 1) {
+                throw new Error("Bad format for lightness");
+            }
         }
         return [h, s, l];
     }
@@ -746,12 +772,318 @@ Color.Converter = {
         return p;
     }
 };
-Color.RED = Color.makeRGB(1.0, 0.0, 0.0); // #FF0000
-Color.GOLD = Color.makeRGB(0.992156863, 0.439215686, 0.0); // #FD7000
-Color.YELLOW = Color.makeRGB(1.0, 1.0, 0.0); // #FFFF00
-Color.GREEN = Color.makeRGB(0.0, 0.501960784, 0.0); // #008000
-Color.LIME_GREEN = Color.makeRGB(0.196078431, 0.803921569, 0.196078431); // #32CD32
-Color.BLUE = Color.makeRGB(0.0, 0.0, 1.0); // #0000FF
-Color.MEDIUM_BLUE = Color.makeRGB(0.0, 0.0, 0.803921569); // #0000CD
-Color.PURPLE = Color.makeRGB(0.501960784, 0.0, 0.501960784); // # #800080
+// static RED: Color = Color.makeRGB(1.0, 0.0, 0.0); // #FF0000
+// static GOLD: Color = Color.makeRGB(0.992156863, 0.439215686, 0.0); // #FD7000
+// static YELLOW: Color = Color.makeRGB(1.0, 1.0, 0.0); // #FFFF00
+// static GREEN: Color = Color.makeRGB(0.0, 0.501960784, 0.0); // #008000
+// static LIME_GREEN: Color = Color.makeRGB(0.196078431, 0.803921569, 0.196078431); // #32CD32
+// static BLUE: Color = Color.makeRGB(0.0, 0.0, 1.0); // #0000FF
+// static MEDIUM_BLUE: Color = Color.makeRGB(0.0, 0.0, 0.803921569); // #0000CD
+// static PURPLE: Color = Color.makeRGB(0.501960784, 0.0, 0.501960784); // # #800080
+// Source
+//    https://en.wikipedia.org/wiki/Web_colors
+// Pink colors
+Color.MediumVioletRed = Color.makeRGB(199, 21, 133);
+Color.DeepPink = Color.makeRGB(255, 20, 147);
+Color.PaleVioletRed = Color.makeRGB(219, 112, 147);
+Color.HotPink = Color.makeRGB(255, 105, 180);
+Color.LightPink = Color.makeRGB(255, 182, 193);
+Color.Pink = Color.makeRGB(255, 192, 203);
+// Red colors
+Color.DarkRed = Color.makeRGB(139, 0, 0);
+Color.Red = Color.makeRGB(255, 0, 0);
+Color.Firebrick = Color.makeRGB(178, 34, 34);
+Color.Crimson = Color.makeRGB(220, 20, 60);
+Color.IndianRed = Color.makeRGB(205, 92, 92);
+Color.LightCoral = Color.makeRGB(240, 128, 128);
+Color.Salmon = Color.makeRGB(250, 128, 114);
+Color.DarkSalmon = Color.makeRGB(233, 150, 122);
+Color.LightSalmon = Color.makeRGB(255, 160, 122);
+// Orange colors
+Color.OrangeRed = Color.makeRGB(255, 69, 0);
+Color.Tomato = Color.makeRGB(255, 99, 71);
+Color.DarkOrange = Color.makeRGB(255, 140, 0);
+Color.Coral = Color.makeRGB(255, 127, 80);
+Color.Orange = Color.makeRGB(255, 165, 0);
+// Yellow colors
+Color.DarkKhaki = Color.makeRGB(189, 183, 107);
+Color.Gold = Color.makeRGB(255, 215, 0);
+Color.Khaki = Color.makeRGB(240, 230, 140);
+Color.PeachPuff = Color.makeRGB(255, 218, 185);
+Color.Yellow = Color.makeRGB(255, 255, 0);
+Color.PaleGoldenrod = Color.makeRGB(238, 232, 170);
+Color.Moccasin = Color.makeRGB(255, 228, 181);
+Color.PapayaWhip = Color.makeRGB(255, 239, 213);
+Color.LightGoldenrodYellow = Color.makeRGB(250, 250, 210);
+Color.LemonChiffon = Color.makeRGB(255, 250, 205);
+Color.LightYellow = Color.makeRGB(255, 255, 224);
+// Brown colors
+Color.Maroon = Color.makeRGB(128, 0, 0);
+Color.Brown = Color.makeRGB(165, 42, 42);
+Color.SaddleBrown = Color.makeRGB(139, 69, 19);
+Color.Sienna = Color.makeRGB(160, 82, 45);
+Color.Chocolate = Color.makeRGB(210, 105, 30);
+Color.DarkGoldenrod = Color.makeRGB(184, 134, 11);
+Color.Peru = Color.makeRGB(205, 133, 63);
+Color.RosyBrown = Color.makeRGB(188, 143, 143);
+Color.Goldenrod = Color.makeRGB(218, 165, 32);
+Color.SandyBrown = Color.makeRGB(244, 164, 96);
+Color.Tan = Color.makeRGB(210, 180, 140);
+Color.Burlywood = Color.makeRGB(222, 184, 135);
+Color.Wheat = Color.makeRGB(245, 222, 179);
+Color.NavajoWhite = Color.makeRGB(255, 222, 173);
+Color.Bisque = Color.makeRGB(255, 228, 196);
+Color.BlanchedAlmond = Color.makeRGB(255, 235, 205);
+Color.Cornsilk = Color.makeRGB(255, 248, 220);
+// Purple, violet, and magenta colors
+Color.Indigo = Color.makeRGB(75, 0, 130);
+Color.Purple = Color.makeRGB(128, 0, 128);
+Color.DarkMagenta = Color.makeRGB(139, 0, 139);
+Color.DarkViolet = Color.makeRGB(148, 0, 211);
+Color.DarkSlateBlue = Color.makeRGB(72, 61, 139);
+Color.BlueViolet = Color.makeRGB(138, 43, 226);
+Color.DarkOrchid = Color.makeRGB(153, 50, 204);
+Color.Fuchsia = Color.makeRGB(255, 0, 255);
+Color.Magenta = Color.makeRGB(255, 0, 255);
+Color.SlateBlue = Color.makeRGB(106, 90, 205);
+Color.MediumSlateBlue = Color.makeRGB(123, 104, 238);
+Color.MediumOrchid = Color.makeRGB(186, 85, 211);
+Color.MediumPurple = Color.makeRGB(147, 112, 219);
+Color.Orchid = Color.makeRGB(218, 112, 214);
+Color.Violet = Color.makeRGB(238, 130, 238);
+Color.Plum = Color.makeRGB(221, 160, 221);
+Color.Thistle = Color.makeRGB(216, 191, 216);
+Color.Lavender = Color.makeRGB(230, 230, 250);
+// Blue colors
+Color.MidnightBlue = Color.makeRGB(25, 25, 112);
+Color.Navy = Color.makeRGB(0, 0, 128);
+Color.DarkBlue = Color.makeRGB(0, 0, 139);
+Color.MediumBlue = Color.makeRGB(0, 0, 205);
+Color.Blue = Color.makeRGB(0, 0, 255);
+Color.RoyalBlue = Color.makeRGB(65, 105, 225);
+Color.SteelBlue = Color.makeRGB(70, 130, 180);
+Color.DodgerBlue = Color.makeRGB(30, 144, 255);
+Color.DeepSkyBlue = Color.makeRGB(0, 191, 255);
+Color.CornflowerBlue = Color.makeRGB(100, 149, 237);
+Color.SkyBlue = Color.makeRGB(135, 206, 235);
+Color.LightSkyBlue = Color.makeRGB(135, 206, 250);
+Color.LightSteelBlue = Color.makeRGB(176, 196, 222);
+Color.LightBlue = Color.makeRGB(173, 216, 230);
+Color.PowderBlue = Color.makeRGB(176, 224, 230);
+// Cyan colors
+Color.Teal = Color.makeRGB(0, 128, 128);
+Color.DarkCyan = Color.makeRGB(0, 139, 139);
+Color.LightSeaGreen = Color.makeRGB(32, 178, 170);
+Color.CadetBlue = Color.makeRGB(95, 158, 160);
+Color.DarkTurquoise = Color.makeRGB(0, 206, 209);
+Color.MediumTurquoise = Color.makeRGB(72, 209, 204);
+Color.Turquoise = Color.makeRGB(64, 224, 208);
+Color.Aqua = Color.makeRGB(0, 255, 255);
+Color.Cyan = Color.makeRGB(0, 255, 255);
+Color.Aquamarine = Color.makeRGB(127, 255, 212);
+Color.PaleTurquoise = Color.makeRGB(175, 238, 238);
+Color.LightCyan = Color.makeRGB(224, 255, 255);
+// Green colors
+Color.DarkGreen = Color.makeRGB(0, 100, 0);
+Color.Green = Color.makeRGB(0, 128, 0);
+Color.DarkOliveGreen = Color.makeRGB(85, 107, 47);
+Color.ForestGreen = Color.makeRGB(34, 139, 34);
+Color.SeaGreen = Color.makeRGB(46, 139, 87);
+Color.Olive = Color.makeRGB(128, 128, 0);
+Color.OliveDrab = Color.makeRGB(107, 142, 35);
+Color.MediumSeaGreen = Color.makeRGB(60, 179, 113);
+Color.LimeGreen = Color.makeRGB(50, 205, 50);
+Color.Lime = Color.makeRGB(0, 255, 0);
+Color.SpringGreen = Color.makeRGB(0, 255, 127);
+Color.MediumSpringGreen = Color.makeRGB(0, 250, 154);
+Color.DarkSeaGreen = Color.makeRGB(143, 188, 143);
+Color.MediumAquamarine = Color.makeRGB(102, 205, 170);
+Color.YellowGreen = Color.makeRGB(154, 205, 50);
+Color.LawnGreen = Color.makeRGB(124, 252, 0);
+Color.Chartreuse = Color.makeRGB(127, 255, 0);
+Color.LightGreen = Color.makeRGB(144, 238, 144);
+Color.GreenYellow = Color.makeRGB(173, 255, 47);
+Color.PaleGreen = Color.makeRGB(152, 251, 152);
+// White colors
+Color.MistyRose = Color.makeRGB(255, 228, 225);
+Color.AntiqueWhite = Color.makeRGB(250, 235, 215);
+Color.Linen = Color.makeRGB(250, 240, 230);
+Color.Beige = Color.makeRGB(245, 245, 220);
+Color.WhiteSmoke = Color.makeRGB(245, 245, 245);
+Color.LavenderBlush = Color.makeRGB(255, 240, 245);
+Color.OldLace = Color.makeRGB(253, 245, 230);
+Color.AliceBlue = Color.makeRGB(240, 248, 255);
+Color.Seashell = Color.makeRGB(255, 245, 238);
+Color.GhostWhite = Color.makeRGB(248, 248, 255);
+Color.Honeydew = Color.makeRGB(240, 255, 240);
+Color.FloralWhite = Color.makeRGB(255, 250, 240);
+Color.Azure = Color.makeRGB(240, 255, 255);
+Color.MintCream = Color.makeRGB(245, 255, 250);
+Color.Snow = Color.makeRGB(255, 250, 250);
+Color.Ivory = Color.makeRGB(255, 255, 240);
+Color.White = Color.makeRGB(255, 255, 255);
+// Gray and black colors
+Color.Black = Color.makeRGB(0, 0, 0);
+Color.DarkSlateGray = Color.makeRGB(47, 79, 79);
+Color.DimGray = Color.makeRGB(105, 105, 105);
+Color.SlateGray = Color.makeRGB(112, 128, 144);
+Color.Gray = Color.makeRGB(128, 128, 128);
+Color.LightSlateGray = Color.makeRGB(119, 136, 153);
+Color.DarkGray = Color.makeRGB(169, 169, 169);
+Color.Silver = Color.makeRGB(192, 192, 192);
+Color.LightGray = Color.makeRGB(211, 211, 211);
+Color.Gainsboro = Color.makeRGB(220, 220, 220);
+Color.CSS_COLORS = {
+    // Pink Color.XYZ,lors
+    MediumVioletRed: Color.MediumVioletRed,
+    DeepPink: Color.DeepPink,
+    PaleVioletRed: Color.PaleVioletRed,
+    HotPink: Color.HotPink,
+    LightPink: Color.LightPink,
+    Pink: Color.Pink,
+    // Red Color.XYZ,lors
+    DarkRed: Color.DarkRed,
+    Red: Color.Red,
+    Firebrick: Color.Firebrick,
+    Crimson: Color.Crimson,
+    IndianRed: Color.IndianRed,
+    LightCoral: Color.LightCoral,
+    Salmon: Color.Salmon,
+    DarkSalmon: Color.DarkSalmon,
+    LightSalmon: Color.LightSalmon,
+    // Orange Color.XYZ,lors
+    OrangeRed: Color.OrangeRed,
+    Tomato: Color.Tomato,
+    DarkOrange: Color.DarkOrange,
+    Coral: Color.Coral,
+    Orange: Color.Orange,
+    // Yellow Color.XYZ,lors
+    DarkKhaki: Color.DarkKhaki,
+    Gold: Color.Gold,
+    Khaki: Color.Khaki,
+    PeachPuff: Color.PeachPuff,
+    Yellow: Color.Yellow,
+    PaleGoldenrod: Color.PaleGoldenrod,
+    Moccasin: Color.Moccasin,
+    PapayaWhip: Color.PapayaWhip,
+    LightGoldenrodYellow: Color.LightGoldenrodYellow,
+    LemonChiffon: Color.LemonChiffon,
+    LightYellow: Color.LightYellow,
+    // Brown Color.XYZ,lors
+    Maroon: Color.Maroon,
+    Brown: Color.Brown,
+    SaddleBrown: Color.SaddleBrown,
+    Sienna: Color.Sienna,
+    Chocolate: Color.Chocolate,
+    DarkGoldenrod: Color.DarkGoldenrod,
+    Peru: Color.Peru,
+    RosyBrown: Color.RosyBrown,
+    Goldenrod: Color.Goldenrod,
+    SandyBrown: Color.SandyBrown,
+    Tan: Color.Tan,
+    Burlywood: Color.Burlywood,
+    Wheat: Color.Wheat,
+    NavajoWhite: Color.NavajoWhite,
+    Bisque: Color.Bisque,
+    BlanchedAlmond: Color.BlanchedAlmond,
+    Cornsilk: Color.Cornsilk,
+    // Purple, violet, and magenta Color.XYZ,lors
+    Indigo: Color.Indigo,
+    Purple: Color.Purple,
+    DarkMagenta: Color.DarkMagenta,
+    DarkViolet: Color.DarkViolet,
+    DarkSlateBlue: Color.DarkSlateBlue,
+    BlueViolet: Color.BlueViolet,
+    DarkOrchid: Color.DarkOrchid,
+    Fuchsia: Color.Fuchsia,
+    Magenta: Color.Magenta,
+    SlateBlue: Color.SlateBlue,
+    MediumSlateBlue: Color.MediumSlateBlue,
+    MediumOrchid: Color.MediumOrchid,
+    MediumPurple: Color.MediumPurple,
+    Orchid: Color.Orchid,
+    Violet: Color.Violet,
+    Plum: Color.Plum,
+    Thistle: Color.Thistle,
+    Lavender: Color.Lavender,
+    // Blue Colors
+    MidnightBlue: Color.MidnightBlue,
+    Navy: Color.Navy,
+    DarkBlue: Color.DarkBlue,
+    MediumBlue: Color.MediumBlue,
+    Blue: Color.Blue,
+    RoyalBlue: Color.RoyalBlue,
+    SteelBlue: Color.SteelBlue,
+    DodgerBlue: Color.DodgerBlue,
+    DeepSkyBlue: Color.DeepSkyBlue,
+    CornflowerBlue: Color.CornflowerBlue,
+    SkyBlue: Color.SkyBlue,
+    LightSkyBlue: Color.LightSkyBlue,
+    LightSteelBlue: Color.LightSteelBlue,
+    LightBlue: Color.LightBlue,
+    PowderBlue: Color.PowderBlue,
+    // Coyan Colors
+    Teal: Color.Teal,
+    DarkCyan: Color.DarkCyan,
+    LightSeaGreen: Color.LightSeaGreen,
+    CadetBlue: Color.CadetBlue,
+    DarkTurquoise: Color.DarkTurquoise,
+    MediumTurquoise: Color.MediumTurquoise,
+    Turquoise: Color.Turquoise,
+    Aqua: Color.Aqua,
+    Cyan: Color.Cyan,
+    Aquamarine: Color.Aquamarine,
+    PaleTurquoise: Color.PaleTurquoise,
+    LightCyan: Color.LightCyan,
+    // Green Colors
+    DarkGreen: Color.DarkGreen,
+    Green: Color.Green,
+    DarkOliveGreen: Color.DarkOliveGreen,
+    ForestGreen: Color.ForestGreen,
+    SeaGreen: Color.SeaGreen,
+    Olive: Color.Olive,
+    OliveDrab: Color.OliveDrab,
+    MediumSeaGreen: Color.MediumSeaGreen,
+    LimeGreen: Color.LimeGreen,
+    Lime: Color.Lime,
+    SpringGreen: Color.SpringGreen,
+    MediumSpringGreen: Color.MediumSpringGreen,
+    DarkSeaGreen: Color.DarkSeaGreen,
+    MediumAquamarine: Color.MediumAquamarine,
+    YellowGreen: Color.YellowGreen,
+    LawnGreen: Color.LawnGreen,
+    Chartreuse: Color.Chartreuse,
+    LightGreen: Color.LightGreen,
+    GreenYellow: Color.GreenYellow,
+    PaleGreen: Color.PaleGreen,
+    // White Color.XYZ,lors
+    MistyRose: Color.MistyRose,
+    AntiqueWhite: Color.AntiqueWhite,
+    Linen: Color.Linen,
+    Beige: Color.Beige,
+    WhiteSmoke: Color.WhiteSmoke,
+    LavenderBlush: Color.LavenderBlush,
+    OldLace: Color.OldLace,
+    AliceBlue: Color.AliceBlue,
+    Seashell: Color.Seashell,
+    GhostWhite: Color.GhostWhite,
+    Honeydew: Color.Honeydew,
+    FloralWhite: Color.FloralWhite,
+    Azure: Color.Azure,
+    MintCream: Color.MintCream,
+    Snow: Color.Snow,
+    Ivory: Color.Ivory,
+    White: Color.White,
+    // Gray and black Color.XYZ,lors
+    Black: Color.Black,
+    DarkSlateGray: Color.DarkSlateGray,
+    DimGray: Color.DimGray,
+    SlateGray: Color.SlateGray,
+    Gray: Color.Gray,
+    LightSlateGray: Color.LightSlateGray,
+    DarkGray: Color.DarkGray,
+    Silver: Color.Silver,
+    LightGray: Color.LightGray,
+    Gainsboro: Color.Gainsboro
+};
 //# sourceMappingURL=Color.js.map

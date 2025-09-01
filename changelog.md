@@ -18,10 +18,13 @@
   - Tweaking the `ColorGradientPicker` class to better handle dataset attributes.
   - Extending `lil-gui` to properly handle color gradients now.
   - Tweaking demo `58-shape-reflecting-rays`: adding ColorGradientPicker to select ray colors.
+  - Modifying the `Color.Sanitizer.RGB` helper method: recognoizing 0 to 255 as valid values (not only 1 to 255).
+  - Modifying the `Color.parse` method: recognizing CSS color strings now.
 - 2025-08-06
   - Added `ColorGradientItem` interface.
   - Fixed an issue in the static `Color.fromRGB` method: values in [0..1] are now correctly reconized (1.0 was excluded).
-  - Added static color instances (singletons): Color.RED, Color.GOLD, Color.YELLOW, Color.GREEN, Color.LIME_GREEN, Color.BLUE, Color.MEDIUM_BLUE, Color.PURPLE.
+  - Added static color instances (singletons): Color.Red, Color.Gold, Color.Yellow, Color.Green, Color.LimeGreen, Color.Blue, Color.MediumBlue, Color.Purple.
+  - Adding all web colors to the Color class http://127.0.0.1:8080/tests/test_linearColorGradientParser.html
 - 2025-08-04
   - Adding the `ColorGradient` class.
   - Adding more features to the `ColorGradientPicker` class: removing color is now possible.

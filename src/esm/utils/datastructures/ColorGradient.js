@@ -12,12 +12,12 @@
 import { Color } from "./Color";
 const RAD_TO_DEG = 180.0 / Math.PI;
 const DEFAULT_COLORSET = [
-    { color: Color.RED, ratio: 0.0 },
-    { color: Color.GOLD, ratio: 0.2 },
-    { color: Color.YELLOW, ratio: 0.4 },
-    { color: Color.LIME_GREEN, ratio: 0.6 },
-    { color: Color.MEDIUM_BLUE, ratio: 0.8 },
-    { color: Color.PURPLE, ratio: 1.0 }
+    { color: Color.Red, ratio: 0.0 },
+    { color: Color.Gold, ratio: 0.2 },
+    { color: Color.Yellow, ratio: 0.4 },
+    { color: Color.LimeGreen, ratio: 0.6 },
+    { color: Color.MediumBlue, ratio: 0.8 },
+    { color: Color.Purple, ratio: 1.0 }
 ];
 export class ColorGradient {
     /**

@@ -59,8 +59,8 @@ export class ColorGradientSelector {
 
   public static readonly DEFAULT_COLOR_GRADIENTS: Array<ColorGradient> = [
     ColorGradient.createDefault(),
-    ColorGradient.createFrom(Color.RED, Color.GREEN),
-    ColorGradient.createFrom(Color.BLUE, Color.GOLD)
+    ColorGradient.createFrom(Color.Red, Color.Green),
+    ColorGradient.createFrom(Color.Blue, Color.Gold)
   ];
 
   /**

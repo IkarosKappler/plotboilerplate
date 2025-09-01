@@ -53,3 +53,11 @@
   display: flex;
   align-items: center;
 }
+
+.red {
+  color: red;
+}
+
+.green {
+  color: green;
+}

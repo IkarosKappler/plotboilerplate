@@ -15,12 +15,12 @@ exports.ColorGradient = void 0;
 var Color_1 = require("./Color");
 var RAD_TO_DEG = 180.0 / Math.PI;
 var DEFAULT_COLORSET = [
-    { color: Color_1.Color.RED, ratio: 0.0 },
-    { color: Color_1.Color.GOLD, ratio: 0.2 },
-    { color: Color_1.Color.YELLOW, ratio: 0.4 },
-    { color: Color_1.Color.LIME_GREEN, ratio: 0.6 },
-    { color: Color_1.Color.MEDIUM_BLUE, ratio: 0.8 },
-    { color: Color_1.Color.PURPLE, ratio: 1.0 }
+    { color: Color_1.Color.Red, ratio: 0.0 },
+    { color: Color_1.Color.Gold, ratio: 0.2 },
+    { color: Color_1.Color.Yellow, ratio: 0.4 },
+    { color: Color_1.Color.LimeGreen, ratio: 0.6 },
+    { color: Color_1.Color.MediumBlue, ratio: 0.8 },
+    { color: Color_1.Color.Purple, ratio: 1.0 }
 ];
 var ColorGradient = /** @class */ (function () {
     /**

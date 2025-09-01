@@ -327,7 +327,7 @@ export class ColorGradientSelector {
 }
 ColorGradientSelector.DEFAULT_COLOR_GRADIENTS = [
     ColorGradient.createDefault(),
-    ColorGradient.createFrom(Color.RED, Color.GREEN),
-    ColorGradient.createFrom(Color.BLUE, Color.GOLD)
+    ColorGradient.createFrom(Color.Red, Color.Green),
+    ColorGradient.createFrom(Color.Blue, Color.Gold)
 ];
 //# sourceMappingURL=ColorGradientSelector.js.map

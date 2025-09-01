@@ -38,22 +38,37 @@
     const parser = new LinearColorGradientParser();
     const outputList = document.getElementById("output-list");
     var result;
+    var buffer = [];
     for (var i = 0; i < inputs.length; i++) {
       console.log("input", i, inputs[i]);
-      outputList.innerHTML += "<li>Testing input: <code>" + inputs[i] + "</code></li>";
+      buffer.push("<li>Testing input: <code>" + inputs[i] + "</code>");
+      buffer.push("<ul>");
+
       try {
         result = parser.parseRaw(inputs[i]);
-        outputList.innerHTML += "<li>Result: <code>" + JSON.stringify(result) + "</code></li>";
+        buffer.push('<li><span class="green">Result:</span> <code>' + JSON.stringify(result) + "</code></li>");
       } catch (e) {
-        outputList.innerHTML += "<li>ERROR <code>" + JSON.stringify(e) + "</code></li>";
+        buffer.push('<li><span class="green">ERROR</span> <code>' + JSON.stringify(e) + "</code></li>");
       }
       if (result) {
         try {
-          console.log(LinearColorGradientParser.parseResultToColorGradient(result));
+          const colorGradientInstance = LinearColorGradientParser.parseResultToColorGradient(result);
+          console.log(colorGradientInstance);
+          buffer.push(
+            '<li><span class="green">Instantiated as ColorGradient: </span> <code>' +
+              JSON.stringify(colorGradientInstance) +
+              "</code></li>"
+          );
         } catch (e) {
           console.log(e);
+          buffer.push('<li><span class="red">Cannot instantiate as ColorGradient</span> <code>' + e.message + "</code></li>");
         }
       }
+      buffer.push("</ul>");
+      buffer.push("</li>");
+
+      outputList.innerHTML += buffer.join("");
+      buffer = [];
     }
   });
 })(window);

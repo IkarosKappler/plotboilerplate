@@ -313,8 +313,8 @@ var ColorGradientSelector = /** @class */ (function () {
     }; // END functionrender()
     ColorGradientSelector.DEFAULT_COLOR_GRADIENTS = [
         ColorGradient_1.ColorGradient.createDefault(),
-        ColorGradient_1.ColorGradient.createFrom(Color_1.Color.RED, Color_1.Color.GREEN),
-        ColorGradient_1.ColorGradient.createFrom(Color_1.Color.BLUE, Color_1.Color.GOLD)
+        ColorGradient_1.ColorGradient.createFrom(Color_1.Color.Red, Color_1.Color.Green),
+        ColorGradient_1.ColorGradient.createFrom(Color_1.Color.Blue, Color_1.Color.Gold)
     ];
     return ColorGradientSelector;
 }());
