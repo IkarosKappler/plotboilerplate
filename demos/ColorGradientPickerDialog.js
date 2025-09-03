@@ -16,6 +16,7 @@
    *
    * @param {Modal} modalDialog
    * @param {boolean} options.isMobileMode - In mobile mode the picker element will be rendered bigger for better usability.
+   * @param {boolean} options.showDebugOptions - If true options for storing/retrieving from localStorage will be displayed.
    */
   var ColorGradientPickerDialog = function (modalDialog, options) {
     if (!modalDialog) {
@@ -38,6 +39,7 @@
     this.colorGradientSelector.addChangeListener(function (newGradient, _newSelectedIndex, _sourceSelector) {
       _self.colorGradientPicker.setGradient(newGradient);
     });
+    this.showDebugOptions = options.showDebugOptions;
   };
 
   ColorGradientPickerDialog.prototype.__handleAddGradientClick = function () {
@@ -80,18 +82,20 @@
     selectorContainer.appendChild(this.colorGradientSelector.container);
 
     // BEGIN for testing
-    const storeGradients = document.createElement("button");
-    storeGradients.innerHTML = "to localStorage";
-    storeGradients.addEventListener("click", function () {
-      _self.storeInLocalStorage();
-    });
-    const restoreGradients = document.createElement("button");
-    restoreGradients.innerHTML = "from localStorage";
-    restoreGradients.addEventListener("click", function () {
-      _self.restoreFromLocalStorage();
-    });
-    selectorContainer.appendChild(storeGradients);
-    selectorContainer.appendChild(restoreGradients);
+    if (this.showDebugOptions) {
+      const storeGradients = document.createElement("button");
+      storeGradients.innerHTML = "to localStorage";
+      storeGradients.addEventListener("click", function () {
+        _self.storeInLocalStorage();
+      });
+      const restoreGradients = document.createElement("button");
+      restoreGradients.innerHTML = "from localStorage";
+      restoreGradients.addEventListener("click", function () {
+        _self.restoreFromLocalStorage();
+      });
+      selectorContainer.appendChild(storeGradients);
+      selectorContainer.appendChild(restoreGradients);
+    }
     // END testing
 
     selectorContainer.appendChild(addGradientButton);

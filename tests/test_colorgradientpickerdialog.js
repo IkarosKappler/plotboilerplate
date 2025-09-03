@@ -5,16 +5,21 @@ window.addEventListener("load", function () {
   var GUP = gup();
   var params = new Params(GUP);
   var isMobile = isMobileDevice();
-  if (params.hasParam("isMobile")) {
-    if (params.getBoolean("isMobile", true) === false) {
-      isMobile = false;
-    } else if (params.getBoolean("isMobile", false) === true) {
-      isMobile = true;
-    }
-  }
+  var showDebugOptions = false;
+  // if (params.hasParam("isMobile")) {
+  //   if (params.getBoolean("isMobile", true) === false) {
+  //     isMobile = false;
+  //   } else if (params.getBoolean("isMobile", false) === true) {
+  //     isMobile = true;
+  //   }
+  // }
+  isMobile = params.getBoolean("isMobile", isMobile);
+  var showDebugOptions = params.getBoolean("showDebugOptions", false);
 
   const colorGradientDialog = new ColorGradientPickerDialog(new Modal({ closeOnBackdropClick: true }), {
-    isMobileMode: isMobile
+    isMobileMode: isMobile,
+    showDebugOptions,
+    showDebugOptions
   });
   var displayPicker = function () {
     const inputColorGradient = ColorGradient.createDefault();
