@@ -89,18 +89,10 @@ export class ColorGradientSelector {
     setGradients(gradients, selectedIndex) {
         // First empty the container
         this.__removeAllChildNodes(this.positioningContainerRef.current);
-        // Clone the array
-        // this.colorGradients = gradients.map((gradient: ColorGradient) => gradient);
         this.colorGradients = [];
         this.colorGradientOptionRefs = [];
         this.selectedGradientIndex = selectedIndex;
         // Re-render button array
-        // const newChildNodes: Array<NoReact.Ref<HTMLButtonElement>> = this._renderAllOptionButtons();
-        // this._renderAllOptionButtons();
-        // Re-fill container with new nodes
-        // this.colorGradientOptionRefs.forEach((nodeRef) => {
-        //   this.positioningContainerRef.current.appendChild(nodeRef.current);
-        // });
         gradients.map((grad) => {
             this.addGradient(grad);
         });
@@ -118,7 +110,6 @@ export class ColorGradientSelector {
         // Add to container
         this.positioningContainerRef.current.appendChild(refMainContainer.current);
     }
-    // public removeGradient
     // +---------------------------------------------------------------------------------
     // | A helper function to remove all child nodes.
     // +-------------------------------
@@ -215,14 +206,17 @@ export class ColorGradientSelector {
             // Find child: and remove from DOM
             console.log("this.colorGradientOptionRefs", this.colorGradientOptionRefs, "clickedIndex", clickedIndex);
             const refPair = this.colorGradientOptionRefs[clickedIndex];
-            // TODO: find containing parent and remove that!
-            // ...
             refPair.mainButton.current.parentElement.remove();
             // Remove from logic
-            this.colorGradients.splice(clickedIndex, 1); // Remove 1 element at the given index
+            // Remove 1 element at the given index
+            this.colorGradients.splice(clickedIndex, 1);
             this.colorGradientOptionRefs.splice(clickedIndex, 1);
             // Update all following elements in the list.
             this.__updateOptionDataSetIndices(clickedIndex);
+            if (this.selectedGradientIndex >= clickedIndex) {
+                // this.selectedGradientIndex--;
+                this.__setSelectedIndex(this.selectedGradientIndex);
+            }
             console.log("All refs", this.colorGradientOptionRefs);
         };
     }
@@ -236,7 +230,10 @@ export class ColorGradientSelector {
         for (var i = startIndex; i < this.colorGradientOptionRefs.length; i++) {
             // this.colorGradientOptionRefs[i].current.setAttribute("gradientIndex", `${i}`);
             this.colorGradientOptionRefs[i].mainButton.current.dataset["gradientIndex"] = `${i}`;
-            this.colorGradientOptionRefs[i].mainButton.current.querySelector;
+            this.colorGradientOptionRefs[i].deleteButton.current.dataset["gradientIndex"] = `${i}`;
+            // this.colorGradientOptionRefs[i].mainButton.current.dataset.gradientIndex = `${i}`;
+            // this.colorGradientOptionRefs[i].mainButton.current.querySelector;
+            console.log("Set", i, this.colorGradientOptionRefs[i].mainButton.current.dataset["gradientIndex"]);
         }
     }
     __setSelectedIndex(newSelectedIndex) {
@@ -331,12 +328,6 @@ export class ColorGradientSelector {
                 } }, _self._renderAllOptionButtons())));
     } // END function render()
     storeInLocalStorage() {
-        // Convert gradients to array of strings
-        // const arr: Array<string> = this.colorGradients.map((grad: ColorGradient) => {
-        //   // return grad.toColorGradientString();
-        //   return JSON.stringify(grad);
-        // });
-        // localStorage.setItem("ColorGradientSelector", JSON.stringify(arr));
         localStorage.setItem("ColorGradientSelector", JSON.stringify(this.colorGradients));
     }
     restoreFromLocalStorage() {
