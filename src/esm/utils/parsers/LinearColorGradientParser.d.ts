@@ -1,8 +1,14 @@
 import { ColorGradient } from "../datastructures/ColorGradient";
+/**
+ * A wrapper type for the regular expressions used to parsed gradient strings.
+ */
 export type ColorGradientParserRegExpLib = {
     gradientSearch: RegExp;
     colorStopSearch: RegExp;
 };
+/**
+ * The raw parse result.
+ */
 export type ColorGradientParseResult = {
     original: string;
     line: string;
@@ -12,10 +18,29 @@ export type ColorGradientParseResult = {
     gradientType?: string;
     parseWarning?: boolean;
 };
-export type ColorGradientStopResult = {
+/**
+ * The position string can have two formats: as percent or as pixels.
+ * For conversion to LinearColorGradient only relative (percent) is supported.
+ */
+type PositionString = `${number}px` | `${number}%`;
+/**
+ * A sub type of the result representing pairs of (color,position) elements.
+ */
+type ColorGradientStopResult = {
     color: string;
-    position: string;
+    position: PositionString;
 };
+/**
+ * This must convert positioning strings to ratio numbers (in [0..1]).
+ * Must throw error if not parsable.
+ */
+export type PositionToRatioConverter = (positionString: PositionString) => number;
+/**
+ * The default implementation of `PositionToRatioConverter`.
+ * @param positionString
+ * @returns
+ */
+export declare const DefaultPositionConverter: PositionToRatioConverter;
 /**
  * Actually parse the input gradient parameters string into an object for reusability.
  *
@@ -28,11 +53,14 @@ export type ColorGradientStopResult = {
  * @returns {object|undefined} Object containing break down of input string including array of stop points.
  */
 export declare var __parseGradient: (regExpLib: ColorGradientParserRegExpLib, input: string) => ColorGradientParseResult;
+/**
+ * The actual parser class.
+ */
 export declare class LinearColorGradientParser {
     private readonly regExpLib;
     constructor(regExpLib?: ColorGradientParserRegExpLib);
-    parse(input: string): ColorGradient;
+    parse(input: string, positionConverter?: PositionToRatioConverter): ColorGradient;
     parseRaw(input: string): ColorGradientParseResult;
-    static parseResultToColorGradient(result: ColorGradientParseResult): ColorGradient;
-    private static parsePosition;
+    static parseResultToColorGradient(result: ColorGradientParseResult, positionConverter?: PositionToRatioConverter): ColorGradient;
 }
+export {};

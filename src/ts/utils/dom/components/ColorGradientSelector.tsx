@@ -101,19 +101,25 @@ export class ColorGradientSelector {
   } // END constructor
 
   // TODO: implement this?
-  // public setGradients(gradients: Array<ColorGradient>, selectedIndex: number): void {
-  //   // First empty the container
-  //   this.__removeAllChildNodes(this.positioningContainerRef.current);
-  //   // Clone the array
-  //   this.colorGradients = gradients.map((gradient: ColorGradient) => gradient);
-  //   // Re-render button array
-  //   // const newChildNodes: Array<NoReact.Ref<HTMLButtonElement>> = this._renderAllOptionButtons();
-  //   this._renderAllOptionButtons();
-  //   // Re-fill container with new nodes
-  //   this.colorGradientOptionRefs.forEach((nodeRef: NoReact.Ref<HTMLButtonElement>) => {
-  //     this.positioningContainerRef.current.appendChild(nodeRef.current);
-  //   });
-  // }
+  public setGradients(gradients: Array<ColorGradient>, selectedIndex: number): void {
+    // First empty the container
+    this.__removeAllChildNodes(this.positioningContainerRef.current);
+    // Clone the array
+    // this.colorGradients = gradients.map((gradient: ColorGradient) => gradient);
+    this.colorGradients = [];
+    this.colorGradientOptionRefs = [];
+    this.selectedGradientIndex = selectedIndex;
+    // Re-render button array
+    // const newChildNodes: Array<NoReact.Ref<HTMLButtonElement>> = this._renderAllOptionButtons();
+    // this._renderAllOptionButtons();
+    // Re-fill container with new nodes
+    // this.colorGradientOptionRefs.forEach((nodeRef) => {
+    //   this.positioningContainerRef.current.appendChild(nodeRef.current);
+    // });
+    gradients.map((grad: ColorGradient) => {
+      this.addGradient(grad);
+    });
+  }
 
   public addGradient(gradient: ColorGradient): void {
     console.log("addGradient");
@@ -407,21 +413,38 @@ export class ColorGradientSelector {
             zIndex: 999
           }}
         >
-          {/* {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map((num: number, index: number) => { */}
-          {/* {this.colorGradients.map((colorGradient: ColorGradient, index: number) => {
-            // console.log("num", num, index);
-            const ref: NoReact.Ref<HTMLButtonElement> = NoReact.useRef<HTMLButtonElement>();
-            _self.colorGradientOptionRefs.push(ref);
-            // return this.__renderOptionButton(this.colorGradients[index % this.colorGradients.length], index, ref);
-            const optionButton: JsxElement = this.__renderOptionButton(colorGradient, index, ref);
-            ref.current.dataset.gradientIndex = `${index}`;
-            return optionButton;
-          })} */}
           {_self._renderAllOptionButtons()}
         </div>
       </div>
     );
-  } // END functionrender()
+  } // END function render()
+
+  public storeInLocalStorage() {
+    // Convert gradients to array of strings
+    // const arr: Array<string> = this.colorGradients.map((grad: ColorGradient) => {
+    //   // return grad.toColorGradientString();
+    //   return JSON.stringify(grad);
+    // });
+    // localStorage.setItem("ColorGradientSelector", JSON.stringify(arr));
+    localStorage.setItem("ColorGradientSelector", JSON.stringify(this.colorGradients));
+  }
+
+  public restoreFromLocalStorage() {
+    // Storage value to array of ColorGradients
+    const value: string = localStorage.getItem("ColorGradientSelector");
+    if (!value) {
+      return;
+    }
+    const jsonArray: object = JSON.parse(value);
+    if (!Array.isArray(jsonArray)) {
+      return;
+    }
+    const gradArray: Array<ColorGradient> = jsonArray.map((gradientObject: any) => {
+      console.log("Converting object to ColorGradient", gradientObject);
+      return ColorGradient.fromObject(gradientObject);
+    });
+    this.setGradients(gradArray, 0);
+  }
 
   /**
    * Adds custom styles (global STYLE tag).

@@ -1,8 +1,27 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LinearColorGradientParser = exports.__parseGradient = void 0;
+exports.LinearColorGradientParser = exports.__parseGradient = exports.DefaultPositionConverter = void 0;
 var Color_1 = require("../datastructures/Color");
 var ColorGradient_1 = require("../datastructures/ColorGradient");
+/**
+ * The default implementation of `PositionToRatioConverter`.
+ * @param positionString
+ * @returns
+ */
+var DefaultPositionConverter = function (positionString) {
+    if (typeof positionString === "undefined") {
+        throw new Error("Cannot parse positioning string `null`.");
+    }
+    var tmp = positionString.trim();
+    if (tmp.length === 0) {
+        throw new Error('Cannot parse empty positioning string "".');
+    }
+    if (!tmp.endsWith("%")) {
+        throw new Error("Cannot parse positioning string, must end with '%': '".concat(tmp, "'"));
+    }
+    return Number.parseFloat(tmp) / 100.0;
+};
+exports.DefaultPositionConverter = DefaultPositionConverter;
 /**
  * Utility combine multiple regular expressions.
  *
@@ -79,7 +98,6 @@ var __parseGradient = function (regExpLib, input) {
             angle: null,
             sideCorner: null
         };
-        // console.log("matchGradient[0]", matchGradient);
         // Line (Angle or Side-Corner).
         if (!!matchGradient[1]) {
             result.line = matchGradient[1];
@@ -114,13 +132,16 @@ var __parseGradient = function (regExpLib, input) {
     return result;
 };
 exports.__parseGradient = __parseGradient;
+/**
+ * The actual parser class.
+ */
 var LinearColorGradientParser = /** @class */ (function () {
     function LinearColorGradientParser(regExpLib) {
         this.regExpLib = regExpLib || __generateDefaultRegExpLib();
     }
-    LinearColorGradientParser.prototype.parse = function (input) {
+    LinearColorGradientParser.prototype.parse = function (input, positionConverter) {
         var result = this.parseRaw(input);
-        return LinearColorGradientParser.parseResultToColorGradient(result);
+        return LinearColorGradientParser.parseResultToColorGradient(result, positionConverter);
     };
     LinearColorGradientParser.prototype.parseRaw = function (input) {
         var result;
@@ -143,7 +164,7 @@ var LinearColorGradientParser = /** @class */ (function () {
         }
         return result;
     };
-    LinearColorGradientParser.parseResultToColorGradient = function (result) {
+    LinearColorGradientParser.parseResultToColorGradient = function (result, positionConverter) {
         if (!result.gradientType || result.gradientType.toLowerCase() != "linear-gradient") {
             throw new Error("Cannot create linear gradient from type '".concat(result.gradientType, "'."));
         }
@@ -151,30 +172,26 @@ var LinearColorGradientParser = /** @class */ (function () {
             throw new Error("Cannot create linear gradient from color stop list of length '".concat(result.colorStopList.length, "'. Too few elements."));
         }
         var colorStops = [];
+        var converter = positionConverter !== null && positionConverter !== void 0 ? positionConverter : exports.DefaultPositionConverter;
         for (var i = 0; i < result.colorStopList.length; i++) {
             var stopListItem = result.colorStopList[i];
             console.log(stopListItem);
             var color = Color_1.Color.parse(stopListItem.color);
-            var position = LinearColorGradientParser.parsePosition(stopListItem.position);
-            if (typeof position === "undefined") {
-                position = i / (result.colorStopList.length - 1);
+            // var position: number = LinearColorGradientParser.parsePosition(stopListItem.position);
+            var ratio;
+            if (typeof stopListItem.position === "undefined") {
+                // Try to auto-fill undefined positions by their index in the list.
+                ratio = i / (result.colorStopList.length - 1);
             }
-            colorStops.push({ color: color, ratio: position });
+            else {
+                ratio = positionConverter(stopListItem.position);
+            }
+            colorStops.push({ color: color, ratio: ratio });
         }
-        return new ColorGradient_1.ColorGradient(colorStops);
-    };
-    LinearColorGradientParser.parsePosition = function (positionString) {
-        if (!positionString || (positionString = positionString.trim()).length === 0) {
-            return null;
-        }
-        // Example: "56.5%"
-        if (!positionString.endsWith("%")) {
-            return Number.parseFloat(positionString);
-        }
-        return Number.parseFloat(positionString) / 100.0;
+        return new ColorGradient_1.ColorGradient(colorStops, result.line);
     };
     return LinearColorGradientParser;
-}());
+}()); // END class
 exports.LinearColorGradientParser = LinearColorGradientParser;
 // var test_this_one = function (regExpLib, input) {
 //   var result,
@@ -192,27 +209,4 @@ exports.LinearColorGradientParser = LinearColorGradientParser;
 //   }
 //   return result;
 // };
-// var test_this_thing = function () {
-//   var result = [],
-//     regExpLib = generateDefaultRegExpLib(),
-//     testSubjects = [
-//       // Original question sample
-//       "background-image:linear-gradient(to right bottom, #FF0000 0%, #00FF00 20px, rgb(0, 0, 255) 100%);",
-//       // Sample to test RGBA values (1)
-//       "background-image:linear-gradient(to right bottom, rgba(255, 0, 0, .1) 0%, rgba(0, 255, 0, 0.9) 20px);",
-//       // Sample to test optional gradient line
-//       "background-image:linear-gradient(#FF0000 0%, #00FF00 20px, rgb(0, 0, 255) 100%);",
-//       // Angle, named colors
-//       "background: linear-gradient(45deg, red, blue);",
-//       // Gradient that starts at 60% of the gradient line
-//       "background: linear-gradient(135deg, orange, orange 60%, cyan);",
-//       // Gradient with multi-position color stops
-//       "background: linear-gradient(to right, red 20%, orange 20% 40%, yellow 40% 60%, green 60% 80%, blue 80%);"
-//     ];
-//   for (var i = 0; i < testSubjects.length; i++) {
-//     result.push(test_this_one(regExpLib, testSubjects[i]));
-//   }
-//   console.log(result);
-// };
-// test_this_thing();
 //# sourceMappingURL=LinearColorGradientParser.js.map

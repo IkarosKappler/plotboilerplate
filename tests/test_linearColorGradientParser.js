@@ -1,11 +1,11 @@
 /**
- * Test the Color class.
+ * Test the LinearColorGradientParser class.
  *
- * @requires lil-gui
+ * @requires lil-gui LinearColorGradientParser
  *
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
- * @date        2021-11-08
+ * @date        2025-09-02
  * @version     1.0.0
  **/
 
@@ -21,6 +21,7 @@
     }
 
     var inputs = Array(
+      "linear-gradient(90deg, #FF0000 0%, #00FF00 50%, rgb(0, 0, 255) 100%)",
       "linear-gradient(to right bottom, #FF0000 0%, #00FF00 20px, rgb(0, 0, 255) 100%)",
       "linear-gradient(to right bottom, rgba(255, 0, 0, .1) 0%, rgba(0, 255, 0, 0.9) 20px)",
       "radial-gradient(rgb(102, 126, 234), rgb(118, 75, 162))",
@@ -43,6 +44,9 @@
       console.log("input", i, inputs[i]);
       buffer.push("<li>Testing input: <code>" + inputs[i] + "</code>");
       buffer.push("<ul>");
+      buffer.push(
+        '<li><div style="width: 100px; height: 1.5em; border: 1px solid grey; background: ' + inputs[i] + '"></div></li>'
+      );
 
       try {
         result = parser.parseRaw(inputs[i]);
@@ -58,6 +62,11 @@
             '<li><span class="green">Instantiated as ColorGradient: </span> <code>' +
               JSON.stringify(colorGradientInstance) +
               "</code></li>"
+          );
+          buffer.push(
+            '<li><div style="width: 100px; height: 1.5em; border: 1px solid grey; background: ' +
+              colorGradientInstance.toColorGradientString() +
+              '"></div></li>'
           );
         } catch (e) {
           console.log(e);

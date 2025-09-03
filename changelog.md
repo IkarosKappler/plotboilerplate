@@ -12,6 +12,10 @@
 - Todo: TBImage should implement Bounds.
 - Todo: check if BezierPathInteractionHelper can work without every possible redraw (event mouseIsOver)
 
+- 2025-09-02
+  - Adding method `ColorGradient.fromObject` to restore from JSON objects.
+- 2025-08-27
+  - Added experimental `ColorGradientDialog` to the demos (pure JS).
 - 2025-08-11
   - Finalizing `ColorGradient` class with `getColorAt(ratio:number)` method.
   - Adding optional `colorGradient` option to the `createRayCollection` helper method.

@@ -10,21 +10,22 @@
  * @date    2025-08-05
  */
 import { Color } from "./Color";
+export type ColorGradientRotation = number | `${number}deg` | `${number}turn` | `to top` | "to bottom" | "to left" | "to right";
 export interface ColorGradientItem {
     color: Color;
     ratio: number;
 }
 export declare class ColorGradient {
     values: Array<ColorGradientItem>;
-    angle: number;
+    angle: ColorGradientRotation;
     /**
      * Creates a new ColorGradient with the given values. Please be sure that the values appear in the correct
      * order regarding the `ratio` information. This will not be validated.
      *
      * @param {Array<ColorGradientItem>} values - The values to use.
-     * @param {number?} angleInRadians - (optional) An optional angle for the gradient; if no specified `PI/2.0` will be used (vertical from left to right).
+     * @param {number?} angle - (optional) An optional angle for the gradient; if no specified `PI/2.0` will be used (vertical from left to right).
      */
-    constructor(values: Array<ColorGradientItem>, angleInRadians?: number);
+    constructor(values: Array<ColorGradientItem>, angle?: ColorGradientRotation);
     /**
      * Get a color gradient CSS value string from these gradient settings.
      *
@@ -47,6 +48,14 @@ export declare class ColorGradient {
      * @returns {[number,number]} A pair of left interval boundary index and closest value.
      */
     locateClosestRatio(ratio: number): [number, ColorGradientItem];
+    /**
+     * Try to convert the given anonymous item (usually and object) to a ColorGradient. This method should be used
+     * to restore items from JSON parse results to convert them into proper ColorGradient instances.
+     *
+     * @param {any} item
+     * @returns {ColorGradient}
+     */
+    static fromObject(item: any): ColorGradient;
     /**
      * Clone this linear color gradient. Returns a deep clone.
      *

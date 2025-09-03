@@ -1,12 +1,17 @@
-import { Line } from "../../Line";
 import { Color } from "../datastructures/Color";
-import { ColorGradient, ColorGradientItem } from "../datastructures/ColorGradient";
+import { ColorGradient, ColorGradientItem, ColorGradientRotation } from "../datastructures/ColorGradient";
 
+/**
+ * A wrapper type for the regular expressions used to parsed gradient strings.
+ */
 export type ColorGradientParserRegExpLib = {
   gradientSearch: RegExp;
   colorStopSearch: RegExp;
 };
 
+/**
+ * The raw parse result.
+ */
 export type ColorGradientParseResult = {
   original: string;
   line: string;
@@ -17,9 +22,43 @@ export type ColorGradientParseResult = {
   parseWarning?: boolean;
 };
 
-export type ColorGradientStopResult = {
+/**
+ * The position string can have two formats: as percent or as pixels.
+ * For conversion to LinearColorGradient only relative (percent) is supported.
+ */
+type PositionString = `${number}px` | `${number}%`;
+
+/**
+ * A sub type of the result representing pairs of (color,position) elements.
+ */
+type ColorGradientStopResult = {
   color: string;
-  position: string;
+  position: PositionString; // '56.5%' or '20px'
+};
+
+/**
+ * This must convert positioning strings to ratio numbers (in [0..1]).
+ * Must throw error if not parsable.
+ */
+export type PositionToRatioConverter = (positionString: PositionString) => number;
+
+/**
+ * The default implementation of `PositionToRatioConverter`.
+ * @param positionString
+ * @returns
+ */
+export const DefaultPositionConverter: PositionToRatioConverter = (positionString: PositionString): number => {
+  if (typeof positionString === "undefined") {
+    throw new Error("Cannot parse positioning string `null`.");
+  }
+  const tmp: string = positionString.trim();
+  if (tmp.length === 0) {
+    throw new Error('Cannot parse empty positioning string "".');
+  }
+  if (!tmp.endsWith("%")) {
+    throw new Error(`Cannot parse positioning string, must end with '%': '${tmp}'`);
+  }
+  return Number.parseFloat(tmp) / 100.0;
 };
 
 /**
@@ -110,8 +149,6 @@ export var __parseGradient = (regExpLib: ColorGradientParserRegExpLib, input: st
       sideCorner: null
     };
 
-    // console.log("matchGradient[0]", matchGradient);
-
     // Line (Angle or Side-Corner).
     if (!!matchGradient[1]) {
       result.line = matchGradient[1];
@@ -138,7 +175,7 @@ export var __parseGradient = (regExpLib: ColorGradientParserRegExpLib, input: st
 
       // Position (optional).
       if (!!matchColorStop[2]) {
-        stopResult.position = matchColorStop[2];
+        stopResult.position = matchColorStop[2] as PositionString;
       }
       result.colorStopList.push(stopResult);
 
@@ -151,6 +188,9 @@ export var __parseGradient = (regExpLib: ColorGradientParserRegExpLib, input: st
   return result;
 };
 
+/**
+ * The actual parser class.
+ */
 export class LinearColorGradientParser {
   private readonly regExpLib: ColorGradientParserRegExpLib;
 
@@ -158,10 +198,10 @@ export class LinearColorGradientParser {
     this.regExpLib = regExpLib || __generateDefaultRegExpLib();
   }
 
-  public parse(input: string): ColorGradient {
+  public parse(input: string, positionConverter?: PositionToRatioConverter): ColorGradient {
     const result: ColorGradientParseResult = this.parseRaw(input);
 
-    return LinearColorGradientParser.parseResultToColorGradient(result);
+    return LinearColorGradientParser.parseResultToColorGradient(result, positionConverter);
   }
 
   public parseRaw(input: string): ColorGradientParseResult {
@@ -188,7 +228,10 @@ export class LinearColorGradientParser {
     return result;
   }
 
-  public static parseResultToColorGradient(result: ColorGradientParseResult) {
+  public static parseResultToColorGradient(
+    result: ColorGradientParseResult,
+    positionConverter?: PositionToRatioConverter
+  ): ColorGradient {
     if (!result.gradientType || result.gradientType.toLowerCase() != "linear-gradient") {
       throw new Error(`Cannot create linear gradient from type '${result.gradientType}'.`);
     }
@@ -200,32 +243,26 @@ export class LinearColorGradientParser {
     }
 
     const colorStops: Array<ColorGradientItem> = [];
+    const converter: PositionToRatioConverter = positionConverter ?? DefaultPositionConverter;
     for (var i = 0; i < result.colorStopList.length; i++) {
       const stopListItem: ColorGradientStopResult = result.colorStopList[i];
       console.log(stopListItem);
       const color = Color.parse(stopListItem.color);
 
-      var position: number = LinearColorGradientParser.parsePosition(stopListItem.position);
-      if (typeof position === "undefined") {
-        position = i / (result.colorStopList.length - 1);
+      // var position: number = LinearColorGradientParser.parsePosition(stopListItem.position);
+      var ratio: number;
+      if (typeof stopListItem.position === "undefined") {
+        // Try to auto-fill undefined positions by their index in the list.
+        ratio = i / (result.colorStopList.length - 1);
+      } else {
+        ratio = positionConverter(stopListItem.position);
       }
-      colorStops.push({ color: color, ratio: position });
+      colorStops.push({ color: color, ratio: ratio });
     }
 
-    return new ColorGradient(colorStops);
+    return new ColorGradient(colorStops, result.line as ColorGradientRotation);
   }
-
-  private static parsePosition(positionString: string): number {
-    if (!positionString || (positionString = positionString.trim()).length === 0) {
-      return null;
-    }
-    // Example: "56.5%"
-    if (!positionString.endsWith("%")) {
-      return Number.parseFloat(positionString);
-    }
-    return Number.parseFloat(positionString) / 100.0;
-  }
-}
+} // END class
 
 // var test_this_one = function (regExpLib, input) {
 //   var result,
@@ -245,28 +282,3 @@ export class LinearColorGradientParser {
 
 //   return result;
 // };
-
-// var test_this_thing = function () {
-//   var result = [],
-//     regExpLib = generateDefaultRegExpLib(),
-//     testSubjects = [
-//       // Original question sample
-//       "background-image:linear-gradient(to right bottom, #FF0000 0%, #00FF00 20px, rgb(0, 0, 255) 100%);",
-//       // Sample to test RGBA values (1)
-//       "background-image:linear-gradient(to right bottom, rgba(255, 0, 0, .1) 0%, rgba(0, 255, 0, 0.9) 20px);",
-//       // Sample to test optional gradient line
-//       "background-image:linear-gradient(#FF0000 0%, #00FF00 20px, rgb(0, 0, 255) 100%);",
-//       // Angle, named colors
-//       "background: linear-gradient(45deg, red, blue);",
-//       // Gradient that starts at 60% of the gradient line
-//       "background: linear-gradient(135deg, orange, orange 60%, cyan);",
-//       // Gradient with multi-position color stops
-//       "background: linear-gradient(to right, red 20%, orange 20% 40%, yellow 40% 60%, green 60% 80%, blue 80%);"
-//     ];
-//   for (var i = 0; i < testSubjects.length; i++) {
-//     result.push(test_this_one(regExpLib, testSubjects[i]));
-//   }
-
-//   console.log(result);
-// };
-// test_this_thing();

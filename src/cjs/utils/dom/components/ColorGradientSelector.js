@@ -71,19 +71,26 @@ var ColorGradientSelector = /** @class */ (function () {
         this.container.append(this._render());
     } // END constructor
     // TODO: implement this?
-    // public setGradients(gradients: Array<ColorGradient>, selectedIndex: number): void {
-    //   // First empty the container
-    //   this.__removeAllChildNodes(this.positioningContainerRef.current);
-    //   // Clone the array
-    //   this.colorGradients = gradients.map((gradient: ColorGradient) => gradient);
-    //   // Re-render button array
-    //   // const newChildNodes: Array<NoReact.Ref<HTMLButtonElement>> = this._renderAllOptionButtons();
-    //   this._renderAllOptionButtons();
-    //   // Re-fill container with new nodes
-    //   this.colorGradientOptionRefs.forEach((nodeRef: NoReact.Ref<HTMLButtonElement>) => {
-    //     this.positioningContainerRef.current.appendChild(nodeRef.current);
-    //   });
-    // }
+    ColorGradientSelector.prototype.setGradients = function (gradients, selectedIndex) {
+        var _this = this;
+        // First empty the container
+        this.__removeAllChildNodes(this.positioningContainerRef.current);
+        // Clone the array
+        // this.colorGradients = gradients.map((gradient: ColorGradient) => gradient);
+        this.colorGradients = [];
+        this.colorGradientOptionRefs = [];
+        this.selectedGradientIndex = selectedIndex;
+        // Re-render button array
+        // const newChildNodes: Array<NoReact.Ref<HTMLButtonElement>> = this._renderAllOptionButtons();
+        // this._renderAllOptionButtons();
+        // Re-fill container with new nodes
+        // this.colorGradientOptionRefs.forEach((nodeRef) => {
+        //   this.positioningContainerRef.current.appendChild(nodeRef.current);
+        // });
+        gradients.map(function (grad) {
+            _this.addGradient(grad);
+        });
+    };
     ColorGradientSelector.prototype.addGradient = function (gradient) {
         console.log("addGradient");
         // Render a new button
@@ -310,7 +317,32 @@ var ColorGradientSelector = /** @class */ (function () {
                     l: 0,
                     zIndex: 999
                 } }, _self._renderAllOptionButtons())));
-    }; // END functionrender()
+    }; // END function render()
+    ColorGradientSelector.prototype.storeInLocalStorage = function () {
+        // Convert gradients to array of strings
+        // const arr: Array<string> = this.colorGradients.map((grad: ColorGradient) => {
+        //   // return grad.toColorGradientString();
+        //   return JSON.stringify(grad);
+        // });
+        // localStorage.setItem("ColorGradientSelector", JSON.stringify(arr));
+        localStorage.setItem("ColorGradientSelector", JSON.stringify(this.colorGradients));
+    };
+    ColorGradientSelector.prototype.restoreFromLocalStorage = function () {
+        // Storage value to array of ColorGradients
+        var value = localStorage.getItem("ColorGradientSelector");
+        if (!value) {
+            return;
+        }
+        var jsonArray = JSON.parse(value);
+        if (!Array.isArray(jsonArray)) {
+            return;
+        }
+        var gradArray = jsonArray.map(function (gradientObject) {
+            console.log("Converting object to ColorGradient", gradientObject);
+            return ColorGradient_1.ColorGradient.fromObject(gradientObject);
+        });
+        this.setGradients(gradArray, 0);
+    };
     ColorGradientSelector.DEFAULT_COLOR_GRADIENTS = [
         ColorGradient_1.ColorGradient.createDefault(),
         ColorGradient_1.ColorGradient.createFrom(Color_1.Color.Red, Color_1.Color.Green),

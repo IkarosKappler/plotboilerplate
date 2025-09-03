@@ -18,10 +18,11 @@
  * @modified 2022-05-11 Fixed the `interpolate` function.
  * @modified 2023-01-23 Added `Color.set(Color)` function to set all values (r,g,b,h,s,l,a) simultanoeusly.
  * @modified 2024-03-10 Fixed some NaN type check for Typescript 5 compatibility.
- * @modified 2025-08-08 Fixed an issue in the static `fromRGB` method: values in [0..1] are now correctly reconized (1.0 was excluded).
- * @modified 2025-08-08 Added static color instances (singletons): Color.RED, Color.GOLD, Color.YELLOW, Color.GREEN, Color.LIME_GREEN, Color.BLUE, Color.MEDIUM_BLUE, Color.PURPLE.
+ * @modified 2025-08-08 Fixed an issue in the static `makeRGB` method: values in [0..1] are now correctly reconized (1.0 was excluded).
+ * @modified 2025-08-08 Added static color instances (singletons): Color.Red, Color.Gold, Color.Yellow, Color.Green, Color.LimeGreen, Color.Blue, Color.MediumBlue, Color.Purple.
  * @modified 2025-09-01 Adding all standard web colors. Source: https://en.wikipedia.org/wiki/Web_colors
- * @modified 2025-09-01 Modifying the Sanitizer.RGB helper method: recognoizing 0 to 255 as valid values (not only 1 to 255).
+ * @modified 2025-09-01 Modifying the `Sanitizer.RGB` helper method: recognoizing 0 to 255 as valid values (not only 1 to 255).
+ * @modified 2025-09-01 Modifying the `Color.parse` method: recognizing CSS color strings now.
  * @version 0.0.14
  **/
 /**
@@ -772,14 +773,6 @@ Color.Converter = {
         return p;
     }
 };
-// static RED: Color = Color.makeRGB(1.0, 0.0, 0.0); // #FF0000
-// static GOLD: Color = Color.makeRGB(0.992156863, 0.439215686, 0.0); // #FD7000
-// static YELLOW: Color = Color.makeRGB(1.0, 1.0, 0.0); // #FFFF00
-// static GREEN: Color = Color.makeRGB(0.0, 0.501960784, 0.0); // #008000
-// static LIME_GREEN: Color = Color.makeRGB(0.196078431, 0.803921569, 0.196078431); // #32CD32
-// static BLUE: Color = Color.makeRGB(0.0, 0.0, 1.0); // #0000FF
-// static MEDIUM_BLUE: Color = Color.makeRGB(0.0, 0.0, 0.803921569); // #0000CD
-// static PURPLE: Color = Color.makeRGB(0.501960784, 0.0, 0.501960784); // # #800080
 // Source
 //    https://en.wikipedia.org/wiki/Web_colors
 // Pink colors

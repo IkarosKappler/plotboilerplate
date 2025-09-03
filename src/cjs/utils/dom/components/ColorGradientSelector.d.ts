@@ -46,6 +46,7 @@ export declare class ColorGradientSelector {
      * @param {string?} containerID - (optional) If you want to use an existing container (should be a DIV).
      */
     constructor(options?: ColorGradientSelectorProps);
+    setGradients(gradients: Array<ColorGradient>, selectedIndex: number): void;
     addGradient(gradient: ColorGradient): void;
     private __removeAllChildNodes;
     /**
@@ -107,6 +108,8 @@ export declare class ColorGradientSelector {
      * @private
      */
     private _render;
+    storeInLocalStorage(): void;
+    restoreFromLocalStorage(): void;
     /**
      * Adds custom styles (global STYLE tag).
      *

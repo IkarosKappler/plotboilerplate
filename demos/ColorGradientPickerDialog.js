@@ -80,6 +80,21 @@
     selectorContainer.appendChild(this.colorGradientSelector.container);
     selectorContainer.appendChild(addGradientButton);
 
+    // BEGIN for testing
+    const storeGradients = document.createElement("button");
+    storeGradients.innerHTML = "to localStorage";
+    storeGradients.addEventListener("click", function () {
+      _self.colorGradientSelector.storeInLocalStorage();
+    });
+    const restoreGradients = document.createElement("button");
+    restoreGradients.innerHTML = "from localStorage";
+    restoreGradients.addEventListener("click", function () {
+      _self.colorGradientSelector.restoreFromLocalStorage();
+    });
+    // END testing
+    selectorContainer.appendChild(storeGradients);
+    selectorContainer.appendChild(restoreGradients);
+
     var modalBody = document.createElement("div");
     // modalBody.appendChild(this.colorGradientSelector.container);
     modalBody.appendChild(selectorContainer);

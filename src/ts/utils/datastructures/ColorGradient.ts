@@ -12,7 +12,9 @@
 
 import { Color } from "./Color";
 
-const RAD_TO_DEG = 180.0 / Math.PI;
+const RAD_TO_DEG: number = 180.0 / Math.PI;
+
+export type ColorGradientRotation = number | `${number}deg` | `${number}turn` | `to top` | "to bottom" | "to left" | "to right";
 
 const DEFAULT_COLORSET: Array<ColorGradientItem> = [
   { color: Color.Red, ratio: 0.0 },
@@ -25,24 +27,24 @@ const DEFAULT_COLORSET: Array<ColorGradientItem> = [
 
 export interface ColorGradientItem {
   color: Color;
-  ratio: number; // A percentage value in [0.0 .. 1.0]
+  ratio: number; // Ideally a percentage value in [0.0 .. 1.0]
 }
 
 export class ColorGradient {
   values: Array<ColorGradientItem>;
-  angle: number;
+  angle: ColorGradientRotation;
 
   /**
    * Creates a new ColorGradient with the given values. Please be sure that the values appear in the correct
    * order regarding the `ratio` information. This will not be validated.
    *
    * @param {Array<ColorGradientItem>} values - The values to use.
-   * @param {number?} angleInRadians - (optional) An optional angle for the gradient; if no specified `PI/2.0` will be used (vertical from left to right).
+   * @param {number?} angle - (optional) An optional angle for the gradient; if no specified `PI/2.0` will be used (vertical from left to right).
    */
-  constructor(values: Array<ColorGradientItem>, angleInRadians?: number) {
+  constructor(values: Array<ColorGradientItem>, angle?: ColorGradientRotation) {
     this.values = values;
     // Default: left to right
-    this.angle = typeof angleInRadians === "undefined" ? Math.PI / 2.0 : angleInRadians;
+    this.angle = typeof angle === "undefined" ? Math.PI / 2.0 : angle;
   }
 
   /**
@@ -55,7 +57,12 @@ export class ColorGradient {
   public toColorGradientString(): string {
     // Example:
     //    linear-gradient(90deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 38%, rgba(161, 210, 108, 1) 68%, rgba(237, 221, 83, 1) 100%)
-    const buffer: Array<string | undefined> = [`linear-gradient( ${RAD_TO_DEG * this.angle}deg, `];
+
+    // const buffer: Array<string | undefined> = [`linear-gradient( ${RAD_TO_DEG * this.angle}deg, `];
+    const buffer: Array<string | undefined> = [
+      `linear-gradient( ${typeof this.angle === "number" ? `${this.angle * RAD_TO_DEG}deg` : this.angle}, `
+    ];
+
     for (var i = 0; i < this.values.length; i++) {
       if (i > 0) {
         buffer.push(",");
@@ -63,7 +70,7 @@ export class ColorGradient {
       const colorValue: string = this.values[i] ? this.values[i].color.cssRGBA() : null;
       buffer.push(colorValue);
       const percentage = this.values[i].ratio;
-      buffer.push(`${percentage * 100}%`);
+      buffer.push(`${typeof percentage === "number" ? `${percentage * 100}%` : percentage}`);
     }
     buffer.push(")");
 
@@ -111,6 +118,40 @@ export class ColorGradient {
       }
     }
     return [leftSliderIndex, closestSliderValue];
+  }
+
+  /**
+   * Try to convert the given anonymous item (usually and object) to a ColorGradient. This method should be used
+   * to restore items from JSON parse results to convert them into proper ColorGradient instances.
+   *
+   * @param {any} item
+   * @returns {ColorGradient}
+   */
+  public static fromObject(item: any): ColorGradient {
+    if (typeof item !== "object") {
+      throw new Error(`Cannot instantiate ColorGradient from item: must be an object. (${typeof item})`);
+    }
+    if (!item.hasOwnProperty("values")) {
+      throw new Error("Cannot instantiate ColorGradient from object: missing property 'values'.");
+    }
+    const valuesObj: Array<object> = item.values;
+    if (!Array.isArray(valuesObj)) {
+      throw new Error("Cannot instantiate ColorGradient from object: property 'values' is not an array.");
+    }
+    const values: Array<ColorGradientItem> = valuesObj.map((element: object, index: number) => {
+      if (typeof element !== "object") {
+        throw new Error(`Cannot instantiate ColorGradient from object: item at index ${index} is not an object.`);
+      }
+      if (!element.hasOwnProperty("color") || !element.hasOwnProperty("ratio")) {
+        throw new Error(
+          `Cannot instantiate ColorGradient from object: item at index ${index} is missing 'color' or 'ratio' property.`
+        );
+      }
+      const tmpElement = element as ColorGradientItem;
+      return { color: Color.makeRGB(tmpElement.color.r, tmpElement.color.g, tmpElement.color.b), ratio: tmpElement.ratio };
+    });
+    // More checks possible here ...
+    return new ColorGradient(values, item.angle);
   }
 
   /**

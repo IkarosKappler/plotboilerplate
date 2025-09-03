@@ -28,12 +28,12 @@ var ColorGradient = /** @class */ (function () {
      * order regarding the `ratio` information. This will not be validated.
      *
      * @param {Array<ColorGradientItem>} values - The values to use.
-     * @param {number?} angleInRadians - (optional) An optional angle for the gradient; if no specified `PI/2.0` will be used (vertical from left to right).
+     * @param {number?} angle - (optional) An optional angle for the gradient; if no specified `PI/2.0` will be used (vertical from left to right).
      */
-    function ColorGradient(values, angleInRadians) {
+    function ColorGradient(values, angle) {
         this.values = values;
         // Default: left to right
-        this.angle = typeof angleInRadians === "undefined" ? Math.PI / 2.0 : angleInRadians;
+        this.angle = typeof angle === "undefined" ? Math.PI / 2.0 : angle;
     }
     /**
      * Get a color gradient CSS value string from these gradient settings.
@@ -45,7 +45,10 @@ var ColorGradient = /** @class */ (function () {
     ColorGradient.prototype.toColorGradientString = function () {
         // Example:
         //    linear-gradient(90deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 38%, rgba(161, 210, 108, 1) 68%, rgba(237, 221, 83, 1) 100%)
-        var buffer = ["linear-gradient( ".concat(RAD_TO_DEG * this.angle, "deg, ")];
+        // const buffer: Array<string | undefined> = [`linear-gradient( ${RAD_TO_DEG * this.angle}deg, `];
+        var buffer = [
+            "linear-gradient( ".concat(typeof this.angle === "number" ? "".concat(this.angle * RAD_TO_DEG, "deg") : this.angle, ", ")
+        ];
         for (var i = 0; i < this.values.length; i++) {
             if (i > 0) {
                 buffer.push(",");
@@ -53,7 +56,7 @@ var ColorGradient = /** @class */ (function () {
             var colorValue = this.values[i] ? this.values[i].color.cssRGBA() : null;
             buffer.push(colorValue);
             var percentage = this.values[i].ratio;
-            buffer.push("".concat(percentage * 100, "%"));
+            buffer.push("".concat(typeof percentage === "number" ? "".concat(percentage * 100, "%") : percentage));
         }
         buffer.push(")");
         return buffer.join(" ");
@@ -99,6 +102,37 @@ var ColorGradient = /** @class */ (function () {
             }
         }
         return [leftSliderIndex, closestSliderValue];
+    };
+    /**
+     * Try to convert the given anonymous item (usually and object) to a ColorGradient. This method should be used
+     * to restore items from JSON parse results to convert them into proper ColorGradient instances.
+     *
+     * @param {any} item
+     * @returns {ColorGradient}
+     */
+    ColorGradient.fromObject = function (item) {
+        if (typeof item !== "object") {
+            throw new Error("Cannot instantiate ColorGradient from item: must be an object. (".concat(typeof item, ")"));
+        }
+        if (!item.hasOwnProperty("values")) {
+            throw new Error("Cannot instantiate ColorGradient from object: missing property 'values'.");
+        }
+        var valuesObj = item.values;
+        if (!Array.isArray(valuesObj)) {
+            throw new Error("Cannot instantiate ColorGradient from object: property 'values' is not an array.");
+        }
+        var values = valuesObj.map(function (element, index) {
+            if (typeof element !== "object") {
+                throw new Error("Cannot instantiate ColorGradient from object: item at index ".concat(index, " is not an object."));
+            }
+            if (!element.hasOwnProperty("color") || !element.hasOwnProperty("ratio")) {
+                throw new Error("Cannot instantiate ColorGradient from object: item at index ".concat(index, " is missing 'color' or 'ratio' property."));
+            }
+            var tmpElement = element;
+            return { color: Color_1.Color.makeRGB(tmpElement.color.r, tmpElement.color.g, tmpElement.color.b), ratio: tmpElement.ratio };
+        });
+        // More checks possible here ...
+        return new ColorGradient(values, item.angle);
     };
     /**
      * Clone this linear color gradient. Returns a deep clone.
