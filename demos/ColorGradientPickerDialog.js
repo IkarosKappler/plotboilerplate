@@ -78,22 +78,23 @@
     selectorContainer.style.flexDirection = "row";
     selectorContainer.style.justifyContent = "space-between";
     selectorContainer.appendChild(this.colorGradientSelector.container);
-    selectorContainer.appendChild(addGradientButton);
 
     // BEGIN for testing
     const storeGradients = document.createElement("button");
     storeGradients.innerHTML = "to localStorage";
     storeGradients.addEventListener("click", function () {
-      _self.colorGradientSelector.storeInLocalStorage();
+      _self.storeInLocalStorage();
     });
     const restoreGradients = document.createElement("button");
     restoreGradients.innerHTML = "from localStorage";
     restoreGradients.addEventListener("click", function () {
-      _self.colorGradientSelector.restoreFromLocalStorage();
+      _self.restoreFromLocalStorage();
     });
-    // END testing
     selectorContainer.appendChild(storeGradients);
     selectorContainer.appendChild(restoreGradients);
+    // END testing
+
+    selectorContainer.appendChild(addGradientButton);
 
     var modalBody = document.createElement("div");
     // modalBody.appendChild(this.colorGradientSelector.container);
@@ -104,6 +105,30 @@
     this.modalDialog.setActions([{ label: "Accept", action: handleAcceptColor }, Modal.ACTION_CLOSE]);
     this.modalDialog.setBody(modalBody);
     this.modalDialog.open();
+  };
+
+  ColorGradientPickerDialog.prototype.storeInLocalStorage = function () {
+    var setValue = JSON.stringify(this.colorGradientSelector.colorGradients);
+    console.log("setValue", setValue);
+    localStorage.setItem("ColorGradientSelector", setValue);
+  };
+
+  ColorGradientPickerDialog.prototype.restoreFromLocalStorage = function () {
+    // Storage value to array of ColorGradients
+    const value = localStorage.getItem("ColorGradientSelector");
+    console.log("value", value);
+    if (!value) {
+      return;
+    }
+    const jsonArray = JSON.parse(value);
+    if (!Array.isArray(jsonArray)) {
+      return;
+    }
+    const gradArray = jsonArray.map(gradientObject => {
+      console.log("Converting object to ColorGradient", gradientObject);
+      return ColorGradient.fromObject(gradientObject);
+    });
+    this.colorGradientSelector.setGradients(gradArray, 0);
   };
 
   _context.ColorGradientPickerDialog = ColorGradientPickerDialog;

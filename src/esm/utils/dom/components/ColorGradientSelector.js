@@ -40,12 +40,9 @@ export class ColorGradientSelector {
             // Thanks to Ana Tudor
             //    https://css-tricks.com/multi-thumb-sliders-particular-two-thumb-case/
             return (NoReact.createElement("style", null, `
-    #${this.elementID} {
-
-    }
 
     #${this.elementID} button {
-      border: 1px solid lightgray;
+      border: 0px solid lightgray;
       padding: 0.25em;
       background-color: rgba(255,255,255,0.9);
     }
@@ -98,7 +95,6 @@ export class ColorGradientSelector {
         });
     }
     addGradient(gradient) {
-        console.log("addGradient");
         // Render a new button
         const index = this.colorGradients.length;
         const refMainContainer = NoReact.useRef();
@@ -195,6 +191,10 @@ export class ColorGradientSelector {
     __optionButtonDeleteHandler() {
         const _self = this;
         return (evt) => {
+            if (this.colorGradientOptionRefs.length === 1) {
+                // Keep the last record
+                return;
+            }
             const targetButton = evt.currentTarget;
             const clickedIndex_raw = targetButton.dataset["gradientIndex"];
             const clickedIndex = Number.parseInt(clickedIndex_raw);
@@ -228,12 +228,8 @@ export class ColorGradientSelector {
     __updateOptionDataSetIndices(startIndex) {
         // Update all elements to the right of the new elelemt
         for (var i = startIndex; i < this.colorGradientOptionRefs.length; i++) {
-            // this.colorGradientOptionRefs[i].current.setAttribute("gradientIndex", `${i}`);
             this.colorGradientOptionRefs[i].mainButton.current.dataset["gradientIndex"] = `${i}`;
             this.colorGradientOptionRefs[i].deleteButton.current.dataset["gradientIndex"] = `${i}`;
-            // this.colorGradientOptionRefs[i].mainButton.current.dataset.gradientIndex = `${i}`;
-            // this.colorGradientOptionRefs[i].mainButton.current.querySelector;
-            console.log("Set", i, this.colorGradientOptionRefs[i].mainButton.current.dataset["gradientIndex"]);
         }
     }
     __setSelectedIndex(newSelectedIndex) {
@@ -318,7 +314,7 @@ export class ColorGradientSelector {
             NoReact.createElement("div", { className: "positioning-container", ref: this.positioningContainerRef, style: {
                     minWidth: this.css_buttonWidth,
                     maxHeight: "25vh",
-                    overflowY: "scroll",
+                    overflowY: "auto",
                     v: "hidden",
                     d: "flex",
                     fd: "column",
@@ -327,25 +323,6 @@ export class ColorGradientSelector {
                     zIndex: 999
                 } }, _self._renderAllOptionButtons())));
     } // END function render()
-    storeInLocalStorage() {
-        localStorage.setItem("ColorGradientSelector", JSON.stringify(this.colorGradients));
-    }
-    restoreFromLocalStorage() {
-        // Storage value to array of ColorGradients
-        const value = localStorage.getItem("ColorGradientSelector");
-        if (!value) {
-            return;
-        }
-        const jsonArray = JSON.parse(value);
-        if (!Array.isArray(jsonArray)) {
-            return;
-        }
-        const gradArray = jsonArray.map((gradientObject) => {
-            console.log("Converting object to ColorGradient", gradientObject);
-            return ColorGradient.fromObject(gradientObject);
-        });
-        this.setGradients(gradArray, 0);
-    }
 }
 ColorGradientSelector.DEFAULT_COLOR_GRADIENTS = [
     ColorGradient.createDefault(),

@@ -108,8 +108,6 @@ export declare class ColorGradientSelector {
      * @private
      */
     private _render;
-    storeInLocalStorage(): void;
-    restoreFromLocalStorage(): void;
     /**
      * Adds custom styles (global STYLE tag).
      *

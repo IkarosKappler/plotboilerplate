@@ -43,7 +43,7 @@ var ColorGradientSelector = /** @class */ (function () {
         this.__createCustomStylesElement = function () {
             // Thanks to Ana Tudor
             //    https://css-tricks.com/multi-thumb-sliders-particular-two-thumb-case/
-            return (NoReact.createElement("style", null, "\n    #".concat(_this.elementID, " {\n\n    }\n\n    #").concat(_this.elementID, " button {\n      border: 1px solid lightgray;\n      padding: 0.25em;\n      background-color: rgba(255,255,255,0.9);\n    }\n\n    #").concat(_this.elementID, " .main-button:hover {\n      background-color: rgba(216,216,216,0.9);\n    }\n\n    #").concat(_this.elementID, " .option-gradient-button:hover, #").concat(_this.elementID, " .option-delete-button:hover {\n      background-color: rgba(216,216,216,0.9);\n    }\n\n    ")));
+            return (NoReact.createElement("style", null, "\n\n    #".concat(_this.elementID, " button {\n      border: 0px solid lightgray;\n      padding: 0.25em;\n      background-color: rgba(255,255,255,0.9);\n    }\n\n    #").concat(_this.elementID, " .main-button:hover {\n      background-color: rgba(216,216,216,0.9);\n    }\n\n    #").concat(_this.elementID, " .option-gradient-button:hover, #").concat(_this.elementID, " .option-delete-button:hover {\n      background-color: rgba(216,216,216,0.9);\n    }\n\n    ")));
         };
         options = options || {};
         if (options.containerID) {
@@ -84,7 +84,6 @@ var ColorGradientSelector = /** @class */ (function () {
         });
     };
     ColorGradientSelector.prototype.addGradient = function (gradient) {
-        console.log("addGradient");
         // Render a new button
         var index = this.colorGradients.length;
         var refMainContainer = NoReact.useRef();
@@ -182,6 +181,10 @@ var ColorGradientSelector = /** @class */ (function () {
         var _this = this;
         var _self = this;
         return function (evt) {
+            if (_this.colorGradientOptionRefs.length === 1) {
+                // Keep the last record
+                return;
+            }
             var targetButton = evt.currentTarget;
             var clickedIndex_raw = targetButton.dataset["gradientIndex"];
             var clickedIndex = Number.parseInt(clickedIndex_raw);
@@ -215,12 +218,8 @@ var ColorGradientSelector = /** @class */ (function () {
     ColorGradientSelector.prototype.__updateOptionDataSetIndices = function (startIndex) {
         // Update all elements to the right of the new elelemt
         for (var i = startIndex; i < this.colorGradientOptionRefs.length; i++) {
-            // this.colorGradientOptionRefs[i].current.setAttribute("gradientIndex", `${i}`);
             this.colorGradientOptionRefs[i].mainButton.current.dataset["gradientIndex"] = "".concat(i);
             this.colorGradientOptionRefs[i].deleteButton.current.dataset["gradientIndex"] = "".concat(i);
-            // this.colorGradientOptionRefs[i].mainButton.current.dataset.gradientIndex = `${i}`;
-            // this.colorGradientOptionRefs[i].mainButton.current.querySelector;
-            // console.log("Set", i, this.colorGradientOptionRefs[i].mainButton.current.dataset["gradientIndex"]);
         }
     };
     ColorGradientSelector.prototype.__setSelectedIndex = function (newSelectedIndex) {
@@ -306,7 +305,7 @@ var ColorGradientSelector = /** @class */ (function () {
             NoReact.createElement("div", { className: "positioning-container", ref: this.positioningContainerRef, style: {
                     minWidth: this.css_buttonWidth,
                     maxHeight: "25vh",
-                    overflowY: "scroll",
+                    overflowY: "auto",
                     v: "hidden",
                     d: "flex",
                     fd: "column",
@@ -315,25 +314,6 @@ var ColorGradientSelector = /** @class */ (function () {
                     zIndex: 999
                 } }, _self._renderAllOptionButtons())));
     }; // END function render()
-    ColorGradientSelector.prototype.storeInLocalStorage = function () {
-        localStorage.setItem("ColorGradientSelector", JSON.stringify(this.colorGradients));
-    };
-    ColorGradientSelector.prototype.restoreFromLocalStorage = function () {
-        // Storage value to array of ColorGradients
-        var value = localStorage.getItem("ColorGradientSelector");
-        if (!value) {
-            return;
-        }
-        var jsonArray = JSON.parse(value);
-        if (!Array.isArray(jsonArray)) {
-            return;
-        }
-        var gradArray = jsonArray.map(function (gradientObject) {
-            console.log("Converting object to ColorGradient", gradientObject);
-            return ColorGradient_1.ColorGradient.fromObject(gradientObject);
-        });
-        this.setGradients(gradArray, 0);
-    };
     ColorGradientSelector.DEFAULT_COLOR_GRADIENTS = [
         ColorGradient_1.ColorGradient.createDefault(),
         ColorGradient_1.ColorGradient.createFrom(Color_1.Color.Red, Color_1.Color.Green),
