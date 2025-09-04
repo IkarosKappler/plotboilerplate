@@ -1,7 +1,5 @@
 # Changelog
 
-# Changelog
-
 - 2025-09-02
   - Adding method `ColorGradient.fromObject` to restore from JSON objects.
 - 2025-08-27
