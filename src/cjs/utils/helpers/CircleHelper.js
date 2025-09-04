@@ -11,6 +11,7 @@
  * @modified 2024-02-26 Removed the constructor param `pb` (unused).
  * @modified 2024-02-25 Added `circle` and `radiusPoint` attributes.
  * @modified 2024-03-10 Fixed some issues in the `destroy` method; listeners were not properly removed.
+ * @modified 2025-05-05 Class `BezierPathInteractionHelper` now implementing `IShapeInteractionHelper`.
  * @version  1.2.1
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -31,9 +32,18 @@ var CircleHelper = /** @class */ (function () {
     function CircleHelper(circle, radiusPoint) {
         this.circle = circle;
         this.radiusPoint = radiusPoint;
-        circle.center.listeners.addDragListener(this.centerHandler = this._handleDragCenter());
-        radiusPoint.listeners.addDragListener(this.radiusHandler = this._handleDragRadiusPoint());
+        circle.center.listeners.addDragListener((this.centerHandler = this._handleDragCenter()));
+        radiusPoint.listeners.addDragListener((this.radiusHandler = this._handleDragRadiusPoint()));
     }
+    //--- BEGIN --- Implement ISHapeInteractionHelper ---
+    /**
+     * Let this shape helper draw it's handle lines. It's up to the helper what they look like.
+     * @param {DrawLib<any>} draw - The draw library to use.
+     * @param {DrawLib<any>} fill - The fill library to use.
+     */
+    CircleHelper.prototype.drawHandleLines = function (_draw, _fill) {
+        // NOOP
+    };
     /**
      * Destroy this circle helper.
      * The listeners will be removed from the circle points.
@@ -46,6 +56,7 @@ var CircleHelper = /** @class */ (function () {
         this.circle.center.listeners.removeDragListener(this.centerHandler);
         this.radiusPoint.listeners.removeDragListener(this.radiusHandler);
     };
+    //--- END --- Implement ISHapeInteractionHelper ---
     /**
      * Creates a new drag handler for the circle's center point.
      *

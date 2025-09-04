@@ -5,7 +5,10 @@
  *
  * @author   Ikaros Kappler
  * @date     2025-03-24
- * @version  1.0.0
+ * @modified 2025-05-05 Refactored `rebuildShapes` and moved to external funcion `createRandomShapes`.
+ * @modified 2025-05-07 Tweaking the demo `57-shape-reflecting-rays` to interact with the new content manager tool. Adding removing shapes is now possible.
+ * @modified 2025-08-11 Replacing start- and end-color by color gradient.
+ * @version  1.1.0
  **/
 
 (function (_context) {
@@ -18,6 +21,8 @@
   _context.addEventListener("load", function () {
     var params = new Params(GUP);
     var isDarkmode = detectDarkMode(GUP);
+    var modal = new Modal({ closeOnBackdropClick: true });
+    var isMobileMode = detectMobileMode(params);
 
     // All config params except the canvas are optional.
     var pb = new PlotBoilerplate(
@@ -50,10 +55,7 @@
     // Array<Polygon | Circle | VEllipse | Line | CircleSector | VEllipseSector | BezierPath | Triangle>
     var shapes = [];
     var mainRay = new Vector(new Vertex(), new Vertex(250, 250).rotate(Math.random() * Math.PI));
-    var ellipseHelper;
-    var cicleSectorHelper;
-    var ellipseSectorHelper;
-    var bezierHelper;
+    var interactionHelpers = []; // Helpers
 
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
@@ -67,8 +69,13 @@
       useParallelLightSource: params.getBoolean("useParallelLightSource", false),
       showBoundingBoxes: params.getBoolean("showBoundingBoxes", false),
       rayLengthFromMaxBounds: params.getBoolean("rayLengthFromMaxBounds", false),
-      drawPreviewRays: params.getBoolean("drawPreviewRays", false)
+      drawPreviewRays: params.getBoolean("drawPreviewRays", false),
+      // rayStartColor: params.getString("rayStartColor", "rgb(0,192,255)"),
+      // rayEndColor: params.getString("rayEndColor", "rgb(255,192,0)")
+      rayColorGradient: ColorGradient.createDefault()
     };
+    // var rayStartColor = Color.parse(config.rayStartColor);
+    // var rayEndColor = Color.parse(config.rayEndColor);
 
     // +---------------------------------------------------------------------------------
     // | Global vars
@@ -76,49 +83,50 @@
     var viewport = pb.viewport();
 
     var postDraw = function (draw, fill) {
-      // console.log("config.showBoundingBoxes", config.showBoundingBoxes);
       if (config.showBoundingBoxes) {
         drawBoundingBoxes(draw, fill);
       }
 
       var rayStepLength = config.rayLengthFromMaxBounds ? getMaxShapeBounds().getMaxDimension() : mainRay.length();
-      var rayCollection = getRayCollection(mainRay);
+      var rayCollection = createRayCollection(mainRay, config.numRays, {
+        createParallelRays: config.useParallelLightSource,
+        initialRayAngle: config.initialRayAngle * DEG_TO_RAD,
+        colorGradient: config.rayColorGradient
+        // startColor: rayStartColor,
+        // endColor: rayEndColor
+      });
+
       var newRays = [];
       var numIter = Math.max(0, config.iterations); // Safeguard to avoid infinite loop
       for (var i = 0; i < numIter; i++) {
-        // console.log("numIter", numIter, "i", i, "rayCollection.length", rayCollection.length, "newRays.length", newRays.length);
-
-        // Set rays to normalized step
-        for (var j = 0; j < rayCollection.length; j++) {
-          rayCollection[j].setLength(rayStepLength);
-        }
-
-        if (config.drawPreviewRays) {
-          drawLines(draw, fill, rayCollection, "rgba(192,192,192,0.25)");
-        }
-        newRays = getRayIteration(rayCollection);
+        newRays = RayShapeReflections(shapes, rayCollection, config, rayStepLength);
         // Crop original rays
         for (var j = 0; j < rayCollection.length; j++) {
-          rayCollection[j].b.set(newRays[j].a);
+          rayCollection[j].vector.b.set(newRays[j].vector.a);
         }
         if (i + 1 >= numIter) {
-          drawRays(draw, fill, rayCollection, "rgba(255,192,0,0.5)");
+          drawRays(draw, fill, rayCollection); // , "rgba(255,192,0,0.5)");
         } else {
-          drawLines(draw, fill, rayCollection, "rgba(255,192,0,0.5)");
+          drawLines(draw, fill, rayCollection); // , "rgba(255,192,0,0.5)");
         }
         rayCollection = newRays;
         // Move new rays one unit (pixel) into their new direction
         // (avoid to reflect multiple times inside one single point)
         for (var j = 0; j < rayCollection.length; j++) {
-          rayCollection[j].a.set(rayCollection[j].clone().setLength(config.rayStepOffset).b);
+          rayCollection[j].vector.a.set(rayCollection[j].vector.clone().setLength(config.rayStepOffset).b);
         }
-      }
-      ellipseHelper.drawHandleLines(draw, fill);
-      cicleSectorHelper.drawHandleLines(draw, fill);
-      ellipseSectorHelper.drawHandleLines(draw, fill);
-      bezierHelper.drawHandleLines();
+      } // END for
+      interactionHelpers.forEach(function (helper) {
+        helper.drawHandleLines(draw, fill);
+      });
+
+      // Maybe the content list has someting nice to draw.
+      contentList.drawHighlighted(draw, fill);
     }; // END postDraw
 
+    // +---------------------------------------------------------------------------------
+    // | Get the minimal bounding box for all shapes in the scene.
+    // +-------------------------------
     var getMaxShapeBounds = function () {
       return Bounds.computeFromBoundsSet(
         shapes.map(function (shape) {
@@ -127,6 +135,9 @@
       );
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Draws all shapes' bounding boxes.
+    // +-------------------------------
     var drawBoundingBoxes = function (draw, fill) {
       shapes.forEach(function (shape) {
         if (typeof shape["getBounds"] === "function") {
@@ -136,197 +147,40 @@
       });
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Draws the given rays as arrows.
+    // +-------------------------------
     var drawRays = function (draw, fill, rays, color) {
       rays.forEach(function (ray) {
-        draw.arrow(ray.a, ray.b, color, config.rayThickness);
+        draw.arrow(ray.vector.a, ray.vector.b, ray.properties.color, config.rayThickness);
       });
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Draws the given lines (not arrows).
+    // +-------------------------------
     var drawLines = function (draw, fill, rays, color) {
       rays.forEach(function (ray) {
-        draw.line(ray.a, ray.b, color, config.rayThickness);
+        draw.line(ray.vector.a, ray.vector.b, ray.properties.color, config.rayThickness);
       });
-    };
-
-    var getRayIteration = function (currentRays) {
-      var reflectedRaysByShapes = calculateAllReflections(currentRays);
-      return reflectedRaysByShapes;
-    };
-
-    /**
-     * @return {Array<Vector[]>} An two-dimensional array of vectors; each array for one of the base shapes.
-     */
-    var calculateAllReflections = function (rays) {
-      // Array<Vector[]>
-      var resultVectors = [];
-      rays.forEach(function (ray) {
-        const reflectedRays = [];
-        shapes.forEach(function (shape) {
-          var reflectedRay = findReflectedRay(shape, ray);
-          if (reflectedRay != null && ray.a.distance(reflectedRay.a) > config.rayCompareEpsilon) {
-            // && reflectedRay.length() > 0.1) {
-            reflectedRays.push(reflectedRay);
-          }
-        });
-        if (reflectedRays.length > 0) {
-          resultVectors.push(findClosestRay(ray, reflectedRays));
-        } else {
-          // Just expand input ray
-          resultVectors.push(ray.clone().moveTo(ray.b));
-        }
-      });
-      return resultVectors;
-    };
-
-    // Pre: rays.length > 0
-    var findClosestRay = function (sourceRay, rays) {
-      var dist = sourceRay.a.distance(rays[0].a);
-      var resultIndex = 0;
-      for (var i = 1; i < rays.length; i++) {
-        if (sourceRay.a.distance(rays[i].a) < dist) {
-          // && sourceRay.a.distance(rays[i].a) > 0.0001) {
-          resultIndex = i;
-        }
-      }
-      return rays[resultIndex];
-    };
-
-    /**
-     * TODO: also allow circle sectors, elliptic sectors, bezier curves??
-     * @param {Polygon | Circle | Ellipse} shape
-     * @param {Vector} ray
-     * @returns
-     */
-    var findReflectedRay = function (shape, ray) {
-      var reflectedRay = null;
-
-      // Find intersection with min distance
-      if (
-        shape instanceof Polygon ||
-        shape instanceof Line ||
-        shape instanceof Circle ||
-        shape instanceof VEllipse ||
-        shape instanceof CircleSector ||
-        shape instanceof VEllipseSector ||
-        shape instanceof BezierPath ||
-        // Note: this is not a direct drawable and cannot be directly added to the canvas,
-        // but let's also handle this case
-        shape instanceof CubicBezierCurve ||
-        shape instanceof Triangle
-      ) {
-        // Array<Vector>
-        var intersectionTangents = shape.lineIntersectionTangents(ray, true);
-        // Find closest intersection vector
-        var closestIntersectionTangent = intersectionTangents.reduce(function (accu, curVal) {
-          if (accu === null || curVal.a.distance(ray.a) < accu.a.distance(ray.a)) {
-            accu = curVal;
-          }
-          return accu;
-        }, null);
-        if (closestIntersectionTangent) {
-          var angleBetween = closestIntersectionTangent.angle(ray);
-          // rotateVector(closestIntersectionTangent, angleBetween);
-          closestIntersectionTangent.rotate(angleBetween);
-          reflectedRay = closestIntersectionTangent;
-        } else {
-          reflectedRay = null;
-        }
-      } else {
-        // ERR! (unrecognized shape)
-        // In the end all shapes should have the same methods!
-      }
-
-      return reflectedRay;
     };
 
     // +---------------------------------------------------------------------------------
     // | Just rebuilds the pattern on changes.
     // +-------------------------------
-    var rebuildShape = function () {
+    var rebuildShapes = function () {
       pb.removeAll(false, false); // Don't trigger redraw
+      var randomShapesAndHelpers = createRandomShapes(pb, viewport);
 
-      // Create a new randomized polygon.
-      var polygon = createRandomizedPolygon(4, viewport, true); // createClockwise=true
-      polygon.scale(0.3, polygon.getCentroid());
-
-      var line = new Line(viewport.randomPoint(), viewport.randomPoint());
-
-      var triangle = new Triangle(viewport.randomPoint(), viewport.randomPoint(), viewport.randomPoint());
-
-      // Create circle and ellpise
-      var circle = new Circle(new Vertex(-25, -15), 90.0);
-      var ellipse = new VEllipse(new Vertex(25, 15), new Vertex(150, 200), -Math.PI * 0.3);
-      var circleSector = randomCircleSector(viewport);
-      var ellipseSector = randomEllipseSector(viewport);
-
-      // Create a new randomized Bézier curve.
-      var tmpPolygon = createRandomizedPolygon(4, viewport, true); // createClockwise=true
-      tmpPolygon.scale(0.3, polygon.getCentroid());
-      var bezierPath = BezierPath.fromCurve(
-        new CubicBezierCurve(tmpPolygon.vertices[0], tmpPolygon.vertices[1], tmpPolygon.vertices[2], tmpPolygon.vertices[3])
-      );
-      bezierHelper = new BezierPathInteractionHelper(pb, [bezierPath]);
-
-      shapes = [polygon, circle, ellipse, circleSector, ellipseSector, bezierPath, line, triangle];
-      // Align all shapes on a circle :)
-      var alignCircle = new Circle(new Vertex(), viewport.getMinDimension() * 0.333);
-      shapes.forEach(function (shape, i) {
-        var newPosition = alignCircle.vertAt((i * Math.PI * 2) / shapes.length);
-        // console.log("shape ", i, typeof shape);
-        shape.move(newPosition);
+      // Destroy old helpers to release all unused listeners.
+      interactionHelpers.forEach(function (helper) {
+        helper.destroy();
       });
-
-      // We want to change the ellipse's radii and rotation by dragging points around
-      var ellipseRotationControlPoint = ellipse.vertAt(0.0).scale(1.2, ellipse.center);
-      if (ellipseHelper) {
-        ellipseHelper.destroy();
-      }
-      ellipseHelper = new VEllipseHelper(ellipse, ellipseRotationControlPoint);
-
-      // Further: add a circle sector helper to edit angles and radius manually (mouse or touch)
-      var controlPointA = circleSector.circle.vertAt(circleSector.startAngle);
-      var controlPointB = circleSector.circle.vertAt(circleSector.endAngle);
-      if (cicleSectorHelper) {
-        cicleSectorHelper.destroy();
-      }
-      cicleSectorHelper = new CircleSectorHelper(circleSector, controlPointA, controlPointB, pb);
-
-      // We want to change the ellipse's radii and rotation by dragging points around
-      var startControlPoint = ellipseSector.ellipse.vertAt(ellipseSector.startAngle);
-      var endControlPoint = ellipseSector.ellipse.vertAt(ellipseSector.endAngle);
-      var rotationControlPoint = ellipseSector.ellipse
-        .vertAt(0) // ellipseSector.ellipse.rotation)
-        .scale(1.2, ellipseSector.ellipse.center);
-      if (ellipseSectorHelper) {
-        ellipseSectorHelper.destroy();
-      }
-      ellipseSectorHelper = new VEllipseSectorHelper(ellipseSector, startControlPoint, endControlPoint, rotationControlPoint);
-
-      pb.add(shapes, false);
-      pb.add(
-        [ellipseRotationControlPoint, controlPointA, controlPointB, startControlPoint, endControlPoint, rotationControlPoint],
-        false
-      );
-      // pb.add(rays, true); // trigger redraw
+      interactionHelpers = randomShapesAndHelpers.helpers;
+      shapes = randomShapesAndHelpers.shapes;
+      pb.add(randomShapesAndHelpers.shapes, false);
+      pb.add(randomShapesAndHelpers.helperPoints, false);
       pb.add([mainRay], true); // trigger redraw
-    };
-
-    var getRayCollection = function (baseRay) {
-      var rays = [];
-      if (config.useParallelLightSource) {
-        var perpRay = baseRay.perp();
-        perpRay.moveTo(perpRay.vertAt(-0.5));
-        for (var i = 0; i < config.numRays; i++) {
-          rays.push(baseRay.clone().moveTo(perpRay.vertAt(i / config.numRays)));
-        }
-        return rays;
-      } else {
-        var rangeAngle = config.initialRayAngle * DEG_TO_RAD;
-        for (var i = 0; i < config.numRays; i++) {
-          rays.push(baseRay.clone().rotate(-rangeAngle / 2.0 + rangeAngle * (i / config.numRays)));
-        }
-        return rays;
-      }
     };
 
     // +---------------------------------------------------------------------------------
@@ -396,10 +250,40 @@
       // prettier-ignore
       gui.add(config, "drawPreviewRays").name("drawPreviewRays").title("Check to see the next iteration of possible rays.")
       .onChange( function() { pb.redraw() });
+      const colorGradientDialog = new ColorGradientPickerDialog(modal, isMobileMode);
+      // prettier-ignore
+      gui.addColorGradient(config, "rayColorGradient", colorGradientDialog).onChange(function (newGradient) { pb.redraw(); });
     }
 
     pb.config.postDraw = postDraw;
-    rebuildShape();
+    // +---------------------------------------------------------------------------------
+    // | This renders a content list component on top, allowing to delete or add
+    // | new shapes.
+    // |
+    // | You should add `contentList.drawHighlighted(draw, fill)`  to your draw
+    // | routine to see what's currently highlighted.
+    // +-------------------------------
+    var contentList = new PBContentList(pb);
+
+    // Filter shapes; keep only those that can reflect rays.
+    pb.addContentChangeListener(function (_shapesAdded, _shapesRemoved) {
+      // Drop everything we cannot handle with reflections
+      shapes = pb.drawables.filter(function (drwbl) {
+        return (
+          drwbl instanceof Line ||
+          // drwbl instanceof Vector ||  // Currently doesn't support intersections. Why?
+          drwbl instanceof Triangle ||
+          drwbl instanceof Polygon ||
+          drwbl instanceof Circle ||
+          drwbl instanceof CircleSector ||
+          drwbl instanceof VEllipse ||
+          drwbl instanceof VEllipseSector ||
+          drwbl instanceof BezierPath
+        );
+      });
+    });
+
+    rebuildShapes();
     toggleAnimation();
   });
 })(globalThis);

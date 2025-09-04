@@ -22,6 +22,8 @@
  * @modified 2024-08-25 Added the `CSSBackdropFilterParams` params to the global params (all optional).
  * @modified 2025-03-29 Added interface `Intersectable`.
  * @modified 2025-04-16 Added interface `IBounded`.
+ * @modified 2025-05-07 Added callback `onContentChanged` to PB to track if the drawable content changed.
+ * @modified 2025-06-07 Adding helper type `PolygonIntersectionTuple` for re-usability.
  **/
 
 import { Vertex } from "../Vertex";
@@ -114,6 +116,18 @@ export interface CanvasWrapper {
   setSize: (width: number, height: number) => void;
   element: HTMLCanvasElement | SVGElement;
 }
+
+/**
+ * The interface for PB change events.
+ */
+export interface IPBChangeEvent {
+  type: "DRAWABLES_ADDED" | "DRAWABLES_REMOVED";
+  addedDrawables: Array<Drawable>;
+  removedDrawables: Array<Drawable>;
+}
+
+export type PBContentChangeListener = (event: IPBChangeEvent) => void; // A callback function that will be triggered after content changed.
+
 /**
  * The config that's used by PB.
  */
@@ -303,3 +317,20 @@ export interface IBounded {
    **/
   getBounds(): IBounds;
 }
+
+export interface IShapeInteractionHelper {
+  /**
+   * Let this shape helper draw it's handle lines. It's up to the helper what they look like.
+   * @param {DrawLib<any>} draw - The draw library to use.
+   * @param {DrawLib<any>} fill - The fill library to use.
+   */
+  drawHandleLines(draw: DrawLib<any>, fill: DrawLib<any>): void;
+
+  /**
+   * Destroys this helper. This means that all listeners get released and this helper
+   * will not receive or handle any events.
+   */
+  destroy(): void;
+}
+
+export type PolygonIntersectionTuple<T> = { edgeIndex: number; intersection: T };

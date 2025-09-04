@@ -1,5 +1,55 @@
 # Changelog
 
+# Changelog
+
+- 2025-09-02
+  - Adding method `ColorGradient.fromObject` to restore from JSON objects.
+- 2025-08-27
+  - Added experimental `ColorGradientDialog` to the demos (pure JS).
+- 2025-08-11
+  - Finalizing `ColorGradient` class with `getColorAt(ratio:number)` method.
+  - Adding optional `colorGradient` option to the `createRayCollection` helper method.
+  - Tweaking the `ColorGradientPicker` class to better handle dataset attributes.
+  - Extending `lil-gui` to properly handle color gradients now.
+  - Tweaking demo `58-shape-reflecting-rays`: adding ColorGradientPicker to select ray colors.
+  - Modifying the `Color.Sanitizer.RGB` helper method: recognoizing 0 to 255 as valid values (not only 1 to 255).
+  - Modifying the `Color.parse` method: recognizing CSS color strings now.
+- 2025-08-06
+  - Added `ColorGradientItem` interface.
+  - Fixed an issue in the static `Color.fromRGB` method: values in [0..1] are now correctly reconized (1.0 was excluded).
+  - Added static color instances (singletons): Color.Red, Color.Gold, Color.Yellow, Color.Green, Color.LimeGreen, Color.Blue, Color.MediumBlue, Color.Purple.
+  - Adding all web colors to the Color class http://127.0.0.1:8080/tests/test_linearColorGradientParser.html
+- 2025-08-04
+  - Adding the `ColorGradient` class.
+  - Adding more features to the `ColorGradientPicker` class: removing color is now possible.
+  - Adding ColorGradients to lil-gui, `addColorGradient(object,name,dialog)`. Added tests for this.
+- 2025-06-07
+  - Adding `Polygon.closestLineIntersectionIndex` to determine line intersections plus detected edge index.
+  - Adding helper type `PolygonIntersectionTuple` for re-usability.
+- 2025-05-20
+  - PlotBoilerplate.drawDrawable: Applying `lineWith` parameter in the draw routine for vectors (had been missing).
+  - Adding a demo to show angles of polygon.
+  - Tweaking `Polygon.getInnerAngleAt` and `Polygo.isAngleAcute` to handle indices out of array bounds as well.
+- 2025-05-08
+  - Tweaking performance of `BezierPathInteractionHelper`: only triggering redraw now when mouse move within given detect range.
+  - demo-58-rays-reflecting-shapes: Fixing an calculation error on multiple consecutive reflections on the same shape.
+- 2025-05-07
+  - Added `PBContentChangeListener` to PB to track if the drawable content changed.
+  - Added `PlogBoilerplate.addContentChangeListener` and `PlogBoilerplate.removeContentChangeListener`.
+  - Moving full vectors now by default when vector point a is moved.
+  - (Demos) Adding a tiny content manager pane.
+  - Class `Vertex` is now implementing interface `IBounded` (to meet convention).
+  - Tweaking the demo `57-shape-reflecting-rays` to interact with the new content manager tool. Adding removing shapes is now possible.
+- 2025-05-05
+  - Added optional params `draw` and `fill` to BezierPathInteractionHelper.drawHandleLines`method.
+  - Demo 58-shape-reflecting-rays: Refactored`rebuildShapes`and moved to external funcion`createRandomShapes`.
+  - Added new inerface to core: `IShapeInteractionHelper`.
+  - Class `CircleHelper` now implementing `IShapeInteractionHelper`.
+  - Class `BezierPathInteractionHelper` now implementing `IShapeInteractionHelper`.
+  - Fixed a typo in the `VEllipseHelper.destroy` method (was named `detroy`).
+  - Class `VEllipseHelper` is now implementing `IShapeInteractionHelper`.
+  - Class `VEllipseSectorHelper` is now implementing `IShapeInteractionHelper`.
+  - Added class `TriangleHelper`.
 - 2025-04-26 [v1.24.0]
   - Added static method `Bounds.computeFromBoundsSet` to calculate containing bounds for a set of bounding boxes.
 - 2025-04-24

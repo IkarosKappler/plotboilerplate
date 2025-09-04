@@ -17,7 +17,7 @@
  * @version 1.0.0
  */
 
-lil.ColorWithAlphaController = function (parent, object, colorProperty, alphaProperty, rgbScale) {
+lil.ColorGradientController = function (parent, object, colorProperty, alphaProperty, rgbScale) {
   this.baseColorController = new lil.ColorController(parent, object, colorProperty, rgbScale);
 
   /** Create a new input element for the alpha range 0.0 to 1.0 */
@@ -91,17 +91,17 @@ lil.ColorWithAlphaController = function (parent, object, colorProperty, alphaPro
 };
 
 /** 'Inherit' from lilgui's default ColorController */
-lil.ColorWithAlphaController.prototype = Object.assign({}, lil.ColorController.prototype);
+lil.ColorGradientController.prototype = Object.assign({}, lil.ColorController.prototype);
 
 /** Add custom updateDisplay function for alpha values */
-lil.ColorWithAlphaController.prototype.updateDisplay = function (newValue) {
+lil.ColorGradientController.prototype.updateDisplay = function (newValue) {
   /** Be sure this is really a number :) */
   this.alphaDisplay.innerHTML = typeof newValue === "number" ? newValue.toFixed(2) : newValue;
 };
 
 /** Finally add the new method 'addColorWithAlpha' to lil.GUI */
 lil.GUI.prototype.addColorWithAlpha = function (object, colorProperty, alphaProperty, rgbScale) {
-  var cntrlr = new lil.ColorWithAlphaController(this, object, colorProperty, alphaProperty, rgbScale);
+  var cntrlr = new lil.ColorGradientController(this, object, colorProperty, alphaProperty, rgbScale);
   cntrlr.onChange = function (handler) {
     cntrlr._handleChange = handler;
     return cntrlr;

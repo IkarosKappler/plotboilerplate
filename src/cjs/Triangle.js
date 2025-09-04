@@ -314,7 +314,7 @@ var Triangle = /** @class */ (function () {
         // Find the intersections of all lines inside the edge bounds
         return Polygon_1.Polygon.utils
             .locateLineIntersecion(line, [this.a, this.b, this.c], false, inVectorBoundsOnly)
-            .map(function (intersectionTuple) { return intersectionTuple.intersectionPoint; });
+            .map(function (intersectionTuple) { return intersectionTuple.intersection; });
     };
     /**
      * Get all line intersections of this polygon and their tangents along the shape.
@@ -334,7 +334,7 @@ var Triangle = /** @class */ (function () {
             .map(function (intersectionTuple) {
             // const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
             var polyLine = _this.getEdgeAt(intersectionTuple.edgeIndex);
-            return new Vector_1.Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersectionPoint);
+            return new Vector_1.Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersection);
         });
     };
     //--- END --- Implement interface `Intersectable`

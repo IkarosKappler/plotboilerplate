@@ -154,6 +154,7 @@ function createDemoDrawables(pb, imagePath, drawCallback) {
       new Vertex(diameter * 1.6, diameter * 1.6)
     )
   ];
+  // Hint: better use TriangleHelper class for this task.
   var setEquilateral = function (triangle) {
     const vec = new Vector(triangle.a, triangle.b);
     const mid = vec.vertAt(0.5);

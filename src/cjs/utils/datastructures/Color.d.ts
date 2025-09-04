@@ -18,7 +18,12 @@
  * @modified 2022-05-11 Fixed the `interpolate` function.
  * @modified 2023-01-23 Added `Color.set(Color)` function to set all values (r,g,b,h,s,l,a) simultanoeusly.
  * @modified 2024-03-10 Fixed some NaN type check for Typescript 5 compatibility.
- * @version 0.0.13
+ * @modified 2025-08-08 Fixed an issue in the static `makeRGB` method: values in [0..1] are now correctly reconized (1.0 was excluded).
+ * @modified 2025-08-08 Added static color instances (singletons): Color.Red, Color.Gold, Color.Yellow, Color.Green, Color.LimeGreen, Color.Blue, Color.MediumBlue, Color.Purple.
+ * @modified 2025-09-01 Adding all standard web colors. Source: https://en.wikipedia.org/wiki/Web_colors
+ * @modified 2025-09-01 Modifying the `Sanitizer.RGB` helper method: recognoizing 0 to 255 as valid values (not only 1 to 255).
+ * @modified 2025-09-01 Modifying the `Color.parse` method: recognizing CSS color strings now.
+ * @version 0.0.14
  **/
 /**
  * @classdesc A color class, inspired by neolitec's Javascript class.
@@ -242,4 +247,145 @@ export declare class Color {
      * @return {Color} A clone of this color (in RGB mode).
      */
     interpolate(c: Color, t: number): Color;
+    static MediumVioletRed: Color;
+    static DeepPink: Color;
+    static PaleVioletRed: Color;
+    static HotPink: Color;
+    static LightPink: Color;
+    static Pink: Color;
+    static DarkRed: Color;
+    static Red: Color;
+    static Firebrick: Color;
+    static Crimson: Color;
+    static IndianRed: Color;
+    static LightCoral: Color;
+    static Salmon: Color;
+    static DarkSalmon: Color;
+    static LightSalmon: Color;
+    static OrangeRed: Color;
+    static Tomato: Color;
+    static DarkOrange: Color;
+    static Coral: Color;
+    static Orange: Color;
+    static DarkKhaki: Color;
+    static Gold: Color;
+    static Khaki: Color;
+    static PeachPuff: Color;
+    static Yellow: Color;
+    static PaleGoldenrod: Color;
+    static Moccasin: Color;
+    static PapayaWhip: Color;
+    static LightGoldenrodYellow: Color;
+    static LemonChiffon: Color;
+    static LightYellow: Color;
+    static Maroon: Color;
+    static Brown: Color;
+    static SaddleBrown: Color;
+    static Sienna: Color;
+    static Chocolate: Color;
+    static DarkGoldenrod: Color;
+    static Peru: Color;
+    static RosyBrown: Color;
+    static Goldenrod: Color;
+    static SandyBrown: Color;
+    static Tan: Color;
+    static Burlywood: Color;
+    static Wheat: Color;
+    static NavajoWhite: Color;
+    static Bisque: Color;
+    static BlanchedAlmond: Color;
+    static Cornsilk: Color;
+    static Indigo: Color;
+    static Purple: Color;
+    static DarkMagenta: Color;
+    static DarkViolet: Color;
+    static DarkSlateBlue: Color;
+    static BlueViolet: Color;
+    static DarkOrchid: Color;
+    static Fuchsia: Color;
+    static Magenta: Color;
+    static SlateBlue: Color;
+    static MediumSlateBlue: Color;
+    static MediumOrchid: Color;
+    static MediumPurple: Color;
+    static Orchid: Color;
+    static Violet: Color;
+    static Plum: Color;
+    static Thistle: Color;
+    static Lavender: Color;
+    static MidnightBlue: Color;
+    static Navy: Color;
+    static DarkBlue: Color;
+    static MediumBlue: Color;
+    static Blue: Color;
+    static RoyalBlue: Color;
+    static SteelBlue: Color;
+    static DodgerBlue: Color;
+    static DeepSkyBlue: Color;
+    static CornflowerBlue: Color;
+    static SkyBlue: Color;
+    static LightSkyBlue: Color;
+    static LightSteelBlue: Color;
+    static LightBlue: Color;
+    static PowderBlue: Color;
+    static Teal: Color;
+    static DarkCyan: Color;
+    static LightSeaGreen: Color;
+    static CadetBlue: Color;
+    static DarkTurquoise: Color;
+    static MediumTurquoise: Color;
+    static Turquoise: Color;
+    static Aqua: Color;
+    static Cyan: Color;
+    static Aquamarine: Color;
+    static PaleTurquoise: Color;
+    static LightCyan: Color;
+    static DarkGreen: Color;
+    static Green: Color;
+    static DarkOliveGreen: Color;
+    static ForestGreen: Color;
+    static SeaGreen: Color;
+    static Olive: Color;
+    static OliveDrab: Color;
+    static MediumSeaGreen: Color;
+    static LimeGreen: Color;
+    static Lime: Color;
+    static SpringGreen: Color;
+    static MediumSpringGreen: Color;
+    static DarkSeaGreen: Color;
+    static MediumAquamarine: Color;
+    static YellowGreen: Color;
+    static LawnGreen: Color;
+    static Chartreuse: Color;
+    static LightGreen: Color;
+    static GreenYellow: Color;
+    static PaleGreen: Color;
+    static MistyRose: Color;
+    static AntiqueWhite: Color;
+    static Linen: Color;
+    static Beige: Color;
+    static WhiteSmoke: Color;
+    static LavenderBlush: Color;
+    static OldLace: Color;
+    static AliceBlue: Color;
+    static Seashell: Color;
+    static GhostWhite: Color;
+    static Honeydew: Color;
+    static FloralWhite: Color;
+    static Azure: Color;
+    static MintCream: Color;
+    static Snow: Color;
+    static Ivory: Color;
+    static White: Color;
+    static Black: Color;
+    static DarkSlateGray: Color;
+    static DimGray: Color;
+    static SlateGray: Color;
+    static Gray: Color;
+    static LightSlateGray: Color;
+    static DarkGray: Color;
+    static Silver: Color;
+    static LightGray: Color;
+    static Gainsboro: Color;
+    static CSS_COLORS: Record<string, Color>;
 }

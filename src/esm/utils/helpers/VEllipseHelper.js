@@ -5,7 +5,9 @@
  * @date     2025-03-31
  * @modified 2025-04-02 Adding `VEllipseHelper.drawHandleLines()`.
  * @modified 2025-04-09 Adding `VEllipseHelper.destroy()`.
- * @version  1.0.0
+ * @modified 2025-05-05 Fixed a typo in the `VEllipseHelper.destroy` method (was named `detroy`).
+ * @modified 2025-05-05 `VEllipseHelper` is now implementing `IShapeInteractionHelper`.
+ * @version  1.0.1
  */
 import { Line } from "../../Line";
 export class VEllipseHelper {
@@ -73,7 +75,7 @@ export class VEllipseHelper {
             dashArray: [4, 2]
         });
     }
-    detroy() {
+    destroy() {
         this.ellipse.center.listeners.removeDragListener(this._centerPointHandler);
         this.rotationControlPoint.listeners.removeDragListener(this._rotationPointHandler);
     }

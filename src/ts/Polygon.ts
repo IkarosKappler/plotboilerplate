@@ -36,7 +36,9 @@
  * @modified 2025-03-28 Added the `Polygon.lineIntersectionTangents` method.
  * @modified 2025-04-09 Added the `Polygon.getCentroid` method.
  * @modified 2025-05-16 Class `Polygon` now implements `IBounded`.
- * @version 1.15.0
+ * @modified 2025-05-20 Tweaking `Polygon.getInnerAngleAt` and `Polygo.isAngleAcute` to handle indices out of array bounds as well.
+ * @modified 2025-06-07 Adding `Polygon.closestLineIntersectionIndex` to determine line intersections plus detected edge index.
+ * @version 1.16.0
  *
  * @file Polygon
  * @public
@@ -51,7 +53,7 @@ import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 import { geomutils } from "./geomutils";
-import { XYCoords, SVGSerializable, UID, Intersectable, IBounded } from "./interfaces";
+import { XYCoords, SVGSerializable, UID, Intersectable, IBounded, PolygonIntersectionTuple } from "./interfaces";
 
 /**
  * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
@@ -195,7 +197,7 @@ export class Polygon implements IBounded, Intersectable, SVGSerializable {
    * @returns {boolean} `true` is angle is acute, `false` is obtuse.
    */
   getInnerAngleAt(vertIndex: number): number {
-    const p2: Vertex = this.vertices[vertIndex];
+    const p2: Vertex = this.vertices[vertIndex % this.vertices.length];
     const p1: Vertex = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
     const p3: Vertex = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
 
@@ -235,7 +237,7 @@ export class Polygon implements IBounded, Intersectable, SVGSerializable {
    */
   isAngleAcute(vertIndex: number): boolean {
     const A: Vertex = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
-    const B: Vertex = this.vertices[vertIndex];
+    const B: Vertex = this.vertices[vertIndex % this.vertices.length];
     const C: Vertex = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
 
     // Find local winding number for triangle A B C
@@ -307,7 +309,9 @@ export class Polygon implements IBounded, Intersectable, SVGSerializable {
         yj: number = this.vertices[j].y;
 
       var intersect: boolean = yi > vert.y != yj > vert.y && vert.x < ((xj - xi) * (vert.y - yi)) / (yj - yi) + xi;
-      if (intersect) inside = !inside;
+      if (intersect) {
+        inside = !inside;
+      }
     }
     return inside;
   }
@@ -526,7 +530,7 @@ export class Polygon implements IBounded, Intersectable, SVGSerializable {
     // Find the intersections of all lines inside the edge bounds
     return Polygon.utils
       .locateLineIntersecion(line, this.vertices, this.isOpen, inVectorBoundsOnly)
-      .map(intersectionTuple => intersectionTuple.intersectionPoint);
+      .map(intersectionTuple => intersectionTuple.intersection);
   }
 
   /**
@@ -542,10 +546,33 @@ export class Polygon implements IBounded, Intersectable, SVGSerializable {
     // Find the intersection tangents of all lines inside the edge bounds
     return Polygon.utils.locateLineIntersecion(line, this.vertices, this.isOpen, inVectorBoundsOnly).map(intersectionTuple => {
       const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
-      return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersectionPoint) as Vector;
+      return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersection) as Vector;
     });
   }
   //--- END --- Implement interface `Intersectable`
+
+  /**
+   * Get all line intersections of this polygon and their tangents along the shape.
+   *
+   * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+   *
+   * @param line
+   * @param inVectorBoundsOnly
+   * @returns
+   */
+  lineIntersectionTangentsIndices(
+    line: VertTuple<any>,
+    inVectorBoundsOnly: boolean = false
+  ): Array<PolygonIntersectionTuple<Vector>> {
+    // Find the intersection tangents of all lines inside the edge bounds
+    return Polygon.utils.locateLineIntersecion(line, this.vertices, this.isOpen, inVectorBoundsOnly).map(intersectionTuple => {
+      const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
+      return {
+        intersection: new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersection) as Vector,
+        edgeIndex: intersectionTuple.edgeIndex
+      };
+    });
+  }
 
   /**
    * Get the closest line-polygon-intersection point (closest the line point A).
@@ -554,27 +581,54 @@ export class Polygon implements IBounded, Intersectable, SVGSerializable {
    *
    * @param {VertTuple} line - The line to find intersections with.
    * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are considered (located strictly between start and end vertex).
-   * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+   * @returns {Vertex | null} - The intersection point within the polygon bounds.
    */
   closestLineIntersection(line: VertTuple<any>, inVectorBoundsOnly: boolean = false): Vertex | null {
+    var closestInterSectionIndex: PolygonIntersectionTuple<Vertex> | null = this.closestLineIntersectionIndex(
+      line,
+      inVectorBoundsOnly
+    );
+    if (closestInterSectionIndex) {
+      return closestInterSectionIndex.intersection;
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Get the closest line-polygon-intersection point (closest the line point A) plus the edge index..
+   *
+   * See demo `63-measure-angles-on-polygon` for how it works.
+   *
+   * @param {VertTuple} line - The line to find intersections with.
+   * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are considered (located strictly between start and end vertex).
+   * @returns {PolygonIntersectionTuple| null} - A pair containing the intersection point and the affected polygon edge index.
+   */
+  closestLineIntersectionIndex(
+    line: VertTuple<any>,
+    inVectorBoundsOnly: boolean = false
+  ): PolygonIntersectionTuple<Vertex> | null {
     const allIntersections = this.lineIntersections(line, inVectorBoundsOnly);
     if (allIntersections.length <= 0) {
       // Empty polygon -> no intersections
       return null;
     }
     // Find the closest intersection
-    let closestIntersection = new Vertex(Number.MAX_VALUE, Number.MAX_VALUE);
+    let closestIntersection: Vertex = new Vertex(Number.MAX_VALUE, Number.MAX_VALUE);
+    let closestInterSectionIndex: number = -1;
     let curDist = Number.MAX_VALUE;
-    for (var i in allIntersections) {
+    for (var i = 0; i < allIntersections.length; i++) {
       const curVert = allIntersections[i];
       const dist = curVert.distance(line.a);
       if (dist < curDist) {
         // && line.hasPoint(curVert)) {
         curDist = dist;
         closestIntersection = curVert;
+        closestInterSectionIndex = i;
       }
     }
-    return closestIntersection;
+    // return [closestIntersection, closestInterSectionIndex];
+    return { edgeIndex: closestInterSectionIndex, intersection: closestIntersection };
   }
 
   /**
@@ -949,9 +1003,9 @@ export class Polygon implements IBounded, Intersectable, SVGSerializable {
       vertices: Array<Vertex>,
       isOpen: boolean,
       inVectorBoundsOnly: boolean
-    ): Array<{ edgeIndex: number; intersectionPoint: Vertex }> {
+    ): Array<PolygonIntersectionTuple<Vertex>> {
       // Find the intersections of all lines inside the edge bounds
-      const intersectionPoints: Array<{ edgeIndex: number; intersectionPoint: Vertex }> = [];
+      const intersectionPoints: Array<PolygonIntersectionTuple<Vertex>> = [];
       var n = isOpen ? vertices.length - 1 : vertices.length;
       for (var i = 0; i < n; i++) {
         const polyLine = new Line(vertices[i % n], vertices[(i + 1) % n]);
@@ -963,7 +1017,7 @@ export class Polygon implements IBounded, Intersectable, SVGSerializable {
           polyLine.hasPoint(intersection, true) &&
           (!inVectorBoundsOnly || line.hasPoint(intersection, inVectorBoundsOnly))
         ) {
-          intersectionPoints.push({ edgeIndex: i, intersectionPoint: intersection });
+          intersectionPoints.push({ edgeIndex: i, intersection: intersection });
         }
       }
       return intersectionPoints;

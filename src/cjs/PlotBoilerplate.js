@@ -87,8 +87,13 @@
  * @modified 2024-07-08 Adding `PlotBoilerplate.getGUI()` to retrieve the GUI instance.
  * @modified 2024-08-25 Extending main class `PlotBoilerplate` optional param `isBackdropFiltersEnabled`.
  * @modified 2024-12-02 Adding the `triggerRedraw` to the `removeAll` method.
+ * @modified 2025-05-07 Changing the return type of `removeVertex` from `void` to `boolean`.
+ * @modified 2025-05-07 Handling content changes now with `contentChangeListeners`.
+ * @modified 2025-05-07 Added `PlogBoilerplate.addContentChangeListener` and `.removeContentChangeListener`.
+ * @modified 2025-05-07 Moving full vectors now by default when vector point a is moved.
+ * @modified 2025-05-20 Applying `lineWith` parameter in the draw routine for vectors (had been missing).
  *
- * @version  1.20.0
+ * @version  1.21.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -213,6 +218,10 @@ var PlotBoilerplate = /** @class */ (function () {
      */
     function PlotBoilerplate(config, drawConfig) {
         var _b, _c;
+        /**
+         * A list of content change listeners.
+         */
+        this.contentChangeListeners = [];
         /**
          * A discrete timestamp to identify single render cycles.
          * Note that using system time milliseconds is not a safe way to identify render frames, as on modern powerful machines
@@ -601,6 +610,52 @@ var PlotBoilerplate = /** @class */ (function () {
         }
     };
     /**
+     * Adds a new content change listener to this instance. Adding duplicates is not possible.
+     *
+     * @param {PBContentChangeListener} listener - The listenre to add.
+     * @method addContentChangeListener
+     * @instance
+     * @memberof PlotBoilerplate
+     * @returns {void}
+     */
+    PlotBoilerplate.prototype.addContentChangeListener = function (listener) {
+        for (var i in this.contentChangeListeners) {
+            if (this.contentChangeListeners[i] === listener) {
+                return;
+            }
+        }
+        this.contentChangeListeners.push(listener);
+    };
+    /**
+     * Removes an existing content change listener from this instance.
+     *
+     * @param {PBContentChangeListener} listener - The listenre to add.
+     * @method removeContentChangeListener
+     * @instance
+     * @memberof PlotBoilerplate
+     * @returns {void}
+     */
+    PlotBoilerplate.prototype.removeContentChangeListener = function (listener) {
+        for (var i = 0; i < this.contentChangeListeners.length; i++) {
+            if (this.contentChangeListeners[i] === listener) {
+                this.contentChangeListeners.splice(i, 1);
+                return;
+            }
+        }
+    };
+    PlotBoilerplate.prototype._fireContentChanged = function (addedDrawables, removedDrawables) {
+        for (var i in this.contentChangeListeners) {
+            var listener = this.contentChangeListeners[i];
+            if (listener && typeof listener === "function") {
+                listener({
+                    type: addedDrawables.length > 0 ? "DRAWABLES_ADDED" : "DRAWABLES_REMOVED",
+                    addedDrawables: addedDrawables,
+                    removedDrawables: removedDrawables
+                });
+            }
+        }
+    };
+    /**
      * Add a drawable object.<br>
      * <br>
      * This must be either:<br>
@@ -624,100 +679,121 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.add = function (drawable, redraw) {
+    PlotBoilerplate.prototype.add = function (drawable, redraw, doNotFireEvent) {
         if (Array.isArray(drawable)) {
             var arr = drawable;
             for (var i = 0; i < arr.length; i++) {
-                this.add(arr[i], false);
+                this.add(arr[i], false, doNotFireEvent);
             }
-        }
-        else if (drawable instanceof Vertex_1.Vertex) {
-            this.drawables.push(drawable);
-            this.vertices.push(drawable);
-        }
-        else if (drawable instanceof Line_1.Line) {
-            // Add some lines
-            this.drawables.push(drawable);
-            this.vertices.push(drawable.a);
-            this.vertices.push(drawable.b);
-        }
-        else if (drawable instanceof Vector_1.Vector) {
-            this.drawables.push(drawable);
-            this.vertices.push(drawable.a);
-            this.vertices.push(drawable.b);
-        }
-        else if (drawable instanceof VEllipse_1.VEllipse) {
-            this.vertices.push(drawable.center);
-            this.vertices.push(drawable.axis);
-            this.drawables.push(drawable);
-            drawable.center.listeners.addDragListener(function (event) {
-                drawable.axis.add(event.params.dragAmount);
-            });
-        }
-        else if (drawable instanceof VEllipseSector_1.VEllipseSector) {
-            this.vertices.push(drawable.ellipse.center);
-            this.vertices.push(drawable.ellipse.axis);
-            this.drawables.push(drawable);
-            drawable.ellipse.center.listeners.addDragListener(function (event) {
-                drawable.ellipse.axis.add(event.params.dragAmount);
-            });
-        }
-        else if (drawable instanceof Circle_1.Circle) {
-            this.vertices.push(drawable.center);
-            this.drawables.push(drawable);
-        }
-        else if (drawable instanceof CircleSector_1.CircleSector) {
-            this.vertices.push(drawable.circle.center);
-            this.drawables.push(drawable);
-        }
-        else if (drawable instanceof Polygon_1.Polygon) {
-            this.drawables.push(drawable);
-            for (var i = 0; i < drawable.vertices.length; i++) {
-                this.vertices.push(drawable.vertices[i]);
-            }
-        }
-        else if (drawable instanceof Triangle_1.Triangle) {
-            this.drawables.push(drawable);
-            this.vertices.push(drawable.a);
-            this.vertices.push(drawable.b);
-            this.vertices.push(drawable.c);
-        }
-        else if (drawable instanceof BezierPath_1.BezierPath) {
-            this.drawables.push(drawable);
-            var bezierPath = drawable;
-            for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
-                if (!drawable.adjustCircular && i == 0) {
-                    this.vertices.push(bezierPath.bezierCurves[i].startPoint);
-                }
-                this.vertices.push(bezierPath.bezierCurves[i].endPoint);
-                this.vertices.push(bezierPath.bezierCurves[i].startControlPoint);
-                this.vertices.push(bezierPath.bezierCurves[i].endControlPoint);
-                bezierPath.bezierCurves[i].startControlPoint.attr.selectable = false;
-                bezierPath.bezierCurves[i].endControlPoint.attr.selectable = false;
-            }
-            PlotBoilerplate.utils.enableBezierPathAutoAdjust(drawable);
-        }
-        else if (drawable instanceof PBImage_1.PBImage) {
-            this.vertices.push(drawable.upperLeft);
-            this.vertices.push(drawable.lowerRight);
-            this.drawables.push(drawable);
-            // Todo: think about a IDragEvent interface
-            drawable.upperLeft.listeners.addDragListener(function (e) {
-                drawable.lowerRight.add(e.params.dragAmount);
-            });
-            drawable.lowerRight.attr.selectable = false;
-        }
-        else if (drawable instanceof PBText_1.PBText) {
-            this.vertices.push(drawable.anchor);
-            this.drawables.push(drawable);
-            drawable.anchor.attr.selectable = false;
+            // !doNotFireEvent && this._fireContentChanged(arr, []);
         }
         else {
-            throw "Cannot add drawable of unrecognized type: " + typeof drawable + ".";
+            var addedDrawables = [drawable];
+            if (drawable instanceof Vertex_1.Vertex) {
+                this.drawables.push(drawable);
+                this.vertices.push(drawable);
+            }
+            else if (drawable instanceof Line_1.Line) {
+                // Add some lines
+                this.drawables.push(drawable);
+                this.vertices.push(drawable.a);
+                this.vertices.push(drawable.b);
+                addedDrawables.push(drawable.a, drawable.b);
+            }
+            else if (drawable instanceof Vector_1.Vector) {
+                this.drawables.push(drawable);
+                this.vertices.push(drawable.a);
+                this.vertices.push(drawable.b);
+                addedDrawables.push(drawable.a, drawable.b);
+                drawable.a.listeners.addDragListener(function (event) {
+                    drawable.b.add(event.params.dragAmount);
+                });
+            }
+            else if (drawable instanceof VEllipse_1.VEllipse) {
+                this.vertices.push(drawable.center);
+                this.vertices.push(drawable.axis);
+                addedDrawables.push(drawable.center, drawable.axis);
+                this.drawables.push(drawable);
+                drawable.center.listeners.addDragListener(function (event) {
+                    drawable.axis.add(event.params.dragAmount);
+                });
+            }
+            else if (drawable instanceof VEllipseSector_1.VEllipseSector) {
+                this.vertices.push(drawable.ellipse.center);
+                this.vertices.push(drawable.ellipse.axis);
+                addedDrawables.push(drawable.ellipse.center, drawable.ellipse.axis);
+                this.drawables.push(drawable);
+                drawable.ellipse.center.listeners.addDragListener(function (event) {
+                    drawable.ellipse.axis.add(event.params.dragAmount);
+                });
+            }
+            else if (drawable instanceof Circle_1.Circle) {
+                this.vertices.push(drawable.center);
+                addedDrawables.push(drawable.center);
+                this.drawables.push(drawable);
+            }
+            else if (drawable instanceof CircleSector_1.CircleSector) {
+                this.vertices.push(drawable.circle.center);
+                addedDrawables.push(drawable.circle.center);
+                this.drawables.push(drawable);
+            }
+            else if (drawable instanceof Polygon_1.Polygon) {
+                this.drawables.push(drawable);
+                for (var i = 0; i < drawable.vertices.length; i++) {
+                    this.vertices.push(drawable.vertices[i]);
+                    addedDrawables.push(drawable.vertices[i]);
+                }
+            }
+            else if (drawable instanceof Triangle_1.Triangle) {
+                this.drawables.push(drawable);
+                this.vertices.push(drawable.a);
+                this.vertices.push(drawable.b);
+                this.vertices.push(drawable.c);
+                addedDrawables.push(drawable.a, drawable.b, drawable.c);
+            }
+            else if (drawable instanceof BezierPath_1.BezierPath) {
+                this.drawables.push(drawable);
+                var bezierPath = drawable;
+                for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
+                    if (!drawable.adjustCircular && i == 0) {
+                        this.vertices.push(bezierPath.bezierCurves[i].startPoint);
+                        addedDrawables.push(bezierPath.bezierCurves[i].startPoint);
+                    }
+                    this.vertices.push(bezierPath.bezierCurves[i].endPoint);
+                    this.vertices.push(bezierPath.bezierCurves[i].startControlPoint);
+                    this.vertices.push(bezierPath.bezierCurves[i].endControlPoint);
+                    addedDrawables.push(bezierPath.bezierCurves[i].endPoint, bezierPath.bezierCurves[i].startControlPoint, bezierPath.bezierCurves[i].endControlPoint);
+                    bezierPath.bezierCurves[i].startControlPoint.attr.selectable = false;
+                    bezierPath.bezierCurves[i].endControlPoint.attr.selectable = false;
+                }
+                PlotBoilerplate.utils.enableBezierPathAutoAdjust(drawable);
+            }
+            else if (drawable instanceof PBImage_1.PBImage) {
+                this.vertices.push(drawable.upperLeft);
+                this.vertices.push(drawable.lowerRight);
+                addedDrawables.push(drawable.upperLeft, drawable.lowerRight);
+                this.drawables.push(drawable);
+                // Todo: think about a IDragEvent interface
+                drawable.upperLeft.listeners.addDragListener(function (e) {
+                    drawable.lowerRight.add(e.params.dragAmount);
+                });
+                drawable.lowerRight.attr.selectable = false;
+            }
+            else if (drawable instanceof PBText_1.PBText) {
+                this.vertices.push(drawable.anchor);
+                addedDrawables.push(drawable.anchor);
+                this.drawables.push(drawable);
+                drawable.anchor.attr.selectable = false;
+            }
+            else {
+                throw "Cannot add drawable of unrecognized type: " + typeof drawable + ".";
+            }
+            !doNotFireEvent && this._fireContentChanged(addedDrawables, []);
         }
         // This is a workaround for backwards compatibility when the 'redraw' param was not yet present.
-        if (redraw || typeof redraw == "undefined")
+        if (redraw || typeof redraw == "undefined") {
             this.redraw();
+        }
     };
     /**
      * Remove a drawable object.<br>
@@ -737,88 +813,113 @@ var PlotBoilerplate = /** @class */ (function () {
      *
      * @param {Drawable|Array<Drawable>} drawable - The drawable (of one of the allowed class instance) to remove.
      * @param {boolean} [redraw=false]
+     * @param {removeWidth}
      * @method remove
      * @instance
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.remove = function (drawable, redraw, removeWithVertices) {
+    PlotBoilerplate.prototype.remove = function (drawable, redraw, removeWithVertices, doNotFireEvent) {
         if (Array.isArray(drawable)) {
+            var removedDrawables_1 = [];
             for (var i = 0; i < drawable.length; i++) {
-                this.remove(drawable[i], false, removeWithVertices);
+                if (this.remove(drawable[i], false, removeWithVertices, true)) {
+                    removedDrawables_1.push(drawable[i]);
+                }
             }
             if (redraw) {
                 this.redraw();
             }
-            return;
+            !doNotFireEvent && this._fireContentChanged([], removedDrawables_1);
+            return removedDrawables_1.length > 0;
         }
         if (drawable instanceof Vertex_1.Vertex) {
-            this.removeVertex(drawable, false);
+            var wasRemoved_1 = this.removeVertex(drawable, false, false);
             if (redraw) {
                 this.redraw();
             }
+            !doNotFireEvent && this._fireContentChanged([], [drawable]);
+            return wasRemoved_1;
         }
+        var wasRemoved = false;
+        var removedDrawables = [];
         for (var i = 0; i < this.drawables.length; i++) {
             if (this.drawables[i] === drawable || this.drawables[i].uid === drawable.uid) {
                 this.drawables.splice(i, 1);
+                removedDrawables.push(drawable);
                 if (removeWithVertices) {
                     // Check if some listeners need to be removed
                     if (drawable instanceof Line_1.Line) {
                         // Add some lines
-                        this.removeVertex(drawable.a, false);
-                        this.removeVertex(drawable.b, false);
+                        this.removeVertex(drawable.a, false, true);
+                        this.removeVertex(drawable.b, false, true);
+                        removedDrawables.push(drawable.a, drawable.b);
                     }
                     else if (drawable instanceof Vector_1.Vector) {
-                        this.removeVertex(drawable.a, false);
-                        this.removeVertex(drawable.b, false);
+                        this.removeVertex(drawable.a, false, true);
+                        this.removeVertex(drawable.b, false, true);
+                        removedDrawables.push(drawable.a, drawable.b);
                     }
                     else if (drawable instanceof VEllipse_1.VEllipse) {
-                        this.removeVertex(drawable.center, false);
-                        this.removeVertex(drawable.axis, false);
+                        this.removeVertex(drawable.center, false, true);
+                        this.removeVertex(drawable.axis, false, true);
+                        removedDrawables.push(drawable.center, drawable.axis);
                     }
                     else if (drawable instanceof VEllipseSector_1.VEllipseSector) {
-                        this.removeVertex(drawable.ellipse.center);
-                        this.removeVertex(drawable.ellipse.axis);
+                        this.removeVertex(drawable.ellipse.center, false, true);
+                        this.removeVertex(drawable.ellipse.axis, false, true);
+                        removedDrawables.push(drawable.ellipse.center, drawable.ellipse.axis);
                     }
                     else if (drawable instanceof Circle_1.Circle) {
-                        this.removeVertex(drawable.center, false);
+                        this.removeVertex(drawable.center, false, true);
                     }
                     else if (drawable instanceof CircleSector_1.CircleSector) {
-                        this.removeVertex(drawable.circle.center, false);
+                        this.removeVertex(drawable.circle.center, false, true);
+                        removedDrawables.push(drawable.circle.center);
                     }
                     else if (drawable instanceof Polygon_1.Polygon) {
                         // for( var i in drawable.vertices )
-                        for (var i = 0; i < drawable.vertices.length; i++)
-                            this.removeVertex(drawable.vertices[i], false);
+                        for (var i = 0; i < drawable.vertices.length; i++) {
+                            this.removeVertex(drawable.vertices[i], false, true);
+                            removedDrawables.push(drawable.vertices[i]);
+                        }
                     }
                     else if (drawable instanceof Triangle_1.Triangle) {
-                        this.removeVertex(drawable.a, false);
-                        this.removeVertex(drawable.b, false);
-                        this.removeVertex(drawable.c, false);
+                        this.removeVertex(drawable.a, false, true);
+                        this.removeVertex(drawable.b, false, true);
+                        this.removeVertex(drawable.c, false, true);
+                        removedDrawables.push(drawable.a, drawable.b, drawable.c);
                     }
                     else if (drawable instanceof BezierPath_1.BezierPath) {
                         for (var i = 0; i < drawable.bezierCurves.length; i++) {
-                            this.removeVertex(drawable.bezierCurves[i].startPoint, false);
-                            this.removeVertex(drawable.bezierCurves[i].startControlPoint, false);
-                            this.removeVertex(drawable.bezierCurves[i].endControlPoint, false);
+                            this.removeVertex(drawable.bezierCurves[i].startPoint, false, true);
+                            this.removeVertex(drawable.bezierCurves[i].startControlPoint, false, true);
+                            this.removeVertex(drawable.bezierCurves[i].endControlPoint, false, true);
+                            removedDrawables.push(drawable.bezierCurves[i].startPoint, drawable.bezierCurves[i].startControlPoint, drawable.bezierCurves[i].endControlPoint);
                             if (i + 1 == drawable.bezierCurves.length) {
-                                this.removeVertex(drawable.bezierCurves[i].endPoint, false);
+                                this.removeVertex(drawable.bezierCurves[i].endPoint, false, true);
+                                removedDrawables.push(drawable.bezierCurves[i].endPoint);
                             }
                         }
                     }
                     else if (drawable instanceof PBImage_1.PBImage) {
-                        this.removeVertex(drawable.upperLeft, false);
-                        this.removeVertex(drawable.lowerRight, false);
+                        this.removeVertex(drawable.upperLeft, false, true);
+                        this.removeVertex(drawable.lowerRight, false, true);
+                        removedDrawables.push(drawable.upperLeft, drawable.lowerRight);
                     }
                     else if (drawable instanceof PBText_1.PBText) {
-                        this.removeVertex(drawable.anchor, false);
+                        this.removeVertex(drawable.anchor, false, true);
+                        removedDrawables.push(drawable.anchor);
                     }
                 } // END removeWithVertices
                 if (redraw) {
                     this.redraw();
                 }
-            }
-        }
+                !doNotFireEvent && this._fireContentChanged([], removedDrawables);
+                wasRemoved = true;
+            } // END if
+        } // END for
+        return wasRemoved;
     };
     /**
      * Remove a vertex from the vertex list.<br>
@@ -828,18 +929,20 @@ var PlotBoilerplate = /** @class */ (function () {
      * @method removeVertex
      * @instance
      * @memberof PlotBoilerplate
-     * @return {void}
+     * @return {boolean}
      **/
-    PlotBoilerplate.prototype.removeVertex = function (vert, redraw) {
+    PlotBoilerplate.prototype.removeVertex = function (vert, redraw, doNotFireEvent) {
         for (var i = 0; i < this.vertices.length; i++) {
             if (this.vertices[i] === vert) {
                 this.vertices.splice(i, 1);
                 if (redraw) {
                     this.redraw();
                 }
-                return;
+                !doNotFireEvent && this._fireContentChanged([], [vert]);
+                return true;
             }
         }
+        return false;
     };
     /**
      * Remove all elements.
@@ -854,13 +957,16 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      */
     PlotBoilerplate.prototype.removeAll = function (keepVertices, triggerRedraw) {
+        var removedDrawables = this.drawables;
         this.drawables = [];
         if (!Boolean(keepVertices)) {
+            removedDrawables = removedDrawables.concat(this.vertices);
             this.vertices = [];
         }
         if (triggerRedraw || typeof triggerRedraw === "undefined") {
             this.redraw();
         }
+        removedDrawables.length > 0 && this._fireContentChanged([], removedDrawables);
     };
     /**
      * Find the vertex near the given position.
@@ -1115,7 +1221,7 @@ var PlotBoilerplate = /** @class */ (function () {
                 d.b.attr.renderTime = renderTime;
         }
         else if (d instanceof Vector_1.Vector) {
-            draw.arrow(d.a, d.b, this.drawConfig.vector.color);
+            draw.arrow(d.a, d.b, this.drawConfig.vector.color, this.drawConfig.vector.lineWidth);
             if (this.drawConfig.drawHandlePoints && d.b.attr.selectable && d.b.attr.visible) {
                 draw.setCurrentId("".concat(d.uid, "_h0"));
                 draw.setCurrentClassName("".concat(d.className, "-handle"));

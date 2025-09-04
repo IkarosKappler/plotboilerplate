@@ -22,12 +22,12 @@ import { CircleSector } from "../../CircleSector";
 import { PlotBoilerplate } from "../../PlotBoilerplate";
 import { VertEvent, VertListener } from "../../VertexListeners";
 import { Vertex } from "../../Vertex";
-import { DrawLib } from "../../interfaces";
+import { DrawLib, IShapeInteractionHelper } from "../../interfaces";
 
 /**
  * @classdesc A helper for handling circles with an additional radius-control-point.
  */
-export class CircleSectorHelper {
+export class CircleSectorHelper implements IShapeInteractionHelper {
   private circleSector: CircleSector;
   private controlPointStart: Vertex;
   private controlPointEnd: Vertex;
@@ -109,6 +109,7 @@ export class CircleSectorHelper {
     };
   }
 
+  //--- BEGIN --- Implement IShapeInteractionHelper ---
   /**
    * Draw grey handle lines.
    *
@@ -139,4 +140,5 @@ export class CircleSectorHelper {
     this.controlPointStart.listeners.removeDragListener(this.radiusStartListener);
     this.controlPointEnd.listeners.removeDragListener(this.radiusEndListener);
   }
+  //--- END --- Implement IShapeInteractionHelper ---
 }

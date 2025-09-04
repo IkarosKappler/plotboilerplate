@@ -1,26 +1,31 @@
 {
-    "compilerOptions": {
-	"outDir": "./src/cjs",
-	"module": "commonjs",
-
-	"target": "es5",
-	"lib": [ "es2015", "dom" ],
-	
-	"sourceMap": true,
-	"declaration": true,
-
-	"allowJs": false,
-
-	"forceConsistentCasingInFileNames": true,
-	"noImplicitReturns": false,
-	"noImplicitThis": false,
-	"noImplicitAny": false,
-	"strictNullChecks": false,
-	"noUnusedLocals": false,
-	"noUnusedParameters": false
-
-    },
-    "include": ["./src/ts/**/*.ts"],
-    "exclude": ["./dist", "./tmp","./src/js","./src/vanilla", "./npm-package", "./demos"],
-    "removeComments": false
-}
+	"compilerOptions": {
+	  "outDir": "./src/cjs",
+	  "module": "commonjs",
+  
+	  "target": "es5",
+	  "lib": ["es2015", "dom"],
+  
+	  "moduleResolution": "node",
+  
+	  "sourceMap": true,
+	  "declaration": true,
+  
+	  "allowJs": false,
+  
+	  "jsx": "react",
+	  "reactNamespace": "NoReact",
+  
+	  "forceConsistentCasingInFileNames": true,
+	  "noImplicitReturns": false,
+	  "noImplicitThis": false,
+	  "noImplicitAny": false,
+	  "strictNullChecks": false,
+	  "noUnusedLocals": false,
+	  "noUnusedParameters": false
+	},
+	"include": ["./src/ts/**/*.ts", "./src/ts/**/*.tsx", "./src/external.d.ts"],
+	"exclude": ["./dist", "./tmp", "./src/js", "./src/vanilla", "./npm-package", "./demos"],
+	"removeComments": false
+  }
+  

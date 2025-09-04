@@ -6,6 +6,7 @@
  * @modified 2025-04-02 Adding `VEllipseSectorHelper.drawHandleLines`.
  * @modified 2025-04-07 Modifying the calculation of `startAngle` and `endAngle` from the rotation control point: wrapping result into [0,TWO_PI).
  * @modified 2025-04-09 Adding the `VEllipseSectorHelper.destroy` method.
+ * @modified 2025-05-05 `VEllipseSectorHelper` is now implementing `IShapeInteractionHelper`.
  * @version  1.1.0
  */
 
@@ -14,9 +15,9 @@ import { VEllipseSector } from "../../VEllipseSector";
 import { Vertex } from "../../Vertex";
 import { VertEvent, VertListener } from "../../VertexListeners";
 import { geomutils } from "../../geomutils";
-import { DrawLib } from "../../interfaces";
+import { DrawLib, IShapeInteractionHelper } from "../../interfaces";
 
-export class VEllipseSectorHelper {
+export class VEllipseSectorHelper implements IShapeInteractionHelper {
   private sector: VEllipseSector;
   private startAngleControlPoint: Vertex;
   private endAngleControlPoint: Vertex;

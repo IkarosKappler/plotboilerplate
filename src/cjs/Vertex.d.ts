@@ -35,14 +35,16 @@
  * @modified 2024-12-17 Outsourced the euclidean distance calculation of `Vertex.distance` to `geomutils.dist4`.
  * @modified 2025-03-24 Making the second parameter `center` of the `Vertex.rotate` method optional.
  * @modified 2025-04-13 Adding the `Vertex.move(amount: XYCoords)` method (does the same as `add`, added by naming convention).
- * @version  2.10.0
+ * @modified 2025-05-07 Class `Vertex` is now implementing interface `IBounded` (to meet convention).
+ * @version  2.11.0
  *
  * @file Vertex
  * @public
  **/
 import { IVertexAttr } from "./VertexAttr";
 import { VertexListeners } from "./VertexListeners";
-import { XYCoords, SVGSerializable, UID } from "./interfaces";
+import { XYCoords, SVGSerializable, UID, IBounded } from "./interfaces";
+import { Bounds } from "./Bounds";
 /**
  * @classdesc A vertex is a pair of two numbers.<br>
  * <br>
@@ -57,7 +59,7 @@ import { XYCoords, SVGSerializable, UID } from "./interfaces";
  * @requires XYCoords
  *
  */
-export declare class Vertex implements XYCoords, SVGSerializable {
+export declare class Vertex implements IBounded, XYCoords, SVGSerializable {
     private static readonly ZERO;
     /**
      * Required to generate proper CSS classes and other class related IDs.
@@ -423,6 +425,16 @@ export declare class Vertex implements XYCoords, SVGSerializable {
      * @memberof Vertex
      */
     abs(): Vertex;
+    /**
+     * Get the bounding box (bounds) of this Vertex.
+     * This is just by convention – any vertex is just a position without any useful with or height (0).
+     *
+     * @method getBounds
+     * @instance
+     * @memberof Vertex
+     * @return {Bounds} The rectangular bounds of this Vertex (width and height are zero).
+     **/
+    getBounds(): Bounds;
     /**
      * Get a string representation of this vertex.
      *

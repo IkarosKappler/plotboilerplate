@@ -24,7 +24,7 @@ var applyGuiSize = function (gui, guiDoubleSize, cssProps) {
         gui.domElement.style["transform-origin"] = "100% 0%";
     }
     var transform = cssProps && cssProps.hasOwnProperty("transform") ? cssProps["transform"] + " " : "";
-    console.log("transform", transform);
+    // console.log("transform", transform);
     if (guiDoubleSize) {
         gui.domElement.style["transform"] = transform + "scale(2.0)";
     }

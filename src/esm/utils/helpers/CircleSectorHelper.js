@@ -75,6 +75,7 @@ export class CircleSectorHelper {
             _self.circleSector.endAngle = _self.circleSector.circle.center.angle(_self.controlPointEnd);
         };
     }
+    //--- BEGIN --- Implement IShapeInteractionHelper ---
     /**
      * Draw grey handle lines.
      *

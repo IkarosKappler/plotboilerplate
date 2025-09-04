@@ -1,5 +1,14 @@
 ## Todos
 
+- Create a helper for triangles.
+- Resize/bestfit seems to fail in Firefoxe's dark mode (plugin).
+- Extend demo 07-voronoi: "randomize" could be a smooth transition :)
+- Todo: Bounding box of PBText
+- Todo: Bounding box of PBImage
+- Todo: think about if Vector should implement `Intersectable` as well.
+- Todo: PBText shoould implement Bounds.
+- Todo: TBImage should implement Bounds.
+- Todo: check if BezierPathInteractionHelper can work without every possible redraw (event mouseIsOver)
 - Removed `getAvailableContainerSpace` from main class. Is in dom-utils now.
 - Removed `getFProp` from main class. Is in dom-utils now.
 - Add a method to draw connected paths (different types of path segments: linear, curve, arc, ...). Useful for the circle intersections demo.

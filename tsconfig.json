@@ -3,7 +3,7 @@
 	"outDir": "./src/esm",
 	
 	"target": "ES2015",
-	"module": "ES2020",
+	"module": "ES2015",
 
 	"moduleResolution": "node",
 
@@ -14,6 +14,9 @@
 
 	"allowJs": false,
 
+	"jsx": "react",
+	"reactNamespace": "NoReact",
+
 	"forceConsistentCasingInFileNames": true,
 	"noImplicitReturns": true,
 	"noImplicitThis": true,
@@ -23,7 +26,7 @@
 	"noUnusedParameters": false
 
     },
-    "include": ["./src/ts/**/*.ts"],
+    "include": ["./src/ts/**/*.ts", "./src/ts/**/*.tsx", "./src/external.d.ts"],
     "exclude": ["./dist", "./tmp","./src/js","./src/_js","./src/cjs","./src/esm","./src/vanilla", "./npm-package", "demos"],
     "removeComments": false
 }

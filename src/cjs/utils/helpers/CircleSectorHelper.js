@@ -78,6 +78,7 @@ var CircleSectorHelper = /** @class */ (function () {
             _self.circleSector.endAngle = _self.circleSector.circle.center.angle(_self.controlPointEnd);
         };
     };
+    //--- BEGIN --- Implement IShapeInteractionHelper ---
     /**
      * Draw grey handle lines.
      *

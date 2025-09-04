@@ -17,11 +17,11 @@
     <meta property="og:title" content="A demo about reflecting rays inside any shape with PlotBoilerplate.js.">
     <meta property="og:description" content="A demo about reflecting rays inside any shape with PlotBoilerplate.js.">
     <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20250427-0-shape-reflecting-rays.png">
-
+    
     <!-- Polyfills for IE -->
     <script src="../../lib/globalthis-polyfill.min.js"></script> 
     <script src="../../lib/path2d-polyfill.min.js"></script>
-
+    
     <!-- A modal -->
     <script src="../modal.js"></script>
     <link rel="stylesheet" href="../modal.css">
@@ -40,8 +40,10 @@
     <script src="../../src/cjs/utils/lil.gui.title.polyfill.js"></script>
     <script src="../../src/cjs/utils/lil.gui.arrowbounce.polyfill.js"></script>
     <script src="../../src/cjs/utils/datastructures/Color.js"></script>
-    <script src="../../src/cjs/utils/detectDarkMode.js"></script>
+    <script src="../../src/cjs/utils/datastructures/ColorGradient.js"></script>
     <script src="../../src/cjs/utils/dom/guiSizeToggler.js"></script>
+    <script src="../../src/cjs/utils/dom/components/ColorGradientPicker.js"></script>
+    <script src="../../src/cjs/utils/dom/components/ColorGradientSelector.js"></script>
     <script src="../../src/cjs/utils/WebColors.js"></script>
     <script src="../../src/cjs/utils/WebColorsContrast.js"></script>
     <script src="../../src/cjs/utils/WebColorsMalachite.js"></script>
@@ -50,7 +52,7 @@
     <script src="../../lib/FileSaver.min.js"></script>
     <script src="../../lib/alloy_finger.js"></script>
     <script src="../../lib/uistats.min.js"></script>
-
+    
     <!-- Load helpers -->
     <script src="../../src/cjs/utils/gup.js"></script>
     <script src="../../src/cjs/utils/Params.js"></script>
@@ -60,18 +62,20 @@
     <script src="../../src/cjs/utils/helpers/CircleHelper.js"></script> 
     <script src="../../src/cjs/utils/helpers/CircleSectorHelper.js"></script> 
     <script src="../../src/cjs/utils/helpers/VEllipseSectorHelper.js"></script> 
+    <script src="../../src/cjs/utils/helpers/TriangleHelper.js"></script>
     <script src="../createCanvasCover.js"></script>
     <script src="../randomWebColor.js"></script>
     <script src="../vertexMedian.js"></script>
     <script src="../drawPolygonIndices.js"></script>
     <script src="../randomCircleSector.js"></script>
     <script src="../randomEllipseSector.js"></script>
-
-
+    <script src="../createRandomShapes.js"></script>
+    
+    
     <!-- For production -->
     <!-- <script src="../../dist/plotboilerplate.min.js"></script> -->
     <!-- END For production -->
-
+    
     <!-- For development -->
     <script src="../../src/cjs/UIDGenerator.js"></script>
     <script src="../../src/cjs/VertexAttr.js"></script>
@@ -100,12 +104,21 @@
     <script src="../../src/cjs/PlotBoilerplate.js"></script>
     <!-- END for development -->
     
+    <script src="../../lib/noreact-main.js"></script>
+    <script src="../PBContentList.js"></script>
+    <script src="../Ray.js"></script>
+    <script src="../createRayCollection.js"></script>
+    <!-- <script src="../lib/lil-gui-0.19.min.js"></script> -->
+    <script src="../ColorGradientPickerDialog.js"></script>
+    <script src="../extend-lilgui-colorgradient.js"></script>
+    <script src="../detectMobileMode.js"></script>
+    <script src="../isMobileDevice.js"></script>
+    <script src="RayShapeReflections.js"></script>
     <script src="index.js"></script>
     <link rel="stylesheet" type="text/css" media="screen" href="../style.css"> 
   </head>
   <body class="fullscreen">
     <input type="file" name="file" id="file" data-type="image-upload" style="display: none;">
-
-    <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
+      <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
   </body>
 </html>

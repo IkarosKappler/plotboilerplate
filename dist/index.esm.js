@@ -958,7 +958,7 @@ class Triangle {
         // Find the intersections of all lines inside the edge bounds
         return Polygon.utils
             .locateLineIntersecion(line, [this.a, this.b, this.c], false, inVectorBoundsOnly)
-            .map(intersectionTuple => intersectionTuple.intersectionPoint);
+            .map(intersectionTuple => intersectionTuple.intersection);
     }
     /**
      * Get all line intersections of this polygon and their tangents along the shape.
@@ -976,7 +976,7 @@ class Triangle {
             .map(intersectionTuple => {
             // const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
             const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
-            return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersectionPoint);
+            return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersection);
         });
     }
     //--- END --- Implement interface `Intersectable`
@@ -1293,7 +1293,8 @@ const geomutils = {
  * @modified 2024-12-17 Outsourced the euclidean distance calculation of `Vertex.distance` to `geomutils.dist4`.
  * @modified 2025-03-24 Making the second parameter `center` of the `Vertex.rotate` method optional.
  * @modified 2025-04-13 Adding the `Vertex.move(amount: XYCoords)` method (does the same as `add`, added by naming convention).
- * @version  2.10.0
+ * @modified 2025-05-07 Class `Vertex` is now implementing interface `IBounded` (to meet convention).
+ * @version  2.11.0
  *
  * @file Vertex
  * @public
@@ -1838,6 +1839,21 @@ class Vertex {
         this.y = Math.abs(this.y);
         return this;
     }
+    //--- BEGIN --- Implement interface `IBounded`
+    /**
+     * Get the bounding box (bounds) of this Vertex.
+     * This is just by convention – any vertex is just a position without any useful with or height (0).
+     *
+     * @method getBounds
+     * @instance
+     * @memberof Vertex
+     * @return {Bounds} The rectangular bounds of this Vertex (width and height are zero).
+     **/
+    getBounds() {
+        // return Bounds.computeFromVertices([this.a, this.b, this.c]);
+        return Bounds.computeFromVertices([this]);
+    }
+    //--- END --- Implement interface `IBounded`
     /**
      * Get a string representation of this vertex.
      *
@@ -2679,7 +2695,9 @@ class Line extends VertTuple {
  * @modified 2025-03-28 Added the `Polygon.lineIntersectionTangents` method.
  * @modified 2025-04-09 Added the `Polygon.getCentroid` method.
  * @modified 2025-05-16 Class `Polygon` now implements `IBounded`.
- * @version 1.15.0
+ * @modified 2025-05-20 Tweaking `Polygon.getInnerAngleAt` and `Polygo.isAngleAcute` to handle indices out of array bounds as well.
+ * @modified 2025-06-07 Adding `Polygon.closestLineIntersectionIndex` to determine line intersections plus detected edge index.
+ * @version 1.16.0
  *
  * @file Polygon
  * @public
@@ -2786,7 +2804,7 @@ class Polygon {
      * @returns {boolean} `true` is angle is acute, `false` is obtuse.
      */
     getInnerAngleAt(vertIndex) {
-        const p2 = this.vertices[vertIndex];
+        const p2 = this.vertices[vertIndex % this.vertices.length];
         const p1 = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
         const p3 = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
         // See
@@ -2822,7 +2840,7 @@ class Polygon {
      */
     isAngleAcute(vertIndex) {
         const A = this.vertices[(vertIndex + this.vertices.length - 1) % this.vertices.length].clone();
-        const B = this.vertices[vertIndex];
+        const B = this.vertices[vertIndex % this.vertices.length];
         const C = this.vertices[(vertIndex + 1) % this.vertices.length].clone();
         // Find local winding number for triangle A B C
         const windingNumber = Triangle.utils.determinant(A, B, C);
@@ -2888,8 +2906,9 @@ class Polygon {
             let xi = this.vertices[i].x, yi = this.vertices[i].y;
             let xj = this.vertices[j].x, yj = this.vertices[j].y;
             var intersect = yi > vert.y != yj > vert.y && vert.x < ((xj - xi) * (vert.y - yi)) / (yj - yi) + xi;
-            if (intersect)
+            if (intersect) {
                 inside = !inside;
+            }
         }
         return inside;
     }
@@ -3099,7 +3118,7 @@ class Polygon {
         // Find the intersections of all lines inside the edge bounds
         return Polygon.utils
             .locateLineIntersecion(line, this.vertices, this.isOpen, inVectorBoundsOnly)
-            .map(intersectionTuple => intersectionTuple.intersectionPoint);
+            .map(intersectionTuple => intersectionTuple.intersection);
     }
     /**
      * Get all line intersections of this polygon and their tangents along the shape.
@@ -3114,10 +3133,29 @@ class Polygon {
         // Find the intersection tangents of all lines inside the edge bounds
         return Polygon.utils.locateLineIntersecion(line, this.vertices, this.isOpen, inVectorBoundsOnly).map(intersectionTuple => {
             const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
-            return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersectionPoint);
+            return new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersection);
         });
     }
     //--- END --- Implement interface `Intersectable`
+    /**
+     * Get all line intersections of this polygon and their tangents along the shape.
+     *
+     * This method returns all intersection tangents (as vectors) with this shape. The returned array of vectors is in no specific order.
+     *
+     * @param line
+     * @param inVectorBoundsOnly
+     * @returns
+     */
+    lineIntersectionTangentsIndices(line, inVectorBoundsOnly = false) {
+        // Find the intersection tangents of all lines inside the edge bounds
+        return Polygon.utils.locateLineIntersecion(line, this.vertices, this.isOpen, inVectorBoundsOnly).map(intersectionTuple => {
+            const polyLine = this.getEdgeAt(intersectionTuple.edgeIndex);
+            return {
+                intersection: new Vector(polyLine.a.clone(), polyLine.b.clone()).moveTo(intersectionTuple.intersection),
+                edgeIndex: intersectionTuple.edgeIndex
+            };
+        });
+    }
     /**
      * Get the closest line-polygon-intersection point (closest the line point A).
      *
@@ -3125,9 +3163,27 @@ class Polygon {
      *
      * @param {VertTuple} line - The line to find intersections with.
      * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are considered (located strictly between start and end vertex).
-     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     * @returns {Vertex | null} - The intersection point within the polygon bounds.
      */
     closestLineIntersection(line, inVectorBoundsOnly = false) {
+        var closestInterSectionIndex = this.closestLineIntersectionIndex(line, inVectorBoundsOnly);
+        if (closestInterSectionIndex) {
+            return closestInterSectionIndex.intersection;
+        }
+        else {
+            return null;
+        }
+    }
+    /**
+     * Get the closest line-polygon-intersection point (closest the line point A) plus the edge index..
+     *
+     * See demo `63-measure-angles-on-polygon` for how it works.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are considered (located strictly between start and end vertex).
+     * @returns {PolygonIntersectionTuple| null} - A pair containing the intersection point and the affected polygon edge index.
+     */
+    closestLineIntersectionIndex(line, inVectorBoundsOnly = false) {
         const allIntersections = this.lineIntersections(line, inVectorBoundsOnly);
         if (allIntersections.length <= 0) {
             // Empty polygon -> no intersections
@@ -3135,17 +3191,20 @@ class Polygon {
         }
         // Find the closest intersection
         let closestIntersection = new Vertex(Number.MAX_VALUE, Number.MAX_VALUE);
+        let closestInterSectionIndex = -1;
         let curDist = Number.MAX_VALUE;
-        for (var i in allIntersections) {
+        for (var i = 0; i < allIntersections.length; i++) {
             const curVert = allIntersections[i];
             const dist = curVert.distance(line.a);
             if (dist < curDist) {
                 // && line.hasPoint(curVert)) {
                 curDist = dist;
                 closestIntersection = curVert;
+                closestInterSectionIndex = i;
             }
         }
-        return closestIntersection;
+        // return [closestIntersection, closestInterSectionIndex];
+        return { edgeIndex: closestInterSectionIndex, intersection: closestIntersection };
     }
     /**
      * Construct a new polygon from this polygon with more vertices on each edge. The
@@ -3503,7 +3562,7 @@ Polygon.utils = {
             if (intersection !== null &&
                 polyLine.hasPoint(intersection, true) &&
                 (!inVectorBoundsOnly || line.hasPoint(intersection, inVectorBoundsOnly))) {
-                intersectionPoints.push({ edgeIndex: i, intersectionPoint: intersection });
+                intersectionPoints.push({ edgeIndex: i, intersection: intersection });
             }
         }
         return intersectionPoints;
@@ -12325,8 +12384,13 @@ VEllipseSector.ellipseSectorUtils = {
  * @modified 2024-07-08 Adding `PlotBoilerplate.getGUI()` to retrieve the GUI instance.
  * @modified 2024-08-25 Extending main class `PlotBoilerplate` optional param `isBackdropFiltersEnabled`.
  * @modified 2024-12-02 Adding the `triggerRedraw` to the `removeAll` method.
+ * @modified 2025-05-07 Changing the return type of `removeVertex` from `void` to `boolean`.
+ * @modified 2025-05-07 Handling content changes now with `contentChangeListeners`.
+ * @modified 2025-05-07 Added `PlogBoilerplate.addContentChangeListener` and `.removeContentChangeListener`.
+ * @modified 2025-05-07 Moving full vectors now by default when vector point a is moved.
+ * @modified 2025-05-20 Applying `lineWith` parameter in the draw routine for vectors (had been missing).
  *
- * @version  1.20.0
+ * @version  1.21.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -12429,6 +12493,10 @@ class PlotBoilerplate {
      */
     constructor(config, drawConfig) {
         var _b, _c;
+        /**
+         * A list of content change listeners.
+         */
+        this.contentChangeListeners = [];
         /**
          * A discrete timestamp to identify single render cycles.
          * Note that using system time milliseconds is not a safe way to identify render frames, as on modern powerful machines
@@ -12817,6 +12885,52 @@ class PlotBoilerplate {
         }
     }
     /**
+     * Adds a new content change listener to this instance. Adding duplicates is not possible.
+     *
+     * @param {PBContentChangeListener} listener - The listenre to add.
+     * @method addContentChangeListener
+     * @instance
+     * @memberof PlotBoilerplate
+     * @returns {void}
+     */
+    addContentChangeListener(listener) {
+        for (var i in this.contentChangeListeners) {
+            if (this.contentChangeListeners[i] === listener) {
+                return;
+            }
+        }
+        this.contentChangeListeners.push(listener);
+    }
+    /**
+     * Removes an existing content change listener from this instance.
+     *
+     * @param {PBContentChangeListener} listener - The listenre to add.
+     * @method removeContentChangeListener
+     * @instance
+     * @memberof PlotBoilerplate
+     * @returns {void}
+     */
+    removeContentChangeListener(listener) {
+        for (var i = 0; i < this.contentChangeListeners.length; i++) {
+            if (this.contentChangeListeners[i] === listener) {
+                this.contentChangeListeners.splice(i, 1);
+                return;
+            }
+        }
+    }
+    _fireContentChanged(addedDrawables, removedDrawables) {
+        for (var i in this.contentChangeListeners) {
+            const listener = this.contentChangeListeners[i];
+            if (listener && typeof listener === "function") {
+                listener({
+                    type: addedDrawables.length > 0 ? "DRAWABLES_ADDED" : "DRAWABLES_REMOVED",
+                    addedDrawables: addedDrawables,
+                    removedDrawables: removedDrawables
+                });
+            }
+        }
+    }
+    /**
      * Add a drawable object.<br>
      * <br>
      * This must be either:<br>
@@ -12840,100 +12954,121 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    add(drawable, redraw) {
+    add(drawable, redraw, doNotFireEvent) {
         if (Array.isArray(drawable)) {
             const arr = drawable;
             for (var i = 0; i < arr.length; i++) {
-                this.add(arr[i], false);
+                this.add(arr[i], false, doNotFireEvent);
             }
-        }
-        else if (drawable instanceof Vertex) {
-            this.drawables.push(drawable);
-            this.vertices.push(drawable);
-        }
-        else if (drawable instanceof Line) {
-            // Add some lines
-            this.drawables.push(drawable);
-            this.vertices.push(drawable.a);
-            this.vertices.push(drawable.b);
-        }
-        else if (drawable instanceof Vector) {
-            this.drawables.push(drawable);
-            this.vertices.push(drawable.a);
-            this.vertices.push(drawable.b);
-        }
-        else if (drawable instanceof VEllipse) {
-            this.vertices.push(drawable.center);
-            this.vertices.push(drawable.axis);
-            this.drawables.push(drawable);
-            drawable.center.listeners.addDragListener((event) => {
-                drawable.axis.add(event.params.dragAmount);
-            });
-        }
-        else if (drawable instanceof VEllipseSector) {
-            this.vertices.push(drawable.ellipse.center);
-            this.vertices.push(drawable.ellipse.axis);
-            this.drawables.push(drawable);
-            drawable.ellipse.center.listeners.addDragListener((event) => {
-                drawable.ellipse.axis.add(event.params.dragAmount);
-            });
-        }
-        else if (drawable instanceof Circle) {
-            this.vertices.push(drawable.center);
-            this.drawables.push(drawable);
-        }
-        else if (drawable instanceof CircleSector) {
-            this.vertices.push(drawable.circle.center);
-            this.drawables.push(drawable);
-        }
-        else if (drawable instanceof Polygon) {
-            this.drawables.push(drawable);
-            for (var i = 0; i < drawable.vertices.length; i++) {
-                this.vertices.push(drawable.vertices[i]);
-            }
-        }
-        else if (drawable instanceof Triangle) {
-            this.drawables.push(drawable);
-            this.vertices.push(drawable.a);
-            this.vertices.push(drawable.b);
-            this.vertices.push(drawable.c);
-        }
-        else if (drawable instanceof BezierPath) {
-            this.drawables.push(drawable);
-            const bezierPath = drawable;
-            for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
-                if (!drawable.adjustCircular && i == 0) {
-                    this.vertices.push(bezierPath.bezierCurves[i].startPoint);
-                }
-                this.vertices.push(bezierPath.bezierCurves[i].endPoint);
-                this.vertices.push(bezierPath.bezierCurves[i].startControlPoint);
-                this.vertices.push(bezierPath.bezierCurves[i].endControlPoint);
-                bezierPath.bezierCurves[i].startControlPoint.attr.selectable = false;
-                bezierPath.bezierCurves[i].endControlPoint.attr.selectable = false;
-            }
-            PlotBoilerplate.utils.enableBezierPathAutoAdjust(drawable);
-        }
-        else if (drawable instanceof PBImage) {
-            this.vertices.push(drawable.upperLeft);
-            this.vertices.push(drawable.lowerRight);
-            this.drawables.push(drawable);
-            // Todo: think about a IDragEvent interface
-            drawable.upperLeft.listeners.addDragListener((e) => {
-                drawable.lowerRight.add(e.params.dragAmount);
-            });
-            drawable.lowerRight.attr.selectable = false;
-        }
-        else if (drawable instanceof PBText) {
-            this.vertices.push(drawable.anchor);
-            this.drawables.push(drawable);
-            drawable.anchor.attr.selectable = false;
+            // !doNotFireEvent && this._fireContentChanged(arr, []);
         }
         else {
-            throw "Cannot add drawable of unrecognized type: " + typeof drawable + ".";
+            const addedDrawables = [drawable];
+            if (drawable instanceof Vertex) {
+                this.drawables.push(drawable);
+                this.vertices.push(drawable);
+            }
+            else if (drawable instanceof Line) {
+                // Add some lines
+                this.drawables.push(drawable);
+                this.vertices.push(drawable.a);
+                this.vertices.push(drawable.b);
+                addedDrawables.push(drawable.a, drawable.b);
+            }
+            else if (drawable instanceof Vector) {
+                this.drawables.push(drawable);
+                this.vertices.push(drawable.a);
+                this.vertices.push(drawable.b);
+                addedDrawables.push(drawable.a, drawable.b);
+                drawable.a.listeners.addDragListener((event) => {
+                    drawable.b.add(event.params.dragAmount);
+                });
+            }
+            else if (drawable instanceof VEllipse) {
+                this.vertices.push(drawable.center);
+                this.vertices.push(drawable.axis);
+                addedDrawables.push(drawable.center, drawable.axis);
+                this.drawables.push(drawable);
+                drawable.center.listeners.addDragListener((event) => {
+                    drawable.axis.add(event.params.dragAmount);
+                });
+            }
+            else if (drawable instanceof VEllipseSector) {
+                this.vertices.push(drawable.ellipse.center);
+                this.vertices.push(drawable.ellipse.axis);
+                addedDrawables.push(drawable.ellipse.center, drawable.ellipse.axis);
+                this.drawables.push(drawable);
+                drawable.ellipse.center.listeners.addDragListener((event) => {
+                    drawable.ellipse.axis.add(event.params.dragAmount);
+                });
+            }
+            else if (drawable instanceof Circle) {
+                this.vertices.push(drawable.center);
+                addedDrawables.push(drawable.center);
+                this.drawables.push(drawable);
+            }
+            else if (drawable instanceof CircleSector) {
+                this.vertices.push(drawable.circle.center);
+                addedDrawables.push(drawable.circle.center);
+                this.drawables.push(drawable);
+            }
+            else if (drawable instanceof Polygon) {
+                this.drawables.push(drawable);
+                for (var i = 0; i < drawable.vertices.length; i++) {
+                    this.vertices.push(drawable.vertices[i]);
+                    addedDrawables.push(drawable.vertices[i]);
+                }
+            }
+            else if (drawable instanceof Triangle) {
+                this.drawables.push(drawable);
+                this.vertices.push(drawable.a);
+                this.vertices.push(drawable.b);
+                this.vertices.push(drawable.c);
+                addedDrawables.push(drawable.a, drawable.b, drawable.c);
+            }
+            else if (drawable instanceof BezierPath) {
+                this.drawables.push(drawable);
+                const bezierPath = drawable;
+                for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
+                    if (!drawable.adjustCircular && i == 0) {
+                        this.vertices.push(bezierPath.bezierCurves[i].startPoint);
+                        addedDrawables.push(bezierPath.bezierCurves[i].startPoint);
+                    }
+                    this.vertices.push(bezierPath.bezierCurves[i].endPoint);
+                    this.vertices.push(bezierPath.bezierCurves[i].startControlPoint);
+                    this.vertices.push(bezierPath.bezierCurves[i].endControlPoint);
+                    addedDrawables.push(bezierPath.bezierCurves[i].endPoint, bezierPath.bezierCurves[i].startControlPoint, bezierPath.bezierCurves[i].endControlPoint);
+                    bezierPath.bezierCurves[i].startControlPoint.attr.selectable = false;
+                    bezierPath.bezierCurves[i].endControlPoint.attr.selectable = false;
+                }
+                PlotBoilerplate.utils.enableBezierPathAutoAdjust(drawable);
+            }
+            else if (drawable instanceof PBImage) {
+                this.vertices.push(drawable.upperLeft);
+                this.vertices.push(drawable.lowerRight);
+                addedDrawables.push(drawable.upperLeft, drawable.lowerRight);
+                this.drawables.push(drawable);
+                // Todo: think about a IDragEvent interface
+                drawable.upperLeft.listeners.addDragListener((e) => {
+                    drawable.lowerRight.add(e.params.dragAmount);
+                });
+                drawable.lowerRight.attr.selectable = false;
+            }
+            else if (drawable instanceof PBText) {
+                this.vertices.push(drawable.anchor);
+                addedDrawables.push(drawable.anchor);
+                this.drawables.push(drawable);
+                drawable.anchor.attr.selectable = false;
+            }
+            else {
+                throw "Cannot add drawable of unrecognized type: " + typeof drawable + ".";
+            }
+            !doNotFireEvent && this._fireContentChanged(addedDrawables, []);
         }
         // This is a workaround for backwards compatibility when the 'redraw' param was not yet present.
-        if (redraw || typeof redraw == "undefined")
+        if (redraw || typeof redraw == "undefined") {
             this.redraw();
+        }
     }
     /**
      * Remove a drawable object.<br>
@@ -12953,88 +13088,113 @@ class PlotBoilerplate {
      *
      * @param {Drawable|Array<Drawable>} drawable - The drawable (of one of the allowed class instance) to remove.
      * @param {boolean} [redraw=false]
+     * @param {removeWidth}
      * @method remove
      * @instance
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    remove(drawable, redraw, removeWithVertices) {
+    remove(drawable, redraw, removeWithVertices, doNotFireEvent) {
         if (Array.isArray(drawable)) {
+            const removedDrawables = [];
             for (var i = 0; i < drawable.length; i++) {
-                this.remove(drawable[i], false, removeWithVertices);
+                if (this.remove(drawable[i], false, removeWithVertices, true)) {
+                    removedDrawables.push(drawable[i]);
+                }
             }
             if (redraw) {
                 this.redraw();
             }
-            return;
+            !doNotFireEvent && this._fireContentChanged([], removedDrawables);
+            return removedDrawables.length > 0;
         }
         if (drawable instanceof Vertex) {
-            this.removeVertex(drawable, false);
+            const wasRemoved = this.removeVertex(drawable, false, false);
             if (redraw) {
                 this.redraw();
             }
+            !doNotFireEvent && this._fireContentChanged([], [drawable]);
+            return wasRemoved;
         }
+        let wasRemoved = false;
+        const removedDrawables = [];
         for (var i = 0; i < this.drawables.length; i++) {
             if (this.drawables[i] === drawable || this.drawables[i].uid === drawable.uid) {
                 this.drawables.splice(i, 1);
+                removedDrawables.push(drawable);
                 if (removeWithVertices) {
                     // Check if some listeners need to be removed
                     if (drawable instanceof Line) {
                         // Add some lines
-                        this.removeVertex(drawable.a, false);
-                        this.removeVertex(drawable.b, false);
+                        this.removeVertex(drawable.a, false, true);
+                        this.removeVertex(drawable.b, false, true);
+                        removedDrawables.push(drawable.a, drawable.b);
                     }
                     else if (drawable instanceof Vector) {
-                        this.removeVertex(drawable.a, false);
-                        this.removeVertex(drawable.b, false);
+                        this.removeVertex(drawable.a, false, true);
+                        this.removeVertex(drawable.b, false, true);
+                        removedDrawables.push(drawable.a, drawable.b);
                     }
                     else if (drawable instanceof VEllipse) {
-                        this.removeVertex(drawable.center, false);
-                        this.removeVertex(drawable.axis, false);
+                        this.removeVertex(drawable.center, false, true);
+                        this.removeVertex(drawable.axis, false, true);
+                        removedDrawables.push(drawable.center, drawable.axis);
                     }
                     else if (drawable instanceof VEllipseSector) {
-                        this.removeVertex(drawable.ellipse.center);
-                        this.removeVertex(drawable.ellipse.axis);
+                        this.removeVertex(drawable.ellipse.center, false, true);
+                        this.removeVertex(drawable.ellipse.axis, false, true);
+                        removedDrawables.push(drawable.ellipse.center, drawable.ellipse.axis);
                     }
                     else if (drawable instanceof Circle) {
-                        this.removeVertex(drawable.center, false);
+                        this.removeVertex(drawable.center, false, true);
                     }
                     else if (drawable instanceof CircleSector) {
-                        this.removeVertex(drawable.circle.center, false);
+                        this.removeVertex(drawable.circle.center, false, true);
+                        removedDrawables.push(drawable.circle.center);
                     }
                     else if (drawable instanceof Polygon) {
                         // for( var i in drawable.vertices )
-                        for (var i = 0; i < drawable.vertices.length; i++)
-                            this.removeVertex(drawable.vertices[i], false);
+                        for (var i = 0; i < drawable.vertices.length; i++) {
+                            this.removeVertex(drawable.vertices[i], false, true);
+                            removedDrawables.push(drawable.vertices[i]);
+                        }
                     }
                     else if (drawable instanceof Triangle) {
-                        this.removeVertex(drawable.a, false);
-                        this.removeVertex(drawable.b, false);
-                        this.removeVertex(drawable.c, false);
+                        this.removeVertex(drawable.a, false, true);
+                        this.removeVertex(drawable.b, false, true);
+                        this.removeVertex(drawable.c, false, true);
+                        removedDrawables.push(drawable.a, drawable.b, drawable.c);
                     }
                     else if (drawable instanceof BezierPath) {
                         for (var i = 0; i < drawable.bezierCurves.length; i++) {
-                            this.removeVertex(drawable.bezierCurves[i].startPoint, false);
-                            this.removeVertex(drawable.bezierCurves[i].startControlPoint, false);
-                            this.removeVertex(drawable.bezierCurves[i].endControlPoint, false);
+                            this.removeVertex(drawable.bezierCurves[i].startPoint, false, true);
+                            this.removeVertex(drawable.bezierCurves[i].startControlPoint, false, true);
+                            this.removeVertex(drawable.bezierCurves[i].endControlPoint, false, true);
+                            removedDrawables.push(drawable.bezierCurves[i].startPoint, drawable.bezierCurves[i].startControlPoint, drawable.bezierCurves[i].endControlPoint);
                             if (i + 1 == drawable.bezierCurves.length) {
-                                this.removeVertex(drawable.bezierCurves[i].endPoint, false);
+                                this.removeVertex(drawable.bezierCurves[i].endPoint, false, true);
+                                removedDrawables.push(drawable.bezierCurves[i].endPoint);
                             }
                         }
                     }
                     else if (drawable instanceof PBImage) {
-                        this.removeVertex(drawable.upperLeft, false);
-                        this.removeVertex(drawable.lowerRight, false);
+                        this.removeVertex(drawable.upperLeft, false, true);
+                        this.removeVertex(drawable.lowerRight, false, true);
+                        removedDrawables.push(drawable.upperLeft, drawable.lowerRight);
                     }
                     else if (drawable instanceof PBText) {
-                        this.removeVertex(drawable.anchor, false);
+                        this.removeVertex(drawable.anchor, false, true);
+                        removedDrawables.push(drawable.anchor);
                     }
                 } // END removeWithVertices
                 if (redraw) {
                     this.redraw();
                 }
-            }
-        }
+                !doNotFireEvent && this._fireContentChanged([], removedDrawables);
+                wasRemoved = true;
+            } // END if
+        } // END for
+        return wasRemoved;
     }
     /**
      * Remove a vertex from the vertex list.<br>
@@ -13044,18 +13204,20 @@ class PlotBoilerplate {
      * @method removeVertex
      * @instance
      * @memberof PlotBoilerplate
-     * @return {void}
+     * @return {boolean}
      **/
-    removeVertex(vert, redraw) {
+    removeVertex(vert, redraw, doNotFireEvent) {
         for (var i = 0; i < this.vertices.length; i++) {
             if (this.vertices[i] === vert) {
                 this.vertices.splice(i, 1);
                 if (redraw) {
                     this.redraw();
                 }
-                return;
+                !doNotFireEvent && this._fireContentChanged([], [vert]);
+                return true;
             }
         }
+        return false;
     }
     /**
      * Remove all elements.
@@ -13070,13 +13232,16 @@ class PlotBoilerplate {
      * @return {void}
      */
     removeAll(keepVertices, triggerRedraw) {
+        let removedDrawables = this.drawables;
         this.drawables = [];
         if (!Boolean(keepVertices)) {
+            removedDrawables = removedDrawables.concat(this.vertices);
             this.vertices = [];
         }
         if (triggerRedraw || typeof triggerRedraw === "undefined") {
             this.redraw();
         }
+        removedDrawables.length > 0 && this._fireContentChanged([], removedDrawables);
     }
     /**
      * Find the vertex near the given position.
@@ -13331,7 +13496,7 @@ class PlotBoilerplate {
                 d.b.attr.renderTime = renderTime;
         }
         else if (d instanceof Vector) {
-            draw.arrow(d.a, d.b, this.drawConfig.vector.color);
+            draw.arrow(d.a, d.b, this.drawConfig.vector.color, this.drawConfig.vector.lineWidth);
             if (this.drawConfig.drawHandlePoints && d.b.attr.selectable && d.b.attr.visible) {
                 draw.setCurrentId(`${d.uid}_h0`);
                 draw.setCurrentClassName(`${d.className}-handle`);

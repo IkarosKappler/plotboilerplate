@@ -25,7 +25,10 @@
  * @modified 2025-04-14 Added the `BezierPathInteractionHelper.drawHandleLines` method.
  * @modified 2025-04-14 Fixing correct event types for touch events in `BezierPathInteractionHelper`.
  * @modified 2025-04-14 BezierPathInteractionHelper: Changed default value of `HelperOptions.autoAdjustPaths` from `true` to `false`.
- * @version  1.2.0
+ * @modified 2025-05-05 Added optional params `draw` and `fill` to BezierPathInteractionHelper.drawHandleLines` method.
+ * @modified 2025-05-05 Class `BezierPathInteractionHelper` now implementing `IShapeInteractionHelper`.
+ * @modified 2025-05-07 Tweaking performance of `BezierPathInteractionHelper`: only triggering redraw now when mouse move within given detect range.
+ * @version  1.2.1
  *
  * @file BezierPathInteractionHelper
  * @public
@@ -42,7 +45,7 @@ import { PlotBoilerplate } from "../../PlotBoilerplate";
 import { VertListener } from "../../VertexListeners";
 import { Vertex } from "../../Vertex";
 import { XMouseEvent } from "../../MouseHandler";
-import { DrawLib, XYCoords } from "../../interfaces";
+import { DrawLib, IShapeInteractionHelper, XYCoords } from "../../interfaces";
 import { AFTouchEvent } from "alloyfinger-typescript/src/cjs/alloy_finger";
 
 /**
@@ -91,7 +94,7 @@ interface HelperOptions {
  *
  * @public
  **/
-export class BezierPathInteractionHelper {
+export class BezierPathInteractionHelper implements IShapeInteractionHelper {
   /**
    * @member {PlotBoilerplate} pb
    * @memberof BezierPathInteractionHelper
@@ -273,8 +276,12 @@ export class BezierPathInteractionHelper {
   /**
    * Draw grey handle lines.
    *
+   * @param {DrawLib<any>} draw - (optional) The draw library to use. If not provided then `pb.draw` will be used.
+   * @param {DrawLib<any>} fill - (optional) The fill library to use. If not provided then `pb.fill` will be used.
    */
-  drawHandleLines() {
+  drawHandleLines(draw?: DrawLib<any>, fill?: DrawLib<any>) {
+    draw = draw || this.pb.draw;
+    fill = fill || this.pb.fill;
     this.paths.forEach((path: BezierPath) => {
       path.bezierCurves.forEach((curve: CubicBezierCurve) => {
         this.pb.draw.line(curve.startPoint, curve.startControlPoint, "rgba(64,192,128,0.333)", 1.0, {
@@ -434,6 +441,9 @@ export class BezierPathInteractionHelper {
   // | Touch and mouse events should call this fuction when the pointer was moved.
   // +-------------------------------
   private _handleMoveEvent(posX: number, posY: number): void {
+    const oldA = this.currentA.clone();
+    const oldB = this.currentB.clone();
+    const oldDistance = this.currentDistance;
     const point: XYCoords = this.pb.transformMousePosition(posX, posY);
     this.currentB.set(point);
     this._updateMinDistance();
@@ -443,8 +453,14 @@ export class BezierPathInteractionHelper {
     } else {
       this.onPointerMoved(-1, null, null, 0.0);
     }
-    // Always redraw even when moving outside the detection distance?
-    this.pb.redraw();
+    // Only redraw when moving inside the detection distance
+    if (
+      (this.currentDistance <= this.maxDetectDistance ||
+        (this.currentDistance > this.maxDetectDistance && oldDistance <= this.maxDetectDistance)) &&
+      (!oldA.equals(this.currentA) || !oldB.equals(this.currentB))
+    ) {
+      this.pb.redraw();
+    }
   }
 
   // +---------------------------------------------------------------------------------
@@ -462,23 +478,15 @@ export class BezierPathInteractionHelper {
   private _installTouchListener(): AlloyFinger {
     var _self: BezierPathInteractionHelper = this;
     const afProps = {
-      // Todo: which event types does AlloyFinger use?
-      // touchStart: function (_event: TouchEvent) {
-      //   _self.mouseIsOver = true;
-      // },
-      // /* TouchMoveEvent , AFTouchEvent<"touchStart"> */
       touchStart: function (_event: AFTouchEvent<"touchStart">) {
         _self.mouseIsOver = true;
       },
       touchMove: function (event: AFTouchEvent<"touchMove">) {
-        // TouchEvent) {
         if (_self.pb.getDraggedElementCount() == 0 && event.touches.length > 0) {
-          // console.log('touchmove');
           _self._handleMoveEvent(event.touches[0].clientX, event.touches[0].clientY);
         }
       },
       touchEnd: function (_event: AFTouchEvent<"touchEnd">) {
-        // TouchEvent) {
         _self.mouseIsOver = false;
         _self._clearMoveEvent();
       }
@@ -571,7 +579,9 @@ export class BezierPathInteractionHelper {
   // | Update the min distance from point `line.b` to the curve. And redraw.
   // +-------------------------------
   private _updateMinDistance(): void {
-    if (this.paths.length == 0) return;
+    if (this.paths.length == 0) {
+      return;
+    }
     let pathIndex: number = -1;
     let minDist: number = Number.MAX_VALUE;
     let closestPoint: Vertex | null = null;

@@ -58,7 +58,9 @@ often use for the visualization of 2D geometries. Basic features are
   - drag and select elements
 - keyboard interaction customizable
 
-The compressed library has 135kb.
+The compressed library has 159kb.
+It once has been my aim to keep the base library less than 80kb – but the more powerful the lib gets
+the more difficult this turned out.
 
 ## Install the package via npm
 
@@ -342,6 +344,14 @@ var pb = new PlotBoilerplate({
     console.log("after drawing.");
   },
 
+  // function
+  //   A callback function that will be triggered after content changed.
+  onContentChanged: function (event) {
+    console.log("Event type (DRAWABLES_ADDED or DRAWABLES_REMOVED)", event.type);
+    console.log("Added drawables:", event.addedDrawables);
+    console.log("Removed drawables:", event.removedDrawables);
+  },
+
   // boolean
   //   Indicates if the application should handle mouse events for you.
 
@@ -564,6 +574,8 @@ new MouseHandler(document.getElementById("mycanvas"))
 - And _Particle in Cell Consulting LLC_ for refactoring Stephen Schmitt's solution: [Computing Intersections Between a Cubic Bezier Curve and a Line](https://www.particleincell.com/2013/cubic-line-intersection/)
 - Richard "RM" for the hints of how to calculate the bounding box of cubic Bézuer curves: [Bezier Area](https://jsfiddle.net/SalixAlba/QQnvm/4/)
 - [Cuixiping](https://stackoverflow.com/users/988089/cuixiping) for the helpful insights on cubic Bézier bounds at [Stackoverflow](https://stackoverflow.com/questions/24809978/calculating-the-bounding-box-of-cubic-bezier-curve)
+- Thanks to Ana Tudor for the Multi-Range-Slider tutorial: https://css-tricks.com/multi-thumb-sliders-particular-two-thumb-case/
+- Thanks to Dean Taylor for the css linear gradient parser howto: https://stackoverflow.com/questions/20215440/parse-css-gradient-rule-with-javascript-regex
 
 ## Todos
 

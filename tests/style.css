@@ -1,3 +1,7 @@
+body {
+  background-color: darkgrey;
+}
+
 .color-wrapper {
   width: 100%;
   border: 1px solid black;
@@ -52,4 +56,12 @@
 .center-h {
   display: flex;
   align-items: center;
+}
+
+.red {
+  color: red;
+}
+
+.green {
+  color: green;
 }

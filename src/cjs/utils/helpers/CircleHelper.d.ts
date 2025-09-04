@@ -10,14 +10,17 @@
  * @modified 2024-02-26 Removed the constructor param `pb` (unused).
  * @modified 2024-02-25 Added `circle` and `radiusPoint` attributes.
  * @modified 2024-03-10 Fixed some issues in the `destroy` method; listeners were not properly removed.
+ * @modified 2025-05-05 Class `BezierPathInteractionHelper` now implementing `IShapeInteractionHelper`.
  * @version  1.2.1
  **/
 import { Circle } from "../../Circle";
 import { Vertex } from "../../Vertex";
+import { IShapeInteractionHelper } from "../../interfaces/core";
+import { DrawLib } from "../../interfaces/DrawLib";
 /**
  * @classdesc A helper for handling circles with an additional radius-control-point.
  */
-export declare class CircleHelper {
+export declare class CircleHelper implements IShapeInteractionHelper {
     circle: Circle;
     radiusPoint: Vertex;
     private centerHandler;
@@ -32,6 +35,12 @@ export declare class CircleHelper {
      * @param {PlotBoilerplate} pb - The PlotBoilerplate which contains the circle and point.
      **/
     constructor(circle: Circle, radiusPoint: Vertex);
+    /**
+     * Let this shape helper draw it's handle lines. It's up to the helper what they look like.
+     * @param {DrawLib<any>} draw - The draw library to use.
+     * @param {DrawLib<any>} fill - The fill library to use.
+     */
+    drawHandleLines(_draw: DrawLib<any>, _fill: DrawLib<any>): void;
     /**
      * Destroy this circle helper.
      * The listeners will be removed from the circle points.
