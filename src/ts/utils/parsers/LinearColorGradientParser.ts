@@ -268,7 +268,7 @@ export class LinearColorGradientParser {
         // Try to auto-fill undefined positions by their index in the list.
         ratio = i / (result.colorStopList.length - 1);
       } else {
-        ratio = positionConverter(stopListItem.position);
+        ratio = converter(stopListItem.position);
       }
       colorStops.push({ color: color, ratio: ratio });
     }

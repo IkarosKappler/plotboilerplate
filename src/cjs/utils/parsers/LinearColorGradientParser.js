@@ -1,4 +1,16 @@
 "use strict";
+/**
+ * A CSS gradient string parser.
+ *
+ * Source:
+ *  https://stackoverflow.com/questions/20215440/parse-css-gradient-rule-with-javascript-regex
+ * Thanks to Dean Taylor
+ *
+ * @date           2025-09-04
+ * @OriginalAuthor Dean Taylor
+ * @RefactoredBy   Ikaros Kappler, ported to Typescript.
+ * @version        1.0.0
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LinearColorGradientParser = exports.__parseGradient = exports.DefaultPositionConverter = void 0;
 var Color_1 = require("../datastructures/Color");
@@ -184,7 +196,7 @@ var LinearColorGradientParser = /** @class */ (function () {
                 ratio = i / (result.colorStopList.length - 1);
             }
             else {
-                ratio = positionConverter(stopListItem.position);
+                ratio = converter(stopListItem.position);
             }
             colorStops.push({ color: color, ratio: ratio });
         }
