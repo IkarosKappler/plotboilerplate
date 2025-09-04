@@ -1,3 +1,16 @@
+/**
+ * A CSS gradient string parser.
+ *
+ * Source:
+ *  https://stackoverflow.com/questions/20215440/parse-css-gradient-rule-with-javascript-regex
+ * Thanks to Dean Taylor
+ *
+ * @date           2025-09-04
+ * @OriginalAuthor Dean Taylor
+ * @RefactoredBy   Ikaros Kappler, ported to Typescript.
+ * @version        1.0.0
+ */
+
 import { Color } from "../datastructures/Color";
 import { ColorGradient, ColorGradientItem, ColorGradientRotation } from "../datastructures/ColorGradient";
 
