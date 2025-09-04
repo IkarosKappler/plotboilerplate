@@ -142,6 +142,9 @@ var ColorGradientPicker = /** @class */ (function () {
             node.removeChild(node.lastChild);
         }
     };
+    // +---------------------------------------------------------------------------------
+    // | Used during initialization: define dataset values for each slider.
+    // +-------------------------------
     ColorGradientPicker.prototype.__initializeDataSets = function () {
         for (var i = 0; i < this._sliderElementRefs.length; i++) {
             var sliderColor = this.colorGradient.values[i].color;
@@ -179,6 +182,9 @@ var ColorGradientPicker = /** @class */ (function () {
         }
         return false;
     };
+    /**
+     * Fires a change event to all installed listeners.
+     */
     ColorGradientPicker.prototype.__fireChangeEvent = function () {
         var newColorGradient = this.getColorGradient();
         for (var i = 0; i < this.installedChangeListeners.length; i++) {
@@ -321,7 +327,7 @@ var ColorGradientPicker = /** @class */ (function () {
             // Check if element was moved in the meantime
             if (_self.__mouseDownPosition && Math.abs(_self.__mouseDownPosition.x - evt.clientX) >= 10.0) {
                 // Ignore event if mouse was moved more than 10 pixels between down- and up-event
-                console.log("Mouse was moved more than 10 px. Cancelling.");
+                // console.log("Mouse was moved more than 10 px. Cancelling.");
                 _self.__mouseDownPosition = null;
                 return;
             }

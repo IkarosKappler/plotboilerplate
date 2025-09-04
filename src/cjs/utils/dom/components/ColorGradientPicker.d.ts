@@ -61,6 +61,9 @@ export declare class ColorGradientPicker {
      * @returns {boolean} True, if the listener existed and has been removed.
      */
     removeChangeListener(listener: ColorGradientChangeListener): boolean;
+    /**
+     * Fires a change event to all installed listeners.
+     */
     private __fireChangeEvent;
     /**
      * Creates a new color range input element.

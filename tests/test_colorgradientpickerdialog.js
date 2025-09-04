@@ -6,13 +6,6 @@ window.addEventListener("load", function () {
   var params = new Params(GUP);
   var isMobile = isMobileDevice();
   var showDebugOptions = false;
-  // if (params.hasParam("isMobile")) {
-  //   if (params.getBoolean("isMobile", true) === false) {
-  //     isMobile = false;
-  //   } else if (params.getBoolean("isMobile", false) === true) {
-  //     isMobile = true;
-  //   }
-  // }
   isMobile = params.getBoolean("isMobile", isMobile);
   var showDebugOptions = params.getBoolean("showDebugOptions", false);
 
