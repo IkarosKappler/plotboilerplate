@@ -462,7 +462,7 @@ export class ColorGradientPicker {
         const sliderRef = this._sliderElementRefs[newSliderIndex];
         leftSlider.after(sliderRef.current);
         sliderRef.current.dataset.colorValue = newColor.cssRGB();
-        sliderRef.current.dataset.colorValueHEX = newColor.cssRGB();
+        sliderRef.current.dataset.colorValueHEX = newColor.cssHEX();
         // No visible change, but let's reflect this in the output gradient anyway
         this.__updateBackgroundGradient();
         // Highlight the newly added range slider
