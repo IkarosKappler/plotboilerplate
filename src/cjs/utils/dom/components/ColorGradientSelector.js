@@ -30,6 +30,7 @@ var ColorGradientSelector = /** @class */ (function () {
         this.css_buttonWidth = "100px";
         this.css_buttonHeight = "1.8em";
         this.css_buttonFontSize = "0.725em";
+        this.css_buttonFontSize_larger = "1.0em";
         this.colorGradients = [];
         // TODO: this does not really need to be a pair, does it?
         this.colorGradientOptionRefs = [];
@@ -61,6 +62,7 @@ var ColorGradientSelector = /** @class */ (function () {
             this.css_buttonWidth = "200px";
             this.css_buttonHeight = "2.5em";
             this.css_buttonFontSize = "1.25em";
+            this.css_buttonFontSize_larger = "1.45em";
         }
         this.baseID = Math.floor(Math.random() * 65535);
         this.elementID = "color-gradient-selector-".concat(this.baseID);
@@ -301,7 +303,7 @@ var ColorGradientSelector = /** @class */ (function () {
                     maxHeight: this.css_buttonHeight
                 }, onClick: this.__mainButtonClickHandler() },
                 NoReact.createElement("div", { className: "main-button-gradient-display", sx: { w: "calc( 100% - ".concat(this.css_buttonFontSize, " )"), background: selectedGradient.toColorGradientString() } }, "\u00A0"),
-                NoReact.createElement("div", { sx: { w: this.css_buttonHeight, flexShrink: 2, fontSize: this.css_buttonFontSize } }, "\u25BE")),
+                NoReact.createElement("div", { sx: { w: this.css_buttonHeight, flexShrink: 2, fontSize: this.css_buttonFontSize_larger } }, "\u25BE")),
             NoReact.createElement("div", { className: "positioning-container", ref: this.positioningContainerRef, style: {
                     minWidth: this.css_buttonWidth,
                     maxHeight: "25vh",

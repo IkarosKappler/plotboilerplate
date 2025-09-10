@@ -873,13 +873,14 @@ export class ColorGradientPicker {
         color: darkorange;
     }
 
-    #${this.elementID} .color-remove-button {    
-      background-color: grey;
-    }
-
     body.darkmode #${this.elementID} .color-remove-button {    
       background-color: #1e2937;
       color: grey;
+    }
+
+    body.darkmode #${this.elementID} .color-remove-button:hover,
+    body.darkmode #${this.elementID} .color-remove-button:active {    
+      background-color: rgba(216,216,216,0.9);
     }
 
     `}</style>

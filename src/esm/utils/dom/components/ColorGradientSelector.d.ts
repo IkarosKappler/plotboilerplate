@@ -31,6 +31,7 @@ export declare class ColorGradientSelector {
     private css_buttonWidth;
     private css_buttonHeight;
     private css_buttonFontSize;
+    private css_buttonFontSize_larger;
     private colorGradients;
     private colorGradientOptionRefs;
     private selectedGradientIndex;
