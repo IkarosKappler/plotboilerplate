@@ -428,7 +428,11 @@ export class ColorGradientSelector {
     #${this.elementID} button {
       border: 0px solid lightgray;
       padding: 0.25em;
-      background-color: rgba(255,255,255,0.9);
+      /* background-color: rgba(255,255,255,0.9); */
+    }
+
+    #${this.elementID} .positioning-container button {
+      border-radius: 0;
     }
 
     #${this.elementID} .main-button:hover {
@@ -438,6 +442,7 @@ export class ColorGradientSelector {
     #${this.elementID} .option-gradient-button:hover, #${this.elementID} .option-delete-button:hover {
       background-color: rgba(216,216,216,0.9);
     }
+
 
     `}</style>
     );

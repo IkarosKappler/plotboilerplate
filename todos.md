@@ -1,5 +1,6 @@
 ## Todos
 
+- Remove duplicate script tags for 'detectDarkMode'.
 - Create a helper for triangles.
 - Resize/bestfit seems to fail in Firefoxe's dark mode (plugin).
 - Extend demo 07-voronoi: "randomize" could be a smooth transition :)

@@ -7,9 +7,10 @@
  * to get this running: NoReact.
  *
  *
- * @author  Ikaros Kappler
- * @date    2025-06-27
- * @version 1.0.0
+ * @author   Ikaros Kappler
+ * @date     2025-06-27
+ * @modified 2025-09-10 Fixing a color select bug on MacOS.
+ * @version  1.0.0
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ColorGradientPicker = void 0;

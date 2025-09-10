@@ -2,30 +2,33 @@
 <html class="fullscreen">
   <head>
     <title>2D Plotting Boilerplate – An extended demo how to import SVG path data</title>
-    <meta charset="UTF-8">
-    <meta name="description" content="A demo about how SVG path imports work with PlotBoilerplate.js.">
-    <meta name="keywords" content="plotboilerplate, Vertex, usage, howto, docs, documentation, circle, line, intersection">
-    <meta name="author" content="Ikaros Kappler">
-    <meta name="date" content="2022-11-06">
-    <meta name="docinfo" content="Change the value of 't' using the interface and see how the orthogonal line changes.">
+    <meta charset="UTF-8" />
+    <meta name="description" content="A demo about how SVG path imports work with PlotBoilerplate.js." />
+    <meta name="keywords" content="plotboilerplate, Vertex, usage, howto, docs, documentation, circle, line, intersection" />
+    <meta name="author" content="Ikaros Kappler" />
+    <meta name="date" content="2022-11-06" />
+    <meta name="docinfo" content="Change the value of 't' using the interface and see how the orthogonal line changes." />
 
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="@humanearthpig">
-    <meta name="twitter:creator" content="@humanearthpig">
-    <meta property="og:url" content="https://www.plotboilerplate.de">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="A demo about how SVG path imports work with PlotBoilerplate.js.">
-    <meta property="og:description" content="An extended demo how SVG path imports work with PlotBoilerplate.js.">
-    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20230103-svg-path-import-logo.png">
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@humanearthpig" />
+    <meta name="twitter:creator" content="@humanearthpig" />
+    <meta property="og:url" content="https://www.plotboilerplate.de" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="A demo about how SVG path imports work with PlotBoilerplate.js." />
+    <meta property="og:description" content="An extended demo how SVG path imports work with PlotBoilerplate.js." />
+    <meta
+      property="og:image"
+      content="https://plotboilerplate.io/repo/screenshots/screenshot-20230103-svg-path-import-logo.png"
+    />
 
     <!-- Polyfills for IE -->
-    <script src="../../lib/globalthis-polyfill.min.js"></script> 
+    <script src="../../lib/globalthis-polyfill.min.js"></script>
     <script src="../../lib/path2d-polyfill.min.js"></script>
 
     <!-- A modal -->
     <script src="../modal.js"></script>
-    <link rel="stylesheet" href="../modal.css">
-    
+    <link rel="stylesheet" href="../modal-modern.css" />
+
     <!-- Load thirdparty libraries -->
     <script src="../../src/cjs/utils/module.js"></script>
     <script src="../../lib/lil-gui-0.19.min.js"></script>
@@ -45,22 +48,20 @@
     <!-- For production -->
     <script src="../../dist/plotboilerplate.min.js"></script>
     <!-- END For production -->
-    
+
     <script src="../../src/cjs/utils/datastructures/Color.js"></script>
     <script src="../../src/cjs/utils/algorithms/getContrastColor.js"></script>
-    <script src="../detectDarkMode.js"></script>
     <!-- <script src="_splitSVGPathData.js"></script>
     <script src="_parseSVGPathData.js"></script> -->
     <script src="../../src/cjs/utils/parsers/svg/splitSVGPathData.js"></script>
     <script src="../../src/cjs/utils/parsers/svg/parseSVGPathData.js"></script>
     <script src="index.js"></script>
-    <link rel="stylesheet" type="text/css" media="screen" href="../style.css"> 
-    <link rel="stylesheet" href="../modal.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="../style.css" />
+    <link rel="stylesheet" href="../modal-modern.css" />
   </head>
   <body class="fullscreen">
-    <input type="file" name="file" id="file" data-type="image-upload" style="display: none;">
+    <input type="file" name="file" id="file" data-type="image-upload" style="display: none" />
 
     <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
-
   </body>
 </html>

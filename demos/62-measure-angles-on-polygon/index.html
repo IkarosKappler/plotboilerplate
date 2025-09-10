@@ -1,21 +1,32 @@
 <!DOCTYPE html>
 <html class="fullscreen">
   <head>
-    <title>2D Plotting Boilerplate – Demonstrating intersection angle calculation of polygons and rays with PlotBoilerplate</title>
-    <meta charset="UTF-8">
-    <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
-    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, bezier, polygon, shape, path, line, curve">
-    <meta name="author" content="Ikaros Kappler">
-    <meta name="date" content="2025-05-20">
+    <title>
+      2D Plotting Boilerplate – Demonstrating intersection angle calculation of polygons and rays with PlotBoilerplate
+    </title>
+    <meta charset="UTF-8" />
+    <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff." />
+    <meta
+      name="keywords"
+      content="2D painting and plotting, javascript, canvas, context2d, draw, fill, bezier, polygon, shape, path, line, curve"
+    />
+    <meta name="author" content="Ikaros Kappler" />
+    <meta name="date" content="2025-05-20" />
 
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="@humanearthpig">
-    <meta name="twitter:creator" content="@humanearthpig">
-    <meta property="og:url" content="https://www.plotboilerplate.de">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Demonstrating intersection angle calculation of polygons and rays with PlotBoilerplate">
-    <meta property="og:description" content="Demonstrating intersection angle calculation of polygons and rays with PlotBoilerplate">
-    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20250607-itersection-angles-of-polygon-0.png">
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@humanearthpig" />
+    <meta name="twitter:creator" content="@humanearthpig" />
+    <meta property="og:url" content="https://www.plotboilerplate.de" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Demonstrating intersection angle calculation of polygons and rays with PlotBoilerplate" />
+    <meta
+      property="og:description"
+      content="Demonstrating intersection angle calculation of polygons and rays with PlotBoilerplate"
+    />
+    <meta
+      property="og:image"
+      content="https://plotboilerplate.io/repo/screenshots/screenshot-20250607-itersection-angles-of-polygon-0.png"
+    />
 
     <!-- Demo meta helper -->
     <script src="../../lib/marked.min.js"></script>
@@ -23,7 +34,7 @@
     <script src="../randomEllipseSector.js"></script>
 
     <!-- Polyfills for IE -->
-    <script src="../../lib/globalthis-polyfill.min.js"></script> 
+    <script src="../../lib/globalthis-polyfill.min.js"></script>
     <script src="../../lib/path2d-polyfill.min.js"></script>
 
     <script src="../../lib/FileSaver.min.js"></script>
@@ -41,28 +52,28 @@
     <script src="../../src/cjs/utils/detectDarkMode.js"></script>
     <script src="../../src/cjs/utils/cloneVertexArray.js"></script>
     <script src="../../src/cjs/utils/datastructures/Color.js"></script>
-    <script src="../../src/cjs/utils/Params.js"></script> 
-    <script src="../../src/cjs/utils/datastructures/GenericPath.js"></script> 
+    <script src="../../src/cjs/utils/Params.js"></script>
+    <script src="../../src/cjs/utils/datastructures/GenericPath.js"></script>
     <script src="../../src/cjs/utils/datastructures/DataGrid2dListAdapter.js"></script>
     <script src="../../src/cjs/utils/datastructures/CircularIntervalSet.js"></script>
-    <script src="../../src/cjs/utils/algorithms/arrayFill.js"></script> 
-    <script src="../../src/cjs/utils/algorithms/arrayResize.js"></script> 
-    <script src="../../src/cjs/utils/algorithms/CircleIntersections.js"></script> 
-    <script src="../../src/cjs/utils/algorithms/clearDuplicateVertices.js"></script> 
-    <script src="../../src/cjs/utils/algorithms/detectPaths.js"></script> 
+    <script src="../../src/cjs/utils/algorithms/arrayFill.js"></script>
+    <script src="../../src/cjs/utils/algorithms/arrayResize.js"></script>
+    <script src="../../src/cjs/utils/algorithms/CircleIntersections.js"></script>
+    <script src="../../src/cjs/utils/algorithms/clearDuplicateVertices.js"></script>
+    <script src="../../src/cjs/utils/algorithms/detectPaths.js"></script>
     <script src="../../src/cjs/utils/algorithms/getContrastColor.js"></script>
     <script src="../../src/cjs/utils/algorithms/arrayFill.js"></script>
     <script src="../../src/cjs/utils/algorithms/matrixFill.js"></script>
-    <script src="../../src/cjs/utils/algorithms/Metaballs.js"></script> 
+    <script src="../../src/cjs/utils/algorithms/Metaballs.js"></script>
     <!-- <script src="../../src/cjs/utils/helpers/CircleHelper.js"></script>  -->
-    <script src="../../src/cjs/utils/helpers/VEllipseSectorHelper.js"></script> 
+    <script src="../../src/cjs/utils/helpers/VEllipseSectorHelper.js"></script>
     <script src="../../src/cjs/utils/WebColors.js"></script>
     <script src="../../src/cjs/utils/WebColorsContrast.js"></script>
     <script src="../../src/cjs/utils/NGons.js"></script>
-    <script src="../../src/cjs/utils/helpers/BezierPathInteractionHelper.js"></script> 
-    <script src="../../src/cjs/utils/helpers/CircleHelper.js"></script> 
-    <script src="../../src/cjs/utils/helpers/CircleSectorHelper.js"></script> 
-    <script src="../../src/cjs/utils/helpers/VEllipseSectorHelper.js"></script> 
+    <script src="../../src/cjs/utils/helpers/BezierPathInteractionHelper.js"></script>
+    <script src="../../src/cjs/utils/helpers/CircleHelper.js"></script>
+    <script src="../../src/cjs/utils/helpers/CircleSectorHelper.js"></script>
+    <script src="../../src/cjs/utils/helpers/VEllipseSectorHelper.js"></script>
     <script src="../../src/cjs/utils/helpers/VEllipseHelper.js"></script>
     <script src="../../src/cjs/utils/helpers/TriangleHelper.js"></script>
 
@@ -100,17 +111,17 @@
     <script src="../randomBezierPath.js"></script>
     <script src="../createRandomShapes.js"></script>
     -->
-    
+
     <!-- For production -->
     <!-- <script src="../../dist/plotboilerplate.min.js"></script> -->
     <!-- END for production -->
-    
+
     <script src="../modal.js"></script>
     <script src="../PBContentList.js"></script>
     <script src="../Ray.js"></script>
     <script src="index.js"></script>
-    <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="../modal.css">
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../modal-modern.css" />
   </head>
   <body class="fullscreen">
     <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>

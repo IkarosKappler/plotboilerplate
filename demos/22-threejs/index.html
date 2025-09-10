@@ -2,23 +2,26 @@
 <html class="fullscreen">
   <head>
     <title>2D Plotting Boilerplate – Demonstrating PlotBoilerplate with THREE.js</title>
-    <meta charset="UTF-8">
-    <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
-    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, curve, 3d, three, three.js threejs, dildo, dong, toy">
-    <meta name="author" content="Ikaros Kappler">
-    <meta name="date" content="2020-07-01">
+    <meta charset="UTF-8" />
+    <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff." />
+    <meta
+      name="keywords"
+      content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, curve, 3d, three, three.js threejs, dildo, dong, toy"
+    />
+    <meta name="author" content="Ikaros Kappler" />
+    <meta name="date" content="2020-07-01" />
 
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="@humanearthpig">
-    <meta name="twitter:creator" content="@humanearthpig">
-    <meta property="og:url" content="https://www.plotboilerplate.de">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Demonstrating PlotBoilerplate with THREE.js.">
-    <meta property="og:description" content="Demonstrating PlotBoilerplate with THREE.js.">
-    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20201019-threejs-highres.png">
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@humanearthpig" />
+    <meta name="twitter:creator" content="@humanearthpig" />
+    <meta property="og:url" content="https://www.plotboilerplate.de" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Demonstrating PlotBoilerplate with THREE.js." />
+    <meta property="og:description" content="Demonstrating PlotBoilerplate with THREE.js." />
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20201019-threejs-highres.png" />
 
     <!-- Polyfills for IE -->
-    <script src="../../lib/globalthis-polyfill.min.js"></script> 
+    <script src="../../lib/globalthis-polyfill.min.js"></script>
     <script src="../../lib/path2d-polyfill.min.js"></script>
 
     <script src="../../lib/FileSaver.min.js"></script>
@@ -29,7 +32,7 @@
     <script src="./lib/slice.min.js"></script>
     <!-- https://raw.githubusercontent.com/chandlerprall/ThreeCSG/master/ThreeCSG.js -->
     <script src="./lib/three-csg.js"></script>
-    
+
     <script src="../../src/cjs/utils/module.js"></script>
     <script src="../../src/cjs/utils/dom/guiSizeToggler.js"></script>
     <script src="../../src/cjs/utils/detectDarkMode.js"></script>
@@ -39,11 +42,11 @@
     <script src="../../src/cjs/utils/lil.gui.title.polyfill.js"></script>
     <script src="../../src/cjs/utils/lil.gui.arrowbounce.polyfill.js"></script>
     <script src="../../src/cjs/utils/gup.js"></script>
-    
+
     <script src="OrbitControls.js"></script>
     <script src="STLExporter.js"></script>
     <script src="VertexNormalsHelper.js"></script>
-    
+
     <script src="defaults.js"></script>
     <script src="DildoGeneration.js"></script>
     <script src="DildoGeometry.js"></script>
@@ -55,7 +58,7 @@
     <script src="locateVertexInArray.js"></script>
     <script src="mergeGeometries.js"></script>
     <script src="UVHelpers.js"></script>
-    
+
     <script src="../../dist/plotboilerplate.min.js"></script>
     <script src="../../lib/alloy_finger.js"></script>
     <script src="../../lib/earcut.min.js"></script>
@@ -65,40 +68,37 @@
     <script src="../randomWebColor.js"></script>
     <script src="../modal.js"></script>
     <script src="index.js"></script>
-    <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="../modal.css">
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../modal-modern.css" />
   </head>
   <body class="fullscreen">
     <div class="w-50 left">
       <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
-      <div class="info monospace">
-	[<span id="cx">-</span>,<span id="cy">-</span>]
-      </div>
+      <div class="info monospace">[<span id="cx">-</span>,<span id="cy">-</span>]</div>
     </div>
     <div class="w-50 right">
       <canvas id="dildo-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
     </div>
-
   </body>
   <style>
     body {
-       display: flex;
+      display: flex;
     }
     .w-50 {
-       width : 50%;
+      width: 50%;
     }
     .left {
-       position : relative;
-       float : left;
+      position: relative;
+      float: left;
     }
     .right {
-       float : right;
+      float: right;
     }
-    #gui { 
-      position: absolute; 
-      top: 2px; 
+    #gui {
+      position: absolute;
+      top: 2px;
       left: 50%;
-      transform: translate(-50%)
+      transform: translate(-50%);
     }
   </style>
 </html>

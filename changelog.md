@@ -1,6 +1,9 @@
 # Changelog
 
-- 2025-09-02
+- 2025-09-10
+  - Finally dumping the old './demos/detectDarkmode.js' function.
+  - modal.js: Changing head text type from `h2` to `h3`. Added classname `button` to action butons.
+- 2025-09-02 [v1.25.0]
   - Adding method `ColorGradient.fromObject` to restore from JSON objects.
 - 2025-08-27
   - Added experimental `ColorGradientDialog` to the demos (pure JS).

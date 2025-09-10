@@ -43,7 +43,7 @@ var ColorGradientSelector = /** @class */ (function () {
         this.__createCustomStylesElement = function () {
             // Thanks to Ana Tudor
             //    https://css-tricks.com/multi-thumb-sliders-particular-two-thumb-case/
-            return (NoReact.createElement("style", null, "\n\n    #".concat(_this.elementID, " button {\n      border: 0px solid lightgray;\n      padding: 0.25em;\n      background-color: rgba(255,255,255,0.9);\n    }\n\n    #").concat(_this.elementID, " .main-button:hover {\n      background-color: rgba(216,216,216,0.9);\n    }\n\n    #").concat(_this.elementID, " .option-gradient-button:hover, #").concat(_this.elementID, " .option-delete-button:hover {\n      background-color: rgba(216,216,216,0.9);\n    }\n\n    ")));
+            return (NoReact.createElement("style", null, "\n\n    #".concat(_this.elementID, " button {\n      border: 0px solid lightgray;\n      padding: 0.25em;\n      /* background-color: rgba(255,255,255,0.9); */\n    }\n\n    #").concat(_this.elementID, " .positioning-container button {\n      border-radius: 0;\n    }\n\n    #").concat(_this.elementID, " .main-button:hover {\n      background-color: rgba(216,216,216,0.9);\n    }\n\n    #").concat(_this.elementID, " .option-gradient-button:hover, #").concat(_this.elementID, " .option-delete-button:hover {\n      background-color: rgba(216,216,216,0.9);\n    }\n\n\n    ")));
         };
         options = options || {};
         if (options.containerID) {
