@@ -9,7 +9,6 @@
  */
 
 export const detectDarkMode = (GUP?: Record<string, string>): boolean => {
-  console.log("detectDarkMode", detectDarkMode);
   var isDarkmode: boolean = false;
   // Respect overrides
   if (typeof GUP !== "undefined" && GUP.hasOwnProperty("darkmode") && GUP["darkmode"]) {
@@ -28,8 +27,8 @@ export const detectDarkMode = (GUP?: Record<string, string>): boolean => {
     isDarkmode = !isDayTime;
   }
 
-  console.log("Adding darkmode to <body>", isDarkmode);
-  if (isDarkmode) {
+  // console.log("Adding darkmode to <body>", isDarkmode);
+  if (isDarkmode && document.body) {
     // Add darkmode class to <body> tag
     document.body.classList.add("darkmode");
   }

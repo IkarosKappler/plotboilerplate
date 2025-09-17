@@ -11,7 +11,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.detectDarkMode = void 0;
 var detectDarkMode = function (GUP) {
-    console.log("detectDarkMode", exports.detectDarkMode);
     var isDarkmode = false;
     // Respect overrides
     if (typeof GUP !== "undefined" && GUP.hasOwnProperty("darkmode") && GUP["darkmode"]) {
@@ -31,8 +30,8 @@ var detectDarkMode = function (GUP) {
         var isDayTime = hours > 6 && hours < 18;
         isDarkmode = !isDayTime;
     }
-    console.log("Adding darkmode to <body>", isDarkmode);
-    if (isDarkmode) {
+    // console.log("Adding darkmode to <body>", isDarkmode);
+    if (isDarkmode && document.body) {
         // Add darkmode class to <body> tag
         document.body.classList.add("darkmode");
     }

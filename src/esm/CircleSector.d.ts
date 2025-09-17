@@ -172,6 +172,9 @@ export declare class CircleSector implements IBounded, Intersectable, SVGSeriali
      * @returns
      */
     lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vector>;
+    describeSVGPath(options?: {
+        moveToStart: boolean;
+    }): SVGPathParams;
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and

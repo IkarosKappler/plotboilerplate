@@ -109,23 +109,22 @@ export class CircleSector implements IBounded, Intersectable, SVGSerializable {
    **/
   getBounds(): Bounds {
     const _self = this;
-    const circleBounds : Bounds = this.circle.getBounds();
+    const circleBounds: Bounds = this.circle.getBounds();
     // Calculage angles from east, west, north and south box points and check if they are inside
-    const candidates : Array<Vertex> = [
+    const candidates: Array<Vertex> = [
       circleBounds.getNorthPoint(),
       circleBounds.getSouthPoint(),
       circleBounds.getWestPoint(),
       circleBounds.getEastPoint()
-    ].filter( (point : Vertex) => {
+    ].filter((point: Vertex) => {
       // Check for each candidate points if they are contained in this sector. Drop if not.
-      const angle : number = new Line(_self.circle.center, point).angle();
+      const angle: number = new Line(_self.circle.center, point).angle();
       return _self.containsAngle(angle);
     });
     // Compute bounds and inlcude start end end point (they are definitely part of the bounds)
     return Bounds.computeFromVertices(candidates.concat([this.getStartPoint(), this.getEndPoint()]));
   }
   //--- BEGIN --- Implement interface `IBounded`
-
 
   /**
    * Move the circle sector by the given amount.
@@ -316,6 +315,38 @@ export class CircleSector implements IBounded, Intersectable, SVGSerializable {
   }
   //--- END --- Implement interface `Intersectable`
 
+  describeSVGPath(options?: { moveToStart: boolean }): SVGPathParams {
+    // const buffer: SVGPathParams = [];
+    // const start = this.getStartPoint();
+    // const end = this.getEndPoint();
+    // //   describeSVGArc
+    // //   x: number,
+    // //   y: number,
+    // //   radius: number,
+    // //   startAngle: number,
+    // //   endAngle: number,
+    // //   options?: { moveToStart: boolean }
+    // // ): SVGPathParams => {
+    // var arcRotation = 0.0;
+    // var largeArcFlag = 1;
+    // var sweepFlag = 0;
+    // if (options && options.moveToStart) {
+    //   buffer.push("M", start.x, start.y);
+    // }
+    // buffer.push("A", cSector.circle.radius, cSector.circle.radius, arcRotation, largeArcFlag, sweepFlag, end.x, end.y);
+    // return buffer;
+
+    const arc = CircleSector.circleSectorUtils.describeSVGArc(
+      this.circle.center.x, // end.x,
+      this.circle.center.y, // end.y,
+      this.circle.radius,
+      this.startAngle,
+      this.endAngle,
+      options // options?: { moveToStart: boolean }
+    );
+    return arc;
+  }
+
   /**
    * This function should invalidate any installed listeners and invalidate this object.
    * After calling this function the object might not hold valid data any more and
@@ -363,7 +394,9 @@ export class CircleSector implements IBounded, Intersectable, SVGSerializable {
       endAngle: number,
       options?: { moveToStart: boolean }
     ): SVGPathParams => {
-      if (typeof options === "undefined") options = { moveToStart: true };
+      if (typeof options === "undefined") {
+        options = { moveToStart: true };
+      }
 
       const end: XYCoords = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, endAngle);
       const start: XYCoords = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, startAngle);

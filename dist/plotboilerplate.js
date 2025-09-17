@@ -2237,6 +2237,32 @@ var CircleSector = /** @class */ (function () {
         });
     };
     //--- END --- Implement interface `Intersectable`
+    CircleSector.prototype.describeSVGPath = function (options) {
+        // const buffer: SVGPathParams = [];
+        // const start = this.getStartPoint();
+        // const end = this.getEndPoint();
+        // //   describeSVGArc
+        // //   x: number,
+        // //   y: number,
+        // //   radius: number,
+        // //   startAngle: number,
+        // //   endAngle: number,
+        // //   options?: { moveToStart: boolean }
+        // // ): SVGPathParams => {
+        // var arcRotation = 0.0;
+        // var largeArcFlag = 1;
+        // var sweepFlag = 0;
+        // if (options && options.moveToStart) {
+        //   buffer.push("M", start.x, start.y);
+        // }
+        // buffer.push("A", cSector.circle.radius, cSector.circle.radius, arcRotation, largeArcFlag, sweepFlag, end.x, end.y);
+        // return buffer;
+        var arc = CircleSector.circleSectorUtils.describeSVGArc(this.circle.center.x, // end.x,
+        this.circle.center.y, // end.y,
+        this.circle.radius, this.startAngle, this.endAngle, options // options?: { moveToStart: boolean }
+        );
+        return arc;
+    };
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
@@ -2275,8 +2301,9 @@ var CircleSector = /** @class */ (function () {
          * @return [ 'A', radiusx, radiusy, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
          */
         describeSVGArc: function (x, y, radius, startAngle, endAngle, options) {
-            if (typeof options === "undefined")
+            if (typeof options === "undefined") {
                 options = { moveToStart: true };
+            }
             var end = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, endAngle);
             var start = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, startAngle);
             // Split full circles into two halves.
