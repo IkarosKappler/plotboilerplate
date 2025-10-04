@@ -13,12 +13,13 @@ var geomutils_1 = require("../geomutils");
 exports.SVGPathUtils = {
     /**
      * Creates an SVG shape resembling a circlular ring sector.
-     * @param center
-     * @param innerRadius
-     * @param outerRadius
-     * @param startAngle
-     * @param endAngle
-     * @returns
+     *
+     * @param {Vertex} center - The center position of the ring.
+     * @param {number} innerRadius - The inner radius of the ring.
+     * @param {number} outerRadius - The outer radius of the ring.
+     * @param {number} startAngle - The start angle of the ring.
+     * @param {number} endAngle - The end angle of the ring.
+     * @returns {SVGPathParams} SVG path parmams for a closed shape representing the circular ring sector.
      */
     mkCircularRingSector: function (center, innerRadius, outerRadius, startAngle, endAngle) {
         var innerStart = Circle_1.Circle.circleUtils.vertAt(startAngle, innerRadius).add(center);

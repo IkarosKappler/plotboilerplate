@@ -29,22 +29,22 @@ export const SVGPathUtils = {
     startAngle: number,
     endAngle: number
   ): SVGPathParams => {
-    const innerStart = Circle.circleUtils.vertAt(startAngle, innerRadius).add(center);
-    const innerEnd = Circle.circleUtils.vertAt(endAngle, innerRadius).add(center);
-    const outerStart = Circle.circleUtils.vertAt(startAngle, outerRadius).add(center);
-    const outerEnd = Circle.circleUtils.vertAt(endAngle, outerRadius).add(center);
+    const innerStart: Vertex = Circle.circleUtils.vertAt(startAngle, innerRadius).add(center);
+    const innerEnd: Vertex = Circle.circleUtils.vertAt(endAngle, innerRadius).add(center);
+    const outerStart: Vertex = Circle.circleUtils.vertAt(startAngle, outerRadius).add(center);
+    const outerEnd: Vertex = Circle.circleUtils.vertAt(endAngle, outerRadius).add(center);
 
-    const buffer = ["M", innerStart.x, innerStart.y];
+    const buffer: SVGPathParams = ["M", innerStart.x, innerStart.y];
     // var isLargeArcRequired = geomutils.mapAngleTo2PI(Math.abs(startAngle - endAngle)) >= Math.PI;
     // var isLargeArcRequired = Math.abs(geomutils.mapAngleTo2PI(startAngle) - geomutils.mapAngleTo2PI(endAngle)) >= Math.PI;
-    var isLargeArcRequired =
+    const isLargeArcRequired =
       geomutils.mapAngleTo2PI(geomutils.mapAngleTo2PI(startAngle) - geomutils.mapAngleTo2PI(endAngle)) >= Math.PI;
 
-    var rotation = 0.0;
-    var innerLargeArcFlag = isLargeArcRequired ? 0 : 1;
-    var innerSweepFlag = 1; // isLargeArcRequired ? 1 : 0; // 1;
-    var outerLargeArcFlag = isLargeArcRequired ? 0 : 1;
-    var outerSweepFlag = 0; // isLargeArcRequired ? 0 : 1; // 0;
+    const rotation: number = 0.0;
+    const innerLargeArcFlag: number = isLargeArcRequired ? 0 : 1;
+    const innerSweepFlag: number = 1; // isLargeArcRequired ? 1 : 0; // 1;
+    const outerLargeArcFlag: number = isLargeArcRequired ? 0 : 1;
+    const outerSweepFlag: number = 0; // isLargeArcRequired ? 0 : 1; // 0;
     buffer.push("A", innerRadius, innerRadius, rotation, innerLargeArcFlag, innerSweepFlag, innerEnd.x, innerEnd.y);
     buffer.push("L", outerEnd.x, outerEnd.y);
     buffer.push("A", outerRadius, outerRadius, rotation, outerLargeArcFlag, outerSweepFlag, outerStart.x, outerStart.y);

@@ -2,6 +2,7 @@
 
 - 2025-10-04
   - Adding `src/ts/utils/SVGPathUtils` with the `mkCircularRingSector` function.
+  - Adding the demo `63-simple-ring-animation`.
 - 2025-09-10
   - Finally dumping the old './demos/detectDarkmode.js' function.
   - modal.js: Changing head text type from `h2` to `h3`. Added classname `button` to action butons.

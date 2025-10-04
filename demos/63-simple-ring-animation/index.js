@@ -31,7 +31,9 @@
       innerRadius: params.getNumber("innerRadius", 90.0),
       outerRadius: params.getNumber("outerRadius", 150.0),
       startAngleDeg: params.getNumber("startAngleDeg", 0.0), // 0.0,
-      endAngleDeg: params.getNumber("endAngleDeg", Math.PI * 1.5 * RAD_TO_DEG)
+      endAngleDeg: params.getNumber("endAngleDeg", Math.PI * 1.5 * RAD_TO_DEG),
+      // Make sure start is sirculary smaller than end?
+      wrapStartEnd: params.getBoolean("wrapStartEnd", true)
     };
 
     // +---------------------------------------------------------------------------------
@@ -45,12 +47,21 @@
       var center = new Vertex({ x: 0, y: 0 });
       // draw.circle(center, 100, "red", 1);
 
+      var safeStartAngle = baseRotation + DEG_TO_RAD * config.startAngleDeg;
+      var safeEndAngle = baseRotation + DEG_TO_RAD * config.endAngleDeg;
+
+      if (config.wrapStartEnd && config.startAngleDeg > config.endAngleDeg) {
+        // Switch if start is after end
+        safeEndAngle = baseRotation + DEG_TO_RAD * config.startAngleDeg;
+        safeStartAngle = baseRotation + DEG_TO_RAD * config.endAngleDeg;
+      }
+
       var tmp2 = SVGPathUtils.mkCircularRingSector(
         center,
         config.innerRadius,
         config.outerRadius,
-        baseRotation + DEG_TO_RAD * config.startAngleDeg,
-        baseRotation + DEG_TO_RAD * config.endAngleDeg
+        safeStartAngle, // baseRotation + DEG_TO_RAD * config.startAngleDeg,
+        safeEndAngle // baseRotation + DEG_TO_RAD * config.endAngleDeg
       );
       draw.path(tmp2, "rgba(255,255,0,1.0)", 6);
       fill.path(tmp2, "rgba(255,255,0,0.5)");
@@ -81,6 +92,9 @@
       // prettier-ignore
       gui.add(config, "endAngleDeg").min(0.0).max(360).step(1).name("endAngleDeg").title("The end angle of the section.")
        .onChange( function() { pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "wrapStartEnd").name("wrapStartEnd").title("Wrap around (swap) if start angle is larger than end angle.")
+        .onChange( function() { pb.redraw() });
     }
     pb.config.postDraw = postDraw;
 
