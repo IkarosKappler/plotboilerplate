@@ -66,22 +66,12 @@
         return;
       }
       for (var i = 0; i < polygon.vertices.length; i++) {
-        var polyEdge = polygon.getEdgeAt(i);
-        // var nextPolyEdge = polygon.getEdgeAt(i + 1);
-        // var vertex = polygon.getVertexAt(i + 1);
+        // var polyEdge = polygon.getEdgeAt(i);
 
         drawEdgeAngle(draw, fill, polygon, i);
 
         // Calculate angle at polygon vertex
         drawAngleInCorner(draw, fill, polygon, i);
-
-        // if (mainRay) {
-        //   var intersections = polyEdge.lineIntersections(mainRay.vector, true);
-        //   if (intersections.length === 0) {
-        //     continue;
-        //   }
-        //   drawIntersectionAngles(draw, fill, intersections[0]);
-        // }
       } // END for
 
       if (mainRay) {
@@ -133,40 +123,6 @@
         }
       );
     };
-
-    // +---------------------------------------------------------------------------------
-    // | Draw angles between main ray and polygon edge.
-    // +-------------------------------
-    // var drawIntersectionAngles = function (draw, fill, intersection) {
-    //   draw.circleHandle(intersection, 4, "red", 2);
-
-    //   for (var j = 0; j < polygon.vertices.length; j++) {
-    //     var polyEdge2 = polygon.getEdgeAt(j);
-    //     if (!polyEdge2.hasPoint(intersection, true)) {
-    //       continue;
-    //     }
-    //     var vectorAngleA = polyEdge2.angle(mainRay.vector);
-    //     fill.text(
-    //       "[" + j + "] " + (geomutils.mapAngleTo2PI(vectorAngleA) * RAD_TO_DEG).toFixed(2) + "°",
-    //       intersection.x,
-    //       intersection.y,
-    //       {
-    //         color: "orange",
-    //         fontFamily: "Monospace",
-    //         fontSize: 12
-    //       }
-    //     );
-    //     // Draw arc
-    //     draw.circleArc(
-    //       intersection,
-    //       16, // radius
-    //       mainRay.vector.angle(), // startAngle
-    //       polyEdge2.angle(), // startAngle
-    //       "orange", // color
-    //       1.0 // lineWidth
-    //     );
-    //   }
-    // };
 
     // +---------------------------------------------------------------------------------
     // | Draw angles between main ray and polygon edge.
