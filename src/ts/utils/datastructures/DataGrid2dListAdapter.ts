@@ -7,19 +7,12 @@
  * @version  1.0.0
  **/
 
-import { DataGridFace4, IDataGrid2d } from "./DataGrid2d";
+import { DataGridFace4, IDataGrid2d, RasterPosition } from "./DataGrid2d";
 
 type Triplet<T> = {
   x: T;
   y: T;
   z: T;
-};
-
-type RasterPosition = {
-  xIndex: number;
-  yIndex: number;
-  xRel?: number;
-  yRel?: number;
 };
 
 export class DataGrid2dListAdapter<T> implements IDataGrid2d<T> {
@@ -96,9 +89,9 @@ export class DataGrid2dListAdapter<T> implements IDataGrid2d<T> {
   getDataValueAt(xIndex: number, yIndex: number, isDebug?: boolean): T | null {
     // var bufferIndex = yIndex * this.xSegmentCount + xIndex;
     var bufferIndex = this.coordinateIndicesToBufferIndex(xIndex, yIndex);
-    if (isDebug) {
-      console.log("xIndex", xIndex, "yIndex", yIndex, "bufferIndex", bufferIndex);
-    }
+    // if (isDebug) {
+    //   console.log("xIndex", xIndex, "yIndex", yIndex, "bufferIndex", bufferIndex);
+    // }
     if (bufferIndex > this._dataList.length) {
       console.error("ERR buffer index is out of bounds! xIndex", xIndex, "yIndex", yIndex, "bufferIndex", bufferIndex);
     }

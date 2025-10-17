@@ -1,18 +1,12 @@
 /**
- * A DataGrid2d implementation on a linear array of triplets/Vector3.
+ * A DataGrid2d implementation on 2 dimensional arrays.
  *
  * @author   Ikaros Kappler
- * @date     2023-10-28
- * @modified 2023-11-04 Converted to a Typescript class.
+ * @date     2025-10-16
  * @version  1.0.0
  **/
 import { DataGridFace4, IDataGrid2d, RasterPosition } from "./DataGrid2d";
-type Triplet<T> = {
-    x: T;
-    y: T;
-    z: T;
-};
-export declare class DataGrid2dListAdapter<T> implements IDataGrid2d<T> {
+export declare class DataGrid2dArrayMatrix<T> implements IDataGrid2d<T> {
     /**
      * @override
      */
@@ -23,11 +17,7 @@ export declare class DataGrid2dListAdapter<T> implements IDataGrid2d<T> {
     readonly ySegmentCount: number;
     minDataValue: T;
     maxDataValue: T;
-    minXValue: T;
-    maxXValue: T;
-    minYValue: T;
-    maxYValue: T;
-    private _dataList;
+    private _matrix;
     /**
      * Create a new DataGrid2d from the given
      * @throws Error if xSegmentCount*ySegmentCount is larger than the capacity of the array/list.
@@ -35,10 +25,10 @@ export declare class DataGrid2dListAdapter<T> implements IDataGrid2d<T> {
      * @param xSegmentCount
      * @param ySegmentCount
      */
-    constructor(list: Array<Triplet<T>>, xSegmentCount: number, ySegmentCount: number);
-    getIndicesFromBufferIndex(bufferIndex: number): RasterPosition;
-    getCoordsFromBufferIndex(bufferIndex: number): RasterPosition;
-    coordinateIndicesToBufferIndex(xIndex: number, yIndex: number): number;
+    constructor(xSegmentCount: number, ySegmentCount: number, initialValue: T);
+    set(xIndex: number, yIndex: number, value: T): void;
+    get(xIndex: number, yIndex: number): T;
+    find(condition: (value: T, xIndex: number, yIndex: number) => boolean): RasterPosition;
     /**
      * @override
      */
@@ -56,4 +46,3 @@ export declare class DataGrid2dListAdapter<T> implements IDataGrid2d<T> {
      */
     getDataFace4At(xIndex: number, yIndex: number, buffer: DataGridFace4<T>): void;
 }
-export {};

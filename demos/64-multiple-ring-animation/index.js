@@ -25,15 +25,49 @@
       )
     );
 
+    const rings = [];
+
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
       animate: params.getBoolean("animate", true),
-      innerRadius: params.getNumber("innerRadius", 90.0),
-      outerRadius: params.getNumber("outerRadius", 150.0),
-      startAngleDeg: params.getNumber("startAngleDeg", 0.0), // 0.0,
-      endAngleDeg: params.getNumber("endAngleDeg", Math.PI * 1.5 * RAD_TO_DEG),
       // Make sure start is sirculary smaller than end?
-      wrapStartEnd: params.getBoolean("wrapStartEnd", true)
+      wrapStartEnd: params.getBoolean("wrapStartEnd", true),
+      numRings: params.getNumber("numRings", 5)
+    };
+
+    var init = function () {
+      rings.push({
+        innerRadius: 45.0,
+        outerRadius: 100.0,
+        startAngleDeg: 0.0,
+        endAngleDeg: Math.PI * 1.5 * RAD_TO_DEG,
+        animators: []
+      });
+      // rings[0].animators.push(new AttrAnimator(rings[0], "innerRadius", 45.0, 120.0, 1.0));
+      rings[0].animators.push(new AttrAnimator(rings[0], "startAngleDeg", Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, 1.0));
+      // rings.push({
+      //   innerRadius: 80.0,
+      //   outerRadius: 150.0,
+      //   startAngleDeg: 0.0,
+      //   endAngleDeg: Math.PI * 1.5 * RAD_TO_DEG,
+      //   animators: []
+      // });
+      // rings[1].animators.push(new AttrAnimator(rings[1], "innerRadius", 80.0, 200.0, 1.0));
+      // rings[1].animators.push(new AttrAnimator(rings[1], "startAngleDeg", Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, 1.0));
+    };
+
+    var AttrAnimator = function (obj, attrName, min, max, stepValue) {
+      this.obj = obj;
+      this.attrName = attrName;
+      this.min = min;
+      this.max = max;
+      this.stepValue = stepValue;
+    };
+    AttrAnimator.prototype.next = function () {
+      this.obj[this.attrName] += this.stepValue;
+      if (this.obj[this.attrName] < this.min || this.obj[this.attrName] > this.max) {
+        this.stepValue = -this.stepValue;
+      }
     };
 
     // +---------------------------------------------------------------------------------
@@ -47,29 +81,32 @@
       var center = new Vertex({ x: 0, y: 0 });
       // draw.circle(center, 100, "red", 1);
 
-      var safeStartAngle = baseRotation + DEG_TO_RAD * config.startAngleDeg;
-      var safeEndAngle = baseRotation + DEG_TO_RAD * config.endAngleDeg;
+      rings.forEach(function (ring, ringIndex) {
+        // console.log("Render Ring", ringIndex);
+        renderRing(draw, fill, ring);
+      });
+    }; // END postDraw
 
-      if (config.wrapStartEnd && config.startAngleDeg > config.endAngleDeg) {
+    var renderRing = function (draw, fill, ring) {
+      var center = new Vertex(0, 0);
+      var safeStartAngle = geomutils.mapAngleTo2PI(baseRotation + DEG_TO_RAD * ring.startAngleDeg);
+      var safeEndAngle = geomutils.mapAngleTo2PI(baseRotation + DEG_TO_RAD * ring.endAngleDeg);
+
+      if (config.wrapStartEnd && ring.startAngleDeg > ring.endAngleDeg) {
         // Switch if start is after end
-        safeEndAngle = baseRotation + DEG_TO_RAD * config.startAngleDeg;
-        safeStartAngle = baseRotation + DEG_TO_RAD * config.endAngleDeg;
+        safeEndAngle = geomutils.mapAngleTo2PI(baseRotation + DEG_TO_RAD * ring.startAngleDeg);
+        safeStartAngle = geomutils.mapAngleTo2PI(baseRotation + DEG_TO_RAD * ring.endAngleDeg) - Math.PI * 2;
       }
 
-      var pathData = SVGPathUtils.mkCircularRingSector(
-        center,
-        config.innerRadius,
-        config.outerRadius,
-        safeStartAngle, // baseRotation + DEG_TO_RAD * config.startAngleDeg,
-        safeEndAngle // baseRotation + DEG_TO_RAD * config.endAngleDeg
-      );
+      var pathData = SVGPathUtils.mkCircularRingSector(center, ring.innerRadius, ring.outerRadius, safeStartAngle, safeEndAngle);
       draw.path(pathData, "rgba(255,255,0,1.0)", 6);
       fill.path(pathData, "rgba(255,255,0,0.5)");
 
       if (animationFrameNumber % 100 === 0) {
-        console.log("pathData", pathData);
+        // console.log("pathData", pathData);
+        console.log("tmp2", pathData, "ring.startAngleDeg", ring.startAngleDeg, "ring.endAngleDeg", ring.endAngleDeg);
       }
-    }; // END postDraw
+    };
 
     // +---------------------------------------------------------------------------------
     // | Create a GUI.
@@ -80,29 +117,27 @@
       gui.add(config, "animate").name("animate").title("Animate the ray?")
         .onChange( function() { toggleAnimation(); });
       // prettier-ignore
-      gui.add(config, "innerRadius").min(1).max(200).step(1).name("innerRadius").title("The inner circle radius")
-       .onChange( function() { pb.redraw() });
-      // prettier-ignore
-      gui.add(config, "outerRadius").min(1).max(200).step(1).name("outerRadius").title("The outer circle radius")
-       .onChange( function() { pb.redraw() });
-      // prettier-ignore
-      gui.add(config, "startAngleDeg").min(0.0).max(360).step(1).name("startAngleDeg").title("The start angle of the section.")
-       .onChange( function() { pb.redraw() });
-      // prettier-ignore
-      gui.add(config, "endAngleDeg").min(0.0).max(360).step(1).name("endAngleDeg").title("The end angle of the section.")
-       .onChange( function() { pb.redraw() });
-      // prettier-ignore
       gui.add(config, "wrapStartEnd").name("wrapStartEnd").title("Wrap around (swap) if start angle is larger than end angle.")
         .onChange( function() { pb.redraw() });
     }
     pb.config.postDraw = postDraw;
+
+    function animateAllRings() {
+      rings.forEach(function (ring) {
+        // ring.animateFn(ring);
+        ring.animators.forEach(function (animator) {
+          animator.next();
+        });
+      });
+    }
 
     // +---------------------------------------------------------------------------------
     // | Render next animation step.
     // +-------------------------------
     var isAnimationRunning = false;
     function animateStep(time) {
-      baseRotation += 0.01;
+      // baseRotation += 0.01;
+      animateAllRings();
       animationFrameNumber++;
       pb.redraw();
       if (isAnimationRunning) {
@@ -147,6 +182,7 @@
       });
     });
 
+    init();
     pb.redraw();
     if (config.animate) {
       toggleAnimation();

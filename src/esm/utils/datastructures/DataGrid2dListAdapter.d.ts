@@ -6,17 +6,11 @@
  * @modified 2023-11-04 Converted to a Typescript class.
  * @version  1.0.0
  **/
-import { DataGridFace4, IDataGrid2d } from "./DataGrid2d";
+import { DataGridFace4, IDataGrid2d, RasterPosition } from "./DataGrid2d";
 type Triplet<T> = {
     x: T;
     y: T;
     z: T;
-};
-type RasterPosition = {
-    xIndex: number;
-    yIndex: number;
-    xRel?: number;
-    yRel?: number;
 };
 export declare class DataGrid2dListAdapter<T> implements IDataGrid2d<T> {
     /**
