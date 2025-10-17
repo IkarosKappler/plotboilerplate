@@ -13,7 +13,8 @@
  * @modified 2025-04-18 Change parameter type in `Bounds.computeFromVertices` from `Vertex` to more general `XYCoords`.
  * @modified 2025-04-19 Added methods to `Bounds` class: `getNorthPoint`, `getSouthPoint`, `getEastPoint` and `getWestPoint`.
  * @modified 2025-04-26 Added static method `Bounds.computeFromBoundsSet` to calculate containing bounds for a set of bounding boxes.
- * @version  1.8.0
+ * @modified 2025-10-17 Added the methods `Bounds.getSouthWestPoint`, `getNorthWestPoint`, `getNorthEastPoint` and `getSouthEastPoint`.
+ * @version  1.9.0
  **/
 import { Polygon } from "./Polygon";
 import { XYCoords, IBounds, XYDimension } from "./interfaces";
@@ -82,23 +83,59 @@ export declare class Bounds implements IBounds, XYDimension {
      */
     getSouthPoint(): Vertex;
     /**
-    * Get the center point of the west bound.
-    *
-    * @method getWestPoint
-    * @instance
-    * @memberof Bounds
-    * @return {Vertex} The "westhmost" centered point of this bounding box.
-    */
+     * Get the center point of the west bound.
+     *
+     * @method getWestPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "westhmost" centered point of this bounding box.
+     */
     getWestPoint(): Vertex;
     /**
-    * Get the center point of the east bound.
-    *
-    * @method getEastPoint
-    * @instance
-    * @memberof Bounds
-    * @return {Vertex} The "easthmost" centered point of this bounding box.
-    */
+     * Get the center point of the east bound.
+     *
+     * @method getEastPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "easthmost" centered point of this bounding box.
+     */
     getEastPoint(): Vertex;
+    /**
+     * Get the upper left corner point these bounds box.
+     *
+     * @method getNorthWestPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "northwestmost" point of this bounding box.
+     */
+    getNorthWestPoint(): Vertex;
+    /**
+     * Get the upper right corner point these bounds box.
+     *
+     * @method getNorthEastPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "northeastmost" point of this bounding box.
+     */
+    getNorthEastPoint(): Vertex;
+    /**
+     * Get the lower right corner point these bounds box.
+     *
+     * @method getSouthEastPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "southeastmost" point of this bounding box.
+     */
+    getSouthEastPoint(): Vertex;
+    /**
+     * Get the lower left corner point these bounds box.
+     *
+     * @method getSouthWestPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "southwestmost" point of this bounding box.
+     */
+    getSouthWestPoint(): Vertex;
     /**
      * Convert this rectangular bounding box to a polygon with four vertices.
      *
@@ -175,16 +212,16 @@ export declare class Bounds implements IBounds, XYDimension {
      **/
     static computeFromVertices(vertices: Array<XYCoords>): Bounds;
     /**
-    * Compute the minimal bounding box for a given set of existing bounding boxes.
-    *
-    * An empty vertex array will return an empty bounding box located at (0,0).
-    *
-    * @static
-    * @method computeFromBoundsSet
-    * @memberof Bounds
-    * @param {Array<IBounds>} boundingBoxes - The set of existing bounding boxes to get the containing bounding box for.
-    * @return The minimal Bounds for the given bounds instances.
-    **/
+     * Compute the minimal bounding box for a given set of existing bounding boxes.
+     *
+     * An empty vertex array will return an empty bounding box located at (0,0).
+     *
+     * @static
+     * @method computeFromBoundsSet
+     * @memberof Bounds
+     * @param {Array<IBounds>} boundingBoxes - The set of existing bounding boxes to get the containing bounding box for.
+     * @return The minimal Bounds for the given bounds instances.
+     **/
     static computeFromBoundsSet(boundingBoxes: Array<IBounds>): Bounds;
     /**
      * Create a new `Bounds` instance just from `width` and `height`, located at (0,0) or the optionally given origin.

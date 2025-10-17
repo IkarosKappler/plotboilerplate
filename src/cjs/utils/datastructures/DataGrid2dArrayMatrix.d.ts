@@ -28,7 +28,7 @@ export declare class DataGrid2dArrayMatrix<T> implements IDataGrid2d<T> {
     constructor(xSegmentCount: number, ySegmentCount: number, initialValue: T);
     set(xIndex: number, yIndex: number, value: T): void;
     get(xIndex: number, yIndex: number): T;
-    find(condition: (value: T, xIndex: number, yIndex: number) => boolean): RasterPosition;
+    find(condition: (value: T, xIndex: number, yIndex: number, sourceMatrix: DataGrid2dArrayMatrix<T>) => boolean): RasterPosition;
     /**
      * @override
      */

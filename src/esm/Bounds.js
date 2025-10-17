@@ -13,7 +13,8 @@
  * @modified 2025-04-18 Change parameter type in `Bounds.computeFromVertices` from `Vertex` to more general `XYCoords`.
  * @modified 2025-04-19 Added methods to `Bounds` class: `getNorthPoint`, `getSouthPoint`, `getEastPoint` and `getWestPoint`.
  * @modified 2025-04-26 Added static method `Bounds.computeFromBoundsSet` to calculate containing bounds for a set of bounding boxes.
- * @version  1.8.0
+ * @modified 2025-10-17 Added the methods `Bounds.getSouthWestPoint`, `getNorthWestPoint`, `getNorthEastPoint` and `getSouthEastPoint`.
+ * @version  1.9.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -50,7 +51,6 @@ export class Bounds {
     getNorthPoint() {
         return new Vertex(this.min.x + this.width / 2.0, this.min.y);
     }
-    ;
     /**
      * Get the center point of the south bound.
      *
@@ -62,31 +62,72 @@ export class Bounds {
     getSouthPoint() {
         return new Vertex(this.min.x + this.width / 2.0, this.max.y);
     }
-    ;
     /**
-    * Get the center point of the west bound.
-    *
-    * @method getWestPoint
-    * @instance
-    * @memberof Bounds
-    * @return {Vertex} The "westhmost" centered point of this bounding box.
-    */
+     * Get the center point of the west bound.
+     *
+     * @method getWestPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "westhmost" centered point of this bounding box.
+     */
     getWestPoint() {
         return new Vertex(this.min.x, this.min.y + this.height / 2.0);
     }
-    ;
     /**
-    * Get the center point of the east bound.
-    *
-    * @method getEastPoint
-    * @instance
-    * @memberof Bounds
-    * @return {Vertex} The "easthmost" centered point of this bounding box.
-    */
+     * Get the center point of the east bound.
+     *
+     * @method getEastPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "easthmost" centered point of this bounding box.
+     */
     getEastPoint() {
         return new Vertex(this.max.x, this.min.y + this.height / 2.0);
     }
-    ;
+    /**
+     * Get the upper left corner point these bounds box.
+     *
+     * @method getNorthWestPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "northwestmost" point of this bounding box.
+     */
+    getNorthWestPoint() {
+        return new Vertex(this.min.x, this.min.y);
+    }
+    /**
+     * Get the upper right corner point these bounds box.
+     *
+     * @method getNorthEastPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "northeastmost" point of this bounding box.
+     */
+    getNorthEastPoint() {
+        return new Vertex(this.max.x, this.min.y);
+    }
+    /**
+     * Get the lower right corner point these bounds box.
+     *
+     * @method getSouthEastPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "southeastmost" point of this bounding box.
+     */
+    getSouthEastPoint() {
+        return new Vertex(this.max.x, this.max.y);
+    }
+    /**
+     * Get the lower left corner point these bounds box.
+     *
+     * @method getSouthWestPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "southwestmost" point of this bounding box.
+     */
+    getSouthWestPoint() {
+        return new Vertex(this.min.x, this.max.y);
+    }
     /**
      * Convert this rectangular bounding box to a polygon with four vertices.
      *
@@ -197,16 +238,16 @@ export class Bounds {
         return new Bounds(new Vertex(xMin, yMin), new Vertex(xMax, yMax));
     }
     /**
-    * Compute the minimal bounding box for a given set of existing bounding boxes.
-    *
-    * An empty vertex array will return an empty bounding box located at (0,0).
-    *
-    * @static
-    * @method computeFromBoundsSet
-    * @memberof Bounds
-    * @param {Array<IBounds>} boundingBoxes - The set of existing bounding boxes to get the containing bounding box for.
-    * @return The minimal Bounds for the given bounds instances.
-    **/
+     * Compute the minimal bounding box for a given set of existing bounding boxes.
+     *
+     * An empty vertex array will return an empty bounding box located at (0,0).
+     *
+     * @static
+     * @method computeFromBoundsSet
+     * @memberof Bounds
+     * @param {Array<IBounds>} boundingBoxes - The set of existing bounding boxes to get the containing bounding box for.
+     * @return The minimal Bounds for the given bounds instances.
+     **/
     static computeFromBoundsSet(boundingBoxes) {
         if (boundingBoxes.length == 0) {
             return new Bounds(new Vertex(0, 0), new Vertex(0, 0));

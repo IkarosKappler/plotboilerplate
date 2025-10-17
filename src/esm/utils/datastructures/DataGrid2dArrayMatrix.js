@@ -38,7 +38,7 @@ export class DataGrid2dArrayMatrix {
     find(condition) {
         for (var x = 0; x < this.xSegmentCount; x++) {
             for (var y = 0; y < this.ySegmentCount; y++) {
-                if (condition(this.get(x, y), x, y)) {
+                if (condition(this.get(x, y), x, y, this)) {
                     return {
                         xIndex: x,
                         yIndex: y,

@@ -20,6 +20,7 @@ export class DataGrid2dArrayMatrix<T> implements IDataGrid2d<T> {
    */
   readonly ySegmentCount: number;
 
+  // This is not really useful here ...
   minDataValue: T;
   maxDataValue: T;
 
@@ -58,10 +59,12 @@ export class DataGrid2dArrayMatrix<T> implements IDataGrid2d<T> {
     return this.getDataValueAt(xIndex, yIndex);
   }
 
-  public find(condition: (value: T, xIndex: number, yIndex: number) => boolean): RasterPosition {
+  public find(
+    condition: (value: T, xIndex: number, yIndex: number, sourceMatrix: DataGrid2dArrayMatrix<T>) => boolean
+  ): RasterPosition {
     for (var x = 0; x < this.xSegmentCount; x++) {
       for (var y = 0; y < this.ySegmentCount; y++) {
-        if (condition(this.get(x, y), x, y)) {
+        if (condition(this.get(x, y), x, y, this)) {
           return {
             xIndex: x,
             yIndex: y,
