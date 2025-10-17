@@ -27,6 +27,8 @@
       )
     );
 
+    var modal = new Modal();
+
     var exampleInputString = `
 X..........XXXXX
 ...........X.X.X
@@ -47,7 +49,7 @@ X..............X
 
     var makeBooleanMatrixFromString = function (str, width, height) {
       var matrix = new DataGrid2dArrayMatrix(width, height, false);
-      var lines = str.split("\n");
+      var lines = str.trim().split("\n");
       for (var y = 0; y < lines.length; y++) {
         for (var x = 0; x < lines[y].length; x++) {
           if (y < height && x < width && lines[y].charAt(x) === "X") {
@@ -61,11 +63,6 @@ X..............X
     var matrix = null;
     var paths = null;
 
-    var LEFT_BORDER = 0;
-    var TOP_BORDER = 1;
-    var RIGHT_BORDER = 2;
-    var BOTTOM_BORDER = 3;
-
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
       // animate: params.getBoolean("animate", true),
@@ -73,7 +70,13 @@ X..............X
       matrixHeight: 16,
       curveFactor: 0.666,
       squareSize: 20,
-      gapSize: 2
+      gapSize: 2,
+      drawMatrixSquares: true,
+      drawActiveMatrixPixels: true,
+      drawOrigin: false,
+      changeInput: function () {
+        insertMatrixString();
+      }
     };
 
     // var squareSize = 20;
@@ -99,24 +102,36 @@ X..............X
       });
     };
 
-    var postDraw = function (draw, fill) {
-      // console.log("postDraw");
-      // console.log("origin", origin);
+    var preDraw = function (draw, fill) {
       contentList.drawHighlighted(draw, fill);
-      draw.crosshair(origin, config.squareSize / 2, "grey", 1);
+      if (config.drawOrigin) {
+        draw.crosshair(origin, config.squareSize / 2, "grey", 1);
+      }
       for (var x = 0; x < matrix.xSegmentCount; x++) {
         // console.log("x", x);
         for (var y = 0; y < matrix.ySegmentCount; y++) {
           var value = matrix.get(x, y);
           var squareBox = getSquareBox(x, y);
-          fill.square(
-            { x: squareBox.min.x + config.squareSize / 2, y: squareBox.min.y + config.squareSize / 2 },
-            squareBox.width,
-            value ? "rgba(0,128,128,0.5)" : "rgba(0,128,128,0.2)"
-          );
+          if (config.drawMatrixSquares && !(config.drawActiveMatrixPixels && value)) {
+            fill.square(
+              { x: squareBox.min.x + config.squareSize / 2, y: squareBox.min.y + config.squareSize / 2 },
+              squareBox.width,
+              "rgba(0,128,128,0.2)"
+            );
+          }
+          if (config.drawActiveMatrixPixels && value) {
+            fill.square(
+              { x: squareBox.min.x + config.squareSize / 2, y: squareBox.min.y + config.squareSize / 2 },
+              squareBox.width,
+              "rgba(0,128,128,0.5)"
+            );
+          }
         }
       }
+    }; // END preDraw
 
+    var postDraw = function (draw, fill) {
+      contentList.drawHighlighted(draw, fill);
       for (var i = 0; i < paths.length; i++) {
         var pathData = paths[i];
         draw.path(pathData, "red", 1);
@@ -137,6 +152,35 @@ X..............X
     };
 
     // +---------------------------------------------------------------------------------
+    // | This is the callback to use when the user wants to insert
+    // | path data into the dialog (modal).
+    // +-------------------------------
+    var insertMatrixString = function () {
+      var textarea = document.createElement("textarea");
+      textarea.style.width = "100%";
+      textarea.style.height = "50vh";
+      textarea.innerHTML = exampleInputString;
+      modal.setTitle("Insert Path data (the 'd' string)");
+      modal.setFooter("");
+      modal.setActions([
+        Modal.ACTION_CANCEL,
+        {
+          label: "Load data",
+          action: function () {
+            // loadPathData(textarea.value);
+            exampleInputString = textarea.value;
+            init();
+            modal.close();
+            pb.redraw();
+          }
+        }
+      ]);
+      modal.setBody(textarea);
+      modal.open();
+    };
+    // insertMatrixString();
+
+    // +---------------------------------------------------------------------------------
     // | Create a GUI.
     // +-------------------------------
     {
@@ -151,9 +195,21 @@ X..............X
       gui.add(config, "matrixHeight").min(1).max(100).step(1).name("matrixHeight").title("TThe height of the pixel matrix.")
       .onChange( function() { init(); pb.redraw() });
       // prettier-ignore
-      gui.add(config, "curveFactor").min(0.0).max(1.666).step(0.01).name("curveFactor").title("The roundness of the curves.")
+      gui.add(config, "curveFactor").min(-0.5).max(1.666).step(0.01).name("curveFactor").title("The roundness of the curves.")
         .onChange( function() { init(); pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "drawOrigin").name("drawOrigin").title("Draw the origin?")
+        .onChange( function() { pb.redraw(); });
+      // prettier-ignore
+      gui.add(config, "drawMatrixSquares").name("drawMatrixSquares").title("Draw all matrix squares?")
+        .onChange( function() { pb.redraw(); });
+      // prettier-ignore
+      gui.add(config, "drawActiveMatrixPixels").name("drawActiveMatrixPixels").title("Draw active matrix squares?")
+        .onChange( function() { pb.redraw(); });
+      // prettier-ignore
+      gui.add(config, "changeInput").title("Define your own pattern.");
     }
+    pb.config.preDraw = preDraw;
     pb.config.postDraw = postDraw;
 
     // +---------------------------------------------------------------------------------

@@ -92,12 +92,13 @@ const lerp = (a, b, lerpFactor) => {
  *
  * @param {SVGPathParams} pathData
  * @param {XYCoords} start
- * @param {XYCoords} corner
+ * @param {XYCoords} controlA
+ * @param {XYCoords} controlB
  * @param {XYCoords} end
  * @param {number} curveFactor
  */
-const addRoundCorner = (pathData, start, corner, end, curveFactor) => {
-    pathData.push("C", lerp(start.x, corner.x, curveFactor), lerp(start.y, corner.y, curveFactor), lerp(end.x, corner.x, curveFactor), lerp(end.y, corner.y, curveFactor), end.x, end.y);
+const addRoundCorner = (pathData, start, controlA, controlB, end, curveFactor) => {
+    pathData.push("C", lerp(start.x, controlA.x, curveFactor), lerp(start.y, controlA.y, curveFactor), lerp(end.x, controlB.x, curveFactor), lerp(end.y, controlB.y, curveFactor), end.x, end.y);
 };
 /**
  * Construct a new path command for a straight line.
@@ -147,15 +148,15 @@ const __constructPath = (pathData, matrix, visitedLeftBordersMatrix, startingPos
             if (y - 1 < 0 || matrix.get(x, y - 1) === false) {
                 // Northwise pixel is empty
                 //  -> construct round corner to right
-                addRoundCorner(pathData, west, squareBox.getNorthWestPoint(), squareBox.getNorthPoint(), curveFactor);
+                addRoundCorner(pathData, west, squareBox.getNorthWestPoint(), squareBox.getNorthWestPoint(), squareBox.getNorthPoint(), curveFactor);
                 borderDirection = TOP_BORDER;
                 // Keep pixel position unchanged
             }
             else if (x - 1 >= 0 && matrix.get(x - 1, y - 1) === true) {
-                // Top neighbour pixel is set AND top-left pixel is set tpo.
+                // Top neighbour pixel is set AND top-left pixel is set too.
                 // -> construct rounded edge to top-left.
                 const squareBoxNW = getSquareBox(origin, squareSize, gapSize, x - 1, y - 1);
-                addRoundCorner(pathData, west, squareBox.getNorthWestPoint(), squareBoxNW.getSouthPoint(), curveFactor);
+                addRoundCorner(pathData, west, squareBox.getNorthWestPoint(), squareBoxNW.getSouthEastPoint(), squareBoxNW.getSouthPoint(), curveFactor);
                 borderDirection = BOTTOM_BORDER;
                 position = { xIndex: x - 1, yIndex: y - 1 };
             }
@@ -174,7 +175,7 @@ const __constructPath = (pathData, matrix, visitedLeftBordersMatrix, startingPos
             if (x + 1 >= matrix.xSegmentCount || matrix.get(x + 1, y) === false) {
                 // Top border and right pixel is empty
                 //  --> create rounded corner to right south
-                addRoundCorner(pathData, north, squareBox.getNorthEastPoint(), squareBox.getEastPoint(), curveFactor);
+                addRoundCorner(pathData, north, squareBox.getNorthEastPoint(), squareBox.getNorthEastPoint(), squareBox.getEastPoint(), curveFactor);
                 borderDirection = RIGHT_BORDER;
                 // Keep pixel position unchanged
             }
@@ -190,7 +191,7 @@ const __constructPath = (pathData, matrix, visitedLeftBordersMatrix, startingPos
                 // Last case: right neighbour is set and north-east pixel is set
                 //-> construct a rounded corner to east-north.
                 const squareBoxNE = getSquareBox(origin, squareSize, gapSize, x + 1, y - 1);
-                addRoundCorner(pathData, north, squareBox.getNorthEastPoint(), squareBoxNE.getWestPoint(), curveFactor);
+                addRoundCorner(pathData, north, squareBox.getNorthEastPoint(), squareBoxNE.getSouthWestPoint(), squareBoxNE.getWestPoint(), curveFactor);
                 borderDirection = LEFT_BORDER;
                 position = { xIndex: x + 1, yIndex: y - 1 };
                 // isPathComplete = true; // TODO!!!
@@ -202,7 +203,7 @@ const __constructPath = (pathData, matrix, visitedLeftBordersMatrix, startingPos
             if (y + 1 >= matrix.ySegmentCount || matrix.get(x, y + 1) === false) {
                 // South pixel is empty.
                 // -> construct rounded corner to south-east
-                addRoundCorner(pathData, east, squareBox.getSouthEastPoint(), squareBox.getSouthPoint(), curveFactor);
+                addRoundCorner(pathData, east, squareBox.getSouthEastPoint(), squareBox.getSouthEastPoint(), squareBox.getSouthPoint(), curveFactor);
                 borderDirection = BOTTOM_BORDER;
                 // Keep pixel position unchanged
             }
@@ -210,7 +211,7 @@ const __constructPath = (pathData, matrix, visitedLeftBordersMatrix, startingPos
                 // South pixel is set AND right lower pixel is set, too.
                 // -> construct round corner to south-east.
                 const squareBoxSE = getSquareBox(origin, squareSize, gapSize, x + 1, y + 1);
-                addRoundCorner(pathData, east, squareBox.getSouthEastPoint(), squareBoxSE.getNorthPoint(), curveFactor);
+                addRoundCorner(pathData, east, squareBox.getSouthEastPoint(), squareBoxSE.getNorthWestPoint(), squareBoxSE.getNorthPoint(), curveFactor);
                 borderDirection = TOP_BORDER;
                 position = { xIndex: x + 1, yIndex: y + 1 };
             }
@@ -229,14 +230,14 @@ const __constructPath = (pathData, matrix, visitedLeftBordersMatrix, startingPos
             if (x - 1 < 0 || matrix.get(x - 1, y) === false) {
                 // Left pixel is empty
                 // -> construct round corner to west-north
-                addRoundCorner(pathData, south, squareBox.getSouthWestPoint(), squareBox.getWestPoint(), curveFactor);
+                addRoundCorner(pathData, south, squareBox.getSouthWestPoint(), squareBox.getSouthWestPoint(), squareBox.getWestPoint(), curveFactor);
                 borderDirection = LEFT_BORDER;
             }
             else if (x - 1 >= 0 && y + 1 < matrix.ySegmentCount && matrix.get(x - 1, y + 1) === true) {
                 // Left pixel AND left lower pixel are set
                 // -> construct rounded edge to south-west
                 const squareBoxSW = getSquareBox(origin, squareSize, gapSize, x - 1, y + 1);
-                addRoundCorner(pathData, south, squareBox.getSouthWestPoint(), squareBoxSW.getEastPoint(), curveFactor);
+                addRoundCorner(pathData, south, squareBox.getSouthWestPoint(), squareBoxSW.getNorthEastPoint(), squareBoxSW.getEastPoint(), curveFactor);
                 borderDirection = RIGHT_BORDER;
                 position = { xIndex: x - 1, yIndex: y + 1 };
             }
