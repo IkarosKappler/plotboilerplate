@@ -1,5 +1,6 @@
-# Calculate intersection angles of polyon and ray
+# Detect outlines of pixel matrices and add rounded corners
 
-TODO
+Imagine a boolean pixel raster. The method detects outlines as SVG paths and
+adds rounded corners.
 
-![Polygon angles](../../screenshots/screenshot-20250521-0-angles-of-polygon-and-ray.png)
+![Polygon angles](../../screenshots/screenshot-20251017-1-rounded-square-paths.png)

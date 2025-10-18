@@ -108,4 +108,44 @@ export class DataGrid2dArrayMatrix<T> implements IDataGrid2d<T> {
     buffer[1][1] = this.getDataValueAt(xIndex + 1, yIndex + 1);
     buffer[0][1] = this.getDataValueAt(xIndex, yIndex + 1);
   }
+
+  /**
+   * A helper method to convert a boolean matrix to a parsable string.
+   *
+   * @param {DataGrid2dArrayMatrix<boolean>} matrix
+   * @returns {string}
+   */
+  static toString(matrix: DataGrid2dArrayMatrix<boolean>): string {
+    const buffer: Array<string> = [];
+    for (var y = 0; y < matrix.ySegmentCount; y++) {
+      for (var x = 0; x < matrix.ySegmentCount; x++) {
+        buffer.push(matrix.get(x, y) ? "X" : ".");
+      }
+      buffer.push("\n");
+    }
+    return buffer.join("");
+  }
+
+  /**
+   * Simple way to parse a data matrix from a string. `false` should be coded as '.' character,
+   * `true` must be coded as 'X' character.
+   *
+   * @param {string} str - The input string.
+   * @param {number} width - The desired width of the matrix (xSegmentCount).
+   * @param {number} height - The desired height of the matrix (ySegmentCount).
+   * @returns {DataGrid2dArrayMatrix<boolean>}
+   */
+  static parseBooleanMatrix(str: string, width: number, height: number): DataGrid2dArrayMatrix<boolean> {
+    const matrix = new DataGrid2dArrayMatrix<boolean>(width, height, false);
+    const lines: String[] = str.trim().split("\n");
+    for (var y = 0; y < lines.length && y < height; y++) {
+      lines[y] = lines[y].trim();
+      for (var x = 0; x < lines[y].length && x < width; x++) {
+        if (y < height && x < width && lines[y].charAt(x) === "X") {
+          matrix.set(x, y, true);
+        }
+      }
+    }
+    return matrix;
+  }
 }

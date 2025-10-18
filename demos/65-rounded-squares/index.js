@@ -29,6 +29,9 @@
 
     var modal = new Modal();
 
+    // +---------------------------------------------------------------------------------
+    // | An initial data matrix coded as a string.
+    // +-------------------------------
     var exampleInputString = `
 X..........XXXXX
 ...........X.X.X
@@ -44,56 +47,56 @@ X..........XXXXX
 .....XX.........
 ......X.........
 ....XX.X........
+................
 X..............X
 `;
 
-    var makeBooleanMatrixFromString = function (str, width, height) {
-      var matrix = new DataGrid2dArrayMatrix(width, height, false);
-      var lines = str.trim().split("\n");
-      for (var y = 0; y < lines.length; y++) {
-        for (var x = 0; x < lines[y].length; x++) {
-          if (y < height && x < width && lines[y].charAt(x) === "X") {
-            matrix.set(x, y, true);
-          }
-        }
-      }
-      return matrix;
-    };
+    // +---------------------------------------------------------------------------------
+    // | Our data matrix to use (will be initialized later), and the resulting path array.
+    // +-------------------------------
+    var matrix = null; // DataGrid2dArrayMatrix<boolean>
+    var paths = null; // Array<SVGPathCommand>
 
-    var matrix = null;
-    var paths = null;
+    // +---------------------------------------------------------------------------------
+    // | The offset (origin) of the final graphics.
+    // +-------------------------------
+    var origin;
 
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
-      // animate: params.getBoolean("animate", true),
-      matrixWidth: 16,
-      matrixHeight: 16,
-      curveFactor: 0.666,
-      squareSize: 20,
-      gapSize: 2,
-      drawMatrixSquares: true,
-      drawActiveMatrixPixels: true,
-      drawOrigin: false,
+      animate: params.getBoolean("animate", true),
+      matrixWidth: params.getNumber("matrixWidth", 16),
+      matrixHeight: params.getNumber("matrixHeight", 16),
+      curveFactor: params.getNumber("curveFactor", 0.666),
+      squareSize: params.getNumber("squareSize", 20),
+      gapSize: params.getNumber("gapSize", 2),
+      drawMatrixSquares: params.getBoolean("drawMatrixSquares", true),
+      drawActiveMatrixPixels: params.getBoolean("drawActiveMatrixPixels", true),
+      drawOrigin: params.getBoolean("drawOrigin", false),
+      pathColor: params.getString("pathColor", "rgb(192,128,0)"),
+      lineWidth: params.getNumber("lineWidth", 2.0),
       changeInput: function () {
         insertMatrixString();
       }
     };
 
-    // var squareSize = 20;
-    // var gapSize = 2;
-    var origin;
-
+    // +---------------------------------------------------------------------------------
+    // | Initializes everything we need: the matrix, the origin based on the pixel size settings
+    // | and runs the path detection.
+    // +-------------------------------
     var init = function () {
-      matrix = makeBooleanMatrixFromString(exampleInputString, config.matrixWidth, config.matrixHeight);
+      matrix = DataGrid2dArrayMatrix.parseBooleanMatrix(exampleInputString, config.matrixWidth, config.matrixHeight);
+      // Update draw origin
       origin = {
         x: (-(config.squareSize + config.gapSize) * matrix.xSegmentCount - config.gapSize) / 2,
         y: (-(config.squareSize + config.gapSize) * matrix.ySegmentCount - config.gapSize) / 2
       };
-      paths = [];
-      findPaths(matrix);
+      rebuildPaths();
     };
 
-    var findPaths = function (matrix) {
+    var rebuildPaths = function () {
+      paths = [];
+      // Detect the paths from the matrix.
       paths = pixelCornersToRoundPaths(matrix, {
         squareSize: config.squareSize,
         gapSize: config.gapSize,
@@ -102,6 +105,9 @@ X..............X
       });
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Render the pixel raster before drawing anything else.
+    // +-------------------------------
     var preDraw = function (draw, fill) {
       contentList.drawHighlighted(draw, fill);
       if (config.drawOrigin) {
@@ -130,11 +136,14 @@ X..............X
       }
     }; // END preDraw
 
+    // +---------------------------------------------------------------------------------
+    // | Render the detected paths at the end.
+    // +-------------------------------
     var postDraw = function (draw, fill) {
       contentList.drawHighlighted(draw, fill);
       for (var i = 0; i < paths.length; i++) {
         var pathData = paths[i];
-        draw.path(pathData, "red", 1);
+        draw.path(pathData, config.pathColor, config.lineWidth);
       }
     }; // END postDraw
 
@@ -159,15 +168,15 @@ X..............X
       var textarea = document.createElement("textarea");
       textarea.style.width = "100%";
       textarea.style.height = "50vh";
-      textarea.innerHTML = exampleInputString;
-      modal.setTitle("Insert Path data (the 'd' string)");
+      // textarea.innerHTML = exampleInputString;
+      textarea.innerHTML = DataGrid2dArrayMatrix.toString(matrix);
+      modal.setTitle("Insert the matrix as a string");
       modal.setFooter("");
       modal.setActions([
         Modal.ACTION_CANCEL,
         {
-          label: "Load data",
+          label: "Load matrix",
           action: function () {
-            // loadPathData(textarea.value);
             exampleInputString = textarea.value;
             init();
             modal.close();
@@ -178,7 +187,26 @@ X..............X
       modal.setBody(textarea);
       modal.open();
     };
-    // insertMatrixString();
+
+    new MouseHandler(pb.eventCatcher).click(function (event) {
+      // Install matrix pixel listeners
+      var relPos = pb.transformMousePosition(event.params.pos.x, event.params.pos.y);
+      // Check all squares if they contain the click position.
+      var isChanged = false;
+      for (var x = 0; x < matrix.xSegmentCount; x++) {
+        for (var y = 0; y < matrix.ySegmentCount; y++) {
+          var squareBox = getSquareBox(x, y);
+          if (squareBox.containsVert(relPos)) {
+            matrix.set(x, y, !matrix.get(x, y));
+            isChanged = true;
+          }
+        }
+      }
+      if (isChanged) {
+        rebuildPaths();
+        pb.redraw();
+      }
+    });
 
     // +---------------------------------------------------------------------------------
     // | Create a GUI.
@@ -206,6 +234,12 @@ X..............X
       // prettier-ignore
       gui.add(config, "drawActiveMatrixPixels").name("drawActiveMatrixPixels").title("Draw active matrix squares?")
         .onChange( function() { pb.redraw(); });
+      // prettier-ignore
+      gui.addColor(config, "pathColor").name("pathColor").title("The color to render the result path with.")
+        .onChange( function() { init(); pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "lineWidth").min(1).max(10).step(1).name("lineWidth").title("The line with to user for rendering pathts.")
+      .onChange( function() { init(); pb.redraw() });
       // prettier-ignore
       gui.add(config, "changeInput").title("Define your own pattern.");
     }

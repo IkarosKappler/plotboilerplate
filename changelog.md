@@ -1,6 +1,8 @@
 # Changelog
 
-- 2025.10-17
+- 2025-10-18
+  - Added method `Bounds.containsVert(XYCoords)`.
+- 2025-10-17
   - Added the methods `Bounds.getSouthWestPoint`, `getNorthWestPoint`, `getNorthEastPoint` and `getSouthEastPoint`.
 - 2025-10-16
   - Added demo `65-rounded-squares`.

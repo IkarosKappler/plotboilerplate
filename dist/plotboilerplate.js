@@ -1392,7 +1392,8 @@ exports.drawutils = drawutils;
  * @modified 2025-04-19 Added methods to `Bounds` class: `getNorthPoint`, `getSouthPoint`, `getEastPoint` and `getWestPoint`.
  * @modified 2025-04-26 Added static method `Bounds.computeFromBoundsSet` to calculate containing bounds for a set of bounding boxes.
  * @modified 2025-10-17 Added the methods `Bounds.getSouthWestPoint`, `getNorthWestPoint`, `getNorthEastPoint` and `getSouthEastPoint`.
- * @version  1.9.0
+ * @modified 2025-10-18 Added method `Bounds.containsVert(XYCoords)`.
+ * @version  1.10.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Bounds = void 0;
@@ -1420,6 +1421,18 @@ var Bounds = /** @class */ (function () {
         this.width = max.x - min.x;
         this.height = max.y - min.y;
     }
+    /**
+     * Check if the given vertex is inside this bounds.
+     *
+     * @method containsVert
+     * @param {XYCoords} vert - The vertex to check.
+     * @return {boolean} True if the passed vertex is inside this bounds.
+     * @instance
+     * @memberof Bounds
+     **/
+    Bounds.prototype.containsVert = function (vert) {
+        return this.min.x <= vert.x && vert.x < this.max.x && this.min.y <= vert.y && vert.y < this.max.y;
+    };
     /**
      * Get the center point of the north bound.
      *

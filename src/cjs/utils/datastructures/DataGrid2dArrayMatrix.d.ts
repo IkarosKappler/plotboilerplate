@@ -45,4 +45,21 @@ export declare class DataGrid2dArrayMatrix<T> implements IDataGrid2d<T> {
      * @override
      */
     getDataFace4At(xIndex: number, yIndex: number, buffer: DataGridFace4<T>): void;
+    /**
+     * A helper method to convert a boolean matrix to a parsable string.
+     *
+     * @param {DataGrid2dArrayMatrix<boolean>} matrix
+     * @returns {string}
+     */
+    static toString(matrix: DataGrid2dArrayMatrix<boolean>): string;
+    /**
+     * Simple way to parse a data matrix from a string. `false` should be coded as '.' character,
+     * `true` must be coded as 'X' character.
+     *
+     * @param {string} str - The input string.
+     * @param {number} width - The desired width of the matrix (xSegmentCount).
+     * @param {number} height - The desired height of the matrix (ySegmentCount).
+     * @returns {DataGrid2dArrayMatrix<boolean>}
+     */
+    static parseBooleanMatrix(str: string, width: number, height: number): DataGrid2dArrayMatrix<boolean>;
 }

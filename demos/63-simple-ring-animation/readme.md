@@ -1,5 +1,6 @@
-# Calculate intersection angles of polyon and ray
+# Methods of rendering ring sectors
 
-TODO
+It's easy to render circle sectors (as lines). Rendering rings as SVG paths
+is a different task.
 
-![Polygon angles](../../screenshots/screenshot-20250521-0-angles-of-polygon-and-ray.png)
+![Polygon angles](../../screenshots/screenshot-20251018-ring-animation.png)

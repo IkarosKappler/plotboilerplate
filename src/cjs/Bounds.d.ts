@@ -14,7 +14,8 @@
  * @modified 2025-04-19 Added methods to `Bounds` class: `getNorthPoint`, `getSouthPoint`, `getEastPoint` and `getWestPoint`.
  * @modified 2025-04-26 Added static method `Bounds.computeFromBoundsSet` to calculate containing bounds for a set of bounding boxes.
  * @modified 2025-10-17 Added the methods `Bounds.getSouthWestPoint`, `getNorthWestPoint`, `getNorthEastPoint` and `getSouthEastPoint`.
- * @version  1.9.0
+ * @modified 2025-10-18 Added method `Bounds.containsVert(XYCoords)`.
+ * @version  1.10.0
  **/
 import { Polygon } from "./Polygon";
 import { XYCoords, IBounds, XYDimension } from "./interfaces";
@@ -64,6 +65,16 @@ export declare class Bounds implements IBounds, XYDimension {
      * @param {XYCoords} max - The max values (x,y) as a XYCoords tuple.
      **/
     constructor(min: XYCoords, max: XYCoords);
+    /**
+     * Check if the given vertex is inside this bounds.
+     *
+     * @method containsVert
+     * @param {XYCoords} vert - The vertex to check.
+     * @return {boolean} True if the passed vertex is inside this bounds.
+     * @instance
+     * @memberof Bounds
+     **/
+    containsVert(vert: XYCoords): boolean;
     /**
      * Get the center point of the north bound.
      *
