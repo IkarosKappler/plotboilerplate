@@ -64,7 +64,7 @@ X..............X
 
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
-      animate: params.getBoolean("animate", true),
+      animate: params.getBoolean("animate", false),
       matrixWidth: params.getNumber("matrixWidth", 16),
       matrixHeight: params.getNumber("matrixHeight", 16),
       curveFactor: params.getNumber("curveFactor", 0.666),
@@ -75,6 +75,11 @@ X..............X
       drawOrigin: params.getBoolean("drawOrigin", false),
       pathColor: params.getString("pathColor", "rgb(192,128,0)"),
       lineWidth: params.getNumber("lineWidth", 2.0),
+      randomize: function () {
+        randomizeMatrix();
+        rebuildPaths();
+        pb.redraw();
+      },
       changeInput: function () {
         insertMatrixString();
       }
@@ -94,6 +99,21 @@ X..............X
       rebuildPaths();
     };
 
+    var randomizeMatrix = function () {
+      for (var x = 0; x < matrix.xSegmentCount; x++) {
+        for (var y = 0; y < matrix.ySegmentCount; y++) {
+          matrix.set(x, y, randomBoolean());
+        }
+      }
+    };
+
+    var randomBoolean = function () {
+      return Math.random() < 0.5;
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Rebuild the paths from the current matrix.
+    // +-------------------------------
     var rebuildPaths = function () {
       paths = [];
       // Detect the paths from the matrix.
@@ -114,7 +134,6 @@ X..............X
         draw.crosshair(origin, config.squareSize / 2, "grey", 1);
       }
       for (var x = 0; x < matrix.xSegmentCount; x++) {
-        // console.log("x", x);
         for (var y = 0; y < matrix.ySegmentCount; y++) {
           var value = matrix.get(x, y);
           var squareBox = getSquareBox(x, y);
@@ -214,8 +233,8 @@ X..............X
     {
       var gui = pb.createGUI();
       // prettier-ignore
-      // gui.add(config, "animate").name("animate").title("Animate the ray?")
-      //   .onChange( function() { toggleAnimation(); });
+      gui.add(config, "animate").name("animate").title("Animate the ray?")
+        .onChange( function() { toggleAnimation(); });
       // prettier-ignore
       gui.add(config, "matrixWidth").min(1).max(100).step(1).name("matrixWidth").title("The width of the pixel matrix.")
         .onChange( function() { init(); pb.redraw() });
@@ -236,15 +255,54 @@ X..............X
         .onChange( function() { pb.redraw(); });
       // prettier-ignore
       gui.addColor(config, "pathColor").name("pathColor").title("The color to render the result path with.")
-        .onChange( function() { init(); pb.redraw() });
+        .onChange( function() {  pb.redraw() });
       // prettier-ignore
       gui.add(config, "lineWidth").min(1).max(10).step(1).name("lineWidth").title("The line with to user for rendering pathts.")
-      .onChange( function() { init(); pb.redraw() });
+      .onChange( function() {  pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "randomize").title("Randomize the current matrix.");
       // prettier-ignore
       gui.add(config, "changeInput").title("Define your own pattern.");
     }
     pb.config.preDraw = preDraw;
     pb.config.postDraw = postDraw;
+
+    // +---------------------------------------------------------------------------------
+    // | Render next animation step.
+    // +-------------------------------
+    var isAnimationRunning = false;
+    var animationFrameNumber = 0;
+    function animateStep() {
+      // console.log("animate");
+      if (!config.animate) {
+        return;
+      }
+      animationFrameNumber++;
+      randomizeMatrix();
+      exampleInputString = DataGrid2dArrayMatrix.toString(matrix);
+      rebuildPaths();
+      pb.redraw();
+      if (isAnimationRunning) {
+        // globalThis.requestAnimationFrame(animateStep);
+        globalThis.setTimeout(animateStep, 1000);
+      }
+    }
+
+    // +---------------------------------------------------------------------------------
+    // | Toggle animation of main ray.
+    // +-------------------------------
+    function toggleAnimation() {
+      if (config.animate) {
+        if (!isAnimationRunning) {
+          isAnimationRunning = true;
+          animateStep(0);
+        }
+      } else {
+        if (isAnimationRunning) {
+          isAnimationRunning = false;
+        }
+      }
+    }
 
     // +---------------------------------------------------------------------------------
     // | This renders a content list component on top, allowing to delete or add
@@ -262,5 +320,6 @@ X..............X
 
     init();
     pb.redraw();
+    toggleAnimation();
   });
 })(globalThis);

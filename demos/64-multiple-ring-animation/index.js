@@ -25,6 +25,12 @@
       )
     );
 
+    // Array< { center: new Vertex(0,0),
+    // innerRadius: 45.0,
+    // outerRadius: 100.0,
+    // startAngleDeg: 0.0,
+    // endAngleDeg: Math.PI * 1.5 * RAD_TO_DEG,
+    // animators: [] } >
     const rings = [];
 
     // Create a config: we want to have control about the arrow head size in this demo
@@ -37,6 +43,7 @@
 
     var init = function () {
       rings.push({
+        center: new Vertex(0, 0),
         innerRadius: 45.0,
         outerRadius: 100.0,
         startAngleDeg: 0.0,
@@ -77,6 +84,9 @@
     var animationFrameNumber = 0;
 
     var postDraw = function (draw, fill) {
+      var milliseconds = Date.now();
+      var quareDuration = 1000; // One change per second
+
       // ...
       var center = new Vertex({ x: 0, y: 0 });
       // draw.circle(center, 100, "red", 1);
@@ -84,11 +94,14 @@
       rings.forEach(function (ring, ringIndex) {
         // console.log("Render Ring", ringIndex);
         renderRing(draw, fill, ring);
+        if (milliseconds % quareDuration < quareDuration / 2.0) {
+          pb.draw.square({ x: ring.center.x, y: ring.center.y }, ring.outerRadius / 2.0, "orange", 1.0);
+        }
       });
     }; // END postDraw
 
     var renderRing = function (draw, fill, ring) {
-      var center = new Vertex(0, 0);
+      // var center = new Vertex(0, 0);
       var safeStartAngle = geomutils.mapAngleTo2PI(baseRotation + DEG_TO_RAD * ring.startAngleDeg);
       var safeEndAngle = geomutils.mapAngleTo2PI(baseRotation + DEG_TO_RAD * ring.endAngleDeg);
 
@@ -98,7 +111,13 @@
         safeStartAngle = geomutils.mapAngleTo2PI(baseRotation + DEG_TO_RAD * ring.endAngleDeg) - Math.PI * 2;
       }
 
-      var pathData = SVGPathUtils.mkCircularRingSector(center, ring.innerRadius, ring.outerRadius, safeStartAngle, safeEndAngle);
+      var pathData = SVGPathUtils.mkCircularRingSector(
+        ring.center,
+        ring.innerRadius,
+        ring.outerRadius,
+        safeStartAngle,
+        safeEndAngle
+      );
       draw.path(pathData, "rgba(255,255,0,1.0)", 6);
       fill.path(pathData, "rgba(255,255,0,0.5)");
 
