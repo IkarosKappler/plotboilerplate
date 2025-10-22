@@ -26,11 +26,11 @@
     );
 
     // Array< { center: new Vertex(0,0),
-    // innerRadius: 45.0,
-    // outerRadius: 100.0,
-    // startAngleDeg: 0.0,
-    // endAngleDeg: Math.PI * 1.5 * RAD_TO_DEG,
-    // animators: [] } >
+    //          innerRadius: 45.0,
+    //          outerRadius: 100.0,
+    //          startAngleDeg: 0.0,
+    //          endAngleDeg: Math.PI * 1.5 * RAD_TO_DEG,
+    //          animators: [] } >
     const rings = [];
 
     // Create a config: we want to have control about the arrow head size in this demo
@@ -38,29 +38,38 @@
       animate: params.getBoolean("animate", true),
       // Make sure start is sirculary smaller than end?
       wrapStartEnd: params.getBoolean("wrapStartEnd", true),
-      numRings: params.getNumber("numRings", 5)
+      numRings: params.getNumber("numRings", 5),
+      debug: params.getBoolean("debug", false)
     };
 
     var init = function () {
       rings.push({
         center: new Vertex(0, 0),
+        baseRotation: 0.0,
         innerRadius: 45.0,
         outerRadius: 100.0,
         startAngleDeg: 0.0,
         endAngleDeg: Math.PI * 1.5 * RAD_TO_DEG,
+        lineColor: "rgba(255,192,0,1.0)",
+        fillColor: "rgba(255,192,0,0.5)",
         animators: []
       });
-      // rings[0].animators.push(new AttrAnimator(rings[0], "innerRadius", 45.0, 120.0, 1.0));
       rings[0].animators.push(new AttrAnimator(rings[0], "startAngleDeg", Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, 1.0));
-      // rings.push({
-      //   innerRadius: 80.0,
-      //   outerRadius: 150.0,
-      //   startAngleDeg: 0.0,
-      //   endAngleDeg: Math.PI * 1.5 * RAD_TO_DEG,
-      //   animators: []
-      // });
-      // rings[1].animators.push(new AttrAnimator(rings[1], "innerRadius", 80.0, 200.0, 1.0));
-      // rings[1].animators.push(new AttrAnimator(rings[1], "startAngleDeg", Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, 1.0));
+      rings[0].animators.push(new AttrAnimator(rings[0], "baseRotation", Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, 1.0));
+
+      // rings[0].animators.push(new AttrAnimator(rings[0], "innerRadius", 45.0, 120.0, 1.0));
+      rings.push({
+        center: new Vertex(0, 0),
+        baseRotation: 0.0,
+        innerRadius: 120.0,
+        outerRadius: 140.0,
+        startAngleDeg: 0.0,
+        endAngleDeg: Math.PI * 1.5 * RAD_TO_DEG,
+        lineColor: "rgba(0,255,255,1.0)",
+        fillColor: "rgba(0,255,255,0.5)",
+        animators: []
+      });
+      rings[1].animators.push(new CircularAttrAnimator(rings[1], "endAngleDeg", "startAngleDeg", 1.0));
     };
 
     var AttrAnimator = function (obj, attrName, min, max, stepValue) {
@@ -76,16 +85,55 @@
         this.stepValue = -this.stepValue;
       }
     };
+    var CircularAttrAnimator = function (obj, startAttrName, endAttrName, stepValue) {
+      this.obj = obj;
+      this.startAttrName = startAttrName;
+      this.endAttrName = endAttrName;
+      this.stepValue = stepValue;
+      this.mode = 0;
+    };
+    CircularAttrAnimator.prototype.next = function () {
+      // console.log("X");
+      if (this.mode === 0) {
+        var newVal = this.obj[this.startAttrName] + this.stepValue;
+        if (newVal >= 360.0) {
+          console.log("this.mode = 1");
+          this.mode = 1;
+          this.obj[this.endAttrName] = 0.0;
+        } else {
+          this.obj[this.startAttrName] = newVal;
+        }
+      } else if (this.mode === 1) {
+        var newVal = this.obj[this.endAttrName] + this.stepValue;
+        if (newVal >= 360.0) {
+          console.log("this.mode = 2");
+          this.mode = 2;
+          this.obj[this.startAttrName] = 0.0;
+          this.obj[this.endAttrName] = 0.0;
+        } else {
+          this.obj[this.endAttrName] = newVal;
+        }
+      } else {
+        var newVal = this.obj[this.endAttrName] + this.stepValue;
+        if (newVal >= 360.0) {
+          console.log("this.mode = 0");
+          this.mode = 0;
+          this.obj[this.startAttrName] = -360.0 + this.stepValue;
+          this.obj[this.endAttrName] = 0.0;
+        } else {
+          this.obj[this.endAttrName] = newVal;
+        }
+      }
+    };
 
     // +---------------------------------------------------------------------------------
     // | Global vars
     // +-------------------------------
-    var baseRotation = Math.PI / 5.0;
     var animationFrameNumber = 0;
 
     var postDraw = function (draw, fill) {
       var milliseconds = Date.now();
-      var quareDuration = 1000; // One change per second
+      var quareDuration = 500; // One change per second
 
       // ...
       var center = new Vertex({ x: 0, y: 0 });
@@ -95,13 +143,29 @@
         // console.log("Render Ring", ringIndex);
         renderRing(draw, fill, ring);
         if (milliseconds % quareDuration < quareDuration / 2.0) {
-          pb.draw.square({ x: ring.center.x, y: ring.center.y }, ring.outerRadius / 2.0, "orange", 1.0);
+          pb.draw.square(
+            { x: ring.center.x + ring.outerRadius, y: ring.center.y + ring.outerRadius },
+            ring.outerRadius / 4.0,
+            "orange",
+            1.0
+          );
         }
       });
     }; // END postDraw
 
+    var textOptions = {
+      color: "rgba(255,0,255,0.5)",
+      fontFamily: "Monospace",
+      fontSize: 12,
+      fontStyle: "normal",
+      fontWeight: 300,
+      lineHeight: 12,
+      textAlign: "left",
+      rotation: 0.0
+    };
     var renderRing = function (draw, fill, ring) {
       // var center = new Vertex(0, 0);
+      var baseRotation = ring.baseRotation * DEG_TO_RAD;
       var safeStartAngle = geomutils.mapAngleTo2PI(baseRotation + DEG_TO_RAD * ring.startAngleDeg);
       var safeEndAngle = geomutils.mapAngleTo2PI(baseRotation + DEG_TO_RAD * ring.endAngleDeg);
 
@@ -118,10 +182,32 @@
         safeStartAngle,
         safeEndAngle
       );
-      draw.path(pathData, "rgba(255,255,0,1.0)", 6);
-      fill.path(pathData, "rgba(255,255,0,0.5)");
+      draw.path(pathData, ring.lineColor, 6);
+      fill.path(pathData, ring.fillColor);
 
-      if (animationFrameNumber % 100 === 0) {
+      var startPosition = Circle.circleUtils.vertAt(ring.startAngleDeg * DEG_TO_RAD, ring.outerRadius + 10.0).add(ring.center);
+      draw.crosshair(startPosition, 5, "rgb(0,192,192)", 1.0);
+      fill.text(`<[s ${ring.startAngleDeg * DEG_TO_RAD}`, startPosition.x, startPosition.y, textOptions);
+
+      var endPosition = Circle.circleUtils.vertAt(ring.endAngleDeg * DEG_TO_RAD, ring.outerRadius + 10.0).add(ring.center);
+      draw.crosshair(endPosition, 5, "rgb(0,192,192)", 1.0);
+      fill.text(`<[e ${ring.endAngleDeg * DEG_TO_RAD}`, endPosition.x, endPosition.y, textOptions);
+
+      // draw.circleArc(ring.center, ring.innerRadius / 2.0, safeStartAngle, safeEndAngle, "red", 2);
+      draw.circleArc(
+        ring.center,
+        ring.innerRadius / 2.0,
+        baseRotation + DEG_TO_RAD * ring.startAngleDeg,
+        baseRotation + DEG_TO_RAD * ring.endAngleDeg,
+        "rgba(0,128,128,0.75)",
+        2,
+        {
+          dashOffset: 0.0,
+          dashArray: [5.0, 2.0]
+        }
+      );
+
+      if (config.debug && animationFrameNumber % 100 === 0) {
         // console.log("pathData", pathData);
         console.log("tmp2", pathData, "ring.startAngleDeg", ring.startAngleDeg, "ring.endAngleDeg", ring.endAngleDeg);
       }
@@ -141,11 +227,11 @@
     }
     pb.config.postDraw = postDraw;
 
-    function animateAllRings() {
+    function animateAllRings(time) {
       rings.forEach(function (ring) {
         // ring.animateFn(ring);
         ring.animators.forEach(function (animator) {
-          animator.next();
+          animator.next(time);
         });
       });
     }
@@ -155,8 +241,7 @@
     // +-------------------------------
     var isAnimationRunning = false;
     function animateStep(time) {
-      // baseRotation += 0.01;
-      animateAllRings();
+      animateAllRings(time);
       animationFrameNumber++;
       pb.redraw();
       if (isAnimationRunning) {

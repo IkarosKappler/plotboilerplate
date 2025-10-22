@@ -43,7 +43,6 @@
     var animationFrameNumber = 0;
 
     var postDraw = function (draw, fill) {
-      // ...
       var center = new Vertex({ x: 0, y: 0 });
       // draw.circle(center, 100, "red", 1);
 
