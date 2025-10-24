@@ -59,8 +59,8 @@
         center,
         config.innerRadius,
         config.outerRadius,
-        safeStartAngle, // baseRotation + DEG_TO_RAD * config.startAngleDeg,
-        safeEndAngle // baseRotation + DEG_TO_RAD * config.endAngleDeg
+        safeStartAngle,
+        safeEndAngle
       );
       draw.path(pathData, "rgba(255,255,0,1.0)", 6);
       fill.path(pathData, "rgba(255,255,0,0.5)");

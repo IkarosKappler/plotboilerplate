@@ -1,6 +1,9 @@
 /**
  * A script for calculating polygon angles and line intersection angles.
  *
+ * @require AttrAnimator
+ * @require CircularAttrAnimator
+ *
  * @author   Ikaros Kappler
  * @date     2025-09-12
  * @version  1.0.0
@@ -25,6 +28,19 @@
       )
     );
 
+    // +---------------------------------------------------------------------------------
+    // | Global vars
+    // +-------------------------------
+    var timingIntervals = [];
+    timingIntervals.push([[500, 500]]); // Wait 500ms, then show 500ms, repeat...
+    timingIntervals.push([[1000, 1000]]);
+    timingIntervals.push([[2000, 2000]]);
+    timingIntervals.push([[4000, 4000]]);
+    timingIntervals.push([[8000, 8000]]);
+    timingIntervals.push([[16000, 16000]]);
+    timingIntervals.push([[32000, 32000]]);
+    timingIntervals.push([[64000, 64000]]);
+
     // Array< { center: new Vertex(0,0),
     //          innerRadius: 45.0,
     //          outerRadius: 100.0,
@@ -32,6 +48,7 @@
     //          endAngleDeg: Math.PI * 1.5 * RAD_TO_DEG,
     //          animators: [] } >
     const rings = [];
+    var maxRingBounds = null;
 
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
@@ -70,79 +87,18 @@
         animators: []
       });
       rings[1].animators.push(new CircularAttrAnimator(rings[1], "endAngleDeg", "startAngleDeg", 1.0));
-    };
 
-    var AttrAnimator = function (obj, attrName, min, max, stepValue) {
-      this.obj = obj;
-      this.attrName = attrName;
-      this.min = min;
-      this.max = max;
-      this.stepValue = stepValue;
+      maxRingBounds = null; // TODO!
     };
-    AttrAnimator.prototype.next = function () {
-      this.obj[this.attrName] += this.stepValue;
-      if (this.obj[this.attrName] < this.min || this.obj[this.attrName] > this.max) {
-        this.stepValue = -this.stepValue;
-      }
-    };
-    var CircularAttrAnimator = function (obj, startAttrName, endAttrName, stepValue) {
-      this.obj = obj;
-      this.startAttrName = startAttrName;
-      this.endAttrName = endAttrName;
-      this.stepValue = stepValue;
-      this.mode = 0;
-    };
-    CircularAttrAnimator.prototype.next = function () {
-      // console.log("X");
-      if (this.mode === 0) {
-        var newVal = this.obj[this.startAttrName] + this.stepValue;
-        if (newVal >= 360.0) {
-          console.log("this.mode = 1");
-          this.mode = 1;
-          this.obj[this.endAttrName] = 0.0;
-        } else {
-          this.obj[this.startAttrName] = newVal;
-        }
-      } else if (this.mode === 1) {
-        var newVal = this.obj[this.endAttrName] + this.stepValue;
-        if (newVal >= 360.0) {
-          console.log("this.mode = 2");
-          this.mode = 2;
-          this.obj[this.startAttrName] = 0.0;
-          this.obj[this.endAttrName] = 0.0;
-        } else {
-          this.obj[this.endAttrName] = newVal;
-        }
-      } else {
-        var newVal = this.obj[this.endAttrName] + this.stepValue;
-        if (newVal >= 360.0) {
-          console.log("this.mode = 0");
-          this.mode = 0;
-          this.obj[this.startAttrName] = -360.0 + this.stepValue;
-          this.obj[this.endAttrName] = 0.0;
-        } else {
-          this.obj[this.endAttrName] = newVal;
-        }
-      }
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | Global vars
-    // +-------------------------------
-    var animationFrameNumber = 0;
 
     var postDraw = function (draw, fill) {
       var milliseconds = Date.now();
-      var quareDuration = 500; // One change per second
-
-      // ...
-      var center = new Vertex({ x: 0, y: 0 });
-      // draw.circle(center, 100, "red", 1);
+      var ringSquareDuration = 500; // One change per second
 
       rings.forEach(function (ring, ringIndex) {
         // console.log("Render Ring", ringIndex);
         renderRing(draw, fill, ring);
-        if (milliseconds % quareDuration < quareDuration / 2.0) {
+        if (milliseconds % ringSquareDuration < ringSquareDuration / 2.0) {
           pb.draw.square(
             { x: ring.center.x + ring.outerRadius, y: ring.center.y + ring.outerRadius },
             ring.outerRadius / 4.0,
@@ -151,6 +107,50 @@
           );
         }
       });
+
+      timingIntervals.forEach(function (timingInterval, index) {
+        drawTimingSquares(draw, fill, milliseconds, timingInterval, index);
+      });
+    }; // END postDraw
+
+    var drawTimingSquares = function (draw, fill, milliseconds, timingInterval, timingSquareIndex) {
+      var totalDurationMs = timingInterval.reduce(function (accu, curValue) {
+        accu += curValue[0] + curValue[1];
+        return accu;
+      }, 0);
+      var currentTimeSection = milliseconds % totalDurationMs;
+      var isRenderTimerItem = timingInterval.reduce(
+        function (accu, curValue, _index) {
+          /**
+           * {boolean} accu
+           * {[number,number]} curvalue
+           */
+          if (
+            accu.leadingMs + curValue[0] <= currentTimeSection &&
+            currentTimeSection < accu.leadingMs + curValue[0] + curValue[1]
+          ) {
+            accu.isVisible = true;
+          }
+          // if (timingSquareIndex == 0 && animationFrameNumber % 25 === 0 && _index + 1 >= timingInterval.length) {
+          //   console.log(
+          //     "totalDurationMs",
+          //     totalDurationMs,
+          //     "currentTimeSection",
+          //     currentTimeSection,
+          //     "accu",
+          //     accu,
+          //     "timingInterval",
+          //     JSON.stringify(timingInterval)
+          //   );
+          // }
+          accu.leadingMs += curValue[0] + curValue[1];
+          return accu;
+        },
+        { leadingMs: 0, isVisible: false }
+      );
+      if (isRenderTimerItem.isVisible) {
+        fill.square({ x: timingSquareIndex * (16 + 4), y: 0 }, 16, "red");
+      }
     }; // END postDraw
 
     var textOptions = {
@@ -240,6 +240,7 @@
     // | Render next animation step.
     // +-------------------------------
     var isAnimationRunning = false;
+    var animationFrameNumber = 0;
     function animateStep(time) {
       animateAllRings(time);
       animationFrameNumber++;
