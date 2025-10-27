@@ -41,6 +41,7 @@
     timingIntervals.push(new TimeSegmentation().add([32000, 32000]));
     timingIntervals.push(new TimeSegmentation().add([64000, 64000]));
     var timingSquareSize = 16;
+    var timingSquareGapSize = 8;
 
     // Array< { center: new Vertex(0,0),
     //          innerRadius: 45.0,
@@ -121,52 +122,24 @@
       timingIntervals.forEach(function (timingInterval, timingSquareIndex) {
         if (timingInterval.isTimestampVisible(milliseconds)) {
           fill.square(
-            { x: timingSquareIndex * (timingSquareSize + timingSquareSize / 4), y: maxRingBounds.min.y - timingSquareSize },
+            {
+              x: timingSquareIndex * (timingSquareSize + timingSquareGapSize),
+              y: maxRingBounds.min.y - timingSquareSize - timingSquareGapSize
+            },
             timingSquareSize,
-            "red"
+            "rgba(192,0,255,0.5)"
+          );
+          draw.square(
+            {
+              x: timingSquareIndex * (timingSquareSize + timingSquareGapSize),
+              y: maxRingBounds.min.y - timingSquareSize - timingSquareGapSize
+            },
+            timingSquareSize,
+            "rgba(192,0,255,0.75)",
+            5.0
           );
         }
       });
-    }; // END postDraw
-
-    var drawTimingSquares = function (draw, fill, milliseconds, timingInterval, timingSquareIndex) {
-      var totalDurationMs = timingInterval.reduce(function (accu, curValue) {
-        accu += curValue[0] + curValue[1];
-        return accu;
-      }, 0);
-      var currentTimeSection = milliseconds % totalDurationMs;
-      var isRenderTimerItem = timingInterval.reduce(
-        function (accu, curValue, _index) {
-          /**
-           * {boolean} accu
-           * {[number,number]} curvalue
-           */
-          if (
-            accu.leadingMs + curValue[0] <= currentTimeSection &&
-            currentTimeSection < accu.leadingMs + curValue[0] + curValue[1]
-          ) {
-            accu.isVisible = true;
-          }
-          // if (timingSquareIndex == 0 && animationFrameNumber % 25 === 0 && _index + 1 >= timingInterval.length) {
-          //   console.log(
-          //     "totalDurationMs",
-          //     totalDurationMs,
-          //     "currentTimeSection",
-          //     currentTimeSection,
-          //     "accu",
-          //     accu,
-          //     "timingInterval",
-          //     JSON.stringify(timingInterval)
-          //   );
-          // }
-          accu.leadingMs += curValue[0] + curValue[1];
-          return accu;
-        },
-        { leadingMs: 0, isVisible: false }
-      );
-      if (isRenderTimerItem.isVisible) {
-        fill.square({ x: timingSquareIndex * (16 + 4), y: 0 }, 16, "red");
-      }
     }; // END postDraw
 
     var textOptions = {
