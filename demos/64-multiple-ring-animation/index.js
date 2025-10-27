@@ -32,14 +32,15 @@
     // | Global vars
     // +-------------------------------
     var timingIntervals = [];
-    timingIntervals.push([[500, 500]]); // Wait 500ms, then show 500ms, repeat...
-    timingIntervals.push([[1000, 1000]]);
-    timingIntervals.push([[2000, 2000]]);
-    timingIntervals.push([[4000, 4000]]);
-    timingIntervals.push([[8000, 8000]]);
-    timingIntervals.push([[16000, 16000]]);
-    timingIntervals.push([[32000, 32000]]);
-    timingIntervals.push([[64000, 64000]]);
+    timingIntervals.push(new TimeSegmentation().add([500, 500])); // Wait 500ms, then show 500ms, repeat...
+    timingIntervals.push(new TimeSegmentation().add([1000, 1000]));
+    timingIntervals.push(new TimeSegmentation().add([2000, 2000]));
+    timingIntervals.push(new TimeSegmentation().add([4000, 4000]));
+    timingIntervals.push(new TimeSegmentation().add([8000, 8000]));
+    timingIntervals.push(new TimeSegmentation().add([16000, 16000]));
+    timingIntervals.push(new TimeSegmentation().add([32000, 32000]));
+    timingIntervals.push(new TimeSegmentation().add([64000, 64000]));
+    var timingSquareSize = 16;
 
     // Array< { center: new Vertex(0,0),
     //          innerRadius: 45.0,
@@ -88,7 +89,16 @@
       });
       rings[1].animators.push(new CircularAttrAnimator(rings[1], "endAngleDeg", "startAngleDeg", 1.0));
 
-      maxRingBounds = null; // TODO!
+      maxRingBounds = rings.reduce(function (curBounds, ring) {
+        curBounds.min.x = Math.min(curBounds.min.x, ring.center.x - ring.outerRadius);
+        curBounds.max.x = Math.max(curBounds.min.x, ring.center.x + ring.outerRadius);
+        curBounds.min.y = Math.min(curBounds.min.y, ring.center.y - ring.outerRadius);
+        curBounds.max.y = Math.max(curBounds.min.y, ring.center.y + ring.outerRadius);
+        return curBounds;
+      }, new Bounds(
+        new Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY),
+        new Vertex(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY)
+      ));
     };
 
     var postDraw = function (draw, fill) {
@@ -108,8 +118,14 @@
         }
       });
 
-      timingIntervals.forEach(function (timingInterval, index) {
-        drawTimingSquares(draw, fill, milliseconds, timingInterval, index);
+      timingIntervals.forEach(function (timingInterval, timingSquareIndex) {
+        if (timingInterval.isTimestampVisible(milliseconds)) {
+          fill.square(
+            { x: timingSquareIndex * (timingSquareSize + timingSquareSize / 4), y: maxRingBounds.min.y - timingSquareSize },
+            timingSquareSize,
+            "red"
+          );
+        }
       });
     }; // END postDraw
 
