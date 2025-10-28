@@ -9,8 +9,6 @@
 (function (_context) {
   "use strict";
 
-  // TODO: GUI scrollable?!
-
   // Fetch the GET params
   let GUP = gup();
   const RAD_TO_DEG = 180.0 / Math.PI;
@@ -100,11 +98,7 @@ X..............X
     };
 
     var randomizeMatrix = function () {
-      for (var x = 0; x < matrix.xSegmentCount; x++) {
-        for (var y = 0; y < matrix.ySegmentCount; y++) {
-          matrix.set(x, y, randomBoolean());
-        }
-      }
+      matrix.setAll(randomBoolean);
     };
 
     var randomBoolean = function () {

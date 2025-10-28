@@ -1,5 +1,9 @@
 # Changelog
 
+- 2025-10-28
+  - Added `Bounds.getWidth()` and `Bounds.getHeight()`.
+  - Added `DataGrid2dArrayMatrix.setAll(function)`.
+  - Fixed a bug in the `DataGrid2dArrayMatrix.toString()` method.
 - 2025-10-18
   - Added method `Bounds.containsVert(XYCoords)`.
 - 2025-10-17

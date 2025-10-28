@@ -3,6 +3,8 @@
  *
  * @author   Ikaros Kappler
  * @date     2025-10-16
+ * @modified 2025-10-28 Added `DataGrid2dArrayMatrix.setAll(function)`.
+ * @modified 2025-10-28 Fixed a bug in the `DataGrid2dArrayMatrix.toString()` method.
  * @version  1.0.0
  **/
 
@@ -38,7 +40,7 @@ export class DataGrid2dArrayMatrix<T> implements IDataGrid2d<T> {
       throw `Cannot create DataGrid2dArray, xSegmentCount (${xSegmentCount}) must be > 0.`;
     }
     if (ySegmentCount <= 0) {
-      throw `Cannot create DataGrid2dArray, ySegmentCount (${xSegmentCount}) must be > 0.`;
+      throw `Cannot create DataGrid2dArray, ySegmentCount (${ySegmentCount}) must be > 0.`;
     }
 
     // this.canvas = document.getElementById(canvasId);
@@ -51,12 +53,41 @@ export class DataGrid2dArrayMatrix<T> implements IDataGrid2d<T> {
     }
   }
 
+  /**
+   * Set the matrix value at the given (x,y) position to a new value.
+   *
+   * @param {number} xIndex - The horizontal matrix position to set.
+   * @param {number} yIndex - The vertical matrix position to set.
+   * @param {T} value - The new value.
+   */
   public set(xIndex: number, yIndex: number, value: T) {
     this._matrix[yIndex][xIndex] = value;
   }
 
+  /**
+   * Getthe matrix value at the given (x,y) position.
+   *
+   * @param {number} xIndex - The horizontal matrix position to set.
+   * @param {number} yIndex - The vertical matrix position to set.
+   * @return {T} value - The new value.
+   */
   public get(xIndex: number, yIndex: number): T {
     return this.getDataValueAt(xIndex, yIndex);
+  }
+
+  /**
+   * Set all matrix values. The passed factory function must accept respective (x,y) positions.
+   *
+   * @param {Function} factory - The factory function to determine the new values to set.
+   * @return {DataGrid2dArrayMatrix<T>} this - for chaning.
+   */
+  public setAll(factory: (xIndex: number, yIndex: number) => T): DataGrid2dArrayMatrix<T> {
+    for (var x = 0; x < this.xSegmentCount; x++) {
+      for (var y = 0; y < this.ySegmentCount; y++) {
+        this.set(x, y, factory(x, y));
+      }
+    }
+    return this;
   }
 
   public find(
@@ -118,7 +149,7 @@ export class DataGrid2dArrayMatrix<T> implements IDataGrid2d<T> {
   static toString(matrix: DataGrid2dArrayMatrix<boolean>): string {
     const buffer: Array<string> = [];
     for (var y = 0; y < matrix.ySegmentCount; y++) {
-      for (var x = 0; x < matrix.ySegmentCount; x++) {
+      for (var x = 0; x < matrix.xSegmentCount; x++) {
         buffer.push(matrix.get(x, y) ? "X" : ".");
       }
       buffer.push("\n");

@@ -43,6 +43,15 @@
     var timingSquareSize = 16;
     var timingSquareGapSize = 8;
 
+    var randomBoolean = function () {
+      return Math.random() < 0.5;
+    };
+
+    var sourceMatrix = new DataGrid2dArrayMatrix(3, 9).setAll(randomBoolean);
+    var targetMatrix = new DataGrid2dArrayMatrix(3, 9).setAll(randomBoolean);
+    var matrixAnimStep = 0;
+    var maxMatrixAnimSteps = 1500;
+
     // Array< { center: new Vertex(0,0),
     //          innerRadius: 45.0,
     //          outerRadius: 100.0,
@@ -58,6 +67,8 @@
       // Make sure start is sirculary smaller than end?
       wrapStartEnd: params.getBoolean("wrapStartEnd", true),
       numRings: params.getNumber("numRings", 5),
+      matrixSquareSize: params.getNumber("matrixSquareSize", 16),
+      matrixGapSize: params.getNumber("matrixGapSize", 8),
       debug: params.getBoolean("debug", false)
     };
 
@@ -92,9 +103,9 @@
 
       maxRingBounds = rings.reduce(function (curBounds, ring) {
         curBounds.min.x = Math.min(curBounds.min.x, ring.center.x - ring.outerRadius);
-        curBounds.max.x = Math.max(curBounds.min.x, ring.center.x + ring.outerRadius);
+        curBounds.max.x = Math.max(curBounds.max.x, ring.center.x + ring.outerRadius);
         curBounds.min.y = Math.min(curBounds.min.y, ring.center.y - ring.outerRadius);
-        curBounds.max.y = Math.max(curBounds.min.y, ring.center.y + ring.outerRadius);
+        curBounds.max.y = Math.max(curBounds.max.y, ring.center.y + ring.outerRadius);
         return curBounds;
       }, new Bounds(
         new Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY),
@@ -102,9 +113,25 @@
       ));
     };
 
+    var getMatrixSquareBox = function (x, y) {
+      return new Bounds(
+        {
+          x: maxRingBounds.min.x - (x + 2) * (config.matrixSquareSize + config.matrixGapSize),
+          y: maxRingBounds.max.y - y * (config.matrixSquareSize + config.matrixGapSize)
+        },
+        {
+          x: maxRingBounds.min.x - (x + 2) * (config.matrixSquareSize + config.matrixGapSize) + config.matrixSquareSize,
+          y: maxRingBounds.max.y - y * (config.matrixSquareSize + config.matrixGapSize) + config.matrixSquareSize
+        }
+      );
+    };
+
     var postDraw = function (draw, fill) {
       var milliseconds = Date.now();
       var ringSquareDuration = 500; // One change per second
+
+      // Draw outer ring bounds.
+      // draw.rect(maxRingBounds.min, maxRingBounds.getWidth(), maxRingBounds.getHeight(), "rgba(192,192,192,0.15)", 1);
 
       rings.forEach(function (ring, ringIndex) {
         // console.log("Render Ring", ringIndex);
@@ -114,11 +141,17 @@
             { x: ring.center.x + ring.outerRadius, y: ring.center.y + ring.outerRadius },
             ring.outerRadius / 4.0,
             "orange",
-            1.0
+            5.0
           );
         }
       });
 
+      drawBinaryClock(draw, fill, milliseconds);
+
+      drawMatrix(draw, fill, milliseconds);
+    }; // END postDraw
+
+    var drawBinaryClock = function (draw, fill, milliseconds) {
       timingIntervals.forEach(function (timingInterval, timingSquareIndex) {
         if (timingInterval.isTimestampVisible(milliseconds)) {
           fill.square(
@@ -140,7 +173,47 @@
           );
         }
       });
-    }; // END postDraw
+    }; // END drawBinaryClock
+
+    var activeMatrixColor = Color.makeRGB(0, 192, 192, 1.0);
+    var inactiveMatrixColor = Color.parse(pb.config.backgroundColor); // Color.makeRGB(0, 0, 0, 1.0);
+    var drawMatrix = function (draw, fill, milliseconds) {
+      var sourceColor = new Color();
+      var targetColor = new Color();
+      // var finalSquareColor = new Color();
+      for (var x = 0; x < sourceMatrix.xSegmentCount; x++) {
+        for (var y = 0; y < sourceMatrix.ySegmentCount; y++) {
+          // console.log("x");
+          var box = getMatrixSquareBox(x, y);
+          // draw.square(box.getCenter(), box.getWidth(), "green", 5);
+          // var isSet = sourceMatrix.get(x, y);
+          if (matrixAnimStep >= maxMatrixAnimSteps) {
+            matrixAnimStep = 0;
+            sourceMatrix = targetMatrix;
+            targetMatrix = new DataGrid2dArrayMatrix(3, 9).setAll(randomBoolean);
+            // console.log("New Matrix sourceMatrix", sourceMatrix.xSegmentCount, sourceMatrix.ySegmentCount);
+            // console.log("New Matrix targetMatrix", targetMatrix.xSegmentCount, targetMatrix.ySegmentCount);
+          } else {
+            matrixAnimStep++;
+          }
+          var matrixAnimAmount = matrixAnimStep / maxMatrixAnimSteps;
+          sourceColor.set(sourceMatrix.get(x, y) ? activeMatrixColor : inactiveMatrixColor);
+          targetColor.set(targetMatrix.get(x, y) ? activeMatrixColor : inactiveMatrixColor);
+          sourceColor.interpolate(targetColor, matrixAnimAmount);
+          // if (animationFrameNumber % 100 === 0) {
+          //   console.log("sourceColor", sourceColor.cssRGB(), "targetColor", targetColor.cssRGB());
+          //   console.log("sourceMatrix", DataGrid2dArrayMatrix.toString(sourceMatrix));
+          //   console.log("targetMatrix", DataGrid2dArrayMatrix.toString(targetMatrix));
+          // }
+          fill.square(
+            box.getCenter(),
+            box.getWidth(),
+            sourceColor.cssRGB(), // isSet ? `rgba(0,192,192,${0.333 * matrixAnimAmount})` : "rgba(0,192,192,0.0)",
+            5
+          );
+        }
+      }
+    }; // END drawMatrix
 
     var textOptions = {
       color: "rgba(255,0,255,0.5)",
@@ -176,11 +249,11 @@
 
       var startPosition = Circle.circleUtils.vertAt(ring.startAngleDeg * DEG_TO_RAD, ring.outerRadius + 10.0).add(ring.center);
       draw.crosshair(startPosition, 5, "rgb(0,192,192)", 1.0);
-      fill.text(`<[s ${ring.startAngleDeg * DEG_TO_RAD}`, startPosition.x, startPosition.y, textOptions);
+      fill.text(`<[s ${(ring.baseRotation + ring.startAngleDeg) * DEG_TO_RAD}`, startPosition.x, startPosition.y, textOptions);
 
       var endPosition = Circle.circleUtils.vertAt(ring.endAngleDeg * DEG_TO_RAD, ring.outerRadius + 10.0).add(ring.center);
       draw.crosshair(endPosition, 5, "rgb(0,192,192)", 1.0);
-      fill.text(`<[e ${ring.endAngleDeg * DEG_TO_RAD}`, endPosition.x, endPosition.y, textOptions);
+      fill.text(`<[e ${(ring.baseRotation + ring.endAngleDeg) * DEG_TO_RAD}`, endPosition.x, endPosition.y, textOptions);
 
       // draw.circleArc(ring.center, ring.innerRadius / 2.0, safeStartAngle, safeEndAngle, "red", 2);
       draw.circleArc(

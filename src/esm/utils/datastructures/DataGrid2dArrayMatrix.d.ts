@@ -3,6 +3,7 @@
  *
  * @author   Ikaros Kappler
  * @date     2025-10-16
+ * @modified 2015-10-28 Added `DataGrid2dArrayMatrix.setAll(function)`.
  * @version  1.0.0
  **/
 import { DataGridFace4, IDataGrid2d, RasterPosition } from "./DataGrid2d";
@@ -26,8 +27,29 @@ export declare class DataGrid2dArrayMatrix<T> implements IDataGrid2d<T> {
      * @param ySegmentCount
      */
     constructor(xSegmentCount: number, ySegmentCount: number, initialValue: T);
+    /**
+     * Set the matrix value at the given (x,y) position to a new value.
+     *
+     * @param {number} xIndex - The horizontal matrix position to set.
+     * @param {number} yIndex - The vertical matrix position to set.
+     * @param {T} value - The new value.
+     */
     set(xIndex: number, yIndex: number, value: T): void;
+    /**
+     * Getthe matrix value at the given (x,y) position.
+     *
+     * @param {number} xIndex - The horizontal matrix position to set.
+     * @param {number} yIndex - The vertical matrix position to set.
+     * @return {T} value - The new value.
+     */
     get(xIndex: number, yIndex: number): T;
+    /**
+     * Set all matrix values. The passed factory function must accept respective (x,y) positions.
+     *
+     * @param {Function} factory - The factory function to determine the new values to set.
+     * @return {DataGrid2dArrayMatrix<T>} this - for chaning.
+     */
+    setAll(factory: (xIndex: number, yIndex: number) => T): DataGrid2dArrayMatrix<T>;
     find(condition: (value: T, xIndex: number, yIndex: number, sourceMatrix: DataGrid2dArrayMatrix<T>) => boolean): RasterPosition;
     /**
      * @override

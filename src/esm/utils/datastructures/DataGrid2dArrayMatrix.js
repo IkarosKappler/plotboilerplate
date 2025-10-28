@@ -3,6 +3,7 @@
  *
  * @author   Ikaros Kappler
  * @date     2025-10-16
+ * @modified 2015-10-28 Added `DataGrid2dArrayMatrix.setAll(function)`.
  * @version  1.0.0
  **/
 import { arrayFill } from "../algorithms/arrayFill";
@@ -19,7 +20,7 @@ export class DataGrid2dArrayMatrix {
             throw `Cannot create DataGrid2dArray, xSegmentCount (${xSegmentCount}) must be > 0.`;
         }
         if (ySegmentCount <= 0) {
-            throw `Cannot create DataGrid2dArray, ySegmentCount (${xSegmentCount}) must be > 0.`;
+            throw `Cannot create DataGrid2dArray, ySegmentCount (${ySegmentCount}) must be > 0.`;
         }
         // this.canvas = document.getElementById(canvasId);
         this.xSegmentCount = xSegmentCount;
@@ -29,11 +30,39 @@ export class DataGrid2dArrayMatrix {
             this._matrix.push(arrayFill(xSegmentCount, initialValue));
         }
     }
+    /**
+     * Set the matrix value at the given (x,y) position to a new value.
+     *
+     * @param {number} xIndex - The horizontal matrix position to set.
+     * @param {number} yIndex - The vertical matrix position to set.
+     * @param {T} value - The new value.
+     */
     set(xIndex, yIndex, value) {
         this._matrix[yIndex][xIndex] = value;
     }
+    /**
+     * Getthe matrix value at the given (x,y) position.
+     *
+     * @param {number} xIndex - The horizontal matrix position to set.
+     * @param {number} yIndex - The vertical matrix position to set.
+     * @return {T} value - The new value.
+     */
     get(xIndex, yIndex) {
         return this.getDataValueAt(xIndex, yIndex);
+    }
+    /**
+     * Set all matrix values. The passed factory function must accept respective (x,y) positions.
+     *
+     * @param {Function} factory - The factory function to determine the new values to set.
+     * @return {DataGrid2dArrayMatrix<T>} this - for chaning.
+     */
+    setAll(factory) {
+        for (var x = 0; x < this.xSegmentCount; x++) {
+            for (var y = 0; y < this.ySegmentCount; y++) {
+                this.set(x, y, factory(x, y));
+            }
+        }
+        return this;
     }
     find(condition) {
         for (var x = 0; x < this.xSegmentCount; x++) {
@@ -87,7 +116,7 @@ export class DataGrid2dArrayMatrix {
     static toString(matrix) {
         const buffer = [];
         for (var y = 0; y < matrix.ySegmentCount; y++) {
-            for (var x = 0; x < matrix.ySegmentCount; x++) {
+            for (var x = 0; x < matrix.xSegmentCount; x++) {
                 buffer.push(matrix.get(x, y) ? "X" : ".");
             }
             buffer.push("\n");

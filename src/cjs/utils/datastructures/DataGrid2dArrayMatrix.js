@@ -4,6 +4,7 @@
  *
  * @author   Ikaros Kappler
  * @date     2025-10-16
+ * @modified 2015-10-28 Added `DataGrid2dArrayMatrix.setAll(function)`.
  * @version  1.0.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -22,7 +23,7 @@ var DataGrid2dArrayMatrix = /** @class */ (function () {
             throw "Cannot create DataGrid2dArray, xSegmentCount (".concat(xSegmentCount, ") must be > 0.");
         }
         if (ySegmentCount <= 0) {
-            throw "Cannot create DataGrid2dArray, ySegmentCount (".concat(xSegmentCount, ") must be > 0.");
+            throw "Cannot create DataGrid2dArray, ySegmentCount (".concat(ySegmentCount, ") must be > 0.");
         }
         // this.canvas = document.getElementById(canvasId);
         this.xSegmentCount = xSegmentCount;
@@ -32,11 +33,39 @@ var DataGrid2dArrayMatrix = /** @class */ (function () {
             this._matrix.push((0, arrayFill_1.arrayFill)(xSegmentCount, initialValue));
         }
     }
+    /**
+     * Set the matrix value at the given (x,y) position to a new value.
+     *
+     * @param {number} xIndex - The horizontal matrix position to set.
+     * @param {number} yIndex - The vertical matrix position to set.
+     * @param {T} value - The new value.
+     */
     DataGrid2dArrayMatrix.prototype.set = function (xIndex, yIndex, value) {
         this._matrix[yIndex][xIndex] = value;
     };
+    /**
+     * Getthe matrix value at the given (x,y) position.
+     *
+     * @param {number} xIndex - The horizontal matrix position to set.
+     * @param {number} yIndex - The vertical matrix position to set.
+     * @return {T} value - The new value.
+     */
     DataGrid2dArrayMatrix.prototype.get = function (xIndex, yIndex) {
         return this.getDataValueAt(xIndex, yIndex);
+    };
+    /**
+     * Set all matrix values. The passed factory function must accept respective (x,y) positions.
+     *
+     * @param {Function} factory - The factory function to determine the new values to set.
+     * @return {DataGrid2dArrayMatrix<T>} this - for chaning.
+     */
+    DataGrid2dArrayMatrix.prototype.setAll = function (factory) {
+        for (var x = 0; x < this.xSegmentCount; x++) {
+            for (var y = 0; y < this.ySegmentCount; y++) {
+                this.set(x, y, factory(x, y));
+            }
+        }
+        return this;
     };
     DataGrid2dArrayMatrix.prototype.find = function (condition) {
         for (var x = 0; x < this.xSegmentCount; x++) {
@@ -90,7 +119,7 @@ var DataGrid2dArrayMatrix = /** @class */ (function () {
     DataGrid2dArrayMatrix.toString = function (matrix) {
         var buffer = [];
         for (var y = 0; y < matrix.ySegmentCount; y++) {
-            for (var x = 0; x < matrix.ySegmentCount; x++) {
+            for (var x = 0; x < matrix.xSegmentCount; x++) {
                 buffer.push(matrix.get(x, y) ? "X" : ".");
             }
             buffer.push("\n");

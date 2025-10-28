@@ -16,7 +16,8 @@
  * @modified 2025-04-26 Added static method `Bounds.computeFromBoundsSet` to calculate containing bounds for a set of bounding boxes.
  * @modified 2025-10-17 Added the methods `Bounds.getSouthWestPoint`, `getNorthWestPoint`, `getNorthEastPoint` and `getSouthEastPoint`.
  * @modified 2025-10-18 Added method `Bounds.containsVert(XYCoords)`.
- * @version  1.10.0
+ * @modified 2025-10-28 Added the `Bounds.getWidth()` and `Bounds.getHeight()`.
+ * @version  1.11.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Bounds = void 0;
@@ -55,6 +56,12 @@ var Bounds = /** @class */ (function () {
      **/
     Bounds.prototype.containsVert = function (vert) {
         return this.min.x <= vert.x && vert.x < this.max.x && this.min.y <= vert.y && vert.y < this.max.y;
+    };
+    Bounds.prototype.getWidth = function () {
+        return this.max.x - this.min.x;
+    };
+    Bounds.prototype.getHeight = function () {
+        return this.max.y - this.min.y;
     };
     /**
      * Get the center point of the north bound.

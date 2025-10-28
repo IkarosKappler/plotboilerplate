@@ -3586,7 +3586,8 @@ Polygon.utils = {
  * @modified 2025-04-26 Added static method `Bounds.computeFromBoundsSet` to calculate containing bounds for a set of bounding boxes.
  * @modified 2025-10-17 Added the methods `Bounds.getSouthWestPoint`, `getNorthWestPoint`, `getNorthEastPoint` and `getSouthEastPoint`.
  * @modified 2025-10-18 Added method `Bounds.containsVert(XYCoords)`.
- * @version  1.10.0
+ * @modified 2025-10-28 Added the `Bounds.getWidth()` and `Bounds.getHeight()`.
+ * @version  1.11.0
  **/
 /**
  * @classdesc A bounds class with min and max values. Implementing IBounds.
@@ -3621,6 +3622,12 @@ class Bounds {
      **/
     containsVert(vert) {
         return this.min.x <= vert.x && vert.x < this.max.x && this.min.y <= vert.y && vert.y < this.max.y;
+    }
+    getWidth() {
+        return this.max.x - this.min.x;
+    }
+    getHeight() {
+        return this.max.y - this.min.y;
     }
     /**
      * Get the center point of the north bound.
