@@ -1,0 +1,95 @@
+"use strict";
+/**
+ * A wrapper for Lissajous figure params.
+ *
+ * @author   Ikaros Kappler
+ * @date     2018-11-22
+ * @modified 2025-10-29 Ported to typescript from demo 13-lissajous.
+ * @version  1.0.0
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.LissajousFigure = void 0;
+var Vertex_1 = require("../Vertex");
+var LissajousFigure = /** @class */ (function () {
+    /**
+     * Create a new figure with the given settings.
+     * @param {number} freqA - The 'horizontal' frequency.
+     * @param {number} freqB - The 'vertical' frequency.
+     * @param {number} phaseA - The 'horizonal' phase shift.
+     * @param {number} phaseB - The 'vertical' phase shift.
+     */
+    function LissajousFigure(freqA, freqB, phaseA, phaseB) {
+        this.freqA = freqA;
+        this.freqB = freqB;
+        this.phaseA = phaseA;
+        this.phaseB = phaseB;
+    }
+    /**
+     * Get the point at the given abstract time.
+     *
+     * The result is periodic in 0..TWO_PI.
+     *
+     * @param {number} t - The timing value (for example milliseconds).
+     * @returns {Vertex} The x-y-position on the Lissajous figure at the given time.
+     */
+    LissajousFigure.prototype.getPointAt = function (t) {
+        return new Vertex_1.Vertex(Math.sin(this.phaseA + this.freqA * t), Math.sin(this.phaseB + this.freqB * t));
+    };
+    LissajousFigure.prototype.toPolyLine = function (stepSize) {
+        var polyLine = [];
+        var pA = new Vertex_1.Vertex(0, 0);
+        stepSize = Math.abs(stepSize);
+        for (var t = 0; t <= 2 * Math.PI; t += stepSize) {
+            pA = this.getPointAt(t);
+            polyLine.push(pA.clone());
+        }
+        return polyLine;
+    };
+    LissajousFigure.prototype.toCubicBezierApproximation = function (stepSize, scale, alternating) {
+        var result = [];
+        var pA = new Vertex_1.Vertex(0, 0);
+        var pB = new Vertex_1.Vertex(0, 0);
+        stepSize = Math.abs(stepSize);
+        var p1 = new Vertex_1.Vertex(0, 0);
+        var dx1 = this.freqA;
+        var dy1 = this.freqB;
+        pA = this.getPointAt(stepSize);
+        var x2, y2, dx2, dy2, det, x3, y3;
+        var i = 0;
+        for (var t = stepSize; t <= 2 * Math.PI + 2 * stepSize; t += stepSize) {
+            x2 = Math.sin(this.phaseA + this.freqA * t);
+            y2 = Math.sin(this.phaseB + this.freqB * t);
+            dx2 = this.freqA * Math.cos(this.phaseA + this.freqA * t);
+            dy2 = this.freqB * Math.cos(this.phaseB + this.freqB * t);
+            det = dx1 * dy2 - dy1 * dx2;
+            if (Math.abs(det) > 0.1) {
+                x3 = ((x2 * dy2 - y2 * dx2) * dx1 - (p1.x * dy1 - p1.y * dx1) * dx2) / det;
+                y3 = ((x2 * dy2 - y2 * dx2) * dy1 - (p1.x * dy1 - p1.y * dx1) * dy2) / det;
+                pB.set(scale * x2, scale * y2 * (alternating ? -1 : 1));
+                // pB.set(x2, y2);
+                if (i > 0) {
+                    //   pb.draw.quadraticBezier(pA, new Vertex(scale * x3, scale * y3), pB, "rgba(0,108,255,1.0)", 2);
+                    result.push([pA.clone(), new Vertex_1.Vertex(scale * x3, scale * y3), pB.clone()]);
+                    //   result.push([pA.clone(), new Vertex(x3, y3), pB.clone()]);
+                }
+            }
+            else {
+                pB.set(scale * x2, scale * y2);
+                // pB.set(x2, y2);
+                if (i > 0) {
+                    //   pb.draw.line(pA, pB, "rgba(0,192,192,0.8)", 2);
+                    result.push([pA.clone(), pB.clone()]);
+                }
+            }
+            p1.set(x2, y2);
+            dx1 = dx2;
+            dy1 = dy2;
+            pA.set(pB);
+            i++;
+        } // END for
+        return result;
+    };
+    return LissajousFigure;
+}());
+exports.LissajousFigure = LissajousFigure;
+//# sourceMappingURL=LissajousFigure.js.map

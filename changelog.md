@@ -1,5 +1,7 @@
 # Changelog
 
+- 2025-10-29
+  - Ported the Lissajous implementation from demo-13 to a Typescript class `utils/LissajousFigure`.
 - 2025-10-28
   - Added `Bounds.getWidth()` and `Bounds.getHeight()`.
   - Added `DataGrid2dArrayMatrix.setAll(function)`.

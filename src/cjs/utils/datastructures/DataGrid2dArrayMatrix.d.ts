@@ -3,7 +3,8 @@
  *
  * @author   Ikaros Kappler
  * @date     2025-10-16
- * @modified 2015-10-28 Added `DataGrid2dArrayMatrix.setAll(function)`.
+ * @modified 2025-10-28 Added `DataGrid2dArrayMatrix.setAll(function)`.
+ * @modified 2025-10-28 Fixed a bug in the `DataGrid2dArrayMatrix.toString()` method.
  * @version  1.0.0
  **/
 import { DataGridFace4, IDataGrid2d, RasterPosition } from "./DataGrid2d";

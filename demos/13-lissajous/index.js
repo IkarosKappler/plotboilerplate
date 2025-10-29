@@ -15,6 +15,7 @@
   // Fetch the GET params
   let GUP = gup();
   var isDarkmode = detectDarkMode(GUP);
+  var params = new Params(GUP);
   window.addEventListener("load", function () {
     // All config params are optional.
     var pb = new PlotBoilerplate(
@@ -41,7 +42,7 @@
           autoAdjustOffset: true,
           offsetAdjustXPercent: 50,
           offsetAdjustYPercent: 50,
-          backgroundColor: "#fff",
+          backgroundColor: isDarkmode ? "#000000" : "#ffffff",
           enableMouse: true,
           enableTouch: true,
           enableKeys: true,
@@ -50,10 +51,6 @@
         GUP
       )
     );
-
-    pb.config.postDraw = function () {
-      redraw();
-    };
 
     // +---------------------------------------------------------------------------------
     // | A global config that's attached to the dat.gui control interface.
@@ -65,8 +62,8 @@
         freqA: 2,
         freqB: 3,
         stepSize: 0.05,
-        drawPhaseAnimation: true,
-        drawCircles: false,
+        drawPhaseAnimation: params.getBoolean("drawPhaseAnimation", true),
+        drawCircles: params.getBoolean("drawCircles", false),
         alternating: true,
         closeGap: true,
         animate: true,
@@ -76,115 +73,125 @@
     );
 
     var time = 0;
-    var Lissajous = function (freqA, freqB, phaseA, phaseB) {
-      this.freqA = freqA;
-      this.freqB = freqB;
-      this.phaseA = phaseA;
-      this.phaseB = phaseB;
 
-      this.getPointAt = function (t) {
-        return new Vertex(Math.sin(this.phaseA + this.freqA * t), Math.sin(this.phaseB + this.freqB * t));
-      };
-    };
-
-    var randColor = function () {
-      return Color.makeRGB(
-        Math.floor(255 * Math.random()),
-        Math.floor(255 * Math.random()),
-        Math.floor(255 * Math.random())
-      ).cssRGB();
+    // +---------------------------------------------------------------------------------
+    // | This is the part where the Bézier magic happens
+    // +-------------------------------
+    var postDraw = function (draw, fill) {
+      var scale = Math.min(pb.canvasSize.width, pb.canvasSize.height) * (config.drawCircles ? 0.25 : 0.35);
+      var staticFigure = new LissajousFigure(config.freqA, config.freqB, 0, 0, config.stepSize);
+      var figure = new LissajousFigure(config.freqA, config.freqB, config.phaseA, config.phaseB, config.stepSize);
+      if (config.drawCircles) {
+        drawCircles(draw, staticFigure, config.freqA, config.freqB, scale);
+      }
+      drawLissajous(staticFigure, figure, config.freqA, config.freqB, config.phaseA, config.phaseB, config.stepSize, scale);
     };
 
     // +---------------------------------------------------------------------------------
-    // | This is the part where the BÃ©zier magic happens
+    // | Draw helping circles.
     // +-------------------------------
-    var step = 0.003;
-    var redraw = function () {
-      var scale = Math.min(pb.canvasSize.width, pb.canvasSize.height) * (config.drawCircles ? 0.25 : 0.35);
+    function drawCircles(draw, staticFigure, freqA, freqB, scale) {
+      var hScale = scale;
+      var vScale = scale * 0.15;
+      var shift = -scale * 1.5;
+      var t = time / 1500;
 
-      function drawCircles(staticFigure, figure, freqA, freqB, phaseA, phaseB, stepSize) {
-        var hScale = scale;
-        var vScale = scale * 0.15;
-        var shift = -scale * 1.5;
-        var t = time / 1500;
+      let hPos = new Vertex(Math.sin(freqA * t), Math.cos(freqA * t));
+      hPos.x *= hScale;
+      hPos.y *= vScale;
+      hPos.y += shift;
+      draw.line(hPos, staticFigure.getPointAt(t).scale(scale), "#888888");
+      draw.ellipse(new Vertex(0, shift), hScale, vScale, "green", 1);
+      draw.diamondHandle(hPos, 5, getContrastColor(Color.parse(pb.config.backgroundColor))); // '#000000' );
 
-        let hPos = new Vertex(Math.sin(freqA * t), Math.cos(freqA * t));
-        hPos.x *= hScale;
-        hPos.y *= vScale;
-        hPos.y += shift;
-        pb.draw.line(hPos, staticFigure.getPointAt(t).scale(scale), "#888888");
-        pb.draw.ellipse(new Vertex(0, shift), hScale, vScale, "green", 1);
-        pb.draw.diamondHandle(hPos, 5, getContrastColor(Color.parse(pb.config.backgroundColor))); // '#000000' );
+      let vPos = new Vertex(Math.cos(freqB * t), Math.sin(freqB * t));
+      vPos.x *= vScale;
+      vPos.y *= hScale;
+      vPos.x += shift;
+      draw.line(vPos, staticFigure.getPointAt(t).scale(scale), "#888888");
+      draw.ellipse(new Vertex(shift, 0), vScale, hScale, "green", 1);
+      draw.diamondHandle(vPos, 5, "#000000");
+    }
 
-        let vPos = new Vertex(Math.cos(freqB * t), Math.sin(freqB * t));
-        vPos.x *= vScale;
-        vPos.y *= hScale;
-        vPos.x += shift;
-        pb.draw.line(vPos, staticFigure.getPointAt(t).scale(scale), "#888888");
-        pb.draw.ellipse(new Vertex(shift, 0), vScale, hScale, "green", 1);
-        pb.draw.diamondHandle(vPos, 5, "#000000");
+    // +---------------------------------------------------------------------------------
+    // | Draw the Lissajous figure.
+    // +-------------------------------
+    function drawLissajous(staticFigure, figure, freqA, freqB, phaseA, phaseB, stepSize, scale) {
+      // Convert the Lissajous figure to an discrete poly line; and scale it if required.
+      var polyLine = staticFigure.toPolyLine(stepSize).map(function (vert) {
+        return vert.scale(scale);
+      });
+
+      pb.draw.polyline(polyLine, config.drawGap, "rgba(192,0,192,0.233)", 3);
+
+      let pA = new Vertex(0, 0);
+      let pB = new Vertex(0, 0);
+      // if (config.drawPhaseAnimation) {
+      //   let p1 = new Vertex(0, 0);
+      //   let dx1 = freqA;
+      //   let dy1 = freqB;
+      //   pA = figure.getPointAt(stepSize);
+      //   let x2, y2, dx2, dy2, det, x3, y3;
+      //   var i = 0;
+      //   for (var t = stepSize; t <= 2 * Math.PI + 2 * stepSize; t += stepSize) {
+      //     x2 = Math.sin(phaseA + freqA * t);
+      //     y2 = Math.sin(phaseB + freqB * t);
+      //     dx2 = freqA * Math.cos(phaseA + freqA * t);
+      //     dy2 = freqB * Math.cos(phaseB + freqB * t);
+      //     det = dx1 * dy2 - dy1 * dx2;
+      //     if (Math.abs(det) > 0.1) {
+      //       x3 = ((x2 * dy2 - y2 * dx2) * dx1 - (p1.x * dy1 - p1.y * dx1) * dx2) / det;
+      //       y3 = ((x2 * dy2 - y2 * dx2) * dy1 - (p1.x * dy1 - p1.y * dx1) * dy2) / det;
+      //       pB.set(scale * x2, scale * y2 * (config.alternating ? -1 : 1));
+      //       if (i > 0) {
+      //         pb.draw.quadraticBezier(pA, new Vertex(scale * x3, scale * y3), pB, "rgba(0,108,255,1.0)", 2);
+      //       }
+      //     } else {
+      //       pB.set(scale * x2, scale * y2);
+      //       if (i > 0) pb.draw.line(pA, pB, "rgba(0,192,192,0.8)", 2);
+      //     }
+      //     p1.set(x2, y2);
+      //     dx1 = dx2;
+      //     dy1 = dy2;
+      //     pA.set(pB);
+      //     i++;
+      //   } // END for
+      // } // END if (drawPhaseAnimation)
+      if (config.drawPhaseAnimation) {
+        var dynamicFigure = new LissajousFigure(freqA, freqB, phaseA, phaseB);
+        var pathSegments = dynamicFigure.toCubicBezierApproximation(stepSize, scale); // , config.alternating);
+        console.log("pathSegments", pathSegments);
+        // pathSegments.forEach(function (segment) {
+        //   segment.forEach(function (vert) {
+        //     vert.scaleXY(scale, scale);
+        //     // if (config.alternating) {
+        //     //   vert.scaleXY(1, -1);
+        //     // }
+        //   });
+        // });
+        for (var i = 0; i < pathSegments.length; i++) {
+          var segment = pathSegments[i];
+          if (segment.length === 3) {
+            pb.draw.quadraticBezier(segment[0], segment[1], segment[2], "rgba(0,108,255,1.0)", 2);
+          } else if (segment.length === 2) {
+            pb.draw.line(segment[0], segment[1], "rgba(0,192,192,0.8)", 2);
+          } else {
+            console.log("No linear nor cubic Bézier fragment.");
+          }
+        }
       }
 
-      function drawLissajous(staticFigure, figure, freqA, freqB, phaseA, phaseB, stepSize) {
-        var polyLine = [];
-
-        let pA = new Vertex(0, 0);
-        let pB = new Vertex(0, 0);
-
-        for (var t = 0; t <= 2 * Math.PI; t += stepSize) {
-          pA = staticFigure.getPointAt(t).scale(scale);
-          polyLine.push(pA.clone());
-        }
-        pb.draw.polyline(polyLine, config.drawGap, "rgba(192,0,192,0.233)", 3);
-
+      if (config.drawMarkers) {
         if (config.drawPhaseAnimation) {
-          let p1 = new Vertex(0, 0);
-          let dx1 = freqA;
-          let dy1 = freqB;
-          pA = figure.getPointAt(stepSize);
-          let x2, y2, dx2, dy2, det, x3, y3;
-          var i = 0;
-          for (var t = stepSize; t <= 2 * Math.PI + 2 * stepSize; t += stepSize) {
-            x2 = Math.sin(phaseA + freqA * t);
-            y2 = Math.sin(phaseB + freqB * t);
-            dx2 = freqA * Math.cos(phaseA + freqA * t);
-            dy2 = freqB * Math.cos(phaseB + freqB * t);
-            det = dx1 * dy2 - dy1 * dx2;
-            if (Math.abs(det) > 0.1) {
-              x3 = ((x2 * dy2 - y2 * dx2) * dx1 - (p1.x * dy1 - p1.y * dx1) * dx2) / det;
-              y3 = ((x2 * dy2 - y2 * dx2) * dy1 - (p1.x * dy1 - p1.y * dx1) * dy2) / det;
-              pB.set(scale * x2, scale * y2 * (config.alternating ? -1 : 1));
-              if (i > 0) pb.draw.quadraticBezier(pA, new Vertex(scale * x3, scale * y3), pB, "rgba(0,108,255,1.0)", 2);
-            } else {
-              pB.set(scale * x2, scale * y2);
-              if (i > 0) pb.draw.line(pA, pB, "rgba(0,192,192,0.8)", 2);
-            }
-            p1.set(x2, y2);
-            dx1 = dx2;
-            dy1 = dy2;
-            pA.set(pB);
-            i++;
-          } // END for
-        } // END if (drawPhaseAnimation)
-
-        if (config.drawMarkers) {
-          if (config.drawPhaseAnimation) {
-            pA = figure.getPointAt(time / 1500);
-            pA.scale(scale);
-            pb.draw.circle(pA, 3, "orange");
-          }
-          pB = staticFigure.getPointAt(time / 1500);
-          pB.scale(scale);
-          pb.draw.circle(pB, 3, "rgba(128,128,128,0.33)");
+          pA = figure.getPointAt(time / 1500);
+          pA.scale(scale);
+          pb.draw.circle(pA, 3, "orange");
         }
-      } // END function
-
-      var staticFigure = new Lissajous(config.freqA, config.freqB, 0, 0, config.stepSize);
-      var figure = new Lissajous(config.freqA, config.freqB, config.phaseA, config.phaseB, config.stepSize);
-      if (config.drawCircles)
-        drawCircles(staticFigure, figure, config.freqA, config.freqB, config.phaseA, config.phaseB, config.stepSize);
-      drawLissajous(staticFigure, figure, config.freqA, config.freqB, config.phaseA, config.phaseB, config.stepSize);
-    };
+        pB = staticFigure.getPointAt(time / 1500);
+        pB.scale(scale);
+        pb.draw.circle(pB, 3, "rgba(128,128,128,0.33)");
+      }
+    } // END function
 
     // +---------------------------------------------------------------------------------
     // | Add some elements to draw (demo).
@@ -287,6 +294,7 @@
       f0.add(config, "animate").title("Toggle phase animation on/off.").onChange(startAnimation);
       f0.open();
 
+      pb.config.postDraw = postDraw;
       // Will stop after first draw if config.animate==false
       startAnimation();
     }
