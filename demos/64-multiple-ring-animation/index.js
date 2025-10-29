@@ -9,6 +9,8 @@
  * @version  1.0.0
  **/
 
+// TODO: add miter options to draw/stroke-options
+
 (function (_context) {
   "use strict";
 
@@ -51,6 +53,12 @@
     var targetMatrix = new DataGrid2dArrayMatrix(3, 9).setAll(randomBoolean);
     var matrixAnimStep = 0;
     var maxMatrixAnimSteps = 1500;
+    var lissajousFigure = new LissajousFigure(
+      2.0, // freqA,
+      3.0, // freqB,
+      0, // phaseA,
+      0 // phaseB
+    );
 
     // Array< { center: new Vertex(0,0),
     //          innerRadius: 45.0,
@@ -149,8 +157,13 @@
       drawBinaryClock(draw, fill, milliseconds);
 
       drawMatrix(draw, fill, milliseconds);
+
+      drawLissajous(draw, fill, milliseconds);
     }; // END postDraw
 
+    // +---------------------------------------------------------------------------------
+    // | Draw the binary clock.
+    // +-------------------------------
     var drawBinaryClock = function (draw, fill, milliseconds) {
       timingIntervals.forEach(function (timingInterval, timingSquareIndex) {
         if (timingInterval.isTimestampVisible(milliseconds)) {
@@ -177,6 +190,9 @@
 
     var activeMatrixColor = Color.makeRGB(0, 192, 192, 1.0);
     var inactiveMatrixColor = Color.parse(pb.config.backgroundColor); // Color.makeRGB(0, 0, 0, 1.0);
+    // +---------------------------------------------------------------------------------
+    // | Draw the matrix animation.
+    // +-------------------------------
     var drawMatrix = function (draw, fill, milliseconds) {
       var sourceColor = new Color();
       var targetColor = new Color();
@@ -225,6 +241,9 @@
       textAlign: "left",
       rotation: 0.0
     };
+    // +---------------------------------------------------------------------------------
+    // | Render the given ring.
+    // +-------------------------------
     var renderRing = function (draw, fill, ring) {
       // var center = new Vertex(0, 0);
       var baseRotation = ring.baseRotation * DEG_TO_RAD;
@@ -273,6 +292,33 @@
         // console.log("pathData", pathData);
         console.log("tmp2", pathData, "ring.startAngleDeg", ring.startAngleDeg, "ring.endAngleDeg", ring.endAngleDeg);
       }
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Draw a tiny lissajous animation.
+    // +-------------------------------
+    var drawLissajous = function (draw, fill, milliseconds) {
+      var stepSize = 0.05;
+      var scale = 30.0;
+      var offset = maxRingBounds.min;
+      lissajousFigure.phaseA = -Math.PI + (((milliseconds / 2000) * Math.PI) % (2 * Math.PI));
+      lissajousFigure.freqA = Math.floor((milliseconds / 3000) % 10); // 1 ... 10
+      // console.log("lissajousFigure.freqA", lissajousFigure.freqA);
+      var polyLine = lissajousFigure.toPolyLine(stepSize);
+      polyLine.forEach(function (vert) {
+        vert.scale(scale);
+        vert.move(offset);
+        vert.move({
+          x: -(config.matrixSquareSize + config.matrixGapSize) * sourceMatrix.xSegmentCount + config.matrixGapSize / 2,
+          y: 0
+        });
+      });
+
+      // The miters look strange on the
+      for (var i = 0; i < polyLine.length; i++) {
+        draw.line(polyLine[i], polyLine[(i + 1) % polyLine.length], "rgba(192,0,192,0.233)", 5);
+      }
+      // draw.polyline(polyLine, false, "rgba(192,0,192,0.233)", 5);
     };
 
     // +---------------------------------------------------------------------------------
