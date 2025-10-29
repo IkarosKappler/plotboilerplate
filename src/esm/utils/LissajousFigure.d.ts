@@ -30,5 +30,5 @@ export declare class LissajousFigure {
      */
     getPointAt(t: number): Vertex;
     toPolyLine(stepSize: number): Array<Vertex>;
-    toCubicBezierApproximation(stepSize: number, scale: number, alternating: boolean): Array<[Vertex, Vertex, Vertex] | [Vertex, Vertex]>;
+    toQuadraticBezierApproximation(stepSize: number): Array<[Vertex, Vertex, Vertex] | [Vertex, Vertex]>;
 }

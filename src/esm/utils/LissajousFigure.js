@@ -42,7 +42,10 @@ export class LissajousFigure {
         }
         return polyLine;
     }
-    toCubicBezierApproximation(stepSize, scale, alternating) {
+    toQuadraticBezierApproximation(stepSize
+    // scale: number
+    // alternating: boolean
+    ) {
         const result = [];
         let pA = new Vertex(0, 0);
         let pB = new Vertex(0, 0);
@@ -62,17 +65,19 @@ export class LissajousFigure {
             if (Math.abs(det) > 0.1) {
                 x3 = ((x2 * dy2 - y2 * dx2) * dx1 - (p1.x * dy1 - p1.y * dx1) * dx2) / det;
                 y3 = ((x2 * dy2 - y2 * dx2) * dy1 - (p1.x * dy1 - p1.y * dx1) * dy2) / det;
-                pB.set(scale * x2, scale * y2 * (alternating ? -1 : 1));
+                // pB.set(scale * x2, scale * y2 * (alternating ? -1 : 1));
+                // pB.set(scale * x2, scale * y2);
+                pB.set(x2, y2);
                 // pB.set(x2, y2);
                 if (i > 0) {
                     //   pb.draw.quadraticBezier(pA, new Vertex(scale * x3, scale * y3), pB, "rgba(0,108,255,1.0)", 2);
-                    result.push([pA.clone(), new Vertex(scale * x3, scale * y3), pB.clone()]);
-                    //   result.push([pA.clone(), new Vertex(x3, y3), pB.clone()]);
+                    //   result.push([pA.clone(), new Vertex(scale * x3, scale * y3), pB.clone()]);
+                    result.push([pA.clone(), new Vertex(x3, y3), pB.clone()]);
                 }
             }
             else {
-                pB.set(scale * x2, scale * y2);
-                // pB.set(x2, y2);
+                // pB.set(scale * x2, scale * y2);
+                pB.set(x2, y2);
                 if (i > 0) {
                     //   pb.draw.line(pA, pB, "rgba(0,192,192,0.8)", 2);
                     result.push([pA.clone(), pB.clone()]);

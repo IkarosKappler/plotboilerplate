@@ -6,7 +6,8 @@
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
  * @date        2018-11-22
- * @version     1.0.0
+ * @modified    2025-10-29 Ported the Lissajous structures to a Typescript class.
+ * @version     1.1.0
  **/
 
 (function (_context) {
@@ -59,15 +60,16 @@
       {
         phaseA: 0.0,
         phaseB: 0.0,
-        freqA: 2,
-        freqB: 3,
-        stepSize: 0.05,
+        freqA: params.getNumber("freqA", 2),
+        freqB: params.getNumber("freqB", 3),
+        stepSize: params.getNumber("stepSize", 0.05),
         drawPhaseAnimation: params.getBoolean("drawPhaseAnimation", true),
         drawCircles: params.getBoolean("drawCircles", false),
-        alternating: true,
-        closeGap: true,
-        animate: true,
-        drawMarkers: true
+        alternating: params.getBoolean("alternating", false),
+        closeGap: params.getBoolean("closeGap", true),
+        animate: params.getBoolean("animate", true),
+        drawMarkers: params.getBoolean("drawMarkers", true),
+        timeDilation: params.getNumber("timeDilation", 1.0)
       },
       GUP
     );
@@ -126,49 +128,24 @@
 
       let pA = new Vertex(0, 0);
       let pB = new Vertex(0, 0);
-      // if (config.drawPhaseAnimation) {
-      //   let p1 = new Vertex(0, 0);
-      //   let dx1 = freqA;
-      //   let dy1 = freqB;
-      //   pA = figure.getPointAt(stepSize);
-      //   let x2, y2, dx2, dy2, det, x3, y3;
-      //   var i = 0;
-      //   for (var t = stepSize; t <= 2 * Math.PI + 2 * stepSize; t += stepSize) {
-      //     x2 = Math.sin(phaseA + freqA * t);
-      //     y2 = Math.sin(phaseB + freqB * t);
-      //     dx2 = freqA * Math.cos(phaseA + freqA * t);
-      //     dy2 = freqB * Math.cos(phaseB + freqB * t);
-      //     det = dx1 * dy2 - dy1 * dx2;
-      //     if (Math.abs(det) > 0.1) {
-      //       x3 = ((x2 * dy2 - y2 * dx2) * dx1 - (p1.x * dy1 - p1.y * dx1) * dx2) / det;
-      //       y3 = ((x2 * dy2 - y2 * dx2) * dy1 - (p1.x * dy1 - p1.y * dx1) * dy2) / det;
-      //       pB.set(scale * x2, scale * y2 * (config.alternating ? -1 : 1));
-      //       if (i > 0) {
-      //         pb.draw.quadraticBezier(pA, new Vertex(scale * x3, scale * y3), pB, "rgba(0,108,255,1.0)", 2);
-      //       }
-      //     } else {
-      //       pB.set(scale * x2, scale * y2);
-      //       if (i > 0) pb.draw.line(pA, pB, "rgba(0,192,192,0.8)", 2);
-      //     }
-      //     p1.set(x2, y2);
-      //     dx1 = dx2;
-      //     dy1 = dy2;
-      //     pA.set(pB);
-      //     i++;
-      //   } // END for
-      // } // END if (drawPhaseAnimation)
       if (config.drawPhaseAnimation) {
         var dynamicFigure = new LissajousFigure(freqA, freqB, phaseA, phaseB);
-        var pathSegments = dynamicFigure.toCubicBezierApproximation(stepSize, scale); // , config.alternating);
-        console.log("pathSegments", pathSegments);
-        // pathSegments.forEach(function (segment) {
-        //   segment.forEach(function (vert) {
-        //     vert.scaleXY(scale, scale);
-        //     // if (config.alternating) {
-        //     //   vert.scaleXY(1, -1);
-        //     // }
-        //   });
-        // });
+        // Convert the dynamic figure to a sequence of path segments:
+        //   - quadratic Bézier segments (3 vertices)
+        //   - lines path segments (2 vertices)
+        // Array< [Vertex, Vertex, Vertex] | [Vertex, Vertex] >
+        var pathSegments = dynamicFigure.toQuadraticBezierApproximation(stepSize);
+        pathSegments.forEach(function (segment) {
+          // Scale figure to be larger than in [-1 .. 1]
+          segment.forEach(function (vert) {
+            vert.scaleXY({ x: scale, y: scale });
+          });
+          // Alternate values?
+          if (config.alternating && segment.length >= 3) {
+            segment[1].scaleXY({ x: 1, y: -1 });
+          }
+        });
+        // Draw the segments.
         for (var i = 0; i < pathSegments.length; i++) {
           var segment = pathSegments[i];
           if (segment.length === 3) {
@@ -194,12 +171,8 @@
     } // END function
 
     // +---------------------------------------------------------------------------------
-    // | Add some elements to draw (demo).
+    // | The animation loop function.
     // +-------------------------------
-    //var diameter = Math.min(pb.canvasSize.width,pb.canvasSize.height)/2.5;
-    //var radius   = diameter*0.5;
-    //var hypo     = Math.sqrt( radius*radius*2 );
-
     var renderLoop = function (_time) {
       if (!config.animate) {
         time = 0;
@@ -208,7 +181,7 @@
       }
       time = _time;
       // Animate from -PI to +PI
-      config.phaseA = -Math.PI + (((time / 5000) * Math.PI) % (2 * Math.PI));
+      config.phaseA = -Math.PI + ((((time * config.timeDilation) / 5000) * Math.PI) % (2 * Math.PI));
       pb.redraw();
       window.requestAnimationFrame(renderLoop);
     };
@@ -223,74 +196,52 @@
     {
       var gui = pb.createGUI();
       var f0 = gui.addFolder("Points");
-      f0.add(config, "phaseA")
-        .min(-Math.PI)
-        .max(Math.PI)
-        .step(0.01)
-        .listen()
-        .title("Phase A.")
+      // prettier-ignore
+      f0.add(config, "phaseA").min(-Math.PI).max(Math.PI).step(0.01).listen().title("Phase A.")
         .onChange(function () {
           console.log("x");
           pb.redraw();
         });
       //f0.add(config, 'phaseB').min(-Math.PI).max(Math.PI).step(0.1).listen().title("Phase B.").onChange( function() { pb.redraw(); } );
-      f0.add(config, "freqA")
-        .min(1)
-        .max(10)
-        .step(1)
-        .listen()
-        .title("The first frequency.")
+      // prettier-ignore
+      f0.add(config, "freqA").min(1).max(10).step(1).listen().onChange(function () {
+          pb.redraw();
+        });
+      // prettier-ignore
+      f0.add(config, "freqB").min(1).max(10).step(1).listen().title("The second frequency.").onChange(function () {
+          pb.redraw();
+        });
+      // prettier-ignore
+      f0.add(config, "stepSize").min(0.05).max(1.0).step(0.05).listen().title("The second phase.").onChange(function () {
+          pb.redraw();
+        });
+      // prettier-ignore
+      f0.add(config, "drawPhaseAnimation").listen().title("Draw the figure animated with phaseA.")
         .onChange(function () {
           pb.redraw();
         });
-      f0.add(config, "freqB")
-        .min(1)
-        .max(10)
-        .step(1)
-        .listen()
-        .title("The second frequency.")
+      // prettier-ignore
+      f0.add(config, "drawCircles").listen().title("Draw the corresponsding circles.").onChange(function () {
+          pb.redraw();
+        });
+      // prettier-ignore
+      f0.add(config, "closeGap").listen().title("Close the draw gap between begin and and of curve.")
         .onChange(function () {
           pb.redraw();
         });
-      f0.add(config, "stepSize")
-        .min(0.05)
-        .max(1.0)
-        .step(0.05)
-        .listen()
-        .title("The second phase.")
-        .onChange(function () {
+      // prettier-ignore
+      f0.add(config, "drawMarkers").listen()
+        .title("Draw a marker for the current begin/end position.").onChange(function () {
           pb.redraw();
         });
-      f0.add(config, "drawPhaseAnimation")
-        .listen()
-        .title("Draw the figure animated with phaseA.")
-        .onChange(function () {
+      // prettier-ignore
+      f0.add(config, "alternating").listen().title("Draw alternating curve segments.").onChange(function () {
           pb.redraw();
         });
-      f0.add(config, "drawCircles")
-        .listen()
-        .title("Draw the corresponsding circles.")
-        .onChange(function () {
-          pb.redraw();
-        });
-      f0.add(config, "closeGap")
-        .listen()
-        .title("Close the draw gap between begin and and of curve.")
-        .onChange(function () {
-          pb.redraw();
-        });
-      f0.add(config, "drawMarkers")
-        .listen()
-        .title("Draw a marker for the current begin/end position.")
-        .onChange(function () {
-          pb.redraw();
-        });
-      f0.add(config, "alternating")
-        .listen()
-        .title("Draw alternating curve segments.")
-        .onChange(function () {
-          pb.redraw();
-        });
+      // prettier-ignore
+      f0.add(config, "timeDilation").min(0.1).max(2.0).step(0.1).listen().onChange(function () {
+        pb.redraw();
+      });
       f0.add(config, "animate").title("Toggle phase animation on/off.").onChange(startAnimation);
       f0.open();
 
