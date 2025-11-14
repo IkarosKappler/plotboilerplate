@@ -77,6 +77,7 @@
       numRings: params.getNumber("numRings", 5),
       matrixSquareSize: params.getNumber("matrixSquareSize", 16),
       matrixGapSize: params.getNumber("matrixGapSize", 8),
+      drawPerlinWrapper: params.getBoolean("drawPerlinWrapper", false),
       debug: params.getBoolean("debug", false)
     };
 
@@ -155,10 +156,9 @@
       });
 
       drawBinaryClock(draw, fill, milliseconds);
-
       drawMatrix(draw, fill, milliseconds);
-
       drawLissajous(draw, fill, milliseconds);
+      drawPerlinData(draw, fill, milliseconds);
     }; // END postDraw
 
     // +---------------------------------------------------------------------------------
@@ -302,7 +302,7 @@
       var scale = 30.0;
       var offset = maxRingBounds.min;
       lissajousFigure.phaseA = -Math.PI + (((milliseconds / 2000) * Math.PI) % (2 * Math.PI));
-      lissajousFigure.freqA = Math.floor((milliseconds / 3000) % 10); // 1 ... 10
+      lissajousFigure.freqA = Math.floor((milliseconds / 6000) % 10); // 1 ... 10
       // console.log("lissajousFigure.freqA", lissajousFigure.freqA);
       var polyLine = lissajousFigure.toPolyLine(stepSize);
       polyLine.forEach(function (vert) {
@@ -321,6 +321,59 @@
       // draw.polyline(polyLine, false, "rgba(192,0,192,0.233)", 5);
     };
 
+    var perlinDepth = 5;
+    var perlinDataLength = Math.pow(2, perlinDepth);
+    var perlinData = arrayFill(perlinDataLength, 0.0);
+    var perlinNoise = new PerlinNoise().seed(10);
+    var perlinBounds = pb
+      .viewport()
+      .getScaled(0.5)
+      .getMoved({ x: 0, y: pb.viewport().getHeight() / 3 });
+    var updateNoiseData = function (milliseconds) {
+      // perlinData = arrayFill(dataLength, 0.0);
+      for (var x = 0; x < perlinDataLength; x++) {
+        perlinData[x] = perlinNoise.perlin2((x / perlinDataLength) * perlinDepth, milliseconds / perlinDataLength / 20);
+      }
+      // console.log("perlinData", perlinData);
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Draw a tiny lissajous animation.
+    // +-------------------------------
+    var drawPerlinData = function (draw, fill, milliseconds) {
+      updateNoiseData(milliseconds);
+      var boundsCenter = perlinBounds.getCenter();
+      var maxColHeight = perlinBounds.getHeight() / 2.0;
+      // draw.crosshair(boundsCenter, 15, "red", 2);
+
+      var leftDrawOffset = perlinBounds.min.x;
+      for (var i = 0; i < perlinData.length; i++) {
+        var xPct = i / (perlinData.length - 1);
+        var value = perlinData[i];
+
+        draw.line(
+          { x: leftDrawOffset + xPct * perlinBounds.width, y: boundsCenter.y },
+          { x: leftDrawOffset + xPct * perlinBounds.width, y: boundsCenter.y - maxColHeight * value },
+          "rgba(255,64,0,0.8)",
+          3
+        );
+        if (config.drawPerlinWrapper && i - 1 >= 0) {
+          var xPctOld = (i - 1) / (perlinData.length - 1);
+          var valueOld = perlinData[i - 1];
+
+          draw.line(
+            {
+              x: leftDrawOffset + xPctOld * perlinBounds.width,
+              y: boundsCenter.y - maxColHeight * valueOld
+            },
+            { x: leftDrawOffset + xPct * perlinBounds.width, y: boundsCenter.y - maxColHeight * value },
+            "orange",
+            1
+          );
+        }
+      }
+    }; // END postDraw
+
     // +---------------------------------------------------------------------------------
     // | Create a GUI.
     // +-------------------------------
@@ -331,6 +384,9 @@
         .onChange( function() { toggleAnimation(); });
       // prettier-ignore
       gui.add(config, "wrapStartEnd").name("wrapStartEnd").title("Wrap around (swap) if start angle is larger than end angle.")
+        .onChange( function() { pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "drawPerlinWrapper").name("drawPerlinWrapper").title("Draw the perlin noise outline.")
         .onChange( function() { pb.redraw() });
     }
     pb.config.postDraw = postDraw;

@@ -6,6 +6,7 @@
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
  * @date        2021-04-14
+ * @modified    2025-11-14 Using `GeometryMesh` class now.
  * @version     1.0.0
  **/
 
@@ -52,5 +53,5 @@ var makeRhombicDodecahedronGeometry = function () {
     [10,7],
     [7,10], [10,6]
       ];
-  return { vertices: vertices, edges: edges };
+  return new GeometryMesh(vertices, edges);
 };

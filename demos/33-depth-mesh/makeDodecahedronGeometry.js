@@ -6,7 +6,8 @@
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
  * @date        2021-04-13
- * @version     1.0.0
+ * @modified    2025-11-14 Using `GeometryMesh` class now.
+ * @version     1.0.1
  **/
 
 var makeDodecahedronGeometry = function () {
@@ -54,5 +55,5 @@ var makeDodecahedronGeometry = function () {
     [4,18],[18,5],
     [18,19]
     ];
-  return { vertices: vertices, edges: edges };
+  return new GeometryMesh(vertices, edges);
 };

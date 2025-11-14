@@ -1394,6 +1394,7 @@ exports.drawutils = drawutils;
  * @modified 2025-10-17 Added the methods `Bounds.getSouthWestPoint`, `getNorthWestPoint`, `getNorthEastPoint` and `getSouthEastPoint`.
  * @modified 2025-10-18 Added method `Bounds.containsVert(XYCoords)`.
  * @modified 2025-10-28 Added the `Bounds.getWidth()` and `Bounds.getHeight()`.
+ * @modified 2025-11-12 Added the `Bounds.getMoved()` method.
  * @version  1.11.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -1439,6 +1440,17 @@ var Bounds = /** @class */ (function () {
     };
     Bounds.prototype.getHeight = function () {
         return this.max.y - this.min.y;
+    };
+    Bounds.prototype.getScaled = function (scaleFactor) {
+        var center = this.getCenter();
+        var newMin = new Vertex_1.Vertex(this.min).scale(scaleFactor, center);
+        var newMax = new Vertex_1.Vertex(this.max).scale(scaleFactor, center);
+        return new Bounds(newMin, newMax);
+    };
+    Bounds.prototype.getMoved = function (moveAmount) {
+        var newMin = new Vertex_1.Vertex(this.min).move(moveAmount);
+        var newMax = new Vertex_1.Vertex(this.max).move(moveAmount);
+        return new Bounds(newMin, newMax);
     };
     /**
      * Get the center point of the north bound.
@@ -3481,7 +3493,8 @@ exports.geomutils = {
  * @modified 2024-01-30 Fixing an issue with immutable style sets; changes to the global draw config did not reflect here (do now).
  * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
  * @modified 2024-07-24 Caching custom style defs in a private buffer variable.
- * @version  1.6.10
+ * @modified 2025-11-14 Fixing a bug in the CSS `mix-blend-mode` property handling (caused a runtime error).
+ * @version  1.6.11
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilssvg = void 0;
@@ -3686,8 +3699,13 @@ var drawutilssvg = /** @class */ (function () {
             node = this.createSVGNode(nodeName);
         }
         if (this.drawlibConfiguration.blendMode) {
-            // node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
-            node.style["mix-blend-mode"](this.drawlibConfiguration.blendMode);
+            var blendMode = node.style["mix-blend-mode"];
+            if (typeof blendMode === "function") {
+                blendMode(this.drawlibConfiguration.blendMode);
+            }
+            else {
+                node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
+            }
         }
         // if (this.lineDashEnabled && this.lineDash && this.lineDash.length > 0 && drawutilssvg.nodeSupportsLineDash(nodeName)) {
         //   node.setAttribute("stroke-dasharray", this.lineDash.join(" "));

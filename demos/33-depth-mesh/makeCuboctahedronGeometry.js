@@ -6,6 +6,7 @@
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
  * @date        2021-05-11
+ * @modified    2025-11-14 Using `GeometryMesh` class now.
  * @version     1.0.0
  **/
 
@@ -84,5 +85,5 @@ var makeCuboctahedronGeometry = function (makeCoriolisStation) {
     addArrow(9, 5, 4);
     addArrow(1, 9, 0);
   }
-  return { vertices: vertices, edges: edges };
+  return new GeometryMesh(vertices, edges);
 };

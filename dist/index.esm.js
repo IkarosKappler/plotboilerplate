@@ -3587,6 +3587,7 @@ Polygon.utils = {
  * @modified 2025-10-17 Added the methods `Bounds.getSouthWestPoint`, `getNorthWestPoint`, `getNorthEastPoint` and `getSouthEastPoint`.
  * @modified 2025-10-18 Added method `Bounds.containsVert(XYCoords)`.
  * @modified 2025-10-28 Added the `Bounds.getWidth()` and `Bounds.getHeight()`.
+ * @modified 2025-11-12 Added the `Bounds.getMoved()` method.
  * @version  1.11.0
  **/
 /**
@@ -3628,6 +3629,17 @@ class Bounds {
     }
     getHeight() {
         return this.max.y - this.min.y;
+    }
+    getScaled(scaleFactor) {
+        const center = this.getCenter();
+        const newMin = new Vertex(this.min).scale(scaleFactor, center);
+        const newMax = new Vertex(this.max).scale(scaleFactor, center);
+        return new Bounds(newMin, newMax);
+    }
+    getMoved(moveAmount) {
+        const newMin = new Vertex(this.min).move(moveAmount);
+        const newMax = new Vertex(this.max).move(moveAmount);
+        return new Bounds(newMin, newMax);
     }
     /**
      * Get the center point of the north bound.
@@ -6431,7 +6443,8 @@ CircleSector.circleSectorUtils = {
  * @modified 2024-01-30 Fixing an issue with immutable style sets; changes to the global draw config did not reflect here (do now).
  * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
  * @modified 2024-07-24 Caching custom style defs in a private buffer variable.
- * @version  1.6.10
+ * @modified 2025-11-14 Fixing a bug in the CSS `mix-blend-mode` property handling (caused a runtime error).
+ * @version  1.6.11
  **/
 const RAD_TO_DEG = 180 / Math.PI;
 /**
@@ -6629,8 +6642,13 @@ class drawutilssvg {
             node = this.createSVGNode(nodeName);
         }
         if (this.drawlibConfiguration.blendMode) {
-            // node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
-            node.style["mix-blend-mode"](this.drawlibConfiguration.blendMode);
+            const blendMode = node.style["mix-blend-mode"];
+            if (typeof blendMode === "function") {
+                blendMode(this.drawlibConfiguration.blendMode);
+            }
+            else {
+                node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
+            }
         }
         // if (this.lineDashEnabled && this.lineDash && this.lineDash.length > 0 && drawutilssvg.nodeSupportsLineDash(nodeName)) {
         //   node.setAttribute("stroke-dasharray", this.lineDash.join(" "));

@@ -16,6 +16,7 @@
  * @modified 2025-10-17 Added the methods `Bounds.getSouthWestPoint`, `getNorthWestPoint`, `getNorthEastPoint` and `getSouthEastPoint`.
  * @modified 2025-10-18 Added method `Bounds.containsVert(XYCoords)`.
  * @modified 2025-10-28 Added the `Bounds.getWidth()` and `Bounds.getHeight()`.
+ * @modified 2025-11-12 Added the `Bounds.getMoved()` method.
  * @version  1.11.0
  **/
 import { Polygon } from "./Polygon";
@@ -59,6 +60,17 @@ export class Bounds {
     }
     getHeight() {
         return this.max.y - this.min.y;
+    }
+    getScaled(scaleFactor) {
+        const center = this.getCenter();
+        const newMin = new Vertex(this.min).scale(scaleFactor, center);
+        const newMax = new Vertex(this.max).scale(scaleFactor, center);
+        return new Bounds(newMin, newMax);
+    }
+    getMoved(moveAmount) {
+        const newMin = new Vertex(this.min).move(moveAmount);
+        const newMax = new Vertex(this.max).move(moveAmount);
+        return new Bounds(newMin, newMax);
     }
     /**
      * Get the center point of the north bound.

@@ -16,6 +16,7 @@
  * @modified 2025-10-17 Added the methods `Bounds.getSouthWestPoint`, `getNorthWestPoint`, `getNorthEastPoint` and `getSouthEastPoint`.
  * @modified 2025-10-18 Added method `Bounds.containsVert(XYCoords)`.
  * @modified 2025-10-28 Added the `Bounds.getWidth()` and `Bounds.getHeight()`.
+ * @modified 2025-11-12 Added the `Bounds.getMoved()` method.
  * @version  1.11.0
  **/
 import { Polygon } from "./Polygon";
@@ -78,6 +79,8 @@ export declare class Bounds implements IBounds, XYDimension {
     containsVert(vert: XYCoords): boolean;
     getWidth(): number;
     getHeight(): number;
+    getScaled(scaleFactor: number): Bounds;
+    getMoved(moveAmount: XYCoords): Bounds;
     /**
      * Get the center point of the north bound.
      *

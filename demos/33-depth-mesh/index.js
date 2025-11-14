@@ -375,9 +375,9 @@
     // | Install a mouse handler to display current pointer position.
     // | And to rotate the object.
     // +-------------------------------
-    new MouseHandler(pb.canvas, "drawsvg-demo")
+    new MouseHandler(pb.eventCatcher, "drawsvg-demo")
       .drag(function (e) {
-        console.log(e.params);
+        // console.log(e.params);
         config.rotationX = geomutils.wrapMinMax(config.rotationX + e.params.dragAmount.y, 0.0, 360.0);
         config.rotationY = geomutils.wrapMinMax(config.rotationY - e.params.dragAmount.x, 0.0, 360.0);
         pb.redraw();
