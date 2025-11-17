@@ -20,6 +20,7 @@
   let GUP = gup();
   var params = new Params(GUP);
   var isDarkmode = detectDarkMode(GUP);
+  console.log("isDarkmode", isDarkmode);
 
   window.addEventListener("load", function () {
     // All config params are optional.
@@ -57,11 +58,11 @@
       )
     );
 
-    new DarkModeHandler(function (isDarkMode) {
-      // console.log("isDarkMode", isDarkMode);
-      pb.config.backgroundColor = isDarkMode ? "#000000" : "#ffffff";
-      pb.redraw();
-    });
+    // new DarkModeHandler(function (_isDarkMode) {
+    //   pb.config.backgroundColor = _isDarkMode ? "#000000" : "#ffffff";
+    //   isDarkmode = _isDarkMode;
+    //   pb.redraw();
+    // });
 
     // prettier-ignore
     var blendModes = [
