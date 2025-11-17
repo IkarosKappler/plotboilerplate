@@ -4,6 +4,7 @@
   - Fixing a bug in the `drawutilssvg` class in the CSS `mix-blend-mode` property handling (caused a runtime error).
   - Adding utility class `utils/datastructures/GeometryMesh`. Extending demo `33-depth-mesh` with the new class.
   - Moved experimental class `Vert3` from demo 33 one level up.
+  - Added demo `67-perlin-noise-3d-depth-mesh`.
 - 2025-11-12
   - Added the `PerlinNoise` class and refactored, copied from a different project `floatsim`.
   - Added the `Bounds.getMoved()` method.
