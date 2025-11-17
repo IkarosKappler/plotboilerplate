@@ -60,7 +60,7 @@ export class GeometryMesh<T extends Vertex2 | Vertex3> {
     }
   }
 
-  getGeometryBounds(): { min: Vertex3; max: Vertex3 } {
+  getGeometryBounds(): { min: Vertex3; max: Vertex3; width: number; height: number; depth: number } {
     // var min = new Vert3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
     // var max = new Vert3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
     var min = { x: Number.MAX_VALUE, y: Number.MAX_VALUE, z: Number.MAX_VALUE };
@@ -74,6 +74,6 @@ export class GeometryMesh<T extends Vertex2 | Vertex3> {
       max.y = Math.max(vert.y, max.y);
       max.z = Math.max(vert.z, max.z);
     }
-    return { min: min, max: max };
+    return { min: min, max: max, width: max.x - min.x, height: max.y - min.y, depth: max.z - min.z };
   }
 }

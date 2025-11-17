@@ -47,7 +47,7 @@ export class GeometryMesh {
             max.y = Math.max(vert.y, max.y);
             max.z = Math.max(vert.z, max.z);
         }
-        return { min: min, max: max };
+        return { min: min, max: max, width: max.x - min.x, height: max.y - min.y, depth: max.z - min.z };
     }
 }
 //# sourceMappingURL=GeometryMesh.js.map

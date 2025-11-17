@@ -42,5 +42,8 @@ export declare class GeometryMesh<T extends Vertex2 | Vertex3> {
     getGeometryBounds(): {
         min: Vertex3;
         max: Vertex3;
+        width: number;
+        height: number;
+        depth: number;
     };
 }
