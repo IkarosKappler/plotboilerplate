@@ -1,5 +1,7 @@
 # Changelog
 
+- 2025-11-17 [v1.26.0]
+  - New release with Perlin and ring sector demos.
 - 2025-11-14
   - Fixing a bug in the `drawutilssvg` class in the CSS `mix-blend-mode` property handling (caused a runtime error).
   - Adding utility class `utils/datastructures/GeometryMesh`. Extending demo `33-depth-mesh` with the new class.
