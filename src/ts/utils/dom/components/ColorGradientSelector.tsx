@@ -46,6 +46,7 @@ export class ColorGradientSelector {
   private css_buttonWidth = "100px";
   private css_buttonHeight = "1.8em";
   private css_buttonFontSize = "0.725em";
+  private css_buttonFontSize_larger = "1.0em";
 
   private colorGradients: Array<ColorGradient> = [];
   // TODO: this does not really need to be a pair, does it?
@@ -88,6 +89,7 @@ export class ColorGradientSelector {
       this.css_buttonWidth = "200px";
       this.css_buttonHeight = "2.5em";
       this.css_buttonFontSize = "1.25em";
+      this.css_buttonFontSize_larger = "1.45em";
     }
     this.baseID = Math.floor(Math.random() * 65535);
     this.elementID = `color-gradient-selector-${this.baseID}`;
@@ -391,7 +393,7 @@ export class ColorGradientSelector {
           >
             &nbsp;
           </div>
-          <div sx={{ w: this.css_buttonHeight, flexShrink: 2, fontSize: this.css_buttonFontSize }}>▾</div>
+          <div sx={{ w: this.css_buttonHeight, flexShrink: 2, fontSize: this.css_buttonFontSize_larger }}>▾</div>
         </button>
         <div
           className="positioning-container"
@@ -428,7 +430,11 @@ export class ColorGradientSelector {
     #${this.elementID} button {
       border: 0px solid lightgray;
       padding: 0.25em;
-      background-color: rgba(255,255,255,0.9);
+      /* background-color: rgba(255,255,255,0.9); */
+    }
+
+    #${this.elementID} .positioning-container button {
+      border-radius: 0;
     }
 
     #${this.elementID} .main-button:hover {
@@ -438,6 +444,7 @@ export class ColorGradientSelector {
     #${this.elementID} .option-gradient-button:hover, #${this.elementID} .option-delete-button:hover {
       background-color: rgba(216,216,216,0.9);
     }
+
 
     `}</style>
     );

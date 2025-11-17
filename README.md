@@ -576,6 +576,7 @@ new MouseHandler(document.getElementById("mycanvas"))
 - [Cuixiping](https://stackoverflow.com/users/988089/cuixiping) for the helpful insights on cubic Bézier bounds at [Stackoverflow](https://stackoverflow.com/questions/24809978/calculating-the-bounding-box-of-cubic-bezier-curve)
 - Thanks to Ana Tudor for the Multi-Range-Slider tutorial: https://css-tricks.com/multi-thumb-sliders-particular-two-thumb-case/
 - Thanks to Dean Taylor for the css linear gradient parser howto: https://stackoverflow.com/questions/20215440/parse-css-gradient-rule-with-javascript-regex
+- Thanks to Stefan Gustavson (stegu@itn.liu.se) for the Perlin noise on example C code (https://github.com/MethanePowered/PerlinNoise). And for Peter Eastman (peastman@drizzle.stanford.edu) for Perlin noise optimizations.
 
 ## Todos
 

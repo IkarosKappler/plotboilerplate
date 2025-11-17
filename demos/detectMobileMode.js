@@ -1,5 +1,8 @@
 /**
- * @date 2025-08-08
+ * Get mobile mode and let it params pass overrides.
+ *
+ * @date     2025-08-08
+ * @modified 2025-09-10 Optimized condition check.
  */
 
 /**
@@ -11,12 +14,5 @@ function detectMobileMode(params) {
   var isMobile = isMobileDevice();
 
   // Check for overrides.
-  if (params.hasParam("isMobile")) {
-    if (params.getBoolean("isMobile", true) === false) {
-      isMobile = false;
-    } else if (params.getBoolean("isMobile", false) === true) {
-      isMobile = true;
-    }
-  }
-  return isMobile;
+  return params.getBoolean("isMobile", isMobile);
 }

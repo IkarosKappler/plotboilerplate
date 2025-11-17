@@ -2,30 +2,33 @@
 <html class="fullscreen">
   <head>
     <title>2D Plotting Boilerplate – How to draw arrows</title>
-    <meta charset="UTF-8">
-    <meta name="description" content="A demo about drawing arrows with PlotBoilerplate.js.">
-    <meta name="keywords" content="plotboilerplate, Vertex, usage, howto, docs, documentation">
-    <meta name="author" content="Ikaros Kappler">
-    <meta name="date" content="2023-09-29">
-    <meta name="docinfo" content="How to draw arrows.">
+    <meta charset="UTF-8" />
+    <meta name="description" content="A demo about drawing arrows with PlotBoilerplate.js." />
+    <meta name="keywords" content="plotboilerplate, Vertex, usage, howto, docs, documentation" />
+    <meta name="author" content="Ikaros Kappler" />
+    <meta name="date" content="2023-09-29" />
+    <meta name="docinfo" content="How to draw arrows." />
 
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="@humanearthpig">
-    <meta name="twitter:creator" content="@humanearthpig">
-    <meta property="og:url" content="https://www.plotboilerplate.de">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="A demo about drawing arrows with PlotBoilerplate.js.">
-    <meta property="og:description" content="A demo about drawing arrows with PlotBoilerplate.js.">
-    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20230929-0-extented-arrow-demo.png">
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@humanearthpig" />
+    <meta name="twitter:creator" content="@humanearthpig" />
+    <meta property="og:url" content="https://www.plotboilerplate.de" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="A demo about drawing arrows with PlotBoilerplate.js." />
+    <meta property="og:description" content="A demo about drawing arrows with PlotBoilerplate.js." />
+    <meta
+      property="og:image"
+      content="https://plotboilerplate.io/repo/screenshots/screenshot-20230929-0-extented-arrow-demo.png"
+    />
 
     <!-- Polyfills for IE -->
-    <script src="../../lib/globalthis-polyfill.min.js"></script> 
+    <script src="../../lib/globalthis-polyfill.min.js"></script>
     <script src="../../lib/path2d-polyfill.min.js"></script>
 
     <!-- A modal -->
     <script src="../modal.js"></script>
-    <link rel="stylesheet" href="../modal.css">
-    
+    <link rel="stylesheet" href="../modal-modern.css" />
+
     <!-- Load thirdparty libraries -->
     <script src="../../src/cjs/utils/module.js"></script>
     <script src="../../lib/lil-gui-0.19.min.js"></script>
@@ -42,21 +45,18 @@
     <script src="../../src/cjs/utils/gup.js"></script>
     <script src="../../src/cjs/utils/detectDarkMode.js"></script>
 
-
     <!-- For production -->
     <script src="../../dist/plotboilerplate.min.js"></script>
     <!-- END For production -->
-    
+
     <script src="index.js"></script>
-    <link rel="stylesheet" type="text/css" media="screen" href="../style.css"> 
+    <link rel="stylesheet" type="text/css" media="screen" href="../style.css" />
   </head>
   <body class="fullscreen">
-    <input type="file" name="file" id="file" data-type="image-upload" style="display: none;">
+    <input type="file" name="file" id="file" data-type="image-upload" style="display: none" />
 
     <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
 
-    <div class="info monospace">
-      [<span id="cx">-</span>,<span id="cy">-</span>]
-    </div>
+    <div class="info monospace">[<span id="cx">-</span>,<span id="cy">-</span>]</div>
   </body>
 </html>

@@ -7,6 +7,7 @@
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
  * @date        2021-02-22
+ * @modified    2025-11-14 Using `GeometryMesh` class now.
  * @version     1.0.0
  **/
 
@@ -41,5 +42,5 @@ var makeSphereGeometry = function () {
       }
     }
   }
-  return { vertices: vertices, edges: edges };
+  return new GeometryMesh(vertices, edges);
 };

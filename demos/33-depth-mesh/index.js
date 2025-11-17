@@ -19,7 +19,6 @@
   // Fetch the GET params
   let GUP = gup();
   var isDarkmode = detectDarkMode(GUP);
-  let D2R = Math.PI / 180;
 
   window.addEventListener("load", function () {
     // All config params are optional.
@@ -110,6 +109,8 @@
       GUP
     );
 
+    var geometryMeshRenderer = new GeometryMeshRenderer(config);
+
     // +---------------------------------------------------------------------------------
     // | Prepare all basic available geometries.
     // | (Bad style to keep all in memory, I know.)
@@ -169,64 +170,7 @@
     pb.config.postDraw = function (draw, fill) {
       var textColor = getContrastColor(Color.parse(pb.config.backgroundColor)).cssRGB();
       var geometry = getGeometry();
-
-      var minMax = getMinMax(geometry.vertices);
-      minMax.min = applyScale(minMax.min);
-      minMax.max = applyScale(minMax.max);
-
-      var transformMatrix0 = Matrix4x4.makeTransformationMatrix(
-        config.rotationX * D2R,
-        config.rotationY * D2R,
-        config.rotationZ * D2R,
-        config.scaleX,
-        config.scaleY,
-        config.scaleZ,
-        config.translateX,
-        config.translateY,
-        config.translateZ
-      );
-      var transformMatrix1 = Matrix4x4.makeTransformationMatrix(
-        config.rotationX * D2R,
-        config.rotationY * D2R,
-        config.rotationZ * D2R,
-        config.scaleX,
-        config.scaleY,
-        config.scaleZ,
-        config.translateX + minMax.width * 0.01,
-        config.translateY,
-        config.translateZ + minMax.depth * 0.01
-      );
-      var transformMatrix2 = Matrix4x4.makeTransformationMatrix(
-        config.rotationX * D2R,
-        config.rotationY * D2R,
-        config.rotationZ * D2R,
-        config.scaleX,
-        config.scaleY,
-        config.scaleZ,
-        config.translateX - minMax.width * 0.01,
-        config.translateY,
-        config.translateZ - minMax.depth * 0.01
-      );
-
-      if (config.useBlendMode) {
-        draw.setConfiguration({ blendMode: config.blendMode });
-        // Use this on black
-        drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(128, 255, 0));
-        drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix1, Color.makeRGB(0, 0, 255));
-        drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix2, Color.makeRGB(255, 0, 0));
-        // Use this on white
-        // drawGeometry(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(128, 0, 255));
-        // drawGeometry(draw, fill, geometry, minMax, transformMatrix1, Color.makeRGB(255, 255, 0));
-        // drawGeometry(draw, fill, geometry, minMax, transformMatrix2, Color.makeRGB(0, 255, 255));
-      } else {
-        // drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(92, 92, 92));
-        drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(192, 192, 192));
-      }
-
-      drawGeometryVertices(draw, fill, geometry, transformMatrix0, {
-        drawVertNumbers: config.drawVertNumbers,
-        textColor: textColor
-      });
+      geometryMeshRenderer.drawGeometry(draw, fill, geometry, { textColor: textColor });
     };
 
     // +---------------------------------------------------------------------------------
@@ -315,18 +259,21 @@
       var reader = new FileReader();
       reader.onload = function () {
         var data = reader.result;
-        var stlGeometry = { vertices: [], edges: [] };
+        var stlGeometry_raw = { vertices: [], edges: [] };
         new STLParser(function (v1, v2, v3, normal) {
-          var index1 = stlGeometry.vertices.length;
-          stlGeometry.vertices.push(new Vert3(v1.x, v1.y, v1.z));
-          var index2 = stlGeometry.vertices.length;
-          stlGeometry.vertices.push(new Vert3(v2.x, v2.y, v2.z));
-          var index3 = stlGeometry.vertices.length;
-          stlGeometry.vertices.push(new Vert3(v3.x, v3.y, v3.z));
-          stlGeometry.edges.push([index1, index2], [index2, index3], [index3, index1]);
+          var index1 = stlGeometry_raw.vertices.length;
+          stlGeometry_raw.vertices.push(new Vert3(v1.x, v1.y, v1.z));
+          var index2 = stlGeometry_raw.vertices.length;
+          stlGeometry_raw.vertices.push(new Vert3(v2.x, v2.y, v2.z));
+          var index3 = stlGeometry_raw.vertices.length;
+          stlGeometry_raw.vertices.push(new Vert3(v3.x, v3.y, v3.z));
+          stlGeometry_raw.edges.push([index1, index2], [index2, index3], [index3, index1]);
         }).parse(data);
-        normalizeGeometry(stlGeometry.vertices);
-        importedGeometry = reduceGeometryDuplicateVertices(stlGeometry);
+        var geometry = new GeometryMesh(stlGeometry_raw.vertices, stlGeometry_raw.edges);
+        // normalizeGeometry(stlGeometry_raw.vertices);
+        geometry.normalize();
+        // importedGeometry = reduceGeometryDuplicateVertices(stlGeometry_raw);
+        importedGeometry = reduceGeometryDuplicateVertices(geometry);
         config.geometryType = "file";
         pb.redraw();
       };
@@ -345,25 +292,28 @@
       var reader = new FileReader();
       reader.onload = function () {
         var data = reader.result;
-        var objGeometry = { vertices: [], edges: [] };
+        var objGeometry_raw = { vertices: [], edges: [] };
         new OBJParser(
           function (x, y, z) {
-            objGeometry.vertices.push(new Vert3(x, y, z));
+            objGeometry_raw.vertices.push(new Vert3(x, y, z));
           },
           function (a, b, c) {
             // Note that OBJ indices start at 1 (not 0)
             a--;
             b--;
             c--;
-            objGeometry.edges.push([a, b]);
-            objGeometry.edges.push([b, c]);
-            objGeometry.edges.push([c, a]);
+            objGeometry_raw.edges.push([a, b]);
+            objGeometry_raw.edges.push([b, c]);
+            objGeometry_raw.edges.push([c, a]);
           }
         ).parse(data);
-        normalizeGeometry(objGeometry.vertices);
+        var geometry = new GeometryMesh(objGeometry_raw.vertices, objGeometry_raw.edges);
+        // normalizeGeometry(objGeometry_raw.vertices);
+        geometry.normalize();
         // Usually it is not required to reduce OBJ geometries, as vertices and edges/faces
         // are stored separately. But even smal, optimizations are ok.
-        importedGeometry = reduceGeometryDuplicateVertices(objGeometry, 0.0001);
+        // importedGeometry = reduceGeometryDuplicateVertices(objGeometry_raw, 0.0001);
+        importedGeometry = reduceGeometryDuplicateVertices(geometry, 0.0001);
         importedGeometry.edges = reduceGeometryDuplicateEdges(importedGeometry.edges);
         config.geometryType = "file";
         pb.redraw();
@@ -375,9 +325,9 @@
     // | Install a mouse handler to display current pointer position.
     // | And to rotate the object.
     // +-------------------------------
-    new MouseHandler(pb.canvas, "drawsvg-demo")
+    new MouseHandler(pb.eventCatcher, "drawsvg-demo")
       .drag(function (e) {
-        console.log(e.params);
+        // console.log(e.params);
         config.rotationX = geomutils.wrapMinMax(config.rotationX + e.params.dragAmount.y, 0.0, 360.0);
         config.rotationY = geomutils.wrapMinMax(config.rotationY - e.params.dragAmount.x, 0.0, 360.0);
         pb.redraw();

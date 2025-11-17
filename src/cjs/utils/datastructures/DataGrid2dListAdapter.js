@@ -57,9 +57,9 @@ var DataGrid2dListAdapter = /** @class */ (function () {
     DataGrid2dListAdapter.prototype.getDataValueAt = function (xIndex, yIndex, isDebug) {
         // var bufferIndex = yIndex * this.xSegmentCount + xIndex;
         var bufferIndex = this.coordinateIndicesToBufferIndex(xIndex, yIndex);
-        if (isDebug) {
-            console.log("xIndex", xIndex, "yIndex", yIndex, "bufferIndex", bufferIndex);
-        }
+        // if (isDebug) {
+        //   console.log("xIndex", xIndex, "yIndex", yIndex, "bufferIndex", bufferIndex);
+        // }
         if (bufferIndex > this._dataList.length) {
             console.error("ERR buffer index is out of bounds! xIndex", xIndex, "yIndex", yIndex, "bufferIndex", bufferIndex);
         }

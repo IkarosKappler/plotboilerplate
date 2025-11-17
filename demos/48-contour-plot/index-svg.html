@@ -2,23 +2,26 @@
 <html class="fullscreen">
   <head>
     <title>2D Plotting Boilerplate – Demonstrating Contour Plots with PlotBoilerplate and THREE.js</title>
-    <meta charset="UTF-8">
-    <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
-    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, curve, 3d, three, three.js threejs, dildo, dong, toy">
-    <meta name="author" content="Ikaros Kappler">
-    <meta name="date" content="2021-01-10">
+    <meta charset="UTF-8" />
+    <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff." />
+    <meta
+      name="keywords"
+      content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, curve, 3d, three, three.js threejs, dildo, dong, toy"
+    />
+    <meta name="author" content="Ikaros Kappler" />
+    <meta name="date" content="2021-01-10" />
 
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="@humanearthpig">
-    <meta name="twitter:creator" content="@humanearthpig">
-    <meta property="og:url" content="https://www.plotboilerplate.de">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Demonstrating Contour Plots with PlotBoilerplate and THREE.js">
-    <meta property="og:description" content="Demonstrating Contour Plots with PlotBoilerplate and THREE.js">
-    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20231103-0-contour-plot.png">
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@humanearthpig" />
+    <meta name="twitter:creator" content="@humanearthpig" />
+    <meta property="og:url" content="https://www.plotboilerplate.de" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Demonstrating Contour Plots with PlotBoilerplate and THREE.js" />
+    <meta property="og:description" content="Demonstrating Contour Plots with PlotBoilerplate and THREE.js" />
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20231103-0-contour-plot.png" />
 
     <!-- Polyfills for IE -->
-    <script src="../../lib/globalthis-polyfill.min.js"></script> 
+    <script src="../../lib/globalthis-polyfill.min.js"></script>
     <script src="../../lib/path2d-polyfill.min.js"></script>
 
     <script src="../../lib/FileSaver.min.js"></script>
@@ -36,14 +39,14 @@
     <script src="../../src/cjs/utils/detectDarkMode.js"></script>
     <script src="../../src/cjs/utils/cloneVertexArray.js"></script>
     <script src="../../src/cjs/utils/datastructures/Color.js"></script>
-    <script src="../../src/cjs/utils/Params.js"></script> 
-    <script src="../../src/cjs/utils/datastructures/GenericPath.js"></script> 
+    <script src="../../src/cjs/utils/Params.js"></script>
+    <script src="../../src/cjs/utils/datastructures/GenericPath.js"></script>
     <script src="../../src/cjs/utils/datastructures/DataGrid2dListAdapter.js"></script>
-    <script src="../../src/cjs/utils/algorithms/clearDuplicateVertices.js"></script> 
-    <script src="../../src/cjs/utils/algorithms/arrayFill.js"></script> 
-    <script src="../../src/cjs/utils/algorithms/matrixFill.js"></script> 
-    <script src="../../src/cjs/utils/algorithms/detectPaths.js"></script> 
-    <script src="../../src/cjs/utils/algorithms/ContourLineDetection.js"></script> 
+    <script src="../../src/cjs/utils/algorithms/clearDuplicateVertices.js"></script>
+    <script src="../../src/cjs/utils/algorithms/arrayFill.js"></script>
+    <script src="../../src/cjs/utils/algorithms/matrixFill.js"></script>
+    <script src="../../src/cjs/utils/algorithms/detectPaths.js"></script>
+    <script src="../../src/cjs/utils/algorithms/ContourLineDetection.js"></script>
     <script src="../../src/cjs/utils/WebColors.js"></script>
     <script src="../../src/cjs/utils/WebColorsContrast.js"></script>
 
@@ -58,44 +61,42 @@
     <!-- <script src="../../src/cjs/utils/helpers/BezierPathInteractionHelper.js"></script> -->
     <script src="../modal.js"></script>
     <script src="index.js"></script>
-    <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="../modal.css">
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../modal-modern.css" />
   </head>
   <body class="fullscreen">
     <div class="w-50 left">
-        <div class="h-50 top">
-          <canvas id="three-canvas-input" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
-        </div>
-        <div class="h-50 top">
-          <canvas id="three-canvas-result" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
-        </div>
+      <div class="h-50 top">
+        <canvas id="three-canvas-input" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
+      </div>
+      <div class="h-50 top">
+        <canvas id="three-canvas-result" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
+      </div>
     </div>
     <div class="w-50 right">
       <svg id="my-canvas"></svg>
     </div>
-
   </body>
   <style>
     body {
-       display: flex;
+      display: flex;
     }
     .w-100 {
       width: 100%;
     }
     .w-50 {
-       width : 50%;
+      width: 50%;
     }
     .h-50 {
-      height : 50%;
-   }
+      height: 50%;
+    }
     .left {
-      position : relative;
-      float : left;
+      position: relative;
+      float: left;
     }
     .right {
-      position : relative;
-      float : right;
+      position: relative;
+      float: right;
     }
-    
   </style>
 </html>

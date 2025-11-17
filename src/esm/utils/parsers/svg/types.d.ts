@@ -14,7 +14,7 @@
  */
 export type NumericString = `${number}`;
 export type BooleanString = "0" | "1" | `${boolean}`;
-export type SVGPathMoveToCommand = ["M" | "m", NumericString, NumericString];
+export type SVGPathMoveToCommand = ["M" | "m", NumericString | number, NumericString | number];
 export type SVGPathLineToCommand = ["L" | "l", NumericString, NumericString, ...Array<NumericString>];
 export type SVGPathVerticalLineToCommand = ["V" | "v", NumericString];
 export type SVGPathHorizontalLineToCommand = ["H" | "h", NumericString];
@@ -31,13 +31,13 @@ export type SVGPathQuadraticCurveToCommand = ["Q" | "q", NumericString, NumericS
 ];
 export type SVGPathCubicCurveToCommand = [
     "C" | "c",
-    NumericString,
-    NumericString,
-    NumericString,
-    NumericString,
-    NumericString,
-    NumericString,
-    ...Array<NumericString>
+    NumericString | number,
+    NumericString | number,
+    NumericString | number,
+    NumericString | number,
+    NumericString | number,
+    NumericString | number,
+    ...Array<NumericString | number>
 ];
 export type SVGPathShorthandCubicCurveToCommand = [
     "S" | "s",

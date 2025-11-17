@@ -6,9 +6,10 @@
  * to get this running: NoReact.
  *
  *
- * @author  Ikaros Kappler
- * @date    2025-06-27
- * @version 1.0.0
+ * @author   Ikaros Kappler
+ * @date     2025-06-27
+ * @modified 2025-09-10 Fixing a color select bug on MacOS.
+ * @version  1.0.0
  */
 import { ColorGradient } from "../../datastructures/ColorGradient";
 export type ColorGradientChangeListener = (colorGradient: ColorGradient, source: ColorGradientPicker) => void;

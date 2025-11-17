@@ -7,9 +7,10 @@
  * to get this running: NoReact.
  *
  *
- * @author  Ikaros Kappler
- * @date    2025-06-27
- * @version 1.0.0
+ * @author   Ikaros Kappler
+ * @date     2025-06-27
+ * @modified 2025-09-10 Fixing a color select bug on MacOS.
+ * @version  1.0.0
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ColorGradientPicker = void 0;
@@ -91,7 +92,7 @@ var ColorGradientPicker = /** @class */ (function () {
         this.__createCustomStylesElement = function () {
             // Thanks to Ana Tudor
             //    https://css-tricks.com/multi-thumb-sliders-particular-two-thumb-case/
-            return (NoReact.createElement("style", null, "\n    #".concat(_this.elementID, " {\n      margin-top: 1em;\n    }\n\n    #").concat(_this.elementID, " input[type='range'] {\n\n      -webkit-appearance: none;\n\n      grid-column: 1;\n      grid-row: 2;\n      \n      /* same as before */\n      background: none; /* get rid of white Chrome background */\n      color: #000;\n      font: inherit; /* fix too small font-size in both Chrome & Firefox */\n      margin: 0;\n      pointer-events: none; /* let clicks pass through */\n    }\n\n    #").concat(_this.elementID, " input[type='range']::-webkit-slider-runnable-track {\n      -webkit-appearance: none;\n\n      background: none; /* get rid of Firefox track background */\n      height: 100%;\n      width: 100%;\n\n      pointer-events: none;\n    }\n\n    #").concat(_this.elementID, " input[type='range']::-webkit-slider-thumb {\n      -webkit-appearance: none;\n      background: currentcolor;\n      border: none; /* get rid of Firefox thumb border */\n      border-radius: 6px; /* get rid of Firefox corner rounding */\n      pointer-events: auto; /* catch clicks */\n      width: ").concat(_this.css_thumbWidth, "; \n      height: ").concat(_this.css_thumbHeight, ";\n    }\n\n    #").concat(_this.elementID, " input[type='range']:focus::-webkit-slider-thumb {\n      border: 2px solid white;\n    }\n\n    #").concat(_this.elementID, " input[type='range']::-moz-range-track {\n      -webkit-appearance: none;\n      background: none; /* get rid of Firefox track background */\n      height: 100%;\n      width: 100%;\n      pointer-events: none;\n    }\n\n    #").concat(_this.elementID, " input[type='range']::-moz-range-thumb {\n      /* -webkit-appearance: none; */\n      background: currentcolor;\n      border: none; /* get rid of Firefox thumb border */\n      border-radius: 6px; /* get rid of Firefox corner rounding */\n      pointer-events: auto; /* catch clicks */\n      width: ").concat(_this.css_thumbWidth, "; \n      height: ").concat(_this.css_thumbHeight, ";\n    }\n\n    #").concat(_this.elementID, " input[type='range']:focus::-moz-range-thumb {\n      border: 2px solid white;\n    }\n\n    #").concat(_this.elementID, " input[type='range'] {\n      /* same as before */\n      z-index: 1;\n    }\n    \n    #").concat(_this.elementID, " input[type='range']:focus {\n        z-index: 2;\n        /* outline: dotted 1px orange; */\n        color: darkorange;\n    }\n    ")));
+            return (NoReact.createElement("style", null, "\n    #".concat(_this.elementID, " {\n      margin-top: 1em;\n    }\n\n    #").concat(_this.elementID, " input[type='range'] {\n\n      -webkit-appearance: none;\n\n      grid-column: 1;\n      grid-row: 2;\n      \n      /* same as before */\n      background: none; /* get rid of white Chrome background */\n      color: #000;\n      font: inherit; /* fix too small font-size in both Chrome & Firefox */\n      margin: 0;\n      pointer-events: none; /* let clicks pass through */\n    }\n\n    #").concat(_this.elementID, " input[type='range']::-webkit-slider-runnable-track {\n      -webkit-appearance: none;\n\n      background: none; /* get rid of Firefox track background */\n      height: 100%;\n      width: 100%;\n\n      pointer-events: none;\n    }\n\n    #").concat(_this.elementID, " input[type='range']::-webkit-slider-thumb {\n      -webkit-appearance: none;\n      background: currentcolor;\n      border: none; /* get rid of Firefox thumb border */\n      border-radius: 6px; /* get rid of Firefox corner rounding */\n      pointer-events: auto; /* catch clicks */\n      width: ").concat(_this.css_thumbWidth, "; \n      height: ").concat(_this.css_thumbHeight, ";\n    }\n\n    #").concat(_this.elementID, " input[type='range']:focus::-webkit-slider-thumb {\n      border: 2px solid white;\n    }\n\n    #").concat(_this.elementID, " input[type='range']::-moz-range-track {\n      -webkit-appearance: none;\n      background: none; /* get rid of Firefox track background */\n      height: 100%;\n      width: 100%;\n      pointer-events: none;\n    }\n\n    #").concat(_this.elementID, " input[type='range']::-moz-range-thumb {\n      /* -webkit-appearance: none; */\n      background: currentcolor;\n      border: none; /* get rid of Firefox thumb border */\n      border-radius: 6px; /* get rid of Firefox corner rounding */\n      pointer-events: auto; /* catch clicks */\n      width: ").concat(_this.css_thumbWidth, "; \n      height: ").concat(_this.css_thumbHeight, ";\n    }\n\n    #").concat(_this.elementID, " input[type='range']:focus::-moz-range-thumb {\n      border: 2px solid white;\n    }\n\n    #").concat(_this.elementID, " input[type='range'] {\n      /* same as before */\n      z-index: 1;\n    }\n    \n    #").concat(_this.elementID, " input[type='range']:focus {\n        z-index: 2;\n        /* outline: dotted 1px orange; */\n        color: darkorange;\n    }\n\n    body.darkmode #").concat(_this.elementID, " .color-remove-button {    \n      background-color: #1e2937;\n      color: grey;\n    }\n\n    body.darkmode #").concat(_this.elementID, " .color-remove-button:hover,\n    body.darkmode #").concat(_this.elementID, " .color-remove-button:active {    \n      background-color: rgba(216,216,216,0.9);\n    }\n\n    ")));
         };
         if (containerID) {
             var cont = document.getElementById(containerID);
@@ -392,7 +393,7 @@ var ColorGradientPicker = /** @class */ (function () {
         var sliderRef = this._sliderElementRefs[newSliderIndex];
         leftSlider.after(sliderRef.current);
         sliderRef.current.dataset.colorValue = newColor.cssRGB();
-        sliderRef.current.dataset.colorValueHEX = newColor.cssRGB();
+        sliderRef.current.dataset.colorValueHEX = newColor.cssHEX();
         // No visible change, but let's reflect this in the output gradient anyway
         this.__updateBackgroundGradient();
         // Highlight the newly added range slider
@@ -641,16 +642,15 @@ var ColorGradientPicker = /** @class */ (function () {
                         fd: "column",
                         transform: "translate(0%, 100%)"
                     } },
-                    NoReact.createElement("button", { id: "color-indicator-button-".concat(this.baseID), style: {
+                    NoReact.createElement("button", { id: "color-indicator-button-".concat(this.baseID), className: "color-indicator-button", style: {
                             backgroundColor: "grey",
-                            borderRadius: "10%",
+                            borderRadius: "50%",
                             border: "1px solid grey",
                             w: this.css_indicatorWidth, // "1em",
                             h: this.css_indicatorHeight, // "1em",
                             transform: "translate(-50%, 0%)"
                         }, onClick: handleIndicatorButtonClick, ref: this.colorIndicatorColorButtonRef }),
                     NoReact.createElement("button", { id: "color-remove-button-".concat(this.baseID), className: "color-remove-button", style: {
-                            backgroundColor: "grey",
                             borderRadius: "10%",
                             border: "1px solid grey",
                             w: this.css_indicatorWidth, // "1em",

@@ -6,6 +6,7 @@
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
  * @date        2021-04-14
+ * @modified    2025-11-14 Using `GeometryMesh` class now.
  * @version     1.0.0
  **/
 
@@ -34,5 +35,5 @@ var makeOctahedronGeometry = function () {
     [1,4],
     [2,4] 
     ];
-  return { vertices: vertices, edges: edges };
+  return new GeometryMesh(vertices, edges);
 };

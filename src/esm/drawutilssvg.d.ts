@@ -47,7 +47,8 @@
  * @modified 2024-01-30 Fixing an issue with immutable style sets; changes to the global draw config did not reflect here (do now).
  * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
  * @modified 2024-07-24 Caching custom style defs in a private buffer variable.
- * @version  1.6.10
+ * @modified 2025-11-14 Fixing a bug in the CSS `mix-blend-mode` property handling (caused a runtime error).
+ * @version  1.6.11
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";

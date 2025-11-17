@@ -10,7 +10,8 @@
  * @modified 2024-03-10 Added a backdrop element for closing by click outside the visible modal.
  * @modified 2024-03-10 Added the construtor option `closeOnBackdropClick`.
  * @modified 2024-03-10 Removed the `showDocumentInfo` method because it was crap. Use reame modal instead.
- * @version  1.2.0
+ * @modified 2025-09-10 Changing head text type from `h2` to `h3`. Added classname `button` to action butons.
+ * @version  1.2.1
  **/
 
 (function () {
@@ -41,7 +42,7 @@
       </div>
     */
 
-  var Modal = function ( options ) {
+  var Modal = function (options) {
     this.modalElements = this.buildDOMNode("myModal-" + modalCounter++);
     this.closeOnBackdropClick = typeof options !== "undefined" && Boolean(options.closeOnBackdropClick);
   };
@@ -75,6 +76,7 @@
         var a = actions[i];
         var cmd = null;
         var btn = document.createElement("button");
+        btn.classList.add("button");
         btn.innerHTML = a.label;
         if (typeof a.action === "function") {
           btn.addEventListener("click", a.action);
@@ -120,8 +122,8 @@
     closeBtn.classList.add("modal-close");
     closeBtn.innerHTML = "&times;";
 
-    var h2 = document.createElement("h2");
-    h2.innerHTML = "Modal Header";
+    var h3 = document.createElement("h3");
+    h3.innerHTML = "Modal Header";
 
     var body = document.createElement("div");
     body.classList.add("modal-body");
@@ -141,7 +143,7 @@
     footer.appendChild(footerActions);
 
     header.appendChild(closeBtn);
-    header.appendChild(h2);
+    header.appendChild(h3);
     content.appendChild(header);
     body.appendChild(bodyContent);
     content.appendChild(body);
@@ -154,8 +156,8 @@
       _self.close();
     };
 
-    backdrop.addEventListener("click", function() {
-      if( _self.closeOnBackdropClick ) {
+    backdrop.addEventListener("click", function () {
+      if (_self.closeOnBackdropClick) {
         _self.close();
       }
     });
@@ -170,7 +172,7 @@
         backdrop: backdrop,
         header: {
           closeBtn: closeBtn,
-          content: h2
+          content: h3
         },
         body: { content: bodyContent },
         footer: {

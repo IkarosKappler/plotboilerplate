@@ -16,6 +16,12 @@
  * @version 1.0.0
  */
 export type DataGridFace4<T> = [[T | null, T | null], [T | null, T | null]];
+export type RasterPosition = {
+    xIndex: number;
+    yIndex: number;
+    xRel?: number;
+    yRel?: number;
+};
 export interface IDataGrid2d<T> {
     readonly xSegmentCount: number;
     readonly ySegmentCount: number;

@@ -5,6 +5,7 @@ window.addEventListener("load", function () {
   var GUP = gup();
   var params = new Params(GUP);
   var isMobile = isMobileDevice();
+  var isDarkmode = detectDarkMode(GUP);
   var showDebugOptions = false;
   isMobile = params.getBoolean("isMobile", isMobile);
   var showDebugOptions = params.getBoolean("showDebugOptions", false);

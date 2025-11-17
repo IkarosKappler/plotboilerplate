@@ -2,35 +2,40 @@
 <html>
   <head>
     <title>Testing ColorGradientPicker Dialog class</title>
-    <meta charset="UTF-8">
-    <meta name="description" content="Testing boucing arrow.">
-    <meta name="keywords" content="javascript, css, animation, arrow, bounce">
-    <meta name="author" content="Ikaros Kappler">
-    <meta name="date" content="2025-06-07">
+    <meta charset="UTF-8" />
+    <meta name="description" content="Testing boucing arrow." />
+    <meta name="keywords" content="javascript, css, animation, arrow, bounce" />
+    <meta name="author" content="Ikaros Kappler" />
+    <meta name="date" content="2025-06-07" />
     <style>
-      .w50 { width: 50%; }
+      .w50 {
+        width: 50%;
+      }
       body {
         background-color: darkgrey;
       }
     </style>
-    <script src="./exports.js"></script> 
+    <script src="./exports.js"></script>
     <script src="./require.js"></script>
     <script src="../demos/isMobileDevice.js"></script>
     <script src="../src/cjs/utils/gup.js"></script>
+    <script src="../src/cjs/utils/detectDarkMode.js"></script>
     <script src="../src/cjs/utils/Params.js"></script>
     <script src="../src/cjs/utils/datastructures/Color.js"></script>
     <script src="../src/cjs/utils/datastructures/ColorGradient.js"></script>
     <script src="../src/cjs/utils/dom/components/ColorGradientPicker.js"></script>
     <script src="../src/cjs/utils/dom/components/ColorGradientSelector.js"></script>
+
     <script src="../lib/noreact-main.js"></script>
 
     <script src="../demos/modal.js"></script>
     <script src="../demos/ColorGradientPickerDialog.js"></script>
 
-    <link rel="stylesheet" href="../demos/modal.css">
+    <link rel="stylesheet" href="../demos/modal-modern.css" />
     <script src="test_colorgradientpickerdialog.js"></script>
   </head>
   <body>
     <!-- <div id="container"></div> -->
     <button id="btn-open-dialog">Open Dialog</button>
   </body>
+</html>

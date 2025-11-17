@@ -6,6 +6,7 @@
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
  * @date        2021-04-14
+ * @modified    2025-11-14 Using `GeometryMesh` class now.
  * @version     1.0.0
  **/
 
@@ -55,5 +56,5 @@ var makeIcosahedronGeometry = function () {
     [8,9],
     [1,11]
     ];
-  return { vertices: vertices, edges: edges };
+  return new GeometryMesh(vertices, edges);
 };

@@ -13,7 +13,11 @@
  * @modified 2025-04-18 Change parameter type in `Bounds.computeFromVertices` from `Vertex` to more general `XYCoords`.
  * @modified 2025-04-19 Added methods to `Bounds` class: `getNorthPoint`, `getSouthPoint`, `getEastPoint` and `getWestPoint`.
  * @modified 2025-04-26 Added static method `Bounds.computeFromBoundsSet` to calculate containing bounds for a set of bounding boxes.
- * @version  1.8.0
+ * @modified 2025-10-17 Added the methods `Bounds.getSouthWestPoint`, `getNorthWestPoint`, `getNorthEastPoint` and `getSouthEastPoint`.
+ * @modified 2025-10-18 Added method `Bounds.containsVert(XYCoords)`.
+ * @modified 2025-10-28 Added the `Bounds.getWidth()` and `Bounds.getHeight()`.
+ * @modified 2025-11-12 Added the `Bounds.getMoved()` method.
+ * @version  1.11.0
  **/
 import { Polygon } from "./Polygon";
 import { XYCoords, IBounds, XYDimension } from "./interfaces";
@@ -64,6 +68,20 @@ export declare class Bounds implements IBounds, XYDimension {
      **/
     constructor(min: XYCoords, max: XYCoords);
     /**
+     * Check if the given vertex is inside this bounds.
+     *
+     * @method containsVert
+     * @param {XYCoords} vert - The vertex to check.
+     * @return {boolean} True if the passed vertex is inside this bounds.
+     * @instance
+     * @memberof Bounds
+     **/
+    containsVert(vert: XYCoords): boolean;
+    getWidth(): number;
+    getHeight(): number;
+    getScaled(scaleFactor: number): Bounds;
+    getMoved(moveAmount: XYCoords): Bounds;
+    /**
      * Get the center point of the north bound.
      *
      * @method getNorthPoint
@@ -82,23 +100,59 @@ export declare class Bounds implements IBounds, XYDimension {
      */
     getSouthPoint(): Vertex;
     /**
-    * Get the center point of the west bound.
-    *
-    * @method getWestPoint
-    * @instance
-    * @memberof Bounds
-    * @return {Vertex} The "westhmost" centered point of this bounding box.
-    */
+     * Get the center point of the west bound.
+     *
+     * @method getWestPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "westhmost" centered point of this bounding box.
+     */
     getWestPoint(): Vertex;
     /**
-    * Get the center point of the east bound.
-    *
-    * @method getEastPoint
-    * @instance
-    * @memberof Bounds
-    * @return {Vertex} The "easthmost" centered point of this bounding box.
-    */
+     * Get the center point of the east bound.
+     *
+     * @method getEastPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "easthmost" centered point of this bounding box.
+     */
     getEastPoint(): Vertex;
+    /**
+     * Get the upper left corner point these bounds box.
+     *
+     * @method getNorthWestPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "northwestmost" point of this bounding box.
+     */
+    getNorthWestPoint(): Vertex;
+    /**
+     * Get the upper right corner point these bounds box.
+     *
+     * @method getNorthEastPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "northeastmost" point of this bounding box.
+     */
+    getNorthEastPoint(): Vertex;
+    /**
+     * Get the lower right corner point these bounds box.
+     *
+     * @method getSouthEastPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "southeastmost" point of this bounding box.
+     */
+    getSouthEastPoint(): Vertex;
+    /**
+     * Get the lower left corner point these bounds box.
+     *
+     * @method getSouthWestPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "southwestmost" point of this bounding box.
+     */
+    getSouthWestPoint(): Vertex;
     /**
      * Convert this rectangular bounding box to a polygon with four vertices.
      *
@@ -175,16 +229,16 @@ export declare class Bounds implements IBounds, XYDimension {
      **/
     static computeFromVertices(vertices: Array<XYCoords>): Bounds;
     /**
-    * Compute the minimal bounding box for a given set of existing bounding boxes.
-    *
-    * An empty vertex array will return an empty bounding box located at (0,0).
-    *
-    * @static
-    * @method computeFromBoundsSet
-    * @memberof Bounds
-    * @param {Array<IBounds>} boundingBoxes - The set of existing bounding boxes to get the containing bounding box for.
-    * @return The minimal Bounds for the given bounds instances.
-    **/
+     * Compute the minimal bounding box for a given set of existing bounding boxes.
+     *
+     * An empty vertex array will return an empty bounding box located at (0,0).
+     *
+     * @static
+     * @method computeFromBoundsSet
+     * @memberof Bounds
+     * @param {Array<IBounds>} boundingBoxes - The set of existing bounding boxes to get the containing bounding box for.
+     * @return The minimal Bounds for the given bounds instances.
+     **/
     static computeFromBoundsSet(boundingBoxes: Array<IBounds>): Bounds;
     /**
      * Create a new `Bounds` instance just from `width` and `height`, located at (0,0) or the optionally given origin.

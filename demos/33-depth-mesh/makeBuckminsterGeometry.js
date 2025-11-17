@@ -6,6 +6,7 @@
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
  * @date        2021-05-05
+ * @modified    2025-11-14 Using `GeometryMesh` class now.
  * @version     1.0.0
  **/
 
@@ -284,5 +285,5 @@ var makeBuckminsterGeometry = function (lerpRatio) {
     lerpIcosido(16, 19);
     lerpIcosido(55, 19);
   }
-  return { vertices: verticesBucky, edges: edges };
+  return new GeometryMesh(verticesBucky, edges);
 };

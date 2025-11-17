@@ -13,7 +13,11 @@
  * @modified 2025-04-18 Change parameter type in `Bounds.computeFromVertices` from `Vertex` to more general `XYCoords`.
  * @modified 2025-04-19 Added methods to `Bounds` class: `getNorthPoint`, `getSouthPoint`, `getEastPoint` and `getWestPoint`.
  * @modified 2025-04-26 Added static method `Bounds.computeFromBoundsSet` to calculate containing bounds for a set of bounding boxes.
- * @version  1.8.0
+ * @modified 2025-10-17 Added the methods `Bounds.getSouthWestPoint`, `getNorthWestPoint`, `getNorthEastPoint` and `getSouthEastPoint`.
+ * @modified 2025-10-18 Added method `Bounds.containsVert(XYCoords)`.
+ * @modified 2025-10-28 Added the `Bounds.getWidth()` and `Bounds.getHeight()`.
+ * @modified 2025-11-12 Added the `Bounds.getMoved()` method.
+ * @version  1.11.0
  **/
 
 import { Polygon } from "./Polygon";
@@ -76,53 +80,134 @@ export class Bounds implements IBounds, XYDimension {
   }
 
   /**
+   * Check if the given vertex is inside this bounds.
+   *
+   * @method containsVert
+   * @param {XYCoords} vert - The vertex to check.
+   * @return {boolean} True if the passed vertex is inside this bounds.
+   * @instance
+   * @memberof Bounds
+   **/
+  containsVert(vert: XYCoords): boolean {
+    return this.min.x <= vert.x && vert.x < this.max.x && this.min.y <= vert.y && vert.y < this.max.y;
+  }
+
+  getWidth(): number {
+    return this.max.x - this.min.x;
+  }
+
+  getHeight(): number {
+    return this.max.y - this.min.y;
+  }
+
+  getScaled(scaleFactor: number): Bounds {
+    const center = this.getCenter();
+    const newMin = new Vertex(this.min).scale(scaleFactor, center);
+    const newMax = new Vertex(this.max).scale(scaleFactor, center);
+    return new Bounds(newMin, newMax);
+  }
+
+  getMoved(moveAmount: XYCoords): Bounds {
+    const newMin = new Vertex(this.min).move(moveAmount);
+    const newMax = new Vertex(this.max).move(moveAmount);
+    return new Bounds(newMin, newMax);
+  }
+
+  /**
    * Get the center point of the north bound.
-   * 
+   *
    * @method getNorthPoint
    * @instance
    * @memberof Bounds
    * @return {Vertex} The "northmost" centered point of this bounding box.
    */
-  getNorthPoint() : Vertex {
-    return new Vertex(this.min.x + this.width/2.0,  this.min.y );
-  };
+  getNorthPoint(): Vertex {
+    return new Vertex(this.min.x + this.width / 2.0, this.min.y);
+  }
 
   /**
    * Get the center point of the south bound.
-   * 
+   *
    * @method getNorthPoint
    * @instance
    * @memberof Bounds
    * @return {Vertex} The "southhmost" centered point of this bounding box.
    */
-  getSouthPoint() : Vertex {
-    return new Vertex( this.min.x + this.width/2.0, this.max.y );
-  };
+  getSouthPoint(): Vertex {
+    return new Vertex(this.min.x + this.width / 2.0, this.max.y);
+  }
 
-   /**
+  /**
    * Get the center point of the west bound.
-   * 
+   *
    * @method getWestPoint
    * @instance
    * @memberof Bounds
    * @return {Vertex} The "westhmost" centered point of this bounding box.
    */
-   getWestPoint() : Vertex {
-    return new Vertex( this.min.x, this.min.y + this.height/2.0 );
-  };
+  getWestPoint(): Vertex {
+    return new Vertex(this.min.x, this.min.y + this.height / 2.0);
+  }
 
-   /**
+  /**
    * Get the center point of the east bound.
-   * 
+   *
    * @method getEastPoint
    * @instance
    * @memberof Bounds
    * @return {Vertex} The "easthmost" centered point of this bounding box.
    */
-   getEastPoint() : Vertex {
-    return new Vertex( this.max.x, this.min.y + this.height/2.0 );
-  };
+  getEastPoint(): Vertex {
+    return new Vertex(this.max.x, this.min.y + this.height / 2.0);
+  }
 
+  /**
+   * Get the upper left corner point these bounds box.
+   *
+   * @method getNorthWestPoint
+   * @instance
+   * @memberof Bounds
+   * @return {Vertex} The "northwestmost" point of this bounding box.
+   */
+  getNorthWestPoint(): Vertex {
+    return new Vertex(this.min.x, this.min.y);
+  }
+
+  /**
+   * Get the upper right corner point these bounds box.
+   *
+   * @method getNorthEastPoint
+   * @instance
+   * @memberof Bounds
+   * @return {Vertex} The "northeastmost" point of this bounding box.
+   */
+  getNorthEastPoint(): Vertex {
+    return new Vertex(this.max.x, this.min.y);
+  }
+
+  /**
+   * Get the lower right corner point these bounds box.
+   *
+   * @method getSouthEastPoint
+   * @instance
+   * @memberof Bounds
+   * @return {Vertex} The "southeastmost" point of this bounding box.
+   */
+  getSouthEastPoint(): Vertex {
+    return new Vertex(this.max.x, this.max.y);
+  }
+
+  /**
+   * Get the lower left corner point these bounds box.
+   *
+   * @method getSouthWestPoint
+   * @instance
+   * @memberof Bounds
+   * @return {Vertex} The "southwestmost" point of this bounding box.
+   */
+  getSouthWestPoint(): Vertex {
+    return new Vertex(this.min.x, this.max.y);
+  }
 
   /**
    * Convert this rectangular bounding box to a polygon with four vertices.
@@ -230,7 +315,7 @@ export class Bounds implements IBounds, XYDimension {
    * @return The minimal Bounds for the given vertices.
    **/
   static computeFromVertices(vertices: Array<XYCoords>): Bounds {
-    if (vertices.length == 0) { 
+    if (vertices.length == 0) {
       return new Bounds(new Vertex(0, 0), new Vertex(0, 0));
     }
 
@@ -250,7 +335,7 @@ export class Bounds implements IBounds, XYDimension {
     return new Bounds(new Vertex(xMin, yMin), new Vertex(xMax, yMax));
   }
 
-   /**
+  /**
    * Compute the minimal bounding box for a given set of existing bounding boxes.
    *
    * An empty vertex array will return an empty bounding box located at (0,0).
@@ -261,7 +346,7 @@ export class Bounds implements IBounds, XYDimension {
    * @param {Array<IBounds>} boundingBoxes - The set of existing bounding boxes to get the containing bounding box for.
    * @return The minimal Bounds for the given bounds instances.
    **/
-  static computeFromBoundsSet(boundingBoxes:Array<IBounds>) : Bounds {
+  static computeFromBoundsSet(boundingBoxes: Array<IBounds>): Bounds {
     if (boundingBoxes.length == 0) {
       return new Bounds(new Vertex(0, 0), new Vertex(0, 0));
     }

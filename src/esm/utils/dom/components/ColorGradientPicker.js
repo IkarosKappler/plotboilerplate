@@ -6,9 +6,10 @@
  * to get this running: NoReact.
  *
  *
- * @author  Ikaros Kappler
- * @date    2025-06-27
- * @version 1.0.0
+ * @author   Ikaros Kappler
+ * @date     2025-06-27
+ * @modified 2025-09-10 Fixing a color select bug on MacOS.
+ * @version  1.0.0
  */
 import * as NoReact from "noreact";
 import { Color } from "../../datastructures/Color";
@@ -163,6 +164,17 @@ export class ColorGradientPicker {
         /* outline: dotted 1px orange; */
         color: darkorange;
     }
+
+    body.darkmode #${this.elementID} .color-remove-button {    
+      background-color: #1e2937;
+      color: grey;
+    }
+
+    body.darkmode #${this.elementID} .color-remove-button:hover,
+    body.darkmode #${this.elementID} .color-remove-button:active {    
+      background-color: rgba(216,216,216,0.9);
+    }
+
     `));
         };
         if (containerID) {
@@ -462,7 +474,7 @@ export class ColorGradientPicker {
         const sliderRef = this._sliderElementRefs[newSliderIndex];
         leftSlider.after(sliderRef.current);
         sliderRef.current.dataset.colorValue = newColor.cssRGB();
-        sliderRef.current.dataset.colorValueHEX = newColor.cssRGB();
+        sliderRef.current.dataset.colorValueHEX = newColor.cssHEX();
         // No visible change, but let's reflect this in the output gradient anyway
         this.__updateBackgroundGradient();
         // Highlight the newly added range slider
@@ -708,16 +720,15 @@ export class ColorGradientPicker {
                         fd: "column",
                         transform: "translate(0%, 100%)"
                     } },
-                    NoReact.createElement("button", { id: `color-indicator-button-${this.baseID}`, style: {
+                    NoReact.createElement("button", { id: `color-indicator-button-${this.baseID}`, className: "color-indicator-button", style: {
                             backgroundColor: "grey",
-                            borderRadius: "10%",
+                            borderRadius: "50%",
                             border: "1px solid grey",
                             w: this.css_indicatorWidth, // "1em",
                             h: this.css_indicatorHeight, // "1em",
                             transform: "translate(-50%, 0%)"
                         }, onClick: handleIndicatorButtonClick, ref: this.colorIndicatorColorButtonRef }),
                     NoReact.createElement("button", { id: `color-remove-button-${this.baseID}`, className: "color-remove-button", style: {
-                            backgroundColor: "grey",
                             borderRadius: "10%",
                             border: "1px solid grey",
                             w: this.css_indicatorWidth, // "1em",

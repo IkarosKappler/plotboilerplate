@@ -1391,7 +1391,11 @@ exports.drawutils = drawutils;
  * @modified 2025-04-18 Change parameter type in `Bounds.computeFromVertices` from `Vertex` to more general `XYCoords`.
  * @modified 2025-04-19 Added methods to `Bounds` class: `getNorthPoint`, `getSouthPoint`, `getEastPoint` and `getWestPoint`.
  * @modified 2025-04-26 Added static method `Bounds.computeFromBoundsSet` to calculate containing bounds for a set of bounding boxes.
- * @version  1.8.0
+ * @modified 2025-10-17 Added the methods `Bounds.getSouthWestPoint`, `getNorthWestPoint`, `getNorthEastPoint` and `getSouthEastPoint`.
+ * @modified 2025-10-18 Added method `Bounds.containsVert(XYCoords)`.
+ * @modified 2025-10-28 Added the `Bounds.getWidth()` and `Bounds.getHeight()`.
+ * @modified 2025-11-12 Added the `Bounds.getMoved()` method.
+ * @version  1.11.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Bounds = void 0;
@@ -1420,6 +1424,35 @@ var Bounds = /** @class */ (function () {
         this.height = max.y - min.y;
     }
     /**
+     * Check if the given vertex is inside this bounds.
+     *
+     * @method containsVert
+     * @param {XYCoords} vert - The vertex to check.
+     * @return {boolean} True if the passed vertex is inside this bounds.
+     * @instance
+     * @memberof Bounds
+     **/
+    Bounds.prototype.containsVert = function (vert) {
+        return this.min.x <= vert.x && vert.x < this.max.x && this.min.y <= vert.y && vert.y < this.max.y;
+    };
+    Bounds.prototype.getWidth = function () {
+        return this.max.x - this.min.x;
+    };
+    Bounds.prototype.getHeight = function () {
+        return this.max.y - this.min.y;
+    };
+    Bounds.prototype.getScaled = function (scaleFactor) {
+        var center = this.getCenter();
+        var newMin = new Vertex_1.Vertex(this.min).scale(scaleFactor, center);
+        var newMax = new Vertex_1.Vertex(this.max).scale(scaleFactor, center);
+        return new Bounds(newMin, newMax);
+    };
+    Bounds.prototype.getMoved = function (moveAmount) {
+        var newMin = new Vertex_1.Vertex(this.min).move(moveAmount);
+        var newMax = new Vertex_1.Vertex(this.max).move(moveAmount);
+        return new Bounds(newMin, newMax);
+    };
+    /**
      * Get the center point of the north bound.
      *
      * @method getNorthPoint
@@ -1430,7 +1463,6 @@ var Bounds = /** @class */ (function () {
     Bounds.prototype.getNorthPoint = function () {
         return new Vertex_1.Vertex(this.min.x + this.width / 2.0, this.min.y);
     };
-    ;
     /**
      * Get the center point of the south bound.
      *
@@ -1442,31 +1474,72 @@ var Bounds = /** @class */ (function () {
     Bounds.prototype.getSouthPoint = function () {
         return new Vertex_1.Vertex(this.min.x + this.width / 2.0, this.max.y);
     };
-    ;
     /**
-    * Get the center point of the west bound.
-    *
-    * @method getWestPoint
-    * @instance
-    * @memberof Bounds
-    * @return {Vertex} The "westhmost" centered point of this bounding box.
-    */
+     * Get the center point of the west bound.
+     *
+     * @method getWestPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "westhmost" centered point of this bounding box.
+     */
     Bounds.prototype.getWestPoint = function () {
         return new Vertex_1.Vertex(this.min.x, this.min.y + this.height / 2.0);
     };
-    ;
     /**
-    * Get the center point of the east bound.
-    *
-    * @method getEastPoint
-    * @instance
-    * @memberof Bounds
-    * @return {Vertex} The "easthmost" centered point of this bounding box.
-    */
+     * Get the center point of the east bound.
+     *
+     * @method getEastPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "easthmost" centered point of this bounding box.
+     */
     Bounds.prototype.getEastPoint = function () {
         return new Vertex_1.Vertex(this.max.x, this.min.y + this.height / 2.0);
     };
-    ;
+    /**
+     * Get the upper left corner point these bounds box.
+     *
+     * @method getNorthWestPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "northwestmost" point of this bounding box.
+     */
+    Bounds.prototype.getNorthWestPoint = function () {
+        return new Vertex_1.Vertex(this.min.x, this.min.y);
+    };
+    /**
+     * Get the upper right corner point these bounds box.
+     *
+     * @method getNorthEastPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "northeastmost" point of this bounding box.
+     */
+    Bounds.prototype.getNorthEastPoint = function () {
+        return new Vertex_1.Vertex(this.max.x, this.min.y);
+    };
+    /**
+     * Get the lower right corner point these bounds box.
+     *
+     * @method getSouthEastPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "southeastmost" point of this bounding box.
+     */
+    Bounds.prototype.getSouthEastPoint = function () {
+        return new Vertex_1.Vertex(this.max.x, this.max.y);
+    };
+    /**
+     * Get the lower left corner point these bounds box.
+     *
+     * @method getSouthWestPoint
+     * @instance
+     * @memberof Bounds
+     * @return {Vertex} The "southwestmost" point of this bounding box.
+     */
+    Bounds.prototype.getSouthWestPoint = function () {
+        return new Vertex_1.Vertex(this.min.x, this.max.y);
+    };
     /**
      * Convert this rectangular bounding box to a polygon with four vertices.
      *
@@ -1579,16 +1652,16 @@ var Bounds = /** @class */ (function () {
         return new Bounds(new Vertex_1.Vertex(xMin, yMin), new Vertex_1.Vertex(xMax, yMax));
     };
     /**
-    * Compute the minimal bounding box for a given set of existing bounding boxes.
-    *
-    * An empty vertex array will return an empty bounding box located at (0,0).
-    *
-    * @static
-    * @method computeFromBoundsSet
-    * @memberof Bounds
-    * @param {Array<IBounds>} boundingBoxes - The set of existing bounding boxes to get the containing bounding box for.
-    * @return The minimal Bounds for the given bounds instances.
-    **/
+     * Compute the minimal bounding box for a given set of existing bounding boxes.
+     *
+     * An empty vertex array will return an empty bounding box located at (0,0).
+     *
+     * @static
+     * @method computeFromBoundsSet
+     * @memberof Bounds
+     * @param {Array<IBounds>} boundingBoxes - The set of existing bounding boxes to get the containing bounding box for.
+     * @return The minimal Bounds for the given bounds instances.
+     **/
     Bounds.computeFromBoundsSet = function (boundingBoxes) {
         if (boundingBoxes.length == 0) {
             return new Bounds(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(0, 0));
@@ -2237,6 +2310,32 @@ var CircleSector = /** @class */ (function () {
         });
     };
     //--- END --- Implement interface `Intersectable`
+    CircleSector.prototype.describeSVGPath = function (options) {
+        // const buffer: SVGPathParams = [];
+        // const start = this.getStartPoint();
+        // const end = this.getEndPoint();
+        // //   describeSVGArc
+        // //   x: number,
+        // //   y: number,
+        // //   radius: number,
+        // //   startAngle: number,
+        // //   endAngle: number,
+        // //   options?: { moveToStart: boolean }
+        // // ): SVGPathParams => {
+        // var arcRotation = 0.0;
+        // var largeArcFlag = 1;
+        // var sweepFlag = 0;
+        // if (options && options.moveToStart) {
+        //   buffer.push("M", start.x, start.y);
+        // }
+        // buffer.push("A", cSector.circle.radius, cSector.circle.radius, arcRotation, largeArcFlag, sweepFlag, end.x, end.y);
+        // return buffer;
+        var arc = CircleSector.circleSectorUtils.describeSVGArc(this.circle.center.x, // end.x,
+        this.circle.center.y, // end.y,
+        this.circle.radius, this.startAngle, this.endAngle, options // options?: { moveToStart: boolean }
+        );
+        return arc;
+    };
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
@@ -2275,8 +2374,9 @@ var CircleSector = /** @class */ (function () {
          * @return [ 'A', radiusx, radiusy, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
          */
         describeSVGArc: function (x, y, radius, startAngle, endAngle, options) {
-            if (typeof options === "undefined")
+            if (typeof options === "undefined") {
                 options = { moveToStart: true };
+            }
             var end = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, endAngle);
             var start = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, startAngle);
             // Split full circles into two halves.
@@ -3393,7 +3493,8 @@ exports.geomutils = {
  * @modified 2024-01-30 Fixing an issue with immutable style sets; changes to the global draw config did not reflect here (do now).
  * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
  * @modified 2024-07-24 Caching custom style defs in a private buffer variable.
- * @version  1.6.10
+ * @modified 2025-11-14 Fixing a bug in the CSS `mix-blend-mode` property handling (caused a runtime error).
+ * @version  1.6.11
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilssvg = void 0;
@@ -3598,8 +3699,13 @@ var drawutilssvg = /** @class */ (function () {
             node = this.createSVGNode(nodeName);
         }
         if (this.drawlibConfiguration.blendMode) {
-            // node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
-            node.style["mix-blend-mode"](this.drawlibConfiguration.blendMode);
+            var blendMode = node.style["mix-blend-mode"];
+            if (typeof blendMode === "function") {
+                blendMode(this.drawlibConfiguration.blendMode);
+            }
+            else {
+                node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
+            }
         }
         // if (this.lineDashEnabled && this.lineDash && this.lineDash.length > 0 && drawutilssvg.nodeSupportsLineDash(nodeName)) {
         //   node.setAttribute("stroke-dasharray", this.lineDash.join(" "));

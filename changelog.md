@@ -1,6 +1,35 @@
 # Changelog
 
-- 2025-09-02
+- 2025-11-14
+  - Fixing a bug in the `drawutilssvg` class in the CSS `mix-blend-mode` property handling (caused a runtime error).
+  - Adding utility class `utils/datastructures/GeometryMesh`. Extending demo `33-depth-mesh` with the new class.
+  - Moved experimental class `Vert3` from demo 33 one level up.
+  - Added demo `67-perlin-noise-3d-depth-mesh`.
+- 2025-11-12
+  - Added the `PerlinNoise` class and refactored, copied from a different project `floatsim`.
+  - Added the `Bounds.getMoved()` method.
+  - Added Demo `66-simple-perlin-noise`.
+  - Extended demo `64-multiple-ring-animation`: added perlin noise element.
+- 2025-10-29
+  - Ported the Lissajous implementation from demo-13 to a Typescript class `utils/LissajousFigure`.
+- 2025-10-28
+  - Added `Bounds.getWidth()` and `Bounds.getHeight()`.
+  - Added `DataGrid2dArrayMatrix.setAll(function)`.
+  - Fixed a bug in the `DataGrid2dArrayMatrix.toString()` method.
+- 2025-10-18
+  - Added method `Bounds.containsVert(XYCoords)`.
+- 2025-10-17
+  - Added the methods `Bounds.getSouthWestPoint`, `getNorthWestPoint`, `getNorthEastPoint` and `getSouthEastPoint`.
+- 2025-10-16
+  - Added demo `65-rounded-squares`.
+  - Adding the `utils/datastructures/DataGrid2dArrayMatrix` class for array like data matrices.
+- 2025-10-04
+  - Adding `src/ts/utils/SVGPathUtils` with the `mkCircularRingSector` function.
+  - Adding the demo `63-simple-ring-animation`.
+- 2025-09-10
+  - Finally dumping the old './demos/detectDarkmode.js' function.
+  - modal.js: Changing head text type from `h2` to `h3`. Added classname `button` to action butons.
+- 2025-09-02 [v1.25.0]
   - Adding method `ColorGradient.fromObject` to restore from JSON objects.
 - 2025-08-27
   - Added experimental `ColorGradientDialog` to the demos (pure JS).
