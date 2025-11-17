@@ -1,0 +1,1 @@
+{"version":3,"file":"GeometryMesh.js","sourceRoot":"","sources":["../../../ts/utils/datastructures/GeometryMesh.ts"],"names":[],"mappings":"AAAA;;;;;;;;GAQG;AAKH,MAAM,OAAO,YAAY;IAsBvB,YAAY,QAAmB,EAAE,KAA+B;QAC9D,IAAI,CAAC,QAAQ,GAAG,QAAQ,IAAI,EAAE,CAAC;QAC/B,IAAI,CAAC,KAAK,GAAG,KAAK,IAAI,EAAE,CAAC;IAC3B,CAAC;CACF"}
