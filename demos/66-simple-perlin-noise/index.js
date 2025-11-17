@@ -39,7 +39,7 @@
     // +-------------------------------
     var animationFrameNumber = 0;
 
-    // MUST be a power of 2
+    // Should be a power of 2
     var perlinDepth = 6;
     var dataLength = Math.pow(2, perlinDepth);
     var data = null;

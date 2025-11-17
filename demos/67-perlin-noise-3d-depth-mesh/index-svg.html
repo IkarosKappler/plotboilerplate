@@ -87,23 +87,17 @@
     <script src="../../src/cjs/utils/parsers/STLParser.js"></script>
     <script src="../../src/cjs/utils/parsers/OBJParser.js"></script>
     <script src="../Vert3.js"></script>
-    <script src="rotatePoint.js"></script>
+    <!-- <script src="Matrix4x4.js"></script> -->
+    <script src="../../src/cjs/utils/Params.js"></script>
+    <script src="../../src/cjs/utils/PerlinNoise.js"></script>
+    <script src="../../src/cjs/utils/algorithms/arrayFill.js"></script>
     <script src="../../src/cjs/utils/algorithms/getContrastColor.js"></script>
+    <script src="../../src/cjs/utils/datastructures/DataGrid2dArrayMatrix.js"></script>
     <script src="../../src/cjs/utils/datastructures/Matrix4x4.js"></script>
     <script src="../../src/cjs/utils/datastructures/GeometryMesh.js"></script>
-    <script src="makeSphereGeometry.js"></script>
-    <script src="makeBoxGeometry.js"></script>
-    <script src="makeCuboctahedronGeometry.js"></script>
-    <script src="makeBuckminsterGeometry.js"></script>
-    <script src="makeDodecahedronGeometry.js"></script>
-    <script src="makeRhombicDodecahedronGeometry.js"></script>
-    <script src="makeTetrahedronGeometry.js"></script>
-    <script src="makeIcosahedronGeometry.js"></script>
-    <script src="makeOctahedronGeometry.js"></script>
-    <script src="makeAugmentedTriDiminishedIcosahedronGeometry.js"></script>
-    <script src="reduceGeometryDuplicateEdges.js"></script>
-    <script src="reduceGeometryDuplicateVertices.js"></script>
+    <script src="makeFlatMeshGeometry.js"></script>
     <script src="../GeometryMeshRenderer.js"></script>
+
 
     <script src="index.js"></script>
 
@@ -114,6 +108,6 @@
   </head>
   <body>
     <input type="file" style="display: none" id="input_file" />
-    <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
+    <svg id="my-canvas" width="1024" height="768"></svg>
   </body>
 </html>

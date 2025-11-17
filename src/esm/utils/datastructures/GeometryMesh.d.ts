@@ -3,9 +3,10 @@
  *
  * Refactored the strucure into a class.
  *
- * @author  Ikaros Kappler
- * @date    2025-11-14
- * @version 1.0.0
+ * @author   Ikaros Kappler
+ * @date     2025-11-14
+ * @modified 2025-11-17 Moved `getBounds` and `normalizeGeometry` from helper functions to this class.
+ * @version  1.0.0
  */
 export type Vertex2 = {
     x: number;
@@ -37,4 +38,9 @@ export declare class GeometryMesh<T extends Vertex2 | Vertex3> {
      */
     edges: Array<[number, number]>;
     constructor(vertices?: Array<T>, edges?: Array<[number, number]>);
+    normalize(): void;
+    getGeometryBounds(): {
+        min: Vertex3;
+        max: Vertex3;
+    };
 }
