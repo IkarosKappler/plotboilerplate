@@ -9,8 +9,9 @@
  *
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
- * @date        2021-02-22
- * @version     1.0.0
+ * @date        2025-11-11
+ * @modified    2025-11-19 Adding alloy-finger to fetch touch events.
+ * @version     1.1.0
  **/
 
 (function (_context) {
@@ -57,12 +58,6 @@
         GUP
       )
     );
-
-    // new DarkModeHandler(function (_isDarkMode) {
-    //   pb.config.backgroundColor = _isDarkMode ? "#000000" : "#ffffff";
-    //   isDarkmode = _isDarkMode;
-    //   pb.redraw();
-    // });
 
     // prettier-ignore
     var blendModes = [
@@ -175,6 +170,22 @@
         stats.mouseY = relPos.y;
       });
 
+    // +---------------------------------------------------------------------------------
+    // | Install a touch handler to rotate on mobile device.
+    // +-------------------------------
+    createAlloyFinger(pb.eventCatcher, {
+      touchMove: function (event) {
+        // console.log("event", event);
+        if (event.touches.length === 0) {
+          return;
+        }
+        // var relPos = pb.transformMousePosition(event.touches[0].clientX, event.touches[0].clientY);
+        config.rotationX = geomutils.wrapMinMax(config.rotationX + event.deltaY, 0.0, 360.0);
+        config.rotationZ = geomutils.wrapMinMax(config.rotationZ - event.deltaX, 0.0, 360.0);
+        pb.redraw();
+      }
+    });
+
     var stats = {
       mouseX: 0,
       mouseY: 0
@@ -252,6 +263,9 @@
 
       f1.open();
       f2.open();
+      if (params.getBoolean("closegui", false)) {
+        gui.close();
+      }
 
       // Add stats
       var uiStats = new UIStats(stats);
