@@ -9,6 +9,7 @@
  * @author  Ikaros Kappler
  * @version 1.0.0
  * @date    2025-08-05
+ * @modified 2025-11-26 Fixing a bug in `ColorGradient.getColorAt(ratio)`: value at 1.0 caused runtime error.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ColorGradient = void 0;
@@ -71,6 +72,9 @@ var ColorGradient = /** @class */ (function () {
         var intervalLocation = this.locateClosestRatio(ratio);
         var leftItem = this.values[intervalLocation[0]];
         var rightItem = this.values[intervalLocation[0] + 1];
+        if (!rightItem) {
+            return leftItem.color.clone();
+        }
         var relativeInnerIntervalPosition = (ratio - leftItem.ratio) / (rightItem.ratio - leftItem.ratio);
         return leftItem.color.clone().interpolate(rightItem.color, relativeInnerIntervalPosition);
     };
@@ -165,6 +169,7 @@ var ColorGradient = /** @class */ (function () {
             { ratio: 1.0, color: endColor }
         ], angleInRadians);
     };
+    ColorGradient.DEFAULT_COLORSET = DEFAULT_COLORSET;
     return ColorGradient;
 }());
 exports.ColorGradient = ColorGradient;

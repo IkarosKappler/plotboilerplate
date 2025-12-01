@@ -11,6 +11,7 @@
  * @author      Ikaros Kappler
  * @date        2025-11-11
  * @modified    2025-11-19 Adding alloy-finger to fetch touch events.
+ * @modified    2025-12-01 Adding color gradients.
  * @version     1.1.0
  **/
 
@@ -104,6 +105,7 @@
     );
 
     var geometryMeshRenderer = new GeometryMeshRenderer(config);
+    var colorSpace2d = new ColorSpace2d(new Bounds3(new Vert3(), new Vert3()));
 
     // +---------------------------------------------------------------------------------
     // | Prepare all basic available geometries.
@@ -114,7 +116,8 @@
     var perlinFactor = 4;
     var matrixHeight = config.perlinGridHeight;
     var matrixWidth = config.perlinGridWidth;
-    var flatMeshGeometryPair = makeFlatMeshGeometry(matrixHeight, matrixWidth, 2.0, 2.0);
+    // { geometry, indexMatrix }
+    var flatMeshGeometryPair = null; // makeFlatMeshGeometry(matrixHeight, matrixWidth, 2.0, 2.0);
     var noise = new PerlinNoise().seed(config.perlinSeed);
     var data = new DataGrid2dArrayMatrix(matrixHeight, matrixWidth, 0.0);
 
@@ -126,6 +129,8 @@
       data = new DataGrid2dArrayMatrix(matrixHeight, matrixWidth, 0.0);
 
       noise = new PerlinNoise().seed(config.perlinSeed);
+      var minZ = Number.MAX_VALUE;
+      var maxZ = Number.MIN_VALUE;
       for (var y = 0; y < matrixHeight; y++) {
         var yIndex = y / matrixHeight;
         for (var x = 0; x < matrixWidth; x++) {
@@ -139,9 +144,13 @@
           // Apply to mesh
           var vertIndex = flatMeshGeometryPair.indexMatrix[y][x];
           flatMeshGeometryPair.geometry.vertices[vertIndex].z = perlinValue * config.perlinValueScale;
+          minZ = Math.min(minZ, flatMeshGeometryPair.geometry.vertices[vertIndex].z);
+          maxZ = Math.max(maxZ, flatMeshGeometryPair.geometry.vertices[vertIndex].z);
         }
       }
-    };
+      colorSpace2d.bounds = flatMeshGeometryPair.geometry.getGeometryBounds();
+      // console.log("Rebuilt: max", maxZ, "min", minZ, "colorSpace2d.bounds", colorSpace2d.bounds);
+    }; // END function initNoiseData
     initNoiseData();
 
     // +---------------------------------------------------------------------------------
@@ -149,7 +158,10 @@
     // +-------------------------------
     pb.config.postDraw = function (draw, fill) {
       var textColor = getContrastColor(Color.parse(pb.config.backgroundColor)).cssRGB();
-      geometryMeshRenderer.drawGeometry(draw, fill, flatMeshGeometryPair.geometry, { textColor: textColor });
+      geometryMeshRenderer.drawGeometry(draw, fill, flatMeshGeometryPair.geometry, {
+        textColor: textColor,
+        colorSpace: colorSpace2d
+      });
     };
 
     // +---------------------------------------------------------------------------------

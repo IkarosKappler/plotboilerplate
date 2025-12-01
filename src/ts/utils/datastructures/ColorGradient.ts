@@ -8,6 +8,7 @@
  * @author  Ikaros Kappler
  * @version 1.0.0
  * @date    2025-08-05
+ * @modified 2025-11-26 Fixing a bug in `ColorGradient.getColorAt(ratio)`: value at 1.0 caused runtime error.
  */
 
 import { Color } from "./Color";
@@ -33,6 +34,8 @@ export interface ColorGradientItem {
 export class ColorGradient {
   values: Array<ColorGradientItem>;
   angle: ColorGradientRotation;
+
+  static DEFAULT_COLORSET = DEFAULT_COLORSET;
 
   /**
    * Creates a new ColorGradient with the given values. Please be sure that the values appear in the correct
@@ -87,6 +90,9 @@ export class ColorGradient {
     const intervalLocation: [number, ColorGradientItem] = this.locateClosestRatio(ratio);
     const leftItem: ColorGradientItem = this.values[intervalLocation[0]];
     const rightItem: ColorGradientItem = this.values[intervalLocation[0] + 1];
+    if (!rightItem) {
+      return leftItem.color.clone();
+    }
     const relativeInnerIntervalPosition: number = (ratio - leftItem.ratio) / (rightItem.ratio - leftItem.ratio);
     return leftItem.color.clone().interpolate(rightItem.color, relativeInnerIntervalPosition);
   }
