@@ -88,6 +88,7 @@
         drawVertNumbers: params.getBoolean("drawVertNumbers", false),
         useBlendMode: params.getBoolean("useBlendMode", false),
         blendMode: params.getString("blendMode", "difference"),
+        useColorGradient: params.getBoolean("useColorGradient", false),
         perlinGridWidth: params.getNumber("perlinGridWidth", 24),
         perlinGridHeight: params.getNumber("perlinGridHeight", 24),
         perlinSeed: params.getNumber("perlinSeed", 10),
@@ -160,7 +161,7 @@
       var textColor = getContrastColor(Color.parse(pb.config.backgroundColor)).cssRGB();
       geometryMeshRenderer.drawGeometry(draw, fill, flatMeshGeometryPair.geometry, {
         textColor: textColor,
-        colorSpace: colorSpace2d
+        colorSpace: config.useColorGradient ? colorSpace2d : null
       });
     };
 
@@ -254,6 +255,8 @@
       f2.add(config, "lineWidth").min(1).max(10).title("Line width").onChange(function () { pb.redraw(); });
       // prettier-ignore
       f2.add(config, "useDistanceThreshold").title("Use distance threshold?").listen().onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      f2.add(config, "useColorGradient").title("Use a color gradient?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
       f2.add(config, "drawVertices").title("Draw vertices?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
