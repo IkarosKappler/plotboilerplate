@@ -31,6 +31,7 @@
     var config = {
       animate: params.getBoolean("animate", false),
       drawFrame: params.getBoolean("drawFrame", false),
+      perlinDepth: params.getNumber("perlinDepth", 6),
       yIndex: params.getNumber("yIndex", 0)
     };
 
@@ -40,14 +41,13 @@
     var animationFrameNumber = 0;
 
     // Should be a power of 2
-    var perlinDepth = 6;
-    var dataLength = Math.pow(2, perlinDepth);
     var data = null;
 
     var initNoiseData = function () {
+      var dataLength = Math.pow(2, config.perlinDepth);
       data = arrayFill(dataLength, 0.0);
       for (var x = 0; x < dataLength; x++) {
-        data[x] = noise.perlin2((x / dataLength) * perlinDepth, config.yIndex / dataLength);
+        data[x] = noise.perlin2((x / dataLength) * config.perlinDepth, config.yIndex / dataLength);
       }
       // console.log("data", data);
     };
@@ -100,7 +100,10 @@
       gui.add(config, "drawFrame").name("drawFrame").title("Draw the bounding frame?")
         .onChange( function() { pb.redraw() });
       // prettier-ignore
-      gui.add(config, "yIndex").listen().min(1).max(dataLength*10).step(1).name("yIndex").title("The perlin noise `y` position.")
+      gui.add(config, "perlinDepth").listen().min(1).max(12).step(1).name("perlinDepth").title("The 2^x data array length.")
+      .onChange( function() { initNoiseData(); pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "yIndex").listen().min(1).max(256).step(1).name("yIndex").title("The perlin noise `y` position.")
       .onChange( function() { initNoiseData(); pb.redraw() });
     }
     pb.config.postDraw = postDraw;

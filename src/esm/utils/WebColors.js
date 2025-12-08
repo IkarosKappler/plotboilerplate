@@ -6,17 +6,17 @@
  * @modified 2020-10-30 Exporting each color under its name globally.
  **/
 import { Color } from "./datastructures/Color";
-export const Red = Color.makeRGB(255, 67, 55);
-export const Pink = Color.makeRGB(232, 31, 100);
-export const Purple = Color.makeRGB(156, 39, 175);
-export const DeepPurple = Color.makeRGB(103, 59, 184);
-export const Indigo = Color.makeRGB(64, 81, 181);
-export const Blue = Color.makeRGB(35, 151, 245);
-export const LightBlue = Color.makeRGB(6, 170, 245);
-export const Cyan = Color.makeRGB(3, 189, 214);
-export const Teal = Color.makeRGB(1, 150, 137);
-export const Green = Color.makeRGB(77, 175, 82);
-export const LightGreen = Color.makeRGB(141, 195, 67);
+export const Red = Color.Red; // Color.makeRGB(255,67,55);
+export const Pink = Color.Pink; // Color.makeRGB(232,31,100);
+export const Purple = Color.Purple; // Color.makeRGB(156,39,175);
+export const DeepPurple = Color.DeepPink; // Color.makeRGB(103,59,184);
+export const Indigo = Color.Indigo; // Color.makeRGB(64,81,181);
+export const Blue = Color.Blue; // Color.makeRGB(35,151,245);
+export const LightBlue = Color.LightBlue; // Color.makeRGB(6,170,245);
+export const Cyan = Color.Cyan; // Color.makeRGB(3,189,214);
+export const Teal = Color.Teal; // Color.makeRGB(1,150,137);
+export const Green = Color.Green; // Color.makeRGB(77,175,82);
+export const LightGreen = Color.LightGreen; // Color.makeRGB(141,195,67);
 /**
  * A set of beautiful web colors (I know, beauty is in the eye of the beholder).
  *
@@ -26,19 +26,7 @@ export const LightGreen = Color.makeRGB(141, 195, 67);
  * @requires Color
  *
  */
-export const WebColors = [
-    Red,
-    Pink,
-    Purple,
-    DeepPurple,
-    Indigo,
-    Blue,
-    LightBlue,
-    Cyan,
-    Teal,
-    Green,
-    LightGreen
-];
+export const WebColors = [Red, Pink, Purple, DeepPurple, Indigo, Blue, LightBlue, Cyan, Teal, Green, LightGreen];
 /**
  * A helper function to shuffle the colors into a new order.
  */

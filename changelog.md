@@ -4,6 +4,9 @@
 
 - replace lib/Color.min.js by proper color class.
 
+* 2025-12-08
+  - Adding a depth buffer to the `GeometryMeshRenderer`.
+  - Replaying self defined colors in `WebColors` by official web colors.
 * 2025-12-01
   - Adding color gradients to demo `67-perlin-noise-3d-depth-mesh`.
   - Adding experimental `ColorSpace2d` to the demo.

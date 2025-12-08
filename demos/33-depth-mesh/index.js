@@ -89,6 +89,7 @@
         useDistanceThreshold: false,
         drawVertices: true,
         drawVertNumbers: false,
+        useDepthBuffer: false,
         useBlendMode: false,
         blendMode: "difference",
         geometryType: "dodecahedron",
@@ -404,6 +405,8 @@
       f2.add(config, "drawVertices").title("Draw vertices?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
       f2.add(config, "drawVertNumbers").title("Draw vertex numbers?").listen().onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      f2.add(config, "useDepthBuffer").title("Use depth buffer (slower)").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
       f2.add(config, "useBlendMode").title("Use blend mode?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore

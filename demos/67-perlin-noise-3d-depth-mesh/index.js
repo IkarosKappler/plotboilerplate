@@ -70,8 +70,8 @@
     // +-------------------------------
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
-        far: -1000,
-        close: 0,
+        far: params.getNumber("far", -1000),
+        close: params.getNumber("close", 0),
         scaleX: params.getNumber("scaleX", 100),
         scaleY: params.getNumber("scaleY", 100),
         scaleZ: params.getNumber("scaleZ", 100),
@@ -79,9 +79,9 @@
         rotationX: params.getNumber("rotationX", 0),
         rotationY: params.getNumber("rotationY", 0),
         rotationZ: params.getNumber("rotationZ", 0),
-        translateX: params.getNumber("rotationZ", 0),
-        translateY: params.getNumber("rotationZ", 0),
-        translateZ: params.getNumber("rotationZ", 0),
+        translateX: params.getNumber("translateX", 0),
+        translateY: params.getNumber("translateX", 0),
+        translateZ: params.getNumber("translateX", 0),
         lineWidth: params.getNumber("lineWidth", 2.0),
         useDistanceThreshold: params.getBoolean("useDistanceThreshold", false),
         drawVertices: params.getBoolean("drawVertices", true),
@@ -89,6 +89,7 @@
         useBlendMode: params.getBoolean("useBlendMode", false),
         blendMode: params.getString("blendMode", "difference"),
         useColorGradient: params.getBoolean("useColorGradient", false),
+        useDepthBuffer: params.getBoolean("useDepthBuffer", false),
         perlinGridWidth: params.getNumber("perlinGridWidth", 24),
         perlinGridHeight: params.getNumber("perlinGridHeight", 24),
         perlinSeed: params.getNumber("perlinSeed", 10),
@@ -161,7 +162,8 @@
       var textColor = getContrastColor(Color.parse(pb.config.backgroundColor)).cssRGB();
       geometryMeshRenderer.drawGeometry(draw, fill, flatMeshGeometryPair.geometry, {
         textColor: textColor,
-        colorSpace: config.useColorGradient ? colorSpace2d : null
+        colorSpace: config.useColorGradient ? colorSpace2d : null,
+        useDepthBuffer: config.useDepthBuffer
       });
     };
 
@@ -264,6 +266,8 @@
       // prettier-ignore
       f2.add(config, "useBlendMode").title("Use blend mode?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
+      f2.add(config, "useDepthBuffer").title("Use depth buffer (slower)").listen().onChange(function () { pb.redraw(); });
+      // prettier-ignore
       f2.add(config, "blendMode", blendModes).title("Which blend mode?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
       f3.add(config, "animate").title("Animate?").onChange(function () { startAnimation(0) });
@@ -298,7 +302,7 @@
           config.perlinYOffset += 0.01;
         }
         if (config.animatePerlinZOffset) {
-          config.perlinZOffset += 0.01;
+          config.perlinZOffset += 0.002;
         }
         if (config.animateRotation) {
           // config.rotationX = (time / 80) % 360; // 50

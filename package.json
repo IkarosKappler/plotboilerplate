@@ -19,7 +19,6 @@
     "compile-typescript-demo": "cd bin && ./run-compile-demo-ts.sh",
     "post-build-cleanup": "rm ./dist/*.d.ts && rm -rf ./dist/interfaces && rm -rf ./dist/utils",
     "mkdocs": "cd bin && ./run-mk-typedocs.sh",
-    "mk-release": "cd bin && ./run-mk-zippackage.sh",
     "server": "npx http-server",
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack-browser": "npx webpack --mode production --config ./webpack5.browser.config.js",
