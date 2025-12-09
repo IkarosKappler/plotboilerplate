@@ -96,6 +96,8 @@
         perlinXOffset: params.getNumber("perlinXOffset", 0.0),
         perlinYOffset: params.getNumber("perlinYOffset", 0.0),
         perlinZOffset: params.getNumber("perlinZOffset", 0.0),
+        perlinXScale: params.getNumber("perlinXScale", 1.0),
+        perlinYScale: params.getNumber("perlinYScale", 1.0),
         perlinValueScale: params.getNumber("perlinValueScale", 1.0),
         animate: params.getBoolean("animate", false),
         animateRotation: params.getBoolean("animateRotation", false),
@@ -138,8 +140,8 @@
         for (var x = 0; x < matrixWidth; x++) {
           var xIndex = x / matrixWidth;
           var perlinValue = noise.perlin3(
-            config.perlinXOffset + xIndex * perlinFactor,
-            config.perlinYOffset + yIndex * perlinFactor,
+            config.perlinXOffset + xIndex * perlinFactor * config.perlinXScale,
+            config.perlinYOffset + yIndex * perlinFactor * config.perlinYScale,
             config.perlinZOffset * perlinFactor
           );
           data.set(y, x, perlinValue);
@@ -240,9 +242,9 @@
       // prettier-ignore
       f1.add(config, "translateZ").min(-1.0).max(1.0).title("The mesh translation Z.").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f1.add(config, "perlinGridWidth").min(2).max(32).step(1).title("Perlin matrix width.").onChange(function () { initNoiseData(); pb.redraw(); });
+      f1.add(config, "perlinGridWidth").min(2).max(64).step(1).title("Perlin matrix width.").onChange(function () { initNoiseData(); pb.redraw(); });
       // prettier-ignore
-      f1.add(config, "perlinGridHeight").min(2).max(32).step(1).title("Perlin matrix height.").onChange(function () { initNoiseData(); pb.redraw(); });
+      f1.add(config, "perlinGridHeight").min(2).max(64).step(1).title("Perlin matrix height.").onChange(function () { initNoiseData(); pb.redraw(); });
       // prettier-ignore
       f1.add(config, "perlinSeed").min(0.0).max(100.0).title("Perlin noise seed.").onChange(function () { initNoiseData(); pb.redraw(); });
       // prettier-ignore
@@ -251,6 +253,10 @@
       f1.add(config, "perlinYOffset").min(-1.0).max(1.0).listen().title("Perlin noise y offset.").onChange(function () { initNoiseData(); pb.redraw(); });
       // prettier-ignore
       f1.add(config, "perlinZOffset").min(-1.0).max(1.0).listen().title("Perlin noise z offset.").onChange(function () { initNoiseData(); pb.redraw(); });
+      // prettier-ignore
+      f1.add(config, "perlinXScale").min(1.0).max(10.0).title("Perlin X scale.").listen().onChange(function () { initNoiseData(); pb.redraw(); });
+      // prettier-ignore
+      f1.add(config, "perlinYScale").min(1.0).max(10.0).title("Perlin Y scale.").listen().onChange(function () { initNoiseData(); pb.redraw(); });
       // prettier-ignore
       f1.add(config, "perlinValueScale").min(-1.0).max(1.0).title("Perlin value scale.").listen().onChange(function () { initNoiseData(); pb.redraw(); });
       // prettier-ignore
