@@ -13,6 +13,7 @@
   let GUP = gup();
   const RAD_TO_DEG = 180.0 / Math.PI;
   const DEG_TO_RAD = Math.PI / 180.0;
+  const GRADIENT_RADIUS = 64.0;
   _context.addEventListener("load", function () {
     var params = new Params(GUP);
     var isDarkmode = detectDarkMode(GUP);
@@ -27,113 +28,95 @@
 
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
-      // ...
+      pow: params.getNumber("pow", 2.0)
     };
 
-    var viewport = pb.viewport();
-    var points = [
-      viewport.randomPoint(),
-      viewport.randomPoint(),
-      viewport.randomPoint(),
-      viewport.randomPoint(),
-      viewport.randomPoint(),
-      viewport.randomPoint()
-    ].sort(function (a, b) {
-      return a.x - b.x;
-    });
-    for (var k = 0; k < points.length; k++) {
-      config[`show_${k}`] = k == 3;
-    }
-    pb.add(points);
+    var viewport = null; // Bounds
+    var points = []; // Array<Vertex>
+    var gradientPoints = null; // Array<Vertex>
+
+    var reinit = function () {
+      viewport = pb.viewport();
+      points = [
+        viewport.randomPoint(),
+        viewport.randomPoint(),
+        viewport.randomPoint(),
+        viewport.randomPoint(),
+        viewport.randomPoint(),
+        viewport.randomPoint()
+      ].sort(function (a, b) {
+        return a.x - b.x;
+      });
+      gradientPoints = points.map(function (point) {
+        return point.clone().addX(GRADIENT_RADIUS);
+      });
+      // Add config checkboxes
+      for (var k = 0; k < points.length; k++) {
+        config[`show_${k}`] = k == 3;
+      }
+      pb.removeAll();
+      pb.add(points);
+      pb.add(gradientPoints);
+
+      // Init math lib
+      pm68 = new PolyMath68(viewport, config, points);
+      // Install listeners
+
+      points.forEach(function (p, i) {
+        (function (index) {
+          p.listeners.addDragListener(function (dragEvent) {
+            gradientPoints[index].move(dragEvent.params.dragAmount);
+          });
+        })(i);
+      });
+    };
 
     // +---------------------------------------------------------------------------------
     // | Global vars
     // +-------------------------------
-    // NONE
+    var pm68 = null;
+
+    var preDraw = function (draw, fill) {
+      // ...
+      // draw.circle({ x: 0, y: 0 }, 100, "red", 1);
+      points.forEach(function (p, index) {
+        draw.circle(p, GRADIENT_RADIUS, "rgba(192,192,192,0.25", 2, {
+          dashOffset: 0.0,
+          dashArray: [2.0, 3.0]
+        });
+      });
+    };
 
     var postDraw = function (draw, fill) {
       // ...
       // draw.circle({ x: 0, y: 0 }, 100, "red", 1);
       points.forEach(function (p, index) {
         draw.circle(p, 5, "red", 1);
-        fill.text(`[${index}] ${p.x.toFixed(2)}, ${p.y.toFixed(2)}`, p.x, p.y, { color: "orange" });
+        fill.text(`[${index}] ${p.x.toFixed(2)}, ${p.y.toFixed(2)}`, p.x, p.y + 16, { color: "orange" });
       });
 
       for (var i = 1; i < points.length; i++) {
         draw.line(points[i - 1], points[i], "green", 1.0);
       }
 
-      drawInterpolation(draw, fill, sin(viewport), { color: Color.CSS_COLORS.Purple, lineWidth: 1.0 });
+      drawInterpolation(draw, fill, pm68.sin(viewport), { color: Color.CSS_COLORS.Purple, lineWidth: 1.0 });
       // drawInterpolation(draw, fill, orthonormal0, { color: Color.CSS_COLORS.Green, lineWidth: 1.0 });
       for (var k = 0; k < points.length; k++) {
         if (config[`show_${k}`]) {
-          drawInterpolation(draw, fill, scaleY(points[k].y, lagrange(k)), {
+          drawInterpolation(draw, fill, pm68.scaleY(points[k].y, pm68.lagrange(k)), {
             color: WebColors[k % WebColors.length],
             lineWidth: 2.0
           });
         }
       }
       var activeK = 3;
-      drawInterpolation(draw, fill, scaleY(points[activeK].y, distanceWeight(activeK, lagrange(activeK))), {
+      drawInterpolation(draw, fill, pm68.scaleY(points[activeK].y, pm68.distanceWeight(activeK, pm68.lagrange(activeK))), {
         color: WebColors[activeK % WebColors.length],
         lineWidth: 2.0
       });
       //     dashOffset?: number;
       //     dashArray?: Array<number>;
     }; // END postDraw
-
-    var sin = function (box) {
-      return function (x) {
-        return (Math.sin((x / box.width) * Math.PI * 2) * box.height) / 2;
-      };
-    };
-
-    var distanceWeight = function (k, func) {
-      return function (x) {
-        // var relX = (x - viewport.min.x) / viewport.width;
-        // var relkX = (points[k].x - viewport.min.x) / viewport.width;
-        // return (1 / (1 + Math.pow(relkX - relX, 2))) * func(x);
-        var width = viewport.width / 2.0; // 20.0;
-        return (width / (width + Math.pow(points[k].x - x, 2))) * func(x);
-      };
-    };
-
-    // var orthonormal0 = function (x) {
-    //   var result = 0.0;
-    //   for (var j = 0; j < points.length; j++) {
-    //     result += points[j].y * lagrange(j)(x);
-    //   }
-    //   return result;
-    // };
-
-    // var lagrange = function (j, x) {
-    //   var result = 1.0;
-    //   // var n = 3;
-    //   for (var m = 0; m < points.length; m++) {
-    //     if (m != j) {
-    //       result *= (x - points[m].x) / (points[j].x - points[m].x);
-    //     }
-    //   }
-    //   return result;
-    // };
-
-    var scaleY = function (yFactor, func) {
-      return function (x) {
-        return yFactor * func(x);
-      };
-    };
-
-    var lagrange = function (j) {
-      return function (x) {
-        var result = 1.0;
-        for (var m = 0; m < points.length; m++) {
-          if (m != j) {
-            result *= (x - points[m].x) / (points[j].x - points[m].x);
-          }
-        }
-        return result;
-      };
-    };
 
     /**
      *
@@ -145,7 +128,7 @@
      */
     var drawInterpolation = function (draw, fill, func, options) {
       var stepSize = 5;
-      console.log(viewport);
+      // console.log(viewport);
       var x = viewport.min.x;
       var maxStepCount = viewport.width / stepSize;
       var stepNumber = 0;
@@ -169,21 +152,25 @@
     // +---------------------------------------------------------------------------------
     // | Create a GUI.
     // +-------------------------------
+    const polynomialControllers = [];
     {
       var gui = pb.createGUI();
-      // // prettier-ignore
-      // gui.add(config, "animate").name("animate").title("Animate the ray?")
-      //   .onChange( function() { toggleAnimation(); });
-      // // prettier-ignore
-      // gui.add(config, "numRays").min(1).max(64).step(1).name("numRays").title("Number of rays to use.")
-      //  .onChange( function() { pb.redraw() });
+      // prettier-ignore
+      gui.add(config, "pow").min(0).max(10).step(0.1).title("The power.").onChange(function () { pb.redraw(); });
+    }
+    var updateGUI = function () {
+      // Add polynomials checkboxes (and keep controllers)
+      // But destroy old controllers first.
+      polynomialControllers.forEach(function (ctrlr) {
+        ctrlr.destroy();
+      });
       for (var k = 0; k < points.length; k++) {
         // prettier-ignore
-        gui.add(config, `show_${k}`).name("Show Lagrange Polynomial "+k).title("Show Lagrange Polynomial "+k)
+        var cntrllr = gui.add(config, `show_${k}`).name("Show Lagrange Polynomial "+k).title("Show Lagrange Polynomial "+k)
           .onChange( function() { pb.redraw() });
+        polynomialControllers.push(cntrllr);
       }
-    }
-    pb.config.postDraw = postDraw;
+    };
 
     // +---------------------------------------------------------------------------------
     // | This renders a content list component on top, allowing to delete or add
@@ -195,17 +182,21 @@
     var contentList = new PBContentList(pb);
 
     // Filter shapes; keep only those of interest here
-    pb.addContentChangeListener(function (_shapesAdded, _shapesRemoved) {
-      // Drop everything we cannot handle with reflections
-      polygon = pb.drawables.find(function (drwbl) {
-        return drwbl instanceof Polygon;
-      });
+    // pb.addContentChangeListener(function (_shapesAdded, _shapesRemoved) {
+    //   // Drop everything we cannot handle with reflections
+    //   polygon = pb.drawables.find(function (drwbl) {
+    //     return drwbl instanceof Polygon;
+    //   });
 
-      mainRay.vector = pb.drawables.find(function (drwbl) {
-        return drwbl instanceof Vector;
-      });
-    });
+    //   mainRay.vector = pb.drawables.find(function (drwbl) {
+    //     return drwbl instanceof Vector;
+    //   });
+    // });
 
+    reinit();
+    updateGUI();
+    pb.config.preDraw = preDraw;
+    pb.config.postDraw = postDraw;
     pb.redraw();
   });
 })(globalThis);

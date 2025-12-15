@@ -1,9 +1,10 @@
 /**
  * @author   Ikaros Kappler
- * @version  1.0.1
  * @date     2018-11-10
  * @modified 2020-10-23 Ported to Typescript.
  * @modified 2020-10-30 Exporting each color under its name globally.
+ * @modified 2025-12-08 Replaying self defined colors by official web colors.
+ * @version  1.0.2
  **/
 import { Color } from "./datastructures/Color";
 export declare const Red: Color;
