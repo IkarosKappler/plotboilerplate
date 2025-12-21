@@ -54,16 +54,16 @@
       }
       var segmentStart = _self.points[segmentIndex];
       var segmentEnd = _self.points[segmentIndex + 1];
-      var ratio = (x - segmentStart.x) / (segmentEnd.x - segmentStart.x);
       if (segmentStart.x < x || segmentEnd.x >= x) {
-        console.log("Viewport", _self.viewport.min.x, _self.viewport.max.x, "ratio", ratio, "x", x);
+        var ratio = (x - segmentStart.x) / (segmentEnd.x - segmentStart.x);
         if (ratio > 0.3 && ratio <= 0.6) {
+          console.log("Viewport", _self.viewport.min.x, _self.viewport.max.x, "ratio", ratio, "x", x);
           console.log("Jo", "segmentIndex", segmentIndex, "segmentStart.x", segmentStart.x, "segmentEnd.x", segmentEnd.x);
         }
-        return 0.0;
+        return segmentStart.y + (segmentEnd.y - segmentStart.y) * ratio;
       }
-      console.log("JAAAAAA", ratio);
-      return segmentStart.y + (segmentEnd.y - segmentStart.y) * ratio;
+      // console.log("JAAAAAA", ratio);
+      return 0.0;
     };
   };
 
