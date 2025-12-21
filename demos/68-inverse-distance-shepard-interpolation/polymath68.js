@@ -9,6 +9,64 @@
     this.points = points;
   };
 
+  _context.PolyMath68.prototype.IDW = function () {
+    const _self = this;
+    return function (x) {
+      var pow = _self.config.pow; // 2.0
+      var numerator = 0.0;
+      var denominator = 0.0;
+      for (var j = 0; j < _self.points.length; j++) {
+        var distanceJSquared = Math.pow(Math.abs(_self.points[j].x - x), pow);
+        numerator += (_self.lagrange(j)(x) * _self.points[j].y) / distanceJSquared;
+        denominator += 1.0 / distanceJSquared;
+      }
+      return numerator / denominator;
+    };
+  };
+
+  _context.PolyMath68.prototype.naiveIDW = function () {
+    const _self = this;
+    return function (x) {
+      var sum = 0.0;
+      for (var j = 0; j < _self.points.length; j++) {
+        sum += _self.scaleY(_self.points[j].y, _self.distanceWeight(j, _self.lagrange(j)))(x);
+      }
+      return sum;
+    };
+  };
+
+  _context.PolyMath68.prototype.linearInterpolation = function () {
+    const _self = this;
+    return function (x) {
+      var sum = 0.0;
+      for (var j = 0; j < _self.points.length; j++) {
+        sum += _self.linearSegmentInterpolation(j)(x);
+      }
+      return sum;
+    };
+  };
+
+  _context.PolyMath68.prototype.linearSegmentInterpolation = function (segmentIndex) {
+    const _self = this;
+    return function (x) {
+      if (segmentIndex < 0 || segmentIndex + 1 >= _self.points.length) {
+        return 0.0;
+      }
+      var segmentStart = _self.points[segmentIndex];
+      var segmentEnd = _self.points[segmentIndex + 1];
+      var ratio = (x - segmentStart.x) / (segmentEnd.x - segmentStart.x);
+      if (segmentStart.x < x || segmentEnd.x >= x) {
+        console.log("Viewport", _self.viewport.min.x, _self.viewport.max.x, "ratio", ratio, "x", x);
+        if (ratio > 0.3 && ratio <= 0.6) {
+          console.log("Jo", "segmentIndex", segmentIndex, "segmentStart.x", segmentStart.x, "segmentEnd.x", segmentEnd.x);
+        }
+        return 0.0;
+      }
+      console.log("JAAAAAA", ratio);
+      return segmentStart.y + (segmentEnd.y - segmentStart.y) * ratio;
+    };
+  };
+
   _context.PolyMath68.prototype.distanceWeight = function (k, func) {
     const _self = this;
     return function (x) {
