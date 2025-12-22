@@ -200,7 +200,7 @@
       // prettier-ignore
       gui.add(config, "drawLinearInterpolation").title("Draw the linear interpolation (as math function).").onChange(function () { pb.redraw(); });
       // prettier-ignore
-      gui.add(config, "pow").min(0).max(10).step(0.1).title("The power.").onChange(function () { pb.redraw(); });
+      gui.add(config, "pow").min(0).max(10.0).step(0.01).title("The power.").onChange(function () { pb.redraw(); });
       // prettier-ignore
       gui.add(config, "drawIDW").min(0).max(10).step(0.1).title("Draw the default IDW?.").onChange(function () { pb.redraw(); });
       // prettier-ignore
