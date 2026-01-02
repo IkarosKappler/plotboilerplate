@@ -4,6 +4,8 @@
 
 - replace lib/Color.min.js by proper color class.
 
+* 2026-01-02
+  - Added color gradients to demo 14-pursuit-curves.
 * 2025-12-08
   - Adding a depth buffer to the `GeometryMeshRenderer`.
   - Replaying self defined colors in `WebColors` by official web colors.

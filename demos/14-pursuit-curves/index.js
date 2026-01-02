@@ -5,7 +5,8 @@
  *
  * @author   Ikaros Kappler
  * @date     2019-02-03
- * @version  1.0.0
+ * @modified 2026-01-02 Added color gradients.
+ * @version  1.1.0
  **/
 
 (function (_context) {
@@ -47,15 +48,21 @@
       )
     );
 
+    // +---------------------------------------------------------------------------------
+    // | This draws the traces if enabled.
+    // +-------------------------------
     var drawTraces = function () {
-      if (!config.drawTraces) return;
-      console.log("drawTraces");
-      for (var i in pointList.pointList) {
+      console.log("draw traces");
+      if (!config.drawTraces) {
+        return;
+      }
+      for (var i = 0; i < pointList.pointList.length; i++) {
         let point = pointList.pointList[i];
-        // if( i == 0 ) console.log( point.attr.trace );
-        for (var e = 1; e < point.attr.trace.length; e++) {
-          pb.draw.line(point.attr.trace[e - 1], point.attr.trace[e], "rgba(192,192,192,0.8)");
-        }
+        var color = config.useColorGradient
+          ? colorGradient.getColorAt(i / (pointList.pointList.length - 1)).cssRGB()
+          : "rgba(192,192,192,0.8)";
+        // console.log("i", i, color);
+        pb.draw.polyline(point.attr.trace.slice(config.skipTraceHead), true, color, config.traceWidth);
       }
     };
 
@@ -66,6 +73,7 @@
     // Fill the full area with points.
     pointList.verticalFillRatio = 1.0;
     pointList.horizontalFillRatio = 1.0;
+    var colorGradient = new ColorGradient(ColorGradient.DEFAULT_COLORSET);
 
     // +---------------------------------------------------------------------------------
     // | Add a mouse listener to track the mouse position.
@@ -85,10 +93,21 @@
       {
         pointCount: 64,
         drawTraces: false,
-        animate: false
+        animate: false,
+        drawPoints: true,
+        useColorGradient: true,
+        traceWidth: 1.0,
+        skipTraceHead: 0
       },
       GUP
     );
+
+    var togglePointVisibility = function () {
+      for (var i in pointList.pointList) {
+        let point = pointList.pointList[i];
+        point.attr.visible = config.drawPoints;
+      }
+    };
 
     var updatePointList = function () {
       pointList.updatePointCount(config.pointCount, false); // Full cover?
@@ -108,9 +127,13 @@
 
     function renderAnimation() {
       updatePursuitPoints(0.1);
-      if (config.animate) window.requestAnimationFrame(renderAnimation);
+      if (config.animate) {
+        window.requestAnimationFrame(renderAnimation);
+      }
       // Animation stopped
-      else drawTraces();
+      else {
+        drawTraces();
+      }
     }
 
     function toggleAnimation() {
@@ -127,27 +150,20 @@
     {
       var gui = pb.createGUI();
       var f0 = gui.addFolder("Points");
-      f0.add(config, "pointCount")
-        .onChange(function () {
-          updatePointList();
-          pb.redraw();
-        })
-        .min(4)
-        .name("Change point count")
-        .title("Change point count.");
-      f0.add(config, "drawTraces")
-        .onChange(function () {
-          pb.redraw();
-          if (config.drawTraces) drawTraces();
-        })
-        .name("Draw traces")
-        .title("Draw traces.");
-      f0.add(config, "animate")
-        .onChange(function () {
-          toggleAnimation();
-        })
-        .name("Animate a point cloud")
-        .title("Animate a point cloud.");
+      // prettier-ignore
+      f0.add(config, "pointCount").onChange(function () { updatePointList(); pb.redraw(); }).min(4).name("Change point count").title("Change point count.");
+      // prettier-ignore
+      f0.add(config, "drawTraces").onChange(function () { pb.redraw(); }).name("Draw traces").title("Draw traces.");
+      // prettier-ignore
+      f0.add(config, "animate").onChange(function () { toggleAnimation(); }).name("Animate a point cloud").title("Animate a point cloud.");
+      // prettier-ignore
+      f0.add(config, "drawPoints").title("Toggle points on/off").onChange(function () { togglePointVisibility(); pb.redraw(); });
+      // prettier-ignore
+      f0.add(config, "useColorGradient").title("Use a color gradient?").onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      f0.add(config, "traceWidth").min(1.0).max(10.0).title("Thickness of traces").onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      f0.add(config, "skipTraceHead").min(0).step(1).title("How many steps to skip at the beginning of each trace.").onChange(function () { pb.redraw(); });
       f0.open();
     }
 
