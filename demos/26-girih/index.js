@@ -197,18 +197,21 @@
         drawTileTexture(pb, tile, textureImage, config.drawFullImages, config.drawBoundingBoxes);
       }
       if (config.drawOutlines) {
-        draw.polygon(tile, pb.drawConfig.polygon.color, pb.drawConfig.polygon.lineWidth); // Polygon is not open
+        // draw.polygon(tile, pb.drawConfig.polygon.color, pb.drawConfig.polygon.lineWidth); // Polygon is not open
+        draw.polygon(tile, config.outlineLineColor, config.outlineLineWidth); // Polygon is not open
       }
       // Draw all inner polygons?
       if (config.drawInnerPolygons) {
         for (var j = 0; j < tile.innerTilePolygons.length; j++) {
-          draw.polygon(tile.innerTilePolygons[j], DeepPurple.cssRGB(), 1.0);
+          // draw.polygon(tile.innerTilePolygons[j], DeepPurple.cssRGB(), 1.0);
+          draw.polygon(tile.innerTilePolygons[j], config.innerPolygonLineColor, config.innerPolygonLineWidth);
         }
       }
       // Draw all outer polygons?
       if (config.drawOuterPolygons) {
         for (var j = 0; j < tile.outerTilePolygons.length; j++) {
-          draw.polygon(tile.outerTilePolygons[j], Teal.cssRGB(), 1.0);
+          // draw.polygon(tile.outerTilePolygons[j], Teal.cssRGB(), 1.0);
+          draw.polygon(tile.outerTilePolygons[j], config.outerPolygonLineColor, config.outerPolygonLineWidth);
         }
       }
       // Draw a crosshair at the center
@@ -518,6 +521,12 @@
         drawFullImages: false,
         drawBoundingBoxes: false,
         texturePath: "girihtexture-500px-2.png",
+        outlineLineWidth: 2.0,
+        outlineLineColor: Color.Green.cssRGB(),
+        innerPolygonLineColor: Color.DeepPink.cssRGB(), // DeepPurple
+        innerPolygonLineWidth: 1.0,
+        outerPolygonLineColor: Color.Teal.cssRGB(),
+        outerPolygonLineWidth: 1.0,
         exportFile: function () {
           exportFile();
         },
@@ -644,6 +653,21 @@
       gui.add(config, 'drawBoundingBoxes').listen().onChange( function() { pb.redraw(); } ).name('drawBoundingBoxes').title('Show different kind of bounding boxes?');
       // prettier-ignore
       gui.add(config, 'texturePath', ["girihtexture-500px-2.png", "girih-tiles-spatial-1.png"]).listen().onChange( handleTextureChange ).name('texturePath').title('Choose a texture.');
+
+      var foldGirihDrawSettings = gui.addFolder("Girih Draw Settings");
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'outlineLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the tiles' outline.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.addColor(config, 'outlineLineColor').title("The color of the tiles' outline.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'innerPolygonLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the inner polygons.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.addColor(config, 'innerPolygonLineColor').title("The color of the innter polygons.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'outerPolygonLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the outer polygons.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.addColor(config, 'outerPolygonLineColor').title("The color of the outer polygons.").onChange( function() { pb.redraw(); } );
+
       var foldImport = gui.addFolder("Import");
       foldImport.add(config, "importFile");
 
