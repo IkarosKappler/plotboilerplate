@@ -14,6 +14,7 @@
 
   // Fetch the GET params
   let GUP = gup();
+  var params = new Params(GUP);
   var isDarkmode = detectDarkMode(GUP);
   window.addEventListener("load", function () {
     // All config params are optional.
@@ -49,10 +50,25 @@
     );
 
     // +---------------------------------------------------------------------------------
+    // | A global config that's attached to the dat.gui control interface.
+    // +-------------------------------
+    var config = PlotBoilerplate.utils.safeMergeByKeys(
+      {
+        pointCount: params.getNumber("pointCount", 64),
+        drawTraces: params.getBoolean("pointCount", false),
+        animate: params.getBoolean("animate", false),
+        drawPoints: params.getBoolean("drawPoints", true),
+        useColorGradient: params.getBoolean("useColorGradient", true),
+        traceWidth: params.getNumber("traceWidth", 1.0),
+        skipTraceHead: params.getNumber("skipTraceHead", 1)
+      },
+      GUP
+    );
+
+    // +---------------------------------------------------------------------------------
     // | This draws the traces if enabled.
     // +-------------------------------
     var drawTraces = function () {
-      console.log("draw traces");
       if (!config.drawTraces) {
         return;
       }
@@ -85,22 +101,6 @@
       if (cx) cx.innerHTML = relPos.x.toFixed(2);
       if (cy) cy.innerHTML = relPos.y.toFixed(2);
     });
-
-    // +---------------------------------------------------------------------------------
-    // | A global config that's attached to the dat.gui control interface.
-    // +-------------------------------
-    var config = PlotBoilerplate.utils.safeMergeByKeys(
-      {
-        pointCount: 64,
-        drawTraces: false,
-        animate: false,
-        drawPoints: true,
-        useColorGradient: true,
-        traceWidth: 1.0,
-        skipTraceHead: 0
-      },
-      GUP
-    );
 
     var togglePointVisibility = function () {
       for (var i in pointList.pointList) {
@@ -151,11 +151,11 @@
       var gui = pb.createGUI();
       var f0 = gui.addFolder("Points");
       // prettier-ignore
-      f0.add(config, "pointCount").onChange(function () { updatePointList(); pb.redraw(); }).min(4).name("Change point count").title("Change point count.");
+      f0.add(config, "pointCount").onChange(function () { updatePointList(); pb.redraw(); }).min(4).title("Change point count.");
       // prettier-ignore
-      f0.add(config, "drawTraces").onChange(function () { pb.redraw(); }).name("Draw traces").title("Draw traces.");
+      f0.add(config, "drawTraces").onChange(function () { pb.redraw(); }).title("Draw traces.");
       // prettier-ignore
-      f0.add(config, "animate").onChange(function () { toggleAnimation(); }).name("Animate a point cloud").title("Animate a point cloud.");
+      f0.add(config, "animate").onChange(function () { toggleAnimation(); }).title("Animate the point cloud.");
       // prettier-ignore
       f0.add(config, "drawPoints").title("Toggle points on/off").onChange(function () { togglePointVisibility(); pb.redraw(); });
       // prettier-ignore
