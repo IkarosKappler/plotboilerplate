@@ -49,7 +49,8 @@
  * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
  * @modified 2024-07-24 Caching custom style defs in a private buffer variable.
  * @modified 2025-11-14 Fixing a bug in the CSS `mix-blend-mode` property handling (caused a runtime error).
- * @version  1.6.11
+ * @modified 2026-01-04 Adding `lineJoin` attribute to the methods' `StrokeOptions` param.
+ * @version  1.7.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilssvg = void 0;
@@ -457,6 +458,7 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.applyStrokeOpts = function (node, strokeOptions) {
         var _this = this;
+        // Set line dash options?
         if (strokeOptions &&
             strokeOptions.dashArray &&
             strokeOptions.dashArray.length > 0 &&
@@ -469,6 +471,10 @@ var drawutilssvg = /** @class */ (function () {
             if (strokeOptions.dashOffset) {
                 node.setAttribute("stroke-dashoffset", "".concat(strokeOptions.dashOffset * this.scale.x));
             }
+        }
+        // Set line join option?
+        if (strokeOptions && strokeOptions.lineJoin && drawutilssvg.nodeSupportsLineJoin(node.tagName)) {
+            node.setAttribute("stroke-linejoin", strokeOptions.lineJoin);
         }
     };
     drawutilssvg.prototype._x = function (x) {
@@ -1184,12 +1190,13 @@ var drawutilssvg = /** @class */ (function () {
      * @param {Polygon} polygon - The polygon to draw.
      * @param {string} color - The CSS color to draw the polygon with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.polygon = function (polygon, color, lineWidth) {
-        return this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
+    drawutilssvg.prototype.polygon = function (polygon, color, lineWidth, strokeOptions) {
+        return this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth, strokeOptions);
     };
     /**
      * Draw a polygon line (alternative function to the polygon).
@@ -1566,6 +1573,9 @@ var drawutilssvg = /** @class */ (function () {
         } // END while
     }; // END transformPathData
     drawutilssvg.nodeSupportsLineDash = function (nodeName) {
+        return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
+    };
+    drawutilssvg.nodeSupportsLineJoin = function (nodeName) {
         return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
     };
     /**

@@ -25,4 +25,5 @@ div.preview-wrapper:hover {
 }
 .highlighted-preview-tile {
   background: rgba(0, 192, 192, 0.5);
+  border: 1px solid orange;
 }

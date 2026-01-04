@@ -6444,7 +6444,8 @@ CircleSector.circleSectorUtils = {
  * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
  * @modified 2024-07-24 Caching custom style defs in a private buffer variable.
  * @modified 2025-11-14 Fixing a bug in the CSS `mix-blend-mode` property handling (caused a runtime error).
- * @version  1.6.11
+ * @modified 2026-01-04 Adding `lineJoin` attribute to the methods' `StrokeOptions` param.
+ * @version  1.7.0
  **/
 const RAD_TO_DEG = 180 / Math.PI;
 /**
@@ -6844,6 +6845,7 @@ class drawutilssvg {
      * @param {StrokeOptions=} strokeOptions -
      */
     applyStrokeOpts(node, strokeOptions) {
+        // Set line dash options?
         if (strokeOptions &&
             strokeOptions.dashArray &&
             strokeOptions.dashArray.length > 0 &&
@@ -6856,6 +6858,10 @@ class drawutilssvg {
             if (strokeOptions.dashOffset) {
                 node.setAttribute("stroke-dashoffset", `${strokeOptions.dashOffset * this.scale.x}`);
             }
+        }
+        // Set line join option?
+        if (strokeOptions && strokeOptions.lineJoin && drawutilssvg.nodeSupportsLineJoin(node.tagName)) {
+            node.setAttribute("stroke-linejoin", strokeOptions.lineJoin);
         }
     }
     _x(x) {
@@ -7565,12 +7571,13 @@ class drawutilssvg {
      * @param {Polygon} polygon - The polygon to draw.
      * @param {string} color - The CSS color to draw the polygon with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    polygon(polygon, color, lineWidth) {
-        return this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
+    polygon(polygon, color, lineWidth, strokeOptions) {
+        return this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth, strokeOptions);
     }
     /**
      * Draw a polygon line (alternative function to the polygon).
@@ -7948,6 +7955,9 @@ class drawutilssvg {
     static nodeSupportsLineDash(nodeName) {
         return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
     }
+    static nodeSupportsLineJoin(nodeName) {
+        return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
+    }
     /**
      * Creates a basic <line> node with start and end coordinates. The created node will not
      * be bound to any root node.
@@ -8132,7 +8142,8 @@ drawutilssvg.HEAD_XML = [
  * @modified 2023-09-30 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
  * @modified 2023-10-07 Adding the optional `arrowHeadBasePositionBuffer` param to the arrowHead(...) method.
  * @modified 2024-09-13 Remoed the scaling of `lineWidth` in the `polygon` and `polyline` methods. This makes no sense here and doesn't match up with the behavior of other line functions.
- * @version  1.13.0
+ * @modified 2026-01-04 Adding `lineJoin` attribute to the `StrokeOptions`.
+ * @version  1.14.0
  **/
 // Todo: rename this class to Drawutils?
 /**
@@ -8165,13 +8176,14 @@ class drawutils {
      * @param {StrokeOptions=} strokeOptions -
      */
     applyStrokeOpts(strokeOptions) {
-        var _a, _b;
+        var _a, _b, _c;
         this.ctx.setLineDash(((_a = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashArray) !== null && _a !== void 0 ? _a : []).map((dashArrayElem) => {
             // Note assume scale.x === scale.y
             // Invariant scale makes funny stuff anyway.
             return dashArrayElem * this.scale.x;
         }));
         this.ctx.lineDashOffset = ((_b = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashOffset) !== null && _b !== void 0 ? _b : 0) * this.scale.x;
+        this.ctx.lineJoin = (_c = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.lineJoin) !== null && _c !== void 0 ? _c : null;
     }
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff. It is not

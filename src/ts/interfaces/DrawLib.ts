@@ -25,6 +25,7 @@
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @modified 2023-09-30 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
+ * @modified 2026-01-04 Adding optional `lineJoin` attribute to the `StrokeOptions` interface.
  **/
 
 import { Bounds } from "../Bounds";
@@ -68,6 +69,8 @@ export interface FontOptions {
 export interface StrokeOptions {
   dashOffset?: number;
   dashArray?: Array<number>;
+  // SVG has more options for this: arcs | bevel | miter | miter-clip | round
+  lineJoin?: "round" | "bevel" | "miter";
 }
 
 /**

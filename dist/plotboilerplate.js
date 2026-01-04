@@ -270,7 +270,8 @@ exports.Vector = Vector;
  * @modified 2023-09-30 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
  * @modified 2023-10-07 Adding the optional `arrowHeadBasePositionBuffer` param to the arrowHead(...) method.
  * @modified 2024-09-13 Remoed the scaling of `lineWidth` in the `polygon` and `polyline` methods. This makes no sense here and doesn't match up with the behavior of other line functions.
- * @version  1.13.0
+ * @modified 2026-01-04 Adding `lineJoin` attribute to the `StrokeOptions`.
+ * @version  1.14.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
@@ -310,13 +311,14 @@ var drawutils = /** @class */ (function () {
      */
     drawutils.prototype.applyStrokeOpts = function (strokeOptions) {
         var _this = this;
-        var _a, _b;
+        var _a, _b, _c;
         this.ctx.setLineDash(((_a = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashArray) !== null && _a !== void 0 ? _a : []).map(function (dashArrayElem) {
             // Note assume scale.x === scale.y
             // Invariant scale makes funny stuff anyway.
             return dashArrayElem * _this.scale.x;
         }));
         this.ctx.lineDashOffset = ((_b = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashOffset) !== null && _b !== void 0 ? _b : 0) * this.scale.x;
+        this.ctx.lineJoin = (_c = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.lineJoin) !== null && _c !== void 0 ? _c : null;
     };
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff. It is not
@@ -3494,7 +3496,8 @@ exports.geomutils = {
  * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
  * @modified 2024-07-24 Caching custom style defs in a private buffer variable.
  * @modified 2025-11-14 Fixing a bug in the CSS `mix-blend-mode` property handling (caused a runtime error).
- * @version  1.6.11
+ * @modified 2026-01-04 Adding `lineJoin` attribute to the methods' `StrokeOptions` param.
+ * @version  1.7.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilssvg = void 0;
@@ -3902,6 +3905,7 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.applyStrokeOpts = function (node, strokeOptions) {
         var _this = this;
+        // Set line dash options?
         if (strokeOptions &&
             strokeOptions.dashArray &&
             strokeOptions.dashArray.length > 0 &&
@@ -3914,6 +3918,10 @@ var drawutilssvg = /** @class */ (function () {
             if (strokeOptions.dashOffset) {
                 node.setAttribute("stroke-dashoffset", "".concat(strokeOptions.dashOffset * this.scale.x));
             }
+        }
+        // Set line join option?
+        if (strokeOptions && strokeOptions.lineJoin && drawutilssvg.nodeSupportsLineJoin(node.tagName)) {
+            node.setAttribute("stroke-linejoin", strokeOptions.lineJoin);
         }
     };
     drawutilssvg.prototype._x = function (x) {
@@ -4629,12 +4637,13 @@ var drawutilssvg = /** @class */ (function () {
      * @param {Polygon} polygon - The polygon to draw.
      * @param {string} color - The CSS color to draw the polygon with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.polygon = function (polygon, color, lineWidth) {
-        return this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
+    drawutilssvg.prototype.polygon = function (polygon, color, lineWidth, strokeOptions) {
+        return this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth, strokeOptions);
     };
     /**
      * Draw a polygon line (alternative function to the polygon).
@@ -5011,6 +5020,9 @@ var drawutilssvg = /** @class */ (function () {
         } // END while
     }; // END transformPathData
     drawutilssvg.nodeSupportsLineDash = function (nodeName) {
+        return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
+    };
+    drawutilssvg.nodeSupportsLineJoin = function (nodeName) {
         return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
     };
     /**

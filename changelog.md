@@ -4,6 +4,12 @@
 
 - replace lib/Color.min.js by proper color class.
 
+* 2026-01-04
+  - Making the line colors and line widths of the Girih demo more configurable.
+  - Adding optional `lineJoin` attribute to the `DrawLib`'s `StrokeOptions` interface.
+  - Class `draw`: Adding `lineJoin` attribute to the `StrokeOptions`.
+  - Class `drawutilssvg`: Adding `lineJoin` attribute to the `StrokeOptions`.
+  - Fixing missing `strokeOptions` param in the `drawutilssvg.polygon` method.
 * 2026-01-02
   - Added color gradients to demo 14-pursuit-curves.
 * 2025-12-08

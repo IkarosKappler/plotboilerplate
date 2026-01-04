@@ -48,7 +48,9 @@
  * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
  * @modified 2024-07-24 Caching custom style defs in a private buffer variable.
  * @modified 2025-11-14 Fixing a bug in the CSS `mix-blend-mode` property handling (caused a runtime error).
- * @version  1.6.11
+ * @modified 2026-01-04 Adding `lineJoin` attribute to the methods' `StrokeOptions` param.
+ * @modified 2026-01-04 Fixing missing `strokeOptions` param in the `drawutilssvg.polygon` method.
+ * @version  1.7.0
  **/
 
 import { CircleSector } from "./CircleSector";
@@ -655,6 +657,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {StrokeOptions=} strokeOptions -
    */
   private applyStrokeOpts(node: SVGElement, strokeOptions?: StrokeOptions) {
+    // Set line dash options?
     if (
       strokeOptions &&
       strokeOptions.dashArray &&
@@ -672,6 +675,10 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       if (strokeOptions.dashOffset) {
         node.setAttribute("stroke-dashoffset", `${strokeOptions.dashOffset * this.scale.x}`);
       }
+    }
+    // Set line join option?
+    if (strokeOptions && strokeOptions.lineJoin && drawutilssvg.nodeSupportsLineJoin(node.tagName)) {
+      node.setAttribute("stroke-linejoin", strokeOptions.lineJoin);
     }
   }
 
@@ -1537,12 +1544,13 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {Polygon} polygon - The polygon to draw.
    * @param {string} color - The CSS color to draw the polygon with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    */
-  polygon(polygon: Polygon, color: string, lineWidth?: number): SVGElement {
-    return this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
+  polygon(polygon: Polygon, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): SVGElement {
+    return this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth, strokeOptions);
   }
 
   /**
@@ -1958,6 +1966,10 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   } // END transformPathData
 
   private static nodeSupportsLineDash(nodeName: string) {
+    return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
+  }
+
+  private static nodeSupportsLineJoin(nodeName: string) {
     return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
   }
 

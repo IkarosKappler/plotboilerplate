@@ -57,7 +57,8 @@
  * @modified 2023-09-30 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
  * @modified 2023-10-07 Adding the optional `arrowHeadBasePositionBuffer` param to the arrowHead(...) method.
  * @modified 2024-09-13 Remoed the scaling of `lineWidth` in the `polygon` and `polyline` methods. This makes no sense here and doesn't match up with the behavior of other line functions.
- * @version  1.13.0
+ * @modified 2026-01-04 Adding `lineJoin` attribute to the `StrokeOptions`.
+ * @version  1.14.0
  **/
 
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -140,6 +141,7 @@ export class drawutils implements DrawLib<void> {
       })
     );
     this.ctx.lineDashOffset = (strokeOptions?.dashOffset ?? 0) * this.scale.x;
+    this.ctx.lineJoin = strokeOptions?.lineJoin ?? null;
   }
 
   // +---------------------------------------------------------------------------------

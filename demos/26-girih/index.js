@@ -9,6 +9,7 @@
  *
  * @author   Ikaros Kappler
  * @date     2020-10-30
+ * @modified 2026-01-04 Making the line colors and line widths of the Girih demo more configurable.
  * @version  1.0.0
  **/
 
@@ -21,12 +22,14 @@
   "use strict";
 
   window.initializePB = function () {
-    if (window.pbInitialized) return;
+    if (window.pbInitialized) {
+      return;
+    }
     window.pbInitialized = true;
 
     // Fetch the GET params
     let GUP = gup();
-    var isDarkmode = detectDarkMode(GUP);
+    var params = new Params(GUP);
     var isDarkmode = detectDarkMode(GUP);
 
     var textureImage = null;
@@ -84,6 +87,45 @@
     );
     pb.drawConfig.polygon.color = Green.cssRGB();
     pb.drawConfig.polygon.lineWidth = 2.0;
+
+    // +---------------------------------------------------------------------------------
+    // | A global Girih config that's attached to the lil.gui control interface.
+    // +-------------------------------
+    var config = PlotBoilerplate.utils.safeMergeByKeys(
+      {
+        drawOutlines: params.getBoolean("drawOutlines", true),
+        drawCenters: params.getBoolean("drawCenters", true),
+        drawCornerNumbers: params.getBoolean("drawCornerNumbers", false),
+        drawTileNumbers: params.getBoolean("drawTileNumbers", false),
+        drawOuterPolygons: params.getBoolean("drawOuterPolygons", true),
+        drawInnerPolygons: params.getBoolean("drawCendrawInnerPolygonsters", true),
+        fillOuterPolygons: params.getBoolean("fillOuterPolygons", false),
+        fillInnerPolygons: params.getBoolean("fillInnerPolygons", false),
+        lineJoin: params.getString("lineJoin", "round"), // [ "bevel", "round", "miter" ]
+        drawTextures: params.getBoolean("drawTextures", false),
+        showPreviewOverlaps: params.getBoolean("showPreviewOverlaps", true),
+        allowOverlaps: params.getBoolean("allowOverlaps", false),
+        drawFullImages: params.getBoolean("drawFullImages", false),
+        drawBoundingBoxes: params.getBoolean("drawBoundingBoxes", false),
+        texturePath: "girihtexture-500px-2.png",
+        outlineLineWidth: params.getNumber("drawFullImages", 2.0),
+        outlineLineColor: params.getString("outlineLineColor", Color.Green.cssRGB()),
+        innerPolygonLineColor: params.getString("innerPolygonLineColor", Color.DeepPink.cssRGB()), // DeepPurple
+        innerPolygonLineWidth: params.getNumber("innerPolygonLineWidth", 1.0),
+        innerPolygonFillColor: params.getString("innerPolygonFillColor", "rgb(128,128,128)"),
+        outerPolygonLineColor: Color.Teal.cssRGB(),
+        outerPolygonLineWidth: params.getNumber("outerPolygonLineWidth", 1.0),
+        outerPolygonFillColor: params.getString("outerPolygonFillColor", "rgb(92,92,92)"),
+
+        exportFile: function () {
+          exportFile();
+        },
+        importFile: function () {
+          importFile();
+        }
+      },
+      GUP
+    );
 
     // +---------------------------------------------------------------------------------
     // | Initialize
@@ -198,20 +240,31 @@
       }
       if (config.drawOutlines) {
         // draw.polygon(tile, pb.drawConfig.polygon.color, pb.drawConfig.polygon.lineWidth); // Polygon is not open
-        draw.polygon(tile, config.outlineLineColor, config.outlineLineWidth); // Polygon is not open
+        draw.polygon(tile, config.outlineLineColor, config.outlineLineWidth, { lineJoin: config.lineJoin }); // Polygon is not open
       }
       // Draw all inner polygons?
-      if (config.drawInnerPolygons) {
-        for (var j = 0; j < tile.innerTilePolygons.length; j++) {
-          // draw.polygon(tile.innerTilePolygons[j], DeepPurple.cssRGB(), 1.0);
-          draw.polygon(tile.innerTilePolygons[j], config.innerPolygonLineColor, config.innerPolygonLineWidth);
+      for (var j = 0; j < tile.innerTilePolygons.length; j++) {
+        // draw.polygon(tile.innerTilePolygons[j], DeepPurple.cssRGB(), 1.0);
+        if (config.fillInnerPolygons) {
+          fill.polygon(tile.innerTilePolygons[j], config.innerPolygonFillColor);
+        }
+        if (config.drawInnerPolygons) {
+          draw.polygon(tile.innerTilePolygons[j], config.innerPolygonLineColor, config.innerPolygonLineWidth, {
+            lineJoin: config.lineJoin
+          });
         }
       }
+
       // Draw all outer polygons?
-      if (config.drawOuterPolygons) {
-        for (var j = 0; j < tile.outerTilePolygons.length; j++) {
-          // draw.polygon(tile.outerTilePolygons[j], Teal.cssRGB(), 1.0);
-          draw.polygon(tile.outerTilePolygons[j], config.outerPolygonLineColor, config.outerPolygonLineWidth);
+      for (var j = 0; j < tile.outerTilePolygons.length; j++) {
+        // draw.polygon(tile.outerTilePolygons[j], Teal.cssRGB(), 1.0);
+        if (config.fillOuterPolygons) {
+          fill.polygon(tile.outerTilePolygons[j], config.outerPolygonFillColor);
+        }
+        if (config.drawOuterPolygons) {
+          draw.polygon(tile.outerTilePolygons[j], config.outerPolygonLineColor, config.outerPolygonLineWidth, {
+            lineJoin: config.lineJoin
+          });
         }
       }
       // Draw a crosshair at the center
@@ -503,40 +556,6 @@
       return intersection;
     };
 
-    // +---------------------------------------------------------------------------------
-    // | A global config that's attached to the dat.gui control interface.
-    // +-------------------------------
-    var config = PlotBoilerplate.utils.safeMergeByKeys(
-      {
-        drawOutlines: true,
-        drawCenters: true,
-        drawCornerNumbers: false,
-        drawTileNumbers: false,
-        drawOuterPolygons: true,
-        drawInnerPolygons: true,
-        lineJoin: "round", // [ "bevel", "round", "miter" ]
-        drawTextures: false,
-        showPreviewOverlaps: true,
-        allowOverlaps: false,
-        drawFullImages: false,
-        drawBoundingBoxes: false,
-        texturePath: "girihtexture-500px-2.png",
-        outlineLineWidth: 2.0,
-        outlineLineColor: Color.Green.cssRGB(),
-        innerPolygonLineColor: Color.DeepPink.cssRGB(), // DeepPurple
-        innerPolygonLineWidth: 1.0,
-        outerPolygonLineColor: Color.Teal.cssRGB(),
-        outerPolygonLineWidth: 1.0,
-        exportFile: function () {
-          exportFile();
-        },
-        importFile: function () {
-          importFile();
-        }
-      },
-      GUP
-    );
-
     // Keep track of loaded textures
     // var textureStore = new Map();
     // var loadTextureImage = function (path, onLoad) {
@@ -640,6 +659,10 @@
       // prettier-ignore
       gui.add(config, 'drawInnerPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawInnerPolygons").title("Draw the inner polygons?");
       // prettier-ignore
+      gui.add(config, 'fillOuterPolygons').listen().onChange( function() { pb.redraw(); } ).title("Fill the outer polygons?");
+      // prettier-ignore
+      gui.add(config, 'fillInnerPolygons').listen().onChange( function() { pb.redraw(); } ).title("Fill the inner polygons?");
+      // prettier-ignore
       gui.add(config, 'lineJoin', [ "bevel", "round", "miter" ] ).onChange( function() { pb.redraw(); } ).name("lineJoin").title("The shape of the line joins.");
       // prettier-ignore
       gui.add(config, 'drawTextures').listen().onChange( function() { pb.redraw(); } ).name("drawTextures").title("Draw the Girih textures?");
@@ -654,7 +677,7 @@
       // prettier-ignore
       gui.add(config, 'texturePath', ["girihtexture-500px-2.png", "girih-tiles-spatial-1.png"]).listen().onChange( handleTextureChange ).name('texturePath').title('Choose a texture.');
 
-      var foldGirihDrawSettings = gui.addFolder("Girih Draw Settings");
+      var foldGirihDrawSettings = gui.addFolder("Girih lines and colors");
       // prettier-ignore
       foldGirihDrawSettings.add(config, 'outlineLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the tiles' outline.").onChange( function() { pb.redraw(); } );
       // prettier-ignore
@@ -662,18 +685,22 @@
       // prettier-ignore
       foldGirihDrawSettings.add(config, 'innerPolygonLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the inner polygons.").onChange( function() { pb.redraw(); } );
       // prettier-ignore
-      foldGirihDrawSettings.addColor(config, 'innerPolygonLineColor').title("The color of the innter polygons.").onChange( function() { pb.redraw(); } );
+      foldGirihDrawSettings.addColor(config, 'innerPolygonLineColor').title("The line color of the inner polygons.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.addColor(config, 'innerPolygonFillColor').title("The fill color of the inner polygons.").onChange( function() { pb.redraw(); } );
       // prettier-ignore
       foldGirihDrawSettings.add(config, 'outerPolygonLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the outer polygons.").onChange( function() { pb.redraw(); } );
       // prettier-ignore
-      foldGirihDrawSettings.addColor(config, 'outerPolygonLineColor').title("The color of the outer polygons.").onChange( function() { pb.redraw(); } );
+      foldGirihDrawSettings.addColor(config, 'outerPolygonLineColor').title("The line color of the outer polygons.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.addColor(config, 'outerPolygonFillColor').title("The fill color of the outer polygons.").onChange( function() { pb.redraw(); } );
 
       var foldImport = gui.addFolder("Import");
-      foldImport.add(config, "importFile");
+      foldImport.add(config, "importFile").name("Import JSON file");
 
       // Add to internal dat.gui folder (exists as enableSVGExport=true)
       var exportFolder = globalThis.utils.guiFolders["editor_settings.export"];
-      exportFolder.add(config, "exportFile");
+      exportFolder.add(config, "exportFile").name("Export JSON file");
 
       // Add stats
       var uiStats = new UIStats(stats);
