@@ -13,25 +13,34 @@
   // | @param {GirihTile[]} tiles - An array containing all possible adjacent tiles.
   // | @param {number} pointer - The current tile pointer (index of highlighted preview tile).
   // | @param {function} setPreviewTilePointer - A function expecting the new highlighted preview tile index.
+  // | @param {boolean} options.isMobile - (optional) If true everythig will be larger.
   // +-------------------------------
-  var createAdjacentTilePreview = function (tiles, pointer, setPreviewTilePointer, pb) {
+  var createAdjacentTilePreview = function (tiles, pointer, setPreviewTilePointer, pb, options) {
     var container = document.querySelector(".wrapper-bottom");
-    while (container.firstChild) {
-      container.removeChild(container.firstChild);
-    }
+    removeAllChildNodes(container);
+    setMobileClass(document.body, options && options.isMobile);
 
     for (var i in tiles) {
       var tile = tiles[i].clone();
       tile.move(tile.position.clone().inv());
       var bounds = tile.getBounds();
 
+      var svgSize = {
+        width: options && options.isMobile ? 128 : 64,
+        height: options && options.isMobile ? 128 : 64
+      };
+      var renderScale = {
+        x: options && options.isMobile ? 0.666 : 0.333,
+        y: options && options.isMobile ? 0.666 : 0.333
+      };
+
       // Create a new SVG renderer.
       var svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       var tosvgDraw = new drawutilssvg(
         svgNode,
-        { x: bounds.width / 4, y: bounds.height / 4 }, // offset,
-        { x: 0.333, y: 0.333 }, // scale,
-        { width: bounds.width / 2, height: bounds.height / 2 }, // canvasSize,
+        { x: svgSize.width / 2, y: svgSize.height / 2 }, // offset,
+        renderScale, // scale,
+        svgSize, // canvasSize,
         false, // fillShapes=false
         pb.drawConfig
       );
@@ -57,6 +66,7 @@
         "click",
         (function (tileIndex) {
           return function (_event) {
+            console.log("Click", tileIndex);
             setPreviewTilePointer(tileIndex);
             highlightPreviewTile(tileIndex, pb);
           };
@@ -79,13 +89,33 @@
     var nodes = document.querySelectorAll(".wrapper-bottom .preview-wrapper");
     for (var i = 0; i < nodes.length; i++) {
       var node = nodes[i];
-      if (node.dataset && Number(node.dataset["tileIndex"]) === pointer) {
+      if (node.dataset && Number(node.dataset["tileIndex"]) == pointer) {
         node.classList.add("highlighted-preview-tile");
         node.querySelectorAll(".tile-background")[0].setAttribute("fill", "rgba(0,255,0,0.25)");
       } else {
         node.classList.remove("highlighted-preview-tile");
         node.querySelectorAll(".tile-background")[0].setAttribute("fill", pb.config.backgroundColor);
       }
+    }
+  };
+
+  // +---------------------------------------------------------------------------------
+  // | A helper function to remove all child nodes.
+  // +-------------------------------
+  var removeAllChildNodes = function (node) {
+    while (node.lastChild) {
+      node.removeChild(node.lastChild);
+    }
+  };
+
+  var setMobileClass = function (container, isMobile) {
+    if (!container) {
+      return;
+    }
+    if (isMobile) {
+      container.classList.add("mobile-mode");
+    } else {
+      container.classList.remove("mobile-mode");
     }
   };
 

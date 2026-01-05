@@ -31,6 +31,8 @@
     let GUP = gup();
     var params = new Params(GUP);
     var isDarkmode = detectDarkMode(GUP);
+    // console.log("isMobile", isMobileDevice());
+    // console.log("agent", navigator.userAgent);
 
     var textureImage = null;
 
@@ -78,7 +80,6 @@
           enableMouse: true,
           enableKeys: true,
           enableTouch: true,
-
           enableSVGExport: true,
           title: title
         },
@@ -479,9 +480,13 @@
           if (hoverEdgeIndex != -1) hoverTileIndex = i;
           i++;
         } while (i < girih.tiles.length && containedTileIndex == -1 && hoverEdgeIndex == -1);
-        if (hoverTileIndex == -1) hoverTileIndex = containedTileIndex;
+        if (hoverTileIndex == -1) {
+          hoverTileIndex = containedTileIndex;
+        }
 
-        if (oldHoverTileIndex == hoverTileIndex && oldHoverEdgeIndex == hoverEdgeIndex) return;
+        if (oldHoverTileIndex == hoverTileIndex && oldHoverEdgeIndex == hoverEdgeIndex) {
+          return;
+        }
 
         // Find the next possible tile to place?
         if (hoverTileIndex != -1) {
@@ -494,7 +499,9 @@
       }
       pb.redraw();
       if (previewTiles.length != 0) {
-        createAdjacentTilePreview(previewTiles, previewTilePointer, setPreviewTilePointer, pb);
+        createAdjacentTilePreview(previewTiles, previewTilePointer, setPreviewTilePointer, pb, {
+          isMobile: detectMobileMode(params)
+        });
       }
     };
 
@@ -555,25 +562,6 @@
       // Calculate size or triangulation here?
       return intersection;
     };
-
-    // Keep track of loaded textures
-    // var textureStore = new Map();
-    // var loadTextureImage = function (path, onLoad) {
-    //   var texture = textureStore.get(path);
-    //   if (!texture) {
-    //     texture = new Image();
-    //     texture.onload = onLoad;
-    //     texture.src = path;
-    //     textureStore.set(path, texture);
-    //   }
-    //   return texture;
-    // };
-    // var path = "girih-tiles-spatial-1.png";
-    // // var path = "girihtexture-500px-2.png";
-    // textureImage = loadTextureImage(path, function () {
-    //   console.log("Texture loaded");
-    //   pb.redraw();
-    // });
 
     var exportFile = function () {
       var data = girihToJSON(girih.tiles);
@@ -646,36 +634,37 @@
     // +-------------------------------
     {
       var gui = pb.createGUI();
+      var foldGirihBasics = gui.addFolder("Girih Settings");
       // prettier-ignore
-      gui.add(config, 'drawCornerNumbers').listen().onChange( function() { pb.redraw(); } ).name("drawCornerNumbers").title("Draw the number of each tile corner?");
+      foldGirihBasics.add(config, 'drawCornerNumbers').listen().onChange( function() { pb.redraw(); } ).name("drawCornerNumbers").title("Draw the number of each tile corner?");
       // prettier-ignore
-      gui.add(config, 'drawTileNumbers').listen().onChange( function() { pb.redraw(); } ).name("drawTileNumbers").title("Draw the index of each tile?");
+      foldGirihBasics.add(config, 'drawTileNumbers').listen().onChange( function() { pb.redraw(); } ).name("drawTileNumbers").title("Draw the index of each tile?");
       // prettier-ignore
-      gui.add(config, 'drawOutlines').listen().onChange( function() { pb.redraw(); } ).name("drawOutlines").title("Draw the tile outlines?");
+      foldGirihBasics.add(config, 'drawOutlines').listen().onChange( function() { pb.redraw(); } ).name("drawOutlines").title("Draw the tile outlines?");
       // prettier-ignore
-      gui.add(config, 'drawCenters').listen().onChange( function() { pb.redraw(); } ).name("drawCenters").title("Draw the center points?");
+      foldGirihBasics.add(config, 'drawCenters').listen().onChange( function() { pb.redraw(); } ).name("drawCenters").title("Draw the center points?");
       // prettier-ignore
-      gui.add(config, 'drawOuterPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawOuterPolygons").title("Draw the outer polygons?");
+      foldGirihBasics.add(config, 'drawOuterPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawOuterPolygons").title("Draw the outer polygons?");
       // prettier-ignore
-      gui.add(config, 'drawInnerPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawInnerPolygons").title("Draw the inner polygons?");
+      foldGirihBasics.add(config, 'drawInnerPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawInnerPolygons").title("Draw the inner polygons?");
       // prettier-ignore
-      gui.add(config, 'fillOuterPolygons').listen().onChange( function() { pb.redraw(); } ).title("Fill the outer polygons?");
+      foldGirihBasics.add(config, 'fillOuterPolygons').listen().onChange( function() { pb.redraw(); } ).title("Fill the outer polygons?");
       // prettier-ignore
-      gui.add(config, 'fillInnerPolygons').listen().onChange( function() { pb.redraw(); } ).title("Fill the inner polygons?");
+      foldGirihBasics.add(config, 'fillInnerPolygons').listen().onChange( function() { pb.redraw(); } ).title("Fill the inner polygons?");
       // prettier-ignore
-      gui.add(config, 'lineJoin', [ "bevel", "round", "miter" ] ).onChange( function() { pb.redraw(); } ).name("lineJoin").title("The shape of the line joins.");
+      foldGirihBasics.add(config, 'lineJoin', [ "bevel", "round", "miter" ] ).onChange( function() { pb.redraw(); } ).name("lineJoin").title("The shape of the line joins.");
       // prettier-ignore
-      gui.add(config, 'drawTextures').listen().onChange( function() { pb.redraw(); } ).name("drawTextures").title("Draw the Girih textures?");
+      foldGirihBasics.add(config, 'drawTextures').listen().onChange( function() { pb.redraw(); } ).name("drawTextures").title("Draw the Girih textures?");
       // prettier-ignore
-      gui.add(config, 'showPreviewOverlaps').listen().onChange( function() { pb.redraw(); } ).name('showPreviewOverlaps').title('Detect and show preview overlaps?');
+      foldGirihBasics.add(config, 'showPreviewOverlaps').listen().onChange( function() { pb.redraw(); } ).name('showPreviewOverlaps').title('Detect and show preview overlaps?');
       // prettier-ignore
-      gui.add(config, 'allowOverlaps').listen().onChange( function() { pb.redraw(); } ).name('allowOverlaps').title('Allow placement of intersecting tiles?');
+      foldGirihBasics.add(config, 'allowOverlaps').listen().onChange( function() { pb.redraw(); } ).name('allowOverlaps').title('Allow placement of intersecting tiles?');
       // prettier-ignore
-      gui.add(config, 'drawFullImages').listen().onChange( function() { pb.redraw(); } ).name('drawFullImages').title('Show a hint of the full imagse?');
+      foldGirihBasics.add(config, 'drawFullImages').listen().onChange( function() { pb.redraw(); } ).name('drawFullImages').title('Show a hint of the full imagse?');
       // prettier-ignore
-      gui.add(config, 'drawBoundingBoxes').listen().onChange( function() { pb.redraw(); } ).name('drawBoundingBoxes').title('Show different kind of bounding boxes?');
+      foldGirihBasics.add(config, 'drawBoundingBoxes').listen().onChange( function() { pb.redraw(); } ).name('drawBoundingBoxes').title('Show different kind of bounding boxes (textur mode only)?');
       // prettier-ignore
-      gui.add(config, 'texturePath', ["girihtexture-500px-2.png", "girih-tiles-spatial-1.png"]).listen().onChange( handleTextureChange ).name('texturePath').title('Choose a texture.');
+      foldGirihBasics.add(config, 'texturePath', ["girihtexture-500px-2.png", "girih-tiles-spatial-1.png"]).listen().onChange( handleTextureChange ).name('texturePath').title('Choose a texture.');
 
       var foldGirihDrawSettings = gui.addFolder("Girih lines and colors");
       // prettier-ignore
@@ -694,6 +683,7 @@
       foldGirihDrawSettings.addColor(config, 'outerPolygonLineColor').title("The line color of the outer polygons.").onChange( function() { pb.redraw(); } );
       // prettier-ignore
       foldGirihDrawSettings.addColor(config, 'outerPolygonFillColor').title("The fill color of the outer polygons.").onChange( function() { pb.redraw(); } );
+      foldGirihDrawSettings.close();
 
       var foldImport = gui.addFolder("Import");
       foldImport.add(config, "importFile").name("Import JSON file");
