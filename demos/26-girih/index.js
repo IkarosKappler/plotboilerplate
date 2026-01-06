@@ -378,7 +378,7 @@
         if (e.params.isTouchEvent || isMobile) {
           return;
         }
-        console.log("move");
+        // console.log("move");
         handleMouseMove(relPos);
       })
       .click(function (e) {
