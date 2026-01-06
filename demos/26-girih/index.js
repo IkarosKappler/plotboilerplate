@@ -109,13 +109,13 @@
       drawFullImages: params.getBoolean("drawFullImages", false),
       drawBoundingBoxes: params.getBoolean("drawBoundingBoxes", false),
       texturePath: params.getString("texturePath", "girihtexture-500px-2.png"),
-      outlineLineWidth: params.getNumber("drawFullImages", 2.0),
-      outlineLineColor: params.getString("outlineLineColor", Color.Green.cssRGB()),
+      outlineLineWidth: params.getNumber("drawFullImages", 4.0),
+      outlineLineColor: params.getString("outlineLineColor", Color.Navy.cssRGB()),
       innerPolygonLineColor: params.getString("innerPolygonLineColor", Color.DeepPink.cssRGB()), // DeepPurple
-      innerPolygonLineWidth: params.getNumber("innerPolygonLineWidth", 1.0),
+      innerPolygonLineWidth: params.getNumber("innerPolygonLineWidth", isMobile ? 4.0 : 2.0),
       innerPolygonFillColor: params.getString("innerPolygonFillColor", "rgb(128,128,128)"),
-      outerPolygonLineColor: Color.Teal.cssRGB(),
-      outerPolygonLineWidth: params.getNumber("outerPolygonLineWidth", 1.0),
+      outerPolygonLineColor: params.getString("outerPolygonLineColor", Color.Teal.cssRGB()),
+      outerPolygonLineWidth: params.getNumber("outerPolygonLineWidth", isMobile ? 4.0 : 2.0),
       outerPolygonFillColor: params.getString("outerPolygonFillColor", "rgb(92,92,92)"),
 
       exportFile: function () {
@@ -233,10 +233,12 @@
       if (config.drawTextures && textureImage.complete && textureImage.naturalHeight !== 0) {
         drawTileTexture(pb, tile, textureImage, config.drawFullImages, config.drawBoundingBoxes);
       }
+
       if (config.drawOutlines) {
         // draw.polygon(tile, pb.drawConfig.polygon.color, pb.drawConfig.polygon.lineWidth); // Polygon is not open
         draw.polygon(tile, config.outlineLineColor, config.outlineLineWidth, { lineJoin: config.lineJoin }); // Polygon is not open
       }
+
       // Draw all inner polygons?
       for (var j = 0; j < tile.innerTilePolygons.length; j++) {
         // draw.polygon(tile.innerTilePolygons[j], DeepPurple.cssRGB(), 1.0);
@@ -262,6 +264,7 @@
           });
         }
       }
+
       // Draw a crosshair at the center
       var isHighlighted = index == hoverTileIndex;
       if (config.drawCenters) {
@@ -672,17 +675,7 @@
       // prettier-ignore
       foldGirihBasics.add(config, 'drawTileNumbers').listen().onChange( function() { pb.redraw(); } ).name("drawTileNumbers").title("Draw the index of each tile?");
       // prettier-ignore
-      foldGirihBasics.add(config, 'drawOutlines').listen().onChange( function() { pb.redraw(); } ).name("drawOutlines").title("Draw the tile outlines?");
-      // prettier-ignore
       foldGirihBasics.add(config, 'drawCenters').listen().onChange( function() { pb.redraw(); } ).name("drawCenters").title("Draw the center points?");
-      // prettier-ignore
-      foldGirihBasics.add(config, 'drawOuterPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawOuterPolygons").title("Draw the outer polygons?");
-      // prettier-ignore
-      foldGirihBasics.add(config, 'drawInnerPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawInnerPolygons").title("Draw the inner polygons?");
-      // prettier-ignore
-      foldGirihBasics.add(config, 'fillOuterPolygons').listen().onChange( function() { pb.redraw(); } ).title("Fill the outer polygons?");
-      // prettier-ignore
-      foldGirihBasics.add(config, 'fillInnerPolygons').listen().onChange( function() { pb.redraw(); } ).title("Fill the inner polygons?");
       // prettier-ignore
       foldGirihBasics.add(config, 'lineJoin', [ "bevel", "round", "miter" ] ).onChange( function() { pb.redraw(); } ).name("lineJoin").title("The shape of the line joins.");
       // prettier-ignore
@@ -700,19 +693,29 @@
 
       var foldGirihDrawSettings = gui.addFolder("Girih lines and colors");
       // prettier-ignore
+      foldGirihDrawSettings.add(config, 'drawOutlines').listen().onChange( function() { pb.redraw(); } ).name("drawOutlines").title("Draw the tile outlines?");
+      // prettier-ignore
       foldGirihDrawSettings.add(config, 'outlineLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the tiles' outline.").onChange( function() { pb.redraw(); } );
       // prettier-ignore
       foldGirihDrawSettings.addColor(config, 'outlineLineColor').title("The color of the tiles' outline.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'drawInnerPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawInnerPolygons").title("Draw the inner polygons?");
       // prettier-ignore
       foldGirihDrawSettings.add(config, 'innerPolygonLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the inner polygons.").onChange( function() { pb.redraw(); } );
       // prettier-ignore
       foldGirihDrawSettings.addColor(config, 'innerPolygonLineColor').title("The line color of the inner polygons.").onChange( function() { pb.redraw(); } );
       // prettier-ignore
+      foldGirihDrawSettings.add(config, 'fillInnerPolygons').listen().onChange( function() { pb.redraw(); } ).title("Fill the inner polygons?");
+      // prettier-ignore
       foldGirihDrawSettings.addColor(config, 'innerPolygonFillColor').title("The fill color of the inner polygons.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'drawOuterPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawOuterPolygons").title("Draw the outer polygons?");
       // prettier-ignore
       foldGirihDrawSettings.add(config, 'outerPolygonLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the outer polygons.").onChange( function() { pb.redraw(); } );
       // prettier-ignore
       foldGirihDrawSettings.addColor(config, 'outerPolygonLineColor').title("The line color of the outer polygons.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'fillOuterPolygons').listen().onChange( function() { pb.redraw(); } ).title("Fill the outer polygons?");
       // prettier-ignore
       foldGirihDrawSettings.addColor(config, 'outerPolygonFillColor').title("The fill color of the outer polygons.").onChange( function() { pb.redraw(); } );
       foldGirihDrawSettings.close();
