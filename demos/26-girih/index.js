@@ -184,10 +184,6 @@
     // | This is the actual render function.
     // +-------------------------------
     var drawAll = function (draw, fill) {
-      // if (draw.ctx) {
-      //   // This is quirky. Only works if target is a canvas (will not work on SVG nodes)
-      //   draw.ctx.lineJoin = config.lineJoin;
-      // }
       // Draw the preview polygon first
       if (hoverTileIndex != -1 && hoverEdgeIndex != -1 && 0 <= previewTilePointer && previewTilePointer < previewTiles.length) {
         draw.polygon(previewTiles[previewTilePointer], "rgba(128,128,128,0.5)", 1.0); // Polygon is not open
