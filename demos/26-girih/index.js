@@ -31,6 +31,7 @@
     let GUP = gup();
     var params = new Params(GUP);
     var isDarkmode = detectDarkMode(GUP);
+    var isMobile = detectMobileMode(params); // isMobileDevice();
     // console.log("isMobile", isMobileDevice());
     // console.log("agent", navigator.userAgent);
 
@@ -92,41 +93,38 @@
     // +---------------------------------------------------------------------------------
     // | A global Girih config that's attached to the lil.gui control interface.
     // +-------------------------------
-    var config = PlotBoilerplate.utils.safeMergeByKeys(
-      {
-        drawOutlines: params.getBoolean("drawOutlines", true),
-        drawCenters: params.getBoolean("drawCenters", true),
-        drawCornerNumbers: params.getBoolean("drawCornerNumbers", false),
-        drawTileNumbers: params.getBoolean("drawTileNumbers", false),
-        drawOuterPolygons: params.getBoolean("drawOuterPolygons", true),
-        drawInnerPolygons: params.getBoolean("drawCendrawInnerPolygonsters", true),
-        fillOuterPolygons: params.getBoolean("fillOuterPolygons", false),
-        fillInnerPolygons: params.getBoolean("fillInnerPolygons", false),
-        lineJoin: params.getString("lineJoin", "round"), // [ "bevel", "round", "miter" ]
-        drawTextures: params.getBoolean("drawTextures", false),
-        showPreviewOverlaps: params.getBoolean("showPreviewOverlaps", true),
-        allowOverlaps: params.getBoolean("allowOverlaps", false),
-        drawFullImages: params.getBoolean("drawFullImages", false),
-        drawBoundingBoxes: params.getBoolean("drawBoundingBoxes", false),
-        texturePath: "girihtexture-500px-2.png",
-        outlineLineWidth: params.getNumber("drawFullImages", 2.0),
-        outlineLineColor: params.getString("outlineLineColor", Color.Green.cssRGB()),
-        innerPolygonLineColor: params.getString("innerPolygonLineColor", Color.DeepPink.cssRGB()), // DeepPurple
-        innerPolygonLineWidth: params.getNumber("innerPolygonLineWidth", 1.0),
-        innerPolygonFillColor: params.getString("innerPolygonFillColor", "rgb(128,128,128)"),
-        outerPolygonLineColor: Color.Teal.cssRGB(),
-        outerPolygonLineWidth: params.getNumber("outerPolygonLineWidth", 1.0),
-        outerPolygonFillColor: params.getString("outerPolygonFillColor", "rgb(92,92,92)"),
+    var config = {
+      drawOutlines: params.getBoolean("drawOutlines", true),
+      drawCenters: params.getBoolean("drawCenters", true),
+      drawCornerNumbers: params.getBoolean("drawCornerNumbers", false),
+      drawTileNumbers: params.getBoolean("drawTileNumbers", false),
+      drawOuterPolygons: params.getBoolean("drawOuterPolygons", true),
+      drawInnerPolygons: params.getBoolean("drawInnerPolygons", true),
+      fillOuterPolygons: params.getBoolean("fillOuterPolygons", false),
+      fillInnerPolygons: params.getBoolean("fillInnerPolygons", false),
+      lineJoin: params.getString("lineJoin", "round"), // [ "bevel", "round", "miter" ]
+      drawTextures: params.getBoolean("drawTextures", false),
+      showPreviewOverlaps: params.getBoolean("showPreviewOverlaps", true),
+      allowOverlaps: params.getBoolean("allowOverlaps", false),
+      drawFullImages: params.getBoolean("drawFullImages", false),
+      drawBoundingBoxes: params.getBoolean("drawBoundingBoxes", false),
+      texturePath: params.getString("texturePath", "girihtexture-500px-2.png"),
+      outlineLineWidth: params.getNumber("drawFullImages", 2.0),
+      outlineLineColor: params.getString("outlineLineColor", Color.Green.cssRGB()),
+      innerPolygonLineColor: params.getString("innerPolygonLineColor", Color.DeepPink.cssRGB()), // DeepPurple
+      innerPolygonLineWidth: params.getNumber("innerPolygonLineWidth", 1.0),
+      innerPolygonFillColor: params.getString("innerPolygonFillColor", "rgb(128,128,128)"),
+      outerPolygonLineColor: Color.Teal.cssRGB(),
+      outerPolygonLineWidth: params.getNumber("outerPolygonLineWidth", 1.0),
+      outerPolygonFillColor: params.getString("outerPolygonFillColor", "rgb(92,92,92)"),
 
-        exportFile: function () {
-          exportFile();
-        },
-        importFile: function () {
-          importFile();
-        }
+      exportFile: function () {
+        exportFile();
       },
-      GUP
-    );
+      importFile: function () {
+        importFile();
+      }
+    };
 
     // +---------------------------------------------------------------------------------
     // | Initialize
@@ -300,7 +298,9 @@
     // | The turnCount is ab abstract number: -1 for one turn left, +1 for one turn right.
     // +-------------------------------
     var handleTurnTile = function (turnCount) {
-      if (hoverTileIndex == -1) return;
+      if (hoverTileIndex == -1) {
+        return;
+      }
       girih.turnTile(hoverTileIndex, turnCount);
       pb.redraw();
     };
@@ -310,8 +310,10 @@
     // | The move amounts are abstract numbers, 1 indicating one unit along each axis.
     // +-------------------------------
     var handleMoveTile = function (moveXAmount, moveYAmount) {
-      console.log("move");
-      if (hoverTileIndex == -1) return;
+      // console.log("move");
+      if (hoverTileIndex == -1) {
+        return;
+      }
       girih.moveTile(hoverTileIndex, moveXAmount, moveYAmount);
       pb.redraw();
     };
@@ -347,18 +349,20 @@
       pb.redraw();
     };
 
-    var addPreviewTile = function () {
+    var addPreviewTile = function (doRedraw) {
       console.log("area", stats, stats.intersectionArea);
 
       // Avoid overlaps?
       if (!config.allowOverlaps && stats.intersectionArea > 1) {
         console.log("Adding overlapping tiles not allowed.");
-        if (humane) humane.log("Adding overlapping tiles not allowed.");
+        if (humane) {
+          humane.log("Adding overlapping tiles not allowed.");
+        }
         return;
       }
 
       addTile(previewTiles[previewTilePointer].clone());
-      pb.redraw();
+      doRedraw && pb.redraw();
     };
 
     // +---------------------------------------------------------------------------------
@@ -372,15 +376,40 @@
         if (cx) cx.innerHTML = relPos.x.toFixed(2);
         if (cy) cy.innerHTML = relPos.y.toFixed(2);
 
+        if (e.params.isTouchEvent || isMobile) {
+          return;
+        }
+        console.log("move");
         handleMouseMove(relPos);
       })
       .click(function (e) {
+        console.log("Click");
         var clickedVert = pb.getVertexNear(e.params.pos, PlotBoilerplate.DEFAULT_CLICK_TOLERANCE);
-        if (!clickedVert && previewTilePointer < previewTiles.length) {
-          // Touch and mouse devices handle this differently
-          if (e.params.isTouchEvent || (!e.params.isTouchEvent && hoverTileIndex != -1 && hoverEdgeIndex != -1)) {
-            addPreviewTile();
+        if (clickedVert) {
+          return;
+        }
+        // Touch and mouse devices handle this differently
+        console.log("isTouch", e.params.isTouchEvent, "isMobile", isMobile);
+        if (e.params.isTouchEvent || isMobile) {
+          // Touch/Mobile mode: first touch identifies edge, second touch places the adjacent tile.
+          console.log("hoverTileIndex", hoverTileIndex, "hoverEdgeIndex", hoverEdgeIndex);
+          if (hoverTileIndex != -1 && hoverEdgeIndex != -1) {
+            // The last clicked located the active tile and active edge.
+            //    -> we can safely add the adjacent tile here
+            addPreviewTile(false);
+            // Clear selected tile/edge after adding
+            hoverTileIndex = -1;
+            hoverEdgeIndex = -1;
+            pb.redraw();
+          } else {
+            // Active
+            var relPos = pb.transformMousePosition(e.params.pos.x, e.params.pos.y);
+            console.log("e.params.pos", e.params.pos);
+            handleMouseMove(relPos);
           }
+        } else if (hoverTileIndex != -1 && hoverEdgeIndex != -1 && previewTilePointer < previewTiles.length) {
+          // Desktop mode: just add.
+          addPreviewTile(true);
         }
       });
 
@@ -451,7 +480,7 @@
         if (previewTilePointer < previewTiles.length) {
           // addTile( previewTiles[previewTilePointer].clone() );
           // pb.redraw();
-          addPreviewTile();
+          addPreviewTile(true);
         }
       })
       .down("delete", function () {
@@ -477,7 +506,9 @@
           var tile = girih.tiles[i];
           // May be -1
           hoverEdgeIndex = tile.locateEdgeAtPoint(relPos, girih.edgeLength / 2);
-          if (hoverEdgeIndex != -1) hoverTileIndex = i;
+          if (hoverEdgeIndex != -1) {
+            hoverTileIndex = i;
+          }
           i++;
         } while (i < girih.tiles.length && containedTileIndex == -1 && hoverEdgeIndex == -1);
         if (hoverTileIndex == -1) {
@@ -707,5 +738,7 @@
     pb.canvas.focus();
   };
 
-  if (!window.pbPreventAutoLoad) window.addEventListener("load", window.initializePB);
+  if (!window.pbPreventAutoLoad) {
+    window.addEventListener("load", window.initializePB);
+  }
 })(window);
