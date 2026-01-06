@@ -3,7 +3,8 @@
  * @date     2020-11-24
  * @modified 2020-11-25 Ported to TypeScript from vanilla JS.
  * @modified 2024-03-10 Fixed some types for Typescript 5 compatibility.
- * @version  1.0.2
+ * @modified 2026-01-06 Added method `Girih.locateContainingTileAndEdge` to locate tile/edge pairs.
+ * @version  1.1.0
  * @file     Girih
  **/
 import { Vertex } from "../../Vertex";
@@ -118,6 +119,43 @@ export class Girih {
                 return i;
         }
         return -1;
+    }
+    /**
+     * Find find a tile-edge-pair (indices) that contain the given position. First match will be returned.
+     *
+     * @name locateContainingTileAndEdge
+     * @memberof Girih
+     * @instance
+     * @param {Vertex} position
+     * @return {{ tileIndex: number; edgeIndex: number }} The index of the containing tile and edge or null if none was found.
+     **/
+    locateContainingTileAndEdge(position) {
+        var containedTileIndex = this.locateConatiningTile(position);
+        // Reset currently highlighted tile/edge (if re-detected nothing changed in the end)
+        var hoverTileIndex = -1;
+        var hoverEdgeIndex = -1;
+        // Find Girih edge nearby ...
+        if (containedTileIndex == -1) {
+            return null;
+        }
+        var i = containedTileIndex;
+        do {
+            var tile = this.tiles[i];
+            // May be -1
+            hoverEdgeIndex = tile.locateEdgeAtPoint(position, this.edgeLength / 2);
+            if (hoverEdgeIndex != -1) {
+                hoverTileIndex = i;
+            }
+            i++;
+        } while (i < this.tiles.length && containedTileIndex == -1 && hoverEdgeIndex == -1);
+        if (hoverTileIndex == -1) {
+            hoverTileIndex = containedTileIndex;
+        }
+        // Find the next possible tile to place?
+        if (hoverTileIndex == -1 || hoverEdgeIndex == -1) {
+            return null;
+        }
+        return { tileIndex: hoverTileIndex, edgeIndex: hoverEdgeIndex };
     }
     /**
      * Turn the tile the mouse is hovering over.

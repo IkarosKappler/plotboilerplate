@@ -4,6 +4,8 @@
 
 - replace lib/Color.min.js by proper color class.
 
+* 2026-01-06
+  - Added method `Girih.locateContainingTileAndEdge` to locate tile/edge pairs.
 * 2026-01-04
   - Making the line colors and line widths of the Girih demo more configurable.
   - Adding optional `lineJoin` attribute to the `DrawLib`'s `StrokeOptions` interface.

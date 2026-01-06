@@ -3,7 +3,8 @@
  * @date     2020-11-24
  * @modified 2020-11-25 Ported to TypeScript from vanilla JS.
  * @modified 2024-03-10 Fixed some types for Typescript 5 compatibility.
- * @version  1.0.2
+ * @modified 2026-01-06 Added method `Girih.locateContainingTileAndEdge` to locate tile/edge pairs.
+ * @version  1.1.0
  * @file     Girih
  **/
 import { Vertex } from "../../Vertex";
@@ -102,6 +103,19 @@ export declare class Girih {
      * @return {number} The index of the containing tile or -1 if none was found.
      **/
     locateConatiningTile(position: Vertex): number;
+    /**
+     * Find find a tile-edge-pair (indices) that contain the given position. First match will be returned.
+     *
+     * @name locateContainingTileAndEdge
+     * @memberof Girih
+     * @instance
+     * @param {Vertex} position
+     * @return {{ tileIndex: number; edgeIndex: number }} The index of the containing tile and edge or null if none was found.
+     **/
+    locateContainingTileAndEdge(position: any): {
+        tileIndex: number;
+        edgeIndex: number;
+    };
     /**
      * Turn the tile the mouse is hovering over.
      * The turnCount is ab abstract number: -1 for one turn left, +1 for one turn right.

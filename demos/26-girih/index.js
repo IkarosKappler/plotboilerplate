@@ -393,7 +393,18 @@
         if (e.params.isTouchEvent || isMobile) {
           // Touch/Mobile mode: first touch identifies edge, second touch places the adjacent tile.
           console.log("hoverTileIndex", hoverTileIndex, "hoverEdgeIndex", hoverEdgeIndex);
-          if (hoverTileIndex != -1 && hoverEdgeIndex != -1) {
+          var relPos = pb.transformMousePosition(e.params.pos.x, e.params.pos.y);
+          var hoverTileAndEdgeIndex = girih.locateContainingTileAndEdge(relPos);
+          if (
+            hoverTileAndEdgeIndex &&
+            (hoverTileAndEdgeIndex.tileIndex != hoverTileIndex || hoverTileAndEdgeIndex.edgeIndex != hoverEdgeIndex)
+          ) {
+            hoverTileIndex = hoverTileAndEdgeIndex.tileIndex;
+            hoverEdgeIndex = hoverTileAndEdgeIndex.edgeIndex;
+            // handleMouseMove(relPos);
+            handleActiveHoverIndices();
+            pb.redraw();
+          } else if (hoverTileIndex != -1 && hoverEdgeIndex != -1) {
             // The last clicked located the active tile and active edge.
             //    -> we can safely add the adjacent tile here
             addPreviewTile(false);
@@ -403,7 +414,6 @@
             pb.redraw();
           } else {
             // Active
-            var relPos = pb.transformMousePosition(e.params.pos.x, e.params.pos.y);
             console.log("e.params.pos", e.params.pos);
             handleMouseMove(relPos);
           }
@@ -491,44 +501,39 @@
     // | @param {XYCoords} relPos
     // +-------------------------------
     var handleMouseMove = function (relPos) {
-      var containedTileIndex = girih.locateConatiningTile(relPos);
-
-      // Reset currently highlighted tile/edge (if re-detected nothing changed in the end)
-      var oldHoverTileIndex = hoverTileIndex;
-      var oldHoverEdgeIndex = hoverEdgeIndex;
-      hoverTileIndex = -1;
-      hoverEdgeIndex = -1;
-
-      // Find Girih edge nearby ...
-      if (containedTileIndex != -1) {
-        var i = containedTileIndex == -1 ? 0 : containedTileIndex;
-        do {
-          var tile = girih.tiles[i];
-          // May be -1
-          hoverEdgeIndex = tile.locateEdgeAtPoint(relPos, girih.edgeLength / 2);
-          if (hoverEdgeIndex != -1) {
-            hoverTileIndex = i;
-          }
-          i++;
-        } while (i < girih.tiles.length && containedTileIndex == -1 && hoverEdgeIndex == -1);
-        if (hoverTileIndex == -1) {
-          hoverTileIndex = containedTileIndex;
+      var hoverTileAndEdgeIndex = girih.locateContainingTileAndEdge(relPos);
+      if (hoverTileAndEdgeIndex) {
+        if (hoverTileIndex == hoverTileAndEdgeIndex.tileIndex && hoverEdgeIndex == hoverTileAndEdgeIndex.edgeIndex) {
+          return; // Nochange
         }
-
-        if (oldHoverTileIndex == hoverTileIndex && oldHoverEdgeIndex == hoverEdgeIndex) {
-          return;
-        }
-
-        // Find the next possible tile to place?
-        if (hoverTileIndex != -1) {
-          previewTiles = girih.findPossibleAdjacentTiles(hoverTileIndex, hoverEdgeIndex);
-          // Set pointer to save range
-          previewTilePointer = Math.min(Math.max(previewTiles.length - 1, previewTilePointer), previewTilePointer);
-          // Find any intersections for the new preview tile
-          findPreviewIntersections();
-        }
+        hoverTileIndex = hoverTileAndEdgeIndex.tileIndex;
+        hoverEdgeIndex = hoverTileAndEdgeIndex.edgeIndex;
+        // previewTiles = girih.findPossibleAdjacentTiles(hoverTileIndex, hoverEdgeIndex);
+        // // Set pointer to save range
+        previewTilePointer = Math.min(Math.max(previewTiles.length - 1, previewTilePointer), previewTilePointer);
+        // // Find any intersections for the new preview tile
+        // findPreviewIntersections();
+      } else {
+        hoverTileIndex = -1;
+        hoverEdgeIndex = -1;
+        // previewTilePointer = 0;
       }
+
+      handleActiveHoverIndices();
       pb.redraw();
+      // if (previewTiles.length != 0) {
+      //   createAdjacentTilePreview(previewTiles, previewTilePointer, setPreviewTilePointer, pb, {
+      //     isMobile: detectMobileMode(params)
+      //   });
+      // }
+    };
+
+    var handleActiveHoverIndices = function () {
+      previewTiles = girih.findPossibleAdjacentTiles(hoverTileIndex, hoverEdgeIndex);
+      // Set pointer to save range
+      // previewTilePointer = Math.min(Math.max(previewTiles.length - 1, previewTilePointer), previewTilePointer);
+      // Find any intersections for the new preview tile
+      findPreviewIntersections();
       if (previewTiles.length != 0) {
         createAdjacentTilePreview(previewTiles, previewTilePointer, setPreviewTilePointer, pb, {
           isMobile: detectMobileMode(params)
