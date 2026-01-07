@@ -31,9 +31,7 @@
     let GUP = gup();
     var params = new Params(GUP);
     var isDarkmode = detectDarkMode(GUP);
-    var isMobile = detectMobileMode(params); // isMobileDevice();
-    // console.log("isMobile", isMobileDevice());
-    // console.log("agent", navigator.userAgent);
+    var isMobile = detectMobileMode(params);
 
     var textureImage = null;
 
