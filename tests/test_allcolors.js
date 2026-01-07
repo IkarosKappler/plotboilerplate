@@ -13,10 +13,55 @@
 
   window.addEventListener("load", function () {
     var GUP = gup();
+    var params = new Params(GUP);
+
     var config = {
       guiDoubleSize: false,
-      color: GUP["color"] || "rgba(0,167,185,1)"
+      saturation: 100 // 0 ... 100 ... 200
     };
+
+    // +---------------------------------------------------------------------------------
+    // | Initialize dat.gui
+    // +-------------------------------
+    var gui = new dat.gui.GUI();
+    var toggleGuiSize = function () {
+      gui.domElement.style["transform-origin"] = "100% 0%";
+      if (config.guiDoubleSize) {
+        gui.domElement.style["transform"] = "scale(2.0)";
+      } else {
+        gui.domElement.style["transform"] = "scale(1.0)";
+      }
+    };
+    if (detectMobileMode(params)) {
+      config.guiDoubleSize = true;
+      toggleGuiSize();
+    }
+
+    var adjustColors = function () {
+      var colorItems = document.querySelectorAll(".color-item");
+      colorItems.forEach(function (item) {
+        var colorName = item.dataset["colorname"];
+        var color = Color.CSS_COLORS[colorName];
+        if (!color) {
+          return;
+        }
+        // console.log("x", colorName);
+        if (config.saturation < 100) {
+          item.style["background-color"] = color
+            .clone()
+            .desaturate((100 - config.saturation) / 100.0)
+            .cssRGB();
+        } else {
+          item.style["background-color"] = color
+            .clone()
+            .saturate((config.saturation - 100) / 100.0)
+            .cssRGB();
+        }
+      });
+    };
+
+    gui.add(config, "guiDoubleSize").title("Double size GUI?").onChange(toggleGuiSize);
+    gui.add(config, "saturation").min(0).max(200).step(1).title("Which saturation to use").onChange(adjustColors);
 
     var colorGroups = [
       {
@@ -206,6 +251,8 @@
         const colorName = group.colorNames[c];
         const color = Color.CSS_COLORS[colorName];
         node.style["background-color"] = color.cssRGB();
+        node.dataset["colorname"] = colorName;
+        node.classList.add("color-item");
         node.innerHTML = colorName;
         groupNode.appendChild(node);
       }
