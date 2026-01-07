@@ -117,7 +117,11 @@
       outerPolygonLineColor: params.getString("outerPolygonLineColor", Color.Teal.cssRGB()),
       outerPolygonLineWidth: params.getNumber("outerPolygonLineWidth", isMobile ? 4.0 : 2.0),
       outerPolygonFillColor: params.getString("outerPolygonFillColor", "rgb(92,92,92)"),
+      previewPolygonLineWidth: params.getNumber("previewPolygonLineWidth", isMobile ? 4.0 : 2.0),
 
+      deleteSelectedTile: function () {
+        handleDeleteTile();
+      },
       exportFile: function () {
         exportFile();
       },
@@ -186,7 +190,7 @@
     var drawAll = function (draw, fill) {
       // Draw the preview polygon first
       if (hoverTileIndex != -1 && hoverEdgeIndex != -1 && 0 <= previewTilePointer && previewTilePointer < previewTiles.length) {
-        draw.polygon(previewTiles[previewTilePointer], "rgba(128,128,128,0.5)", 1.0); // Polygon is not open
+        draw.polygon(previewTiles[previewTilePointer], "rgba(128,128,128,0.5)", config.previewPolygonLineWidth); // Polygon is not open
 
         // Draw intersection polygons (if there are any)
         if (config.showPreviewOverlaps) {
@@ -345,6 +349,7 @@
     // +-------------------------------
     var setPreviewTilePointer = function (pointer) {
       previewTilePointer = pointer;
+      findPreviewIntersections();
       pb.redraw();
     };
 
@@ -493,6 +498,10 @@
         }
       })
       .down("delete", function () {
+        console.log("delete");
+        handleDeleteTile();
+      })
+      .down("backspace", function () {
         console.log("delete");
         handleDeleteTile();
       });
@@ -690,6 +699,8 @@
       foldGirihBasics.add(config, 'drawBoundingBoxes').listen().onChange( function() { pb.redraw(); } ).name('drawBoundingBoxes').title('Show different kind of bounding boxes (textur mode only)?');
       // prettier-ignore
       foldGirihBasics.add(config, 'texturePath', ["girihtexture-500px-2.png", "girih-tiles-spatial-1.png"]).listen().onChange( handleTextureChange ).name('texturePath').title('Choose a texture.');
+      // prettier-ignore
+      foldGirihBasics.add(config, 'deleteSelectedTile').name("Delete Selected Tile").title('Delete selected tile.');
 
       var foldGirihDrawSettings = gui.addFolder("Girih lines and colors");
       // prettier-ignore
@@ -718,6 +729,8 @@
       foldGirihDrawSettings.add(config, 'fillOuterPolygons').listen().onChange( function() { pb.redraw(); } ).title("Fill the outer polygons?");
       // prettier-ignore
       foldGirihDrawSettings.addColor(config, 'outerPolygonFillColor').title("The fill color of the outer polygons.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'previewPolygonLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the preview polygon.").onChange( function() { pb.redraw(); } );
       foldGirihDrawSettings.close();
 
       var foldImport = gui.addFolder("Import");
