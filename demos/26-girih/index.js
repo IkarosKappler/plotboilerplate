@@ -63,7 +63,7 @@
           scaleX: 1.0,
           scaleY: 1.0,
           rasterGrid: true,
-          drawGrid: true,
+          drawGrid: false,
           drawOrigin: false,
           rasterAdjustFactor: 2.0,
           redrawOnResize: true,
@@ -432,11 +432,8 @@
         }
         hoverTileIndex = hoverTileAndEdgeIndex.tileIndex;
         hoverEdgeIndex = hoverTileAndEdgeIndex.edgeIndex;
-        // previewTiles = girih.findPossibleAdjacentTiles(hoverTileIndex, hoverEdgeIndex);
         // // Set pointer to save range
         previewTilePointer = Math.min(Math.max(previewTiles.length - 1, previewTilePointer), previewTilePointer);
-        // // Find any intersections for the new preview tile
-        // findPreviewIntersections();
       } else {
         hoverTileIndex = -1;
         hoverEdgeIndex = -1;
@@ -449,8 +446,6 @@
 
     var handleActiveHoverIndices = function () {
       previewTiles = girih.findPossibleAdjacentTiles(hoverTileIndex, hoverEdgeIndex);
-      // Set pointer to save range
-      // previewTilePointer = Math.min(Math.max(previewTiles.length - 1, previewTilePointer), previewTilePointer);
       // Find any intersections for the new preview tile
       findPreviewIntersections();
       if (previewTiles.length != 0) {
@@ -645,11 +640,11 @@
       foldGirihDrawSettings.close();
 
       var foldImport = gui.addFolder("Import");
-      foldImport.add(config, "importFile").name("Import JSON file");
+      foldImport.add(config, "importFile").name("Import Girih from JSON file");
 
       // Add to internal dat.gui folder (exists as enableSVGExport=true)
       var exportFolder = globalThis.utils.guiFolders["editor_settings.export"];
-      exportFolder.add(config, "exportFile").name("Export JSON file");
+      exportFolder.add(config, "exportFile").name("Export Girih to JSON file");
 
       // Add stats
       var uiStats = new UIStats(stats);
