@@ -131,6 +131,11 @@
     };
 
     // +---------------------------------------------------------------------------------
+    // | Create a new renderer.
+    // +-------------------------------
+    var girihRenderer = new GirihRenderer(pb, girih, config);
+
+    // +---------------------------------------------------------------------------------
     // | Initialize
     // +-------------------------------
     // The index of the tile the mouse is hovering on or nearby (in the tiles-array)
@@ -177,123 +182,41 @@
       girih.removeTileAt(tileIndex);
     };
 
-    // +---------------------------------------------------------------------------------
-    // | Get the contrast color (string) for the given color (object).
-    // +-------------------------------
-    var toContrastColor = function (color) {
-      return getContrastColor(color).cssRGB();
-    };
+    // // +---------------------------------------------------------------------------------
+    // // | Get the contrast color (string) for the given color (object).
+    // // +-------------------------------
+    // var toContrastColor = function (color) {
+    //   return getContrastColor(color).cssRGB();
+    // };
 
     // +---------------------------------------------------------------------------------
     // | This is the actual render function.
     // +-------------------------------
     var drawAll = function (draw, fill) {
       // Draw the preview polygon first
-      if (hoverTileIndex != -1 && hoverEdgeIndex != -1 && 0 <= previewTilePointer && previewTilePointer < previewTiles.length) {
-        draw.polygon(previewTiles[previewTilePointer], "rgba(128,128,128,0.5)", config.previewPolygonLineWidth); // Polygon is not open
-
-        // Draw intersection polygons (if there are any)
-        if (config.showPreviewOverlaps) {
-          for (var i = 0; i < previewIntersectionPolygons.length; i++) {
-            pb.fill.polygon(previewIntersectionPolygons[i], "rgba(255,0,0,0.25)");
-          }
-        }
-      }
+      girihRenderer.drawPreviewIntersectionPolygons(
+        draw,
+        fill,
+        previewTiles,
+        previewIntersectionPolygons,
+        hoverTileIndex,
+        hoverEdgeIndex,
+        previewTilePointer
+      );
 
       // Draw all tiles
-      for (var i in girih.tiles) {
-        var tile = girih.tiles[i];
-        // Fill polygon when highlighted (mouse hover)
-        drawTile(draw, fill, tile, i);
-      }
+      girihRenderer.drawAllTiles(draw, fill, hoverTileIndex, textureImage);
 
       // Draw intersection polygons? (if there are any)
-      if (
-        config.showPreviewOverlaps &&
-        hoverTileIndex != -1 &&
-        hoverEdgeIndex != -1 &&
-        0 <= previewTilePointer &&
-        previewTilePointer < previewTiles.length
-      ) {
-        for (var i = 0; i < previewIntersectionPolygons.length; i++) {
-          fill.polygon(previewIntersectionPolygons[i], "rgba(255,0,0,0.25)");
-        }
-      }
-
-      if (hoverTileIndex != -1 && hoverEdgeIndex != -1) {
-        var tile = girih.tiles[hoverTileIndex];
-        var edge = new Line(tile.vertices[hoverEdgeIndex], tile.vertices[(hoverEdgeIndex + 1) % tile.vertices.length]);
-        draw.line(edge.a, edge.b, Red.cssRGB(), 2.0);
-      }
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | Draw the given tile.
-    // |
-    // | @param {GirihTile} tile - The tile itself.
-    // | @param {number} index - The index in the tiles-array (to highlight hover).
-    // +-------------------------------
-    var drawTile = function (draw, fill, tile, index) {
-      if (config.drawTextures && textureImage.complete && textureImage.naturalHeight !== 0) {
-        drawTileTexture(pb, tile, textureImage, config.drawFullImages, config.drawBoundingBoxes);
-      }
-
-      if (config.drawOutlines) {
-        // draw.polygon(tile, pb.drawConfig.polygon.color, pb.drawConfig.polygon.lineWidth); // Polygon is not open
-        draw.polygon(tile, config.outlineLineColor, config.outlineLineWidth, { lineJoin: config.lineJoin }); // Polygon is not open
-      }
-
-      // Draw all inner polygons?
-      for (var j = 0; j < tile.innerTilePolygons.length; j++) {
-        // draw.polygon(tile.innerTilePolygons[j], DeepPurple.cssRGB(), 1.0);
-        if (config.fillInnerPolygons) {
-          fill.polygon(tile.innerTilePolygons[j], config.innerPolygonFillColor);
-        }
-        if (config.drawInnerPolygons) {
-          draw.polygon(tile.innerTilePolygons[j], config.innerPolygonLineColor, config.innerPolygonLineWidth, {
-            lineJoin: config.lineJoin
-          });
-        }
-      }
-
-      // Draw all outer polygons?
-      for (var j = 0; j < tile.outerTilePolygons.length; j++) {
-        // draw.polygon(tile.outerTilePolygons[j], Teal.cssRGB(), 1.0);
-        if (config.fillOuterPolygons) {
-          fill.polygon(tile.outerTilePolygons[j], config.outerPolygonFillColor);
-        }
-        if (config.drawOuterPolygons) {
-          draw.polygon(tile.outerTilePolygons[j], config.outerPolygonLineColor, config.outerPolygonLineWidth, {
-            lineJoin: config.lineJoin
-          });
-        }
-      }
-
-      // Draw a crosshair at the center
-      var isHighlighted = index == hoverTileIndex;
-      if (config.drawCenters) {
-        drawFancyCrosshair(
-          draw,
-          fill,
-          tile.position,
-          tile.position.attr.isSelected ? "red" : isHighlighted ? "rgba(192,0,0,0.5)" : "rgba(0,192,192,0.5)",
-          tile.position.attr.isSelected ? 2.0 : 1.0,
-          3.0
-        );
-      }
-
-      var contrastColor = toContrastColor(Color.parse(pb.config.backgroundColor));
-      // Draw corner numbers?
-      if (config.drawCornerNumbers) {
-        for (var i = 0; i < tile.vertices.length; i++) {
-          var pos = tile.vertices[i].clone().scale(0.85, tile.position);
-          fill.text("" + i, pos.x, pos.y, { color: contrastColor });
-        }
-      }
-
-      if (config.drawTileNumbers) {
-        fill.text("" + index, tile.position.x, tile.position.y, { color: contrastColor });
-      }
+      girihRenderer.drawIntersectionPolygons(
+        draw,
+        fill,
+        hoverTileIndex,
+        hoverEdgeIndex,
+        previewTiles,
+        previewTilePointer,
+        previewIntersectionPolygons
+      );
     };
 
     // +---------------------------------------------------------------------------------
