@@ -46,17 +46,21 @@
           return;
         }
         // console.log("x", colorName);
+        var colorString;
         if (config.saturation < 100) {
-          item.style["background-color"] = color
+          colorString = color
             .clone()
             .desaturate((100 - config.saturation) / 100.0)
             .cssRGB();
+          node.setAttribute("title", color.cssRGB());
         } else {
-          item.style["background-color"] = color
+          colorString = color
             .clone()
             .saturate((config.saturation - 100) / 100.0)
             .cssRGB();
         }
+        item.style["background-color"] = colorString;
+        item.setAttribute("title", colorString);
       });
     };
 
@@ -254,6 +258,9 @@
         node.dataset["colorname"] = colorName;
         node.classList.add("color-item");
         node.innerHTML = colorName;
+        // Add tooltip
+        node.setAttribute("title", color.cssRGB());
+        node.style["color"] = getContrastColor(color).cssRGB();
         groupNode.appendChild(node);
       }
       container.appendChild(groupNode);
