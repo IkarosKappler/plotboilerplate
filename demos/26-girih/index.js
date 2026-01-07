@@ -182,13 +182,6 @@
       girih.removeTileAt(tileIndex);
     };
 
-    // // +---------------------------------------------------------------------------------
-    // // | Get the contrast color (string) for the given color (object).
-    // // +-------------------------------
-    // var toContrastColor = function (color) {
-    //   return getContrastColor(color).cssRGB();
-    // };
-
     // +---------------------------------------------------------------------------------
     // | This is the actual render function.
     // +-------------------------------
@@ -452,11 +445,6 @@
 
       handleActiveHoverIndices();
       pb.redraw();
-      // if (previewTiles.length != 0) {
-      //   createAdjacentTilePreview(previewTiles, previewTilePointer, setPreviewTilePointer, pb, {
-      //     isMobile: detectMobileMode(params)
-      //   });
-      // }
     };
 
     var handleActiveHoverIndices = function () {
