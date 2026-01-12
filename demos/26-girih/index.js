@@ -57,7 +57,9 @@
     
     Press [i] to toggle the inner polygons on/off.
     
-    Press [t] to toggle the textures on/off.`;
+    Press [t] to toggle the textures on/off.
+    
+    Press [c] to toggle center points on/off.`;
     // All config params are optional.
     var pb = new PlotBoilerplate(
       PlotBoilerplate.utils.safeMergeByKeys(
@@ -161,8 +163,15 @@
     var previewTiles = [];
     var previewTilePointer = 0;
     var initTiles = function () {
-      for (var i in girih.TILE_TEMPLATES) {
-        var tile = girih.TILE_TEMPLATES[i].clone();
+      // for (var i in girih.TILE_TEMPLATES) {
+      //   var tile = girih.TILE_TEMPLATES[i].clone();
+      //   addTile(tile);
+      // }
+      // Copied from file `girih-e.json`
+      // prettier-ignore
+      var initialTiles = girihFromJSON([{"tileType":"DECAGON","position":{"x":0,"y":0},"rotation":0,"edgeLength":58},{"tileType":"BOW_TIE","position":{"x":-32.42298567374695,"y":99.78768923416013},"rotation":0,"edgeLength":58},{"tileType":"BOW_TIE","position":{"x":84.88447851062045,"y":-61.672183605522946},"rotation":0.6283185307179586,"edgeLength":58},{"tileType":"BOW_TIE","position":{"x":-32.42298567374698,"y":-99.7876892341601},"rotation":2.5132741228718345,"edgeLength":58},{"tileType":"PENROSE_RHOMBUS","position":{"x":43.50000000000006,"y":99.78768923416013},"rotation":2.5132741228718345,"edgeLength":58},{"tileType":"PENROSE_RHOMBUS","position":{"x":-93.84597134749392,"y":55.16127794511893},"rotation":1.8849555921538759,"edgeLength":58},{"tileType":"IRREGULAR_HEXAGON","position":{"x":52.46149283687343,"y":-161.45987283968304},"rotation":2.5132741228718345,"edgeLength":58},{"tileType":"RHOMBUS","position":{"x":43.50000000000012,"y":154.94896717927904},"rotation":2.5132741228718345,"edgeLength":58},{"tileType":"RHOMBUS","position":{"x":-126.26895702124087,"y":99.78768923416011},"rotation":2.5132741228718345,"edgeLength":58},{"tileType":"PENTAGON","position":{"x":140.7689570212409,"y":15.246202251454818},"rotation":0.6283185307179586,"edgeLength":58},{"tileType":"PENTAGON","position":{"x":-122.84597134749392,"y":-70.40748019657377},"rotation":0,"edgeLength":58},{"tileType":"PENROSE_RHOMBUS","position":{"x":-158.6919426949878,"y":144.41410052320128},"rotation":1.8849555921538759,"edgeLength":58},{"tileType":"PENROSE_RHOMBUS","position":{"x":43.50000000000013,"y":210.11024512439795},"rotation":2.5132741228718345,"edgeLength":58}]);
+      for (var i in initialTiles) {
+        var tile = initialTiles[i].clone();
         addTile(tile);
       }
     };
@@ -317,10 +326,10 @@
       })
       .click(function (e) {
         // console.log("Click");
+        var clickedVert = pb.getVertexNear(e.params.pos, PlotBoilerplate.DEFAULT_CLICK_TOLERANCE);
         // Touch and mouse devices handle this differently
         // console.log("isTouch", e.params.isTouchEvent, "isMobile", isMobile);
         if (e.params.isTouchEvent || isMobile) {
-          var clickedVert = pb.getVertexNear(e.params.pos, PlotBoilerplate.DEFAULT_CLICK_TOLERANCE);
           if (clickedVert) {
             console.log("Clicked");
             handleClickedVert(clickedVert);
@@ -361,7 +370,11 @@
             handleMouseMove(relPos);
           }
         } else if (hoverTileIndex != -1 && hoverEdgeIndex != -1 && previewTilePointer < previewTiles.length) {
-          // Desktop mode: just add.
+          // Desktop mode: just add (if center not clicked)
+          if (clickedVert) {
+            console.log("center Clicked");
+            return;
+          }
           addPreviewTile(true);
         }
       });
