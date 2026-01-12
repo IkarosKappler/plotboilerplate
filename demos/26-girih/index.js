@@ -32,6 +32,13 @@
     var params = new Params(GUP);
     var isDarkmode = detectDarkMode(GUP);
     var isMobile = detectMobileMode(params);
+    if (isMobile) {
+      try {
+        document.body.classList.add("mobile");
+      } catch (e) {
+        console.warn(e);
+      }
+    }
 
     var textureImage = null;
 
@@ -134,6 +141,16 @@
     var girihRenderer = new GirihRenderer(pb, girih, config);
 
     // +---------------------------------------------------------------------------------
+    // | Create a hover menu for mobile devices?
+    // +-------------------------------
+    var mobileHoverMenu = isMobile ? new MobileHoverMenu("left center-v hidden") : null;
+    if (mobileHoverMenu) {
+      mobileHoverMenu.addButton("♻", function () {
+        handleDeleteTile();
+      });
+    }
+
+    // +---------------------------------------------------------------------------------
     // | Initialize
     // +-------------------------------
     // The index of the tile the mouse is hovering on or nearby (in the tiles-array)
@@ -178,6 +195,8 @@
       // Remove listeners?
       pb.remove(girih.tiles[tileIndex].position);
       girih.removeTileAt(tileIndex);
+      hoverTileIndex = -1;
+      hoverEdgeIndex = -1;
     };
 
     // +---------------------------------------------------------------------------------
@@ -256,6 +275,7 @@
         removeTile(selectedTileIndices[i]);
       }
       pb.redraw();
+      updateHoverMenu();
     };
 
     // +---------------------------------------------------------------------------------
@@ -288,29 +308,27 @@
     // +-------------------------------
     new MouseHandler(pb.eventCatcher, "girih-demo")
       .move(function (e) {
-        var relPos = pb.transformMousePosition(e.params.pos.x, e.params.pos.y);
-        var cx = document.getElementById("cx");
-        var cy = document.getElementById("cy");
-        if (cx) cx.innerHTML = relPos.x.toFixed(2);
-        if (cy) cy.innerHTML = relPos.y.toFixed(2);
-
         if (e.params.isTouchEvent || isMobile) {
           return;
         }
         // console.log("move");
+        var relPos = pb.transformMousePosition(e.params.pos.x, e.params.pos.y);
         handleMouseMove(relPos);
       })
       .click(function (e) {
-        console.log("Click");
-        var clickedVert = pb.getVertexNear(e.params.pos, PlotBoilerplate.DEFAULT_CLICK_TOLERANCE);
-        if (clickedVert) {
-          return;
-        }
+        // console.log("Click");
         // Touch and mouse devices handle this differently
-        console.log("isTouch", e.params.isTouchEvent, "isMobile", isMobile);
+        // console.log("isTouch", e.params.isTouchEvent, "isMobile", isMobile);
         if (e.params.isTouchEvent || isMobile) {
+          var clickedVert = pb.getVertexNear(e.params.pos, PlotBoilerplate.DEFAULT_CLICK_TOLERANCE);
+          if (clickedVert) {
+            console.log("Clicked");
+            handleClickedVert(clickedVert);
+            updateHoverMenu();
+            return;
+          }
           // Touch/Mobile mode: first touch identifies edge, second touch places the adjacent tile.
-          console.log("hoverTileIndex", hoverTileIndex, "hoverEdgeIndex", hoverEdgeIndex);
+          // console.log("hoverTileIndex", hoverTileIndex, "hoverEdgeIndex", hoverEdgeIndex);
           var relPos = pb.transformMousePosition(e.params.pos.x, e.params.pos.y);
           var hoverTileAndEdgeIndex = girih.locateContainingTileAndEdge(relPos);
           if (
@@ -321,18 +339,25 @@
             hoverEdgeIndex = hoverTileAndEdgeIndex.edgeIndex;
             // handleMouseMove(relPos);
             handleActiveHoverIndices();
+            updateHoverMenu();
             pb.redraw();
-          } else if (hoverTileIndex != -1 && hoverEdgeIndex != -1) {
+            // } else if (hoverTileIndex != -1 && hoverEdgeIndex != -1) {
+          } else if (
+            hoverTileAndEdgeIndex &&
+            hoverTileIndex == hoverTileAndEdgeIndex.tileIndex &&
+            hoverEdgeIndex == hoverTileAndEdgeIndex.edgeIndex
+          ) {
             // The last clicked located the active tile and active edge.
             //    -> we can safely add the adjacent tile here
             addPreviewTile(false);
             // Clear selected tile/edge after adding
             hoverTileIndex = -1;
             hoverEdgeIndex = -1;
+            updateHoverMenu();
             pb.redraw();
           } else {
             // Active
-            console.log("e.params.pos", e.params.pos);
+            // console.log("e.params.pos", e.params.pos);
             handleMouseMove(relPos);
           }
         } else if (hoverTileIndex != -1 && hoverEdgeIndex != -1 && previewTilePointer < previewTiles.length) {
@@ -340,6 +365,35 @@
           addPreviewTile(true);
         }
       });
+
+    var handleClickedVert = function (clickedVert) {
+      // Locate the Girih tile with the specified vert at center.
+      var clickedTile = girih.getTileByCenter(clickedVert);
+      if (clickedTile) {
+        clickedTile.position.attr.isSelected = !clickedTile.position.attr.isSelected;
+        pb.redraw();
+      }
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Mobile devices use a hover menu for additional features that would be usable
+    // | by keyboard events on desktop devices.
+    // +-------------------------------
+    var updateHoverMenu = function () {
+      if (!mobileHoverMenu) {
+        return;
+      }
+      // Is at least one tile selected?
+      var isOneSelected =
+        girih.tiles.find(function (tile) {
+          return tile.position.attr.isSelected;
+        }) != null;
+      if (isOneSelected) {
+        mobileHoverMenu.show();
+      } else {
+        mobileHoverMenu.hide();
+      }
+    };
 
     // +---------------------------------------------------------------------------------
     // | Add a key listener.
@@ -418,6 +472,13 @@
       .down("backspace", function () {
         console.log("delete");
         handleDeleteTile();
+      })
+      .down("escape", function () {
+        console.log("clear selection");
+        girih.tiles.forEach(function (tile) {
+          tile.position.attr.isSelected = false;
+        });
+        updateHoverMenu();
       });
     // +---------------------------------------------------------------------------------
     // | @param {XYCoords} relPos
@@ -439,6 +500,7 @@
       }
 
       handleActiveHoverIndices();
+      updateHoverMenu();
       pb.redraw();
     };
 

@@ -4,6 +4,7 @@
  * @modified 2020-11-25 Ported to TypeScript from vanilla JS.
  * @modified 2024-03-10 Fixed some types for Typescript 5 compatibility.
  * @modified 2026-01-06 Added method `Girih.locateContainingTileAndEdge` to locate tile/edge pairs.
+ * @modified 2026-01-12 Added method `Girih.getTileByCenter` to locate tiles by position.
  * @version  1.1.0
  * @file     Girih
  **/
@@ -16,6 +17,7 @@ import { GirihHexagon } from "./GirihHexagon";
 import { GirihPenroseRhombus } from "./GirihPenroseRhombus";
 import { GirihPentagon } from "./GirihPentagon";
 import { GirihRhombus } from "./GirihRhombus";
+import { XYCoords } from "../../interfaces";
 
 /**
  * @classdesc The Girih datastructure for generating patterns.
@@ -136,6 +138,7 @@ export class Girih {
   }
 
   /**
+   * Replace all current tiles with the given ones.
    *
    * @param tiles
    */
@@ -144,6 +147,25 @@ export class Girih {
     for (var i in tiles) {
       this.addTile(tiles[i]);
     }
+  }
+
+  /**
+   * Find the tile with the given center.
+   *
+   * @name getTileByCenter
+   * @memberof Girih
+   * @instance
+   * @param {XYCoords} center - The center point to look for.
+   * @return {GirihTile} The tile or null if not found.
+   */
+  getTileByCenter(center: XYCoords): GirihTile {
+    for (var i = 0; i < this.tiles.length; i++) {
+      const pos = this.tiles[i].position;
+      if (pos === center || (pos.x == center.x && pos.y == center.y)) {
+        return this.tiles[i];
+      }
+    }
+    return null;
   }
 
   /**

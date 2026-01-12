@@ -153,6 +153,12 @@
     if (this.config.drawTileNumbers) {
       fill.text("" + index, tile.position.x, tile.position.y, { color: contrastColor });
     }
+
+    // Selected?
+    if (tile.position.attr.isSelected) {
+      // draw.polygon(tile, pb.drawConfig.polygon.color, pb.drawConfig.polygon.lineWidth); // Polygon is not open
+      fill.polygon(tile, "rgba(255,128,0,0.333)", 2, { lineJoin: this.config.lineJoin }); // Polygon is not open
+    }
   };
 
   _context.GirihRenderer = GirihRenderer;

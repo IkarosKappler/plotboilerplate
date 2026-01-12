@@ -4,6 +4,8 @@
 
 - replace lib/Color.min.js by proper color class.
 
+* 2026-01-12
+  - Added method `Girih.getTileByCenter` to locate tiles by position.
 * 2026-01-06
   - Added method `Girih.locateContainingTileAndEdge` to locate tile/edge pairs.
 * 2026-01-04

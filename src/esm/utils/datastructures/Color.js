@@ -309,25 +309,6 @@ export class Color {
         Color.Converter.HSLToRGB(this);
         return this;
     }
-    //   lighten(v: string | number): Color {
-    //     if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
-    //       this.l += v / 100;
-    //     } else if ("number" == typeof v) {
-    //       if (v >= -1.0 && v <= 1.0) {
-    //         // range 0.0...1.0
-    //         this.l += v;
-    //       } else {
-    //         // range 255
-    //         this.l += v / 255;
-    //       }
-    //     } else {
-    //       throw new Error("error: bad modifier format (percent or number)");
-    //     }
-    //     if (this.l > 1) this.l = 1;
-    //     else if (this.l < 0) this.l = 0;
-    //     Color.Converter.HSLToRGB(this);
-    //     return this;
-    //   }
     lighten(v) {
         // if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
         if ("string" == typeof v && v.indexOf("%") > -1 && !Number.isNaN((v = parseInt(v)))) {
