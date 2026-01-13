@@ -33,6 +33,7 @@
         x: options && options.isMobile ? 0.666 : 0.333,
         y: options && options.isMobile ? 0.666 : 0.333
       };
+      var lineWidth = options && options.isMobile ? 4 : 2;
 
       // Create a new SVG renderer.
       var svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -46,16 +47,14 @@
       );
       var tosvgFill = tosvgDraw.copyInstance(true); // fillShapes=true
       var drawCycle = 0;
-
-      var drawCycle = 0;
       tosvgDraw.beginDrawCycle(drawCycle);
       tosvgFill.beginDrawCycle(drawCycle);
       tosvgDraw.clear(pb.config.backgroundColor);
       // Add a background for highlight the selected
       tosvgFill.curClassName = "tile-background";
-      tosvgFill.rect(bounds.min, bounds.width, bounds.height, "rgba(0,255,0," + (pointer == i ? 0.25 : 0.0) + ")", 2);
+      tosvgFill.rect(bounds.min, bounds.width, bounds.height, "rgba(0,255,0," + (pointer == i ? 0.25 : 0.0) + ")", lineWidth);
       tosvgFill.curClassName = null;
-      tosvgDraw.polygon(tile, "green", 2);
+      tosvgDraw.polygon(tile, "green", lineWidth);
       tosvgDraw.endDrawCycle(drawCycle);
       tosvgFill.endDrawCycle(drawCycle);
 
