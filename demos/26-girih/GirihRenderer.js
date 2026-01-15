@@ -93,7 +93,10 @@
   // | @param {number} index - The index in the tiles-array (to highlight hover).
   // +-------------------------------
   GirihRenderer.prototype.drawTile = function (draw, fill, tile, index, isHighlighted, textureImage) {
-    if (this.config.drawTextures && textureImage.complete && textureImage.naturalHeight !== 0) {
+    if (this.config.drawTextures && !textureImage) {
+      console.warn("Cannot draw texture: texture object not insitialized.");
+    }
+    if (this.config.drawTextures && textureImage && textureImage.complete && textureImage.naturalHeight !== 0) {
       drawTileTexture(this.pb, tile, textureImage, this.config.drawFullImages, this.config.drawBoundingBoxes);
     }
 
