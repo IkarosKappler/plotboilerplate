@@ -100,6 +100,9 @@
       drawTileTexture(this.pb, tile, textureImage, this.config.drawFullImages, this.config.drawBoundingBoxes);
     }
 
+    if (isHighlighted) {
+      fill.polygon(tile, "rgba(128,128,128,0.5)", 1.0); // Polygon is not open
+    }
     if (this.config.drawOutlines) {
       // draw.polygon(tile, pb.drawConfig.polygon.color, pb.drawConfig.polygon.lineWidth); // Polygon is not open
       draw.polygon(tile, this.config.outlineLineColor, this.config.outlineLineWidth, { lineJoin: this.config.lineJoin }); // Polygon is not open

@@ -5,6 +5,7 @@
  * @modified 2024-03-10 Fixed some types for Typescript 5 compatibility.
  * @modified 2026-01-06 Added method `Girih.locateContainingTileAndEdge` to locate tile/edge pairs.
  * @modified 2026-01-12 Added method `Girih.getTileByCenter` to locate tiles by position.
+ * @modified 2026-01-18 Added method `Girih.removeAllTiles`.
  * @version  1.1.0
  * @file     Girih
  **/
@@ -90,6 +91,15 @@ export declare class Girih {
      * @return {void}
      */
     removeTileAt(index: number): void;
+    /**
+     * Remove all tiles.
+     *
+     * @name removeAllTiles
+     * @memberof Girih
+     * @instance
+     * @return {void}
+     */
+    removeAllTiles(): void;
     /**
      * Replace all current tiles with the given ones.
      *

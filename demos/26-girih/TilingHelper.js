@@ -41,24 +41,41 @@
     tile.position.listeners.addClickListener(
       (function (vertex) {
         return function (_clickEvent) {
+          console.log("click");
           vertex.attr.isSelected = !vertex.attr.isSelected;
+          console.log("vertex.attr.isSelected", vertex.attr.isSelected);
           _self.pb.redraw();
         };
       })(tile.position)
     );
     tile.position.attr.draggable = false;
     tile.position.attr.visible = false;
-    this.pb.add(tile.position);
     this.girih.addTile(tile);
+    this.pb.add(tile.position);
   };
 
   // +---------------------------------------------------------------------------------
   // | Remove the tile at the given index.
   // +-------------------------------
   TilingHelper.prototype.removeTile = function (tileIndex) {
+    // Don't remove last tile
+    if (this.girih.tiles.length <= 1) {
+      return;
+    }
     // Remove listeners?
     this.pb.remove(this.girih.tiles[tileIndex].position);
     this.girih.removeTileAt(tileIndex);
+    this.hoverTileIndex = -1;
+    this.hoverEdgeIndex = -1;
+  };
+
+  // +---------------------------------------------------------------------------------
+  // | Remove the tile at the given index.
+  // +-------------------------------
+  TilingHelper.prototype.removeAllTiles = function () {
+    // Remove listeners?
+    this.pb.removeAll(false, false); // keepVertices=false, triggerRedraw=false
+    this.girih.removeAllTiles();
     this.hoverTileIndex = -1;
     this.hoverEdgeIndex = -1;
   };

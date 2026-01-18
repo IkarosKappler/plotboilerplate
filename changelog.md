@@ -4,6 +4,8 @@
 
 - replace lib/Color.min.js by proper color class.
 
+* 2026-01-18
+  - Added method `Girih.removeAllTiles`.
 * 2026-01-15
   - Adding experimental `TileHelper` class to the Girih demo.
 * 2026-01-12

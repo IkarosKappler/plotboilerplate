@@ -15,6 +15,14 @@
  **/
 
 // TODOs
+//  * DONE: Reset (start over button) with only one tile
+//  * DONE: Clear selection button
+//  * safe current setup in localstorage
+//  * DONE: Fill-highlight the hovering tile
+//  * Flip tile?
+//  * Avoid removing the last tile.
+//  * multiple random start setups
+//  * undo/redo pipeline
 //  * build auto-generation (random)
 //  * build grid of all possible positions (centers only)
 //  * detect connecting lines (inner polygons to max paths)
@@ -125,9 +133,15 @@
       outerPolygonFillColor: params.getString("outerPolygonFillColor", "rgb(92,92,92)"),
       previewPolygonLineWidth: params.getNumber("previewPolygonLineWidth", isMobile ? 4.0 : 2.0),
 
+      clearSelection: function () {
+        clearSelection();
+      },
       deleteSelectedTile: function () {
         tilingHelper.handleDeleteTile();
         updateHoverMenu();
+      },
+      clearScene: function () {
+        clearScene();
       },
       exportFile: function () {
         exportFile();
@@ -236,8 +250,10 @@
       })
       .click(function (e) {
         var clickedVert = pb.getVertexNear(e.params.pos, PlotBoilerplate.DEFAULT_CLICK_TOLERANCE);
+        console.log("clickedVert", clickedVert);
         // Touch and mouse devices handle this differently
         if (e.params.isTouchEvent || isMobile) {
+          console.log("isMobile");
           if (clickedVert) {
             console.log("Clicked");
             handleClickedVert(clickedVert);
@@ -281,7 +297,7 @@
         ) {
           // Desktop mode: just add (if center not clicked)
           if (clickedVert) {
-            // console.log("center Clicked");
+            console.log("center Clicked");
             return;
           }
           addPreviewTile(true);
@@ -397,10 +413,7 @@
       })
       .down("escape", function () {
         // console.log("clear selection");
-        girih.tiles.forEach(function (tile) {
-          tile.position.attr.isSelected = false;
-        });
-        updateHoverMenu();
+        clearSelection();
       });
     // +---------------------------------------------------------------------------------
     // | @param {XYCoords} relPos
@@ -432,6 +445,9 @@
       pb.redraw();
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Update adjacent possible preview tiles.
+    // +-------------------------------
     var handleActiveHoverIndices = function () {
       tilingHelper.previewTiles = girih.findPossibleAdjacentTiles(tilingHelper.hoverTileIndex, tilingHelper.hoverEdgeIndex);
       // Find any intersections for the new preview tile
@@ -449,6 +465,26 @@
           }
         );
       }
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Clear/reset the scene and add one
+    // +-------------------------------
+    var clearScene = function () {
+      tilingHelper.removeAllTiles();
+      tilingHelper.addTile(girih.TILE_TEMPLATES[0].clone());
+      updateHoverMenu();
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Clears the `selected` flag for all vertices.
+    // +-------------------------------
+    var clearSelection = function () {
+      girih.tiles.forEach(function (tile) {
+        tile.position.attr.isSelected = false;
+      });
+      updateHoverMenu();
+      pb.redraw();
     };
 
     var exportFile = function () {
@@ -540,7 +576,11 @@
       // prettier-ignore
       foldGirihBasics.add(config, 'texturePath', ["girihtexture-500px-2.png", "girih-tiles-spatial-1.png"]).listen().onChange( handleTextureChange ).name('texturePath').title('Choose a texture.');
       // prettier-ignore
+      foldGirihBasics.add(config, 'clearSelection').name("Clear Selection").title('De-selects all tiles.');
+      // prettier-ignore
       foldGirihBasics.add(config, 'deleteSelectedTile').name("Delete Selected Tile").title('Delete selected tile.');
+      // prettier-ignore
+      foldGirihBasics.add(config, 'clearScene').name("Clear Scene").title('Clear the whole scene and add one default tile.');
 
       var foldGirihDrawSettings = gui.addFolder("Girih lines and colors");
       // prettier-ignore
