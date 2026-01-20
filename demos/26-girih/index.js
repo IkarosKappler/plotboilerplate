@@ -184,9 +184,11 @@
     var tilingHelper = new TilingHelper(pb, girih, stats);
 
     var initTiles = function () {
-      // Copied from file `girih-e.json`
-      // prettier-ignore
-      var initialTiles = girihFromJSON([{"tileType":"DECAGON","position":{"x":0,"y":0},"rotation":0,"edgeLength":58},{"tileType":"BOW_TIE","position":{"x":-32.42298567374695,"y":99.78768923416013},"rotation":0,"edgeLength":58},{"tileType":"BOW_TIE","position":{"x":84.88447851062045,"y":-61.672183605522946},"rotation":0.6283185307179586,"edgeLength":58},{"tileType":"BOW_TIE","position":{"x":-32.42298567374698,"y":-99.7876892341601},"rotation":2.5132741228718345,"edgeLength":58},{"tileType":"PENROSE_RHOMBUS","position":{"x":43.50000000000006,"y":99.78768923416013},"rotation":2.5132741228718345,"edgeLength":58},{"tileType":"PENROSE_RHOMBUS","position":{"x":-93.84597134749392,"y":55.16127794511893},"rotation":1.8849555921538759,"edgeLength":58},{"tileType":"IRREGULAR_HEXAGON","position":{"x":52.46149283687343,"y":-161.45987283968304},"rotation":2.5132741228718345,"edgeLength":58},{"tileType":"RHOMBUS","position":{"x":43.50000000000012,"y":154.94896717927904},"rotation":2.5132741228718345,"edgeLength":58},{"tileType":"RHOMBUS","position":{"x":-126.26895702124087,"y":99.78768923416011},"rotation":2.5132741228718345,"edgeLength":58},{"tileType":"PENTAGON","position":{"x":140.7689570212409,"y":15.246202251454818},"rotation":0.6283185307179586,"edgeLength":58},{"tileType":"PENTAGON","position":{"x":-122.84597134749392,"y":-70.40748019657377},"rotation":0,"edgeLength":58},{"tileType":"PENROSE_RHOMBUS","position":{"x":-158.6919426949878,"y":144.41410052320128},"rotation":1.8849555921538759,"edgeLength":58},{"tileType":"PENROSE_RHOMBUS","position":{"x":43.50000000000013,"y":210.11024512439795},"rotation":2.5132741228718345,"edgeLength":58},{"tileType":"PENROSE_RHOMBUS","position":{"x":-184.26895702124088,"y":-65.69614460119664},"rotation":2.5132741228718345,"edgeLength":58},{"tileType":"PENROSE_RHOMBUS","position":{"x":187.69194269498792,"y":55.16127794511885},"rotation":1.8849555921538759,"edgeLength":58},{"tileType":"PENROSE_RHOMBUS","position":{"x":-41.384478510620426,"y":127.36832820671957},"rotation":0.6283185307179586,"edgeLength":58}]);
+      // Templates from `girihTemplates.js`
+      var templateIndex = Math.floor(Math.random() * GIRIH_TEMPLATES.length);
+      var template = GIRIH_TEMPLATES[templateIndex];
+      console.log("templateIndex", templateIndex);
+      var initialTiles = girihFromJSON(template);
       for (var i in initialTiles) {
         var tile = initialTiles[i].clone();
         tilingHelper.addTile(tile);
