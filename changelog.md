@@ -4,6 +4,8 @@
 
 - replace lib/Color.min.js by proper color class.
 
+* 2026-01-21
+  - Adding algorithm for detecting polygon tesselation outer hull: `utils/algorithms/PolygonTesselationOutlines`.
 * 2026-01-18
   - Added method `Girih.removeAllTiles`.
 * 2026-01-15

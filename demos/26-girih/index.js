@@ -20,6 +20,7 @@
 //  * safe current setup in localstorage
 //  * DONE: Fill-highlight the hovering tile
 //  * Flip tile?
+//  * PolygonTesselationOutlines requires proper documentation.
 //  * Avoid removing the last tile.
 //  * multiple random start setups
 //  * undo/redo pipeline
@@ -110,6 +111,8 @@
     var config = {
       drawOutlines: params.getBoolean("drawOutlines", true),
       drawOuterHull: params.getBoolean("drawOuterHull", true),
+      outerHullTolerance: params.getNumber("outerHullTolerance", PolygonTesselationOutlines.DEFAULT_TOLERANCE),
+      outerHullRemoveExcessiveVerts: params.getBoolean("outerHullRemoveExcessiveVerts", true),
       drawCenters: params.getBoolean("drawCenters", true),
       drawCornerNumbers: params.getBoolean("drawCornerNumbers", false),
       drawTileNumbers: params.getBoolean("drawTileNumbers", false),
@@ -228,7 +231,7 @@
       );
 
       // Draw tesselation graph?
-      // var tesselationGraph = tesselationToGraph(girih.tiles);
+      // var tesselationGraph = polygonTesselationToGraph(girih.tiles);
       // for (var e = 0; e < tesselationGraph.edges.length; e++) {
       //   var edgeIndices = tesselationGraph.edges[e];
       //   var vertA = tesselationGraph.vertices[edgeIndices.i];
@@ -237,15 +240,25 @@
       // }
 
       if (config.drawOuterHull) {
-        var outlinesGraph = new PolygonTesselationOutlines(girih.tiles, { tolerance: 0.01 }).findAllOutlines();
-        for (var e = 0; e < outlinesGraph.edges.length; e++) {
-          var edgeIndices = outlinesGraph.edges[e];
-          if (!edgeIndices) {
-            continue;
-          }
-          var vertA = outlinesGraph.vertices[edgeIndices.i];
-          var vertB = outlinesGraph.vertices[edgeIndices.j];
-          draw.line(vertA, vertB, config.outerHullLineColor, config.outerHullLineWidth);
+        var polygonTesselationHull = new PolygonTesselationOutlines(girih.tiles, {
+          tolerance: config.outerHullTolerance,
+          removeUnusedVertices: config.outerHullRemoveExcessiveVerts
+        });
+        var outlinesGraph = polygonTesselationHull.findAllOutlinesGraph();
+        // for (var e = 0; e < outlinesGraph.edges.length; e++) {
+        //   var edgeIndices = outlinesGraph.edges[e];
+        //   if (!edgeIndices) {
+        //     continue;
+        //   }
+        //   var vertA = outlinesGraph.vertices[edgeIndices.i];
+        //   var vertB = outlinesGraph.vertices[edgeIndices.j];
+        //   draw.line(vertA, vertB, config.outerHullLineColor, config.outerHullLineWidth);
+        // }
+
+        var outlinesPolygons = polygonTesselationHull.findAllOutlinesPolygons(outlinesGraph);
+        for (var p = 0; p < outlinesPolygons.length; p++) {
+          var polygon = outlinesPolygons[p];
+          draw.polygon(polygon, config.outerHullLineColor, config.outerHullLineWidth);
         }
       }
     };
@@ -638,6 +651,10 @@
       foldGirihDrawSettings.addColor(config, 'outerPolygonFillColor').title("The fill color of the outer polygons.").onChange( function() { pb.redraw(); } );
       // prettier-ignore
       foldGirihDrawSettings.add(config, 'drawOuterHull').listen().onChange( function() { pb.redraw(); } ).title("Calculate and draw the outer hull?");
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'outerHullTolerance').min(0.0).max(4.0).step(0.01).title("The tolerance (max distance) to use for calculating the outer hull.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'outerHullRemoveExcessiveVerts').listen().onChange( function() { pb.redraw(); } ).title("If outer hull is calculated: remove unused vertices?");
       // prettier-ignore
       foldGirihDrawSettings.add(config, 'outerHullLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the outer hull.").onChange( function() { pb.redraw(); } );
       // prettier-ignore
