@@ -167,5 +167,42 @@
     }
   };
 
+  GirihRenderer.prototype.drawOuterHull = function (draw, fill) {
+    if (!this.config.drawOuterHull) {
+      return;
+    }
+    // Draw tesselation graph?
+    // var tesselationGraph = polygonTesselationToGraph(girih.tiles);
+    // for (var e = 0; e < tesselationGraph.edges.length; e++) {
+    //   var edgeIndices = tesselationGraph.edges[e];
+    //   var vertA = tesselationGraph.vertices[edgeIndices.i];
+    //   var vertB = tesselationGraph.vertices[edgeIndices.j];
+    //   draw.line(vertA, vertB, "red", 4);
+    // }
+
+    if (this.config.drawOuterHull) {
+      var polygonTesselationHull = new PolygonTesselationOutlines(this.girih.tiles, {
+        tolerance: this.config.outerHullTolerance,
+        removeUnusedVertices: this.config.outerHullRemoveExcessiveVerts
+      });
+      var outlinesGraph = polygonTesselationHull.findAllOutlinesGraph();
+      // for (var e = 0; e < outlinesGraph.edges.length; e++) {
+      //   var edgeIndices = outlinesGraph.edges[e];
+      //   if (!edgeIndices) {
+      //     continue;
+      //   }
+      //   var vertA = outlinesGraph.vertices[edgeIndices.i];
+      //   var vertB = outlinesGraph.vertices[edgeIndices.j];
+      //   draw.line(vertA, vertB, config.outerHullLineColor, config.outerHullLineWidth);
+      // }
+
+      var outlinesPolygons = polygonTesselationHull.findAllOutlinesPolygons(outlinesGraph);
+      for (var p = 0; p < outlinesPolygons.length; p++) {
+        var polygon = outlinesPolygons[p];
+        draw.polygon(polygon, this.config.outerHullLineColor, this.config.outerHullLineWidth);
+      }
+    }
+  };
+
   _context.GirihRenderer = GirihRenderer;
 })(globalThis);

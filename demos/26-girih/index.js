@@ -135,8 +135,8 @@
       outerPolygonLineColor: params.getString("outerPolygonLineColor", Color.Teal.cssRGB()),
       outerPolygonLineWidth: params.getNumber("outerPolygonLineWidth", isMobile ? 4.0 : 2.0),
       outerPolygonFillColor: params.getString("outerPolygonFillColor", "rgb(92,92,92)"),
-      outerHullLineWidth: params.getNumber("outerHullLineWidth", isMobile ? 4.0 : 2.0),
-      outerHullLineColor: params.getString("outerHullLineColor", "rgb(255,0,92)"),
+      outerHullLineWidth: params.getNumber("outerHullLineWidth", isMobile ? 24.0 : 12.0),
+      outerHullLineColor: params.getString("outerHullLineColor", "rgb(36,31,49)"),
       previewPolygonLineWidth: params.getNumber("previewPolygonLineWidth", isMobile ? 4.0 : 2.0),
 
       clearSelection: function () {
@@ -205,7 +205,10 @@
     // | This is the actual render function.
     // +-------------------------------
     var drawAll = function (draw, fill) {
-      // Draw the preview polygon first
+      // Draw tesselation graph?
+      girihRenderer.drawOuterHull(draw, fill);
+
+      // Draw the preview polygon before other polygons/tiles.
       girihRenderer.drawPreviewIntersectionPolygons(
         draw,
         fill,
@@ -229,38 +232,6 @@
         tilingHelper.previewTilePointer,
         tilingHelper.previewIntersectionPolygons
       );
-
-      // Draw tesselation graph?
-      // var tesselationGraph = polygonTesselationToGraph(girih.tiles);
-      // for (var e = 0; e < tesselationGraph.edges.length; e++) {
-      //   var edgeIndices = tesselationGraph.edges[e];
-      //   var vertA = tesselationGraph.vertices[edgeIndices.i];
-      //   var vertB = tesselationGraph.vertices[edgeIndices.j];
-      //   draw.line(vertA, vertB, "red", 4);
-      // }
-
-      if (config.drawOuterHull) {
-        var polygonTesselationHull = new PolygonTesselationOutlines(girih.tiles, {
-          tolerance: config.outerHullTolerance,
-          removeUnusedVertices: config.outerHullRemoveExcessiveVerts
-        });
-        var outlinesGraph = polygonTesselationHull.findAllOutlinesGraph();
-        // for (var e = 0; e < outlinesGraph.edges.length; e++) {
-        //   var edgeIndices = outlinesGraph.edges[e];
-        //   if (!edgeIndices) {
-        //     continue;
-        //   }
-        //   var vertA = outlinesGraph.vertices[edgeIndices.i];
-        //   var vertB = outlinesGraph.vertices[edgeIndices.j];
-        //   draw.line(vertA, vertB, config.outerHullLineColor, config.outerHullLineWidth);
-        // }
-
-        var outlinesPolygons = polygonTesselationHull.findAllOutlinesPolygons(outlinesGraph);
-        for (var p = 0; p < outlinesPolygons.length; p++) {
-          var polygon = outlinesPolygons[p];
-          draw.polygon(polygon, config.outerHullLineColor, config.outerHullLineWidth);
-        }
-      }
     };
 
     var addPreviewTile = function (doRedraw) {
