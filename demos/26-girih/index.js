@@ -109,6 +109,7 @@
     // +-------------------------------
     var config = {
       drawOutlines: params.getBoolean("drawOutlines", true),
+      drawOuterHull: params.getBoolean("drawOuterHull", true),
       drawCenters: params.getBoolean("drawCenters", true),
       drawCornerNumbers: params.getBoolean("drawCornerNumbers", false),
       drawTileNumbers: params.getBoolean("drawTileNumbers", false),
@@ -131,6 +132,8 @@
       outerPolygonLineColor: params.getString("outerPolygonLineColor", Color.Teal.cssRGB()),
       outerPolygonLineWidth: params.getNumber("outerPolygonLineWidth", isMobile ? 4.0 : 2.0),
       outerPolygonFillColor: params.getString("outerPolygonFillColor", "rgb(92,92,92)"),
+      outerHullLineWidth: params.getNumber("outerHullLineWidth", isMobile ? 4.0 : 2.0),
+      outerHullLineColor: params.getString("outerHullLineColor", "rgb(255,0,92)"),
       previewPolygonLineWidth: params.getNumber("previewPolygonLineWidth", isMobile ? 4.0 : 2.0),
 
       clearSelection: function () {
@@ -223,6 +226,28 @@
         tilingHelper.previewTilePointer,
         tilingHelper.previewIntersectionPolygons
       );
+
+      // Draw tesselation graph?
+      // var tesselationGraph = tesselationToGraph(girih.tiles);
+      // for (var e = 0; e < tesselationGraph.edges.length; e++) {
+      //   var edgeIndices = tesselationGraph.edges[e];
+      //   var vertA = tesselationGraph.vertices[edgeIndices.i];
+      //   var vertB = tesselationGraph.vertices[edgeIndices.j];
+      //   draw.line(vertA, vertB, "red", 4);
+      // }
+
+      if (config.drawOuterHull) {
+        var outlinesGraph = new PolygonTesselationOutlines(girih.tiles, { tolerance: 0.01 }).findAllOutlines();
+        for (var e = 0; e < outlinesGraph.edges.length; e++) {
+          var edgeIndices = outlinesGraph.edges[e];
+          if (!edgeIndices) {
+            continue;
+          }
+          var vertA = outlinesGraph.vertices[edgeIndices.i];
+          var vertB = outlinesGraph.vertices[edgeIndices.j];
+          draw.line(vertA, vertB, config.outerHullLineColor, config.outerHullLineWidth);
+        }
+      }
     };
 
     var addPreviewTile = function (doRedraw) {
@@ -611,6 +636,12 @@
       foldGirihDrawSettings.add(config, 'fillOuterPolygons').listen().onChange( function() { pb.redraw(); } ).title("Fill the outer polygons?");
       // prettier-ignore
       foldGirihDrawSettings.addColor(config, 'outerPolygonFillColor').title("The fill color of the outer polygons.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'drawOuterHull').listen().onChange( function() { pb.redraw(); } ).title("Calculate and draw the outer hull?");
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'outerHullLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the outer hull.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.addColor(config, 'outerHullLineColor').title("The line color of the outer hull.").onChange( function() { pb.redraw(); } );
       // prettier-ignore
       foldGirihDrawSettings.add(config, 'previewPolygonLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the preview polygon.").onChange( function() { pb.redraw(); } );
       foldGirihDrawSettings.close();
