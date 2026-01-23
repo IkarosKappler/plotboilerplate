@@ -17,7 +17,7 @@
 // TODOs
 //  * DONE: Reset (start over button) with only one tile
 //  * DONE: Clear selection button
-//  * safe current setup in localstorage
+//  * DONE safe current setup in localstorage
 //  * DONE: Fill-highlight the hovering tile
 //  * Flip tile?
 //  * PolygonTesselationOutlines requires proper documentation.
@@ -109,7 +109,7 @@
     // | A global Girih config that's attached to the lil.gui control interface.
     // +-------------------------------
     var config = {
-      drawOutlines: params.getBoolean("drawOutlines", true),
+      drawOutlines: params.getBoolean("drawOutlines", false),
       drawOuterHull: params.getBoolean("drawOuterHull", true),
       outerHullTolerance: params.getNumber("outerHullTolerance", PolygonTesselationOutlines.DEFAULT_TOLERANCE),
       outerHullRemoveExcessiveVerts: params.getBoolean("outerHullRemoveExcessiveVerts", true),
@@ -148,6 +148,10 @@
       },
       clearScene: function () {
         clearScene();
+      },
+      randomPreset: function () {
+        tilingHelper.removeAllTiles();
+        initTiles();
       },
       exportFile: function () {
         exportFile();
@@ -560,6 +564,32 @@
       pb.redraw();
     });
 
+    const storeInLocalStorage = function () {
+      var setValue = girihToJSON(girih.tiles);
+      console.log("[storeInLocalStorage] setValue"); //, setValue);
+      localStorage.setItem("GirihEditor", setValue);
+    };
+
+    const restoreFromLocalStorage = function () {
+      // Storage value to array of ColorGradients
+      const value = localStorage.getItem("GirihEditor");
+      console.log("[restoreFromLocalStorage] value"); //, value);
+      if (!value) {
+        return false;
+      }
+      const jsonArray = JSON.parse(value);
+      if (!Array.isArray(jsonArray)) {
+        return false;
+      }
+      var jsonObject = girihFromJSON(jsonArray);
+      tilingHelper.removeAllTiles();
+      for (var i in jsonObject) {
+        var tile = jsonObject[i].clone();
+        tilingHelper.addTile(tile);
+      }
+      return true;
+    };
+
     // +---------------------------------------------------------------------------------
     // | Initialize dat.gui
     // +-------------------------------
@@ -586,12 +616,7 @@
       foldGirihBasics.add(config, 'drawBoundingBoxes').listen().onChange( function() { pb.redraw(); } ).name('drawBoundingBoxes').title('Show different kind of bounding boxes (textur mode only)?');
       // prettier-ignore
       foldGirihBasics.add(config, 'texturePath', ["girihtexture-500px-2.png", "girih-tiles-spatial-1.png"]).listen().onChange( handleTextureChange ).name('texturePath').title('Choose a texture.');
-      // prettier-ignore
-      foldGirihBasics.add(config, 'clearSelection').name("Clear Selection").title('De-selects all tiles.');
-      // prettier-ignore
-      foldGirihBasics.add(config, 'deleteSelectedTile').name("Delete Selected Tile").title('Delete selected tile.');
-      // prettier-ignore
-      foldGirihBasics.add(config, 'clearScene').name("Clear Scene").title('Clear the whole scene and add one default tile.');
+      foldGirihBasics.close();
 
       var foldGirihDrawSettings = gui.addFolder("Girih lines and colors");
       // prettier-ignore
@@ -632,7 +657,16 @@
       foldGirihDrawSettings.addColor(config, 'outerHullLineColor').title("The line color of the outer hull.").onChange( function() { pb.redraw(); } );
       // prettier-ignore
       foldGirihDrawSettings.add(config, 'previewPolygonLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the preview polygon.").onChange( function() { pb.redraw(); } );
-      foldGirihDrawSettings.close();
+      // foldGirihDrawSettings.close();
+
+      // prettier-ignore
+      gui.add(config, 'clearSelection').name("Clear Selection").title('De-selects all tiles.');
+      // prettier-ignore
+      gui.add(config, 'deleteSelectedTile').name("Delete Selected Tile").title('Delete selected tile.');
+      // prettier-ignore
+      gui.add(config, 'clearScene').name("Clear Scene").title('Clear the whole scene and add one default tile.');
+      // prettier-ignore
+      gui.add(config, 'randomPreset').name("Load random preset").title('Loads a random preset scene.');
 
       var foldImport = gui.addFolder("Import");
       foldImport.add(config, "importFile").name("Import Girih from JSON file");
@@ -642,11 +676,18 @@
       exportFolder.add(config, "exportFile").name("Export Girih to JSON file");
     }
 
-    initTiles();
+    if (!restoreFromLocalStorage()) {
+      initTiles();
+    }
     pb.config.preDraw = drawAll;
     var container = document.querySelector(".wrapper-bottom");
     // Apply canvas background color (this respects the darkmode in this component)
     container.style["background-color"] = pb.config.backgroundColor;
+
+    setInterval(() => {
+      storeInLocalStorage();
+    }, 10000);
+
     pb.redraw();
     pb.canvas.focus();
   };

@@ -34,10 +34,10 @@ export interface TesselationGraph {
   edges: Array<IndexPair>;
 }
 
-// +---------------------------------------------------------------------------------
-// | Convert any non-intersecting tesselation to a graph.
-// | Adjadent tiles (polygons) will result in duplicate edges.
-// +-------------------------------
+/**
+ * Convert any non-intersecting tesselation to a graph.
+ * Adjadent tiles (polygons) will result in duplicate edges.
+ */
 export const polygonTesselationToGraph = (polygons: Polygon[]): TesselationGraph => {
   const vertices: Array<Vertex> = [];
   const edges: Array<IndexPair> = [];
@@ -64,9 +64,9 @@ export const polygonTesselationToGraph = (polygons: Polygon[]): TesselationGraph
   return { vertices, edges };
 };
 
-// +---------------------------------------------------------------------------------
-// | A helper class to calculate the tesselation's outer hull.
-// +-------------------------------
+/**
+ * A helper class to calculate the tesselation's outer hull.
+ */
 export class PolygonTesselationOutlines {
   public static readonly DEFAULT_TOLERANCE = 0.01;
 
@@ -82,9 +82,9 @@ export class PolygonTesselationOutlines {
     this.removeUnusedVertices = options?.removeUnusedVertices ?? true;
   }
 
-  // +---------------------------------------------------------------------------------
-  // | Clear duplicate edges: set to null.
-  // +-------------------------------
+  /**
+   * Clear duplicate edges: set to null.
+   */
   private eliminateDuplicateEdges(tesselationGraph: TesselationGraph): TesselationGraph {
     const newEdges: Array<IndexPair> = [];
     for (var e = 0; e < tesselationGraph.edges.length; e++) {
@@ -119,19 +119,19 @@ export class PolygonTesselationOutlines {
     }; // TODO: create clean clone with new mapping
   }
 
-  // +---------------------------------------------------------------------------------
-  // | Locate some edge that adjacent to the given vertex index
-  // | @return -1 if no such edge is found.
-  // +------
+  /*
+   * Locate some edge that adjacent to the given vertex index
+   * @return -1 if no such edge is found.
+   */
   private locateEdgeWithVertIndex(vertIndex: number, tesselationGraph: TesselationGraph): number {
     return tesselationGraph.edges.findIndex((edge: IndexPair) => edge.i == vertIndex || edge.j == vertIndex);
   }
 
-  // +---------------------------------------------------------------------------------
-  // | Removes all null-edges.
-  // | TODO: Remove all unvisited vertices.
-  // | TODO: Remap indices.
-  // +-------------------------------
+  /**
+   * Removes all null-edges.
+   * TODO: Remove all unvisited vertices.
+   * TODO: Remap indices.
+   */
   private __removeUnusedVertices(tesselationGraph: TesselationGraph): TesselationGraph {
     // First remove un-used vertices and re-map indices.
     const newVertices: Array<Vertex> = [];
@@ -158,9 +158,9 @@ export class PolygonTesselationOutlines {
     return { vertices: newVertices, edges: newEdges };
   }
 
-  // +---------------------------------------------------------------------------------
-  // | Creates a tesselation graph and removes all inner edges.
-  // +-------------------------------
+  /**
+   * Creates a tesselation graph and removes all inner edges.
+   */
   findAllOutlinesGraph(): TesselationGraph {
     // First build tesselation graph from polygons, containing all edges and vertices.
     const tesselationGraph: TesselationGraph = polygonTesselationToGraph(this.polygons);
@@ -176,6 +176,16 @@ export class PolygonTesselationOutlines {
     }
   }
 
+  /**
+   * Convert any generic path to a polygon. Each path segment (start point and end point)
+   * are interpreted as a linear segment here.
+   *
+   * @name __convertGenericPathToPolygon
+   * @private
+   * @memberof PolygonTesselationOutlines
+   * @instance
+   * @param {GenericPath} path - The path to convert.
+   */
   private __convertGenericPathToPolygon(path: GenericPath): Polygon {
     const vertices: Array<Vertex> = [];
     const n: number = path.getSegmentCount();
@@ -190,9 +200,15 @@ export class PolygonTesselationOutlines {
     return new Polygon(vertices, isOpen);
   }
 
-  // +---------------------------------------------------------------------------------
-  // | Creates a tesselation graph and removes all inner edges.
-  // +-------------------------------
+  /**
+   * Creates a tesselation graph and removes all inner edges.
+   *
+   * @name findAllOutlinesPolygons
+   * @private
+   * @memberof PolygonTesselationOutlines
+   * @instance
+   * @param {TesselationGraph} tesselationGraph - Find all outlines on the tesselation graph.
+   */
   findAllOutlinesPolygons(tesselationGraph: TesselationGraph): Array<Polygon> {
     // Convert to real line segments:
     const lineSegments: Array<Line> = tesselationGraph.edges.map(
@@ -210,16 +226,12 @@ export class PolygonTesselationOutlines {
     return vertA.distance(vertB) < this.tolerance;
   }
 
-  // +---------------------------------------------------------------------------------
-  // | Check if two edges are equal.
-  // | Ignore edge direction.
-  // | Use configured tolerance.
-  // +-------------------------------
+  /*
+   * Check if two edges are equal.
+   * Ignore edge direction.
+   * Use configured tolerance.
+   */
   private isEqualEdge(edgeAvertA: Vertex, edgeAvertB: Vertex, edgeBvertA: Vertex, edgeBvertB: Vertex): boolean {
-    // return (
-    //   (edgeAvertA.distance(edgeBvertA) < this.tolerance && edgeAvertB.distance(edgeBvertB) < this.tolerance) ||
-    //   (edgeAvertA.distance(edgeBvertB) < this.tolerance && edgeAvertB.distance(edgeBvertA) < this.tolerance)
-    // );
     return (
       (this.isEqualPoint(edgeAvertA, edgeBvertA) && this.isEqualPoint(edgeAvertB, edgeBvertB)) ||
       (this.isEqualPoint(edgeAvertA, edgeBvertB) && this.isEqualPoint(edgeAvertB, edgeBvertA))

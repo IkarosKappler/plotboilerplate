@@ -60,6 +60,10 @@
   TilingHelper.prototype.removeTile = function (tileIndex) {
     // Don't remove last tile
     if (this.girih.tiles.length <= 1) {
+      console.log("Removing the last tile is not allowed.");
+      if (humane) {
+        humane.log("Removing the last tile is not allowed.");
+      }
       return;
     }
     // Remove listeners?
