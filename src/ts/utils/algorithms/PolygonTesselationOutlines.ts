@@ -37,6 +37,9 @@ export interface TesselationGraph {
 /**
  * Convert any non-intersecting tesselation to a graph.
  * Adjadent tiles (polygons) will result in duplicate edges.
+ *
+ * @param {Polygon[]} polygons - The polygon tesselation to use.
+ * @return {TesselationGraph} A tesselation graph.
  */
 export const polygonTesselationToGraph = (polygons: Polygon[]): TesselationGraph => {
   const vertices: Array<Vertex> = [];
@@ -65,7 +68,7 @@ export const polygonTesselationToGraph = (polygons: Polygon[]): TesselationGraph
 };
 
 /**
- * A helper class to calculate the tesselation's outer hull.
+ * A class to calculate the tesselation's outer hull.
  */
 export class PolygonTesselationOutlines {
   public static readonly DEFAULT_TOLERANCE = 0.01;
@@ -75,6 +78,11 @@ export class PolygonTesselationOutlines {
   private readonly tolerance: number;
   private readonly removeUnusedVertices: boolean;
 
+  /**
+   * @constructor
+   * @param {Polygon[]} polygons - The polygon tesselation to use.
+   * @param {PolygonTesselationOutlinesOptions} options - (optional)
+   */
   constructor(polygons: Polygon[], options?: PolygonTesselationOutlinesOptions) {
     this.polygons = polygons;
     // this.tesselationGraph = tesselationToGraph(polygons);
@@ -83,9 +91,18 @@ export class PolygonTesselationOutlines {
   }
 
   /**
-   * Clear duplicate edges: set to null.
+   * Clears duplicate edges.
+   *
+   * Note: this works only for duplicates. Triplets will not be removed.
+   *
+   * @name __eliminateDuplicateEdges
+   * @private
+   * @memberof TesselationGraph
+   * @instance
+   * @param {TesselationGraph} tesselationGraph - The tesselation graph to remove duplicate edges from.
+   * @return {TesselationGraph} A new tesselation graph with cleaned up edges.
    */
-  private eliminateDuplicateEdges(tesselationGraph: TesselationGraph): TesselationGraph {
+  private __eliminateDuplicateEdges(tesselationGraph: TesselationGraph): TesselationGraph {
     const newEdges: Array<IndexPair> = [];
     for (var e = 0; e < tesselationGraph.edges.length; e++) {
       const curEdge: IndexPair = tesselationGraph.edges[e];
@@ -104,7 +121,7 @@ export class PolygonTesselationOutlines {
         }
         const otherA: Vertex = tesselationGraph.vertices[otherEdge.i];
         const otherB: Vertex = tesselationGraph.vertices[otherEdge.j];
-        if (this.isEqualEdge(curA, curB, otherA, otherB)) {
+        if (this.__isEqualEdge(curA, curB, otherA, otherB)) {
           // Both edges are equal -> remove both
           tesselationGraph.edges[e] = null;
           tesselationGraph.edges[f] = null;
@@ -119,25 +136,38 @@ export class PolygonTesselationOutlines {
     }; // TODO: create clean clone with new mapping
   }
 
-  /*
+  /**
    * Locate some edge that adjacent to the given vertex index
+   *
+   * @name __locateEdgeWithVertIndex
+   * @private
+   * @memberof TesselationGraph
+   * @instance
+   * @param {number} vertIndex - The vertex index to find an edge for.
+   * @param {TesselationGraph} tesselationGraph - The tesselation graph to remove unused vertices from.
+   * @return {number} The edge index that's adjacent to the given vertex index.
    * @return -1 if no such edge is found.
    */
-  private locateEdgeWithVertIndex(vertIndex: number, tesselationGraph: TesselationGraph): number {
+  private __locateEdgeWithVertIndex(vertIndex: number, tesselationGraph: TesselationGraph): number {
     return tesselationGraph.edges.findIndex((edge: IndexPair) => edge.i == vertIndex || edge.j == vertIndex);
   }
 
   /**
-   * Removes all null-edges.
-   * TODO: Remove all unvisited vertices.
-   * TODO: Remap indices.
+   * Removes all unused vertices from the graph and re-matps the edges.
+   *
+   * @name __removeUnusedVertices
+   * @private
+   * @memberof TesselationGraph
+   * @instance
+   * @param {TesselationGraph} tesselationGraph - The tesselation graph to remove unused vertices from.
+   * @return {TesselationGraph} A new tesselation graph.
    */
   private __removeUnusedVertices(tesselationGraph: TesselationGraph): TesselationGraph {
     // First remove un-used vertices and re-map indices.
     const newVertices: Array<Vertex> = [];
     const indexMapping: Array<number> = arrayFill(tesselationGraph.vertices.length, -1);
     for (var j = 0; j < tesselationGraph.vertices.length; j++) {
-      const edgeIndex: number = this.locateEdgeWithVertIndex(j, tesselationGraph);
+      const edgeIndex: number = this.__locateEdgeWithVertIndex(j, tesselationGraph);
       if (edgeIndex === -1) {
         // No adjacent edge found -> vertex is not in use
         // Ignore; index mapping remains to -1
@@ -160,14 +190,20 @@ export class PolygonTesselationOutlines {
 
   /**
    * Creates a tesselation graph and removes all inner edges.
+   *
+   * @name findAllOutlinesGraph
+   * @private
+   * @memberof PolygonTesselationOutlines
+   * @instance
+   * @return {TesselationGraph} A tesselation graph containing the outer hull edges only.
    */
   findAllOutlinesGraph(): TesselationGraph {
     // First build tesselation graph from polygons, containing all edges and vertices.
     const tesselationGraph: TesselationGraph = polygonTesselationToGraph(this.polygons);
 
     // Now eliminate all duplicate edges. By construction only inner edges are duplicates.
-    const outerHull = this.eliminateDuplicateEdges(tesselationGraph);
-    // NOT WORKING!
+    const outerHull = this.__eliminateDuplicateEdges(tesselationGraph);
+    // Only of requested remove unused vertices.
     if (this.removeUnusedVertices) {
       const cleanOuterHull = this.__removeUnusedVertices(outerHull);
       return cleanOuterHull;
@@ -193,7 +229,7 @@ export class PolygonTesselationOutlines {
     for (var i = 0; i < n; i++) {
       const segment: PathSegment = path.getSegmentAt(i);
       vertices.push(segment.getStartPoint());
-      if (i > 0 && i + 1 >= n && !this.isEqualPoint(segment.getEndPoint(), vertices[0])) {
+      if (i > 0 && i + 1 >= n && !this.__isEqualPoint(segment.getEndPoint(), vertices[0])) {
         isOpen = true;
       }
     }
@@ -222,19 +258,39 @@ export class PolygonTesselationOutlines {
     return paths.map((path: GenericPath) => this.__convertGenericPathToPolygon(path));
   }
 
-  private isEqualPoint(vertA: Vertex, vertB: Vertex): boolean {
+  /**
+   * Checks if two vertices are equal – regarding to the current tolerance setting.
+   *
+   * @name __isEqualPoint
+   * @private
+   * @memberof PolygonTesselationOutlines
+   * @instance
+   * @param {boolean} vertA - The first point.
+   * @param {boolean} vertB - The second point.
+   * @return True if the vertices are equal.
+   */
+  private __isEqualPoint(vertA: Vertex, vertB: Vertex): boolean {
     return vertA.distance(vertB) < this.tolerance;
   }
 
-  /*
-   * Check if two edges are equal.
-   * Ignore edge direction.
-   * Use configured tolerance.
+  /**
+   * Checks if two edges (identified as two pairs of vertices) are equal – regarding to the
+   * current tolerance setting.
+   *
+   * @name __isEqualEdge
+   * @private
+   * @memberof PolygonTesselationOutlines
+   * @instance
+   * @param {boolean} edgeAvertA - The first edge's point A.
+   * @param {boolean} edgeAvertB - The first edge's point B.
+   * @param {boolean} edgeBvertA - The second edge's point A.
+   * @param {boolean} edgeBvertB - The second edge's point B.
+   * @return True if the edges are equal.
    */
-  private isEqualEdge(edgeAvertA: Vertex, edgeAvertB: Vertex, edgeBvertA: Vertex, edgeBvertB: Vertex): boolean {
+  private __isEqualEdge(edgeAvertA: Vertex, edgeAvertB: Vertex, edgeBvertA: Vertex, edgeBvertB: Vertex): boolean {
     return (
-      (this.isEqualPoint(edgeAvertA, edgeBvertA) && this.isEqualPoint(edgeAvertB, edgeBvertB)) ||
-      (this.isEqualPoint(edgeAvertA, edgeBvertB) && this.isEqualPoint(edgeAvertB, edgeBvertA))
+      (this.__isEqualPoint(edgeAvertA, edgeBvertA) && this.__isEqualPoint(edgeAvertB, edgeBvertB)) ||
+      (this.__isEqualPoint(edgeAvertA, edgeBvertB) && this.__isEqualPoint(edgeAvertB, edgeBvertA))
     );
   }
 }
