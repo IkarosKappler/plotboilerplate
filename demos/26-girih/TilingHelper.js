@@ -36,7 +36,18 @@
   // +---------------------------------------------------------------------------------
   // | Add a tile and install listeners.
   // +-------------------------------
-  TilingHelper.prototype.addTile = function (tile) {
+  TilingHelper.prototype.addAllTiles = function (tiles) {
+    var _self = this;
+    tiles.forEach(function (tile) {
+      _self.addTile(tile, false); // doRedraw=false
+    });
+    this.pb.redraw();
+  };
+
+  // +---------------------------------------------------------------------------------
+  // | Add a tile and install listeners.
+  // +-------------------------------
+  TilingHelper.prototype.addTile = function (tile, doRedraw) {
     var _self = this;
     tile.position.listeners.addClickListener(
       (function (vertex) {
@@ -51,7 +62,7 @@
     tile.position.attr.draggable = false;
     tile.position.attr.visible = false;
     this.girih.addTile(tile);
-    this.pb.add(tile.position);
+    this.pb.add(tile.position, doRedraw);
   };
 
   // +---------------------------------------------------------------------------------
@@ -82,6 +93,16 @@
     this.girih.removeAllTiles();
     this.hoverTileIndex = -1;
     this.hoverEdgeIndex = -1;
+  };
+
+  TilingHelper.prototype.replaceAllTiles = function (tiles) {
+    this.pb.removeAll(false, false); // keepVertices=false, triggerRedraw=false
+    this.girih.removeAllTiles();
+    // this.girih.replaceTiles(tiles);
+    this.addAllTiles(tiles);
+    this.hoverTileIndex = -1;
+    this.hoverEdgeIndex = -1;
+    this.pb.redraw();
   };
 
   // +---------------------------------------------------------------------------------

@@ -20,9 +20,9 @@
 //  * DONE safe current setup in localstorage
 //  * DONE: Fill-highlight the hovering tile
 //  * Flip tile?
-//  * PolygonTesselationOutlines requires proper documentation.
-//  * Avoid removing the last tile.
-//  * multiple random start setups
+//  * DONE PolygonTesselationOutlines requires proper documentation.
+//  * DONE Avoid removing the last tile.
+//  * DONE multiple random start setups
 //  * undo/redo pipeline
 //  * build auto-generation (random)
 //  * build grid of all possible positions (centers only)
@@ -60,6 +60,8 @@
     Press [Enter] or click to place new tiles onto the canvas.
     
     Press [o] to toggle the outlines on/off.
+
+    Press [h] to toggle the outer hull on/off.
     
     Press [p] to toggle the outer polygons on/off.
     
@@ -374,6 +376,10 @@
         config.drawOutlines = !config.drawOutlines;
         pb.redraw();
       })
+      .down("h", function () {
+        config.drawOuterHull = !config.drawOuterHull;
+        pb.redraw();
+      })
       .down("n", function () {
         config.drawCornerNumbers = !config.drawCornerNumbers;
         pb.redraw();
@@ -520,7 +526,8 @@
           var content = readerEvent.target.result;
           var jsonData = JSON.parse(content);
           var jsonObject = girihFromJSON(jsonData);
-          girih.replaceTiles(jsonObject);
+          // girih.replaceTiles(jsonObject);
+          tilingHelper.replaceAllTiles(jsonObject);
           pb.redraw();
         };
       };
@@ -560,7 +567,8 @@
     var fileDrop = new FileDrop(pb.eventCatcher);
     fileDrop.onFileJSONDropped(function (jsonObject) {
       var loadedGirihTiles = girihFromJSON(jsonObject);
-      girih.replaceTiles(loadedGirihTiles);
+      // girih.replaceTiles(loadedGirihTiles);
+      tilingHelper.replaceAllTiles(loadedGirihTiles);
       pb.redraw();
     });
 
