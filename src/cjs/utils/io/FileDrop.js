@@ -156,8 +156,12 @@ var FileDrop = /** @class */ (function () {
     FileDrop.prototype.onFileTextDropped = function (callback) {
         this.fileDroppedCallbackText = callback;
     };
+    // TODO: docs
     FileDrop.prototype.onFileSVGDropped = function (callback) {
         this.fileDroppedCallbackSVG = callback;
+    };
+    FileDrop.prototype.onFileBinaryDropped = function (callback) {
+        this.fileDroppedCallbackBinary = callback;
     };
     /**
      * Removes all listeners (drop, dragover and dragleave).
