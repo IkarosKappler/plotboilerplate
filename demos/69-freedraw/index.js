@@ -1,0 +1,158 @@
+/**
+ * A script for calculating Sheperd weighted polynomials.
+ *
+ * @author   Ikaros Kappler
+ * @date     2025-12-09
+ * @version  1.0.0
+ **/
+
+(function (_context) {
+  "use strict";
+
+  // Fetch the GET params
+  let GUP = gup();
+  _context.addEventListener("load", function () {
+    var params = new Params(GUP);
+    var isDarkmode = detectDarkMode(GUP);
+
+    // All config params except the canvas are optional.
+    var pb = new PlotBoilerplate(
+      PlotBoilerplate.utils.safeMergeByKeys(
+        { canvas: document.getElementById("my-canvas"), backgroundColor: isDarkmode ? "#000000" : "#ffffff", fullSize: true },
+        GUP
+      )
+    );
+    // pb.drawConfig.drawHandlePoints = false;
+
+    // Create a config: we want to have control about the arrow head size in this demo
+    var config = {
+      showVertices: params.getBoolean("showVertices", false),
+      lineColor: params.getString("lineColor", "rgb(255,128,0)"),
+      lineWidth: params.getNumber("lineWidth", 3.0),
+      showHobbyCurves: params.getBoolean("showHobbyCurves", true),
+      showLinear: params.getBoolean("showLinear", true)
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Global vars
+    // +-------------------------------
+    var freedrawLines = []; // Array<Polygon>
+    var curPolyline = null; // Polygon
+    var hobbyCurves = []; // Array< Array<CubicBezierPath> >
+
+    var preDraw = function (draw, fill) {
+      // ...
+      // draw.circle({ x: 0, y: 0 }, 100, "red", 1);
+
+      if (curPolyline) {
+        draw.polyline(curPolyline.vertices, true, "orange", 2.0);
+      }
+
+      if (config.showLinear) {
+        for (var i = 0; i < freedrawLines.length; i++) {
+          draw.polyline(freedrawLines[i].vertices, true, "blue", 1.0);
+        }
+      }
+    };
+
+    var postDraw = function (draw, fill) {
+      if (!config.showHobbyCurves) {
+        return;
+      }
+      for (var p = 0; p < hobbyCurves.length; p++) {
+        console.log("hobbyCurves[p]", p, hobbyCurves[p]);
+        for (var i = 0; i < hobbyCurves[p].length; i++) {
+          pb.draw.cubicBezier(
+            hobbyCurves[p][i].startPoint,
+            hobbyCurves[p][i].endPoint,
+            hobbyCurves[p][i].startControlPoint,
+            hobbyCurves[p][i].endControlPoint,
+            "rgba(255,128,0,0.5)",
+            5
+          );
+          if (config.drawTangents) {
+            drawHandleLine(hobbyCurves[p][i].startPoint, hobbyCurves[p][i].startControlPoint, "rgba(0,192,64,0.55)");
+            drawHandleLine(hobbyCurves[p][i].endPoint, hobbyCurves[p][i].endControlPoint, "rgba(0,192,64,0.55)");
+          }
+        }
+      }
+    }; // END postDraw
+
+    var addHobbyPath = function (polyline) {
+      console.log("Add hobby path", polyline);
+      var hobbyPath = new HobbyPath(polyline.vertices);
+      var curves = hobbyPath.generateCurve(false, 0.0); // isCircular=false, hobbyOmega=0.0
+      hobbyCurves.push(curves);
+    };
+
+    // Install mouse listener
+    new MouseHandler(pb.eventCatcher)
+      .down(function (event) {
+        if (!event.params.leftButton || event.params.wasDragged) {
+          return;
+        }
+        var relPos = new Vertex(pb.transformMousePosition(event.params.pos.x, event.params.pos.y));
+        curPolyline = new Polygon([relPos], true); // isOpen=true
+        relPos.attr.visible = config.showVertices;
+        // pb.add([curPolyline, relPos], true); // triggerRedraw=true
+        // freedrawLines.push(curPolyline);
+        pb.add(relPos, true); // triggerRedraw=true
+      })
+      .drag(function (event) {
+        var relPos = new Vertex(pb.transformMousePosition(event.params.pos.x, event.params.pos.y));
+        relPos.attr.visible = config.showVertices;
+        curPolyline.vertices.push(relPos);
+        pb.add(relPos);
+      })
+      // Event Type: XMouseEvent (an extension of the regular MouseEvent)
+      .up(function (event) {
+        if (!event.params.leftButton) {
+          return;
+        }
+        freedrawLines.push(curPolyline);
+        addHobbyPath(curPolyline);
+        curPolyline = null;
+        pb.redraw();
+      });
+
+    var toggleVertexVisibility = function () {
+      freedrawLines.forEach(function (polyline) {
+        polyline.vertices.forEach(function (vertex) {
+          vertex.attr.visible = config.showVertices;
+        });
+      });
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Create a GUI.
+    // +-------------------------------
+    {
+      var gui = pb.createGUI();
+      // prettier-ignore
+      gui.add(config, "showVertices").title("Draw the vertices?").onChange(function () { toggleVertexVisibility(); pb.redraw(); });
+      // prettier-ignore
+      gui.addColor(config, "lineColor").title("The line's color to draw with.").onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      gui.add(config, "lineWidth").min(0).max(20.0).step(0.5).title("The lines' with.").onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      gui.add(config, "showHobbyCurves").min(0).max(20.0).step(0.5).title("Draw the respective hobby curves.").onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      gui.add(config, "showLinear").title("Draw the linear elements?").onChange(function () { pb.redraw(); } );
+    }
+
+    // +---------------------------------------------------------------------------------
+    // | This renders a content list component on top, allowing to delete or add
+    // | new shapes.
+    // |
+    // | You should add `contentList.drawHighlighted(draw, fill)`  to your draw
+    // | routine to see what's currently highlighted.
+    // +-------------------------------
+    var contentList = new PBContentList(pb);
+
+    // reinit();
+    // updateGUI();
+    pb.config.preDraw = preDraw;
+    pb.config.postDraw = postDraw;
+    pb.redraw();
+  });
+})(globalThis);

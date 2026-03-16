@@ -5760,8 +5760,9 @@ exports.KeyHandler = KeyHandler;
  * @modified 2025-05-07 Added `PlogBoilerplate.addContentChangeListener` and `.removeContentChangeListener`.
  * @modified 2025-05-07 Moving full vectors now by default when vector point a is moved.
  * @modified 2025-05-20 Applying `lineWith` parameter in the draw routine for vectors (had been missing).
+ * @modified 2026-03-13 Changed visibility of `setZoom` and `setOffset` to public. There was no good reason to have the private.
  *
- * @version  1.21.1
+ * @version  1.21.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.

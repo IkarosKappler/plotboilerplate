@@ -2,12 +2,14 @@
 
 ++ Todos
 
-- Bezier handle Line color aus der drawconfig wird nicht beachtet!!!
+- Bezier handle Line color aus der drawconfig is not in use!
+- Website: demos, add #anchors
+- replace lib/Color.min.js by proper color class.
+- Add 'Rulers' class from the ngdg project.
+- Add 'onclose' and 'onopen' to the Modal (demos).
 
-* Website: demos, add #anchors
-
-* replace lib/Color.min.js by proper color class.
-
+- 2026-03-13
+  Changed visibility of `PlotBoilerplate.setZoom` and `PlotBoilerplate.setOffset` to public. There was no good reason to have the private.
 - 2026-03-03
   - Adding `onFileBinaryDropped` to the `FileDrop` class.
 - 2026-01-21

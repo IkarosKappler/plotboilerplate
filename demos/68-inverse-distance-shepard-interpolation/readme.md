@@ -2,4 +2,4 @@
 
 TODO
 
-![Polygon angles](../../screenshots/na.png)
+![Sheperd Weighted Interpolation](../../screenshots/screenshot-20260316-0-Shepherd-Interpolation.png)
