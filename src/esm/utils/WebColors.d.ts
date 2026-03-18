@@ -4,7 +4,8 @@
  * @modified 2020-10-23 Ported to Typescript.
  * @modified 2020-10-30 Exporting each color under its name globally.
  * @modified 2025-12-08 Replaying self defined colors by official web colors.
- * @version  1.0.2
+ * @modified 2026-03-18 Fixing global `WebColors` array.
+ * @version  1.0.3
  **/
 import { Color } from "./datastructures/Color";
 export declare const Red: Color;

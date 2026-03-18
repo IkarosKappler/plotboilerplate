@@ -5,7 +5,8 @@
  * @modified 2020-10-23 Ported to Typescript.
  * @modified 2020-10-30 Exporting each color under its name globally.
  * @modified 2025-12-08 Replaying self defined colors by official web colors.
- * @version  1.0.2
+ * @modified 2026-03-18 Fixing global `WebColors` array.
+ * @version  1.0.3
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shuffleWebColors = exports.WebColors = exports.LightGreen = exports.Green = exports.Teal = exports.Cyan = exports.LightBlue = exports.Blue = exports.Indigo = exports.DeepPurple = exports.Purple = exports.Pink = exports.Red = void 0;
@@ -30,7 +31,19 @@ exports.LightGreen = Color_1.Color.LightGreen; // Color.makeRGB(141,195,67);
  * @requires Color
  *
  */
-exports.WebColors = [exports.Red, exports.Pink, exports.Purple, exports.DeepPurple, exports.Indigo, exports.Blue, exports.LightBlue, exports.Cyan, exports.Teal, exports.Green, exports.LightGreen];
+exports.WebColors = [
+    Color_1.Color.Red,
+    Color_1.Color.Pink,
+    Color_1.Color.Purple,
+    Color_1.Color.DeepPink,
+    Color_1.Color.Indigo,
+    Color_1.Color.Blue,
+    Color_1.Color.LightBlue,
+    Color_1.Color.Cyan,
+    Color_1.Color.Teal,
+    Color_1.Color.Green,
+    Color_1.Color.LightGreen
+];
 /**
  * A helper function to shuffle the colors into a new order.
  */
