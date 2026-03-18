@@ -59,6 +59,7 @@
  * @modified 2023-10-07 Adding the optional `arrowHeadBasePositionBuffer` param to the arrowHead(...) method.
  * @modified 2024-09-13 Remoed the scaling of `lineWidth` in the `polygon` and `polyline` methods. This makes no sense here and doesn't match up with the behavior of other line functions.
  * @modified 2026-01-04 Adding `lineJoin` attribute to the `StrokeOptions`.
+ * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @version  1.14.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -555,7 +556,7 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.cubicBezierPath = function (path, color, lineWidth, strokeOptions) {
+    drawutils.prototype.cubicBezierPath = function (path, color, lineWidth, strokeOptions, isOpen) {
         if (!path || path.length == 0) {
             return;
         }
@@ -573,7 +574,9 @@ var drawutils = /** @class */ (function () {
             endPoint = path[i + 2];
             this.ctx.bezierCurveTo(this.offset.x + startControlPoint.x * this.scale.x, this.offset.y + startControlPoint.y * this.scale.y, this.offset.x + endControlPoint.x * this.scale.x, this.offset.y + endControlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
         }
-        this.ctx.closePath();
+        if (!isOpen) {
+            this.ctx.closePath();
+        }
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
         this.ctx.restore();

@@ -50,6 +50,7 @@
  * @modified 2025-11-14 Fixing a bug in the CSS `mix-blend-mode` property handling (caused a runtime error).
  * @modified 2026-01-04 Adding `lineJoin` attribute to the methods' `StrokeOptions` param.
  * @modified 2026-01-04 Fixing missing `strokeOptions` param in the `drawutilssvg.polygon` method.
+ * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @version  1.7.0
  **/
 import { Polygon } from "./Polygon";
@@ -498,12 +499,12 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {string} color - The CSS colot to draw the path with.
      * @param {number=1} lineWidth - (optional) The line width to use.
      * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
-     *
+     * @param {boolean} isOpen - (optional) Set to tur if the path should not be closed.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    cubicBezierPath(path: Array<XYCoords>, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): SVGElement;
+    cubicBezierPath(path: Array<XYCoords>, color: string, lineWidth?: number, strokeOptions?: StrokeOptions, isOpen?: boolean): SVGElement;
     /**
      * Draw the given handle and handle point (used to draw interactive Bézier curves).
      *

@@ -28,9 +28,10 @@
     var config = {
       showVertices: params.getBoolean("showVertices", false),
       lineColor: params.getString("lineColor", "rgb(255,128,0)"),
-      lineWidth: params.getNumber("lineWidth", 3.0),
+      lineWidth: params.getNumber("lineWidth", 7.0),
       showHobbyCurves: params.getBoolean("showHobbyCurves", true),
-      showLinear: params.getBoolean("showLinear", true)
+      showLinear: params.getBoolean("showLinear", false),
+      showHobbyTangents: params.getBoolean("showHobbyTangents", false)
     };
 
     // +---------------------------------------------------------------------------------
@@ -40,7 +41,7 @@
     var curPolyline = null; // Polygon
     var hobbyCurves = []; // Array< Array<CubicBezierPath> >
 
-    var preDraw = function (draw, fill) {
+    var postDraw = function (draw, fill) {
       // ...
       // draw.circle({ x: 0, y: 0 }, 100, "red", 1);
 
@@ -55,24 +56,33 @@
       }
     };
 
-    var postDraw = function (draw, fill) {
+    var preDraw = function (draw, fill) {
       if (!config.showHobbyCurves) {
         return;
       }
       for (var p = 0; p < hobbyCurves.length; p++) {
-        console.log("hobbyCurves[p]", p, hobbyCurves[p]);
-        for (var i = 0; i < hobbyCurves[p].length; i++) {
-          pb.draw.cubicBezier(
-            hobbyCurves[p][i].startPoint,
-            hobbyCurves[p][i].endPoint,
-            hobbyCurves[p][i].startControlPoint,
-            hobbyCurves[p][i].endControlPoint,
-            "rgba(255,128,0,0.5)",
-            5
-          );
-          if (config.drawTangents) {
-            drawHandleLine(hobbyCurves[p][i].startPoint, hobbyCurves[p][i].startControlPoint, "rgba(0,192,64,0.55)");
-            drawHandleLine(hobbyCurves[p][i].endPoint, hobbyCurves[p][i].endControlPoint, "rgba(0,192,64,0.55)");
+        // console.log("hobbyCurves[p]", p, hobbyCurves[p]);
+        if (hobbyCurves[p].length === 0) {
+          // Empty curve
+          return;
+        }
+        // Convert sequence of CubicBezierCurve to bezier path data for direct draw.
+        // This avoid ugly visible micro-gaps between all segments.
+        var pathData = hobbyCurves[p].reduce(
+          function (accu, nextCubicCurve) {
+            accu.push(nextCubicCurve.startControlPoint, nextCubicCurve.endControlPoint, nextCubicCurve.endPoint);
+            return accu;
+          },
+          [hobbyCurves[p][0].startPoint]
+        );
+        // console.log("pathData", pathData);
+        draw.cubicBezierPath(pathData, config.lineColor, config.lineWidth, null, true);
+        if (config.showHobbyTangents) {
+          for (var i = 0; i < hobbyCurves[p].length; i++) {
+            if (config.showHobbyTangents) {
+              draw.line(hobbyCurves[p][i].startPoint, hobbyCurves[p][i].startControlPoint, "rgba(0,255,255,1.0)", 2.0);
+              draw.line(hobbyCurves[p][i].endPoint, hobbyCurves[p][i].endControlPoint, "rgba(0,255,255,1.0)", 2.0);
+            }
           }
         }
       }
@@ -80,7 +90,9 @@
 
     var addHobbyPath = function (polyline) {
       console.log("Add hobby path", polyline);
-      var hobbyPath = new HobbyPath(polyline.vertices);
+      // Hobby curve generation will fail if the vertex list contains duplicates.
+      var cleanVertices = clearDuplicateVertices(polyline.vertices, 2.0); // epsilon=2.0
+      var hobbyPath = new HobbyPath(cleanVertices);
       var curves = hobbyPath.generateCurve(false, 0.0); // isCircular=false, hobbyOmega=0.0
       hobbyCurves.push(curves);
     };
@@ -99,6 +111,10 @@
         pb.add(relPos, true); // triggerRedraw=true
       })
       .drag(function (event) {
+        if (!curPolyline) {
+          console.warn("[WARN] curPolyline is null which is not expected here.");
+          return;
+        }
         var relPos = new Vertex(pb.transformMousePosition(event.params.pos.x, event.params.pos.y));
         relPos.attr.visible = config.showVertices;
         curPolyline.vertices.push(relPos);
@@ -138,6 +154,8 @@
       gui.add(config, "showHobbyCurves").min(0).max(20.0).step(0.5).title("Draw the respective hobby curves.").onChange(function () { pb.redraw(); });
       // prettier-ignore
       gui.add(config, "showLinear").title("Draw the linear elements?").onChange(function () { pb.redraw(); } );
+      // prettier-ignore
+      gui.add(config, "showHobbyTangents").title("Draw the linear Hobby curve tangents?").onChange(function () { pb.redraw(); } );
     }
 
     // +---------------------------------------------------------------------------------
@@ -154,5 +172,7 @@
     pb.config.preDraw = preDraw;
     pb.config.postDraw = postDraw;
     pb.redraw();
+
+    humane.log("Draw a line with your mouse / finger");
   });
 })(globalThis);

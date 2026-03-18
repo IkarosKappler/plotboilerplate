@@ -6446,6 +6446,7 @@ CircleSector.circleSectorUtils = {
  * @modified 2025-11-14 Fixing a bug in the CSS `mix-blend-mode` property handling (caused a runtime error).
  * @modified 2026-01-04 Adding `lineJoin` attribute to the methods' `StrokeOptions` param.
  * @modified 2026-01-04 Fixing missing `strokeOptions` param in the `drawutilssvg.polygon` method.
+ * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @version  1.7.0
  **/
 const RAD_TO_DEG = 180 / Math.PI;
@@ -7113,12 +7114,12 @@ class drawutilssvg {
      * @param {string} color - The CSS colot to draw the path with.
      * @param {number=1} lineWidth - (optional) The line width to use.
      * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
-     *
+     * @param {boolean} isOpen - (optional) Set to tur if the path should not be closed.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    cubicBezierPath(path, color, lineWidth, strokeOptions) {
+    cubicBezierPath(path, color, lineWidth, strokeOptions, isOpen) {
         const node = this.makeNode("path");
         this.applyStrokeOpts(node, strokeOptions);
         if (!path || path.length == 0) {
@@ -7135,6 +7136,9 @@ class drawutilssvg {
             endControlPoint = path[i + 1];
             endPoint = path[i + 2];
             d.push("C", this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y));
+        }
+        if (!isOpen) {
+            d.push("Z");
         }
         node.setAttribute("d", d.join(" "));
         return this._bindFillDraw(node, "cubicBezierPath", color, lineWidth || 1);
@@ -8144,6 +8148,7 @@ drawutilssvg.HEAD_XML = [
  * @modified 2023-10-07 Adding the optional `arrowHeadBasePositionBuffer` param to the arrowHead(...) method.
  * @modified 2024-09-13 Remoed the scaling of `lineWidth` in the `polygon` and `polyline` methods. This makes no sense here and doesn't match up with the behavior of other line functions.
  * @modified 2026-01-04 Adding `lineJoin` attribute to the `StrokeOptions`.
+ * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @version  1.14.0
  **/
 // Todo: rename this class to Drawutils?
@@ -8630,7 +8635,7 @@ class drawutils {
      * @instance
      * @memberof drawutils
      */
-    cubicBezierPath(path, color, lineWidth, strokeOptions) {
+    cubicBezierPath(path, color, lineWidth, strokeOptions, isOpen) {
         if (!path || path.length == 0) {
             return;
         }
@@ -8648,7 +8653,9 @@ class drawutils {
             endPoint = path[i + 2];
             this.ctx.bezierCurveTo(this.offset.x + startControlPoint.x * this.scale.x, this.offset.y + startControlPoint.y * this.scale.y, this.offset.x + endControlPoint.x * this.scale.x, this.offset.y + endControlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
         }
-        this.ctx.closePath();
+        if (!isOpen) {
+            this.ctx.closePath();
+        }
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
         this.ctx.restore();
@@ -9250,6 +9257,7 @@ drawutils.helpers = {
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `lineDashes` attribute.
+ * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @version  0.0.10
  **/
 /**
@@ -9562,7 +9570,7 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    cubicBezierPath(path, color, lineWidth) {
+    cubicBezierPath(path, color, lineWidth, strokeOptions, isOpen) {
         // NOT YET IMPLEMENTED
     }
     /**

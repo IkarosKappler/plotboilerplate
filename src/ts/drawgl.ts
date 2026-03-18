@@ -16,12 +16,13 @@
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `lineDashes` attribute.
+ * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @version  0.0.10
  **/
 
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, XYCoords, SVGPathParams, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
+import { DrawLib, XYCoords, SVGPathParams, UID, DrawLibConfiguration, FontStyle, FontWeight, StrokeOptions } from "./interfaces";
 import { Bounds } from "./Bounds";
 
 /**
@@ -426,7 +427,7 @@ export class drawutilsgl implements DrawLib<void> {
    * @instance
    * @memberof drawutils
    */
-  cubicBezierPath(path: Array<XYCoords>, color: string, lineWidth?: number) {
+  cubicBezierPath(path: Array<XYCoords>, color: string, lineWidth?: number, strokeOptions?: StrokeOptions, isOpen?: boolean) {
     // NOT YET IMPLEMENTED
   }
 

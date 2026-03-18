@@ -58,6 +58,7 @@
  * @modified 2023-10-07 Adding the optional `arrowHeadBasePositionBuffer` param to the arrowHead(...) method.
  * @modified 2024-09-13 Remoed the scaling of `lineWidth` in the `polygon` and `polyline` methods. This makes no sense here and doesn't match up with the behavior of other line functions.
  * @modified 2026-01-04 Adding `lineJoin` attribute to the `StrokeOptions`.
+ * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @version  1.14.0
  **/
 import { Polygon } from "./Polygon";
@@ -322,7 +323,7 @@ export declare class drawutils implements DrawLib<void> {
      * @instance
      * @memberof drawutils
      */
-    cubicBezierPath(path: Array<XYCoords>, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): void;
+    cubicBezierPath(path: Array<XYCoords>, color: string, lineWidth?: number, strokeOptions?: StrokeOptions, isOpen?: boolean): void;
     /**
      * Draw the given handle and handle point (used to draw interactive Bézier curves).
      *
