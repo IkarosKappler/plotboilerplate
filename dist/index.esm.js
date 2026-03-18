@@ -457,7 +457,7 @@ class Circle {
     tangentAt(angle) {
         const pointA = Circle.circleUtils.vertAt(angle, this.radius);
         // Construct the perpendicular of the line in point a. Then move relative to center.
-        return new Vector(pointA, new Vertex(0, 0)).add(this.center).perp();
+        return new Vector(pointA, new Vertex$1(0, 0)).add(this.center).perp();
         // return (new Vector(this.center.clone(), pointA).add(pointA) as Vector).perp() as Vector;
     }
     //--- BEGIN --- Implement interface `Intersectable`
@@ -523,7 +523,7 @@ class Circle {
         var y3 = p2.y - (h * (p1.x - p0.x)) / d;
         var x4 = p2.x - (h * (p1.y - p0.y)) / d;
         var y4 = p2.y + (h * (p1.x - p0.x)) / d;
-        return new Line(new Vertex(x3, y3), new Vertex(x4, y4));
+        return new Line(new Vertex$1(x3, y3), new Vertex$1(x4, y4));
     }
     /**
      * Calculate the intersection points (if exists) with the given infinite line (defined by two points).
@@ -538,11 +538,11 @@ class Circle {
     lineIntersection(a, b) {
         // Based on the math from
         //    https://mathworld.wolfram.com/Circle-LineIntersection.html
-        const interA = new Vertex();
-        const interB = new Vertex();
+        const interA = new Vertex$1();
+        const interB = new Vertex$1();
         // First do a transformation, because the calculation is based on a cicle at (0,0)
-        const transA = new Vertex(a).sub(this.center);
-        const transB = new Vertex(b).sub(this.center);
+        const transA = new Vertex$1(a).sub(this.center);
+        const transB = new Vertex$1(b).sub(this.center);
         const diff = transA.difference(transB);
         // There is a special case if diff.y=0, where the intersection is not calcuatable.
         // Use an non-zero epsilon here to approximate this case.
@@ -626,7 +626,7 @@ class Circle {
         const lineIntersection = this.lineIntersection(this.center, vert);
         if (!lineIntersection) {
             // Note: this case should not happen as a radial from the center always intersect this circle.
-            return new Vertex();
+            return new Vertex$1();
         }
         // Return closed of both
         if (lineIntersection.a.distance(vert) < lineIntersection.b.distance(vert)) {
@@ -650,7 +650,7 @@ Circle.circleUtils = {
     vertAt: (angle, radius) => {
         /* return new Vertex( Math.sin(angle) * radius,
                      Math.cos(angle) * radius ); */
-        return new Vertex(Math.cos(angle) * radius, Math.sin(angle) * radius);
+        return new Vertex$1(Math.cos(angle) * radius, Math.sin(angle) * radius);
     }
 };
 
@@ -770,7 +770,7 @@ class Triangle {
      * @memberof Triangle
      **/
     getCentroid() {
-        return new Vertex((this.a.x + this.b.x + this.c.x) / 3, (this.a.y + this.b.y + this.c.y) / 3);
+        return new Vertex$1((this.a.x + this.b.x + this.c.x) / 3, (this.a.y + this.b.y + this.c.y) / 3);
     }
     /**
      * Scale the triangle towards its centroid.
@@ -901,14 +901,14 @@ class Triangle {
         if (Math.abs(G) < Triangle.EPSILON) {
             // Collinear - find extremes and use the midpoint
             const bounds = this.bounds();
-            this.center = new Vertex((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
+            this.center = new Vertex$1((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
             dx = this.center.x - bounds.min.x;
             dy = this.center.y - bounds.min.y;
         }
         else {
             const cx = (D * E - B * F) / G;
             const cy = (A * F - C * E) / G;
-            this.center = new Vertex(cx, cy);
+            this.center = new Vertex$1(cx, cy);
             dx = this.center.x - this.a.x;
             dy = this.center.y - this.a.y;
         }
@@ -940,7 +940,7 @@ class Triangle {
      * @memberof Triangle
      */
     bounds() {
-        return new Bounds(new Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)), new Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y)));
+        return new Bounds(new Vertex$1(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)), new Vertex$1(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y)));
     }
     //--- BEGIN --- Implement interface `Intersectable`
     /**
@@ -1313,7 +1313,7 @@ const geomutils = {
  * @requires XYCoords
  *
  */
-class Vertex {
+class Vertex$1 {
     /**
      * The constructor for the vertex class.
      *
@@ -1631,8 +1631,8 @@ class Vertex {
      * @memberof Vertex
      **/
     equals(vertex) {
-        var eqX = Math.abs(this.x - vertex.x) < Vertex.EPSILON;
-        var eqY = Math.abs(this.y - vertex.y) < Vertex.EPSILON;
+        var eqX = Math.abs(this.x - vertex.x) < Vertex$1.EPSILON;
+        var eqY = Math.abs(this.y - vertex.y) < Vertex$1.EPSILON;
         var result = eqX && eqY;
         return result;
     }
@@ -1645,7 +1645,7 @@ class Vertex {
      * @memberof Vertex
      **/
     clone() {
-        return new Vertex(this.x, this.y);
+        return new Vertex$1(this.x, this.y);
     }
     /**
      * Get the distance to the passed point (in euclidean metric)
@@ -1688,7 +1688,7 @@ class Vertex {
      * @memberof Vertex
      **/
     difference(vert) {
-        return new Vertex(vert.x - this.x, vert.y - this.y);
+        return new Vertex$1(vert.x - this.x, vert.y - this.y);
     }
     /**
      * This is a vector-like behavior and 'scales' this vertex
@@ -1777,7 +1777,7 @@ class Vertex {
         }
         this.sub(center);
         angle += Math.atan2(this.y, this.x);
-        let len = this.distance(Vertex.ZERO); // {x:0,y:0});
+        let len = this.distance(Vertex$1.ZERO); // {x:0,y:0});
         this.x = len * Math.cos(angle);
         this.y = len * Math.sin(angle);
         this.add(center);
@@ -1886,18 +1886,18 @@ class Vertex {
      * @return A new vertex with a random position.
      **/
     static randomVertex(viewPort) {
-        return new Vertex(viewPort.min.x + Math.random() * (viewPort.max.x - viewPort.min.x), viewPort.min.y + Math.random() * (viewPort.max.y - viewPort.min.y));
+        return new Vertex$1(viewPort.min.x + Math.random() * (viewPort.max.x - viewPort.min.x), viewPort.min.y + Math.random() * (viewPort.max.y - viewPort.min.y));
     }
 }
-Vertex.ZERO = new Vertex(0, 0);
+Vertex$1.ZERO = new Vertex$1(0, 0);
 /**
  * An epsilon for comparison
  *
  * @private
  * @readonly
  **/
-Vertex.EPSILON = 1.0e-6;
-Vertex.utils = {
+Vertex$1.EPSILON = 1.0e-6;
+Vertex$1.utils = {
     /**
      * Generate a four-point arrow head, starting at the vector end minus the
      * arrow head length.
@@ -1928,10 +1928,10 @@ Vertex.utils = {
         console.warn("[DEPRECATION] Vertex.utils.buildArrowHead is deprecated. Please use Vector.utils.buildArrowHead instead.");
         var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
         var vertices = [];
-        vertices.push(new Vertex(zB.x * scaleX - headlen * Math.cos(angle), zB.y * scaleY - headlen * Math.sin(angle)));
-        vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle - Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle - Math.PI / 8)));
-        vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
-        vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle + Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle + Math.PI / 8)));
+        vertices.push(new Vertex$1(zB.x * scaleX - headlen * Math.cos(angle), zB.y * scaleY - headlen * Math.sin(angle)));
+        vertices.push(new Vertex$1(zB.x * scaleX - headlen * 1.35 * Math.cos(angle - Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle - Math.PI / 8)));
+        vertices.push(new Vertex$1(zB.x * scaleX, zB.y * scaleY));
+        vertices.push(new Vertex$1(zB.x * scaleX - headlen * 1.35 * Math.cos(angle + Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle + Math.PI / 8)));
         return vertices;
     },
     /**
@@ -2122,7 +2122,7 @@ class VertTuple {
      **/
     angle(line) {
         if (line == null || typeof line == "undefined") {
-            line = this.factory(new Vertex(0, 0), new Vertex(100, 0));
+            line = this.factory(new Vertex$1(0, 0), new Vertex$1(100, 0));
         }
         // Compute the angle from x axis and the return the difference :)
         const v0 = this.b.clone().sub(this.a);
@@ -2144,7 +2144,7 @@ class VertTuple {
      * @memberof VertTuple
      **/
     vertAt(t) {
-        return new Vertex(this.a.x + (this.b.x - this.a.x) * t, this.a.y + (this.b.y - this.a.y) * t);
+        return new Vertex$1(this.a.x + (this.b.x - this.a.x) * t, this.a.y + (this.b.y - this.a.y) * t);
     }
     /**
      * Get the denominator of this and the given line.
@@ -2174,7 +2174,7 @@ class VertTuple {
      * @return true if both lines are co-linear.
      */
     colinear(line, epsilon) {
-        return Math.abs(this.denominator(line)) < (typeof epsilon === "undefined" ? Vertex.EPSILON : epsilon);
+        return Math.abs(this.denominator(line)) < (typeof epsilon === "undefined" ? Vertex$1.EPSILON : epsilon);
     }
     /**
      * Get the closest position T from this line to the specified point.
@@ -2215,10 +2215,10 @@ class VertTuple {
         // Compare to pointDistance?
         const distance = Math.sqrt(VertTuple.vtutils.dist2(point, this.vertAt(t)));
         if (typeof insideBoundsOnly !== "undefined" && insideBoundsOnly) {
-            return distance < (epsilon !== null && epsilon !== void 0 ? epsilon : Vertex.EPSILON) && t >= 0 && t <= 1;
+            return distance < (epsilon !== null && epsilon !== void 0 ? epsilon : Vertex$1.EPSILON) && t >= 0 && t <= 1;
         }
         else {
-            return distance < (epsilon !== null && epsilon !== void 0 ? epsilon : Vertex.EPSILON); // t >= 0 && t <= 1;
+            return distance < (epsilon !== null && epsilon !== void 0 ? epsilon : Vertex$1.EPSILON); // t >= 0 && t <= 1;
         }
     }
     /**
@@ -2344,7 +2344,7 @@ class Vector extends VertTuple {
     perp() {
         var v = this.clone();
         v.sub(this.a);
-        v = new Vector(new Vertex(), new Vertex(-v.b.y, v.b.x));
+        v = new Vector(new Vertex$1(), new Vertex$1(-v.b.y, v.b.x));
         v.a.add(this.a);
         v.b.add(this.a);
         return v;
@@ -2394,7 +2394,7 @@ class Vector extends VertTuple {
         // TODO:
         // FOR A VECTOR THE LINE-INTERSECTION MUST BE ON BOTH VECTORS
         // if we cast these lines infinitely in both directions, they intersect here:
-        return new Vertex(this.a.x + a * (this.b.x - this.a.x), this.a.y + a * (this.b.y - this.a.y));
+        return new Vertex$1(this.a.x + a * (this.b.x - this.a.x), this.a.y + a * (this.b.y - this.a.y));
     }
     /**
      * Get the orthogonal "vector" of this vector (rotated by 90° clockwise).
@@ -2457,10 +2457,10 @@ Vector.utils = {
     buildArrowHead: (zA, zB, headlen, scaleX, scaleY) => {
         const angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
         const vertices = [];
-        vertices.push(new Vertex(zB.x * scaleX - headlen * Math.cos(angle), zB.y * scaleY - headlen * Math.sin(angle)));
-        vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle - Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle - Math.PI / 8)));
-        vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
-        vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle + Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle + Math.PI / 8)));
+        vertices.push(new Vertex$1(zB.x * scaleX - headlen * Math.cos(angle), zB.y * scaleY - headlen * Math.sin(angle)));
+        vertices.push(new Vertex$1(zB.x * scaleX - headlen * 1.35 * Math.cos(angle - Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle - Math.PI / 8)));
+        vertices.push(new Vertex$1(zB.x * scaleX, zB.y * scaleY));
+        vertices.push(new Vertex$1(zB.x * scaleX - headlen * 1.35 * Math.cos(angle + Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle + Math.PI / 8)));
         return vertices;
     }
 };
@@ -2542,7 +2542,7 @@ class Line extends VertTuple {
             return null;
         }
         // if we cast these lines infinitely in both directions, they intersect here:
-        return new Vertex(x, y);
+        return new Vertex$1(x, y);
     }
     //--- BEGIN --- Implement interface `IBounded`
     /**
@@ -2814,9 +2814,9 @@ class Polygon {
         // Acute angles and obtuse angles need to be handled differently.
         const isAcute = this.isAngleAcute(vertIndex);
         // Differences
-        const zero = new Vertex(0, 0);
-        const p2mp1 = new Vertex(p2.x - p1.x, p2.y - p1.y);
-        const p3mp2 = new Vertex(p3.x - p2.x, p3.y - p2.y);
+        const zero = new Vertex$1(0, 0);
+        const p2mp1 = new Vertex$1(p2.x - p1.x, p2.y - p1.y);
+        const p3mp2 = new Vertex$1(p3.x - p2.x, p3.y - p2.y);
         const p2mp1_len = zero.distance(p2mp1);
         const p3mp2_len = zero.distance(p3mp2);
         // Dot products
@@ -2943,7 +2943,7 @@ class Polygon {
             }
         }
         // All vertices are inside; check for intersections
-        const lineSegment = new Line(new Vertex(), new Vertex());
+        const lineSegment = new Line(new Vertex$1(), new Vertex$1());
         for (var i = 0; i < polygon.vertices.length; i++) {
             lineSegment.a.set(polygon.vertices[i]);
             lineSegment.b.set(polygon.vertices[(i + 1) % polygon.vertices.length]);
@@ -3087,7 +3087,7 @@ class Polygon {
         if (this.vertices.length === 0) {
             return null;
         }
-        const center = new Vertex(0.0, 0.0);
+        const center = new Vertex$1(0.0, 0.0);
         const n = this.vertices.length;
         for (var i = 0; i < n; i++) {
             // center.add(this.vertices[i]);
@@ -3190,7 +3190,7 @@ class Polygon {
             return null;
         }
         // Find the closest intersection
-        let closestIntersection = new Vertex(Number.MAX_VALUE, Number.MAX_VALUE);
+        let closestIntersection = new Vertex$1(Number.MAX_VALUE, Number.MAX_VALUE);
         let closestInterSectionIndex = -1;
         let curDist = Number.MAX_VALUE;
         for (var i = 0; i < allIntersections.length; i++) {
@@ -3245,7 +3245,7 @@ class Polygon {
             return result;
         }
         // Fetch and add the start point from the source polygon
-        let polygonPoint = new Vertex(this.vertices[0]);
+        let polygonPoint = new Vertex$1(this.vertices[0]);
         result.vertices.push(polygonPoint);
         if (this.vertices.length === 1) {
             return result;
@@ -3254,7 +3254,7 @@ class Polygon {
         const stepSize = perimeter / pointCount;
         const n = this.vertices.length;
         let polygonIndex = 1;
-        let nextPolygonPoint = new Vertex(this.vertices[1]);
+        let nextPolygonPoint = new Vertex$1(this.vertices[1]);
         let segmentLength = polygonPoint.distance(nextPolygonPoint);
         let loopMax = this.isOpen ? n : n + 1;
         let curSegmentU = stepSize;
@@ -3270,7 +3270,7 @@ class Polygon {
             else {
                 polygonIndex++;
                 polygonPoint = nextPolygonPoint;
-                nextPolygonPoint = new Vertex(this.vertices[polygonIndex % n]);
+                nextPolygonPoint = new Vertex$1(this.vertices[polygonIndex % n]);
                 curSegmentU = curSegmentU - segmentLength;
                 segmentLength = polygonPoint.distance(nextPolygonPoint);
             }
@@ -3321,8 +3321,8 @@ class Polygon {
         const eps = typeof tolerance === "undefined" ? 1.0 : tolerance;
         const verts = this.vertices.slice(); // Creates a shallow copy
         let i = 0;
-        var lineA = new Line(new Vertex(), new Vertex());
-        var lineB = new Line(new Vertex(), new Vertex());
+        var lineA = new Line(new Vertex$1(), new Vertex$1());
+        var lineB = new Line(new Vertex$1(), new Vertex$1());
         while (i + 1 < verts.length && verts.length > 2) {
             const vertA = verts[i];
             const vertB = verts[(i + 1) % verts.length];
@@ -3368,13 +3368,13 @@ class Polygon {
         var qbezier = [];
         var cc0 = this.vertices[0];
         var cc1 = this.vertices[1];
-        var edgeCenter = new Vertex(cc0.x + (cc1.x - cc0.x) / 2, cc0.y + (cc1.y - cc0.y) / 2);
+        var edgeCenter = new Vertex$1(cc0.x + (cc1.x - cc0.x) / 2, cc0.y + (cc1.y - cc0.y) / 2);
         qbezier.push(edgeCenter);
         var limit = this.isOpen ? this.vertices.length : this.vertices.length + 1;
         for (var t = 1; t < limit; t++) {
             cc0 = this.vertices[t % this.vertices.length];
             cc1 = this.vertices[(t + 1) % this.vertices.length];
-            var edgeCenter = new Vertex(cc0.x + (cc1.x - cc0.x) / 2, cc0.y + (cc1.y - cc0.y) / 2);
+            var edgeCenter = new Vertex$1(cc0.x + (cc1.x - cc0.x) / 2, cc0.y + (cc1.y - cc0.y) / 2);
             qbezier.push(cc0);
             qbezier.push(edgeCenter);
             cc0 = cc1;
@@ -3422,17 +3422,17 @@ class Polygon {
         var cbezier = [];
         var a = this.vertices[0];
         var b = this.vertices[1];
-        var edgeCenter = new Vertex(a.x + (b.x - a.x) / 2, a.y + (b.y - a.y) / 2);
+        var edgeCenter = new Vertex$1(a.x + (b.x - a.x) / 2, a.y + (b.y - a.y) / 2);
         cbezier.push(edgeCenter);
         var limit = this.isOpen ? this.vertices.length - 1 : this.vertices.length;
         for (var t = 0; t < limit; t++) {
             var a = this.vertices[t % this.vertices.length];
             var b = this.vertices[(t + 1) % this.vertices.length];
             var c = this.vertices[(t + 2) % this.vertices.length];
-            var aCenter = new Vertex(a.x + (b.x - a.x) / 2, a.y + (b.y - a.y) / 2);
-            var bCenter = new Vertex(b.x + (c.x - b.x) / 2, b.y + (c.y - b.y) / 2);
-            var a2 = new Vertex(aCenter.x + (b.x - aCenter.x) * threshold, aCenter.y + (b.y - aCenter.y) * threshold);
-            var b0 = new Vertex(bCenter.x + (b.x - bCenter.x) * threshold, bCenter.y + (b.y - bCenter.y) * threshold);
+            var aCenter = new Vertex$1(a.x + (b.x - a.x) / 2, a.y + (b.y - a.y) / 2);
+            var bCenter = new Vertex$1(b.x + (c.x - b.x) / 2, b.y + (c.y - b.y) / 2);
+            var a2 = new Vertex$1(aCenter.x + (b.x - aCenter.x) * threshold, aCenter.y + (b.y - aCenter.y) * threshold);
+            var b0 = new Vertex$1(bCenter.x + (b.x - bCenter.x) * threshold, bCenter.y + (b.y - bCenter.y) * threshold);
             cbezier.push(a2);
             cbezier.push(b0);
             cbezier.push(bCenter);
@@ -3632,13 +3632,13 @@ class Bounds {
     }
     getScaled(scaleFactor) {
         const center = this.getCenter();
-        const newMin = new Vertex(this.min).scale(scaleFactor, center);
-        const newMax = new Vertex(this.max).scale(scaleFactor, center);
+        const newMin = new Vertex$1(this.min).scale(scaleFactor, center);
+        const newMax = new Vertex$1(this.max).scale(scaleFactor, center);
         return new Bounds(newMin, newMax);
     }
     getMoved(moveAmount) {
-        const newMin = new Vertex(this.min).move(moveAmount);
-        const newMax = new Vertex(this.max).move(moveAmount);
+        const newMin = new Vertex$1(this.min).move(moveAmount);
+        const newMax = new Vertex$1(this.max).move(moveAmount);
         return new Bounds(newMin, newMax);
     }
     /**
@@ -3650,7 +3650,7 @@ class Bounds {
      * @return {Vertex} The "northmost" centered point of this bounding box.
      */
     getNorthPoint() {
-        return new Vertex(this.min.x + this.width / 2.0, this.min.y);
+        return new Vertex$1(this.min.x + this.width / 2.0, this.min.y);
     }
     /**
      * Get the center point of the south bound.
@@ -3661,7 +3661,7 @@ class Bounds {
      * @return {Vertex} The "southhmost" centered point of this bounding box.
      */
     getSouthPoint() {
-        return new Vertex(this.min.x + this.width / 2.0, this.max.y);
+        return new Vertex$1(this.min.x + this.width / 2.0, this.max.y);
     }
     /**
      * Get the center point of the west bound.
@@ -3672,7 +3672,7 @@ class Bounds {
      * @return {Vertex} The "westhmost" centered point of this bounding box.
      */
     getWestPoint() {
-        return new Vertex(this.min.x, this.min.y + this.height / 2.0);
+        return new Vertex$1(this.min.x, this.min.y + this.height / 2.0);
     }
     /**
      * Get the center point of the east bound.
@@ -3683,7 +3683,7 @@ class Bounds {
      * @return {Vertex} The "easthmost" centered point of this bounding box.
      */
     getEastPoint() {
-        return new Vertex(this.max.x, this.min.y + this.height / 2.0);
+        return new Vertex$1(this.max.x, this.min.y + this.height / 2.0);
     }
     /**
      * Get the upper left corner point these bounds box.
@@ -3694,7 +3694,7 @@ class Bounds {
      * @return {Vertex} The "northwestmost" point of this bounding box.
      */
     getNorthWestPoint() {
-        return new Vertex(this.min.x, this.min.y);
+        return new Vertex$1(this.min.x, this.min.y);
     }
     /**
      * Get the upper right corner point these bounds box.
@@ -3705,7 +3705,7 @@ class Bounds {
      * @return {Vertex} The "northeastmost" point of this bounding box.
      */
     getNorthEastPoint() {
-        return new Vertex(this.max.x, this.min.y);
+        return new Vertex$1(this.max.x, this.min.y);
     }
     /**
      * Get the lower right corner point these bounds box.
@@ -3716,7 +3716,7 @@ class Bounds {
      * @return {Vertex} The "southeastmost" point of this bounding box.
      */
     getSouthEastPoint() {
-        return new Vertex(this.max.x, this.max.y);
+        return new Vertex$1(this.max.x, this.max.y);
     }
     /**
      * Get the lower left corner point these bounds box.
@@ -3727,7 +3727,7 @@ class Bounds {
      * @return {Vertex} The "southwestmost" point of this bounding box.
      */
     getSouthWestPoint() {
-        return new Vertex(this.min.x, this.max.y);
+        return new Vertex$1(this.min.x, this.max.y);
     }
     /**
      * Convert this rectangular bounding box to a polygon with four vertices.
@@ -3738,7 +3738,7 @@ class Bounds {
      * @return {Polygon} This bound rectangle as a polygon.
      */
     toPolygon() {
-        return new Polygon([new Vertex(this.min), new Vertex(this.max.x, this.min.y), new Vertex(this.max), new Vertex(this.min.x, this.max.y)], false);
+        return new Polygon([new Vertex$1(this.min), new Vertex$1(this.max.x, this.min.y), new Vertex$1(this.max), new Vertex$1(this.min.x, this.max.y)], false);
     }
     /**
      * Get the center of this boinding box.
@@ -3749,7 +3749,7 @@ class Bounds {
      * @returns {Vertex} The center of these bounds.
      */
     getCenter() {
-        return new Vertex(this.min.x + (this.max.x - this.min.x) / 2.0, this.min.y + (this.max.y - this.min.y) / 2);
+        return new Vertex$1(this.min.x + (this.max.x - this.min.x) / 2.0, this.min.y + (this.max.y - this.min.y) / 2);
     }
     /**
      * Get the minimum of `width` and `height`.
@@ -3782,7 +3782,7 @@ class Bounds {
         // Check if the safe areas are meant as percent
         const absHorizontalSafeArea = horizontalSafeArea > 0 && horizontalSafeArea < 1 ? this.width * horizontalSafeArea : horizontalSafeArea;
         const absVerticalSafeArea = verticalSafeArea > 0 && verticalSafeArea < 1 ? this.height * verticalSafeArea : verticalSafeArea;
-        return new Vertex(this.min.x + absHorizontalSafeArea + Math.random() * (this.width - 2 * absHorizontalSafeArea), this.min.y + absVerticalSafeArea + Math.random() * (this.height - 2 * absVerticalSafeArea));
+        return new Vertex$1(this.min.x + absHorizontalSafeArea + Math.random() * (this.width - 2 * absHorizontalSafeArea), this.min.y + absVerticalSafeArea + Math.random() * (this.height - 2 * absVerticalSafeArea));
     }
     /**
      * Convert these bounds to a human readable form.
@@ -3822,7 +3822,7 @@ class Bounds {
      **/
     static computeFromVertices(vertices) {
         if (vertices.length == 0) {
-            return new Bounds(new Vertex(0, 0), new Vertex(0, 0));
+            return new Bounds(new Vertex$1(0, 0), new Vertex$1(0, 0));
         }
         let xMin = vertices[0].x;
         let xMax = vertices[0].x;
@@ -3836,7 +3836,7 @@ class Bounds {
             yMin = Math.min(yMin, vert.y);
             yMax = Math.max(yMax, vert.y);
         }
-        return new Bounds(new Vertex(xMin, yMin), new Vertex(xMax, yMax));
+        return new Bounds(new Vertex$1(xMin, yMin), new Vertex$1(xMax, yMax));
     }
     /**
      * Compute the minimal bounding box for a given set of existing bounding boxes.
@@ -3851,7 +3851,7 @@ class Bounds {
      **/
     static computeFromBoundsSet(boundingBoxes) {
         if (boundingBoxes.length == 0) {
-            return new Bounds(new Vertex(0, 0), new Vertex(0, 0));
+            return new Bounds(new Vertex$1(0, 0), new Vertex$1(0, 0));
         }
         let xMin = boundingBoxes[0].min.x;
         let xMax = boundingBoxes[0].max.x;
@@ -3865,7 +3865,7 @@ class Bounds {
             yMin = Math.min(yMin, bounds.min.y);
             yMax = Math.max(yMax, bounds.min.y);
         }
-        return new Bounds(new Vertex(xMin, yMin), new Vertex(xMax, yMax));
+        return new Bounds(new Vertex$1(xMin, yMin), new Vertex$1(xMax, yMax));
     }
     /**
      * Create a new `Bounds` instance just from `width` and `height`, located at (0,0) or the optionally given origin.
@@ -4078,7 +4078,7 @@ class CubicBezierCurve {
      **/
     updateArcLengths() {
         let pointA = this.startPoint.clone();
-        let pointB = new Vertex(0, 0);
+        let pointB = new Vertex$1(0, 0);
         let curveStep = 1.0 / this.curveIntervals;
         // Clear segment cache
         this.segmentCache = [];
@@ -4288,7 +4288,7 @@ class CubicBezierCurve {
         //   this.endPoint.y * Math.pow(t, 3);
         const x = CubicBezierCurve.utils.evaluateT(this.startPoint.x, this.startControlPoint.x, this.endControlPoint.x, this.endPoint.x, t);
         const y = CubicBezierCurve.utils.evaluateT(this.startPoint.y, this.startControlPoint.y, this.endControlPoint.y, this.endPoint.y, t);
-        return new Vertex(x, y);
+        return new Vertex$1(x, y);
     }
     /**
      * Get the curve point at a given position u, where u is in [0,arcLength].<br>
@@ -4328,7 +4328,7 @@ class CubicBezierCurve {
         const tX = -3 * a.x * nt2 + b.x * (3 * nt2 - 6 * (t - t2)) + c.x * (6 * (t - t2) - 3 * t2) + 3 * d.x * t2;
         const tY = -3 * a.y * nt2 + b.y * (3 * nt2 - 6 * (t - t2)) + c.y * (6 * (t - t2) - 3 * t2) + 3 * d.y * t2;
         // Note: my implementation does NOT normalize tangent vectors!
-        return new Vertex(tX, tY);
+        return new Vertex$1(tX, tY);
     }
     /**
      * Trim off a start section of this curve. The position parameter `uValue` is the absolute position on the
@@ -4485,7 +4485,7 @@ class CubicBezierCurve {
      **/
     getPerpendicularAt(t) {
         const tangentVector = this.getTangentAt(t);
-        return new Vertex(tangentVector.y, -tangentVector.x);
+        return new Vertex$1(tangentVector.y, -tangentVector.x);
     }
     /**
      * Clone this Bézier curve (deep clone).
@@ -4719,7 +4719,7 @@ class CubicBezierCurve {
             throw 'Object member "startControlPoint" missing.';
         if (!obj.endControlPoint)
             throw 'Object member "endControlPoint" missing.';
-        return new CubicBezierCurve(new Vertex(obj.startPoint[0], obj.startPoint[1]), new Vertex(obj.endPoint[0], obj.endPoint[1]), new Vertex(obj.startControlPoint[0], obj.startControlPoint[1]), new Vertex(obj.endControlPoint[0], obj.endControlPoint[1]));
+        return new CubicBezierCurve(new Vertex$1(obj.startPoint[0], obj.startPoint[1]), new Vertex$1(obj.endPoint[0], obj.endPoint[1]), new Vertex$1(obj.startControlPoint[0], obj.startControlPoint[1]), new Vertex$1(obj.endControlPoint[0], obj.endControlPoint[1]));
     }
     /**
      * Convert a 4-element array of vertices to a cubic bézier curve.
@@ -5634,8 +5634,8 @@ class BezierPath {
     neighbourCurve, mainPoint, mainControlPoint, neighbourPoint, neighbourControlPoint, obtainHandleLengths, _updateArcLengths // TODO: remove param
     ) {
         // Calculate start handle length
-        var mainHandleBounds = new Vertex(mainControlPoint.x - mainPoint.x, mainControlPoint.y - mainPoint.y);
-        var neighbourHandleBounds = new Vertex(neighbourControlPoint.x - neighbourPoint.x, neighbourControlPoint.y - neighbourPoint.y);
+        var mainHandleBounds = new Vertex$1(mainControlPoint.x - mainPoint.x, mainControlPoint.y - mainPoint.y);
+        var neighbourHandleBounds = new Vertex$1(neighbourControlPoint.x - neighbourPoint.x, neighbourControlPoint.y - neighbourPoint.y);
         var mainHandleLength = Math.sqrt(Math.pow(mainHandleBounds.x, 2) + Math.pow(mainHandleBounds.y, 2));
         var neighbourHandleLength = Math.sqrt(Math.pow(neighbourHandleBounds.x, 2) + Math.pow(neighbourHandleBounds.y, 2));
         if (mainHandleLength <= 0.1)
@@ -5659,8 +5659,8 @@ class BezierPath {
      * @return {Bounds} The bounds of this Bézier path.
      **/
     getBounds() {
-        const min = new Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
-        const max = new Vertex(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
+        const min = new Vertex$1(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
+        const max = new Vertex$1(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
         var b;
         for (var i = 0; i < this.bezierCurves.length; i++) {
             b = this.bezierCurves[i].getBounds();
@@ -5696,7 +5696,7 @@ class BezierPath {
             return result;
         }
         // Fetch and add the start point from the source polygon
-        var polygonPoint = new Vertex(this.bezierCurves[0].startPoint);
+        var polygonPoint = new Vertex$1(this.bezierCurves[0].startPoint);
         result.push(polygonPoint);
         // if (this.bezierCurves.length === 1) {
         //   return result;
@@ -5722,7 +5722,7 @@ class BezierPath {
                 segmentLength = curveIndex < n ? this.bezierCurves[curveIndex].arcLength : 0;
             }
         }
-        result.push(new Vertex(this.bezierCurves[n - 1].endPoint));
+        result.push(new Vertex$1(this.bezierCurves[n - 1].endPoint));
         return result;
     }
     /**
@@ -6003,7 +6003,7 @@ class BezierPath {
     static fromReducedList(pointArray, adjustCircular) {
         // Convert to object
         var bezierPath = new BezierPath(); // null); // No points yet
-        var startPoint = new Vertex();
+        var startPoint = new Vertex$1();
         var startControlPoint;
         var endControlPoint;
         var endPoint;
@@ -6011,14 +6011,14 @@ class BezierPath {
         do {
             if (i == 0) {
                 // firstStartPoint =
-                startPoint = new Vertex(pointArray[i], pointArray[i + 1]);
+                startPoint = new Vertex$1(pointArray[i], pointArray[i + 1]);
             }
-            startControlPoint = new Vertex(pointArray[i + 2], pointArray[i + 3]);
-            endControlPoint = new Vertex(pointArray[i + 4], pointArray[i + 5]);
+            startControlPoint = new Vertex$1(pointArray[i + 2], pointArray[i + 3]);
+            endControlPoint = new Vertex$1(pointArray[i + 4], pointArray[i + 5]);
             // if (i + 8 >= pointArray.length) {
             //   endPoint = firstStartPoint;
             // } else {
-            endPoint = new Vertex(pointArray[i + 6], pointArray[i + 7]);
+            endPoint = new Vertex$1(pointArray[i + 6], pointArray[i + 7]);
             // }
             var bCurve = new CubicBezierCurve(startPoint, endPoint, startControlPoint, endControlPoint);
             bezierPath.bezierCurves.push(bCurve);
@@ -6266,7 +6266,7 @@ class CircleSector {
         // First get all line intersections from underlying ellipse.
         const ellipseIntersections = this.circle.lineIntersections(ray, inVectorBoundsOnly);
         // Drop all intersection points that are not contained in the circle sectors bounds.
-        const tmpLine = new Line(this.circle.center, new Vertex());
+        const tmpLine = new Line(this.circle.center, new Vertex$1());
         return ellipseIntersections.filter((intersectionPoint) => {
             tmpLine.b.set(intersectionPoint);
             const lineAngle = tmpLine.angle();
@@ -6449,7 +6449,7 @@ CircleSector.circleSectorUtils = {
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @version  1.7.0
  **/
-const RAD_TO_DEG = 180 / Math.PI;
+const RAD_TO_DEG$1 = 180 / Math.PI;
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
  * be compatible to the default 'draw' class.
@@ -6480,8 +6480,8 @@ class drawutilssvg {
      **/
     constructor(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode, bufferGNode, nodeDefs, bufferNodeDefs, nodeStyle) {
         this.svgNode = svgNode;
-        this.offset = new Vertex(0, 0).set(offset);
-        this.scale = new Vertex(1, 1).set(scale);
+        this.offset = new Vertex$1(0, 0).set(offset);
+        this.scale = new Vertex$1(1, 1).set(scale);
         this.fillShapes = fillShapes;
         this.isSecondary = Boolean(isSecondary);
         this.drawConfig = drawConfig;
@@ -6943,7 +6943,7 @@ class drawutilssvg {
     cubicBezierArrow(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, headLength = 8, strokeOptions) {
         const group = this.makeNode("g");
         // Just create the child nodes, don't bind them to the root node.
-        const arrowHeadBasePosition = new Vertex(0, 0);
+        const arrowHeadBasePosition = new Vertex$1(0, 0);
         const arrowHead = this.makeArrowHeadNode(endControlPoint, endPoint, color, lineWidth, headLength, undefined, arrowHeadBasePosition);
         const diff = arrowHeadBasePosition.difference(endPoint);
         const bezier = this.makeCubicBezierNode(startPoint, { x: endPoint.x - diff.x, y: endPoint.y - diff.y }, startControlPoint, { x: endControlPoint.x - diff.x, y: endControlPoint.y - diff.y }, color, lineWidth, strokeOptions);
@@ -7031,7 +7031,7 @@ class drawutilssvg {
      **/
     texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation) {
         // const basePolygonBounds: Bounds = polygon.getBounds();
-        const rotatedScalingOrigin = new Vertex(textureSize.min).clone().rotate(rotation, polygonPosition);
+        const rotatedScalingOrigin = new Vertex$1(textureSize.min).clone().rotate(rotation, polygonPosition);
         // const rotationCenter = polygonPosition.clone().add(rotatedScalingOrigin.difference(textureSize.min).inv());
         // Create something like this
         // ...
@@ -7060,7 +7060,7 @@ class drawutilssvg {
         imageNode.setAttribute("href", textureImage.src);
         // imageNode.setAttribute("opacity", "0.5");
         // SVG rotations in degrees
-        imageNode.setAttribute("transform", `rotate(${rotation * RAD_TO_DEG}, ${this._x(rotatedScalingOrigin.x)}, ${this._y(rotatedScalingOrigin.y)})`);
+        imageNode.setAttribute("transform", `rotate(${rotation * RAD_TO_DEG$1}, ${this._x(rotatedScalingOrigin.x)}, ${this._y(rotatedScalingOrigin.y)})`);
         const pathNode = this.makeNode("path");
         const pathData = [];
         if (polygon.vertices.length > 0) {
@@ -7654,7 +7654,7 @@ class drawutilssvg {
         // It's essential to use rotate(r,x,y) here. "rotate(r)"" with transform-origin(x,y) won't do the job.
         // And rotate and translate cannot be used is combination on a text object.
         // So wrap the text inside a <g>, translate the <g>, and rotate the text inside.
-        const rotate = options.rotation ? `rotate(${options.rotation * RAD_TO_DEG} 0 0)` : ``;
+        const rotate = options.rotation ? `rotate(${options.rotation * RAD_TO_DEG$1} 0 0)` : ``;
         const node = this.makeNode("g");
         const curId = this.curId;
         this.curId = curId + "_text";
@@ -8172,8 +8172,8 @@ class drawutils {
     constructor(context, fillShapes) {
         this.ctx = context;
         // this.lineDash = [];
-        this.offset = new Vertex(0, 0);
-        this.scale = new Vertex(1, 1);
+        this.offset = new Vertex$1(0, 0);
+        this.scale = new Vertex$1(1, 1);
         this.fillShapes = fillShapes;
     }
     /**
@@ -8320,7 +8320,7 @@ class drawutils {
      * @memberof drawutils
      **/
     arrow(zA, zB, color, lineWidth, headLength = 8, strokeOptions) {
-        const arrowHeadBasePosition = new Vertex(0, 0);
+        const arrowHeadBasePosition = new Vertex$1(0, 0);
         this.arrowHead(zA, zB, color, lineWidth, headLength, undefined, arrowHeadBasePosition); // Will NOT use dash configuration
         this.line(zA, arrowHeadBasePosition, color, lineWidth, strokeOptions); // Will use dash configuration
     }
@@ -8342,7 +8342,7 @@ class drawutils {
      * @memberof DrawLib
      */
     cubicBezierArrow(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, headLength, strokeOptions) {
-        const arrowHeadBasePosition = new Vertex(0, 0);
+        const arrowHeadBasePosition = new Vertex$1(0, 0);
         // Will NOT use dash configuration
         this.arrowHead(endControlPoint, endPoint, color, lineWidth, headLength, undefined, arrowHeadBasePosition);
         const diff = arrowHeadBasePosition.difference(endPoint);
@@ -8431,12 +8431,12 @@ class drawutils {
     texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation) {
         var basePolygonBounds = polygon.getBounds();
         // var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
-        new Vertex(polygonPosition.x, polygonPosition.y).difference(basePolygonBounds.getCenter());
+        new Vertex$1(polygonPosition.x, polygonPosition.y).difference(basePolygonBounds.getCenter());
         // var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
         // Get the position offset of the polygon
-        var targetTextureSize = new Vertex(textureSize.width, textureSize.height);
+        var targetTextureSize = new Vertex$1(textureSize.width, textureSize.height);
         // var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
-        var targetTextureOffset = new Vertex(textureSize.min.x, textureSize.min.y).sub(polygonPosition);
+        var targetTextureOffset = new Vertex$1(textureSize.min.x, textureSize.min.y).sub(polygonPosition);
         this.ctx.save();
         // this.ctx.translate(this.offset.x + rotationCenter.x * this.scale.x, this.offset.y + rotationCenter.y * this.scale.y);
         this.ctx.translate(this.offset.x + polygonPosition.x * this.scale.x, this.offset.y + polygonPosition.y * this.scale.y);
@@ -9281,8 +9281,8 @@ class drawutilsgl {
      **/
     constructor(context, fillShapes) {
         this.gl = context;
-        this.offset = new Vertex(0, 0);
-        this.scale = new Vertex(1, 1);
+        this.offset = new Vertex$1(0, 0);
+        this.scale = new Vertex$1(1, 1);
         this.fillShapes = fillShapes;
         this._zindex = 0.0;
         if (context == null || typeof context === "undefined")
@@ -11042,7 +11042,7 @@ class PBText {
         this.className = "PBText";
         this.uid = UIDGenerator.next();
         this.text = text;
-        this.anchor = anchor !== null && anchor !== void 0 ? anchor : new Vertex();
+        this.anchor = anchor !== null && anchor !== void 0 ? anchor : new Vertex$1();
         this.color = options === null || options === void 0 ? void 0 : options.color;
         this.fontFamily = options === null || options === void 0 ? void 0 : options.fontFamily;
         this.fontSize = options === null || options === void 0 ? void 0 : options.fontSize;
@@ -11113,7 +11113,7 @@ const getAngle = (v1, v2) => {
  * @param {XYCoords} v2 - The second vector in {x,y} notation.
  * @return {number} The cross product of both vectors.
  */
-const cross = (v1, v2) => {
+const cross$1 = (v1, v2) => {
     return v1.x * v2.y - v2.x * v1.y;
 };
 /**
@@ -11125,7 +11125,7 @@ const cross = (v1, v2) => {
  */
 const getRotateAngle = (v1, v2) => {
     var angle = getAngle(v1, v2);
-    if (cross(v1, v2) > 0) {
+    if (cross$1(v1, v2) > 0) {
         angle *= -1;
     }
     return angle * 180 / Math.PI;
@@ -11534,7 +11534,7 @@ class VEllipse {
         // return Math.abs(this.axis.x - this.center.x);
         // Rotate axis back to origin before calculating radius
         // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).x - this.center.x);
-        return new Vertex(this.axis).rotate(-this.rotation, this.center).x - this.center.x;
+        return new Vertex$1(this.axis).rotate(-this.rotation, this.center).x - this.center.x;
     }
     /**
      * Get the non-negative vertical radius of this ellipse.
@@ -11557,7 +11557,7 @@ class VEllipse {
      */
     signedRadiusV() {
         // Rotate axis back to origin before calculating radius
-        return new Vertex(this.axis).rotate(-this.rotation, this.center).y - this.center.y;
+        return new Vertex$1(this.axis).rotate(-this.rotation, this.center).y - this.center.y;
     }
     /**
      * Get the the minima and maxima (points) of this (rotated) ellipse.
@@ -11580,12 +11580,12 @@ class VEllipse {
         const y_x2 = this.center.y + a * Math.cos(t_x2) * Math.sin(this.rotation) + b * Math.sin(t_x2) * Math.cos(this.rotation);
         let x_max, x_min;
         if (x_x1 > x_x2) {
-            x_max = new Vertex(x_x1, y_x1);
-            x_min = new Vertex(x_x2, y_x2);
+            x_max = new Vertex$1(x_x1, y_x1);
+            x_min = new Vertex$1(x_x2, y_x2);
         }
         else {
-            x_max = new Vertex(x_x2, y_x2);
-            x_min = new Vertex(x_x1, y_x1);
+            x_max = new Vertex$1(x_x2, y_x2);
+            x_min = new Vertex$1(x_x1, y_x1);
         }
         // Calculate t_y values
         const t_y1 = Math.atan2(b * Math.cos(this.rotation), a * Math.sin(this.rotation));
@@ -11597,12 +11597,12 @@ class VEllipse {
         const y_y2 = this.center.y + a * Math.cos(t_y2) * Math.sin(this.rotation) + b * Math.sin(t_y2) * Math.cos(this.rotation);
         let y_max, y_min;
         if (y_y1 > y_y2) {
-            y_max = new Vertex(x_y1, y_y1);
-            y_min = new Vertex(x_y2, y_y2);
+            y_max = new Vertex$1(x_y1, y_y1);
+            y_min = new Vertex$1(x_y2, y_y2);
         }
         else {
-            y_max = new Vertex(x_y2, y_y2);
-            y_min = new Vertex(x_y1, y_y1);
+            y_max = new Vertex$1(x_y2, y_y2);
+            y_min = new Vertex$1(x_y1, y_y1);
         }
         return [x_max, x_min, y_max, y_min];
     }
@@ -11687,7 +11687,7 @@ class VEllipse {
         // https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle
         const a = this.radiusH();
         const b = this.radiusV();
-        return new Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle)).rotate(this.rotation, this.center);
+        return new Vertex$1(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle)).rotate(this.rotation, this.center);
     }
     /**
      * Get the normal vector at the given angle.
@@ -11841,7 +11841,7 @@ class VEllipse {
         rayCopy.b.scaleXY(scalingFactors);
         // Intermediate result: now the ellipse is transformed to a circle and we can calculate intersections :)
         // Step F: calculate circle+line intersecions
-        const tmpCircle = new Circle(new Vertex(), ellipseCopy.radiusH()); // radiusH() === radiusV()
+        const tmpCircle = new Circle(new Vertex$1(), ellipseCopy.radiusH()); // radiusH() === radiusV()
         const intersections = tmpCircle.lineIntersections(rayCopy, inVectorBoundsOnly);
         // Step G: transform intersecions back to original configuration
         intersections.forEach(function (intersectionPoint) {
@@ -12162,7 +12162,7 @@ class VEllipseSector {
         // First get all line intersections from underlying ellipse.
         const ellipseIntersections = this.ellipse.lineIntersections(ray, inVectorBoundsOnly);
         // Drop all intersection points that are not contained in the circle sectors bounds.
-        const tmpLine = new Line(this.ellipse.center, new Vertex());
+        const tmpLine = new Line(this.ellipse.center, new Vertex$1());
         return ellipseIntersections.filter((intersectionPoint) => {
             tmpLine.b.set(intersectionPoint);
             const lineAngle = tmpLine.angle();
@@ -12280,8 +12280,8 @@ VEllipseSector.ellipseSectorUtils = {
         endAngle = geomutils.wrapMax(endAngle, Math.PI * 2);
         // Find the start- and end-point on the rotated ellipse
         // XYCoords to Vertex (for rotation)
-        var end = new Vertex(VEllipse.utils.polarToCartesian(x, y, radiusH, radiusV, endAngle));
-        var start = new Vertex(VEllipse.utils.polarToCartesian(x, y, radiusH, radiusV, startAngle));
+        var end = new Vertex$1(VEllipse.utils.polarToCartesian(x, y, radiusH, radiusV, endAngle));
+        var start = new Vertex$1(VEllipse.utils.polarToCartesian(x, y, radiusH, radiusV, startAngle));
         end.rotate(rotation, { x: x, y: y });
         start.rotate(rotation, { x: x, y: y });
         // Boolean stored as integers (0|1).
@@ -12412,13 +12412,13 @@ VEllipseSector.ellipseSectorUtils = {
         const cx = cosphi * _cx - sinphi * _cy + (x1 + x2) / 2;
         const cy = sinphi * _cx + cosphi * _cy + (y1 + y2) / 2;
         // Step 4: Compute start and end angle
-        const center = new Vertex(cx, cy);
+        const center = new Vertex$1(cx, cy);
         const axis = center.clone().addXY(rx, ry);
         const ellipse = new VEllipse(center, axis, 0);
         // console.log("VELLIPSE::::::", ellipse);
         ellipse.rotate(phi);
-        const startAngle = new Line(ellipse.center, new Vertex(x1, y1)).angle();
-        const endAngle = new Line(ellipse.center, new Vertex(x2, y2)).angle();
+        const startAngle = new Line(ellipse.center, new Vertex$1(x1, y1)).angle();
+        const endAngle = new Line(ellipse.center, new Vertex$1(x2, y2)).angle();
         return new VEllipseSector(ellipse, startAngle - phi, endAngle - phi);
     }
 }; // END ellipseSectorUtils
@@ -12802,7 +12802,7 @@ class PlotBoilerplate {
         // +---------------------------------------------------------------------------------
         // | Object members.
         // +-------------------------------
-        this.grid = new Grid(new Vertex(0, 0), new Vertex(50, 50));
+        this.grid = new Grid(new Vertex$1(0, 0), new Vertex$1(50, 50));
         this.canvasSize = { width: PlotBoilerplate.DEFAULT_CANVAS_WIDTH, height: PlotBoilerplate.DEFAULT_CANVAS_HEIGHT };
         const canvasElement = typeof config.canvas === "string" ? document.querySelector(config.canvas) : config.canvas;
         if (typeof canvasElement === "undefined") {
@@ -12837,8 +12837,8 @@ class PlotBoilerplate {
             if (typeof drawutilssvg === "undefined")
                 throw `The svg draw library is not yet integrated part of PlotBoilerplate. Please include ./src/js/utils/helpers/drawutils.svg into your document.`;
             this.canvas = canvasElement;
-            this.draw = new drawutilssvg(this.canvas, new Vertex(), // offset
-            new Vertex(), // scale
+            this.draw = new drawutilssvg(this.canvas, new Vertex$1(), // offset
+            new Vertex$1(), // scale
             this.canvasSize, false, // fillShapes=false
             this.drawConfig, false // isSecondary=false
             );
@@ -12962,11 +12962,11 @@ class PlotBoilerplate {
      *
      **/
     fitToView(bounds) {
-        const canvasCenter = new Vertex(this.canvasSize.width / 2.0, this.canvasSize.height / 2.0);
+        const canvasCenter = new Vertex$1(this.canvasSize.width / 2.0, this.canvasSize.height / 2.0);
         const canvasRatio = this.canvasSize.width / this.canvasSize.height;
         const ratio = bounds.width / bounds.height;
         // Find the new draw offset
-        const center = new Vertex(bounds.max.x - bounds.width / 2.0, bounds.max.y - bounds.height / 2.0)
+        const center = new Vertex$1(bounds.max.x - bounds.width / 2.0, bounds.max.y - bounds.height / 2.0)
             .inv()
             .addXY(this.canvasSize.width / 2.0, this.canvasSize.height / 2.0);
         this.setOffset(center);
@@ -13092,7 +13092,7 @@ class PlotBoilerplate {
         }
         else {
             const addedDrawables = [drawable];
-            if (drawable instanceof Vertex) {
+            if (drawable instanceof Vertex$1) {
                 this.drawables.push(drawable);
                 this.vertices.push(drawable);
             }
@@ -13236,7 +13236,7 @@ class PlotBoilerplate {
             !doNotFireEvent && this._fireContentChanged([], removedDrawables);
             return removedDrawables.length > 0;
         }
-        if (drawable instanceof Vertex) {
+        if (drawable instanceof Vertex$1) {
             const wasRemoved = this.removeVertex(drawable, false, false);
             if (redraw) {
                 this.redraw();
@@ -13609,7 +13609,7 @@ class PlotBoilerplate {
         else if (d instanceof CircleSector) {
             draw.circleArc(d.circle.center, d.circle.radius, d.startAngle, d.endAngle, this.drawConfig.circleSector.color, this.drawConfig.circleSector.lineWidth);
         }
-        else if (d instanceof Vertex) {
+        else if (d instanceof Vertex$1) {
             if (this.drawConfig.drawVertices && (!d.attr.selectable || !d.attr.draggable) && d.attr.visible) {
                 // Draw as special point (grey)
                 draw.circleHandle(d, 7, this.drawConfig.vertex.color);
@@ -13990,7 +13990,7 @@ class PlotBoilerplate {
         }
         else if (_self.selectPolygon != null) {
             const vert = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
-            _self.selectPolygon.vertices.push(new Vertex(vert.x, vert.y));
+            _self.selectPolygon.vertices.push(new Vertex$1(vert.x, vert.y));
             _self.redraw();
         }
     }
@@ -14118,7 +14118,7 @@ class PlotBoilerplate {
             for (var i in _self.draggedElements) {
                 var p = _self.draggedElements[i];
                 if (p.typeName == "bpath") {
-                    _self.paths[p.pindex].moveCurvePoint(p.cindex, p.pid, new Vertex(e.params.dragAmount.x, e.params.dragAmount.y));
+                    _self.paths[p.pindex].moveCurvePoint(p.cindex, p.pid, new Vertex$1(e.params.dragAmount.x, e.params.dragAmount.y));
                     _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEvent(e);
                 }
                 else if (p.typeName == "vertex") {
@@ -14182,10 +14182,10 @@ class PlotBoilerplate {
         const _self = this;
         const we = e;
         if (we.deltaY < 0) {
-            _self.setZoom(_self.config.scaleX * zoomStep, _self.config.scaleY * zoomStep, new Vertex(e.params.pos.x, e.params.pos.y));
+            _self.setZoom(_self.config.scaleX * zoomStep, _self.config.scaleY * zoomStep, new Vertex$1(e.params.pos.x, e.params.pos.y));
         }
         else if (we.deltaY > 0) {
-            _self.setZoom(_self.config.scaleX / zoomStep, _self.config.scaleY / zoomStep, new Vertex(e.params.pos.x, e.params.pos.y));
+            _self.setZoom(_self.config.scaleX / zoomStep, _self.config.scaleY / zoomStep, new Vertex$1(e.params.pos.x, e.params.pos.y));
         }
         e.preventDefault();
         _self.redraw();
@@ -14293,8 +14293,8 @@ class PlotBoilerplate {
                         // touchStart: (evt: TouchEvent) => {
                         touchStart: (evt) => {
                             if (evt.touches.length == 1) {
-                                touchMovePos = new Vertex(relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
-                                touchDownPos = new Vertex(relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
+                                touchMovePos = new Vertex$1(relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
+                                touchDownPos = new Vertex$1(relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
                                 draggedElement = _self.locatePointNear(_self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
                                 if (draggedElement && draggedElement.typeName == "vertex") {
                                     var draggingVertex = _self.vertices[draggedElement.vindex];
@@ -14322,7 +14322,7 @@ class PlotBoilerplate {
                                 }
                                 var rel = relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY });
                                 var trans = _self.transformMousePosition(rel.x, rel.y);
-                                var diff = new Vertex(_self.transformMousePosition(touchMovePos.x, touchMovePos.y)).difference(trans);
+                                var diff = new Vertex$1(_self.transformMousePosition(touchMovePos.x, touchMovePos.y)).difference(trans);
                                 if (draggedElement.typeName == "vertex") {
                                     if (!_self.vertices[draggedElement.vindex].attr.draggable)
                                         return;
@@ -14341,7 +14341,7 @@ class PlotBoilerplate {
                                     draggingVertex.listeners.fireDragEvent(fakeEvent);
                                     _self.redraw();
                                 }
-                                touchMovePos = new Vertex(rel);
+                                touchMovePos = new Vertex$1(rel);
                             }
                             else if (evt.touches.length == 2) {
                                 if (!this.config.enablePan) {
@@ -14403,8 +14403,8 @@ class PlotBoilerplate {
                                 return;
                             }
                             // For pinching there must be at least two touch items
-                            const fingerA = new Vertex(touchItem0.clientX, touchItem0.clientY);
-                            const fingerB = new Vertex(touchItem1.clientX, touchItem1.clientY);
+                            const fingerA = new Vertex$1(touchItem0.clientX, touchItem0.clientY);
+                            const fingerB = new Vertex$1(touchItem1.clientX, touchItem1.clientY);
                             const center = new Line(fingerA, fingerB).vertAt(0.5);
                             _self.setZoom(multiTouchStartScale.x * evt.zoom, multiTouchStartScale.y * evt.zoom, center);
                             _self.redraw();
@@ -14732,7 +14732,7 @@ PlotBoilerplate.utils = {
                 bezierPath.bezierCurves[bezierPath.bezierCurves.length - 1].endPoint.listeners.addDragListener(function (e) {
                     if (!bezierPath.adjustCircular) {
                         var cindex = bezierPath.locateCurveByEndPoint(e.params.vertex);
-                        bezierPath.moveCurvePoint(cindex * 1, bezierPath.END_CONTROL_POINT, new Vertex({ x: e.params.dragAmount.x, y: e.params.dragAmount.y }));
+                        bezierPath.moveCurvePoint(cindex * 1, bezierPath.END_CONTROL_POINT, new Vertex$1({ x: e.params.dragAmount.x, y: e.params.dragAmount.y }));
                     }
                     bezierPath.updateArcLengths();
                 });
@@ -14741,5 +14741,11026 @@ PlotBoilerplate.utils = {
     }
 }; // END utils
 
-export { BezierPath, Bounds, Circle, CircleSector, CubicBezierCurve, Grid, KeyHandler, Line, MouseHandler, PBImage, PBText, PlotBoilerplate, Polygon, Triangle, UIDGenerator, VEllipse, VEllipseSector, Vector, VertTuple, Vertex, VertexAttr, VertexListeners, XMouseEvent, XWheelEvent, drawutils, drawutilsgl, drawutilssvg, geomutils };
+/**
+ * The name says it.
+ *
+ * @requires Vertex
+ *
+ * @author   Ikaros Kappler
+ * @date     2020-12-20
+ * @modified 2021-02-09 Ported to TypeScript.
+ * @version  1.0.0
+ */
+const cloneVertexArray = (vertices) => {
+    const result = [];
+    for (var i = 0; i < vertices.length; i++) {
+        result.push(new Vertex$1(vertices[i].x, vertices[i].y));
+    }
+    return result;
+};
+
+/**
+ * A helper function to generate randmoized non-intersecting polygons.
+ *
+ * @author  Ikaros Kappler
+ * @date    2025-03-23 (ported to Typescript from a helper script from 2024)
+ * @version 1.0.0
+ */
+/**
+ * @param numVertices
+ * @returns
+ */
+const createRandomizedPolygon = (numVertices, viewport, createClockwise) => {
+    const polygon = new Polygon();
+    for (var i = 0; i < numVertices; i++) {
+        const vert = new Vertex$1(viewport.getMinDimension() * 0.33, 0.0);
+        vert.rotate(((Math.PI * 2) / numVertices) * i);
+        vert.addXY(viewport.width * 0.1 * (1.0 - Math.random() * 2), viewport.height * 0.1 * (1.0 - Math.random() * 2));
+        polygon.addVertex(vert);
+    }
+    if (createClockwise && !polygon.isClockwise()) {
+        // Reverse
+        polygon.vertices = polygon.vertices.reverse();
+    }
+    return polygon;
+};
+
+/**
+ * @author  Ikaros Kappler
+ * @date    2021-11-07
+ * @modified 2023-09-25 Ported to Typescript and added system darkmode detection.
+ * @version 1.1.0
+ *
+ * @param {Record<string,string>} GUP
+ * @returns {boolean}
+ */
+const detectDarkMode = (GUP) => {
+    var isDarkmode = false;
+    // Respect overrides
+    if (typeof GUP !== "undefined" && GUP.hasOwnProperty("darkmode") && GUP["darkmode"]) {
+        // const overrideValue = PlotBoilerplate.utils.fetch.bool(GUP, "darkmode", null);
+        const overrideValue = !!JSON.parse(GUP["darkmode"]);
+        if (overrideValue !== null) {
+            isDarkmode = overrideValue;
+        }
+    }
+    else if (globalThis.matchMedia && globalThis.matchMedia("(prefers-color-scheme: dark)").matches) {
+        // dark mode by system
+        isDarkmode = true;
+    }
+    else {
+        // else: dark mode by daytime
+        const hours = new Date().getHours();
+        const isDayTime = hours > 6 && hours < 18;
+        isDarkmode = !isDayTime;
+    }
+    // console.log("Adding darkmode to <body>", isDarkmode);
+    if (isDarkmode && document.body) {
+        // Add darkmode class to <body> tag
+        document.body.classList.add("darkmode");
+    }
+    return isDarkmode;
+};
+
+/**
+ * @author  Ikaros Kappler
+ * @date    2022-01-10
+ * @version 1.0.0
+ */
+/**
+ * In an array of vertices find the first occurence of a specific vertex, using
+ * and epsilon tolerance.
+ *
+ * @param {Array<Vertex>} vertexList - The vertex array to search in.
+ * @param {XYCoords} vertex - A vertex/position to search for. This can be any x-y-tuple and does not
+ *                              necessarily need to be an instance of Vertex.
+ * @param {number} epsilon - The epsilon tolerance to use (should be >= 0). This is a required param to avoid excessive
+ *                              is-undef checking if this function runs in a loop.
+ * @returns {boolean} - The first index of a vertex that matched or -1 if no such vertex could be found.
+ */
+const findInVertexArray = (vertexList, vertex, epsilon) => {
+    for (var i = 0; i < vertexList.length; i++) {
+        if (vertexList[i].distance(vertex) < epsilon) {
+            return i;
+        }
+    }
+    return -1;
+};
+
+/**
+ * `gup` = "Get URL/URI Params".
+ *
+ * This function simply taktes the location string from the broser bar and retrieves all GET params
+ * as a record of string mappings.
+ *
+ * You can pass that result into the `Params` class to get proper type conversion for numbers and booleans.
+ *
+ * Ported to typescript.
+ * @date 2021-05-21
+ * @modified 2024-03-10 Fixed some type for Typescript 5 compatibility.
+ * @modified 2024-08-26 Decoding URI components in GET params.
+ */
+// Get the URI GET params as an assoc.
+//
+// A nicer version with regex
+// Found at
+//    https://stackoverflow.com/questions/979975/how-to-get-the-value-from-the-get-parameters?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+const gup = () => {
+    const vars = {};
+    globalThis.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, (_m, key, value) => {
+        const keyName = key;
+        return (vars[decodeURIComponent(keyName)] = value);
+    });
+    return vars;
+};
+
+/**
+ * Approach to observe objects from other scripts to be initialized.
+ *
+ * @author  Ikaros Kappler
+ * @date    2024-07-08
+ * @version 1.0.0
+ */
+class InitializationObserver {
+    constructor(timeout, timeoutMessage) {
+        this._acceptRejectPairs = [];
+        this._timeoutMessage = timeoutMessage !== null && timeoutMessage !== void 0 ? timeoutMessage : null;
+        globalThis.setTimeout(() => {
+            var _a;
+            if (this._isInitialized) {
+                return; // NOOP
+            }
+            // else
+            if (!this._timeoutMessage) {
+                console.warn("Failed to initialize object. Reason unknown.");
+            }
+            this._fireReject((_a = this._timeoutMessage) !== null && _a !== void 0 ? _a : null);
+        }, timeout);
+    }
+    accept(value) {
+        if (this._isInitialized) {
+            return;
+        }
+        this._isInitialized = true;
+        this._initializedValue = value;
+        this._fireAccept(value);
+    }
+    _fireAccept(value) {
+        this._acceptRejectPairs.forEach(pair => {
+            pair.accept(value);
+        });
+    }
+    _fireReject(error) {
+        this._acceptRejectPairs.forEach(pair => {
+            pair.reject(error);
+        });
+    }
+    waitForInitialized() {
+        const _self = this;
+        // If the value is already present, then accept immediately
+        if (_self._isInitialized) {
+            return new Promise((accept, reject) => {
+                accept(_self._initializedValue);
+            });
+        }
+        else {
+            return new Promise((accept, reject) => {
+                _self._acceptRejectPairs.push({ accept, reject });
+            });
+        }
+    }
+}
+
+/**
+ * A wrapper for Lissajous figure params.
+ *
+ * @author   Ikaros Kappler
+ * @date     2018-11-22
+ * @modified 2025-10-29 Ported to typescript from demo 13-lissajous.
+ * @version  1.0.0
+ */
+class LissajousFigure {
+    /**
+     * Create a new figure with the given settings.
+     * @param {number} freqA - The 'horizontal' frequency.
+     * @param {number} freqB - The 'vertical' frequency.
+     * @param {number} phaseA - The 'horizonal' phase shift.
+     * @param {number} phaseB - The 'vertical' phase shift.
+     */
+    constructor(freqA, freqB, phaseA, phaseB) {
+        this.freqA = freqA;
+        this.freqB = freqB;
+        this.phaseA = phaseA;
+        this.phaseB = phaseB;
+    }
+    /**
+     * Get the point at the given abstract time.
+     *
+     * The result is periodic in 0..TWO_PI.
+     *
+     * @param {number} t - The timing value (for example milliseconds).
+     * @returns {Vertex} The x-y-position on the Lissajous figure at the given time.
+     */
+    getPointAt(t) {
+        return new Vertex$1(Math.sin(this.phaseA + this.freqA * t), Math.sin(this.phaseB + this.freqB * t));
+    }
+    toPolyLine(stepSize) {
+        const polyLine = [];
+        let pA = new Vertex$1(0, 0);
+        stepSize = Math.abs(stepSize);
+        for (var t = 0; t <= 2 * Math.PI; t += stepSize) {
+            pA = this.getPointAt(t);
+            polyLine.push(pA.clone());
+        }
+        return polyLine;
+    }
+    toQuadraticBezierApproximation(stepSize
+    // scale: number
+    // alternating: boolean
+    ) {
+        const result = [];
+        let pA = new Vertex$1(0, 0);
+        let pB = new Vertex$1(0, 0);
+        stepSize = Math.abs(stepSize);
+        let p1 = new Vertex$1(0, 0);
+        let dx1 = this.freqA;
+        let dy1 = this.freqB;
+        pA = this.getPointAt(stepSize);
+        let x2, y2, dx2, dy2, det, x3, y3;
+        var i = 0;
+        for (var t = stepSize; t <= 2 * Math.PI + 2 * stepSize; t += stepSize) {
+            x2 = Math.sin(this.phaseA + this.freqA * t);
+            y2 = Math.sin(this.phaseB + this.freqB * t);
+            dx2 = this.freqA * Math.cos(this.phaseA + this.freqA * t);
+            dy2 = this.freqB * Math.cos(this.phaseB + this.freqB * t);
+            det = dx1 * dy2 - dy1 * dx2;
+            if (Math.abs(det) > 0.1) {
+                x3 = ((x2 * dy2 - y2 * dx2) * dx1 - (p1.x * dy1 - p1.y * dx1) * dx2) / det;
+                y3 = ((x2 * dy2 - y2 * dx2) * dy1 - (p1.x * dy1 - p1.y * dx1) * dy2) / det;
+                // pB.set(scale * x2, scale * y2 * (alternating ? -1 : 1));
+                // pB.set(scale * x2, scale * y2);
+                pB.set(x2, y2);
+                // pB.set(x2, y2);
+                if (i > 0) {
+                    //   pb.draw.quadraticBezier(pA, new Vertex(scale * x3, scale * y3), pB, "rgba(0,108,255,1.0)", 2);
+                    //   result.push([pA.clone(), new Vertex(scale * x3, scale * y3), pB.clone()]);
+                    result.push([pA.clone(), new Vertex$1(x3, y3), pB.clone()]);
+                }
+            }
+            else {
+                // pB.set(scale * x2, scale * y2);
+                pB.set(x2, y2);
+                if (i > 0) {
+                    //   pb.draw.line(pA, pB, "rgba(0,192,192,0.8)", 2);
+                    result.push([pA.clone(), pB.clone()]);
+                }
+            }
+            p1.set(x2, y2);
+            dx1 = dx2;
+            dy1 = dy2;
+            pA.set(pB);
+            i++;
+        } // END for
+        return result;
+    }
+}
+
+/**
+ * Generate regular polygons (N-Gons) and stars (N-Stars).
+ *
+ * @author   Ikaros Kappler
+ * @date     2023-11-24 (plain Javascript)
+ * @modified 2024-01-29 Ported to Typescript.
+ * @version 1.0.0
+ */
+const NGons = {
+    ngon: (n, radius) => {
+        const center = new Vertex$1(0, 0);
+        const verts = [];
+        for (var i = 0; i < n; i++) {
+            var vert = new Vertex$1(radius, 0);
+            vert.rotate(((Math.PI * 2) / n) * i, center);
+            verts.push(vert);
+        }
+        return new Polygon(verts);
+    },
+    nstar: (n, radiusA, radiusB) => {
+        const center = new Vertex$1(0, 0);
+        const verts = [];
+        for (var i = 0; i < n; i++) {
+            var vert = new Vertex$1(i % 2 === 0 ? radiusA : radiusB, 0);
+            vert.rotate(((Math.PI * 2) / n) * i, center);
+            verts.push(vert);
+        }
+        return new Polygon(verts);
+    }
+};
+
+/**
+ * Wraps a Record<string,string> and adds type conversion methods (developed this in
+ * some other project) and added this here (2023-10-28).
+ *
+ * @author   Ikars Kappler
+ * @version  1.0.0
+ * @date     2023-03-13
+ * @modified 2024-08-26 Added the `hasParam` method.
+ */
+class Params {
+    constructor(baseParams) {
+        this.baseParams = baseParams;
+    }
+    hasParam(name) {
+        return this.baseParams.hasOwnProperty(name);
+    }
+    getString(name, fallback) {
+        let value = this.baseParams[name];
+        if (typeof value === "undefined" || !value || (value = value.trim()).length === 0) {
+            return fallback;
+        }
+        return value;
+    }
+    getNumber(name, fallback) {
+        let value = this.baseParams[name];
+        if (typeof value === "undefined" || !value || (value = value.trim()).length === 0) {
+            return fallback;
+        }
+        return Number(value);
+    }
+    getBoolean(name, fallback) {
+        let value = this.baseParams[name];
+        if (typeof value === "undefined" || !value || (value = value.trim()).length === 0) {
+            return fallback;
+        }
+        value = value.toLocaleLowerCase();
+        if (value === "1" || value === "on" || value === "yes" || value === "y" || value === "hi" || value == "high") {
+            return true;
+        }
+        else if (value === "0" || value === "off" || value === "no" || value === "n" || value === "lo" || value == "low") {
+            return false;
+        }
+        else {
+            return Boolean(value);
+        }
+    }
+}
+
+/*
+ * A speed-improved perlin and simplex noise algorithms for 2D.
+ *
+ * Based on example code by Stefan Gustavson (stegu@itn.liu.se).
+ * Optimisations by Peter Eastman (peastman@drizzle.stanford.edu).
+ * Better rank ordering method by Stefan Gustavson in 2012.
+ * Converted to Javascript by Joseph Gentle.
+ *
+ * Version 2012-03-09
+ *
+ * This code was placed in the public domain by its original author,
+ * Stefan Gustavson. You may use it as you see fit, but
+ * attribution is appreciated.
+ *
+ * @modified 2023-03-07 Ikaros Kappler; ported to Typescript & refactored to class.
+ * @modified 2025-11-12 Ikaros Kappler; moved from a different project `floatsim` and refactored the class.
+ */
+class Grad {
+    constructor(x, y, z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+    dot2(x, y) {
+        return this.x * x + this.y * y;
+    }
+    dot3(x, y, z) {
+        return this.x * x + this.y * y + this.z * z;
+    }
+}
+const grad3 = [
+    new Grad(1, 1, 0),
+    new Grad(-1, 1, 0),
+    new Grad(1, -1, 0),
+    new Grad(-1, -1, 0),
+    new Grad(1, 0, 1),
+    new Grad(-1, 0, 1),
+    new Grad(1, 0, -1),
+    new Grad(-1, 0, -1),
+    new Grad(0, 1, 1),
+    new Grad(0, -1, 1),
+    new Grad(0, 1, -1),
+    new Grad(0, -1, -1)
+];
+const p = [
+    151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23,
+    190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33, 88, 237, 149, 56, 87, 174, 20,
+    125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48, 27, 166, 77, 146, 158, 231, 83, 111, 229, 122, 60, 211, 133, 230, 220,
+    105, 92, 41, 55, 46, 245, 40, 244, 102, 143, 54, 65, 25, 63, 161, 1, 216, 80, 73, 209, 76, 132, 187, 208, 89, 18, 169, 200, 196,
+    135, 130, 116, 188, 159, 86, 164, 100, 109, 198, 173, 186, 3, 64, 52, 217, 226, 250, 124, 123, 5, 202, 38, 147, 118, 126, 255,
+    82, 85, 212, 207, 206, 59, 227, 47, 16, 58, 17, 182, 189, 28, 42, 223, 183, 170, 213, 119, 248, 152, 2, 44, 154, 163, 70, 221,
+    153, 101, 155, 167, 43, 172, 9, 129, 22, 39, 253, 19, 98, 108, 110, 79, 113, 224, 232, 178, 185, 112, 104, 218, 246, 97, 228,
+    251, 34, 242, 193, 238, 210, 144, 12, 191, 179, 162, 241, 81, 51, 145, 235, 249, 14, 239, 107, 49, 192, 214, 31, 181, 199, 106,
+    157, 184, 84, 204, 176, 115, 121, 50, 45, 127, 4, 150, 254, 138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78,
+    66, 215, 61, 156, 180
+];
+// To remove the need for index wrapping, double the permutation table length
+// const perm = new Array<number>(512);
+// const gradP = new Array<Grad>(512);
+// Skewing and unskewing factors for 2, 3, and 4 dimensions
+const F2 = 0.5 * (Math.sqrt(3) - 1);
+const G2 = (3 - Math.sqrt(3)) / 6;
+const F3 = 1 / 3;
+const G3 = 1 / 6;
+const fade = (t) => {
+    return t * t * t * (t * (t * 6 - 15) + 10);
+};
+const lerp$1 = (a, b, t) => {
+    return (1 - t) * a + t * b;
+};
+// export const noise = {
+class PerlinNoise {
+    constructor() {
+        // To remove the need for index wrapping, double the permutation table length
+        this.perm = new Array(512);
+        this.gradP = new Array(512);
+        // Use initial seed.
+        this.seed(0);
+    }
+    // This isn't a very good seeding function, but it works ok. It supports 2^16
+    // different seed values. Write something better if you need more seeds.
+    //   module.seed = function (seed) {
+    seed(seed) {
+        if (seed > 0 && seed < 1) {
+            // Scale the seed out
+            seed *= 65536;
+        }
+        seed = Math.floor(seed);
+        if (seed < 256) {
+            seed |= seed << 8;
+        }
+        for (var i = 0; i < 256; i++) {
+            var v;
+            if (i & 1) {
+                v = p[i] ^ (seed & 255);
+            }
+            else {
+                v = p[i] ^ ((seed >> 8) & 255);
+            }
+            this.perm[i] = this.perm[i + 256] = v;
+            this.gradP[i] = this.gradP[i + 256] = grad3[v % 12];
+        }
+        return this;
+    }
+    // 2D simplex noise
+    simplex2(xin, yin) {
+        var n0, n1, n2; // Noise contributions from the three corners
+        // Skew the input space to determine which simplex cell we're in
+        const s = (xin + yin) * F2; // Hairy factor for 2D
+        var i = Math.floor(xin + s);
+        var j = Math.floor(yin + s);
+        const t = (i + j) * G2;
+        const x0 = xin - i + t; // The x,y distances from the cell origin, unskewed.
+        const y0 = yin - j + t;
+        // For the 2D case, the simplex shape is an equilateral triangle.
+        // Determine which simplex we are in.
+        var i1, j1; // Offsets for second (middle) corner of simplex in (i,j) coords
+        if (x0 > y0) {
+            // lower triangle, XY order: (0,0)->(1,0)->(1,1)
+            i1 = 1;
+            j1 = 0;
+        }
+        else {
+            // upper triangle, YX order: (0,0)->(0,1)->(1,1)
+            i1 = 0;
+            j1 = 1;
+        }
+        // A step of (1,0) in (i,j) means a step of (1-c,-c) in (x,y), and
+        // a step of (0,1) in (i,j) means a step of (-c,1-c) in (x,y), where
+        // c = (3-sqrt(3))/6
+        const x1 = x0 - i1 + G2; // Offsets for middle corner in (x,y) unskewed coords
+        const y1 = y0 - j1 + G2;
+        const x2 = x0 - 1 + 2 * G2; // Offsets for last corner in (x,y) unskewed coords
+        const y2 = y0 - 1 + 2 * G2;
+        // Work out the hashed gradient indices of the three simplex corners
+        i &= 255;
+        j &= 255;
+        const gi0 = this.gradP[i + this.perm[j]];
+        const gi1 = this.gradP[i + i1 + this.perm[j + j1]];
+        const gi2 = this.gradP[i + 1 + this.perm[j + 1]];
+        // Calculate the contribution from the three corners
+        var t0 = 0.5 - x0 * x0 - y0 * y0;
+        if (t0 < 0) {
+            n0 = 0;
+        }
+        else {
+            t0 *= t0;
+            n0 = t0 * t0 * gi0.dot2(x0, y0); // (x,y) of grad3 used for 2D gradient
+        }
+        var t1 = 0.5 - x1 * x1 - y1 * y1;
+        if (t1 < 0) {
+            n1 = 0;
+        }
+        else {
+            t1 *= t1;
+            n1 = t1 * t1 * gi1.dot2(x1, y1);
+        }
+        var t2 = 0.5 - x2 * x2 - y2 * y2;
+        if (t2 < 0) {
+            n2 = 0;
+        }
+        else {
+            t2 *= t2;
+            n2 = t2 * t2 * gi2.dot2(x2, y2);
+        }
+        // Add contributions from each corner to get the final noise value.
+        // The result is scaled to return values in the interval [-1,1].
+        return 70 * (n0 + n1 + n2);
+    }
+    // 3D simplex noise
+    simplex3(xin, yin, zin) {
+        var n0, n1, n2, n3; // Noise contributions from the four corners
+        // Skew the input space to determine which simplex cell we're in
+        const s = (xin + yin + zin) * F3; // Hairy factor for 2D
+        var i = Math.floor(xin + s);
+        var j = Math.floor(yin + s);
+        var k = Math.floor(zin + s);
+        const t = (i + j + k) * G3;
+        const x0 = xin - i + t; // The x,y distances from the cell origin, unskewed.
+        const y0 = yin - j + t;
+        const z0 = zin - k + t;
+        // For the 3D case, the simplex shape is a slightly irregular tetrahedron.
+        // Determine which simplex we are in.
+        var i1, j1, k1; // Offsets for second corner of simplex in (i,j,k) coords
+        var i2, j2, k2; // Offsets for third corner of simplex in (i,j,k) coords
+        if (x0 >= y0) {
+            if (y0 >= z0) {
+                i1 = 1;
+                j1 = 0;
+                k1 = 0;
+                i2 = 1;
+                j2 = 1;
+                k2 = 0;
+            }
+            else if (x0 >= z0) {
+                i1 = 1;
+                j1 = 0;
+                k1 = 0;
+                i2 = 1;
+                j2 = 0;
+                k2 = 1;
+            }
+            else {
+                i1 = 0;
+                j1 = 0;
+                k1 = 1;
+                i2 = 1;
+                j2 = 0;
+                k2 = 1;
+            }
+        }
+        else {
+            if (y0 < z0) {
+                i1 = 0;
+                j1 = 0;
+                k1 = 1;
+                i2 = 0;
+                j2 = 1;
+                k2 = 1;
+            }
+            else if (x0 < z0) {
+                i1 = 0;
+                j1 = 1;
+                k1 = 0;
+                i2 = 0;
+                j2 = 1;
+                k2 = 1;
+            }
+            else {
+                i1 = 0;
+                j1 = 1;
+                k1 = 0;
+                i2 = 1;
+                j2 = 1;
+                k2 = 0;
+            }
+        }
+        // A step of (1,0,0) in (i,j,k) means a step of (1-c,-c,-c) in (x,y,z),
+        // a step of (0,1,0) in (i,j,k) means a step of (-c,1-c,-c) in (x,y,z), and
+        // a step of (0,0,1) in (i,j,k) means a step of (-c,-c,1-c) in (x,y,z), where
+        // c = 1/6.
+        const x1 = x0 - i1 + G3; // Offsets for second corner
+        const y1 = y0 - j1 + G3;
+        const z1 = z0 - k1 + G3;
+        const x2 = x0 - i2 + 2 * G3; // Offsets for third corner
+        const y2 = y0 - j2 + 2 * G3;
+        const z2 = z0 - k2 + 2 * G3;
+        const x3 = x0 - 1 + 3 * G3; // Offsets for fourth corner
+        const y3 = y0 - 1 + 3 * G3;
+        const z3 = z0 - 1 + 3 * G3;
+        // Work out the hashed gradient indices of the four simplex corners
+        i &= 255;
+        j &= 255;
+        k &= 255;
+        const gi0 = this.gradP[i + this.perm[j + this.perm[k]]];
+        const gi1 = this.gradP[i + i1 + this.perm[j + j1 + this.perm[k + k1]]];
+        const gi2 = this.gradP[i + i2 + this.perm[j + j2 + this.perm[k + k2]]];
+        const gi3 = this.gradP[i + 1 + this.perm[j + 1 + this.perm[k + 1]]];
+        // Calculate the contribution from the four corners
+        var t0 = 0.5 - x0 * x0 - y0 * y0 - z0 * z0;
+        if (t0 < 0) {
+            n0 = 0;
+        }
+        else {
+            t0 *= t0;
+            n0 = t0 * t0 * gi0.dot3(x0, y0, z0); // (x,y) of grad3 used for 2D gradient
+        }
+        var t1 = 0.5 - x1 * x1 - y1 * y1 - z1 * z1;
+        if (t1 < 0) {
+            n1 = 0;
+        }
+        else {
+            t1 *= t1;
+            n1 = t1 * t1 * gi1.dot3(x1, y1, z1);
+        }
+        var t2 = 0.5 - x2 * x2 - y2 * y2 - z2 * z2;
+        if (t2 < 0) {
+            n2 = 0;
+        }
+        else {
+            t2 *= t2;
+            n2 = t2 * t2 * gi2.dot3(x2, y2, z2);
+        }
+        var t3 = 0.5 - x3 * x3 - y3 * y3 - z3 * z3;
+        if (t3 < 0) {
+            n3 = 0;
+        }
+        else {
+            t3 *= t3;
+            n3 = t3 * t3 * gi3.dot3(x3, y3, z3);
+        }
+        // Add contributions from each corner to get the final noise value.
+        // The result is scaled to return values in the interval [-1,1].
+        return 32 * (n0 + n1 + n2 + n3);
+    }
+    // 2D Perlin Noise
+    perlin2(x_init, y_init) {
+        // Find unit grid cell containing point
+        var X = Math.floor(x_init), Y = Math.floor(y_init);
+        // Get relative xy coordinates of point within that cell
+        const x = x_init - X;
+        const y = y_init - Y;
+        // Wrap the integer cells at 255 (smaller integer period can be introduced here)
+        X = X & 255;
+        Y = Y & 255;
+        // Calculate noise contributions from each of the four corners
+        const n00 = this.gradP[X + this.perm[Y]].dot2(x, y);
+        const n01 = this.gradP[X + this.perm[Y + 1]].dot2(x, y - 1);
+        const n10 = this.gradP[X + 1 + this.perm[Y]].dot2(x - 1, y);
+        const n11 = this.gradP[X + 1 + this.perm[Y + 1]].dot2(x - 1, y - 1);
+        // Compute the fade curve value for x
+        const u = fade(x);
+        // Interpolate the four results
+        return lerp$1(lerp$1(n00, n10, u), lerp$1(n01, n11, u), fade(y));
+    }
+    // 3D Perlin Noise
+    perlin3(x_init, y_init, z_init) {
+        // Find unit grid cell containing point
+        var X = Math.floor(x_init), Y = Math.floor(y_init), Z = Math.floor(z_init);
+        // Get relative xyz coordinates of point within that cell
+        const x = x_init - X;
+        const y = y_init - Y;
+        const z = z_init - Z;
+        // Wrap the integer cells at 255 (smaller integer period can be introduced here)
+        X = X & 255;
+        Y = Y & 255;
+        Z = Z & 255;
+        // Calculate noise contributions from each of the eight corners
+        const n000 = this.gradP[X + this.perm[Y + this.perm[Z]]].dot3(x, y, z);
+        const n001 = this.gradP[X + this.perm[Y + this.perm[Z + 1]]].dot3(x, y, z - 1);
+        const n010 = this.gradP[X + this.perm[Y + 1 + this.perm[Z]]].dot3(x, y - 1, z);
+        const n011 = this.gradP[X + this.perm[Y + 1 + this.perm[Z + 1]]].dot3(x, y - 1, z - 1);
+        const n100 = this.gradP[X + 1 + this.perm[Y + this.perm[Z]]].dot3(x - 1, y, z);
+        const n101 = this.gradP[X + 1 + this.perm[Y + this.perm[Z + 1]]].dot3(x - 1, y, z - 1);
+        const n110 = this.gradP[X + 1 + this.perm[Y + 1 + this.perm[Z]]].dot3(x - 1, y - 1, z);
+        const n111 = this.gradP[X + 1 + this.perm[Y + 1 + this.perm[Z + 1]]].dot3(x - 1, y - 1, z - 1);
+        // Compute the fade curve value for x, y, z
+        const u = fade(x);
+        const v = fade(y);
+        const w = fade(z);
+        // Interpolate
+        return lerp$1(lerp$1(lerp$1(n000, n100, u), lerp$1(n001, n101, u), w), lerp$1(lerp$1(n010, n110, u), lerp$1(n011, n111, u), w), v);
+    }
+}
+// noise.seed(0);
+
+/**
+ * A collection of SVG path generation tools.
+ *
+ * @author  Ikaros Kappler
+ * @date    2025-04-04
+ * @version 1.0.0
+ */
+const SVGPathUtils = {
+    /**
+     * Creates an SVG shape resembling a circlular ring sector.
+     *
+     * @param {Vertex} center - The center position of the ring.
+     * @param {number} innerRadius - The inner radius of the ring.
+     * @param {number} outerRadius - The outer radius of the ring.
+     * @param {number} startAngle - The start angle of the ring.
+     * @param {number} endAngle - The end angle of the ring.
+     * @returns {SVGPathParams} SVG path parmams for a closed shape representing the circular ring sector.
+     */
+    mkCircularRingSector: (center, innerRadius, outerRadius, startAngle, endAngle) => {
+        const innerStart = Circle.circleUtils.vertAt(startAngle, innerRadius).add(center);
+        const innerEnd = Circle.circleUtils.vertAt(endAngle, innerRadius).add(center);
+        const outerStart = Circle.circleUtils.vertAt(startAngle, outerRadius).add(center);
+        const outerEnd = Circle.circleUtils.vertAt(endAngle, outerRadius).add(center);
+        const buffer = ["M", innerStart.x, innerStart.y];
+        // var isLargeArcRequired = geomutils.mapAngleTo2PI(Math.abs(startAngle - endAngle)) >= Math.PI;
+        // var isLargeArcRequired = Math.abs(geomutils.mapAngleTo2PI(startAngle) - geomutils.mapAngleTo2PI(endAngle)) >= Math.PI;
+        const isLargeArcRequired = geomutils.mapAngleTo2PI(geomutils.mapAngleTo2PI(startAngle) - geomutils.mapAngleTo2PI(endAngle)) >= Math.PI;
+        const rotation = 0.0;
+        const innerLargeArcFlag = isLargeArcRequired ? 0 : 1;
+        const innerSweepFlag = 1; // isLargeArcRequired ? 1 : 0; // 1;
+        const outerLargeArcFlag = isLargeArcRequired ? 0 : 1;
+        const outerSweepFlag = 0; // isLargeArcRequired ? 0 : 1; // 0;
+        buffer.push("A", innerRadius, innerRadius, rotation, innerLargeArcFlag, innerSweepFlag, innerEnd.x, innerEnd.y);
+        buffer.push("L", outerEnd.x, outerEnd.y);
+        buffer.push("A", outerRadius, outerRadius, rotation, outerLargeArcFlag, outerSweepFlag, outerStart.x, outerStart.y);
+        buffer.push("Z");
+        return buffer;
+    }
+};
+
+/**
+ * @author Extended, bugfixed and ported to TypeScript by Ikaros Kappler.
+ * @modified 2018-xx-xx Added a clone() function.
+ * @modified 2018-xx-xx Allowing leading '#' in the makeHEX() function.
+ * @modified 2018-11-28 Fixed the checkHEX() function to accept 000000.
+ * @modified 2019-11-18 Added a generic parse(string) function that detects the format.
+ * @modified 2020-01-09 Fixed a bug in the parse(string) function. Hex colors with only three elements were considered faulty.
+ * @modified 2020-10-23 Ported to Typescript.
+ * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
+ * @modified 2021-02-08 Added basic tsdoc/jsdoc comments.
+ * @modified 2021-11-05 Fixing the regex to parse rgba-strings.
+ * @modified 2021-11-05 Added return value `this` to all modifier functions (for chaining).
+ * @modified 2021-11-07 Changed the behavior of `darken` and `lighten`: the passed value is handled relative now which makes values much easier predictable and makes the change feel more 'natural'.
+ * @modified 2021-11-07 Did the same with `saturate` and `desaturate`.
+ * @modified 2021-11-07 Did the same with the `fadein` and `fadeout` functions.
+ * @modified 2021-11-07 Added setRed, setGreen, setBlue, setHue, setSaturation, setLiminance functions.
+ * @modified 2022-05-11 Modified the `clone` function by just copying the numeric calues, not re-calculating the whole color.
+ * @modified 2022-05-11 Fixed the `interpolate` function.
+ * @modified 2023-01-23 Added `Color.set(Color)` function to set all values (r,g,b,h,s,l,a) simultanoeusly.
+ * @modified 2024-03-10 Fixed some NaN type check for Typescript 5 compatibility.
+ * @modified 2025-08-08 Fixed an issue in the static `makeRGB` method: values in [0..1] are now correctly reconized (1.0 was excluded).
+ * @modified 2025-08-08 Added static color instances (singletons): Color.Red, Color.Gold, Color.Yellow, Color.Green, Color.LimeGreen, Color.Blue, Color.MediumBlue, Color.Purple.
+ * @modified 2025-09-01 Adding all standard web colors. Source: https://en.wikipedia.org/wiki/Web_colors
+ * @modified 2025-09-01 Modifying the `Sanitizer.RGB` helper method: recognoizing 0 to 255 as valid values (not only 1 to 255).
+ * @modified 2025-09-01 Modifying the `Color.parse` method: recognizing CSS color strings now.
+ * @version 0.0.14
+ **/
+/**
+ * @classdesc A color class, inspired by neolitec's Javascript class.
+ *    Original found at
+ *      https://gist.github.com/neolitec/1344610
+ *    Thanks to neolitec
+ */
+class Color {
+    /**
+     * Construct a new color with `r=0 g=0 b=0`.
+     *
+     * Consider using the `makeHex`, `makeRGB` or `makeHSL` functions.
+     *
+     * @constructor
+     * @instance
+     * @memberof Color
+     */
+    constructor() {
+        this.r = this.g = this.b = 0;
+        this.h = this.s = this.l = 0;
+        this.a = 1;
+    }
+    // --- RGB ----------------------------------
+    /**
+     * Get this color as a CSS `rgb` string.
+     *
+     * Consult this for details: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value
+     *
+     * @method cssRGB
+     * @instance
+     * @memberof Color
+     * @return {string} This color as a CSS rgb string.
+     */
+    cssRGB() {
+        return "rgb(" + Math.round(255 * this.r) + "," + Math.round(255 * this.g) + "," + Math.round(255 * this.b) + ")";
+    }
+    /**
+     * Get this color as a CSS `rgba` string.
+     *
+     * Consult this for details: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value
+     *
+     * @method cssRGBA
+     * @instance
+     * @memberof Color
+     * @return {string} This color as a CSS rgba string.
+     */
+    cssRGBA() {
+        return `rgba(${Math.round(255 * this.r)},${Math.round(255 * this.g)},${Math.round(255 * this.b)},${this.a})`;
+    }
+    /**
+     * Get the red component of this RGB(A)color. This method just returns the `r` color attribute.
+     *
+     * @method red
+     * @instance
+     * @memberof Color
+     * @return {number} A value between 0.0 and 1.0.
+     */
+    red() {
+        return this.r;
+    }
+    /**
+     * Get the green component of this RGB(A) color. This method just returns the `g` color attribute.
+     *
+     * @method green
+     * @instance
+     * @memberof Color
+     * @return {number} A value between 0.0 and 1.0.
+     */
+    green() {
+        return this.g;
+    }
+    /**
+     * Get the blue component of this RGB(A) color. This method just returns the `b` color attribute.
+     *
+     * @method blue
+     * @instance
+     * @memberof Color
+     * @return {number} A value between 0.0 and 1.0.
+     */
+    blue() {
+        return this.b;
+    }
+    set(color) {
+        this.r = color.r;
+        this.g = color.g;
+        this.b = color.b;
+        this.a = color.a;
+        this.h = color.h;
+        this.s = color.s;
+        this.l = color.l;
+        return this;
+    }
+    setRed(r) {
+        this.r = r;
+        return this;
+    }
+    setBlue(b) {
+        this.b = b;
+        Color.Converter.RGBToHSL(this);
+        return this;
+    }
+    setAlpha(a) {
+        this.a = a;
+        Color.Converter.RGBToHSL(this);
+        return this;
+    }
+    setGreen(g) {
+        this.g = g;
+        Color.Converter.RGBToHSL(this);
+        return this;
+    }
+    setHue(h) {
+        this.h = h;
+        Color.Converter.HSLToRGB(this);
+        return this;
+    }
+    setSaturation(s) {
+        this.s = s;
+        Color.Converter.HSLToRGB(this);
+        return this;
+    }
+    setLuminance(l) {
+        this.l = l;
+        Color.Converter.HSLToRGB(this);
+        return this;
+    }
+    // --- HSL ----------------------------------
+    /**
+     * Get this color as a CSS `hsl` string.
+     *
+     * @method cssHSL
+     * @instance
+     * @memberof Color
+     * @return {string} This color as a CSS hsl string.
+     */
+    cssHSL() {
+        return "hsl(" + Math.round(360 * this.h) + "," + Math.round(100 * this.s) + "%," + Math.round(100 * this.l) + "%)";
+    }
+    /**
+     * Get this color as a CSS `hsla` string.
+     *
+     * @method cssHSLA
+     * @instance
+     * @memberof Color
+     * @return {string} This color as a CSS hsla string.
+     */
+    cssHSLA() {
+        return ("hsla(" +
+            Math.round(360 * this.h) +
+            "," +
+            Math.round(100 * this.s) +
+            "%," +
+            Math.round(100 * this.l) +
+            "%," +
+            Math.round(this.a) +
+            ")");
+    }
+    /**
+     * Get the hue component of this HSL(A) color. This method just returns the `h` color attribute.
+     *
+     * @method hue
+     * @instance
+     * @memberof Color
+     * @return {number} A value between 0.0 and 1.0.
+     */
+    hue() {
+        return this.h;
+    }
+    /**
+     * Get the saturation component of this HSL(A) color. This method just returns the `s` color attribute.
+     *
+     * @method saturation
+     * @instance
+     * @memberof Color
+     * @return {number} A value between 0.0 and 1.0.
+     */
+    saturation() {
+        return this.s;
+    }
+    /**
+     * Get the lightness component of this HSL(A) color. This method just returns the `l` color attribute.
+     *
+     * @method lightness
+     * @instance
+     * @memberof Color
+     * @return {number} A value between 0.0 and 1.0.
+     */
+    lightness() {
+        return this.l;
+    }
+    // --- HEX ----------------------------------
+    /**
+     * Get this color as a CSS-HEX string (non-alpha): #rrggbb
+     *
+     * @method cssHEX
+     * @instance
+     * @memberof Color
+     * @return {string} This color as a CSS-HEX string.
+     */
+    cssHEX() {
+        return ("#" +
+            (255 * this.r < 16 ? "0" : "") +
+            Math.round(255 * this.r).toString(16) +
+            (255 * this.g < 16 ? "0" : "") +
+            Math.round(255 * this.g).toString(16) +
+            (255 * this.b < 16 ? "0" : "") +
+            Math.round(255 * this.b).toString(16));
+    }
+    // --- Transparency ----------------------------------
+    /**
+     * Get the alpha channel (transparency) of this color.
+     *
+     * @method alpha
+     * @instance
+     * @memberof Color
+     * @return {number} A value between 0.0 and 1.0.
+     */
+    alpha() {
+        return this.a;
+    }
+    // --- Modifiers ----------------------------------
+    //   saturate(v: string | number): Color {
+    //     if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+    //       this.s += v / 100;
+    //     } else if ("number" == typeof v) {
+    //       // range 255
+    //       this.s += v / 255;
+    //     } else {
+    //       throw new Error("error: bad modifier format (percent or number)");
+    //     }
+    //     if (this.s > 1) this.s = 1;
+    //     else if (this.s < 0) this.s = 0;
+    //     Color.Converter.HSLToRGB(this);
+    //     return this;
+    //   }
+    saturate(v) {
+        // if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+        if ("string" == typeof v && v.indexOf("%") > -1 && !Number.isNaN((v = parseInt(v)))) {
+            this.s += (1 - this.s) * (v / 100);
+        }
+        else if ("number" == typeof v) {
+            if (v >= -0.0 && v <= 1.0) {
+                // range 255
+                this.s += (1 - this.s) * v;
+            }
+            else {
+                // range 0-1
+                this.s += (1 - this.s) * (v / 255);
+            }
+        }
+        else {
+            throw new Error("error: bad modifier format (percent or number)");
+        }
+        if (this.s > 1)
+            this.s = 1;
+        else if (this.s < 0)
+            this.s = 0;
+        Color.Converter.HSLToRGB(this);
+        return this;
+    }
+    desaturate(v) {
+        // if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+        if ("string" == typeof v && v.indexOf("%") > -1 && !Number.isNaN((v = parseInt(v)))) {
+            this.s -= v / 100;
+        }
+        else if ("number" == typeof v) {
+            if (v >= 0.0 && v <= 1.0) {
+                // range 255
+                this.s -= this.s * v;
+            }
+            else {
+                // range 0-1
+                this.s -= this.s * (v / 255);
+            }
+        }
+        else {
+            throw new Error("error: bad modifier format (percent or number)");
+        }
+        if (this.s > 1)
+            this.s = 1;
+        else if (this.s < 0)
+            this.s = 0;
+        Color.Converter.HSLToRGB(this);
+        return this;
+    }
+    lighten(v) {
+        // if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+        if ("string" == typeof v && v.indexOf("%") > -1 && !Number.isNaN((v = parseInt(v)))) {
+            this.l += (1 - this.l) * (v / 100);
+        }
+        else if ("number" == typeof v) {
+            if (v >= 0.0 && v <= 1.0) {
+                // range 0.0...1.0
+                this.l += (1 - this.l) * v;
+            }
+            else {
+                // range 255
+                this.l += (1 - this.l) * (v / 255);
+            }
+        }
+        else {
+            throw new Error("error: bad modifier format (percent or number)");
+        }
+        if (this.l > 1)
+            this.l = 1;
+        else if (this.l < 0)
+            this.l = 0;
+        Color.Converter.HSLToRGB(this);
+        return this;
+    }
+    darken(v) {
+        // if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+        if ("string" == typeof v && v.indexOf("%") > -1 && !Number.isNaN((v = parseInt(v)))) {
+            this.l -= this.l * (v / 100);
+        }
+        else if ("number" == typeof v) {
+            if (v >= 0.0 && v <= 1.0) {
+                // range 0.0...1.0
+                this.l -= this.l * v;
+            }
+            else {
+                // range 255
+                this.l -= this.l * (v / 255);
+            }
+        }
+        else {
+            throw new Error("error: bad modifier format (percent or number)");
+        }
+        if (this.l > 1)
+            this.l = 1;
+        else if (this.l < 0)
+            this.l = 0;
+        Color.Converter.HSLToRGB(this);
+        return this;
+    }
+    fadein(v) {
+        // if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+        if ("string" == typeof v && v.indexOf("%") > -1 && !Number.isNaN((v = parseInt(v)))) {
+            this.a += (1 - this.a) * (v / 100);
+        }
+        else if ("number" == typeof v) {
+            if (v >= 0.0 && v <= 1.0) {
+                // range 0-1
+                this.a += (1 - this.a) * v;
+            }
+            else {
+                // range 255
+                this.a += (1 - this.a) * (v / 255);
+            }
+        }
+        else {
+            throw new Error("error: bad modifier format (percent or number)");
+        }
+        console.log("New alpha", this.a);
+        if (this.a > 1)
+            this.a = 1;
+        else if (this.a < 0)
+            this.a = 0;
+        Color.Converter.HSLToRGB(this);
+        return this;
+    }
+    fadeout(v) {
+        // if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+        if ("string" == typeof v && v.indexOf("%") > -1 && !Number.isNaN((v = parseInt(v)))) {
+            this.a -= v / 100;
+        }
+        else if ("number" == typeof v) {
+            if (v >= 0.0 && v <= 1.0) {
+                // range 0-1
+                this.a -= v;
+            }
+            else {
+                // range 255
+                this.a -= v / 255;
+            }
+        }
+        else {
+            throw new Error("error: bad modifier format (percent or number)");
+        }
+        if (this.a > 1)
+            this.a = 1;
+        else if (this.a < 0)
+            this.a = 0;
+        Color.Converter.HSLToRGB(this);
+        return this;
+    }
+    spin(v) {
+        // if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) this.h += v / 100;
+        if ("string" == typeof v && v.indexOf("%") > -1 && !Number.isNaN((v = parseInt(v)))) {
+            this.h += v / 100;
+        }
+        else if ("number" == typeof v) {
+            // range 360
+            this.h += v / 360;
+        }
+        else {
+            throw new Error("error: bad modifier format (percent or number)");
+        }
+        if (this.h > 1)
+            this.h = 1;
+        else if (this.h < 0)
+            this.h = 0;
+        Color.Converter.HSLToRGB(this);
+        return this;
+    }
+    static makeRGB(...args) {
+        const c = new Color();
+        let sanitized;
+        if (args.length < 3 || args.length > 4) {
+            throw new Error("error: 3 or 4 arguments");
+        }
+        sanitized = Color.Sanitizer.RGB(args[0], args[1], args[2]);
+        c.r = sanitized[0];
+        c.g = sanitized[1];
+        c.b = sanitized[2];
+        if (args.length == 4) {
+            c.a = args[3];
+        }
+        else {
+            c.a = 1.0;
+        }
+        Color.Converter.RGBToHSL(c);
+        return c;
+    }
+    static makeHSL(...args) {
+        const c = new Color();
+        let sanitized;
+        if (args.length < 3 || args.length > 4) {
+            throw new Error("error: 3 or 4 arguments");
+        }
+        sanitized = Color.Sanitizer.HSL(args[0], args[1], args[2]);
+        c.h = sanitized[0];
+        c.s = sanitized[1];
+        c.l = sanitized[2];
+        if (args.length == 4) {
+            c.a = typeof args[3] === "string" ? Number.parseFloat(args[3]) : args[3];
+        }
+        else {
+            c.a = 1.0;
+        }
+        Color.Converter.HSLToRGB(c);
+        return c;
+    }
+    static makeHEX(value) {
+        var c = new Color(), sanitized;
+        // Edit Ika 2018-0308
+        // Allow leading '#'
+        if (value && value.startsWith("#")) {
+            value = value.substr(1);
+        }
+        Color.Validator.checkHEX(value);
+        if (value.length == 3) {
+            sanitized = Color.Sanitizer.RGB(parseInt(value.substr(0, 1) + value.substr(0, 1), 16), parseInt(value.substr(1, 1) + value.substr(1, 1), 16), parseInt(value.substr(2, 1) + value.substr(2, 1), 16));
+        }
+        else if (value.length == 6) {
+            sanitized = Color.Sanitizer.RGB(parseInt(value.substr(0, 2), 16), parseInt(value.substr(2, 2), 16), parseInt(value.substr(4, 2), 16));
+        }
+        else {
+            throw new Error("error: 3 or 6 arguments");
+        }
+        c.r = sanitized[0];
+        c.g = sanitized[1];
+        c.b = sanitized[2];
+        c.a = 1.0; // TODO: Accept #xxxxxxxx (8 chars, too, for alpha)
+        Color.Converter.RGBToHSL(c);
+        return c;
+    }
+    /**
+     * Parse the given color string. Currently only these formate are recognized: hex, rgb, rgba.
+     *
+     * @method parse
+     * @static
+     * @memberof Color
+     * @param {string} str - The string representation to parse.
+     * @return {Color} The color instance that's represented by the given string.
+     */
+    static parse(str) {
+        if (typeof str == "undefined") {
+            return null;
+        }
+        if ((str = str.trim().toLowerCase()).length == 0) {
+            return null;
+        }
+        if (str.startsWith("#")) {
+            return Color.makeHEX(str.substring(1, str.length));
+        }
+        if (str.startsWith("rgb")) {
+            var parts = str.match(/^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,?\s*(\d*(?:\.\d+\s*)?)\)$/);
+            if (!parts) {
+                throw "Unrecognized color format (2): " + str;
+            }
+            // [ str, r, g, b, a|undefined ]
+            //   console.log("parts", parts);
+            if (parts.length <= 4 || typeof parts[4] == "undefined" || parts[4] == "") {
+                return Color.makeRGB(parts[1], parts[2], parts[3]);
+            }
+            else {
+                return Color.makeRGB(parts[1], parts[2], parts[3], Number(parts[4]));
+            }
+        }
+        // Try to locate by CSS color name
+        const keys = Object.keys(Color.CSS_COLORS);
+        const cssColorKey = keys.reduce((prevKey, curKey) => {
+            if (curKey && curKey.toLowerCase() === str.toLowerCase()) {
+                return curKey;
+            }
+            return prevKey;
+        }, null);
+        if (cssColorKey) {
+            const cssColor = Color.CSS_COLORS[cssColorKey];
+            // console.log("cssColor?", cssColor, str, cssColorKey);
+            if (cssColor) {
+                // console.log("CONSTRUCTOR?", cssColor.constructor);
+                return cssColor.clone();
+            }
+        }
+        throw "Unrecognized color format (1): " + str;
+    }
+    /**
+     * Create a clone of this color (RGB).
+     *
+     * @method clone
+     * @instance
+     * @memberof Color
+     * @return {Color} A clone of this color (in RGB mode).
+     */
+    clone() {
+        // return Color.makeRGB(this.r, this.g, this.b, this.a);
+        const col = new Color();
+        col.r = this.r;
+        col.g = this.g;
+        col.b = this.b;
+        col.a = this.a;
+        col.h = this.h;
+        col.s = this.s;
+        col.l = this.l;
+        return col;
+    }
+    /**
+     * Interpolate this color on the RGB scale.
+     *
+     * @method interpolate
+     * @instance
+     * @memberof Color
+     * @param {Color} c - The color to interpolate to.
+     * @param {number} t - An interpolation value between 0.0 and 1.0.
+     * @return {Color} A clone of this color (in RGB mode).
+     */
+    interpolate(c, t) {
+        this.r += (c.r - this.r) * t;
+        this.g += (c.g - this.g) * t;
+        this.b += (c.b - this.b) * t;
+        this.a += (c.a - this.a) * t;
+        return this;
+    }
+} // END class
+Color.Sanitizer = {
+    RGB: (...args) => {
+        var o = [];
+        if (args.length == 0) {
+            return [];
+        }
+        // const allAreFrac = Color.testFrac( arguments );
+        for (var i = 0; i < args.length; i++) {
+            var c = args[i];
+            if ("string" == typeof c && c.indexOf("%") > -1) {
+                // if ((c = parseInt(c)) == NaN) throw new Error("Bad format");
+                if (Number.isNaN((c = parseInt(c)))) {
+                    throw new Error("Bad format");
+                }
+                if (c < 0 || c > 100)
+                    throw new Error("Bad format");
+                o[i] = c / 100;
+            }
+            else {
+                // if ("string" == typeof c && (c = parseInt(c)) == NaN) {
+                if ("string" == typeof c && Number.isNaN((c = parseInt(c)))) {
+                    throw new Error("Bad format");
+                }
+                if (c < 0) {
+                    throw new Error("Bad format");
+                }
+                //else if( allAreFrac ) o[i] = c; // c >= 0 && c <= 1 (all)
+                else if (c >= 0 && c <= 1) {
+                    o[i] = c;
+                }
+                // else if(c >= 0.0 && c <= 1.0) o[i] = c;
+                else if (c >= 0 && c < 256) {
+                    o[i] = c / 255;
+                }
+                // ???
+                // else if(c >= 0 && c < 256) o[i] = c/255;
+                else
+                    throw new Error("Bad format (" + c + ")");
+            }
+        }
+        return o;
+    },
+    HSL: function (...args) {
+        if (args.length < 3 || args.length > 4) {
+            throw new Error("3 or 4 arguments required");
+        }
+        var h = args[0], s = args[1], l = args[2];
+        // if ("string" == typeof h && (h = parseFloat(h)) == NaN) throw new Error("Bad format for hue");
+        if ("string" == typeof h && Number.isNaN((h = parseFloat(h)))) {
+            throw new Error("Bad format for hue");
+        }
+        if (h < 0 || h > 360)
+            throw new Error("Hue out of range (0..360)");
+        else if ((("" + h).indexOf(".") > -1 && h > 1) || ("" + h).indexOf(".") == -1)
+            h /= 360;
+        if ("string" == typeof s && s.indexOf("%") > -1) {
+            // if ((s = parseInt(s)) == NaN) throw new Error("Bad format for saturation");
+            if (Number.isNaN((s = parseInt(s)))) {
+                throw new Error("Bad format for saturation");
+            }
+            if (s < 0 || s > 100) {
+                throw new Error("Bad format for saturation");
+            }
+            s /= 100;
+        }
+        else {
+            s = typeof s === "string" ? Number.parseFloat(s) : s;
+            if (s < 0 || s > 1) {
+                throw new Error("Bad format for saturation");
+            }
+        }
+        if ("string" == typeof l && l.indexOf("%") > -1) {
+            // if ((l = parseInt(l)) == NaN) throw new Error("Bad format for lightness");
+            if (Number.isNaN((l = parseInt(l)))) {
+                throw new Error("Bad format for lightness");
+            }
+            if (l < 0 || l > 100) {
+                throw new Error("Bad format for lightness");
+            }
+            l /= 100;
+        }
+        else {
+            l = typeof l === "string" ? Number.parseFloat(l) : l;
+            if (l < 0 || l > 1) {
+                throw new Error("Bad format for lightness");
+            }
+        }
+        return [h, s, l];
+    }
+}; // ENd sanitizer
+Color.Validator = {
+    /**
+     * Check a hexa color (without #)
+     */
+    checkHEX: (value) => {
+        if (value.length != 6 && value.length != 3)
+            throw new Error("Hexa color: bad length (" + value.length + ")," + value);
+        value = value.toLowerCase();
+        //for( var i in value ) {
+        for (var i = 0; i < value.length; i++) {
+            var c = value.charCodeAt(i);
+            if (!((c >= 48 && c <= 57) || (c >= 97 && c <= 102)))
+                throw new Error(`Hexa color: out of range for "${value}" at position ${i}.`);
+        }
+    }
+};
+Color.Converter = {
+    /**
+     * Calculates HSL Color.
+     * RGB must be normalized.
+     * http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+     */
+    RGBToHSL: (color) => {
+        var r = color.r;
+        var g = color.g;
+        var b = color.b;
+        var max = Math.max(r, g, b);
+        var min = Math.min(r, g, b);
+        color.l = (max + min) / 2;
+        if (max == min) {
+            color.h = color.s = 0; // achromatic
+        }
+        else {
+            var d = max - min;
+            color.s = color.l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r:
+                    color.h = (g - b) / d + (g < b ? 6 : 0);
+                    break;
+                case g:
+                    color.h = (b - r) / d + 2;
+                    break;
+                case b:
+                    color.h = (r - g) / d + 4;
+                    break;
+            }
+            color.h /= 6;
+        }
+    },
+    /**
+     * Calculates RGB color (nomalized).
+     * HSL must be normalized.
+     *
+     * http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+     */
+    HSLToRGB: (color) => {
+        var h = color.h;
+        var s = color.s;
+        var l = color.l;
+        if (s == 0) {
+            color.r = color.g = color.b = l; // achromatic
+        }
+        else {
+            var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            var p = 2 * l - q;
+            color.r = Color.Converter.hue2rgb(p, q, h + 1 / 3);
+            color.g = Color.Converter.hue2rgb(p, q, h);
+            color.b = Color.Converter.hue2rgb(p, q, h - 1 / 3);
+        }
+    },
+    hue2rgb: (p, q, t) => {
+        if (t < 0)
+            t += 1;
+        if (t > 1)
+            t -= 1;
+        if (t < 1 / 6)
+            return p + (q - p) * 6 * t;
+        if (t < 1 / 2)
+            return q;
+        if (t < 2 / 3)
+            return p + (q - p) * (2 / 3 - t) * 6;
+        return p;
+    }
+};
+// Source
+//    https://en.wikipedia.org/wiki/Web_colors
+// Pink colors
+Color.MediumVioletRed = Color.makeRGB(199, 21, 133);
+Color.DeepPink = Color.makeRGB(255, 20, 147);
+Color.PaleVioletRed = Color.makeRGB(219, 112, 147);
+Color.HotPink = Color.makeRGB(255, 105, 180);
+Color.LightPink = Color.makeRGB(255, 182, 193);
+Color.Pink = Color.makeRGB(255, 192, 203);
+// Red colors
+Color.DarkRed = Color.makeRGB(139, 0, 0);
+Color.Red = Color.makeRGB(255, 0, 0);
+Color.Firebrick = Color.makeRGB(178, 34, 34);
+Color.Crimson = Color.makeRGB(220, 20, 60);
+Color.IndianRed = Color.makeRGB(205, 92, 92);
+Color.LightCoral = Color.makeRGB(240, 128, 128);
+Color.Salmon = Color.makeRGB(250, 128, 114);
+Color.DarkSalmon = Color.makeRGB(233, 150, 122);
+Color.LightSalmon = Color.makeRGB(255, 160, 122);
+// Orange colors
+Color.OrangeRed = Color.makeRGB(255, 69, 0);
+Color.Tomato = Color.makeRGB(255, 99, 71);
+Color.DarkOrange = Color.makeRGB(255, 140, 0);
+Color.Coral = Color.makeRGB(255, 127, 80);
+Color.Orange = Color.makeRGB(255, 165, 0);
+// Yellow colors
+Color.DarkKhaki = Color.makeRGB(189, 183, 107);
+Color.Gold = Color.makeRGB(255, 215, 0);
+Color.Khaki = Color.makeRGB(240, 230, 140);
+Color.PeachPuff = Color.makeRGB(255, 218, 185);
+Color.Yellow = Color.makeRGB(255, 255, 0);
+Color.PaleGoldenrod = Color.makeRGB(238, 232, 170);
+Color.Moccasin = Color.makeRGB(255, 228, 181);
+Color.PapayaWhip = Color.makeRGB(255, 239, 213);
+Color.LightGoldenrodYellow = Color.makeRGB(250, 250, 210);
+Color.LemonChiffon = Color.makeRGB(255, 250, 205);
+Color.LightYellow = Color.makeRGB(255, 255, 224);
+// Brown colors
+Color.Maroon = Color.makeRGB(128, 0, 0);
+Color.Brown = Color.makeRGB(165, 42, 42);
+Color.SaddleBrown = Color.makeRGB(139, 69, 19);
+Color.Sienna = Color.makeRGB(160, 82, 45);
+Color.Chocolate = Color.makeRGB(210, 105, 30);
+Color.DarkGoldenrod = Color.makeRGB(184, 134, 11);
+Color.Peru = Color.makeRGB(205, 133, 63);
+Color.RosyBrown = Color.makeRGB(188, 143, 143);
+Color.Goldenrod = Color.makeRGB(218, 165, 32);
+Color.SandyBrown = Color.makeRGB(244, 164, 96);
+Color.Tan = Color.makeRGB(210, 180, 140);
+Color.Burlywood = Color.makeRGB(222, 184, 135);
+Color.Wheat = Color.makeRGB(245, 222, 179);
+Color.NavajoWhite = Color.makeRGB(255, 222, 173);
+Color.Bisque = Color.makeRGB(255, 228, 196);
+Color.BlanchedAlmond = Color.makeRGB(255, 235, 205);
+Color.Cornsilk = Color.makeRGB(255, 248, 220);
+// Purple, violet, and magenta colors
+Color.Indigo = Color.makeRGB(75, 0, 130);
+Color.Purple = Color.makeRGB(128, 0, 128);
+Color.DarkMagenta = Color.makeRGB(139, 0, 139);
+Color.DarkViolet = Color.makeRGB(148, 0, 211);
+Color.DarkSlateBlue = Color.makeRGB(72, 61, 139);
+Color.BlueViolet = Color.makeRGB(138, 43, 226);
+Color.DarkOrchid = Color.makeRGB(153, 50, 204);
+Color.Fuchsia = Color.makeRGB(255, 0, 255);
+Color.Magenta = Color.makeRGB(255, 0, 255);
+Color.SlateBlue = Color.makeRGB(106, 90, 205);
+Color.MediumSlateBlue = Color.makeRGB(123, 104, 238);
+Color.MediumOrchid = Color.makeRGB(186, 85, 211);
+Color.MediumPurple = Color.makeRGB(147, 112, 219);
+Color.Orchid = Color.makeRGB(218, 112, 214);
+Color.Violet = Color.makeRGB(238, 130, 238);
+Color.Plum = Color.makeRGB(221, 160, 221);
+Color.Thistle = Color.makeRGB(216, 191, 216);
+Color.Lavender = Color.makeRGB(230, 230, 250);
+// Blue colors
+Color.MidnightBlue = Color.makeRGB(25, 25, 112);
+Color.Navy = Color.makeRGB(0, 0, 128);
+Color.DarkBlue = Color.makeRGB(0, 0, 139);
+Color.MediumBlue = Color.makeRGB(0, 0, 205);
+Color.Blue = Color.makeRGB(0, 0, 255);
+Color.RoyalBlue = Color.makeRGB(65, 105, 225);
+Color.SteelBlue = Color.makeRGB(70, 130, 180);
+Color.DodgerBlue = Color.makeRGB(30, 144, 255);
+Color.DeepSkyBlue = Color.makeRGB(0, 191, 255);
+Color.CornflowerBlue = Color.makeRGB(100, 149, 237);
+Color.SkyBlue = Color.makeRGB(135, 206, 235);
+Color.LightSkyBlue = Color.makeRGB(135, 206, 250);
+Color.LightSteelBlue = Color.makeRGB(176, 196, 222);
+Color.LightBlue = Color.makeRGB(173, 216, 230);
+Color.PowderBlue = Color.makeRGB(176, 224, 230);
+// Cyan colors
+Color.Teal = Color.makeRGB(0, 128, 128);
+Color.DarkCyan = Color.makeRGB(0, 139, 139);
+Color.LightSeaGreen = Color.makeRGB(32, 178, 170);
+Color.CadetBlue = Color.makeRGB(95, 158, 160);
+Color.DarkTurquoise = Color.makeRGB(0, 206, 209);
+Color.MediumTurquoise = Color.makeRGB(72, 209, 204);
+Color.Turquoise = Color.makeRGB(64, 224, 208);
+Color.Aqua = Color.makeRGB(0, 255, 255);
+Color.Cyan = Color.makeRGB(0, 255, 255);
+Color.Aquamarine = Color.makeRGB(127, 255, 212);
+Color.PaleTurquoise = Color.makeRGB(175, 238, 238);
+Color.LightCyan = Color.makeRGB(224, 255, 255);
+// Green colors
+Color.DarkGreen = Color.makeRGB(0, 100, 0);
+Color.Green = Color.makeRGB(0, 128, 0);
+Color.DarkOliveGreen = Color.makeRGB(85, 107, 47);
+Color.ForestGreen = Color.makeRGB(34, 139, 34);
+Color.SeaGreen = Color.makeRGB(46, 139, 87);
+Color.Olive = Color.makeRGB(128, 128, 0);
+Color.OliveDrab = Color.makeRGB(107, 142, 35);
+Color.MediumSeaGreen = Color.makeRGB(60, 179, 113);
+Color.LimeGreen = Color.makeRGB(50, 205, 50);
+Color.Lime = Color.makeRGB(0, 255, 0);
+Color.SpringGreen = Color.makeRGB(0, 255, 127);
+Color.MediumSpringGreen = Color.makeRGB(0, 250, 154);
+Color.DarkSeaGreen = Color.makeRGB(143, 188, 143);
+Color.MediumAquamarine = Color.makeRGB(102, 205, 170);
+Color.YellowGreen = Color.makeRGB(154, 205, 50);
+Color.LawnGreen = Color.makeRGB(124, 252, 0);
+Color.Chartreuse = Color.makeRGB(127, 255, 0);
+Color.LightGreen = Color.makeRGB(144, 238, 144);
+Color.GreenYellow = Color.makeRGB(173, 255, 47);
+Color.PaleGreen = Color.makeRGB(152, 251, 152);
+// White colors
+Color.MistyRose = Color.makeRGB(255, 228, 225);
+Color.AntiqueWhite = Color.makeRGB(250, 235, 215);
+Color.Linen = Color.makeRGB(250, 240, 230);
+Color.Beige = Color.makeRGB(245, 245, 220);
+Color.WhiteSmoke = Color.makeRGB(245, 245, 245);
+Color.LavenderBlush = Color.makeRGB(255, 240, 245);
+Color.OldLace = Color.makeRGB(253, 245, 230);
+Color.AliceBlue = Color.makeRGB(240, 248, 255);
+Color.Seashell = Color.makeRGB(255, 245, 238);
+Color.GhostWhite = Color.makeRGB(248, 248, 255);
+Color.Honeydew = Color.makeRGB(240, 255, 240);
+Color.FloralWhite = Color.makeRGB(255, 250, 240);
+Color.Azure = Color.makeRGB(240, 255, 255);
+Color.MintCream = Color.makeRGB(245, 255, 250);
+Color.Snow = Color.makeRGB(255, 250, 250);
+Color.Ivory = Color.makeRGB(255, 255, 240);
+Color.White = Color.makeRGB(255, 255, 255);
+// Gray and black colors
+Color.Black = Color.makeRGB(0, 0, 0);
+Color.DarkSlateGray = Color.makeRGB(47, 79, 79);
+Color.DimGray = Color.makeRGB(105, 105, 105);
+Color.SlateGray = Color.makeRGB(112, 128, 144);
+Color.Gray = Color.makeRGB(128, 128, 128);
+Color.LightSlateGray = Color.makeRGB(119, 136, 153);
+Color.DarkGray = Color.makeRGB(169, 169, 169);
+Color.Silver = Color.makeRGB(192, 192, 192);
+Color.LightGray = Color.makeRGB(211, 211, 211);
+Color.Gainsboro = Color.makeRGB(220, 220, 220);
+Color.CSS_COLORS = {
+    // Pink Color.XYZ,lors
+    MediumVioletRed: Color.MediumVioletRed,
+    DeepPink: Color.DeepPink,
+    PaleVioletRed: Color.PaleVioletRed,
+    HotPink: Color.HotPink,
+    LightPink: Color.LightPink,
+    Pink: Color.Pink,
+    // Red Color.XYZ,lors
+    DarkRed: Color.DarkRed,
+    Red: Color.Red,
+    Firebrick: Color.Firebrick,
+    Crimson: Color.Crimson,
+    IndianRed: Color.IndianRed,
+    LightCoral: Color.LightCoral,
+    Salmon: Color.Salmon,
+    DarkSalmon: Color.DarkSalmon,
+    LightSalmon: Color.LightSalmon,
+    // Orange Color.XYZ,lors
+    OrangeRed: Color.OrangeRed,
+    Tomato: Color.Tomato,
+    DarkOrange: Color.DarkOrange,
+    Coral: Color.Coral,
+    Orange: Color.Orange,
+    // Yellow Color.XYZ,lors
+    DarkKhaki: Color.DarkKhaki,
+    Gold: Color.Gold,
+    Khaki: Color.Khaki,
+    PeachPuff: Color.PeachPuff,
+    Yellow: Color.Yellow,
+    PaleGoldenrod: Color.PaleGoldenrod,
+    Moccasin: Color.Moccasin,
+    PapayaWhip: Color.PapayaWhip,
+    LightGoldenrodYellow: Color.LightGoldenrodYellow,
+    LemonChiffon: Color.LemonChiffon,
+    LightYellow: Color.LightYellow,
+    // Brown Color.XYZ,lors
+    Maroon: Color.Maroon,
+    Brown: Color.Brown,
+    SaddleBrown: Color.SaddleBrown,
+    Sienna: Color.Sienna,
+    Chocolate: Color.Chocolate,
+    DarkGoldenrod: Color.DarkGoldenrod,
+    Peru: Color.Peru,
+    RosyBrown: Color.RosyBrown,
+    Goldenrod: Color.Goldenrod,
+    SandyBrown: Color.SandyBrown,
+    Tan: Color.Tan,
+    Burlywood: Color.Burlywood,
+    Wheat: Color.Wheat,
+    NavajoWhite: Color.NavajoWhite,
+    Bisque: Color.Bisque,
+    BlanchedAlmond: Color.BlanchedAlmond,
+    Cornsilk: Color.Cornsilk,
+    // Purple, violet, and magenta Color.XYZ,lors
+    Indigo: Color.Indigo,
+    Purple: Color.Purple,
+    DarkMagenta: Color.DarkMagenta,
+    DarkViolet: Color.DarkViolet,
+    DarkSlateBlue: Color.DarkSlateBlue,
+    BlueViolet: Color.BlueViolet,
+    DarkOrchid: Color.DarkOrchid,
+    Fuchsia: Color.Fuchsia,
+    Magenta: Color.Magenta,
+    SlateBlue: Color.SlateBlue,
+    MediumSlateBlue: Color.MediumSlateBlue,
+    MediumOrchid: Color.MediumOrchid,
+    MediumPurple: Color.MediumPurple,
+    Orchid: Color.Orchid,
+    Violet: Color.Violet,
+    Plum: Color.Plum,
+    Thistle: Color.Thistle,
+    Lavender: Color.Lavender,
+    // Blue Colors
+    MidnightBlue: Color.MidnightBlue,
+    Navy: Color.Navy,
+    DarkBlue: Color.DarkBlue,
+    MediumBlue: Color.MediumBlue,
+    Blue: Color.Blue,
+    RoyalBlue: Color.RoyalBlue,
+    SteelBlue: Color.SteelBlue,
+    DodgerBlue: Color.DodgerBlue,
+    DeepSkyBlue: Color.DeepSkyBlue,
+    CornflowerBlue: Color.CornflowerBlue,
+    SkyBlue: Color.SkyBlue,
+    LightSkyBlue: Color.LightSkyBlue,
+    LightSteelBlue: Color.LightSteelBlue,
+    LightBlue: Color.LightBlue,
+    PowderBlue: Color.PowderBlue,
+    // Coyan Colors
+    Teal: Color.Teal,
+    DarkCyan: Color.DarkCyan,
+    LightSeaGreen: Color.LightSeaGreen,
+    CadetBlue: Color.CadetBlue,
+    DarkTurquoise: Color.DarkTurquoise,
+    MediumTurquoise: Color.MediumTurquoise,
+    Turquoise: Color.Turquoise,
+    Aqua: Color.Aqua,
+    Cyan: Color.Cyan,
+    Aquamarine: Color.Aquamarine,
+    PaleTurquoise: Color.PaleTurquoise,
+    LightCyan: Color.LightCyan,
+    // Green Colors
+    DarkGreen: Color.DarkGreen,
+    Green: Color.Green,
+    DarkOliveGreen: Color.DarkOliveGreen,
+    ForestGreen: Color.ForestGreen,
+    SeaGreen: Color.SeaGreen,
+    Olive: Color.Olive,
+    OliveDrab: Color.OliveDrab,
+    MediumSeaGreen: Color.MediumSeaGreen,
+    LimeGreen: Color.LimeGreen,
+    Lime: Color.Lime,
+    SpringGreen: Color.SpringGreen,
+    MediumSpringGreen: Color.MediumSpringGreen,
+    DarkSeaGreen: Color.DarkSeaGreen,
+    MediumAquamarine: Color.MediumAquamarine,
+    YellowGreen: Color.YellowGreen,
+    LawnGreen: Color.LawnGreen,
+    Chartreuse: Color.Chartreuse,
+    LightGreen: Color.LightGreen,
+    GreenYellow: Color.GreenYellow,
+    PaleGreen: Color.PaleGreen,
+    // White Color.XYZ,lors
+    MistyRose: Color.MistyRose,
+    AntiqueWhite: Color.AntiqueWhite,
+    Linen: Color.Linen,
+    Beige: Color.Beige,
+    WhiteSmoke: Color.WhiteSmoke,
+    LavenderBlush: Color.LavenderBlush,
+    OldLace: Color.OldLace,
+    AliceBlue: Color.AliceBlue,
+    Seashell: Color.Seashell,
+    GhostWhite: Color.GhostWhite,
+    Honeydew: Color.Honeydew,
+    FloralWhite: Color.FloralWhite,
+    Azure: Color.Azure,
+    MintCream: Color.MintCream,
+    Snow: Color.Snow,
+    Ivory: Color.Ivory,
+    White: Color.White,
+    // Gray and black Color.XYZ,lors
+    Black: Color.Black,
+    DarkSlateGray: Color.DarkSlateGray,
+    DimGray: Color.DimGray,
+    SlateGray: Color.SlateGray,
+    Gray: Color.Gray,
+    LightSlateGray: Color.LightSlateGray,
+    DarkGray: Color.DarkGray,
+    Silver: Color.Silver,
+    LightGray: Color.LightGray,
+    Gainsboro: Color.Gainsboro
+};
+
+/**
+ * @author   Ikaros Kappler
+ * @date     2018-11-10
+ * @modified 2020-10-23 Ported to Typescript.
+ * @modified 2020-10-30 Exporting each color under its name globally.
+ * @modified 2025-12-08 Replaying self defined colors by official web colors.
+ * @version  1.0.2
+ **/
+const Red = Color.Red; // Color.makeRGB(255,67,55);
+const Pink = Color.Pink; // Color.makeRGB(232,31,100);
+const Purple = Color.Purple; // Color.makeRGB(156,39,175);
+const DeepPurple = Color.DeepPink; // Color.makeRGB(103,59,184);
+const Indigo = Color.Indigo; // Color.makeRGB(64,81,181);
+const Blue = Color.Blue; // Color.makeRGB(35,151,245);
+const LightBlue = Color.LightBlue; // Color.makeRGB(6,170,245);
+const Cyan = Color.Cyan; // Color.makeRGB(3,189,214);
+const Teal = Color.Teal; // Color.makeRGB(1,150,137);
+const Green = Color.Green; // Color.makeRGB(77,175,82);
+const LightGreen = Color.LightGreen; // Color.makeRGB(141,195,67);
+/**
+ * A set of beautiful web colors (I know, beauty is in the eye of the beholder).
+ *
+ * I found this color chart with 11 colors and think it is somewhat nice
+ *    https://www.pinterest.com/pin/229965124706497134/
+ *
+ * @requires Color
+ *
+ */
+const WebColors = [Red, Pink, Purple, DeepPurple, Indigo, Blue, LightBlue, Cyan, Teal, Green, LightGreen];
+/**
+ * A helper function to shuffle the colors into a new order.
+ */
+const shuffleWebColors = (order) => {
+    const result = Array(order.length);
+    for (var i = 0; i < order.length; i++) {
+        result[i] = WebColors[order[i] % WebColors.length];
+    }
+    return result;
+};
+
+/**
+ * @requires Color
+ *
+ * @date 2020-10-27
+ **/
+const ORDER_CONTRAST = [8, 0, 6, 4, 1, 9, 2, 10, 3, 7, 5];
+const WebColorsContrast = shuffleWebColors(ORDER_CONTRAST);
+
+/**
+ * @author   Ikaros Kappler
+ * @version  1.0.0
+ * @date     2018-11-11
+ **/
+/**
+ * A mix of green shades.
+ *
+ * @requires Color
+ */
+const WebColorsMalachite = [
+    Color.makeRGB(0, 21, 6),
+    Color.makeRGB(0, 30, 12),
+    Color.makeRGB(0, 52, 28),
+    Color.makeRGB(0, 81, 47),
+    Color.makeRGB(21, 134, 88),
+    Color.makeRGB(0, 46, 19),
+    Color.makeRGB(0, 68, 40),
+    Color.makeRGB(11, 81, 55),
+    Color.makeRGB(0, 91, 46),
+    Color.makeRGB(0, 111, 46),
+    Color.makeRGB(33, 140, 106)
+];
+
+/**
+ * An equivalent of lodash.array_fill(...).
+ *
+ * @author Ikaros Kappler
+ * @date 2020-10-23
+ * @version 1.0.0
+ **/
+const arrayFill = (count, initialValue) => {
+    const arr = Array(count);
+    for (var i = 0; i < count; i++)
+        arr[i] = initialValue;
+    return arr;
+};
+
+/**
+ * Resize a given array to a desired number of elements by adding or removing some.
+ *
+ * @author  Ikaros Kappler
+ * @date    2024-02-07
+ * @version 1.0.0
+ */
+const arrayResize = (arr, desiredSize, factoryFn) => {
+    if (arr.length === desiredSize) {
+        // No change required
+        return;
+    }
+    while (arr.length < desiredSize) {
+        arr.push(factoryFn());
+    }
+    if (arr.length > desiredSize) {
+        arr.splice(desiredSize);
+    }
+};
+
+/**
+ * Randomize a given array in-place.
+ *
+ * @author Ikaros Kappler
+ * @date 2022-10-09
+ * @version 1.0.0
+ **/
+const arrayShuffle = (arr) => {
+    arr.sort(() => Math.random() - 0.5);
+};
+
+/**
+ * @date     2020-04-15
+ * @author   Converted to a class by Ikaros Kappler
+ * @modified 2020-08-19 Ported this class from vanilla JS to TypeScript.
+ * @version  1.0.1
+ *
+ * @file CatmullRomPath
+ * @public
+ **/
+/**
+ * @classdesc Compute the Catmull-Rom spline path from a sequence of points (vertices).
+ *
+ * For comparison to the HobbyCurve I wanted to add a Catmull-Rom path (to show that the
+ * HobbyCurve is smoother).
+ *
+ * This demo implementation was inspired by this Codepen by Blake Bowen
+ * https://codepen.io/osublake/pen/BowJed
+ *
+ * @requires CubicBezierCurve
+ * @requires Vertex
+ */
+class CatmullRomPath {
+    /**
+     * @constructor
+     * @name CatmullRomPath
+     * @param {Array<Vertex>=} vertices? - An optional array of vertices to initialize the path with.
+     **/
+    constructor(vertices) {
+        this.vertices = vertices ? vertices : [];
+    }
+    ;
+    /**
+     * Add a new point to the end of the vertex sequence.
+     *
+     * @name addPoint
+     * @memberof CatmullRomPath
+     * @instance
+     * @param {Vertex} p - The vertex (point) to add.
+     **/
+    addPoint(p) {
+        this.vertices.push(p);
+    }
+    ;
+    /**
+     * Generate a sequence of cubic Bézier curves from the point set.
+     *
+     * @name generateCurve
+     * @memberof CatmullRomPath
+     * @instance
+     * @param {boolean=} circular - Specify if the path should be closed.
+     * @param {number=1} tension - (default=0) An optional tension parameter.
+     * @return Array<CubicBezierCurve>
+     **/
+    generateCurve(circular, tension) {
+        if (typeof tension === 'undefined')
+            tension = 1.0;
+        if (circular)
+            return this.solveClosed(tension);
+        else
+            return this.solveOpen(tension);
+    }
+    ;
+    solveOpen(k) {
+        var curves = [];
+        if (k == null || typeof k === 'undefined')
+            k = 1;
+        var size = this.vertices.length;
+        var last = size - 2;
+        for (var i = 0; i < size - 1; i++) {
+            var p0 = i ? this.vertices[i - 1] : this.vertices[0];
+            var p1 = this.vertices[i + 0];
+            var p2 = this.vertices[i + 1];
+            var p3 = i !== last ? this.vertices[i + 2] : p2;
+            var cp1 = new Vertex$1(p1.x + (p2.x - p0.x) / 6 * k, p1.y + (p2.y - p0.y) / 6 * k);
+            var cp2 = new Vertex$1(p2.x - (p3.x - p1.x) / 6 * k, p2.y - (p3.y - p1.y) / 6 * k);
+            curves.push(new CubicBezierCurve(p1, p2, cp1, cp2));
+        }
+        return curves;
+    }
+    ; // END solveOpen
+    solveClosed(k) {
+        var curves = [];
+        if (k == null || typeof k === 'undefined')
+            k = 1;
+        var size = this.vertices.length;
+        var last = size - 1;
+        for (var i = 0; i < size; i++) {
+            var p0 = i ? this.vertices[i - 1] : this.vertices[last];
+            var p1 = this.vertices[i + 0];
+            var p2 = this.vertices[(i + 1) % size];
+            var p3 = this.vertices[(i + 2) % size];
+            var cp1 = new Vertex$1(p1.x + (p2.x - p0.x) / 6 * k, p1.y + (p2.y - p0.y) / 6 * k);
+            var cp2 = new Vertex$1(p2.x - (p3.x - p1.x) / 6 * k, p2.y - (p3.y - p1.y) / 6 * k);
+            curves.push(new CubicBezierCurve(p1, p2, cp1, cp2));
+        }
+        return curves;
+    }
+    ; // END solveClosed
+}
+
+/**
+ * @author Ikaros Kappler
+ * @date 2020-10-23
+ * @version 1.0.0
+ **/
+/**
+ * A matrix-fill helper function. Equivalent of lodash.array_fill(...).
+ */
+const matrixFill = (countA, countB, initialValue) => {
+    const arr = Array(countA);
+    for (var i = 0; i < countA; i++) {
+        arr[i] = arrayFill(countB, initialValue);
+    }
+    return arr;
+};
+
+/**
+ * @classdesc A circular interval set.
+ *
+ * @author   Ikaros Kappler
+ * @date     2020-10-02
+ * @modified 2020-10-18 Ported to Typescript from vanilla JS.
+ * @modified 2020-10-22 Added the removeAt funcion.
+ * @version  1.0.1
+ * @name CircularIntervalSet
+ **/
+class CircularIntervalSet {
+    /**
+     * Create a new CircularIntervalSet with the given lower and upperBound (start and end).
+     *
+     * The intervals inside lower and upper bound will initially be added to this set (full range).
+     *
+     * @param {number} start
+     * @param {number} end
+     * @method clear
+     * @memberof CircularIntervalSet
+     **/
+    constructor(start, end) {
+        this.start = start;
+        this.end = end;
+        this.intervals = [[start, end]];
+    }
+    ;
+    /**
+     * Clear this set (will be empty after this operation).
+     *
+     * @method clear
+     * @instance
+     * @memberof CircularIntervalSet
+     * @return {void}
+     **/
+    clear() {
+        this.intervals = [];
+    }
+    ;
+    /**
+     * Remove the interval at given index.
+     *
+     * @param {number} index
+     * @method removeAt
+     * @instance
+     * @memberof CircularIntervalSet
+     * @return {void}
+     **/
+    // Todo: remove? (not in use any more?)
+    removeAt(index) {
+        if (index < 0 || index >= this.intervals.length)
+            return;
+        this.intervals.splice(index, 1);
+    }
+    ;
+    /**
+     * Intersect all sub intervalls with the given range (must be inside bounds).
+     *
+     * @param {number} start
+     * @param {number} end
+     * @method intersect
+     * @instance
+     * @memberof CircularIntervalSet
+     * @return {void}
+     **/
+    intersect(start, end) {
+        for (var i = 0; i < this.intervals.length;) {
+            if (start <= end) {
+                if ((this.intervals[i][0] >= end || this.intervals[i][1] <= start)) {
+                    // Current interval is fully outside range.
+                    // REMOVE
+                    this.intervals.splice(i, 1);
+                }
+                else if (this.intervals[i][0] >= start && this.intervals[i][1] <= end) {
+                    // Current interval is fully inside.
+                    // KEEP
+                    i++;
+                }
+                else if (this.intervals[i][0] <= start && this.intervals[i][1] >= end) {
+                    // Desired range lies inside current interval.
+                    // CUT OFF LEFT AND RIGHT.
+                    this.intervals.splice(i, 1, [start, end]);
+                    i++;
+                }
+                else if (this.intervals[i][0] <= start && this.intervals[i][1] < end) {
+                    // Right end is inside range.
+                    // CUT OFF LEFT.
+                    this.intervals[i][0] = start;
+                    i++;
+                }
+                else if (this.intervals[i][0] > start && this.intervals[i][1] >= end) {
+                    // LEFT end is inside range.
+                    // CUT OFF RIGHT.
+                    this.intervals[i][1] = end;
+                    i++;
+                }
+                else {
+                    // NOOP
+                    i++;
+                }
+            }
+            else {
+                // start > end
+                if (this.intervals[i][0] >= end && this.intervals[i][1] <= start) {
+                    // Current interval is fully outside range.
+                    // REMOVE
+                    this.intervals.splice(i, 1);
+                }
+                else if (this.intervals[i][0] >= start) {
+                    // Full inside (right range).
+                    // Keep.
+                    i++;
+                }
+                else if (this.intervals[i][1] <= end) {
+                    // Full inside (left range).
+                    // Keep.
+                    i++;
+                }
+                else if (this.intervals[i][0] >= end && this.intervals[i][1] > start) {
+                    // Right part inside.
+                    // Cut off left part.
+                    this.intervals.splice(i, 1, [start, this.intervals[i][1]]);
+                    i++;
+                }
+                else if (this.intervals[i][0] <= end && this.intervals[i][1] < start) {
+                    // Left part inside.
+                    // Cut off right part.
+                    this.intervals.splice(i, 1, [this.intervals[i][0], end]);
+                    i++;
+                }
+                else if (this.intervals[i][0] <= end && this.intervals[i][1] >= start) {
+                    // Start and end inside, inner part is not.
+                    // Cut into two.
+                    this.intervals.splice(i, 1, [this.intervals[i][0], end], [start, this.intervals[i][1]]);
+                    i += 2;
+                }
+                else {
+                    // NOOP
+                    i++;
+                }
+            }
+        }
+    }
+    ;
+    /**
+     * Convert this set to a human readable string.
+     *
+     * @method toString
+     * @instance
+     * @memberof CircularIntervalSet
+     * @return {string}
+     **/
+    toString() {
+        return JSON.stringify(this.intervals);
+    }
+    ;
+}
+
+/**
+ * @author   Ikaros Kappler
+ * @date     2020-10-05
+ * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
+ * @modified 2024-02-23 Fixed some null-type conflicts.
+ * @version  1.0.2
+ * @file CircleIntersections
+ * @public
+ **/
+/**
+ * @classdesc A script for finding the intersection points of two or
+ * multiple circles (the 'radical lines').
+ *
+ * Based on the C++ implementation by Robert King
+ *    https://stackoverflow.com/questions/3349125/circle-circle-intersection-points
+ * and the 'Circles and spheres' article by Paul Bourke.
+ *    http://paulbourke.net/geometry/circlesphere/
+ *
+ * @requires arrayFill
+ * @requires matrixFill
+ * @requires Circle
+ * @requires IndexPair
+ * @requires Matrix
+ * @requires Interval
+ * @requires Line
+ * @requires CirularIntervalSet
+ */
+class CircleIntersections {
+    /**
+     * Find all connected outer path partitions.
+     *
+     * @method findOuterPartitions
+     * @static
+     * @memberof CircleIntersections
+     * @param {Array<Circle>} circles - The circles to find intersections for.
+     * @param {Array<CircularIntervalSet>} intervalSets - The determined interval sets (see `findOuterCircleIntervals`).
+     * @return {Array<Array<IndexPair>>} An array of paths, each defined by a sequence of IndexPairs adressing circle i and interval j.
+     **/
+    static findOuterPartitions(circles, intervalSets) {
+        // For tracking which interval we already used for detecting the partition
+        // we need a matrix; find the maximal interval length.
+        let maxSetLength = 0;
+        for (var i = 0; i < intervalSets.length; i++) {
+            maxSetLength = Math.max(maxSetLength, intervalSets[i].intervals.length);
+        }
+        const usedIntervals = matrixFill(intervalSets.length, maxSetLength, false);
+        var path = null;
+        var pathList = [];
+        while ((path = CircleIntersections.findOuterPartition(circles, intervalSets, usedIntervals)) != null) {
+            pathList.push(path);
+        }
+        return pathList;
+    }
+    /**
+     * Find all connected outer path partitions (as CircleSectors).
+     *
+     * @method findOuterPartitionsAsSectors
+     * @static
+     * @memberof CircleIntersections
+     * @param {Array<Circle>} circles - The circles to find intersections for.
+     * @param {Array<CircularIntervalSet>} intervalSets - The determined interval sets (see `findOuterCircleIntervals`).
+     * @return {Array<Array<CircleSector>>} An array of paths, each defined by a sequence of SircleSectors.
+     **/
+    static findOuterPartitionsAsSectors(circles, intervalSets) {
+        const partitions = CircleIntersections.findOuterPartitions(circles, intervalSets);
+        const partitionsAsArcs = [];
+        for (var p = 0; p < partitions.length; p++) {
+            const path = partitions[p];
+            const pathAsArcs = [];
+            for (var i = 0; i < path.length; i++) {
+                const circleIndex = path[i].i;
+                const circle = circles[circleIndex];
+                var interval = intervalSets[path[i].i].intervals[path[i].j];
+                // Params: circle, startAngle, endAngle
+                pathAsArcs.push(new CircleSector(circle, interval[0], interval[1]));
+            } // END for
+            partitionsAsArcs.push(pathAsArcs);
+        } // END for
+        return partitionsAsArcs;
+    }
+    /**
+     * Build the n*n intersection matrix: contains the radical line at (i,j) if circle i and circle j do intersect;
+     * conatins null at (i,j) otherwise.
+     *
+     * Note that this matrix is symmetrical: if circles (i,j) intersect with line (A,B), then also circles (j,i) intersect
+     * with line (B,A).
+     *
+     * The returned two-dimensional matrix (array) has exactly as many entries as the passed circle array.
+     *
+     * @method buildRadicalLineMatrix
+     * @static
+     * @memberof CircleIntersections
+     * @param {Array<Circle>} circles - The circles to find intersections for.
+     * @return {Array<Array<Line>>} A 2d-matrix containing the radical lines where circles intersect.
+     **/
+    static buildRadicalLineMatrix(circles) {
+        var radicalLines = [];
+        for (var i = 0; i < circles.length; i++) {
+            if (!radicalLines[i]) {
+                radicalLines[i] = arrayFill(circles.length, null);
+            }
+            for (var j = 0; j < circles.length; j++) {
+                if (i == j)
+                    continue;
+                if (radicalLines[i][j])
+                    continue;
+                radicalLines[i][j] = circles[i].circleIntersection(circles[j]);
+                // Build symmetrical matrix
+                var tmpRadLine = radicalLines[i][j];
+                if (tmpRadLine) {
+                    if (!radicalLines[j]) {
+                        radicalLines[j] = arrayFill(circles.length, null);
+                    }
+                    // Use reverse line
+                    radicalLines[j][i] = new Line(tmpRadLine.b, tmpRadLine.a);
+                }
+            }
+        }
+        return radicalLines;
+    }
+    /**
+     * Find all circles (indices) which are completely located inside another circle.
+     *
+     * The returned array conatins the array indices.
+     *
+     * @method findInnerCircles
+     * @static
+     * @memberof CircleIntersections
+     * @param {Array<Circle>} circles - The circles to find intersections for.
+     * @return {Array<number>}
+     **/
+    static findInnerCircles(circles) {
+        const innerCircleIndices = [];
+        for (var i = 0; i < circles.length; i++) {
+            for (var j = 0; j < circles.length; j++) {
+                if (i == j)
+                    continue;
+                if (circles[j].containsCircle(circles[i])) {
+                    innerCircleIndices.push(i);
+                }
+            }
+        }
+        return innerCircleIndices;
+    }
+    /**
+     * Calculate all outer circle intervals (sections that belong to the outermost line), dermined by the given
+     * circles and their radical lines.
+     *
+     * The returned array contains IntervalSets - one for each circle - indicating the remaining circle sections.
+     *
+     * @method findOuterCircleIntervals
+     * @static
+     * @memberof CircleIntersections
+     * @param {Array<Circle>} circles - The circles to find intersections for.
+     * @param {Array<Line>} intersectionMatrix
+     * @return {Array<number>}
+     **/
+    static findOuterCircleIntervals(circles, intersectionMatrix) {
+        const intervalSets = [];
+        for (var i = 0; i < circles.length; i++) {
+            intervalSets[i] = new CircularIntervalSet(0, 2 * Math.PI);
+            for (var j = 0; j < circles.length; j++) {
+                if (i == j)
+                    continue;
+                if (intersectionMatrix[i][j] !== null) {
+                    // const interval : Interval = CircleIntersections.radicalLineToInterval( circle, radicalLine );
+                    CircleIntersections.handleCircleInterval(circles[i], intersectionMatrix[i][j], intervalSets[i]);
+                }
+                else if (circles[j].containsCircle(circles[i])) {
+                    intervalSets[i].clear();
+                }
+            }
+        }
+        return intervalSets;
+    }
+    /**
+     * Calculate the next connected partition from the given set of circles and outer path intervals. The function
+     * will pick a random unused circle interval and detect all adjacent intervals until a closed partition
+     * was found.
+     *
+     * If an interval (circle section) was already visited will be stored in the `usedIntervalSetRecords` matrix (thus
+     * is must be large enough to map all sections).
+     *
+     * The returned array contains IndexPairs (i,j) - one for each circle i - indicating the used circle section j.
+     *
+     * @method findOuterPartition
+     * @static
+     * @memberof CircleIntersections
+     * @param {Array<Circle>} circles - The circles to find intersections for.
+     * @param {Array<CircularIntervalSet>} intervalSets - The circle intervals that form the intersection outline.
+     * @param {Matrix<boolean>} usedIntervals - A matrix for remembering which circle intervals were always used.
+     * @return {Array<Indexpair>|null} The next partition or `null` if no more can be found.
+     **/
+    static findOuterPartition(circles, intervalSets, usedIntervals) {
+        let intLocation = CircleIntersections.randomUnusedInterval(intervalSets, usedIntervals);
+        const path = [];
+        while (intLocation != null) {
+            path.push(intLocation);
+            usedIntervals[intLocation.i][intLocation.j] = true;
+            intLocation = CircleIntersections.findAdjacentInterval(circles, intLocation, intervalSets, usedIntervals, 0.001);
+        }
+        return path.length == 0 ? null : path;
+    }
+    /**
+     * Convert a radical line (belonging to a circle) into an interval: start angle and end angle.
+     *
+     * @method radicalLineToInterval
+     * @static
+     * @private
+     * @memberof CircleIntersections
+     * @param {Circle} circle - The circle itself.
+     * @param {Line} radicaLine - The radical line to convert (must have two intersection points on the circle).
+     * @return {Interval} The interval `[startAngle,endAngle]` determined by the radical line.
+     **/
+    static radicalLineToInterval(circle, radicalLine) {
+        // Get angle sections in the circles
+        const lineA = new Line(circle.center, radicalLine.a);
+        const lineB = new Line(circle.center, radicalLine.b);
+        let angleA = lineA.angle();
+        let angleB = lineB.angle();
+        // Map angles to [0 ... 2*PI]
+        // (the angle() function might return negative angles in [-PI .. 0 .. PI])
+        if (angleA < 0)
+            angleA = Math.PI * 2 + angleA;
+        if (angleB < 0)
+            angleB = Math.PI * 2 + angleB;
+        return [angleA, angleB];
+    }
+    /**
+     * This is a helper fuction used by `findOuterCircleIntervals`.
+     *
+     * It applies the passed radical line by intersecting the remaining circle sections with the new section.
+     *
+     * @method handleCircleInterval
+     * @static
+     * @private
+     * @memberof CircleIntersections
+     * @param {Circle} circle - The circles to find intersections for.
+     * @param {Line} radicalLine - The radical line to apply.
+     * @param {CircularIntervalSet} intervalSet - The CircularIntervalSet to use (must have left and right border: 0 and 2*PI).
+     * @return {void}
+     **/
+    static handleCircleInterval(circle, radicalLine, intervalSet) {
+        const interval = CircleIntersections.radicalLineToInterval(circle, radicalLine);
+        intervalSet.intersect(interval[1], interval[0]);
+    }
+    /**
+     * Pick a random unused circle interval. This function is used by the `findOuterPartition` function, which
+     * starts the detection with any random section.
+     *
+     * @method randomUnusedInterval
+     * @static
+     * @private
+     * @memberof CircleIntersections
+     * @param {Array<CircularIntervalSet>} intervalSets - An array of all available interval sets/intervals.
+     * @param {Matrix<boolean>} usedIntervals - A matrix indicating which intervals have already been used/visited by the algorithm
+     * @return {IndexPair|null}
+     **/
+    static randomUnusedInterval(intervalSets, usedIntervals) {
+        for (var i = 0; i < intervalSets.length; i++) {
+            for (var j = 0; j < intervalSets[i].intervals.length; j++) {
+                if (!usedIntervals[i][j]) {
+                    return { i: i, j: j };
+                }
+            }
+        }
+        return null;
+    }
+    /**
+     * Find the next adjacent circle interval for the given interval.
+     * starts the detection with any random section.
+     *
+     * @method randomUnusedInterval
+     * @static
+     * @private
+     * @memberof CircleIntersections
+     * @param {Array<CircularIntervalSet>} intervalSets - An array of all available interval sets/intervals.
+     * @param {Matrix<boolean>} usedIntervals - A matrix indicating which intervals have already been used/visited by the algorithm
+     * @return {IndexPair|null}
+     **/
+    static findAdjacentInterval(circles, intLocation, intervalSets, usedIntervalSetRecords, epsilon) {
+        var curInterval = intervalSets[intLocation.i].intervals[intLocation.j];
+        var curEndPoint = circles[intLocation.i].vertAt(curInterval[1]);
+        for (var i = 0; i < intervalSets.length; i++) {
+            for (var j = 0; j < intervalSets[i].intervals.length; j++) {
+                if (usedIntervalSetRecords[i][j]) {
+                    continue;
+                }
+                var interval = intervalSets[i].intervals[j];
+                var startPoint = circles[i].vertAt(interval[0]);
+                if (curEndPoint.distance(startPoint) < epsilon)
+                    return { i: i, j: j };
+            }
+        }
+        return null;
+    }
+}
+
+/**
+ * Remove duplicate vertices (2d) from an array.
+ *
+ * This method war taken and refactored from an older demo.
+ *
+ * @author   Ikaros Kappler
+ * @date     2021-07-13
+ * @modified 2023-10-28 Refactored and ported to Typescript.
+ * @modified 2024-12-17 Simplified this method to work with generic sub types of XYCoords as well.
+ * @version  1.0.1
+ */
+const EPS$1 = 0.000001;
+/**
+ * Filter the array and clear all duplicates.
+ *
+ * The original array is left unchanged. The vertices in the array are not cloned.
+ *
+ * @param {XYCoords[]} vertices
+ * @param {number=EPS} epsilon
+ * @return {Vertex[]}
+ */
+const clearDuplicateVertices = (vertices, epsilon) => {
+    if (typeof epsilon === "undefined") {
+        epsilon = EPS$1;
+    }
+    const result = [];
+    for (var i = 0; i < vertices.length; i++) {
+        if (!containsElementFrom(vertices, vertices[i], i + 1, epsilon)) {
+            result.push(vertices[i]);
+        }
+    }
+    return result;
+};
+const isCloseTo = (vertA, vertB, eps) => {
+    // return vertA.distance(vertB) < eps;
+    return geomutils.dist4(vertA.x, vertA.y, vertB.x, vertB.y) < eps;
+};
+const containsElementFrom = (vertices, vertex, fromIndex, epsilon) => {
+    for (var i = fromIndex; i < vertices.length; i++) {
+        if (isCloseTo(vertices[i], vertex, epsilon)) {
+            return true;
+        }
+    }
+    return false;
+};
+
+/**
+ * @requires Vertex
+ *
+ * @author Ikaros Kappler
+ * @date 2020-12-20
+ */
+/**
+ * Remove all duplicate neighbours from the given polygon.
+ *
+ * Imagagine a polygon:
+ * [ [0,0], [10,10], [10,10], [10,10], [20,20], [10,10], [30,30], [0,0] ]
+ *
+ * The returned vertex array will then be:
+ * [ [10,10], [20,20], [10,10], [30,30], [0,0] ]
+ *
+ * Duplicate neighbours (and only neightours) of a run of any length will be removed.
+ *
+ * @method clearPolygonDuplicateVertices
+ * @param {Array<Vertex>} vertices - The polygon vertices to use.
+ * @param {number=0} epsilon - The epsilon area to use around each vertex to check equality.
+ * @return {Array<Vertex>}
+ */
+const clearPolygonDuplicateVertices = (vertices, epsilon) => {
+    const n = vertices.length;
+    if (n === 0)
+        return [];
+    // Find following up sequence of vertices that are inside the epsilon sphere.
+    if (typeof epsilon === "undefined")
+        epsilon = 0;
+    // Check if the verts a i and j are considered equal
+    const equalVerts = (i, j) => {
+        const vertA = vertices[i % n];
+        const vertB = vertices[j % n];
+        return (epsilon === 0 && vertA.x === vertB.x && vertA.y === vertB.y)
+            || (epsilon !== 0 && vertA.distance(vertB) <= epsilon);
+    };
+    // Find the next vertex in the list, starting from 'index', that is different
+    const findEndOfRun = (index) => {
+        var b = index;
+        while (equalVerts(index, b + 1) && b < index + n) {
+            b++;
+        }
+        return b;
+    };
+    var start = findEndOfRun(0);
+    // console.log('starting at', start );
+    var i = 0;
+    const result = [];
+    for (var j = i + 1; j <= n; j++) {
+        if (!equalVerts(start + i, start + j)) {
+            result.push(vertices[(start + j) % n]);
+            i = j;
+        }
+    }
+    return result;
+};
+
+/**
+ * @author   Ikaros Kappler
+ * @version  1.1.0
+ * @date     2022-10-17
+ * @modified 2023-11-27 Added the `GenericPath.getAllStartEndPoints()` function.
+ */
+class GenericPath {
+    constructor(startSegment) {
+        this.segments = [startSegment];
+    }
+    /**
+     * Get the number of segments in this path.
+     *
+     * @method getSegmentCount
+     * @memberof Path
+     * @return {number} The number (integer) of path segments.
+     */
+    getSegmentCount() {
+        return this.segments.length;
+    }
+    /**
+     * Get the path segment at the given index.
+     *
+     * @method getSegmentAt
+     * @memberof Path
+     * @return {PathSegment} The paths segment at the given index.
+     */
+    getSegmentAt(index) {
+        return this.segments[index];
+    }
+    /**
+     * Create a deep clone of this path.
+     *
+     * @method clone
+     * @memberof Path
+     * @return {Path} A deep clone/copy of this path.
+     */
+    clone() {
+        const newPath = new GenericPath(this.segments[this.segments.length - 1].clone().reverse());
+        for (var i = this.segments.length - 2; i >= 0; i--) {
+            newPath.segments.push(this.segments[i].clone().reverse());
+        }
+        return newPath;
+    }
+    /**
+     * Reverse this path (swap start and end and thus – the direction) in-place.
+     *
+     * @method reverse
+     * @memberof Path
+     * @return {PathSegment} This path instance.
+     */
+    reverse() {
+        const newSegments = [];
+        for (var i = this.segments.length - 1; i >= 0; i--) {
+            newSegments.push(this.segments[i].reverse());
+        }
+        this.segments = newSegments;
+        return this;
+    }
+    /**
+     * Get the start point of this path segment.
+     *
+     * @method getStartPoint
+     * @memberof PathSegment
+     * @return {Vertex} The start point of this path segment.
+     */
+    getStartPoint() {
+        return this.segments[0].getStartPoint();
+    }
+    /**
+     * Get the end point of this path segment.
+     *
+     * @method getEndPoint
+     * @memberof PathSegment
+     * @return {Vertex} The end point of this path segment.
+     */
+    getEndPoint() {
+        return this.segments[this.segments.length - 1].getEndPoint();
+    }
+    /**
+     * Get the tangent's end point at the start point of this segment.
+     *
+     * @method getStartTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the starting point's tangent.
+     */
+    getStartTangent() {
+        return this.segments[0].getStartTangent();
+    }
+    /**
+     * Get the tangent's end point at the end point of this segment.
+     *
+     * @method getEndTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the ending point's tangent.
+     */
+    getEndTangent() {
+        return this.segments[this.segments.length - 1].getEndTangent();
+    }
+    /**
+     * Get the sequence of all start/end points of this path.
+     * Assumption is: each path segment's end point is located on the next segment's start point
+     * to shape a full connected path.
+     *
+     * No arcs are considered here, just plain linear segments.
+     *
+     * @returns {Array<Vertex>}
+     */
+    getAllStartEndPoints() {
+        const verts = [this.segments[0].getStartPoint()];
+        this.segments.forEach((segment) => {
+            verts.push(segment.getEndPoint());
+        });
+        return verts;
+    }
+}
+
+/**
+ * A function to detect connected paths on the plane given by a random set of segments.
+ *
+ * Note that is algorithm operates IN PLACE and will ALTER your INPUT array.
+ *
+ * @author  Ikaros Kappler
+ * @version 1.0.0
+ * @date    2022-10-17
+ */
+/**
+ * A private helper function that initializes the visitation tracking and reverses
+ * dangling path ends to connect them with preceding paths.
+ *
+ * Note that this function alters those dangling path segments IN PLACE!
+ *
+ * @param segments
+ * @param epsilon
+ * @returns
+ */
+const initVisitationArray = (segments, epsilon) => {
+    const result = []; // { visited: false, hasPredecessor: false }
+    for (var i = 0; i < segments.length; i++) {
+        result.push({ visited: false, hasPredecessor: false, hasSuccessor: false });
+        for (var j = 0; j < segments.length; j++) {
+            if (i === j) {
+                continue;
+            }
+            if (segments[i].getStartPoint().distance(segments[j].getEndPoint()) < epsilon ||
+                segments[i].getStartPoint().distance(segments[j].getStartPoint()) < epsilon) {
+                result[i].hasPredecessor = true;
+            }
+            if (segments[i].getEndPoint().distance(segments[j].getEndPoint()) < epsilon ||
+                segments[i].getEndPoint().distance(segments[j].getStartPoint()) < epsilon) {
+                result[i].hasSuccessor = true;
+            }
+        }
+    }
+    // After first initialization make sure that no loose path ends are dangling around
+    // if the affected path segment has a predecessor (but nu successor).
+    //
+    // Revert those segments. This makes the actual detection algorithm much easier.
+    for (var i = 0; i < segments.length; i++) {
+        if (!result[i].hasSuccessor && result[i].hasPredecessor) {
+            segments[i] = segments[i].reverse();
+            result[i].hasPredecessor = false;
+            result[i].hasSuccessor = true;
+        }
+    }
+    return result;
+};
+/**
+ * Find the next unvisited path segment (private helper function).
+ *
+ * There is a special order: starting path segments (those without any predecessor)
+ * will be preferred. If no more open paths are available (no starting path segments),
+ * then no more unvisited paths are available or all remaining paths are loops (without
+ * determined start/end).
+ *
+ * Doing this keeps us from the need to run a final loop to connect detected sub paths.
+ *
+ * @param {Array<PathSegment>} segments - The path segments to search in.
+ * @param { Array<Visitation>} isSegmentVisited
+ * @returns {number} The index of the next unvisited path segment or -1 if no more are available.
+ */
+const locateUnvisitedSegment = (segments, isSegmentVisited) => {
+    // First run: detect beginnings
+    for (var i = 0; i < segments.length; i++) {
+        if (!isSegmentVisited[i].hasPredecessor && !isSegmentVisited[i].visited) {
+            return i;
+        }
+    }
+    // Second run: if no beginnings exist -> use inner path segment
+    for (var i = 0; i < segments.length; i++) {
+        if (!isSegmentVisited[i].visited) {
+            return i;
+        }
+    }
+    return -1;
+};
+/**
+ * Get the next adjacent path segment to the given (current) segment. This is a private
+ * helper function.
+ *
+ * Note that the function will revert the adjacent path segment if required, so the next
+ * starting point 'equals' the current ending point.
+ *
+ * The visitation tracker will be updated if the adjacent segment was found.
+ *
+ * @param {Array<PathSegment>} segments - The total set of available path segments (visited and invisited).
+ * @param {Array<Visitation>} isSegmentVisited - A tracker of visited path segments so far.
+ * @param {PathSegment} currentSegment - The current path segment to find the adjacent segment for.
+ * @param {number} epsilon - The epsilon to use to detect 'equal' start/end points. Must be >= 0.
+ * @returns {PathSegment | null} The next adjacent path segment of null if no such exists.
+ */
+const getAdjacentSegment = (segments, isSegmentVisited, currentSegment, epsilon) => {
+    for (var j = 0; j < segments.length; j++) {
+        if (isSegmentVisited[j].visited) {
+            continue;
+        }
+        var nextSegment = segments[j];
+        // [start]---[end] [start]---[end]
+        if (currentSegment.getEndPoint().distance(nextSegment.getStartPoint()) < epsilon) {
+            isSegmentVisited[j].visited = true;
+            return nextSegment;
+        }
+        // [start]---[end] [end]---[start]
+        else if (currentSegment.getEndPoint().distance(nextSegment.getEndPoint()) < epsilon) {
+            isSegmentVisited[j].visited = true;
+            return nextSegment.reverse();
+        }
+    }
+    return null;
+};
+/**
+ * A private helper function to find the adjacent full path for the given path segment,
+ * considering the current path segment is a starting segment (or one inside a loop).
+ *
+ * @param {Array<PathSegment>} segments - The total set of available path segments.
+ * @param { Array<Visitation>} isSegmentVisited - A tracker to determine which segments have already been visited.
+ * @param {number} currentSegmentIndex - The index of the current segments to find the containing path for.
+ * @param {number} epsilon - The epsilon to use to determine 'equal' path points. Must be >= 0.
+ * @returns {GenericPath} The dected path which consists at least of the current path segment.
+ */
+const detectAdjacentPath = (segments, isSegmentVisited, currentSegmentIndex, epsilon) => {
+    var currentSegment = segments[currentSegmentIndex];
+    isSegmentVisited[currentSegmentIndex].visited = true;
+    const path = new GenericPath(currentSegment); // { segments: [currentSegment], reverse };
+    var i = 0;
+    // A safety break if something goes wrong
+    while (i < segments.length && currentSegment) {
+        currentSegment = getAdjacentSegment(segments, isSegmentVisited, currentSegment, epsilon);
+        if (currentSegment) {
+            path.segments.push(currentSegment);
+        }
+        i++;
+    }
+    return path;
+};
+/**
+ * Run a path detection on the given set of path segments.
+ *
+ * Note that the array and some path segments may be altered (like reversal) IN PLACE.
+ *
+ * @param {Array<PathSegment>} segments - The total set (array) of available path segments.
+ * @param {number=1.0} epsilon - (optional) An epsilon to use to tell if two plane points should be considered 'equal'.
+ * @returns {Array<GenericPath>} An array containing all detected path (consisting of adjacent path segments of the original set).
+ */
+const detectPaths = (segments, epsilon) => {
+    const eps = typeof epsilon === "undefined" || epsilon < 0 ? 1.0 : epsilon;
+    const isSegmentVisited = initVisitationArray(segments, eps);
+    const resultPaths = [];
+    var nextSegmentIndex = -1;
+    var i = 0;
+    while ((nextSegmentIndex = locateUnvisitedSegment(segments, isSegmentVisited)) !== -1 && i < segments.length) {
+        isSegmentVisited[nextSegmentIndex].visited = true;
+        // A safety break (to avoid infinited loops during development).
+        i++;
+        const path = detectAdjacentPath(segments, isSegmentVisited, nextSegmentIndex, eps);
+        i += path.getSegmentCount() - 1;
+        resultPaths.push(path);
+    }
+    return resultPaths;
+};
+
+/**
+ * A function to detect contour lines from 3D terrain data.
+ *
+ * For usage see demo `./demos/48-contour-plot`.
+ *
+ * @requires detectPaths
+ * @requires GenericPath
+ * @author   Ikaros Kappler
+ * @date     2023-11-05
+ * @modified 2023-11-20 Addig path detection on a triangle based grid.
+ * @version  1.0.0
+ */
+class ContourLineDetection {
+    /**
+     * Creates a new instance for calculating contour lines from the given data grid.
+     * @param {IDataGrid2d<number>} dataGrid - The data grid to use. Must not contain any NaN or null values.
+     * @param {boolean=?} debugMode - (optional) Pass `true` to log warnings on (rare) critical edge cases where the algorithm might fail.
+     */
+    constructor(dataGrid, debugMode) {
+        this.rawLinearPathSegments = [];
+        // Activates/deactivates warning messages on rare edge cases where local path detection fails.
+        this.debugMode = false;
+        this.dataGrid = dataGrid;
+        this.debugMode = Boolean(debugMode);
+    }
+    /**
+     * Detect contour paths from the underlying data source.
+     *
+     * @param {number} criticalHeightValue - The height value. If above data's maximum or below data's minimum then the result will be empty (no intersections).
+     * @param {number} options.closeGapType - `CLOSE_GAP_TYPE_NONE` or `CLOSE_GAP_TYPE_ABOVE` or `CLOSE_GAP_TYPE_BELOW`.
+     * @param {boolean=false} options.useTriangles - If set to true the detection will split each face3 quad into two triangle faces.
+     * @param {pathDetectEpsilon=0.000001} options.pathDetectEpsilon - (optional) The epsilon to tell if two points are located 'in the same place'. Used for connected path detection. If not specified the value `0.0000001` is used.
+     * @param {pointEliminationEpsilon=0.0000001} options.pointEliminationEpsilon - (optional) The epsilon for duplicate point elimination (default is 0.000001).
+     * @param {function?} onRawSegmentsDetected - (optional) Get the interim result of all detected single lines before path detection starts; DO NOT MODIFY the array.
+     * @returns {Array<GenericPath>} - A list of connected paths that resemble the contour lines of the data/terrain at the given height value.
+     */
+    detectContourPaths(criticalHeightValue, options) {
+        var _a, _b;
+        options = options || { closeGapType: ContourLineDetection.CLOSE_GAP_TYPE_NONE };
+        // First: clear the buffer
+        this.rawLinearPathSegments = [];
+        // Imagine a face4 element like this
+        //    (x,y)       (x+1,y)
+        //         A-----B
+        //         |   / |
+        //         | /   |
+        //         D-----C
+        //  (x,y+1)        (x+1,y+1)
+        //	   then result in the buffer will be
+        //   [ [A,B],
+        //     [D,C] ]
+        // Note that the diagonal line (used for triangles) is optional; depends on `options.useTriangles`.
+        const heightFace = [
+            [0, 0],
+            [0, 0]
+        ];
+        for (var y = 0; y + 1 < this.dataGrid.ySegmentCount; y++) {
+            for (var x = 0; x + 1 < this.dataGrid.xSegmentCount; x++) {
+                this.dataGrid.getDataFace4At(x, y, heightFace);
+                this.findHeightFaceIntersectionLines(x, y, heightFace, criticalHeightValue, (_a = options.pointEliminationEpsilon) !== null && _a !== void 0 ? _a : 0.0000001, options.useTriangles);
+            }
+        }
+        // Collect value above/below on the y axis
+        if (options.closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_ABOVE ||
+            options.closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_BELOW) {
+            const xExtremes = [0, this.dataGrid.xSegmentCount - 1];
+            for (var i = 0; i < xExtremes.length; i++) {
+                const x = xExtremes[i];
+                for (var y = 0; y + 1 < this.dataGrid.ySegmentCount; y++) {
+                    const nextX = x;
+                    const nextY = y + 1;
+                    this.detectAboveBelowLerpSegment(x, y, nextX, nextY, criticalHeightValue, options.closeGapType);
+                }
+            }
+            const yExtremes = [0, this.dataGrid.ySegmentCount - 1];
+            for (var j = 0; j < yExtremes.length; j++) {
+                var y = yExtremes[j];
+                for (var x = 0; x + 1 < this.dataGrid.xSegmentCount; x++) {
+                    const nextX = x + 1;
+                    const nextY = y;
+                    this.detectAboveBelowLerpSegment(x, y, nextX, nextY, criticalHeightValue, options.closeGapType);
+                }
+            }
+        }
+        if (options.onRawSegmentsDetected) {
+            options.onRawSegmentsDetected(this.rawLinearPathSegments);
+        }
+        // Detect connected paths
+        let pathSegments = detectPaths(this.rawLinearPathSegments, (_b = options.pathDetectEpsilon) !== null && _b !== void 0 ? _b : 0.0000001); // Epsilon
+        // Filter out segments with only a single line of length~=0
+        pathSegments = pathSegments.filter(function (pathSegment) {
+            return (pathSegment.segments.length != 1 ||
+                (pathSegment.segments.length === 1 && pathSegment.segments[0].length() > 0.1));
+        });
+        return pathSegments;
+    }
+    /**
+     * This function will calculate a single intersecion line of the given face4 data
+     * segment. If the given face does not intersect with the plane at the given `heightValue`
+     * then no segments will be stored.
+     *
+     * @param {number} xIndex - The x position (index) of the data face.
+     * @param {number} yIndex - The y position (index) of the data face.
+     * @param {[[number,number],[number,number]]} heightFace - The data sample that composes the face4 as a two-dimensional number array.
+     * @param {number} heightValue - The height value of the intersection plane to check for.
+     * @returns {Line|null}
+     */
+    findHeight4FaceIntersectionLine(xIndex, yIndex, heightFace, heightValue, pointEliminationEpsilon) {
+        const heightValueA = heightFace[0][0]; // value at (x,y)
+        const heightValueB = heightFace[1][0];
+        const heightValueC = heightFace[1][1];
+        const heightValueD = heightFace[0][1];
+        if (heightValueA === null || heightValueB === null || heightValueC === null || heightValueD === null) {
+            throw `[findHeightFace4IntersectionLine] Cannot extract data face at (${xIndex},${yIndex}). Some values are null.`;
+        }
+        let points = [];
+        // Case A: use full quad face
+        if (this.isBetween(heightValueA, heightValueB, heightValue)) {
+            const lerpValueByHeight = this.getLerpRatio(heightValueA, heightValueB, heightValue);
+            points.push(new Vertex$1(this.lerp(xIndex, xIndex + 1, lerpValueByHeight), yIndex));
+        }
+        if (this.isBetween(heightValueB, heightValueC, heightValue)) {
+            const lerpValueByHeight = this.getLerpRatio(heightValueB, heightValueC, heightValue);
+            points.push(new Vertex$1(xIndex + 1, this.lerp(yIndex, yIndex + 1, lerpValueByHeight)));
+        }
+        if (this.isBetween(heightValueC, heightValueD, heightValue)) {
+            const lerpValueByHeight = this.getLerpRatio(heightValueC, heightValueD, heightValue);
+            points.push(new Vertex$1(this.lerp(xIndex + 1, xIndex, lerpValueByHeight), yIndex + 1));
+        }
+        if (this.isBetween(heightValueD, heightValueA, heightValue)) {
+            const lerpValueByHeight = this.getLerpRatio(heightValueD, heightValueA, heightValue);
+            points.push(new Vertex$1(xIndex, this.lerp(yIndex + 1, yIndex, lerpValueByHeight)));
+        }
+        // Warning: if a plane intersection point is located EXACTLY on the corner
+        // edge of a face, then the two adjacent edges will result in 2x the same
+        // intersecion point. This must be handled as one, so filter the point list
+        // by an epsilon.
+        points = clearDuplicateVertices(points, pointEliminationEpsilon); // 0.000001);
+        if (points.length >= 2) {
+            const startPoint = points[0];
+            const endPoint = points[1];
+            if (this.debugMode && points.length > 2) {
+                console.warn("[findHeightFace4IntersectionLine] Detected more than 2 points on one face whre only 0 or 2 should appear. At ", xIndex, yIndex, points);
+            }
+            return new Line(startPoint, endPoint);
+        }
+        else {
+            if (this.debugMode && points.length === 1) {
+                console.warn("[findHeightFace4IntersectionLine] Point list has only one point (should not happen).");
+            }
+            return null;
+        }
+    }
+    /**
+     * This function will calculate a single intersecion line of the given face4 data
+     * segment. If the given face does not intersect with the plane at the given `heightValue`
+     * then no segments will be stored.
+     *
+     * @param {number} xIndex - The x position (index) of the data face.
+     * @param {number} yIndex - The y position (index) of the data face.
+     * @param {[[number,number],[number,number]]} heightFace - The data sample that composes the face4 as a two-dimensional number array.
+     * @param {number} heightValue - The height value of the intersection plane to check for.
+     * @returns {Line|null}
+     */
+    findHeightFaceIntersectionLines(xIndex, yIndex, heightFace, criticalHeightValue, pointEliminationEpsilon, useTriangles) {
+        // Imagine a face4 element like this
+        //    (x,y)       (x+1,y)
+        //         A-----B
+        //         |   / |
+        //         | /   |
+        //         D-----C
+        //  (x,y+1)        (x+1,y+1)
+        //	   then result in the buffer will be
+        //   [ [A,B],
+        //     [D,C] ]
+        if (useTriangles) {
+            const lineA = this.findHeighteFace3IntersectionLine(xIndex, yIndex, xIndex, yIndex + 1, xIndex + 1, yIndex, [heightFace[0][0], heightFace[0][1], heightFace[1][0]], criticalHeightValue, pointEliminationEpsilon);
+            if (lineA) {
+                this.rawLinearPathSegments.push(lineA);
+            }
+            const lineB = this.findHeighteFace3IntersectionLine(xIndex, yIndex + 1, xIndex + 1, yIndex + 1, xIndex + 1, yIndex, [heightFace[0][1], heightFace[1][1], heightFace[1][0]], criticalHeightValue, pointEliminationEpsilon);
+            if (lineB) {
+                this.rawLinearPathSegments.push(lineB);
+            }
+        }
+        else {
+            const line = this.findHeight4FaceIntersectionLine(xIndex, yIndex, heightFace, criticalHeightValue, pointEliminationEpsilon);
+            if (line) {
+                this.rawLinearPathSegments.push(line);
+            }
+        }
+    }
+    /**
+     * This function will calculate a single intersecion line of the given face3 data
+     * segment. If the given face does not intersect with the plane at the given `heightValue`
+     * then no segments will be stored.
+     *
+     * @param {number} xIndexA - The x position (index) of the first triangle data point.
+     * @param {number} yIndexA - The y position (index) of the first triangle data point.
+     * @param {[[number,number],[number,number]]} heightFace - The data sample that composes the face4 as a two-dimensional number array.
+     * @param {number} heightValue - The height value of the intersection plane to check for.
+     * @returns {Line|null}
+     */
+    findHeighteFace3IntersectionLine(xIndexA, yIndexA, xIndexB, yIndexB, xIndexC, yIndexC, heightFace, heightValue, pointEliminationEpsilon) {
+        const heightValueA = heightFace[0]; // value at (x,y)
+        const heightValueB = heightFace[1];
+        const heightValueC = heightFace[2];
+        if (heightValueA === null || heightValueB === null || heightValueC === null) {
+            throw `[findHeightFace3IntersectionLine] Cannot extract data face at (${xIndexA},${yIndexA}). Some values are null.`;
+        }
+        let points = [];
+        // Case A: use full quad face
+        if (this.isBetween(heightValueA, heightValueB, heightValue)) {
+            const lerpValueByHeight = this.getLerpRatio(heightValueA, heightValueB, heightValue);
+            points.push(new Vertex$1(this.lerp(xIndexA, xIndexB, lerpValueByHeight), this.lerp(yIndexA, yIndexB, lerpValueByHeight)));
+        }
+        if (this.isBetween(heightValueB, heightValueC, heightValue)) {
+            const lerpValueByHeight = this.getLerpRatio(heightValueB, heightValueC, heightValue);
+            // points.push(new Vertex(xIndex + 1, this.lerp(yIndex, yIndex + 1, lerpValueByHeight)));
+            points.push(new Vertex$1(this.lerp(xIndexB, xIndexC, lerpValueByHeight), this.lerp(yIndexB, yIndexC, lerpValueByHeight)));
+        }
+        if (this.isBetween(heightValueC, heightValueA, heightValue)) {
+            const lerpValueByHeight = this.getLerpRatio(heightValueC, heightValueA, heightValue);
+            // points.push(new Vertex(this.lerp(xIndex + 1, xIndex, lerpValueByHeight), yIndex + 1));
+            points.push(new Vertex$1(this.lerp(xIndexC, xIndexA, lerpValueByHeight), this.lerp(yIndexC, yIndexA, lerpValueByHeight)));
+        }
+        // Warning: if a plane intersection point is located EXACTLY on the corner
+        // edge of a face, then the two adjacent edges will result in 2x the same
+        // intersecion point. This must be handled as one, so filter the point list
+        // by an epsilon.
+        points = clearDuplicateVertices(points, pointEliminationEpsilon); // 0.0000001);
+        if (points.length >= 2) {
+            const startPoint = points[0];
+            const endPoint = points[1];
+            if (this.debugMode && points.length > 2) {
+                console.warn("[findHeightFace3IntersectionLine] Detected more than 2 points on one face whre only 0 or 2 should appear. At ", xIndexA, yIndexA, points);
+            }
+            return new Line(startPoint, endPoint);
+        }
+        else {
+            if (this.debugMode && points.length === 1) {
+                console.warn("[findHeightFace3IntersectionLine] Point list has only one point (should not happen).");
+            }
+            return null;
+        }
+    }
+    /**
+     * This procedure will look at the face4 at the ((x,y),(nextX,nextY)) position – which are four values –
+     * and determines the local contour lines for these cases.
+     *
+     * This is used to detect and calculate edge cases on the borders of the underliying height data:
+     *  * left and right border (x=0, x=data.xSegmentCount)
+     *  * top and bottom border (x=y, x=data.ySegmentCount)
+     *
+     * Resulting path segments will be stored in the global `rawLinearPathSegments` array for further processing.
+     *
+     * @param {number} x
+     * @param {number} y
+     * @param {number} nextX
+     * @param {number} nextY
+     * @param {number} criticalHeightValue
+     * @param {number} closeGapType - CLOSE_GAP_TYPE_ABOVE or CLOSE_GAP_TYPE_BELOW.
+     * @return {void}
+     */
+    detectAboveBelowLerpSegment(x, y, nextX, nextY, criticalHeightValue, closeGapType) {
+        const heightValueA = this.dataGrid.getDataValueAt(x, y);
+        const heightValueB = this.dataGrid.getDataValueAt(nextX, nextY);
+        //   if (heightValueA >= criticalHeightValue && heightValueB >= criticalHeightValue) {
+        if (this.areBothValuesOnRequiredPlaneSide(heightValueA, heightValueB, criticalHeightValue, closeGapType)) {
+            //  Both above
+            const line = new Line(new Vertex$1(x, y), new Vertex$1(nextX, nextY));
+            this.rawLinearPathSegments.push(line);
+        }
+        else if ((closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_ABOVE &&
+            heightValueA >= criticalHeightValue &&
+            heightValueB <= criticalHeightValue) ||
+            (closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_BELOW &&
+                heightValueA <= criticalHeightValue &&
+                heightValueB >= criticalHeightValue)) {
+            // Only one of both (first) is above -> interpolate to find exact intersection point
+            const lerpValueByHeight = this.getLerpRatio(heightValueA, heightValueB, criticalHeightValue);
+            const interpLine = new Line(new Vertex$1(x, y), new Vertex$1(this.lerp(x, nextX, lerpValueByHeight), this.lerp(y, nextY, lerpValueByHeight)));
+            this.rawLinearPathSegments.push(interpLine);
+        }
+        else if ((closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_ABOVE &&
+            heightValueA <= criticalHeightValue &&
+            heightValueB >= criticalHeightValue) ||
+            (closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_BELOW &&
+                heightValueA >= criticalHeightValue &&
+                heightValueB <= criticalHeightValue)) {
+            // Only one of both (second) is above -> interpolate to find exact intersection point
+            const lerpValueByHeight = this.getLerpRatio(heightValueA, heightValueB, criticalHeightValue);
+            const interpLine = new Line(new Vertex$1(this.lerp(x, nextX, lerpValueByHeight), this.lerp(y, nextY, lerpValueByHeight)), new Vertex$1(nextX, nextY));
+            this.rawLinearPathSegments.push(interpLine);
+        }
+    }
+    /**
+     * Checks if both value are on the same side of the critical value (above or below). The `closeGapType`
+     * indictes if `CLOSE_GAP_TYPE_BELOW` or `CLOSE_GAP_TYPE_ABOVE` should be used as a rule.
+     *
+     * @param {number} valueA
+     * @param {number} valueB
+     * @param {number} criticalValue
+     * @param {number} closeGapType
+     * @returns {boolean}
+     */
+    areBothValuesOnRequiredPlaneSide(valueA, valueB, criticalValue, closeGapType) {
+        return ((closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_BELOW && valueA <= criticalValue && valueB <= criticalValue) ||
+            (closeGapType == ContourLineDetection.CLOSE_GAP_TYPE_ABOVE && valueA >= criticalValue && valueB >= criticalValue));
+    }
+    /**
+     * Test if a given numeric value (`curValue`) is between the given values `valA` and `valB`.
+     * Value A and B don't need to be in ascending order, so `valA <= curValue <= valB` and `valB <= curvalue <= valA`
+     * will do the job.
+     *
+     * @param {number} valA - The first of the two bounds.
+     * @param {number} valB - The second of the two bounds.
+     * @param {number} curValue - The value to check if it is between (or equal) to the given bounds.
+     * @returns {boolean}
+     */
+    isBetween(valA, valB, curValue) {
+        return (valA <= curValue && curValue <= valB) || (valB <= curValue && curValue <= valA);
+    }
+    /**
+     * Get a 'lerp' value - which is some sort of percentage/ratio for the `curValue` inside the
+     * range of the given interval `[valA ... valB]`.
+     *
+     * Examples:
+     *  * getLerpRatio(0,100,50) === 0.5
+     *  * getLerpRatio(50,100,75) === 0.5
+     *  * getLerpRatio(0,100,0) === 0.0
+     *  * getLerpRatio(0,100,100) === 1.0
+     *  * getLerpRatio(0,100,-50) === -0.5
+     *
+     * @param {number} valA
+     * @param {number} valB
+     * @param {number} curValue
+     * @returns
+     */
+    getLerpRatio(valA, valB, curValue) {
+        return (curValue - valA) / (valB - valA);
+    }
+    /**
+     * Helper function to lerp a numeric value.
+     *
+     * @param {number} min - The min (start) value. Doesn't necesarily need to be the smaller one.
+     * @param {number} max - The max (end) value. Doesn't necesarily need to be the larger one.
+     * @param {number} ratio - The lerp ratio; usually a value between 0.0 and 1.0, but other values a valid for linear interpolation, too.
+     * @returns {number}
+     */
+    lerp(min, max, ratio) {
+        return min + (max - min) * ratio;
+    }
+}
+ContourLineDetection.CLOSE_GAP_TYPE_NONE = 0;
+ContourLineDetection.CLOSE_GAP_TYPE_ABOVE = 1;
+ContourLineDetection.CLOSE_GAP_TYPE_BELOW = 2;
+
+/**
+ * @author   Rosettcode, rewritten and ported to TypeScript by Ikaros Kappler
+ * @date     2020-05-04
+ * @modified 2020-08-17 Ported this function from vanilla JS to TypeScript.
+ * @version  1.0.1
+ *
+ * @file convexHull
+ * @public
+ **/
+/**
+ * @description The Convex Hull algorithm, found at RosettaCode:
+ *
+ * https://rosettacode.org/wiki/Convex_hull#JavaScript
+ *
+ * @requires XYCoords
+ *
+ * @global
+ * @name convexHull
+ * @param {Array<XYCoords>} points - The points on the 2D plane to find the convex hull for.
+ * @return {Array<XYCoords>} A ordered array of points defining the convex hull.
+ **/
+const getConvexHull = (points) => {
+    points.sort(comparison);
+    const L = [];
+    for (var i = 0; i < points.length; i++) {
+        while (L.length >= 2 && cross(L[L.length - 2], L[L.length - 1], points[i]) <= 0) {
+            L.pop();
+        }
+        L.push(points[i]);
+    }
+    const U = [];
+    for (var i = points.length - 1; i >= 0; i--) {
+        while (U.length >= 2 && cross(U[U.length - 2], U[U.length - 1], points[i]) <= 0) {
+            U.pop();
+        }
+        U.push(points[i]);
+    }
+    L.pop();
+    U.pop();
+    return L.concat(U);
+};
+/**
+ * Compare two vertices to create an order on the 2D plane.
+ *
+ * @name comparison
+ * @private
+ * @param {XYCoords} a - The first of the two points to compare.
+ * @param {XYCoords} b - The second of the two points to compare.
+ * @return {number} A number indicating the order (negative if `a` is 'smaller', 0 if both are equal, positive if `a` is 'larger').
+ **/
+const comparison = (a, b) => {
+    return a.x == b.x ? a.y - b.y : a.x - b.x;
+};
+/**
+ * Calculate the cross product of the three coordinates, interpreted as vectors.
+ *
+ * @name cross
+ * @private
+ * @param {XYCoords} a
+ * @param {XYCoords} b
+ * @param {XYCoords} o
+ * @return {number} The cross product of the three 'vectors'.
+ **/
+const cross = (a, b, o) => {
+    return (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
+};
+
+/**
+ * @author   mbostock, extended and ported to TypeScript by Ikaros Kappler
+ * @date     2020-05-19
+ * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
+ * @modified 2024-03-24 Fixing some unstrict types to match with the new Typescript settings.
+ * @version  1.0.3
+ * @file     contextPolygonIncircle
+ * @public
+ */
+/**
+ * For circle-polygon-intersection-count detection we need an epsilon to
+ * eliminate smaller precision errors.
+ */
+const EPS = 0.000001;
+/**
+ * Compute the max sized inlying circle in the given convex (!) polygon - also called the
+ * convex-polygon incircle.
+ *
+ * The function will return an object with either: the circle, and the triangle that defines
+ * the three tangent points where the circle touches the polygon.
+ *
+ * Inspired by
+ *  https://observablehq.com/@mbostock/convex-polygon-incircle
+ *  https://observablehq.com/@mbostock/circle-tangent-to-three-lines
+ *
+ *
+ * @requires Circle
+ * @requires Line
+ * @requires Vertex
+ * @requires Triangle
+ * @requires nsectAngle
+ * @requires geomutils
+ *
+ * @global
+ * @name convexPolygonIncircle
+ * @param {Polygon} convexHull - The actual convex polygon.
+ * @return {PolygonIncircle} A pair of a circle (the incircle) and a triangle (the three points where the circle is touching the polygon).
+ */
+const convexPolygonIncircle = (convexHull) => {
+    var n = convexHull.vertices.length;
+    var bestCircle = null;
+    var bestTriangle = null;
+    for (var a = 0; a < n; a++) {
+        for (var b = a + 1; b < n; b++) {
+            for (var c = b + 1; c < n; c++) {
+                // As these lines are part of the convex hull, we know that
+                //  * line a preceeds line b and
+                //  * line b preceeds line c :)
+                let lineA = new Line(convexHull.vertices[a], convexHull.vertices[(a + 1) % n]);
+                let lineB = new Line(convexHull.vertices[b], convexHull.vertices[(b + 1) % n]);
+                let lineC = new Line(convexHull.vertices[c], convexHull.vertices[(c + 1) % n]);
+                // Find intersections by expanding the lines
+                let vertB = lineA.intersection(lineB);
+                let vertC = lineB.intersection(lineC);
+                if (!vertB || !vertC) {
+                    continue;
+                }
+                // An object: { center: Vertex, radius: number }
+                let triangle = getTangentTriangle4(lineA.a, vertB, vertC, lineC.b);
+                if (!triangle) {
+                    continue;
+                }
+                // Workaround. There will be a future version where the 'getCircumCircle()' functions
+                // returns a real Circle instance.
+                let _circle = triangle.getCircumcircle();
+                let circle = new Circle(_circle.center, _circle.radius);
+                // Count the number of intersections with the convex hull:
+                // If there are exactly three, we have found an in-lying circle.
+                //  * Check if this one is better (bigger) than the old one.
+                //  * Also check if the circle is located inside the polygon;
+                //    The construction can, in some cases, produce an out-lying circle.
+                if (!convexHull.containsVert(circle.center)) {
+                    continue;
+                }
+                var circleIntersections = findCircleIntersections(convexHull, circle);
+                if (circleIntersections.length == 3 && (bestCircle == undefined || bestCircle.radius < circle.radius)) {
+                    bestCircle = circle;
+                    bestTriangle = triangle;
+                }
+            }
+        }
+    }
+    return { circle: bestCircle, triangle: bestTriangle };
+};
+/**
+ * This function computes the three points for the inner maximum circle
+ * lying tangential to the three subsequential lines (given by four points).
+ *
+ * Compute the circle from that triangle by using Triangle.getCircumcircle().
+ *
+ * Not all three lines should be parallel, otherwise the circle might have infinite radius.
+ *
+ * LineA := [vertA, vertB]
+ * LineB := [vertB, vertC]
+ * LineC := [vertC, vertD]
+ *
+ * @param {Vertex} vertA - The first point of the three connected lines.
+ * @param {Vertex} vertB - The second point of the three connected lines.
+ * @param {Vertex} vertC - The third point of the three connected lines.
+ * @param {Vertex} vertD - The fourth point of the three connected lines.
+ * @return {Triangle} The triangle of the circular tangential points with the given lines (3 or 4 of them).
+ */
+const getTangentTriangle4 = (vertA, vertB, vertC, vertD) => {
+    const lineA = new Line(vertA, vertB);
+    const lineB = new Line(vertB, vertC);
+    const lineC = new Line(vertC, vertD);
+    const bisector1 = geomutils.nsectAngle(vertB, vertA, vertC, 2)[0]; // bisector of first triangle
+    const bisector2 = geomutils.nsectAngle(vertC, vertB, vertD, 2)[0]; // bisector of second triangle
+    const intersection = bisector1.intersection(bisector2);
+    if (!intersection) {
+        return null;
+    }
+    // Find the closest points on one of the polygon lines (all have same distance by construction)
+    const circleIntersA = lineA.getClosestPoint(intersection);
+    const circleIntersB = lineB.getClosestPoint(intersection);
+    const circleIntersC = lineC.getClosestPoint(intersection);
+    return new Triangle(circleIntersA, circleIntersB, circleIntersC);
+};
+/**
+ * Find all intersecting lines (indices) on the polyon that intersect the circle.
+ *
+ * @param {Polygon} convexHull - The polygon to detect the intersections on (here this is the convex hull given).
+ * @param {Circle} circle - The circle to detect the intersections with.
+ * @return {Array<number>} The indices of those lines that intersect (or touch) the circle.
+ **/
+const findCircleIntersections = (convexHull, circle) => {
+    const result = [];
+    for (var i = 0; i < convexHull.vertices.length; i++) {
+        var line = new Line(convexHull.vertices[i], convexHull.vertices[(i + 1) % convexHull.vertices.length]);
+        // Use an epsilon here because circle coordinates can be kind of unprecise in the detail.
+        if (circle.lineDistance(line) < EPS) {
+            result.push(i);
+        }
+    }
+    return result;
+};
+
+/**
+ * @classdesc A HobbyCurve/HobbyPath calculation class: compute a set of optimal
+ *            cubic Bézier curves from a sequence of vertices.
+ *
+ * This Hobby curve (path) implementation was strongly inspired by
+ * the one by Prof. Dr. Edmund Weitz:
+ * Here's the website:
+ *  http://weitz.de/hobby/
+ *
+ * @date     2020-04-07
+ * @author   Transformed to a JS-class by Ikaros Kappler
+ * @modified 2020-08-19 Ported from vanilla JS to TypeScript.
+ * @version 1.0.1
+ *
+ * @file HobbyPath
+ * @public
+ **/
+/**
+ * @classdesc A HobbyCurve/HobbyPath calculation class: compute a set of optimal
+ *            cubic Bézier curves from a sequence of vertices.
+ *
+ * @requires CubicBezierCurve
+ * @requires Vertex
+ */
+class HobbyPath {
+    /**
+     * @constructor
+     * @name HobbyPath
+     * @param {Array<Vertex>=} vertices? - An optional array of vertices to initialize the path with.
+     **/
+    constructor(vertices) {
+        this.vertices = vertices ? vertices : [];
+    }
+    ;
+    /**
+     * Add a new point to the end of the vertex sequence.
+     *
+     * @name addPoint
+     * @memberof HobbyPath
+     * @instance
+     * @param {Vertex} p - The vertex (point) to add.
+     **/
+    addPoint(p) {
+        this.vertices.push(p);
+    }
+    ;
+    /**
+     * Generate a sequence of cubic Bézier curves from the point set.
+     *
+     * @name generateCurve
+     * @memberof HobbyPath
+     * @instance
+     * @param {boolean=} circular - Specify if the path should be closed.
+     * @param {number=0} omega - (default=0) An optional tension parameter.
+     * @return Array<CubicBezierCurve>
+     **/
+    generateCurve(circular, omega) {
+        let n = this.vertices.length;
+        if (n > 1) {
+            if (n == 2) {
+                // for two points, just draw a straight line
+                return [new CubicBezierCurve(this.vertices[0], this.vertices[1], this.vertices[0], this.vertices[1])];
+            }
+            else {
+                const curves = [];
+                let controlPoints = this.hobbyControls(circular, omega);
+                for (let i = 0; i < n - (circular ? 0 : 1); i++) {
+                    // if i is n-1, the "next" point is the first one
+                    let j = (i + 1) % n; // Use a succ function here?
+                    curves.push(new CubicBezierCurve(this.vertices[i], this.vertices[j], controlPoints.startControlPoints[i], controlPoints.endControlPoints[i]));
+                }
+                return curves;
+            }
+        }
+        else {
+            return [];
+        }
+    }
+    ;
+    /**
+     * Computes the control point coordinates for a Hobby curve through
+     * the points given.
+     *
+     * @name hobbyControls
+     * @memberof HobbyPath
+     * @instance
+     * @param {boolean}  circular - If true, then the path will be closed.
+     * @param {number=0} omega    - The 'curl' or the path.
+     * @return {IControlPoints} An object with two members: startControlPoints and endControlPoints (Array<Vertex>).
+     **/
+    hobbyControls(circular, omega) {
+        // This is a version that works for both, closed and non-closed paths.
+        if (typeof omega === 'undefined')
+            omega = 0;
+        let n = this.vertices.length - (circular ? 0 : 1);
+        let D = new Array(n);
+        let ds = new Array(n);
+        var succ = (i) => { return circular ? ((i + 1) % n) : (i + 1); };
+        var pred = (i) => { return circular ? ((i + n - 1) % n) : (i - 1); };
+        for (let i = 0; i < n; i++) {
+            // the "next" point in a modular way
+            let j = succ(i);
+            ds[i] = this.vertices[i].difference(this.vertices[j]);
+            D[i] = Math.sqrt(ds[i].x * ds[i].x + ds[i].y * ds[i].y);
+        }
+        let gamma = new Array(n + (circular ? 0 : 1));
+        for (let i = (circular ? 0 : 1); i < n; i++) {
+            // the "previous" point in a modular way
+            let k = pred(i);
+            let sin = ds[k].y / D[k];
+            let cos = ds[k].x / D[k];
+            let vec = HobbyPath.utils.rotate(ds[i], -sin, cos);
+            gamma[i] = Math.atan2(vec.y, vec.x);
+        }
+        if (!circular)
+            gamma[n] = 0;
+        let a = new Array(n + (circular ? 0 : 1));
+        let b = new Array(n + (circular ? 0 : 1));
+        let c = new Array(n + (circular ? 0 : 1));
+        let d = new Array(n + (circular ? 0 : 1));
+        for (let i = (circular ? 0 : 1); i < n; i++) {
+            // j is the "next" point, k the "previous" one
+            let j = succ(i);
+            let k = pred(i);
+            // see video for the equations
+            a[i] = 1 / D[k];
+            b[i] = (2 * D[k] + 2 * D[i]) / (D[k] * D[i]);
+            c[i] = 1 / D[i];
+            d[i] = -(2 * gamma[i] * D[i] + gamma[j] * D[k]) / (D[k] * D[i]);
+        }
+        // make matrix tridiagonal in preparation for the "sherman" function
+        var alpha;
+        var beta;
+        if (circular) {
+            let s = a[0] * omega; // Use omega here?
+            a[0] = 0;
+            let t = c[n - 1] * omega; // Use omega here?
+            c[n - 1] = 0;
+            alpha = HobbyPath.utils.sherman(a, b, c, d, s, t);
+            beta = new Array(n);
+            for (let i = 0; i < n - (circular ? 0 : 1); i++) {
+                // "next" point
+                let j = succ(i);
+                beta[i] = -gamma[j] - alpha[j];
+            }
+        }
+        else {
+            // see the Jackowski article for the following values; the result
+            // will be that the curvature at the first point is identical to the
+            // curvature at the second point (and likewise for the last and
+            // second-to-last)
+            b[0] = 2 + omega;
+            c[0] = 2 * omega + 1;
+            d[0] = -c[0] * gamma[1];
+            a[n] = 2 * omega + 1;
+            b[n] = 2 + omega;
+            d[n] = 0;
+            // solve system for the angles called "alpha" in the video
+            alpha = HobbyPath.utils.thomas(a, b, c, d);
+            // compute "beta" angles from "alpha" angles
+            beta = new Array(n);
+            for (let i = 0; i < n - 1; i++)
+                beta[i] = -gamma[i + 1] - alpha[i + 1];
+            // again, see Jackowski article
+            beta[n - 1] = -alpha[n];
+        }
+        let startControlPoints = new Array(n);
+        let endControlPoints = new Array(n);
+        for (let i = 0; i < n; i++) {
+            let j = succ(i);
+            let a = HobbyPath.utils.rho(alpha[i], beta[i]) * D[i] / 3;
+            let b = HobbyPath.utils.rho(beta[i], alpha[i]) * D[i] / 3;
+            let v = HobbyPath.utils.normalize(HobbyPath.utils.rotateAngle(ds[i], alpha[i]));
+            startControlPoints[i] = new Vertex$1(this.vertices[i].x + a * v.x, this.vertices[i].y + a * v.y);
+            v = HobbyPath.utils.normalize(HobbyPath.utils.rotateAngle(ds[i], -beta[i]));
+            endControlPoints[i] = new Vertex$1(this.vertices[j].x - b * v.x, this.vertices[j].y - b * v.y);
+        }
+        return { startControlPoints: startControlPoints,
+            endControlPoints: endControlPoints
+        };
+    }
+}
+HobbyPath.utils = {
+    // rotates a vector [x, y] about an angle; the angle is implicitly
+    // determined by its sine and cosine
+    rotate: (vert, sin, cos) => {
+        return new Vertex$1(vert.x * cos - vert.y * sin, vert.x * sin + vert.y * cos);
+    },
+    // rotates a vector [x, y] about the angle alpha
+    rotateAngle: (vert, alpha) => {
+        return HobbyPath.utils.rotate(vert, Math.sin(alpha), Math.cos(alpha));
+    },
+    // returns a normalized version of the vector
+    normalize: (vec) => {
+        let n = Math.hypot(vec.x, vec.y);
+        if (n == 0)
+            return new Vertex$1(0, 0);
+        else
+            return new Vertex$1(vec.x / n, vec.y / n); // TODO: do in-place
+    },
+    // the "velocity function" (also called rho in the video); a and b are
+    // the angles alpha and beta, the return value is the distance between
+    // a control point and its neighboring point; to compute sigma(a,b)
+    // we'll simply use rho(b,a)
+    rho: (a, b) => {
+        // see video for formula
+        let sa = Math.sin(a);
+        let sb = Math.sin(b);
+        let ca = Math.cos(a);
+        let cb = Math.cos(b);
+        let s5 = Math.sqrt(5);
+        let num = 4 + Math.sqrt(8) * (sa - sb / 16) * (sb - sa / 16) * (ca - cb);
+        let den = 2 + (s5 - 1) * ca + (3 - s5) * cb;
+        return num / den;
+    },
+    // Implements the Thomas algorithm for a tridiagonal system with i-th
+    // row a[i]x[i-1] + b[i]x[i] + c[i]x[i+1] = d[i] starting with row
+    // i=0, ending with row i=n-1 and with a[0] = c[n-1] = 0.  Returns the
+    // values x[i] as an array.
+    thomas: (a, b, c, d) => {
+        let n = a.length;
+        let cc = new Array(n);
+        let dd = new Array(n);
+        // forward sweep
+        cc[0] = c[0] / b[0];
+        dd[0] = d[0] / b[0];
+        for (let i = 1; i < n; i++) {
+            let den = b[i] - cc[i - 1] * a[i];
+            cc[i] = c[i] / den;
+            dd[i] = (d[i] - dd[i - 1] * a[i]) / den;
+        }
+        let x = new Array(n);
+        // back substitution
+        x[n - 1] = dd[n - 1];
+        for (let i = n - 2; i >= 0; i--)
+            x[i] = dd[i] - cc[i] * x[i + 1];
+        return x;
+    },
+    // Solves an "almost" tridiagonal linear system with i-th row
+    // a[i]x[i-1] + b[i]x[i] + c[i]x[i+1] = d[i] starting with row i=0,
+    // ending with row i=n-1 and with a[0] = c[n-1] = 0.  Returns the
+    // values x[i] as an array.  The system is not really tridiagonal
+    // because the 0-th row is b[0]x[0] + c[0]x[1] + sx[n-1] = d[0] and
+    // row n-1 is tx[0] + a[n-1]x[n-2] + b[n-1]x[n-1] = d[n-1].  The
+    // Sherman-Morrison-Woodbury formula is used so that the function
+    // "thomas" can be called to solve the system.
+    sherman: (a, b, c, d, s, t) => {
+        const n = a.length;
+        const u = new Array(n);
+        u.fill(0, 1, n - 1);
+        u[0] = 1;
+        u[n - 1] = 1;
+        let v = new Array(n);
+        v.fill(0, 1, n - 1);
+        v[0] = t;
+        v[n - 1] = s;
+        b[0] -= t;
+        b[n - 1] -= s;
+        // this would be more efficient if computed in parallel, but hey...
+        const Td = HobbyPath.utils.thomas(a, b, c, d);
+        const Tu = HobbyPath.utils.thomas(a, b, c, u);
+        const factor = (t * Td[0] + s * Td[n - 1]) / (1 + t * Tu[0] + s * Tu[n - 1]);
+        const x = new Array(n);
+        for (let i = 0; i < n; i++)
+            x[i] = Td[i] - factor * Tu[i];
+        return x;
+    }
+};
+
+/**
+ * @author   Ikaros Kappler (ported from basic script to class).
+ * @date     2020-04-15
+ * @modified 2020-08-19 Ported this class from vanilla JS to TypeScript.
+ * @version  1.0.0
+ *
+ * @file CubicSplinePath
+ * @public
+ **/
+/**
+ * @classdesc Compute a natural cubic Bézier spline path from a given sequence of points/vertices.
+ *
+ * Inspired by http://weitz.de/hobby/
+ *
+ * @requires CubicBezierCurve
+ * @requires HobbyPath
+ * @requires Vertex
+ */
+class CubicSplinePath {
+    /**
+     * @constructor
+     * @name CubicSplinePath
+     * @param {Array<Vertex>=} vertices? - An optional array of vertices to initialize the path with.
+     **/
+    constructor(vertices) {
+        this.vertices = vertices ? vertices : [];
+    }
+    ;
+    /**
+    * Add a new point to the end of the vertex sequence.
+    *
+    * @name addPoint
+    * @memberof CubicSplinePath
+    * @instance
+    * @param {Vertex} p - The vertex (point) to add.
+    **/
+    addPoint(p) {
+        this.vertices.push(p);
+    }
+    ;
+    /**
+     * Generate a sequence of cubic Bézier curves from the point set.
+     *
+     * @name generateCurve
+     * @memberof CubicSplinePath
+     * @instance
+     * @param {boolean=} circular - Specify if the path should be closed.
+     * @return Array<CubicBezierCurve>
+     **/
+    generateCurve(circular) {
+        const xs = [];
+        const ys = [];
+        for (var i = 0; i < this.vertices.length; i++) {
+            xs.push(this.vertices[i].x);
+            ys.push(this.vertices[i].y);
+        }
+        const curves = [];
+        let n = this.vertices.length;
+        if (n > 1) {
+            if (n == 2) {
+                // for two points, just draw a straight line
+                curves.push(new CubicBezierCurve(this.vertices[0], this.vertices[1], this.vertices[0], this.vertices[1]));
+            }
+            else {
+                if (!circular) {
+                    // open curve
+                    // x1 and y1 contain the coordinates of the first control
+                    // points, x2 and y2 those of the second
+                    const controlsX = CubicSplinePath.utils.naturalControlsOpen(xs);
+                    const controlsY = CubicSplinePath.utils.naturalControlsOpen(ys);
+                    for (let i = 1; i < n; i++) {
+                        // add Bézier segment - two control points and next node
+                        curves.push(new CubicBezierCurve(this.vertices[i - 1], this.vertices[i], new Vertex$1(controlsX.start[i - 1], controlsY.start[i - 1]), // x1[i-1], y1[i-1]), // new Vertex(x1[i-1], y1[i-1]),
+                        new Vertex$1(controlsX.end[i - 1], controlsY.end[i - 1]) // new Vertex(x2[i-1], y2[i-1])
+                        ));
+                    }
+                }
+                else {
+                    // closed curve, i.e. endpoints are connected
+                    // see comments for open curve
+                    let controlsX = CubicSplinePath.utils.naturalControlsClosed(xs);
+                    let controlsY = CubicSplinePath.utils.naturalControlsClosed(ys);
+                    for (let i = 0; i < n; i++) {
+                        // if i is n-1, the "next" point is the first one
+                        let j = (i + 1) % n;
+                        curves.push(new CubicBezierCurve(this.vertices[i], this.vertices[j], new Vertex$1(controlsX.start[i], controlsY.start[i]), // new Vertex(x1[i], y1[i]),
+                        new Vertex$1(controlsX.end[i], controlsY.end[i]) // new Vertex(x2[i], y2[i])
+                        ));
+                    }
+                }
+            }
+        }
+        return curves;
+    }
+    ;
+}
+CubicSplinePath.utils = {
+    naturalControlsClosed: (coords) => {
+        const n = coords.length;
+        // a, b, and c are the diagonals of the tridiagonal matrix, d is the
+        // right side
+        const a = new Array(n);
+        const b = new Array(n);
+        const c = new Array(n);
+        const d = new Array(n);
+        // the video explains why the matrix is filled this way
+        b[0] = 4;
+        c[0] = 1;
+        d[0] = 4 * coords[0] + 2 * coords[1];
+        a[n - 1] = 1;
+        b[n - 1] = 4;
+        d[n - 1] = 4 * coords[n - 1] + 2 * coords[0];
+        for (let i = 1; i < n - 1; i++) {
+            a[i] = 1;
+            b[i] = 4;
+            c[i] = 1;
+            d[i] = 4 * coords[i] + 2 * coords[i + 1];
+        }
+        // add a one to the two empty corners and solve the system for the
+        // first control points
+        const x1 = HobbyPath.utils.sherman(a, b, c, d, 1, 1);
+        // compute second controls points from first
+        const x2 = new Array(n);
+        for (let i = 0; i < n - 1; i++)
+            x2[i] = 2 * coords[i + 1] - x1[i + 1];
+        x2[n - 1] = 2 * coords[0] - x1[0];
+        return { start: x1, end: x2 };
+    },
+    // computes two arrays for the first and second controls points for a
+    // natural cubic spline through the points in K, an "open" curve where
+    // the curve doesn't return to the starting point; the function works
+    // with one coordinate at a time, i.e. it has to be called twice
+    naturalControlsOpen: (coords) => {
+        const n = coords.length - 1;
+        // a, b, and c are the diagonals of the tridiagonal matrix, d is the
+        // right side
+        const a = new Array(n);
+        const b = new Array(n);
+        const c = new Array(n);
+        const d = new Array(n);
+        // the video explains why the matrix is filled this way
+        b[0] = 2;
+        c[0] = 1;
+        d[0] = coords[0] + 2 * coords[1];
+        a[n - 1] = 2;
+        b[n - 1] = 7;
+        d[n - 1] = 8 * coords[n - 1] + coords[n];
+        for (let i = 1; i < n - 1; i++) {
+            a[i] = 1;
+            b[i] = 4;
+            c[i] = 1;
+            d[i] = 4 * coords[i] + 2 * coords[i + 1];
+        }
+        // solve the system to get the first control points
+        const x1 = HobbyPath.utils.thomas(a, b, c, d);
+        // compute second controls points from first
+        const x2 = new Array(n);
+        for (let i = 0; i < n - 1; i++) {
+            x2[i] = 2 * coords[i + 1] - x1[i + 1];
+        }
+        x2[n - 1] = (coords[n] + x1[n - 1]) / 2;
+        return { start: x1, end: x2 };
+    }
+}; // END utils
+
+/**
+ * @modified_by Ikaros Kappler
+ * @date_init   2012-10-17
+ * @date        2017-07-31
+ * @modified    2020-08-17 Ported from vanilla JS to TypeScript.
+ * @version     2.0.1
+ **/
+// TODO: cleanup? This seems not to be used.
+// const EPSILON : number = 1.0e-6;
+/**
+ * @classdesc A Delaunay pointset triangulation implementation.  Inspired by
+ *    http://www.travellermap.com/tmp/delaunay.htm
+ *
+ * License: Public Domain
+ *          Original C++ code by Joshua Bell
+ *
+ * @requires Triangle
+ * @requires Line
+ * @requires Vertex
+ */
+class Delaunay {
+    constructor(pointList) {
+        this.pointList = pointList;
+    }
+    triangulate() {
+        return this.Triangulate(this.pointList);
+    }
+    ////////////////////////////////////////////////////////////////////////////////
+    //
+    // Delaunay Triangulation Code, by Joshua Bell
+    //
+    // Inspired by: http://www.codeguru.com/cpp/data/mfc_database/misc/article.php/c8901/
+    //
+    // This work is hereby released into the Public Domain. To view a copy of the public 
+    // domain dedication, visit http://creativecommons.org/licenses/publicdomain/ or send 
+    // a letter to Creative Commons, 171 Second Street, Suite 300, San Francisco, 
+    // California, 94105, USA.
+    //
+    ////////////////////////////////////////////////////////////////////////////////
+    //------------------------------------------------------------
+    // Triangulate
+    //
+    // Perform the Delaunay Triangulation of a set of vertices.
+    //
+    // vertices: Array of Vertex objects
+    //
+    // returns: Array of Triangles
+    //------------------------------------------------------------
+    Triangulate(vertices) {
+        const triangles = [];
+        // First, create a "supertriangle" that bounds all vertices  
+        var st = this.createBoundingTriangle(vertices);
+        triangles.push(st);
+        // begin the triangulation one vertex at a time
+        for (var i in vertices) {
+            // NOTE: This is O(n^2) - can be optimized by sorting vertices
+            // along the x-axis and only considering triangles that have 
+            // potentially overlapping circumcircles
+            this.AddVertex(vertices[i], triangles);
+        }
+        // Remove triangles that shared edges with "supertriangle"
+        for (var i in triangles) {
+            var triangle = triangles[i];
+            if (triangle.a == st.a || triangle.a == st.b || triangle.a == st.c ||
+                triangle.b == st.a || triangle.b == st.b || triangle.b == st.c ||
+                triangle.c == st.a || triangle.c == st.b || triangle.c == st.c) {
+                delete triangles[i];
+            }
+        }
+        return triangles;
+    }
+    ; // Triangulate
+    // Internal: create a triangle that bounds the given vertices, with room to spare
+    createBoundingTriangle(vertices) {
+        // NOTE: There's a bit of a heuristic here. If the bounding triangle 
+        // is too large and you see overflow/underflow errors. If it is too small 
+        // you end up with a non-convex hull.
+        var minx, miny, maxx, maxy;
+        for (var i in vertices) {
+            var vertex = vertices[i];
+            if (minx === undefined || vertex.x < minx) {
+                minx = vertex.x;
+            }
+            if (miny === undefined || vertex.y < miny) {
+                miny = vertex.y;
+            }
+            if (maxx === undefined || vertex.x > maxx) {
+                maxx = vertex.x;
+            }
+            if (maxy === undefined || vertex.y > maxy) {
+                maxy = vertex.y;
+            }
+        }
+        var dx = (maxx - minx) * 10;
+        var dy = (maxy - miny) * 10;
+        var stv0 = new Vertex$1(minx - dx, miny - dy * 3);
+        var stv1 = new Vertex$1(minx - dx, maxy + dy);
+        var stv2 = new Vertex$1(maxx + dx * 3, maxy + dy);
+        return new Triangle(stv0, stv1, stv2);
+    }
+    ; // END createBoundingTriangle
+    // Internal: update triangulation with a vertex 
+    AddVertex(vertex, triangles) {
+        var edges = [];
+        // Remove triangles with circumcircles containing the vertex
+        for (var i in triangles) {
+            var triangle = triangles[i];
+            if (triangle.inCircumcircle(vertex)) {
+                edges.push(new Line(triangle.a, triangle.b));
+                edges.push(new Line(triangle.b, triangle.c));
+                edges.push(new Line(triangle.c, triangle.a));
+                delete triangles[i];
+            }
+        }
+        edges = this.mkUniqueEdges(edges);
+        // Create new triangles from the unique edges and new vertex
+        for (var i in edges) {
+            // console.log( 'adding triangle' );
+            var edge = edges[i];
+            triangles.push(new Triangle(edge.a, edge.b, vertex));
+        }
+    }
+    ; // END AddVertex
+    // Internal: remove duplicate edges from an array
+    mkUniqueEdges(edges) {
+        // TODO: This is O(n^2), make it O(n) with a hash or some such
+        const uniqueEdges = [];
+        for (var i in edges) {
+            let edge1 = edges[i];
+            let unique = true;
+            for (var j in edges) {
+                if (i != j) {
+                    let edge2 = edges[j];
+                    if ((edge1.a == edge2.a && edge1.b == edge2.b) ||
+                        (edge1.a == edge2.b && edge1.b == edge2.a)) {
+                        unique = false;
+                        break;
+                    }
+                }
+            }
+            if (unique) {
+                uniqueEdges.push(edge1);
+            }
+        }
+        return uniqueEdges;
+    }
+    ; // END mkUniqueEdges
+}
+
+/**
+ * @classdesc A simple voronoi cell (part of a voronoi diagram), stored as an array of
+ * adjacent triangles.
+ *
+ * @requires Line
+ * @requires Triangle
+ * @requires Polygon
+ * @requires Vertex
+ *
+ * @author   Ikaros Kappler
+ * @date     2018-04-11
+ * @modified 2018-05-04 Added the 'sharedVertex' param to the constructor. Extended open cells into 'infinity'.
+ * @modified 2019-10-25 Fixed a serious bug in the toPathArray function; cell with only one vertex (extreme cases) returned invalid arrays which broke the rendering.
+ * @modified 2019-12-09 Removed an unnecesary if-condition from the _calculateOpenEdgePoint(...) helper function.
+ * @modified 2020-05-18 Added function VoronoiCell.toPolygon().
+ * @modified 2020-08-12 Ported this class from vanilla JS to TypeScript.
+ * @modified 2020-08-17 Added some missing type declarations.
+ * @modified 2021-01-20 Members `triangles` and `sharedVertex` are now public.
+ * @version  1.1.3
+ *
+ * @file VoronoiCell
+ * @public
+ **/
+class VoronoiCell {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name VoronoiCell
+     * @param {Triangle[]} triangles    The passed triangle array must contain an ordered sequence of
+     *                                  adjacent triangles.
+     * @param {Vertex}     sharedVertex This is the 'center' of the voronoi cell; all triangles must share
+     *                                  that vertex.
+     **/
+    constructor(triangles, sharedVertex) {
+        if (typeof triangles === 'undefined')
+            triangles = [];
+        if (typeof sharedVertex === 'undefined')
+            sharedVertex = new Vertex$1(0, 0);
+        this.triangles = triangles;
+        this.sharedVertex = sharedVertex;
+    }
+    ;
+    /**
+     * Check if the first and the last triangle in the path are NOT connected.
+     *
+     * @method isOpen
+     * @instance
+     * @memberof VoronoiCell
+     * @return {boolean}
+     **/
+    isOpen() {
+        // There must be at least three triangles
+        return this.triangles.length < 3 || !this.triangles[0].isAdjacent(this.triangles[this.triangles.length - 1]);
+    }
+    ;
+    /**
+     * Convert this Voronoi cell to a path polygon, consisting of all Voronoi cell corner points.
+     *
+     * Note that open Voronoi cell cannot properly converted to Polygons as they are considered
+     * infinite. 'Open' Voronoi edges will be cut off at their innermose vertices.
+     *
+     * @method toPolygon
+     * @instance
+     * @memberof VoronoiCell
+     * @return {Polygon}
+     **/
+    toPolygon() {
+        return new Polygon(this.toPathArray(), this.isOpen());
+    }
+    ;
+    /**
+     * Convert the voronoi cell path data to an SVG polygon data string.
+     *
+     * "x0,y0 x1,y1 x2,y2 ..."
+     *
+     * @method toPathSVGString
+     * @instance
+     * @memberof VoronoiCell
+     * @return {string}
+     **/
+    toPathSVGString() {
+        if (this.triangles.length == 0)
+            return "";
+        const arr = this.toPathArray();
+        return arr.map((vert) => { return '' + vert.x + ',' + vert.y; }).join(' ');
+    }
+    ;
+    /**
+     * Convert the voronoi cell path data to an array.
+     *
+     * [vertex0, vertex1, vertex2, ... ]
+     *
+     * @method toPathArray
+     * @instance
+     * @memberof VoronoiCell
+     * @return {Vertex[]}
+     **/
+    toPathArray() {
+        if (this.triangles.length == 0)
+            return [];
+        if (this.triangles.length == 1)
+            return [this.triangles[0].getCircumcircle().center];
+        const arr = [];
+        for (var t = 0; t < this.triangles.length; t++) {
+            var cc = this.triangles[t].getCircumcircle();
+            arr.push(cc.center);
+        }
+        // Urgh, this is not working right now.
+        /* if( false && this.isOpen() )
+            arr.push( VoronoiCell._calcOpenEdgePoint( this.triangles[ this.triangles.length-1 ], this.triangles[ this.triangles.length-2 ], this.sharedVertex ) );
+        */
+        return arr;
+    }
+    /**
+     * A helper function.
+     *
+     * Calculate the 'infinite' open edge point based on the open path triangle
+     * 'tri' and its neighbour 'neigh'.
+     *
+     * This function is used to determine outer hull points.
+     *
+     * @method _calcOpenEdhePoint
+     * @private
+     * @static
+     * @instance
+     * @memberof VoronoiCell
+     * @return {Vertex}
+     **/
+    static _calcOpenEdgePoint(tri, neigh, sharedVertex) {
+        const center = tri.getCircumcircle().center;
+        // Find non-adjacent edge (=outer edge)
+        const edgePoint = VoronoiCell._findOuterEdgePoint(tri, neigh, sharedVertex);
+        // const perpendicular : Vertex = VoronoiCell._perpendicularLinePoint( sharedVertex, edgePoint, center );
+        const perpendicular = new Line(sharedVertex, edgePoint).getClosestPoint(center);
+        // It is not necesary to make a difference on the determinant here
+        const openEdgePoint = new Vertex$1(perpendicular.x + (center.x - perpendicular.x) * 1000, perpendicular.y + (center.y - perpendicular.y) * 1000);
+        return openEdgePoint;
+    }
+    ;
+    /**
+     * A helper function.
+     *
+     * Find the outer (not adjacent) vertex in triangle 'tri' which has triangle 'neighbour'.
+     *
+     * This function is used to determine outer hull points.
+     *
+     * @return {Vertex}
+     **/
+    static _findOuterEdgePoint(tri, neighbour, sharedVertex) {
+        if (tri.a.equals(sharedVertex)) {
+            if (neighbour.a.equals(tri.b) || neighbour.b.equals(tri.b) || neighbour.c.equals(tri.b))
+                return tri.c;
+            else
+                return tri.b;
+        }
+        if (tri.b.equals(sharedVertex)) {
+            if (neighbour.a.equals(tri.a) || neighbour.b.equals(tri.a) || neighbour.c.equals(tri.a))
+                return tri.c;
+            else
+                return tri.a;
+        }
+        // Here:
+        //    tri.c.equals(sharedVertex) 
+        if (neighbour.a.equals(tri.a) || neighbour.b.equals(tri.a) || neighbour.c.equals(tri.a))
+            return tri.b;
+        else
+            return tri.a;
+    }
+    ;
+}
+
+/**
+ * @author   Ikaros Kappler
+ * @date     2018-04-07
+ * @modified 2018-04-11 Using VoronoiCells now (was array before).
+ * @modified 2020-08-15 Ported from vanilla JS to TypeScript.
+ * @version  1.0.2
+ **/
+/**
+ * @classdesc Create the voronoi diagram from the given delaunay triangulation (they are dual graphs).
+ *
+ * @requires VoronoiCell
+ * @requires Triangle
+ */
+class delaunay2voronoi {
+    constructor(pointList, triangles) {
+        this.failedTriangleSets = [];
+        this.hasErrors = false;
+        this.pointList = pointList;
+        this.triangles = triangles;
+    }
+    ;
+    // +---------------------------------------------------------------------------------
+    // | Convert the triangle set to the Voronoi diagram.
+    // +-------------------------------
+    build() {
+        const voronoiDiagram = [];
+        for (var p in this.pointList) {
+            var point = this.pointList[p];
+            // Find adjacent triangles for first point
+            var adjacentSubset = [];
+            for (var t in this.triangles) {
+                if (this.triangles[t].a.equals(point) || this.triangles[t].b.equals(point) || this.triangles[t].c.equals(point))
+                    adjacentSubset.push(this.triangles[t]);
+            }
+            var path = this.subsetToPath(adjacentSubset);
+            if (path) // There may be errors
+                voronoiDiagram.push(new VoronoiCell(path, point));
+        }
+        return voronoiDiagram;
+    }
+    ;
+    // +---------------------------------------------------------------------------------
+    // | Re-order a tiangle subset so the triangle define a single path.
+    // |
+    // | It is required that all passed triangles are connected to a
+    // | path. Otherwise this function will RAISE AN EXCEPTION.
+    // |
+    // | The function has a failsafe recursive call for the case the first
+    // | element in the array is inside the path (no border element).
+    // +-------------------------------
+    subsetToPath(triangleSet, startPosition, tryOnce) {
+        if (triangleSet.length == 0)
+            return [];
+        if (typeof startPosition === 'undefined')
+            startPosition = 0;
+        let t = startPosition;
+        const result = [triangleSet[t]];
+        const visited = [t];
+        let i = 0;
+        while (result.length < triangleSet.length && i < triangleSet.length) {
+            let u = (startPosition + i) % triangleSet.length;
+            if (t != u && visited.indexOf(u) == -1 && triangleSet[t].isAdjacent(triangleSet[u])) {
+                result.push(triangleSet[u]);
+                visited.push(u);
+                t = u;
+                i = 0;
+            }
+            else {
+                i++;
+            }
+        }
+        // If not all triangles were used the passed set is NOT CIRCULAR.
+        // But in this case the triangle at position t is at one end of the path :)
+        // -> Restart with t.
+        if (result.length < triangleSet.length) {
+            if (tryOnce) {
+                // Possibility A (try to fix this): split the triangle set into two arrays and restart with each.
+                // Possibility B (no fix for this): throw an error and terminate.
+                // Possibility C (temp solution): Store the error for later reporting and continue.
+                // this.failedTriangleSets.push( triangleSet );
+                this.failedTriangleSets = triangleSet;
+                this.hasErrors = true;
+                // throw "Error: this triangle set is not connected: " + JSON.stringify(triangleSet);
+                return null;
+            }
+            else {
+                // Triangle inside path found. Rearrange.
+                return this.subsetToPath(triangleSet, t, true);
+            }
+        }
+        else {
+            return result;
+        }
+    }
+    ;
+}
+
+/**
+ * @requires Line
+ * @requires Vertex
+ *
+ * @author   Ikaros Kappler
+ * @date     2020-12-04
+ * @modified 2020-12-09 Ported from vanilla JS to Typescript.
+ * @modified 2024-11-22 Fixed a type error in line 41.
+ */
+/**
+ * Collect all self-intersection points of the given polygon.
+ *
+ * If the given polygon (vertices) is not self intersecting then the returned array is empty.
+ *
+ * @name findPolygonSelfIntersections
+ * @param {Array<Vertex>} vertices - The vertices that form the polygon.
+ * @return {Array<Vertex>}
+ */
+const findPolygonSelfIntersections = (vertices) => {
+    const pointList = [];
+    const lineA = new Line(new Vertex$1(), new Vertex$1());
+    const lineB = new Line(new Vertex$1(), new Vertex$1());
+    const n = vertices.length;
+    for (var a = 0; a < n; a++) {
+        lineA.a.set(vertices[a]);
+        lineA.b.set(vertices[(a + 1) % n]);
+        for (var b = 0; b < n; b++) {
+            // Same edge or neighbour edges intersect by definition.
+            // Skip them.
+            if (a == b || a + 1 == b || a == b + 1 || (a == 0 && b + 1 == n) || (b == 0 && a + 1 == n))
+                continue;
+            lineB.a.set(vertices[b]);
+            lineB.b.set(vertices[(b + 1) % n]);
+            // Commpute the intersection point of the (infinite) lines.
+            // The point is undefined if and only if both line are parallel (co-linear).
+            const intersectionPoint = lineA.intersection(lineB);
+            // Check if the intersection point is on both (finite) edges of the polygon.
+            if (intersectionPoint && lineA.hasPoint(intersectionPoint) && lineB.hasPoint(intersectionPoint)) {
+                pointList.push(intersectionPoint);
+            }
+        }
+    }
+    return pointList;
+};
+
+/**
+ * @author Original from Martin Sojka. Ported to TypesScript by Ikaros Kappler
+ * @date   2020-11-10
+ */
+const BLACK = Color.makeRGB(0, 0, 0);
+const WHITE = Color.makeRGB(255, 255, 255);
+/**
+ * Contrast color algorithm by Martin Sojka's.
+ * Found at
+ *    https://gamedev.stackexchange.com/questions/38536/given-a-rgb-color-x-how-to-find-the-most-contrasting-color-y/38542#38542
+ *
+ * @requires Color
+ */
+const getContrastColor = (color) => {
+    // r,g,b in [0..1]
+    const gamma = 2.2;
+    const L = 0.2126 * Math.pow(color.r, gamma) + 0.7152 * Math.pow(color.g, gamma) + 0.0722 * Math.pow(color.b, gamma);
+    const use_black = L > Math.pow(0.5, gamma);
+    return use_black ? BLACK : WHITE;
+};
+
+/**
+ * Algorithm:
+ *  Input Circles
+ *      -> filter out fully contained circles
+ *      -> build outer containing circles (given by detect radius)
+ *      -> find radical lines
+ *
+ * This implementation currently does not detect any holes.
+ *
+ * @author  Ikaros Kappler
+ * @version 1.0.0
+ * @date    2024-03-01
+ */
+class Metaballs {
+    constructor(inputCircles) {
+        this.circleIsFullyContained = []; // Array<boolean>
+        this.inputCircles = [];
+        this.circlesOfInterest = [];
+        this.containingCircles = [];
+        // Array< { baseCircleIndexA, baseCircleIndexB,
+        //          baseCircleA, baseCircleB,
+        //          circleA, circleB,
+        //          inverseCircleA, inverseCircleB,
+        //          doIntersect, circlePointsA:[], circlePointsB:[] } >
+        this.inverseCirclesPairs = [];
+        this.inputCircles = inputCircles;
+    }
+    rebuild(options) {
+        this.detectContainmentStatus();
+        this.rebuildContainingCircles(options);
+        this.inverseCirclesPairs = [];
+        const radicalLineMatrix = CircleIntersections.buildRadicalLineMatrix(this.containingCircles);
+        for (var i = 0; i < this.containingCircles.length; i++) {
+            var circleA = this.containingCircles[i];
+            var centerCircleA = this.circlesOfInterest[i];
+            for (var j = i + 1; j < this.containingCircles.length; j++) {
+                var radicalLine = radicalLineMatrix[i][j];
+                if (radicalLine == null) {
+                    // The two circles do not have an intersection.
+                    // console.log("Circles", i, j, "do not have any intersections");
+                    continue;
+                }
+                var circleB = this.containingCircles[j];
+                var centerCircleB = this.circlesOfInterest[j];
+                // But if they have -> compute. outer circle(s).
+                // They are symmetrical.
+                var inverseCircle1 = new Circle(radicalLine.a, options.metaRadiusAddon);
+                var inverseCircle2 = new Circle(radicalLine.b, options.metaRadiusAddon);
+                var doIntersect = inverseCircle1.circleIntersection(inverseCircle2) != null;
+                // console.log("doIntersect", doIntersect);
+                // Now find the intersection points between inner and outer circles.
+                // We will need them later.
+                var circlePointsA = [
+                    centerCircleA.closestPoint(inverseCircle1.center),
+                    centerCircleA.closestPoint(inverseCircle2.center)
+                ];
+                var circlePointsB = [
+                    centerCircleB.closestPoint(inverseCircle1.center),
+                    centerCircleB.closestPoint(inverseCircle2.center)
+                ];
+                this.inverseCirclesPairs.push({
+                    baseCircleIndexA: i,
+                    baseCircleIndexB: j,
+                    baseCircleA: this.circlesOfInterest[i],
+                    baseCircleB: this.circlesOfInterest[j],
+                    circleA: circleA,
+                    inverseCircleA: inverseCircle1,
+                    circleB: circleB,
+                    inverseCircleB: inverseCircle2,
+                    doIntersect: doIntersect,
+                    circlePointsA: circlePointsA,
+                    circlePointsB: circlePointsB
+                });
+            } // END for j
+        } // END for i
+    }
+    //   public getInnerPath;
+    checkCircleFullyContained(circleIndex) {
+        for (var i = 0; i < this.inputCircles.length; i++) {
+            if (circleIndex == i) {
+                continue;
+            }
+            if (this.inputCircles[i].containsCircle(this.inputCircles[circleIndex])) {
+                return true;
+            }
+        }
+        return false;
+    }
+    detectContainmentStatus() {
+        this.circleIsFullyContained = [];
+        this.circlesOfInterest = [];
+        for (var i = 0; i < this.inputCircles.length; i++) {
+            this.circleIsFullyContained[i] = this.checkCircleFullyContained(i);
+            if (!this.circleIsFullyContained[i]) {
+                this.circlesOfInterest.push(this.inputCircles[i]);
+            }
+        }
+    }
+    rebuildContainingCircles(options) {
+        this.containingCircles = [];
+        for (var i = 0; i < this.circlesOfInterest.length; i++) {
+            var containingCircle = new Circle(this.circlesOfInterest[i].center, this.circlesOfInterest[i].radius + options.metaRadiusAddon);
+            this.containingCircles.push(containingCircle);
+        }
+    }
+}
+
+/**
+ * A DataGrid2d implementation on 2 dimensional arrays.
+ *
+ * @author   Ikaros Kappler
+ * @date     2025-10-16
+ * @modified 2025-10-28 Added `DataGrid2dArrayMatrix.setAll(function)`.
+ * @modified 2025-10-28 Fixed a bug in the `DataGrid2dArrayMatrix.toString()` method.
+ * @version  1.0.0
+ **/
+class DataGrid2dArrayMatrix {
+    /**
+     * Create a new DataGrid2d from the given
+     * @throws Error if xSegmentCount*ySegmentCount is larger than the capacity of the array/list.
+     * @param list
+     * @param xSegmentCount
+     * @param ySegmentCount
+     */
+    constructor(xSegmentCount, ySegmentCount, initialValue) {
+        if (xSegmentCount <= 0) {
+            throw `Cannot create DataGrid2dArray, xSegmentCount (${xSegmentCount}) must be > 0.`;
+        }
+        if (ySegmentCount <= 0) {
+            throw `Cannot create DataGrid2dArray, ySegmentCount (${ySegmentCount}) must be > 0.`;
+        }
+        // this.canvas = document.getElementById(canvasId);
+        this.xSegmentCount = xSegmentCount;
+        this.ySegmentCount = ySegmentCount;
+        this._matrix = [];
+        for (var i = 0; i < ySegmentCount; i++) {
+            this._matrix.push(arrayFill(xSegmentCount, initialValue));
+        }
+    }
+    /**
+     * Set the matrix value at the given (x,y) position to a new value.
+     *
+     * @param {number} xIndex - The horizontal matrix position to set.
+     * @param {number} yIndex - The vertical matrix position to set.
+     * @param {T} value - The new value.
+     */
+    set(xIndex, yIndex, value) {
+        this._matrix[yIndex][xIndex] = value;
+    }
+    /**
+     * Getthe matrix value at the given (x,y) position.
+     *
+     * @param {number} xIndex - The horizontal matrix position to set.
+     * @param {number} yIndex - The vertical matrix position to set.
+     * @return {T} value - The new value.
+     */
+    get(xIndex, yIndex) {
+        return this.getDataValueAt(xIndex, yIndex);
+    }
+    /**
+     * Set all matrix values. The passed factory function must accept respective (x,y) positions.
+     *
+     * @param {Function} factory - The factory function to determine the new values to set.
+     * @return {DataGrid2dArrayMatrix<T>} this - for chaning.
+     */
+    setAll(factory) {
+        for (var x = 0; x < this.xSegmentCount; x++) {
+            for (var y = 0; y < this.ySegmentCount; y++) {
+                this.set(x, y, factory(x, y));
+            }
+        }
+        return this;
+    }
+    find(condition) {
+        for (var x = 0; x < this.xSegmentCount; x++) {
+            for (var y = 0; y < this.ySegmentCount; y++) {
+                if (condition(this.get(x, y), x, y, this)) {
+                    return {
+                        xIndex: x,
+                        yIndex: y,
+                        xRel: x / this.xSegmentCount,
+                        yRel: y / this.ySegmentCount
+                    };
+                }
+            }
+        }
+        return null;
+    }
+    /**
+     * @override
+     */
+    getMinDataValue() {
+        return this.minDataValue;
+    }
+    /**
+     * @override
+     */
+    getMaxDataValue() {
+        return this.maxDataValue;
+    }
+    /**
+     * @override
+     */
+    getDataValueAt(xIndex, yIndex, isDebug) {
+        return this._matrix[yIndex][xIndex];
+    }
+    /**
+     * @override
+     */
+    getDataFace4At(xIndex, yIndex, buffer) {
+        // buffer: array[2][2]
+        buffer[0][0] = this.getDataValueAt(xIndex, yIndex);
+        buffer[1][0] = this.getDataValueAt(xIndex + 1, yIndex);
+        buffer[1][1] = this.getDataValueAt(xIndex + 1, yIndex + 1);
+        buffer[0][1] = this.getDataValueAt(xIndex, yIndex + 1);
+    }
+    /**
+     * A helper method to convert a boolean matrix to a parsable string.
+     *
+     * @param {DataGrid2dArrayMatrix<boolean>} matrix
+     * @returns {string}
+     */
+    static toString(matrix) {
+        const buffer = [];
+        for (var y = 0; y < matrix.ySegmentCount; y++) {
+            for (var x = 0; x < matrix.xSegmentCount; x++) {
+                buffer.push(matrix.get(x, y) ? "X" : ".");
+            }
+            buffer.push("\n");
+        }
+        return buffer.join("");
+    }
+    /**
+     * Simple way to parse a data matrix from a string. `false` should be coded as '.' character,
+     * `true` must be coded as 'X' character.
+     *
+     * @param {string} str - The input string.
+     * @param {number} width - The desired width of the matrix (xSegmentCount).
+     * @param {number} height - The desired height of the matrix (ySegmentCount).
+     * @returns {DataGrid2dArrayMatrix<boolean>}
+     */
+    static parseBooleanMatrix(str, width, height) {
+        const matrix = new DataGrid2dArrayMatrix(width, height, false);
+        const lines = str.trim().split("\n");
+        for (var y = 0; y < lines.length && y < height; y++) {
+            lines[y] = lines[y].trim();
+            for (var x = 0; x < lines[y].length && x < width; x++) {
+                if (y < height && x < width && lines[y].charAt(x) === "X") {
+                    matrix.set(x, y, true);
+                }
+            }
+        }
+        return matrix;
+    }
+}
+
+/**
+ * A script to convert any boolean matrix to rounded paths.
+ *
+ * @author  Ikaros Kappler
+ * @date    2025-10-17 (ported to Typescript from a demo-script)
+ * @version 1.0.0
+ */
+const LEFT_BORDER = 0;
+const TOP_BORDER = 1;
+const RIGHT_BORDER = 2;
+const BOTTOM_BORDER = 3;
+/**
+ * Computes an array of paths from the given boolean matrix.
+ *
+ * @param {DataGrid2dArrayMatrix<boolean>} matrix
+ * @param {PixelCornerPathOptions} options
+ * @returns
+ */
+const pixelCornersToRoundPaths = (matrix, options) => {
+    const paths = [];
+    const visitedLeftBorderMatrix = new DataGrid2dArrayMatrix(matrix.xSegmentCount, matrix.ySegmentCount, false);
+    const origin = options && options.origin ? options.origin : { x: 0, y: 0 };
+    const squareSize = options && typeof options.squareSize === "number" ? options.squareSize : 10;
+    const gapSize = options && typeof options.gapSize === "number" ? options.gapSize : 2;
+    const curveFactor = options && typeof options.curveFactor === "number" ? options.curveFactor : 0.666;
+    // Find an unvisited pixel with a free left neighbour
+    const condition = (value, x, y, _matrix) => {
+        return (value === true &&
+            visitedLeftBorderMatrix.get(x, y) === false &&
+            // is left neighbour free?
+            (x - 1 < 0 || _matrix.get(x - 1, y) === false));
+    };
+    // Just to be sure the while loop terminates after a maximum number of iterations.
+    const safetyLimit = matrix.xSegmentCount * matrix.ySegmentCount + 1;
+    // The next unvisited pixel position.
+    var nonVisitedPosition;
+    var i = 0;
+    while ((nonVisitedPosition = matrix.find(condition)) && i++ < safetyLimit) {
+        // console.log("nonVisitedPosition", nonVisitedPosition);
+        // Condition: if a point was found then its left neighbour is empty.
+        //            So by this the current pixel's left bound is definitely a path start.
+        const squareBox = getSquareBox(origin, squareSize, gapSize, nonVisitedPosition.xIndex, nonVisitedPosition.yIndex);
+        const west = squareBox.getWestPoint();
+        // A starting point was found: Initialize the next path.
+        var pathData = [
+            // Start point
+            "M",
+            west.x,
+            west.y
+        ];
+        // Now from this point starting (left pixel corner) construct the next sequence of path commands.
+        __constructPath(pathData, matrix, visitedLeftBorderMatrix, nonVisitedPosition, LEFT_BORDER, origin, squareSize, gapSize, curveFactor);
+        paths.push(pathData);
+        // console.log("pathData", pathData);
+    }
+    return paths;
+};
+/**
+ * Construct a bounding box representing the visual square bounds for the given pixel.
+ *
+ * @param {XYCoords} origin - The origin to build the paths from (upper left corner of the graphics).
+ * @param {number} squareSize - The number of pixels to use to represent a pixel square.
+ * @param {number} gapSize - The number of pixels to use for gaps between squares.
+ * @param {number} x - The x position inside the data grid (matrix offset).
+ * @param {number} y - They  position inside the data grid (matrix offset).
+ * @returns
+ */
+const getSquareBox = (origin, squareSize, gapSize, x, y) => {
+    return new Bounds({
+        x: origin.x + x * (squareSize + gapSize),
+        y: origin.y + y * (squareSize + gapSize)
+    }, {
+        x: origin.x + x * (squareSize + gapSize) + squareSize,
+        y: origin.y + y * (squareSize + gapSize) + squareSize
+    });
+};
+/**
+ * Lerp between these two numbers using the passed lerp amount (usually a value in 0.0-1.0).
+ *
+ * @param {number} a
+ * @param {number} b
+ * @param {number} lerpFactor
+ * @returns {number}
+ */
+const lerp = (a, b, lerpFactor) => {
+    return a + (b - a) * lerpFactor;
+};
+/**
+ * Construct a path command for a cubic Bézier curve.
+ *
+ * @param {SVGPathParams} pathData
+ * @param {XYCoords} start
+ * @param {XYCoords} controlA
+ * @param {XYCoords} controlB
+ * @param {XYCoords} end
+ * @param {number} curveFactor
+ */
+const addRoundCorner = (pathData, start, controlA, controlB, end, curveFactor) => {
+    pathData.push("C", lerp(start.x, controlA.x, curveFactor), lerp(start.y, controlA.y, curveFactor), lerp(end.x, controlB.x, curveFactor), lerp(end.y, controlB.y, curveFactor), end.x, end.y);
+};
+/**
+ * Construct a new path command for a straight line.
+ *
+ * @param {SVGPathParams} pathData
+ * @param {XYCoords} target
+ */
+const addStraightLine = (pathData, target) => {
+    pathData.push("L", target.x, target.y);
+};
+/**
+ * A helper function for constructing the next path, beginning at the passed matrix position.
+ *
+ * Note the path will be created at the left border of the given 'pixel', constructe
+ * in clockwise order.
+ *
+ * @param {SVGPathParams} pathData
+ * @param {DataGrid2dArrayMatrix<boolean>} matrix - The data matrix to use.
+ * @param {DataGrid2dArrayMatrix<boolean>} visitedLeftBordersMatrix - A helper matrix to keep track of visited pixels.
+ * @param {RasterPosition} startingPosition
+ * @param {number} startingBorderDirection
+ * @param {XYCoords} origin
+ * @param {number} squareSize
+ * @param {number} gapSize
+ * @param {number} curveFactor
+ */
+const __constructPath = (pathData, matrix, visitedLeftBordersMatrix, startingPosition, startingBorderDirection, origin, squareSize, gapSize, curveFactor) => {
+    // Pre: position's neighbour pixel at ehe given border direction is unset.
+    var isPathComplete = false;
+    const maxInterations = matrix.xSegmentCount * matrix.ySegmentCount * 4 + 1;
+    var i = 0;
+    var position = startingPosition;
+    var borderDirection = startingBorderDirection;
+    while (!isPathComplete && i++ < maxInterations) {
+        var x = position.xIndex;
+        var y = position.yIndex;
+        // console.log("x", x, "y", y, "borderDirection", borderDirection);
+        // Get the pixel's box bounds.
+        const squareBox = getSquareBox(origin, squareSize, gapSize, x, y);
+        // Find next step when walking 'clockwise'
+        if (borderDirection === LEFT_BORDER) {
+            // Only track visits on left borders. By this we can detect non-visited holes :)
+            visitedLeftBordersMatrix.set(x, y, true);
+            // We want to expand the left border
+            const west = squareBox.getWestPoint();
+            // Pixel in the north?
+            if (y - 1 < 0 || matrix.get(x, y - 1) === false) {
+                // Northwise pixel is empty
+                //  -> construct round corner to right
+                addRoundCorner(pathData, west, squareBox.getNorthWestPoint(), squareBox.getNorthWestPoint(), squareBox.getNorthPoint(), curveFactor);
+                borderDirection = TOP_BORDER;
+                // Keep pixel position unchanged
+            }
+            else if (x - 1 >= 0 && matrix.get(x - 1, y - 1) === true) {
+                // Top neighbour pixel is set AND top-left pixel is set too.
+                // -> construct rounded edge to top-left.
+                const squareBoxNW = getSquareBox(origin, squareSize, gapSize, x - 1, y - 1);
+                addRoundCorner(pathData, west, squareBox.getNorthWestPoint(), squareBoxNW.getSouthEastPoint(), squareBoxNW.getSouthPoint(), curveFactor);
+                borderDirection = BOTTOM_BORDER;
+                position = { xIndex: x - 1, yIndex: y - 1 };
+            }
+            else {
+                // Straight to top
+                const squareBoxN = getSquareBox(origin, squareSize, gapSize, x, y - 1);
+                addStraightLine(pathData, squareBoxN.getWestPoint());
+                position = { xIndex: x, yIndex: y - 1 };
+                // Keep borderDirection: LEFT_BORDER
+                // isPathComplete = true; // TODO
+            }
+        }
+        else if (borderDirection === TOP_BORDER) {
+            // North pixel is definitely empty.
+            const north = squareBox.getNorthPoint();
+            if (x + 1 >= matrix.xSegmentCount || matrix.get(x + 1, y) === false) {
+                // Top border and right pixel is empty
+                //  --> create rounded corner to right south
+                addRoundCorner(pathData, north, squareBox.getNorthEastPoint(), squareBox.getNorthEastPoint(), squareBox.getEastPoint(), curveFactor);
+                borderDirection = RIGHT_BORDER;
+                // Keep pixel position unchanged
+            }
+            else if (y - 1 < 0 || matrix.get(x + 1, y - 1) === false) {
+                // Top border and right pixel is set, and north-east pixel is clear.
+                // -> linear path to right
+                const squareBoxE = getSquareBox(origin, squareSize, gapSize, x + 1, y);
+                addStraightLine(pathData, squareBoxE.getNorthPoint());
+                position = { xIndex: x + 1, yIndex: y };
+                // Keep borderDirection TOP
+            }
+            else {
+                // Last case: right neighbour is set and north-east pixel is set
+                //-> construct a rounded corner to east-north.
+                const squareBoxNE = getSquareBox(origin, squareSize, gapSize, x + 1, y - 1);
+                addRoundCorner(pathData, north, squareBox.getNorthEastPoint(), squareBoxNE.getSouthWestPoint(), squareBoxNE.getWestPoint(), curveFactor);
+                borderDirection = LEFT_BORDER;
+                position = { xIndex: x + 1, yIndex: y - 1 };
+                // isPathComplete = true; // TODO!!!
+            }
+        }
+        else if (borderDirection === RIGHT_BORDER) {
+            // East pixel is definitely empty.
+            var east = squareBox.getEastPoint();
+            if (y + 1 >= matrix.ySegmentCount || matrix.get(x, y + 1) === false) {
+                // South pixel is empty.
+                // -> construct rounded corner to south-east
+                addRoundCorner(pathData, east, squareBox.getSouthEastPoint(), squareBox.getSouthEastPoint(), squareBox.getSouthPoint(), curveFactor);
+                borderDirection = BOTTOM_BORDER;
+                // Keep pixel position unchanged
+            }
+            else if (x + 1 < matrix.xSegmentCount && y + 1 < matrix.ySegmentCount && matrix.get(x + 1, y + 1) === true) {
+                // South pixel is set AND right lower pixel is set, too.
+                // -> construct round corner to south-east.
+                const squareBoxSE = getSquareBox(origin, squareSize, gapSize, x + 1, y + 1);
+                addRoundCorner(pathData, east, squareBox.getSouthEastPoint(), squareBoxSE.getNorthWestPoint(), squareBoxSE.getNorthPoint(), curveFactor);
+                borderDirection = TOP_BORDER;
+                position = { xIndex: x + 1, yIndex: y + 1 };
+            }
+            else {
+                // South pixel is set and south-east pixel is clear.
+                // -> construct linear connection to south
+                const squareBoxS = getSquareBox(origin, squareSize, gapSize, x, y + 1);
+                addStraightLine(pathData, squareBoxS.getEastPoint());
+                position = { xIndex: x, yIndex: y + 1 };
+                // Keep borderDirection RIGHT
+            }
+        }
+        else if (borderDirection === BOTTOM_BORDER) {
+            // Pre: south pixel is definitely empty
+            const south = squareBox.getSouthPoint();
+            if (x - 1 < 0 || matrix.get(x - 1, y) === false) {
+                // Left pixel is empty
+                // -> construct round corner to west-north
+                addRoundCorner(pathData, south, squareBox.getSouthWestPoint(), squareBox.getSouthWestPoint(), squareBox.getWestPoint(), curveFactor);
+                borderDirection = LEFT_BORDER;
+            }
+            else if (x - 1 >= 0 && y + 1 < matrix.ySegmentCount && matrix.get(x - 1, y + 1) === true) {
+                // Left pixel AND left lower pixel are set
+                // -> construct rounded edge to south-west
+                const squareBoxSW = getSquareBox(origin, squareSize, gapSize, x - 1, y + 1);
+                addRoundCorner(pathData, south, squareBox.getSouthWestPoint(), squareBoxSW.getNorthEastPoint(), squareBoxSW.getEastPoint(), curveFactor);
+                borderDirection = RIGHT_BORDER;
+                position = { xIndex: x - 1, yIndex: y + 1 };
+            }
+            else {
+                // Left pixel is set AND south pixel is empty
+                // -> construct linear edge to left neighbour.
+                const squareBoxW = getSquareBox(origin, squareSize, gapSize, x - 1, y);
+                addStraightLine(pathData, squareBoxW.getSouthPoint());
+                position = { xIndex: x - 1, yIndex: y };
+                // Keep borderDirection BOTTOM
+            }
+        }
+        else {
+            console.warn(`[Error] Cannot construct full rounded path; 'borderDirection' has wrong value (${borderDirection}).`);
+            isPathComplete = true;
+        }
+        // End condition reached?
+        if (startingPosition.xIndex === position.xIndex &&
+            startingPosition.yIndex === position.yIndex &&
+            startingBorderDirection === borderDirection) {
+            pathData.push("Z");
+            isPathComplete = true;
+        }
+    }
+};
+
+/**
+ * @requires Line
+ * @requires Vertex
+ *
+ * @author   Ikaros Kappler
+ * @date     2020-12-04
+ * @modified 2020-12-07 Ported from vanilla JS to typescript.
+ * @modified 2024-11-22 Added the `insideBoundsOnly` param to the `splitPolygonToNonIntersecting` algorithm.
+ * @version  1.1.0
+ */
+/**
+ * This function cuts a given self-intersecting polygon into non-self-intersecting
+ * sub polygons.
+ *
+ * The algorithm only works for non-self-overlapping polygons:
+ * Please note that the union set of the sub polygons themselves will _not_ be disjunct if
+ * the input polyon overlaps with itself!
+ *
+ * See this illustration for details:
+ * ./demos/27-polygon-intersection-greinerhormann/splitting-polygon-types.png
+ *
+ * @name splitPolygonToNonIntersecting
+ * @param {Array<Vertex>} vertices - The polygon as an array of vertices.
+ * @param {number=10} maxDepth - Number of max recursive steps (default is 10).
+ * @return {Array<Array<Vertex>>} A sequence of non-self-intersecting sub polygons.
+ */
+const splitPolygonToNonIntersecting = (() => {
+    /**
+     * @param {Array<Vertex>} vertices
+     * @param {number=10} maxDepth
+     */
+    const splitPolygonToNonIntersecting = (vertices, maxDepth, insideBoundsOnly) => {
+        if (typeof maxDepth === "undefined")
+            maxDepth = 10;
+        return _splitPolygonToNonIntersecting(vertices, maxDepth, insideBoundsOnly);
+    };
+    const _splitPolygonToNonIntersecting = (vertices, maxDepth, insideBoundsOnly) => {
+        if (maxDepth <= 0) {
+            // aborting at max depth
+            return [vertices];
+        }
+        if (vertices.length <= 3) {
+            // No intersections possible
+            return [vertices];
+        }
+        const n = vertices.length;
+        const lineA = new Line(new Vertex$1(), new Vertex$1());
+        const lineB = new Line(new Vertex$1(), new Vertex$1());
+        for (var a = 0; a < vertices.length; a++) {
+            lineA.a.set(vertices[a]);
+            lineA.b.set(vertices[(a + 1) % n]);
+            for (var b = 0; b < vertices.length; b++) {
+                // Equal edges or neighbour edges intersect by definition.
+                // We ignore them.
+                if (a == b || a + 1 == b || a == b + 1 || (a == 0 && b + 1 == vertices.length) || (b == 0 && a + 1 == vertices.length))
+                    continue;
+                lineB.a.set(vertices[b]);
+                lineB.b.set(vertices[(b + 1) % n]);
+                const intersectionPoint = lineA.intersection(lineB);
+                if (intersectionPoint &&
+                    lineA.hasPoint(intersectionPoint, insideBoundsOnly) &&
+                    lineB.hasPoint(intersectionPoint, insideBoundsOnly)) {
+                    // Cut polygon into two here
+                    const split = splitPolygonAt(vertices, a, b, intersectionPoint);
+                    // Split has 2 elements.
+                    const leftCleaned = _splitPolygonToNonIntersecting(split[0], maxDepth - 1, insideBoundsOnly);
+                    const rightCleaned = _splitPolygonToNonIntersecting(split[1], maxDepth - 1, insideBoundsOnly);
+                    return leftCleaned.concat(rightCleaned);
+                }
+            }
+        }
+        // No intersection found:
+        //    just return a list with the original
+        //    polygon as its only element.
+        return [vertices];
+    };
+    // Pre: edgeIndexA < edgeIndexB && vertices.length >= 4
+    const splitPolygonAt = (vertices, edgeIndexA, edgeIndexB, intersectionPoint) => {
+        const first = [];
+        var second = [];
+        for (var i = 0; i < vertices.length; i++) {
+            if (i <= edgeIndexA)
+                first.push(vertices[i]);
+            if (i == edgeIndexA) {
+                first.push(intersectionPoint);
+                second.push(intersectionPoint); // clone???
+            }
+            if (i > edgeIndexA && i <= edgeIndexB)
+                second.push(vertices[i]);
+            if (i > edgeIndexB)
+                first.push(vertices[i]);
+        }
+        return [first, second];
+    };
+    return splitPolygonToNonIntersecting;
+})();
+
+/**
+ * The Sutherland-Hodgman convex polygon clipping algorithm.
+ *
+ * Original version:
+ *    https://rosettacode.org/wiki/Sutherland-Hodgman_polygon_clipping#JavaScript
+ *
+ * @author  Ikaros Kappler (ported to TypeScript with {x,y} vertices).
+ * @date    2021-01-29
+ * @version 1.0.0
+ */
+/**
+ * @param {XYCoords}
+ * @param {XYCoords}
+ **/
+const inside = (cp1, cp2, p) => {
+    return (cp2.x - cp1.x) * (p.y - cp1.y) > (cp2.y - cp1.y) * (p.x - cp1.x);
+};
+/**
+ * @param {XYCoords}
+ * @param {XYCoords}
+ * @param {XYCoords}
+ * @param {XYCoords}
+ */
+const intersection = (cp1, cp2, s, e) => {
+    const dc = {
+        x: cp1.x - cp2.x,
+        y: cp1.y - cp2.y
+    };
+    const dp = {
+        x: s.x - e.x,
+        y: s.y - e.y
+    };
+    const n1 = cp1.x * cp2.y - cp1.y * cp2.x;
+    const n2 = s.x * e.y - s.y * e.x;
+    const n3 = 1.0 / (dc.x * dp.y - dc.y * dp.x);
+    return { x: (n1 * dp.x - n2 * dc.x) * n3,
+        y: (n1 * dp.y - n2 * dc.y) * n3
+    };
+};
+/**
+ * @param {Array<XYCoords>} subjectPolygon - Can be any polygon.
+ * @param {Array<XYCoords>} clipPolygon - Must be convex.
+ */
+const sutherlandHodgman = (subjectPolygon, clipPolygon) => {
+    let cp1 = clipPolygon[clipPolygon.length - 1];
+    let cp2;
+    let s;
+    let e;
+    let outputList = subjectPolygon;
+    for (var j in clipPolygon) {
+        cp2 = clipPolygon[j];
+        var inputList = outputList;
+        outputList = [];
+        s = inputList[inputList.length - 1]; // last on the input list
+        for (var i in inputList) {
+            e = inputList[i];
+            if (inside(cp1, cp2, e)) {
+                if (!inside(cp1, cp2, s)) {
+                    outputList.push(intersection(cp1, cp2, s, e));
+                }
+                outputList.push(e);
+            }
+            else if (inside(cp1, cp2, s)) {
+                outputList.push(intersection(cp1, cp2, s, e));
+            }
+            s = e;
+        }
+        cp1 = cp2;
+    }
+    return outputList;
+};
+
+/**
+ * Calculate the inset of any non-self-overlapping polygon.
+ *
+ * The polygon may be
+ *  - convex or non-convex
+ *  - self-intersecting
+ *
+ * The algorithms will
+ *  - first construct a general offset polygon which may be corrupt due to ouf-of-bounds or in illegal-area problems.
+ *  - then dissect the possibly self-intersecting inset polygon into separate simple polygons.
+ *  - then detect for each if it's out of bounds or in some illegal area.
+ *  - keeping only the valid ones.
+ *
+ * @required sutherlandHodgman
+ * @required splitPolygonToNonIntersecting
+ *
+ * @author   Ikaros Kappler
+ * @date     2024-11-04 Ported the script to a class.
+ * @modified 2024-12-02 Ported to Typescript.
+ */
+class PolygonInset {
+    /**
+     * Constructs a new PolygonInset instance with the underlying given polygon to work with.
+     *
+     * Please note that the algorithm will reverse the vertex order if the given polygon
+     * is not clockwise.
+     *
+     * @param {Polygon} polygon - The polygon to calculate the offset for.
+     */
+    constructor(polygon) {
+        /**
+         * The original polygon as a sequence of line objects. This is easier to use than a list of points.
+         */
+        this.originalPolygonLines = [];
+        /**
+         * The simple inset lines, directly generated by offsetting the original polygon lines by the given amount.
+         */
+        this.insetLines = [];
+        /**
+         * The cropped inset lines that makes up the first direct iteration of the inset polygon.
+         * This one will probably be self-intersecting.
+         */
+        this.insetPolygonLines = [];
+        /**
+         * The inset polygon split up into simple non-self-intersecting polygons.
+         * Represented as a list of vertex-lists. Each sub-list represents a single polygon.
+         */
+        this.splitPolygons = [];
+        this.polygon = polygon;
+    }
+    /**
+     * This is the main method.
+     *
+     * Call this with the required option params to compute your desired offset polygon(s).
+     *
+     * @param {number} options.innerPolygonOffset - The offset to use. Should be a positive number. Correct result for negative numbers are not guaranteed.
+     * @param {number?} options.maxPolygonSplitDepth - (default is the number of polygon.vertices) The maximum amount of recursive stepts to simplify the complex first iteration of the offset polygon.
+     * @param {number?} options.intersectionEpsilon - (default is 1.0) The epsilon to use for detecting overlapping polygons. This indicates a tolerance value, because directly adjecent polygons may have a little arithmetic intersection area.
+     * @returns {Array<Array<Vertex>>} A list of vertex-lists, each one representing a simple polygon from the offset-polygons.
+     */
+    computeOutputPolygons(options) {
+        var _a;
+        // No offset implies: no change.
+        if (options.innerPolygonOffset === 0) {
+            return [this.polygon.vertices]; // No change
+        }
+        // This algorithm only works with polygon in clockwise vertex order.
+        // If the polygon is not clockwise: revert.
+        PolygonInset._assertPolygonIsClockwise(this.polygon.vertices);
+        // The potential result polygons might overlap with other parts. These are not part of the desired
+        // result set and need to be filtered out.
+        // Define an intersection-epsilon: minimal critical overlaps might result of rounding errors and
+        // don't represent real overlaps.
+        const intersectionEpsilon = options.intersectionEpsilon;
+        // This will create a deep clone
+        this.optimizedPolygon = this.polygon.clone();
+        // In case the potential result polygons are self intersecting we need to split them apart later.
+        // Using the initial vertex number as the upper split limit should be safe here.
+        const maxPolygonSplitDepth = (_a = options === null || options === void 0 ? void 0 : options.maxPolygonSplitDepth) !== null && _a !== void 0 ? _a : this.optimizedPolygon.vertices.length;
+        // For calculations of initial inset rectagles we need the original polygon's lines.
+        this.originalPolygonLines = this.optimizedPolygon.getEdges();
+        this._collectInsetLines(this.originalPolygonLines, options.innerPolygonOffset);
+        this._collectInsetPolygonLines(this.insetLines);
+        this.insetRectanglePolygons = this._collectRectangularPolygonInsets(this.originalPolygonLines, this.insetLines);
+        // Optimize inset polygon AND the insetRectanglePolygons?
+        if (options.removeEars) {
+            // console.log("Remove ears");
+            // This will modify both params!
+            PolygonInset._optimizeInsetPolygon(this.optimizedPolygon, this.insetRectanglePolygons);
+        }
+        // Create a naive first inset polygon for later optimization.
+        this.insetPolygon = PolygonInset.convertToBasicInsetPolygon(this.insetPolygonLines);
+        // // Optimize inset polygon AND the insetRectanglePolygons!
+        // if (options.removeEars) {
+        //   // This will modify both params!
+        //   PolygonInset._optimizeInsetPolygon(this.insetPolygon, this.insetRectanglePolygons);
+        // }
+        // The resulting polygon will likely intersect itself multiple times.
+        // For further calculations split apart into non-self-intersecting.
+        this.splitPolygons = splitPolygonToNonIntersecting(this.insetPolygon.vertices, maxPolygonSplitDepth, true); // insideBoundsOnly
+        // This method was initially meant to calculate inset-polygons only.
+        // But with a simple filter we COULD also create outer offset-polygons.
+        // Maybe this is a task for the future
+        // console.log("DEBUG", DEBUG);
+        // DEBUG("TEST");
+        if (options.innerPolygonOffset < 0) ;
+        // console.log("splitPolygons.length", this.splitPolygons.length);
+        // Assert all polygons are clockwise!
+        PolygonInset._assertAllPolygonsAreClockwise(this.splitPolygons);
+        this.filteredSplitPolygons = PolygonInset._filterInnerSplitPolygonsByCoverage(this.splitPolygons, this.insetRectanglePolygons, intersectionEpsilon);
+        // console.log("[0] filteredSplitPolygons.length", this.filteredSplitPolygons.length);
+        this.filteredSplitPolygons = PolygonInset._filterInnerSplitPolygonsByOriginalBounds(this.filteredSplitPolygons, this.polygon);
+        // console.log("[1] filteredSplitPolygons.length", this.filteredSplitPolygons.length);
+        return this.filteredSplitPolygons;
+    }
+    /**
+     * This method transforms each polygon line into a new line
+     * by moving it to the inside direction of the polygon (by the given `insetAmount`).
+     *
+     * @param {Array<Line>} polygonLines
+     * @param {number} insetAmount
+     * @return {Array<Line>} The transformed lines. The result array has the same length and order as the input array.
+     */
+    _collectInsetLines(polygonLines, insetAmount) {
+        const insetLines = []; // Array<Line>
+        for (var i = 0; i < polygonLines.length; i++) {
+            const line = polygonLines[i];
+            const perp = new Vector(line.a, line.b).perp();
+            const t = insetAmount / perp.length();
+            const offsetOnPerp = perp.vertAt(t);
+            const diff = line.a.difference(offsetOnPerp);
+            // Polygon is is clockwise order.
+            // Move line inside polygon
+            const movedLine = line.clone();
+            movedLine.a.add(diff);
+            movedLine.b.add(diff);
+            insetLines.push(movedLine);
+        }
+        this.insetLines = insetLines;
+        return insetLines;
+    }
+    /**
+     * For a sequence of inset polygon lines get the inset polygon by detecting
+     * useful intersections (by cropping or extending them).
+     *
+     * The returned lines resemble a new polygon.
+     *
+     * Please note that the returned polygon can be self-intersecting!
+     *
+     * @param {Array<Line>} insetLines
+     * @returns {Array<Line>} The cropped or exented inset polygon lines.
+     */
+    _collectInsetPolygonLines(insetLines) {
+        if (insetLines.length <= 1) {
+            return [];
+        }
+        const insetPolygonLines = [];
+        // Collect first intersection at beginning :)
+        const lastInsetLine = insetLines[insetLines.length - 1];
+        const firstInsetLine = insetLines[0];
+        let lastIntersectionPoint = lastInsetLine.intersection(firstInsetLine); // Must not be null
+        for (var i = 0; i < insetLines.length; i++) {
+            const insetLine = insetLines[i];
+            const nextInsetLine = insetLines[(i + 1) % insetLines.length];
+            // Find desired intersection
+            const intersection = insetLine.intersection(nextInsetLine);
+            if (intersection == null) {
+                console.warn("[collectInsetPolygon] WARN intersection line must not be null", i, nextInsetLine);
+            }
+            else {
+                // By construction they MUST have any non-null intersection!
+                if (lastIntersectionPoint != null) {
+                    const resultLine = new Line(lastIntersectionPoint, intersection);
+                    insetPolygonLines.push(resultLine);
+                }
+            }
+            lastIntersectionPoint = intersection;
+        }
+        // Store intermediate result for later retrieval.
+        this.insetPolygonLines = insetPolygonLines;
+        return insetPolygonLines;
+    }
+    /**
+     * Converts two lists (same length) of original polygon lines and inset lines (interpreted as
+     * pairs) to a list of rectangular polyons.
+     *
+     * @static
+     * @param {Array<Line>} originalPolygonLines
+     * @param {Array<Line>} insetLines
+     * @returns {Array<Polygon>} A list of rectangular polygons; each returned polyon has exactly four vertices.
+     */
+    _collectRectangularPolygonInsets(originalPolygonLines, insetLines) {
+        // Convert to rectangle polygon
+        const insetRectanglePolygons = originalPolygonLines.map((polygonLine, index) => {
+            const rectPolygon = new Polygon([], false);
+            // Add in original order
+            rectPolygon.vertices.push(polygonLine.a.clone());
+            rectPolygon.vertices.push(polygonLine.b.clone());
+            // Add in reverse order
+            const insetLine = insetLines[index];
+            rectPolygon.vertices.push(insetLine.b.clone());
+            rectPolygon.vertices.push(insetLine.a.clone());
+            return rectPolygon;
+        });
+        return insetRectanglePolygons;
+    }
+    /**
+     * Converts a sequence of (hopefully adjacent) lines to a polygon by using all second line vertices `b`.
+     *
+     * @static
+     * @param insetPolygonLines
+     * @returns
+     */
+    static convertToBasicInsetPolygon(insetPolygonLines) {
+        const insetPolygon = new Polygon([], false);
+        insetPolygonLines.forEach((insetLine) => {
+            insetPolygon.vertices.push(insetLine.a);
+        });
+        return insetPolygon;
+    }
+    /**
+     * Filter split polygons: only keep those whose vertices are all contained inside the original polygon.
+     * Reason: scaling too much will result in excessive translation beyond the opposite bounds of the polygon (like more than 200% of possible insetting).
+     *
+     * @param {Array<Array<Vertex>>} splitPolygonsVertices
+     * @param {Polygon} originalPolygon
+     * @return {Array<Array<Vertex>>} The filtered polygon list.
+     */
+    static _filterInnerSplitPolygonsByOriginalBounds(splitPolygonsVertices, originalPolygon) {
+        return splitPolygonsVertices.filter((splitPolyVerts, _splitPolyIndex) => {
+            return splitPolyVerts.every((splitPVert) => {
+                return originalPolygon.containsVert(splitPVert);
+            });
+        });
+    }
+    /**
+     * Filter split polygons: only keep those that do not (signifiantly) interset with any rectangles.
+     *
+     * @static
+     * @param {Array<Array<Vertex>>} splitPolygonsVertices
+     * @param {Array<Polygon>} insetRectanglePolygons
+     * @param {number?=1.0} intersectionEpsilon - (optional, default is 1.0) A epsislon to define a tolerance for checking if two polygons intersect.
+     */
+    static _filterInnerSplitPolygonsByCoverage(splitPolygonsVertices, insetRectanglePolygons, intersectionEpsilon) {
+        // TEST: Add some jitter
+        // splitPolygonsVertices.forEach(split => {
+        //   split.forEach(vert => {
+        //     vert.x += (0.5 - Math.random()) * 0.01;
+        //     vert.y += (0.5 - Math.random()) * 0.01;
+        //   });
+        // });
+        splitPolygonsVertices.forEach((split, index) => {
+            const isCW = Polygon.utils.isClockwise(split);
+            if (!isCW) {
+                console.warn("------ split is not isClockwise!", index, isCW);
+            }
+        });
+        insetRectanglePolygons.forEach((rect, index) => {
+            const isCW = rect.isClockwise();
+            if (!isCW) {
+                console.warn("------ rect is not isClockwise!", index, isCW);
+            }
+        });
+        const eps = intersectionEpsilon === undefined || typeof intersectionEpsilon === "undefined" ? 1.0 : intersectionEpsilon;
+        return splitPolygonsVertices.filter((splitPolyVerts, _splitPolyIndex) => {
+            const intersectionTestCallback = PolygonInset._hasIntersectionCallback(splitPolyVerts, eps, _splitPolyIndex);
+            const intersectsWithAnyRect = insetRectanglePolygons.some(intersectionTestCallback);
+            return !intersectsWithAnyRect;
+        });
+    }
+    /**
+     * This private method will reverse each polygon's vertex order that's not clockwise.
+     *
+     * @param {Array<Vertex[]>} polygons
+     */
+    static _assertAllPolygonsAreClockwise(polygons) {
+        polygons.forEach((polygonVerts, _polyIndex) => {
+            // if (!Polygon.utils.isClockwise(polygonVerts)) {
+            //   polygonVerts.reverse(); // Attention: this happens in-place (Array.reverse is destructive!)
+            // }
+            PolygonInset._assertPolygonIsClockwise(polygonVerts);
+        });
+    }
+    /**
+     * This private method will revert the vertex order if the polygon is not clockwise.
+     *
+     * @param {Vertex[]} polygonVerts
+     */
+    static _assertPolygonIsClockwise(polygonVerts) {
+        if (!Polygon.utils.isClockwise(polygonVerts)) {
+            polygonVerts.reverse(); // Attention: this happens in-place (Array.reverse is destructive!)
+        }
+    }
+}
+/**
+ * Optimize the inset polygon by removing critical `ear` edges.
+ * Such an is identified by: the edge itself is completely located inside its neighbours inset rectangle.
+ *
+ * In this process multiple edges from the ear might be dropped and two adjacent edges get a new
+ * common intersection point.
+ *
+ * Note: this method is not working as expected in all cases and quite experimental.
+ *
+ * @param insetPolygon
+ * @param insetRectangles
+ */
+PolygonInset._optimizeInsetPolygon = (insetPolygon, insetRectangles) => {
+    // Locate edge that can be removed:
+    var earEdgeIndex = -1;
+    var maxLimit = insetPolygon.vertices.length;
+    var i = 0;
+    while (i++ < maxLimit &&
+        insetPolygon.vertices.length > 3 &&
+        (earEdgeIndex = PolygonInset._locateExcessiveEarEdge(insetPolygon, insetRectangles)) != -1) {
+        // console.log("REMOVE EAR EDGE", earEdgeIndex);
+        // As this is an ear edge: don't just remove the vertex.
+        //   i) Remove the vertex and calculate the new intersection point of neighbour edges.
+        //  ii) Update neightbour rectangles
+        var leftEdge = insetPolygon.getEdgeAt(earEdgeIndex - 2);
+        var rightEdge = insetPolygon.getEdgeAt(earEdgeIndex + 1);
+        var newIntersection = leftEdge.intersection(rightEdge);
+        newIntersection && rightEdge.a.set(newIntersection);
+        // Update rectangles
+        // ...
+        insetPolygon.vertices.splice(earEdgeIndex, 1);
+        insetRectangles.splice(earEdgeIndex, 1);
+    }
+    // TODO remove if not -1
+};
+PolygonInset._locateExcessiveEarEdge = (insetPolygon, insetRectangles) => {
+    for (var i = 0; i < insetPolygon.vertices.length; i++) {
+        const thisEdge = insetPolygon.getEdgeAt(i);
+        const leftIndex = i == 0 ? insetPolygon.vertices.length - 1 : i - 1;
+        // const rightIndex = i + 1 >= insetPolygon.vertices.length ? 0 : i + 1;
+        const leftRect = insetRectangles[leftIndex];
+        // const rightRect = insetRectangles[rightIndex];
+        const leftRectContainsThisEdge = PolygonInset._rectangleFullyContainsLine(leftRect, thisEdge);
+        if (leftRectContainsThisEdge) {
+            return i;
+        }
+        const leftEdge = insetPolygon.getEdgeAt(leftIndex);
+        const thisRect = insetRectangles[i];
+        const thisRectContainsLeftEdge = PolygonInset._rectangleFullyContainsLine(thisRect, leftEdge);
+        if (thisRectContainsLeftEdge) {
+            return i; // leftIndex;
+        }
+    }
+    return -1;
+};
+// Pre: rectangle.vertices.length === 4
+PolygonInset._rectangleFullyContainsLine = (rectangle, edge) => {
+    rectangle.getEdgeAt(0).length();
+    rectangle.getEdgeAt(1).length();
+    edge.length();
+    var epsPointA = edge.vertAt(0.01); // edgeLen * eps);
+    var epsPointB = edge.vertAt(0.99); // 1.0 - edgeLen * eps);
+    var centerPoint = edge.vertAt(0.5);
+    return rectangle.containsVerts([epsPointA, epsPointB, centerPoint]);
+};
+/**
+ * For simplification I'm using a callback generator function here.
+ *
+ * @param splitPolyVerts
+ * @param eps
+ * @param _splitPolyIndex
+ * @returns {Function} The callback for an `Array.some` parameter.
+ */
+PolygonInset._hasIntersectionCallback = (splitPolyVerts, eps, _splitPolyIndex) => (rectanglePoly, _rectanglePolyIndex) => {
+    // const intersectionVerts: XYCoords[] = sutherlandHodgman(splitPolyVerts, rectanglePoly.vertices);
+    const intersectionVerts = sutherlandHodgman(rectanglePoly.vertices, splitPolyVerts);
+    // var intersection = GreinerHorman.intersection(sourcePolygon.vertices, clipPolygon.vertices);
+    // const uniqueIntersectionVerts = clearDuplicateVertices(intersectionVerts);
+    const intersectionAreaSize = Polygon.utils.area(intersectionVerts);
+    if (intersectionAreaSize < 0) {
+        console.warn("%cFound a polygon split with negative area. Counterclockwise against all odds?", "color: red; background: black;", //  font-size: 30px",
+        "intersectionAreaSize", intersectionAreaSize, "_splitPolyIndex", _splitPolyIndex, "_rectanglePolyIndex", _rectanglePolyIndex, "intersectionVerts", intersectionVerts
+        // "uniqueIntersectionVerts",
+        // uniqueIntersectionVerts
+        );
+    }
+    // if (intersectionAreaSize >= eps) {
+    //   console.log(
+    //     "%cFound a polygon split for removal",
+    //     "color: orange; background: grey;", //  font-size: 30px",
+    //     "intersectionAreaSize",
+    //     intersectionAreaSize,
+    //     "_splitPolyIndex",
+    //     _splitPolyIndex,
+    //     "_rectanglePolyIndex",
+    //     _rectanglePolyIndex,
+    //     "intersectionVerts",
+    //     intersectionVerts
+    //     // "uniqueIntersectionVerts",
+    //     // uniqueIntersectionVerts
+    //   );
+    // }
+    // if (intersectionAreaSize < eps) {
+    //   // console.log("%cHello", "color: green; background: yellow; font-size: 30px");
+    //   console.log(
+    //     "Polygon split can be kept. Area is position but below epsilon.",
+    //     "intersectionAreaSize",
+    //     intersectionAreaSize,
+    //     "_splitPolyIndex",
+    //     _splitPolyIndex,
+    //     "_rectanglePolyIndex",
+    //     _rectanglePolyIndex,
+    //     "intersectionVerts",
+    //     intersectionVerts
+    //     // "uniqueIntersectionVerts",
+    //     // uniqueIntersectionVerts
+    //   );
+    // }
+    return intersectionAreaSize >= eps;
+};
+
+/**
+ * Find the outer hull outlines of a (not necessarily full connected) polygon tesellation.
+ *
+ * The method `findAllOutlinesGraph` will return a simple graph containing all vertices and edges
+ * that belong to the outer hull.
+ *
+ * The method `findAllOutlinesPolygons` will detect connected paths inside the graph and return
+ * an array of Polygons.
+ *
+ *
+ * @require detectPaths
+ *
+ * @author  Ikaros Kappler
+ * @date    2026-01-20
+ * @version 1.0.0
+ */
+/**
+ * Convert any non-intersecting tesselation to a graph.
+ * Adjadent tiles (polygons) will result in duplicate edges.
+ *
+ * @param {Polygon[]} polygons - The polygon tesselation to use.
+ * @return {TesselationGraph} A tesselation graph.
+ */
+const polygonTesselationToGraph = (polygons) => {
+    const vertices = [];
+    const edges = [];
+    // const vertexPolygonMapping: Array<number>[] = []; // Map polygon+vertex to graph vertices
+    for (var i = 0; i < polygons.length; i++) {
+        const polygon = polygons[i];
+        const polygonMapping = [];
+        // vertexPolygonMapping.push(polygonMapping);
+        // Add vertices
+        for (var j = 0; j < polygon.vertices.length; j++) {
+            const graphVertIndex = vertices.length;
+            vertices.push(polygon.vertices[j]);
+            polygonMapping.push(graphVertIndex);
+        }
+        // Now add edges
+        for (var j = 0; j < polygon.vertices.length; j++) {
+            const polyEdgeIndexA = j;
+            const polyEdgeIndexB = (j + 1) % polygon.vertices.length;
+            const grapgVertIndexA = polygonMapping[polyEdgeIndexA];
+            const grapgVertIndexB = polygonMapping[polyEdgeIndexB];
+            edges.push({ i: grapgVertIndexA, j: grapgVertIndexB });
+        }
+    }
+    return { vertices, edges };
+};
+/**
+ * A class to calculate the tesselation's outer hull.
+ */
+class PolygonTesselationOutlines {
+    /**
+     * @constructor
+     * @param {Polygon[]} polygons - The polygon tesselation to use.
+     * @param {PolygonTesselationOutlinesOptions} options - (optional)
+     */
+    constructor(polygons, options) {
+        var _a, _b;
+        this.polygons = polygons;
+        // this.tesselationGraph = tesselationToGraph(polygons);
+        this.tolerance = (_a = options === null || options === void 0 ? void 0 : options.tolerance) !== null && _a !== void 0 ? _a : PolygonTesselationOutlines.DEFAULT_TOLERANCE;
+        this.removeUnusedVertices = (_b = options === null || options === void 0 ? void 0 : options.removeUnusedVertices) !== null && _b !== void 0 ? _b : true;
+    }
+    /**
+     * Clears duplicate edges.
+     *
+     * Note: this works only for duplicates. Triplets will not be removed.
+     *
+     * @name __eliminateDuplicateEdges
+     * @private
+     * @memberof TesselationGraph
+     * @instance
+     * @param {TesselationGraph} tesselationGraph - The tesselation graph to remove duplicate edges from.
+     * @return {TesselationGraph} A new tesselation graph with cleaned up edges.
+     */
+    __eliminateDuplicateEdges(tesselationGraph) {
+        for (var e = 0; e < tesselationGraph.edges.length; e++) {
+            const curEdge = tesselationGraph.edges[e];
+            if (!curEdge) {
+                continue;
+            }
+            const curA = tesselationGraph.vertices[curEdge.i];
+            const curB = tesselationGraph.vertices[curEdge.j];
+            for (var f = 0; f < tesselationGraph.edges.length; f++) {
+                if (e === f) {
+                    continue;
+                }
+                const otherEdge = tesselationGraph.edges[f];
+                if (!otherEdge) {
+                    continue;
+                }
+                const otherA = tesselationGraph.vertices[otherEdge.i];
+                const otherB = tesselationGraph.vertices[otherEdge.j];
+                if (this.__isEqualEdge(curA, curB, otherA, otherB)) {
+                    // Both edges are equal -> remove both
+                    tesselationGraph.edges[e] = null;
+                    tesselationGraph.edges[f] = null;
+                }
+            }
+        }
+        // return tesselationGraph; // TODO: create clean clone with new mapping
+        // Clear null-records.
+        return {
+            vertices: tesselationGraph.vertices,
+            edges: tesselationGraph.edges.filter((edge) => edge != null)
+        }; // TODO: create clean clone with new mapping
+    }
+    /**
+     * Locate some edge that adjacent to the given vertex index
+     *
+     * @name __locateEdgeWithVertIndex
+     * @private
+     * @memberof TesselationGraph
+     * @instance
+     * @param {number} vertIndex - The vertex index to find an edge for.
+     * @param {TesselationGraph} tesselationGraph - The tesselation graph to remove unused vertices from.
+     * @return {number} The edge index that's adjacent to the given vertex index.
+     * @return -1 if no such edge is found.
+     */
+    __locateEdgeWithVertIndex(vertIndex, tesselationGraph) {
+        return tesselationGraph.edges.findIndex((edge) => edge.i == vertIndex || edge.j == vertIndex);
+    }
+    /**
+     * Removes all unused vertices from the graph and re-matps the edges.
+     *
+     * @name __removeUnusedVertices
+     * @private
+     * @memberof TesselationGraph
+     * @instance
+     * @param {TesselationGraph} tesselationGraph - The tesselation graph to remove unused vertices from.
+     * @return {TesselationGraph} A new tesselation graph.
+     */
+    __removeUnusedVertices(tesselationGraph) {
+        // First remove un-used vertices and re-map indices.
+        const newVertices = [];
+        const indexMapping = arrayFill(tesselationGraph.vertices.length, -1);
+        for (var j = 0; j < tesselationGraph.vertices.length; j++) {
+            const edgeIndex = this.__locateEdgeWithVertIndex(j, tesselationGraph);
+            if (edgeIndex === -1) ;
+            else {
+                // Keep vertex
+                const newIndex = newVertices.length;
+                newVertices.push(tesselationGraph.vertices[j]);
+                indexMapping[j] = newIndex;
+            }
+        }
+        // Now re-map the egdes
+        const newEdges = [];
+        for (var j = 0; j < tesselationGraph.edges.length; j++) {
+            const edge = tesselationGraph.edges[j];
+            newEdges.push({ i: indexMapping[edge.i], j: indexMapping[edge.j] });
+        }
+        return { vertices: newVertices, edges: newEdges };
+    }
+    /**
+     * Creates a tesselation graph and removes all inner edges.
+     *
+     * @name findAllOutlinesGraph
+     * @private
+     * @memberof PolygonTesselationOutlines
+     * @instance
+     * @return {TesselationGraph} A tesselation graph containing the outer hull edges only.
+     */
+    findAllOutlinesGraph() {
+        // First build tesselation graph from polygons, containing all edges and vertices.
+        const tesselationGraph = polygonTesselationToGraph(this.polygons);
+        // Now eliminate all duplicate edges. By construction only inner edges are duplicates.
+        const outerHull = this.__eliminateDuplicateEdges(tesselationGraph);
+        // Only of requested remove unused vertices.
+        if (this.removeUnusedVertices) {
+            const cleanOuterHull = this.__removeUnusedVertices(outerHull);
+            return cleanOuterHull;
+        }
+        else {
+            return outerHull;
+        }
+    }
+    /**
+     * Convert any generic path to a polygon. Each path segment (start point and end point)
+     * are interpreted as a linear segment here.
+     *
+     * @name __convertGenericPathToPolygon
+     * @private
+     * @memberof PolygonTesselationOutlines
+     * @instance
+     * @param {GenericPath} path - The path to convert.
+     */
+    __convertGenericPathToPolygon(path) {
+        const vertices = [];
+        const n = path.getSegmentCount();
+        let isOpen = false;
+        for (var i = 0; i < n; i++) {
+            const segment = path.getSegmentAt(i);
+            vertices.push(segment.getStartPoint());
+            if (i > 0 && i + 1 >= n && !this.__isEqualPoint(segment.getEndPoint(), vertices[0])) {
+                isOpen = true;
+            }
+        }
+        return new Polygon(vertices, isOpen);
+    }
+    /**
+     * Creates a tesselation graph and removes all inner edges.
+     *
+     * @name findAllOutlinesPolygons
+     * @private
+     * @memberof PolygonTesselationOutlines
+     * @instance
+     * @param {TesselationGraph} tesselationGraph - Find all outlines on the tesselation graph.
+     */
+    findAllOutlinesPolygons(tesselationGraph) {
+        // Convert to real line segments:
+        const lineSegments = tesselationGraph.edges.map((edge) => new Line(tesselationGraph.vertices[edge.i], tesselationGraph.vertices[edge.j]));
+        // Now run the path detection.
+        const paths = detectPaths(lineSegments, this.tolerance);
+        // And now convert the generic paths back to polygons
+        // (we have put in line segments, so line segments must have returned)
+        return paths.map((path) => this.__convertGenericPathToPolygon(path));
+    }
+    /**
+     * Checks if two vertices are equal – regarding to the current tolerance setting.
+     *
+     * @name __isEqualPoint
+     * @private
+     * @memberof PolygonTesselationOutlines
+     * @instance
+     * @param {boolean} vertA - The first point.
+     * @param {boolean} vertB - The second point.
+     * @return True if the vertices are equal.
+     */
+    __isEqualPoint(vertA, vertB) {
+        return vertA.distance(vertB) < this.tolerance;
+    }
+    /**
+     * Checks if two edges (identified as two pairs of vertices) are equal – regarding to the
+     * current tolerance setting.
+     *
+     * @name __isEqualEdge
+     * @private
+     * @memberof PolygonTesselationOutlines
+     * @instance
+     * @param {boolean} edgeAvertA - The first edge's point A.
+     * @param {boolean} edgeAvertB - The first edge's point B.
+     * @param {boolean} edgeBvertA - The second edge's point A.
+     * @param {boolean} edgeBvertB - The second edge's point B.
+     * @return True if the edges are equal.
+     */
+    __isEqualEdge(edgeAvertA, edgeAvertB, edgeBvertA, edgeBvertB) {
+        return ((this.__isEqualPoint(edgeAvertA, edgeBvertA) && this.__isEqualPoint(edgeAvertB, edgeBvertB)) ||
+            (this.__isEqualPoint(edgeAvertA, edgeBvertB) && this.__isEqualPoint(edgeAvertB, edgeBvertA)));
+    }
+}
+PolygonTesselationOutlines.DEFAULT_TOLERANCE = 0.01;
+
+/**
+ * A simple linear color gradient implementation.
+ *
+ * A color gradient is just an array of color objects paired with position values on the gradient.
+ *
+ * TODO: add `angle`
+ *
+ * @author  Ikaros Kappler
+ * @version 1.0.0
+ * @date    2025-08-05
+ * @modified 2025-11-26 Fixing a bug in `ColorGradient.getColorAt(ratio)`: value at 1.0 caused runtime error.
+ */
+const RAD_TO_DEG = 180.0 / Math.PI;
+const DEFAULT_COLORSET = [
+    { color: Color.Red, ratio: 0.0 },
+    { color: Color.Gold, ratio: 0.2 },
+    { color: Color.Yellow, ratio: 0.4 },
+    { color: Color.LimeGreen, ratio: 0.6 },
+    { color: Color.MediumBlue, ratio: 0.8 },
+    { color: Color.Purple, ratio: 1.0 }
+];
+class ColorGradient {
+    /**
+     * Creates a new ColorGradient with the given values. Please be sure that the values appear in the correct
+     * order regarding the `ratio` information. This will not be validated.
+     *
+     * @param {Array<ColorGradientItem>} values - The values to use.
+     * @param {number?} angle - (optional) An optional angle for the gradient; if no specified `PI/2.0` will be used (vertical from left to right).
+     */
+    constructor(values, angle) {
+        this.values = values;
+        // Default: left to right
+        this.angle = typeof angle === "undefined" ? Math.PI / 2.0 : angle;
+    }
+    /**
+     * Get a color gradient CSS value string from these gradient settings.
+     *
+     * @instance
+     * @memberof ColorGradientPicker
+     * @returns {string}
+     */
+    toColorGradientString() {
+        // Example:
+        //    linear-gradient(90deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 38%, rgba(161, 210, 108, 1) 68%, rgba(237, 221, 83, 1) 100%)
+        // const buffer: Array<string | undefined> = [`linear-gradient( ${RAD_TO_DEG * this.angle}deg, `];
+        const buffer = [
+            `linear-gradient( ${typeof this.angle === "number" ? `${this.angle * RAD_TO_DEG}deg` : this.angle}, `
+        ];
+        for (var i = 0; i < this.values.length; i++) {
+            if (i > 0) {
+                buffer.push(",");
+            }
+            const colorValue = this.values[i] ? this.values[i].color.cssRGBA() : null;
+            buffer.push(colorValue);
+            const percentage = this.values[i].ratio;
+            buffer.push(`${typeof percentage === "number" ? `${percentage * 100}%` : percentage}`);
+        }
+        buffer.push(")");
+        return buffer.join(" ");
+    }
+    /**
+     * Get the color at the specific relative position.
+     *
+     * @param {number} ratio - Any value between 0.0 and 1.0.
+     */
+    getColorAt(ratio) {
+        // Locate interval first
+        const intervalLocation = this.locateClosestRatio(ratio);
+        const leftItem = this.values[intervalLocation[0]];
+        const rightItem = this.values[intervalLocation[0] + 1];
+        if (!rightItem) {
+            return leftItem.color.clone();
+        }
+        const relativeInnerIntervalPosition = (ratio - leftItem.ratio) / (rightItem.ratio - leftItem.ratio);
+        return leftItem.color.clone().interpolate(rightItem.color, relativeInnerIntervalPosition);
+    }
+    /**
+     * Find that gradient record (index) that's value is closest to the given relative value. The function will return
+     * the closest value and the left index, indicating the containing interval index.
+     *
+     * @param {number} ratio - The value to look for.
+     * @returns {[number,number]} A pair of left interval boundary index and closest value.
+     */
+    locateClosestRatio(ratio) {
+        if (this.values.length === 0) {
+            console.warn("[Warn] All slider values array is empty. This should not happen, cannot proceed.");
+            return [NaN, null]; // This should not happen: at least two values must be present in a gradient
+        }
+        // console.log("__locateClosestSliderValue", "allSliderValues", allSliderValues);
+        let leftSliderIndex = 0;
+        let closestSliderValue = this.values[leftSliderIndex];
+        for (var i = 1; i < this.values.length; i++) {
+            const curVal = this.values[i];
+            if (Math.abs(curVal.ratio - ratio) < Math.abs(closestSliderValue.ratio - ratio)) {
+                closestSliderValue = curVal;
+                if (curVal.ratio > ratio) {
+                    leftSliderIndex = i - 1;
+                }
+                else {
+                    leftSliderIndex = i;
+                }
+            }
+        }
+        return [leftSliderIndex, closestSliderValue];
+    }
+    /**
+     * Try to convert the given anonymous item (usually and object) to a ColorGradient. This method should be used
+     * to restore items from JSON parse results to convert them into proper ColorGradient instances.
+     *
+     * @param {any} item
+     * @returns {ColorGradient}
+     */
+    static fromObject(item) {
+        if (typeof item !== "object") {
+            throw new Error(`Cannot instantiate ColorGradient from item: must be an object. (${typeof item})`);
+        }
+        if (!item.hasOwnProperty("values")) {
+            throw new Error("Cannot instantiate ColorGradient from object: missing property 'values'.");
+        }
+        const valuesObj = item.values;
+        if (!Array.isArray(valuesObj)) {
+            throw new Error("Cannot instantiate ColorGradient from object: property 'values' is not an array.");
+        }
+        const values = valuesObj.map((element, index) => {
+            if (typeof element !== "object") {
+                throw new Error(`Cannot instantiate ColorGradient from object: item at index ${index} is not an object.`);
+            }
+            if (!element.hasOwnProperty("color") || !element.hasOwnProperty("ratio")) {
+                throw new Error(`Cannot instantiate ColorGradient from object: item at index ${index} is missing 'color' or 'ratio' property.`);
+            }
+            const tmpElement = element;
+            return { color: Color.makeRGB(tmpElement.color.r, tmpElement.color.g, tmpElement.color.b), ratio: tmpElement.ratio };
+        });
+        // More checks possible here ...
+        return new ColorGradient(values, item.angle);
+    }
+    /**
+     * Clone this linear color gradient. Returns a deep clone.
+     *
+     * @returns {ColorGradient}
+     */
+    clone() {
+        return new ColorGradient(this.values.map((item) => {
+            return { color: item.color, ratio: item.ratio };
+        }), this.angle);
+    }
+    /**
+     * Create a default color gradient with six color: red, orange, yellow, green, blue, purple.
+     * @returns
+     */
+    static createDefault() {
+        return new ColorGradient(DEFAULT_COLORSET.map((item) => ({ color: item.color, ratio: item.ratio })));
+    }
+    /**
+     * Create a basic color gradient from only two colors.
+     *
+     * @param {Color} startColor - The leftmost color.
+     * @param {Color} endColor - The rightmost color.
+     * @param {number?} angleInRadians - (optional) An optional angle for the gradient; if no specified `PI/2.0` will be used (vertical from left to right).
+     * @returns
+     */
+    static createFrom(startColor, endColor, angleInRadians) {
+        return new ColorGradient([
+            { ratio: 0.0, color: startColor },
+            { ratio: 1.0, color: endColor }
+        ], angleInRadians);
+    }
+}
+ColorGradient.DEFAULT_COLORSET = DEFAULT_COLORSET;
+
+/**
+ * A DataGrid2d implementation on a linear array of triplets/Vector3.
+ *
+ * @author   Ikaros Kappler
+ * @date     2023-10-28
+ * @modified 2023-11-04 Converted to a Typescript class.
+ * @version  1.0.0
+ **/
+class DataGrid2dListAdapter {
+    /**
+     * Create a new DataGrid2d from the given
+     * @throws Error if xSegmentCount*ySegmentCount is larger than the capacity of the array/list.
+     * @param list
+     * @param xSegmentCount
+     * @param ySegmentCount
+     */
+    constructor(list, xSegmentCount, ySegmentCount) {
+        if (xSegmentCount * ySegmentCount > list.length) {
+            throw `Cannot create DataGrid2dListAdapter, the list (length ${list.length}) does not provide enough items for ${xSegmentCount}x${ySegmentCount} required entries.`;
+        }
+        // this.canvas = document.getElementById(canvasId);
+        this.xSegmentCount = xSegmentCount;
+        this.ySegmentCount = ySegmentCount;
+        this._dataList = list;
+    }
+    getIndicesFromBufferIndex(bufferIndex) {
+        return { xIndex: Math.floor(bufferIndex % this.xSegmentCount), yIndex: Math.floor(bufferIndex / this.xSegmentCount) };
+    }
+    getCoordsFromBufferIndex(bufferIndex) {
+        var index = this.getIndicesFromBufferIndex(bufferIndex);
+        // Note that the xSegmentCount and ySegmentCount counts plane squares, each consisting of four vertices
+        index.xRel = index.xIndex / (this.xSegmentCount - 1);
+        index.yRel = index.yIndex / (this.ySegmentCount - 1);
+        return index;
+    }
+    coordinateIndicesToBufferIndex(xIndex, yIndex) {
+        return yIndex * this.xSegmentCount + xIndex;
+    }
+    /**
+     * @override
+     */
+    getMinDataValue() {
+        return this.minDataValue;
+    }
+    /**
+     * @override
+     */
+    getMaxDataValue() {
+        return this.maxDataValue;
+    }
+    /**
+     * @override
+     */
+    getDataValueAt(xIndex, yIndex, isDebug) {
+        // var bufferIndex = yIndex * this.xSegmentCount + xIndex;
+        var bufferIndex = this.coordinateIndicesToBufferIndex(xIndex, yIndex);
+        // if (isDebug) {
+        //   console.log("xIndex", xIndex, "yIndex", yIndex, "bufferIndex", bufferIndex);
+        // }
+        if (bufferIndex > this._dataList.length) {
+            console.error("ERR buffer index is out of bounds! xIndex", xIndex, "yIndex", yIndex, "bufferIndex", bufferIndex);
+        }
+        if (!this._dataList[bufferIndex]) {
+            console.error("ERR buffer element is null! xIndex", xIndex, "yIndex", yIndex, "bufferIndex", bufferIndex);
+        }
+        return this._dataList && bufferIndex < this._dataList.length ? this._dataList[bufferIndex].z : null;
+    }
+    /**
+     * @override
+     */
+    getDataFace4At(xIndex, yIndex, buffer) {
+        // buffer: array[2][2]
+        buffer[0][0] = this.getDataValueAt(xIndex, yIndex);
+        buffer[1][0] = this.getDataValueAt(xIndex + 1, yIndex);
+        buffer[1][1] = this.getDataValueAt(xIndex + 1, yIndex + 1);
+        buffer[0][1] = this.getDataValueAt(xIndex, yIndex + 1);
+    }
+}
+
+/**
+ * Adapted from the 3D geometry datastuctured from demo-33 (depth mesh).
+ *
+ * Refactored the strucure into a class.
+ *
+ * @author   Ikaros Kappler
+ * @date     2025-11-14
+ * @modified 2025-11-17 Moved `getBounds` and `normalizeGeometry` from helper functions to this class.
+ * @version  1.0.0
+ */
+class GeometryMesh {
+    constructor(vertices, edges) {
+        this.vertices = vertices || [];
+        this.edges = edges || [];
+    }
+    normalize() {
+        // Desired bounds is a max bounding box. The object will be scaled keeping aspect ratio
+        // in that way that the largest axis size touches the desired bounds.
+        var desiredBounds = { min: { x: -1, y: -1, z: -1 }, max: { x: 1, y: 1, z: 1 } };
+        var bounds = this.getGeometryBounds();
+        var sizeX = bounds.max.x - bounds.min.x;
+        var sizeY = bounds.max.y - bounds.min.y;
+        var sizeZ = bounds.max.z - bounds.min.z;
+        // Scale uniform so the dimension with the max expansion fits into [-1,1]
+        var maxDimension = Math.max(sizeX, sizeY, sizeZ);
+        var desiredSizeX = (desiredBounds.max.x - desiredBounds.min.x) / maxDimension;
+        var desiredSizeY = (desiredBounds.max.y - desiredBounds.min.y) / maxDimension;
+        var desiredSizeZ = (desiredBounds.max.z - desiredBounds.min.z) / maxDimension;
+        for (var i in this.vertices) {
+            var vert = this.vertices[i]; // TODO: Check if this is safe
+            vert.x = desiredBounds.min.x + (bounds.max.x - vert.x) * desiredSizeX;
+            vert.y = desiredBounds.min.y + (bounds.max.y - vert.y) * desiredSizeY;
+            vert.z = desiredBounds.min.z + (bounds.max.z - vert.z) * desiredSizeZ;
+        }
+    }
+    getGeometryBounds() {
+        // var min = new Vert3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+        // var max = new Vert3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
+        var min = { x: Number.MAX_VALUE, y: Number.MAX_VALUE, z: Number.MAX_VALUE };
+        var max = { x: Number.MIN_VALUE, y: Number.MIN_VALUE, z: Number.MIN_VALUE };
+        for (var i in this.vertices) {
+            var vert = this.vertices[i];
+            min.x = Math.min(vert.x, min.x);
+            min.y = Math.min(vert.y, min.y);
+            min.z = Math.min(vert.z, min.z);
+            max.x = Math.max(vert.x, max.x);
+            max.y = Math.max(vert.y, max.y);
+            max.z = Math.max(vert.z, max.z);
+        }
+        return { min: min, max: max, width: max.x - min.x, height: max.y - min.y, depth: max.z - min.z };
+    }
+}
+
+/**
+ * @author   Ikaros Kappler
+ * @date     2013-11-27
+ * @modified 2014-04-05 Ikaros Kappler (member array outerTilePolygons added).
+ * @modified 2015-03-19 Ikaros Kappler (added toSVG()).
+ * @modified 2020-10-30 Refactored the this super class to work with PlotBoilerplate.
+ * @modified 2020-11-11 Ported the class from vanilla JS to TypeScript.
+ * @version  2.0.1-alpha
+ * @name GirihTile
+ **/
+var TileType;
+(function (TileType) {
+    TileType["UNKNOWN"] = "UNKNOWN";
+    TileType["DECAGON"] = "DECAGON";
+    TileType["PENTAGON"] = "PENTAGON";
+    TileType["IRREGULAR_HEXAGON"] = "IRREGULAR_HEXAGON";
+    TileType["RHOMBUS"] = "RHOMBUS";
+    TileType["BOW_TIE"] = "BOW_TIE";
+    // This is not part of the actual girih tile set!
+    TileType["PENROSE_RHOMBUS"] = "PENROSE_RHOMBUS";
+})(TileType || (TileType = {}));
+/**
+ * @classdesc This is a general tile superclass. All other tile classes extends this one.
+ *
+ * Rule:
+ *  * the outer and the inner sub polygons must be inside the main polygon's bounds.
+ *
+ * @requires Bounds
+ * @requires Polyon
+ * @requires Vertex
+ * @requires XYCoords
+ */
+class GirihTile extends Polygon {
+    /**
+     * @constructor
+     * @memberof GirihTile
+     * @abstract class
+     * @param {Vertex} position   - The position of the tile.
+     * @param {number} edgeLength - The edge length (default is GirihTile.DEFAULT_EDGE_LENGTH).
+     * @param {TileType} tileType - One of `TileType.*` enum members.
+     **/
+    constructor(position, edgeLength, tileType) {
+        super([], false); // vertices, isOpen
+        if (typeof edgeLength === "undefined")
+            edgeLength = GirihTile.DEFAULT_EDGE_LENGTH;
+        if (typeof tileType == "undefined")
+            tileType = TileType.UNKNOWN;
+        this.edgeLength = edgeLength;
+        this.position = position;
+        this.rotation = 0.0; // angle;
+        this.symmetry = 10;
+        this.uniqueSymmetries = 10;
+        // An array of polygons.
+        // The inner tile polygons are those that do not share edges with the outer
+        // tile bounds (vertices are OK).
+        this.innerTilePolygons = [];
+        // A second array of polygons.
+        // The outer tile polygons are those that make up the whole tile area
+        // _together with the inner tile polygons (!)_; the union of the
+        // inner tile polygons and the outer tile polygons covers exactly
+        // the whole tile polygon.
+        // The intersection of both sets is empty.
+        // Outer tile polygon share at least one (partial) edge with the complete
+        // tile polygon (length > 0).
+        this.outerTilePolygons = [];
+        // this.imageProperties      = null;
+        this.textureSource = new Bounds(new Vertex$1(), new Vertex$1());
+        this.tileType = tileType;
+    }
+    /**
+     * Move this tile around (together will all inner polygons).
+     * As this function overrides Polygon.move(...), the returned
+     * instance (this) must be of type `Polygon`.
+     *
+     * @name move
+     * @instance
+     * @override
+     * @memberof GirihTile
+     * @param {XYCoords} amount
+     * @return {Polygon} this
+     */
+    move(amount) {
+        super.move.call(this, amount);
+        for (var i in this.innerTilePolygons)
+            this.innerTilePolygons[i].move(amount);
+        for (var i in this.outerTilePolygons)
+            this.outerTilePolygons[i].move(amount);
+        this.position.add(amount);
+        return this;
+    }
+    /**
+     * Find the adjacent tile (given by the template tile)
+     * Note that the tile itself will be modified (rotated and moved to the correct position).
+     *
+     * @name findAdjacentTilePosition
+     * @memberof GirihTile
+     * @instance
+     * @param {number} edgeIndex - The edge number of the you you want to find adjacency for.
+     * @param {Polygon} tile - The polygon (or tile) you want to find adjacency for at the specified edge.
+     * @return {IAdjacency|null} Adjacency information or null if the passed tile does not match.
+     */
+    findAdjacentTilePosition(edgeIndex, tile) {
+        const edgeA = new Line(this.vertices[edgeIndex % this.vertices.length], this.vertices[(edgeIndex + 1) % this.vertices.length]);
+        // Find adjacent edge
+        for (var i = 0; i < tile.vertices.length; i++) {
+            const edgeB = new Line(tile.vertices[i % tile.vertices.length].clone(), tile.vertices[(i + 1) % tile.vertices.length].clone());
+            // Goal: edgeA.a==edgeB.b && edgeA.b==edgeB.a
+            // So move edgeB
+            const offset = edgeB.b.difference(edgeA.a);
+            edgeB.add(offset);
+            if (edgeB.a.distance(edgeA.b) < GirihTile.epsilon) {
+                return { edgeIndex: i, offset: offset };
+            }
+        }
+        return null;
+    }
+    /**
+     * Find all possible adjacent tile positions (and rotations) for `neighbourTile`.
+     *
+     * @name transformTileToAdjacencies
+     * @memberof GirihTile
+     * @instance
+     * @param {number} baseEdgeIndex - The edge number of the you you want to find adjacencies for.
+     * @param {GirihTile} neighbourTile - The polygon (or tile) you want to find adjacencies for at the specified edge.
+     * @return {IAdjacency|null} Adjacency information or null if the passed tile does not match.
+     */
+    transformTileToAdjacencies(baseEdgeIndex, neighbourTile) {
+        // Find a rotation for that tile to match
+        let i = 0;
+        const foundAlignments = [];
+        let positionedTile = null;
+        while (i < neighbourTile.uniqueSymmetries) {
+            positionedTile = this.transformTilePositionToAdjacency(baseEdgeIndex, neighbourTile);
+            if (positionedTile != null) {
+                positionedTile = positionedTile.clone();
+                foundAlignments.push(positionedTile);
+            }
+            neighbourTile.rotate((Math.PI * 2) / neighbourTile.symmetry);
+            i++;
+        }
+        return foundAlignments;
+    }
+    /**
+     * Apply adjacent tile position to `neighbourTile`.
+     *
+     * @name transformTilePositionToAdjacencies
+     * @memberof GirihTile
+     * @instance
+     * @param {number} baseEdgeIndex - The edge number of the you you want to apply adjacent position for.
+     * @param {Polygon} neighbourTile - The polygon (or tile) you want to find adjacency for at the specified edge.
+     * @return {Polygon|null} the passed tile itself if adjacency was found, null otherwise.
+     */
+    transformTilePositionToAdjacency(baseEdgeIndex, neighbourTile) {
+        // Find the position for that tile to match (might not exist)
+        // { edgeIndex:number, offset:XYCoords }
+        var adjacency = this.findAdjacentTilePosition(baseEdgeIndex, neighbourTile);
+        if (adjacency != null) {
+            neighbourTile.move(adjacency.offset);
+            return neighbourTile;
+        }
+        return null;
+    }
+    /**
+     * Get the inner tile polygon at the given index.
+     * This function applies MOD to the index.
+     *
+     * @name getInnerTilePolygonAt
+     * @instance
+     * @memberof GirihTile
+     * @param {number} index
+     * @return {Polygon} The sub polygon (inner tile) at the given index.
+     **/
+    getInnerTilePolygonAt(index) {
+        if (index < 0)
+            return this.innerTilePolygons[this.innerTilePolygons.length - (Math.abs(index) % this.innerTilePolygons.length)];
+        else
+            return this.innerTilePolygons[index % this.innerTilePolygons.length];
+    }
+    /**
+     * Get the outer tile polygon at the given index.
+     * This function applies MOD to the index.
+     *
+     * @name getOuterTilePolygonAt
+     * @instance
+     * @memberof GirihTile
+     * @param {number} index
+     * @return {Polygon} The sub polygon (outer tile) at the given index.
+     **/
+    getOuterTilePolygonAt(index) {
+        if (index < 0)
+            return this.outerTilePolygons[this.outerTilePolygons.length - (Math.abs(index) % this.outerTilePolygons.length)];
+        else
+            return this.outerTilePolygons[index % this.outerTilePolygons.length];
+    }
+    /**
+     * Rotate this tile
+     * Note: this function behaves a bitdifferent than the genuine Polygon.rotate function!
+     *       Polygon has the default center of rotation at (0,0).
+     *       The GirihTile rotates around its center (position) by default.
+     *
+     * @name rotate
+     * @instance
+     * @memberof GirihTile
+     * @param {number} angle - The angle to use for rotation.
+     * @param {Vertex?} center - The center of rotation (default is this.position).
+     * @return {Polygon} this
+     **/
+    rotate(angle, center) {
+        if (typeof center === "undefined")
+            center = this.position;
+        super.rotate(angle, center);
+        for (var i in this.innerTilePolygons) {
+            this.innerTilePolygons[i].rotate(angle, center);
+        }
+        for (var i in this.outerTilePolygons) {
+            this.outerTilePolygons[i].rotate(angle, center);
+        }
+        this.rotation += angle;
+        return this;
+    }
+    /**
+     * This function locates the closest tile edge (polygon edge)
+     * to the passed point.
+     *
+     * Currently the edge distance to a point is measured by the
+     * euclidian distance from the edge's middle point.
+     *
+     * Idea: move this function to Polygon?
+     *
+     * @name locateEdgeAtPoint
+     * @instance
+     * @memberof GirihTile
+     * @param {XYCoords} point     - The point to detect the closest edge for.
+     * @param {number}   tolerance - The tolerance (=max distance) the detected edge
+     *                               must be inside.
+     * @return {nmber} the edge index (index of the starting vertex, so [index,index+1] is the edge ) or -1 if not found.
+     **/
+    locateEdgeAtPoint(point, tolerance) {
+        if (this.vertices.length == 0)
+            return -1;
+        const middle = new Vertex$1(0, 0);
+        let tmpDistance = 0;
+        let resultDistance = tolerance * 2; // definitely outside the tolerance :)
+        let resultIndex = -1;
+        for (var i = 0; i < this.vertices.length; i++) {
+            const vertI = this.getVertexAt(i);
+            const vertJ = this.getVertexAt(i + 1);
+            // Create a point in the middle of the edge
+            middle.x = vertI.x + (vertJ.x - vertI.x) / 2.0;
+            middle.y = vertI.y + (vertJ.y - vertI.y) / 2.0;
+            tmpDistance = middle.distance(point);
+            if (tmpDistance <= tolerance && (resultIndex == -1 || tmpDistance < resultDistance)) {
+                resultDistance = tmpDistance;
+                resultIndex = i;
+            }
+        }
+        return resultIndex;
+    }
+} // END class
+/**
+ * An epsilon to use for detecting adjacent edges. 0.001 seems to be a good value.
+ * Adjust if needed.
+ *
+ * @name epsilon
+ * @member {number}
+ * @memberof GirihTile
+ * @type {number}
+ * @static
+ */
+GirihTile.epsilon = 0.001;
+/**
+ * The default edge length.
+ *
+ * @name DEFAULT_EDGE_LENGTH
+ * @member {number}
+ * @memberof GirihTile
+ * @type {number}
+ * @readonly
+ * @static
+ */
+GirihTile.DEFAULT_EDGE_LENGTH = 58;
+
+/**
+ * @classdesc The bow tie tile from the Girih set.
+ *
+ * @requires Bounds
+ * @requires GirihTile
+ * @requires Polygon
+ * @requires TileType
+ * @requires Vertex
+ *
+ * @author Ikaros Kappler
+ * @modified 2013-11-28
+ * @modified 2014-04-05 Ikaros Kappler (member array outerTilePolygons added).
+ * @modified 2015-03-19 Ikaros Kappler (added toSVG()).
+ * @modified 2020-10-31 Refactored to work with PlotBoilerplate.
+ * @modified 2020-11-13 Ported from vanilla JS to TypeScript.
+ * @version 2.0.1-alpha
+ * @file GirihBowtie
+ * @public
+ **/
+class GirihBowtie extends GirihTile {
+    /**
+     * @constructor
+     * @extends GirihTile
+     * @name GirihBowtie
+     * @param {Vertex} position
+     * @param {number} edgeLength
+     */
+    constructor(position, edgeLength) {
+        super(position, edgeLength, TileType.BOW_TIE);
+        // Overwrite the default symmetries:
+        //    the bow-tie tile has a 180° symmetry (5/10 * 360°)
+        this.uniqueSymmetries = 5;
+        // Init the actual decahedron shape with the passed size
+        let pointA = new Vertex$1(0, 0);
+        let pointB = pointA;
+        const startPoint = pointA;
+        let oppositePoint = null;
+        this.addVertex(pointB);
+        // TODO: notate in radians
+        var angles = [0.0,
+            72.0,
+            72.0,
+            216.0,
+            72.0
+        ];
+        var theta = 0.0;
+        for (var i = 0; i < angles.length; i++) {
+            theta += (180.0 - angles[i]);
+            pointA = pointB; // center of rotation
+            pointB = pointB.clone();
+            pointB.x -= this.edgeLength;
+            pointB.rotate(theta * (Math.PI / 180.0), pointA);
+            this.addVertex(pointB);
+            if (i == 2)
+                oppositePoint = pointB;
+        } // END for
+        // Move to center and position 
+        const move = new Vertex$1((oppositePoint.x - startPoint.x) / 2.0, (oppositePoint.y - startPoint.y) / 2.0);
+        for (var i = 0; i < this.vertices.length; i++) {
+            this.vertices[i].add(position).sub(move);
+        }
+        this.textureSource.min.x = 288 / 500.0;
+        this.textureSource.min.y = 7 / 460.0;
+        this.textureSource.max.x = this.textureSource.min.x + 206 / 500.0;
+        this.textureSource.max.y = this.textureSource.min.y + 150 / 460.0;
+        this.baseBounds = this.getBounds();
+        this._buildInnerPolygons(this.edgeLength);
+        this._buildOuterPolygons(this.edgeLength); // Only call AFTER the inner polygons were created!
+    }
+    ;
+    /**
+     * @override
+     */
+    clone() {
+        return new GirihBowtie(this.position.clone(), this.edgeLength).rotate(this.rotation);
+    }
+    ;
+    _buildInnerPolygons(edgeLength) {
+        const indices = [1, 4];
+        for (var i = 0; i < indices.length; i++) {
+            const index = indices[i];
+            const middlePoint = this.getVertexAt(index).clone().scale(0.5, this.getVertexAt(index + 1));
+            const leftPoint = this.getVertexAt(index - 1).clone().scale(0.5, this.getVertexAt(index));
+            const rightPoint = this.getVertexAt(index + 1).clone().scale(0.5, this.getVertexAt(index + 2));
+            const innerPoint = middlePoint.clone().scale(0.38, this.position); // multiplyScalar( 0.38 );
+            const innerTile = new Polygon([]);
+            innerTile.addVertex(middlePoint);
+            innerTile.addVertex(rightPoint);
+            innerTile.addVertex(innerPoint);
+            innerTile.addVertex(leftPoint);
+            this.innerTilePolygons.push(innerTile);
+        }
+    }
+    ;
+    _buildOuterPolygons(edgeLength) {
+        // Add the outer four 'edges'
+        const indices = [0, 3];
+        for (var i = 0; i < indices.length; i++) {
+            const index = indices[i];
+            // The first/third triangle
+            const outerTileA = new Polygon();
+            outerTileA.addVertex(this.innerTilePolygons[i].getVertexAt(0).clone());
+            outerTileA.addVertex(this.getVertexAt(index + 2).clone());
+            outerTileA.addVertex(this.innerTilePolygons[i].getVertexAt(1).clone());
+            this.outerTilePolygons.push(outerTileA);
+            // The second/fourth triangle
+            const outerTileB = new Polygon();
+            outerTileB.addVertex(this.innerTilePolygons[i].getVertexAt(0).clone());
+            outerTileB.addVertex(this.getVertexAt(index + 1).clone());
+            outerTileB.addVertex(this.innerTilePolygons[i].getVertexAt(3).clone());
+            this.outerTilePolygons.push(outerTileB);
+        }
+        // Add the center polygon
+        const centerTile = new Polygon();
+        centerTile.addVertex(this.getVertexAt(0).clone());
+        centerTile.addVertex(this.innerTilePolygons[0].getVertexAt(3).clone());
+        centerTile.addVertex(this.innerTilePolygons[0].getVertexAt(2).clone());
+        centerTile.addVertex(this.innerTilePolygons[0].getVertexAt(1).clone());
+        centerTile.addVertex(this.getVertexAt(3).clone());
+        centerTile.addVertex(this.innerTilePolygons[1].getVertexAt(3).clone());
+        centerTile.addVertex(this.innerTilePolygons[1].getVertexAt(2).clone());
+        centerTile.addVertex(this.innerTilePolygons[1].getVertexAt(1).clone());
+        this.outerTilePolygons.push(centerTile);
+    }
+    ;
+}
+
+/**
+ * @classdesc The decagon tile from the Girih set.
+ *
+ * @requires GirihTile
+ * @requires Polygon
+ * @requires TileType
+ * @requires Vertex
+ *
+ * @author   Ikaros Kappler
+ * @date     2013-11-27
+ * @date     2014-04-05 Ikaros Kappler (member array outerTilePolygons added).
+ * @date     2015-03-19 Ikaros Kappler (added toSVG()).
+ * @modified 2020-10-30 Refactored to work with PlotBoilerplate.
+ * @modified 2020-11-13 Ported from vanilla JS to TypeScript.
+ * @version  2.0.1-alpha
+ * @file GirihDecacon
+ * @public
+ **/
+class GirihDecagon extends GirihTile {
+    /**
+     * @constructor
+     * @extends GirihTile
+     * @name GirihDecagon
+     * @param {Vertex} position
+     * @param {number} edgeLength
+     */
+    constructor(position, edgeLength) {
+        super(position, edgeLength, TileType.DECAGON);
+        // Overwrite the default symmetries:
+        //    the decagon tile has a 36° symmetry (1/10 * 360°)
+        this.uniqueSymmetries = 1;
+        // Init the actual decahedron shape with the passed size:
+        // Divide the full circle into 10 sections (we want to make a regular decagon).
+        const theta = (Math.PI * 2) / 10.0;
+        // Compute the 'radius' using pythagoras
+        const radius = Math.sqrt(Math.pow(this.edgeLength / 2, 2)
+            +
+                Math.pow(1 / Math.tan(theta / 2) * this.edgeLength / 2, 2));
+        for (var i = 0; i < 10; i++) {
+            this.addVertex(position.clone().addY(-radius).rotate(theta / 2 + i * theta, position));
+        }
+        this.textureSource.min.x = 169 / 500.0;
+        this.textureSource.min.y = 140 / 460.0;
+        this.textureSource.max.x = this.textureSource.min.x + 313 / 500.0;
+        this.textureSource.max.y = this.textureSource.min.y + 297 / 460.0;
+        this.baseBounds = this.getBounds();
+        this._buildInnerPolygons(this.edgeLength);
+        this._buildOuterPolygons(this.edgeLength); // Important: call AFTER inner polygons were created!
+    }
+    ;
+    /**
+     * @override
+     */
+    clone() {
+        return new GirihDecagon(this.position.clone(), this.edgeLength).rotate(this.rotation);
+    }
+    ;
+    /**
+     * Build the inner polygons.
+     *
+     * @name _buildInnerPolygons
+     * @memberof GirihDecagon
+     * @private
+     * @param {number} edgeLength
+     */
+    _buildInnerPolygons(edgeLength) {
+        const centralStar = new Polygon();
+        for (var i = 0; i < 10; i++) {
+            const innerTile = new Polygon();
+            // Make polygon
+            const topPoint = this.getVertexAt(i).clone().scale(0.5, this.getVertexAt(i + 1));
+            const bottomPoint = topPoint.clone().scale(0.615, this.position);
+            const leftPoint = this.getVertexAt(i).clone().scale(0.69, this.position);
+            const rightPoint = this.getVertexAt(i + 1).clone().scale(0.69, this.position);
+            innerTile.addVertex(topPoint);
+            innerTile.addVertex(rightPoint);
+            innerTile.addVertex(bottomPoint);
+            innerTile.addVertex(leftPoint);
+            this.innerTilePolygons.push(innerTile);
+            centralStar.addVertex(leftPoint.clone());
+            centralStar.addVertex(bottomPoint.clone());
+        }
+        this.innerTilePolygons.push(centralStar);
+    }
+    ;
+    /**
+     * Build the outer polygons.
+     *
+     * @name _buildOuterPolygons
+     * @memberof GirihDecagon
+     * @private
+     * @param {number} edgeLength
+     */
+    _buildOuterPolygons(edgeLength) {
+        // DON'T include the inner star here!
+        for (var i = 0; i < 10; i++) {
+            const outerTile = new Polygon();
+            outerTile.addVertex(this.getVertexAt(i).clone());
+            outerTile.addVertex(this.innerTilePolygons[i].vertices[0].clone());
+            outerTile.addVertex(this.innerTilePolygons[i].vertices[3].clone());
+            outerTile.addVertex(this.getInnerTilePolygonAt(i == 0 ? 9 : i - 1).vertices[0].clone());
+            this.outerTilePolygons.push(outerTile);
+        }
+    }
+    ;
+}
+
+/**
+ * @classdesc The irregular hexagon tile from the Girih set.
+ *
+ * @requires Bounds
+ * @requires Circle
+ * @requires GirihTile
+ * @requires Line
+ * @requires Polygon
+ * @requires TileType
+ * @requires Vertex
+ *
+ * @author Ikaros Kappler
+ * @date 2013-11-28
+ * @modified 2014-04-05 Ikaros Kappler (member array outerTilePolygons added).
+ * @modified 2015-03-19 Ikaros Kappler (added toSVG()).
+ * @modified 2020-10-31 Refactored to work with PlotBoilerplate.
+ * @modified 2020-11-13 Ported from vanilla JS to TypeScript.
+ * @version 2.0.1-alpha
+ * @file GirihHexagon
+ * @public
+ **/
+class GirihHexagon extends GirihTile {
+    /**
+     * @constructor
+     * @extends GirihTile
+     * @name GirihHexagon
+     * @param {Vertex} position
+     * @param {number} edgeLength
+     */
+    constructor(position, edgeLength) {
+        super(position, edgeLength, TileType.IRREGULAR_HEXAGON);
+        // Overwrite the default symmetries:
+        //    the hexagon tile has a 180° symmetry (5/10 * 360°)
+        this.uniqueSymmetries = 5;
+        // Init the actual decahedron shape with the passed size
+        let pointA = new Vertex$1(0, 0);
+        let pointB = pointA;
+        const startPoint = pointA;
+        let oppositePoint = null;
+        this.addVertex(pointB);
+        // TODO: use radians here
+        const angles = [0.0,
+            72.0,
+            144.0,
+            144.0,
+            72.0
+            // 144.0
+        ];
+        let theta = 0.0;
+        for (var i = 0; i < angles.length; i++) {
+            theta += (180.0 - angles[i]);
+            pointA = pointB; // center of rotation
+            pointB = pointB.clone();
+            pointB.x -= this.edgeLength;
+            pointB.rotate(theta * (Math.PI / 180.0), pointA);
+            this.addVertex(pointB);
+            if (i == 2)
+                oppositePoint = pointB;
+        }
+        // Center and move to desired position    
+        const move = new Vertex$1((oppositePoint.x - startPoint.x) / 2.0, (oppositePoint.y - startPoint.y) / 2.0);
+        for (var i = 0; i < this.vertices.length; i++) {
+            this.vertices[i].add(position).sub(move);
+        }
+        this.textureSource.min.x = 77 / 500.0;
+        this.textureSource.min.y = 11 / 460.0;
+        this.textureSource.max.x = this.textureSource.min.x + 205 / 500.0;
+        this.textureSource.max.y = this.textureSource.min.y + 150 / 460.0;
+        this.baseBounds = this.getBounds();
+        this._buildInnerPolygons(this.edgeLength);
+        this._buildOuterPolygons(this.edgeLength); // Only call AFTER the inner polygons were created!
+    }
+    ;
+    /**
+     * @override
+     */
+    clone() {
+        return new GirihHexagon(this.position.clone(), this.edgeLength).rotate(this.rotation);
+    }
+    ;
+    _buildInnerPolygons(edgeLength) {
+        // Connect all edges half-the-way
+        const innerTile = new Polygon();
+        innerTile.addVertex(this.vertices[0].clone().scale(0.5, this.vertices[1]));
+        innerTile.addVertex(this.vertices[1].clone().scale(0.5, this.vertices[2]));
+        // Compute the next inner polygon vertex by the intersection of two circles
+        const circleA = new Circle(innerTile.vertices[1], innerTile.vertices[0].distance(innerTile.vertices[1]));
+        const circleB = new Circle(this.vertices[2].clone().scale(0.5, this.vertices[3]), circleA.radius);
+        // TODO: the following piece of code occurs exactly four times.
+        // -> refactor! (DRY)
+        // There is definitely an intersection
+        let intersection = circleA.circleIntersection(circleB);
+        // The intersection is definitely not empty (by construction)
+        // One of the two points is inside the tile, the other is outside.
+        // Locate the inside point.
+        // Use the point that is closer to the center
+        if (this.position.distance(intersection.a) < this.position.distance(intersection.b))
+            innerTile.addVertex(intersection.a);
+        else
+            innerTile.addVertex(intersection.b);
+        innerTile.addVertex(circleB.center.clone());
+        // var i = 3;
+        // Move circles
+        circleA.center = circleB.center;
+        circleB.center = this.vertices[3].clone().scale(0.5, this.vertices[4]);
+        intersection = circleA.circleIntersection(circleB);
+        // The intersection is definitely not empty (by construction)
+        // There are two points again (one inside, one outside the tile)
+        // Use the point that is closer to the center
+        if (this.position.distance(intersection.a) < this.position.distance(intersection.b))
+            innerTile.addVertex(intersection.a);
+        else
+            innerTile.addVertex(intersection.b);
+        innerTile.addVertex(circleB.center.clone());
+        innerTile.addVertex(this.vertices[4].clone().scale(0.5, this.vertices[5]));
+        // Move circles  
+        circleA.center = innerTile.vertices[innerTile.vertices.length - 1];
+        circleB.center = this.vertices[5].clone().scale(0.5, this.vertices[0]);
+        intersection = circleA.circleIntersection(circleB);
+        // The intersection is definitely not empty (by construction)
+        // There are two points again (one inside, one outside the tile)
+        // Use the point that is closer to the center
+        if (this.position.distance(intersection.a) < this.position.distance(intersection.b))
+            innerTile.addVertex(intersection.a);
+        else
+            innerTile.addVertex(intersection.b);
+        innerTile.addVertex(circleB.center.clone());
+        // Move circles  
+        circleA.center = innerTile.vertices[innerTile.vertices.length - 1];
+        circleB.center = innerTile.vertices[0];
+        intersection = circleA.circleIntersection(circleB);
+        // The intersection is definitely not empty (by construction)
+        // There are two points again (one inside, one outside the tile)
+        // Use the point that is closer to the center
+        if (this.position.distance(intersection.a) < this.position.distance(intersection.b))
+            innerTile.addVertex(intersection.a);
+        else
+            innerTile.addVertex(intersection.b);
+        innerTile.addVertex(circleB.center.clone());
+        this.innerTilePolygons.push(innerTile);
+    }
+    ;
+    _buildOuterPolygons(edgeLength) {
+        // First add the two triangles at the 'ends' of the shape.
+        const indicesA = [0, 3]; //  6:2
+        const indicesB = [0, 5]; // 10:2
+        for (var i = 0; i < indicesA.length; i++) {
+            const indexA = indicesA[i];
+            const indexB = indicesB[i];
+            // The triangle
+            const outerTileX = new Polygon();
+            outerTileX.addVertex(this.getVertexAt(indexA + 1).clone());
+            outerTileX.addVertex(this.innerTilePolygons[0].getVertexAt(indexB).clone());
+            outerTileX.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 1).clone());
+            this.outerTilePolygons.push(outerTileX);
+            // The first 'kite'
+            const outerTileY = new Polygon();
+            outerTileY.addVertex(this.getVertexAt(indexA + 2).clone());
+            outerTileY.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 1).clone());
+            outerTileY.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 2).clone());
+            outerTileY.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 3).clone());
+            this.outerTilePolygons.push(outerTileY);
+            // The second 'kite'
+            const outerTileZ = new Polygon();
+            outerTileZ.addVertex(this.getVertexAt(indexA + 3).clone());
+            outerTileZ.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 3).clone());
+            outerTileZ.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 4).clone());
+            outerTileZ.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 5).clone());
+            this.outerTilePolygons.push(outerTileZ);
+        }
+    }
+    ;
+}
+
+/**
+ * @classdesc The penrose rhombus tile from the Girih set.
+ * The penrose rhombus (angles 36° and 144°) is NOT part of the actual girih tile set!
+ *
+ * @requires Bounds
+ * @requires GirihTile
+ * @requires Polygon
+ * @requires TileType
+ * @requires Vertex
+ *
+ *
+ * But it fits perfect into the girih as the angles are the same.
+ * *
+ * @author Ikaros Kappler
+ * @date 2013-12-11
+ * @modified 2014-04-05 Ikaros Kappler (member array outerTilePolygons added).
+ * @modified 2015-03-19 Ikaros Kappler (added toSVG()).
+ * @modified 2020-10-31 Refactored to work with PlotBoilerplate.
+ * @modified 2020-11-13 Ported from vanilla JS to TypeScript.
+ * @version 2.0.1-alpha
+ * @file GirihPenroseRhombus
+ * @public
+ **/
+class GirihPenroseRhombus extends GirihTile {
+    /**
+     * @constructor
+     * @extends GirihTile
+     * @name GirihPenroseRhombus
+     * @param {Vertex} position
+     * @param {number} edgeLength
+     */
+    constructor(position, edgeLength, addCenterPolygon) {
+        super(position, edgeLength, TileType.PENROSE_RHOMBUS);
+        // Overwrite the default symmetries:
+        //    the penrose-rhombus tile has a 180° symmetry (5/10 * 360°)
+        this.uniqueSymmetries = 5;
+        if (typeof addCenterPolygon === "undefined") {
+            addCenterPolygon = true; // Add by default
+        }
+        // Init the actual decahedron shape with the passed size
+        let pointA = new Vertex$1(0, 0);
+        let pointB = pointA;
+        this.addVertex(pointB);
+        const angles = [
+            0.0,
+            36.0, // 72.0,
+            144.0 // 108.0
+        ];
+        let theta = 0.0;
+        for (var i = 0; i < angles.length; i++) {
+            theta += 180.0 - angles[i];
+            pointA = pointB; // center of rotation
+            pointB = pointB.clone();
+            pointB.x += this.edgeLength;
+            pointB.rotate(theta * (Math.PI / 180.0), pointA);
+            this.addVertex(pointB);
+        }
+        // Move to center and position
+        const bounds = Bounds.computeFromVertices(this.vertices);
+        const move = new Vertex$1(bounds.width / 2.0 - (bounds.width - this.edgeLength), bounds.height / 2.0);
+        for (var i = 0; i < this.vertices.length; i++) {
+            this.vertices[i].add(move).add(position);
+        }
+        this.textureSource.min.x = 2 / 500.0;
+        this.textureSource.min.y = 8 / 460.0;
+        this.textureSource.max.x = this.textureSource.min.x + 173 / 500.0;
+        this.textureSource.max.y = this.textureSource.min.y + 56 / 460.0;
+        this.baseBounds = this.getBounds();
+        this._buildInnerPolygons(this.edgeLength, addCenterPolygon);
+        this._buildOuterPolygons(this.edgeLength, addCenterPolygon);
+    }
+    /**
+     * @override
+     */
+    clone() {
+        return new GirihPenroseRhombus(this.position.clone(), this.edgeLength, true).rotate(this.rotation);
+    }
+    _buildInnerPolygons(_edgeLength, addCenterPolygon) {
+        const indices = [0, 2];
+        const centerTile = new Polygon();
+        for (var i = 0; i < indices.length; i++) {
+            const innerTile = new Polygon();
+            const index = indices[i];
+            const left = this.getVertexAt(index)
+                .clone()
+                .scale(0.5, this.getVertexAt(index + 1));
+            const right = this.getVertexAt(index + 1)
+                .clone()
+                .scale(0.5, this.getVertexAt(index + 2));
+            const innerA = this.getVertexAt(index + 1)
+                .clone()
+                .scale(0.28, this.position);
+            const innerB = this.getVertexAt(index + 1)
+                .clone()
+                .scale(0.55, this.position);
+            innerTile.addVertex(left);
+            innerTile.addVertex(innerA);
+            innerTile.addVertex(right);
+            innerTile.addVertex(innerB);
+            centerTile.addVertex(this.getVertexAt(index)
+                .clone()
+                .scale(0.1775, this.getVertexAt(index + 2)));
+            centerTile.addVertex(innerA.clone());
+            this.innerTilePolygons.push(innerTile);
+        }
+        if (addCenterPolygon)
+            this.innerTilePolygons.push(centerTile);
+    }
+    _buildOuterPolygons(_edgeLength, centerPolygonExists) {
+        // Add left and right 'spikes'.
+        const indices = [0, 2];
+        for (var i = 0; i < indices.length; i++) {
+            const outerTile = new Polygon();
+            const index = indices[i];
+            const left = this.getVertexAt(index)
+                .clone()
+                .scale(0.5, this.getVertexAt(index + 1));
+            const right = this.getVertexAt(index + 1)
+                .clone()
+                .scale(0.5, this.getVertexAt(index + 2));
+            // const innerA:Vertex = this.getVertexAt( index+1 ).clone().scale( 0.28, this.position );
+            const innerB = this.getVertexAt(index + 1)
+                .clone()
+                .scale(0.55, this.position);
+            outerTile.addVertex(left.clone());
+            outerTile.addVertex(this.getVertexAt(index + 1).clone());
+            outerTile.addVertex(right.clone());
+            outerTile.addVertex(innerB.clone());
+            this.outerTilePolygons.push(outerTile);
+        }
+        // If the center polygon exists then the last outer polygon is split into two.
+        if (centerPolygonExists) {
+            // Two polygons
+            const indices = [0, 2];
+            for (var i = 0; i < indices.length; i++) {
+                const outerTile = new Polygon();
+                const index = indices[i];
+                outerTile.addVertex(this.getVertexAt(index).clone());
+                outerTile.addVertex(this.getVertexAt(index)
+                    .clone()
+                    .scale(0.5, this.getVertexAt(index + 1)));
+                outerTile.addVertex(this.innerTilePolygons[i].getVertexAt(1).clone());
+                outerTile.addVertex(this.getVertexAt(index)
+                    .clone()
+                    .scale(0.1775, this.getVertexAt(index + 2)));
+                outerTile.addVertex(this.innerTilePolygons[(i + 1) % 2].getVertexAt(1).clone());
+                outerTile.addVertex(this.getVertexAt(index - 1)
+                    .clone()
+                    .scale(0.5, this.getVertexAt(index)));
+                this.outerTilePolygons.push(outerTile);
+            }
+        }
+    }
+    /**
+     * If you want the center polygon not to be drawn the canvas handler needs to
+     * know the respective polygon index (inside the this.innerTilePolygons array).
+     **/
+    // TODO: IS THIS STILL REQUIRED
+    getCenterPolygonIndex() {
+        return 2;
+    }
+}
+
+/**
+ * @classdesc The pentagon tile from the Girih set.
+ *
+ * @requires Bounds
+ * @requires GirihTile
+ * @requires Polygon
+ * @requires TileType
+ * @requires Vertex
+ *
+ * @author Ikaros Kappler
+ * @date 2013-11-27
+ * @modified 2014-04-05 Ikaros Kappler (member array outerTilePolygons added).
+ * @modified 2015-03-19 Ikaros Kappler (added toSVG()).
+ * @modified 2020-10-31 Refactored to work with PlotBoilerplate.
+ * @modified 2020-11-13 Ported from vanilla JS to TypeScript.
+ * @version 2.0.1-alpha
+ * @file GirihPentagon
+ * @public
+ **/
+class GirihPentagon extends GirihTile {
+    /**
+     * @constructor
+     * @extends GirihTile
+     * @name GirihPentagon
+     * @param {Vertex} position
+     * @param {number} edgeLength
+     */
+    constructor(position, edgeLength) {
+        super(position, edgeLength, TileType.PENTAGON);
+        // Overwrite the default symmetries:
+        //    the pentagon tile has a 72° symmetry (2/10 * 360°)
+        this.uniqueSymmetries = 2;
+        // Init the actual pentagon shape with the passed size:
+        // Divide the full circle into 5 sections (we want to make a regular pentagon).
+        const theta = (Math.PI * 2) / 5.0;
+        // Compute the 'radius' using pythagoras
+        const radius = Math.sqrt(Math.pow(this.edgeLength / 2, 2)
+            +
+                Math.pow(1 / Math.tan(theta / 2) * this.edgeLength / 2, 2));
+        for (var i = 0; i < 5; i++) {
+            this.addVertex(position.clone().addY(-radius).rotate(theta / 2 + i * theta, position));
+        }
+        this.textureSource.min.x = 7 / 500.0;
+        this.textureSource.min.y = (303) / 460.0;
+        this.textureSource.max.x = this.textureSource.min.x + 157 / 500.0;
+        this.textureSource.max.y = this.textureSource.min.y + (150) / 460.0;
+        this.baseBounds = this.getBounds();
+        this._buildInnerPolygons(this.edgeLength);
+        this._buildOuterPolygons(this.edgeLength); // Only call AFTER the inner polygons were built!
+    }
+    ;
+    /**
+     * @override
+     */
+    clone() {
+        return new GirihPentagon(this.position.clone(), this.edgeLength).rotate(this.rotation);
+    }
+    ;
+    _buildInnerPolygons(edgeLength) {
+        // Connect all edges half-the-way
+        const innerTile = new Polygon();
+        for (var i = 0; i < this.vertices.length; i++) {
+            innerTile.addVertex(this.getVertexAt(i).clone().scale(0.5, this.getVertexAt(i + 1)));
+            // ... make linear approximation instead
+            innerTile.addVertex(this.getVertexAt(i + 1).clone().scale(0.5, this.position));
+        }
+        this.innerTilePolygons.push(innerTile);
+    }
+    ;
+    _buildOuterPolygons(edgeLength) {
+        for (var i = 0; i < this.vertices.length; i++) {
+            const indexA = i;
+            const indexB = i * 2;
+            // The triangle
+            const outerTile = new Polygon();
+            outerTile.addVertex(this.getVertexAt(indexA + 1).clone());
+            outerTile.addVertex(this.innerTilePolygons[0].getVertexAt(indexB).clone());
+            outerTile.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 1).clone());
+            outerTile.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 2).clone());
+            this.outerTilePolygons.push(outerTile);
+        }
+    }
+    ;
+}
+
+/**
+ * @classdesc The rhombus tile from the Girih set.
+ *
+ * @requires Bounds
+ * @requires GirihTile
+ * @requires Polygon
+ * @requires TileType
+ * @requires Vertex
+ *
+ *
+ * @author Ikaros Kappler
+ * @date 2013-11-28
+ * @modified 2014-04-05 Ikaros Kappler (member array outerTilePolygons added).
+ * @modified 2015-03-19 Ikaros Kappler (added toSVG()).
+ * @modified 2020-10-31 Refactored to work with PlotBoilerplate.
+ * @modified 2020-11-13 Ported from vanilla JS to TypeScript.
+ * @version 2.0.1-alpha
+ * @file GirihRhombus
+ * @public
+ **/
+class GirihRhombus extends GirihTile {
+    /**
+     * @constructor
+     * @extends GirihTile
+     * @name GirihRhombus
+     * @param {Vertex} position
+     * @param {number} edgeLength
+     */
+    constructor(position, edgeLength) {
+        super(position, edgeLength, TileType.RHOMBUS);
+        // Overwrite the default symmetries:
+        //    the rhombus tile has a 180° symmetry (5/10 * 360°)
+        this.uniqueSymmetries = 5;
+        // Init the actual rhombus shape with the passed size
+        let pointA = new Vertex$1(0, 0);
+        let pointB = pointA;
+        this.addVertex(pointB);
+        const angles = [0.0,
+            72.0,
+            108.0
+            // 72.0
+        ];
+        let theta = 0.0;
+        for (var i = 0; i < angles.length; i++) {
+            theta += (180.0 - angles[i]);
+            pointA = pointB; // center of rotation
+            pointB = pointB.clone();
+            pointB.x += this.edgeLength;
+            pointB.rotate(theta * (Math.PI / 180.0), pointA);
+            this.addVertex(pointB);
+        }
+        // Move to center    
+        const bounds = Bounds.computeFromVertices(this.vertices);
+        const move = new Vertex$1(bounds.width / 2.0 - (bounds.width - this.edgeLength), bounds.height / 2.0);
+        for (var i = 0; i < this.vertices.length; i++) {
+            this.vertices[i].add(move).add(this.position);
+        }
+        this.textureSource.min.x = 32 / 500.0;
+        this.textureSource.min.y = 188 / 460.0;
+        this.textureSource.max.x = this.textureSource.min.x + 127 / 500.0;
+        this.textureSource.max.y = this.textureSource.min.y + 92 / 460.0;
+        this.baseBounds = this.getBounds();
+        this._buildInnerPolygons();
+        this._buildOuterPolygons(); // Call only AFTER the inner polygons were built!
+    }
+    ;
+    /**
+     * @override
+     */
+    clone() {
+        return new GirihRhombus(this.position.clone(), this.edgeLength).rotate(this.rotation);
+    }
+    ;
+    _buildInnerPolygons() {
+        // Connect all edges half-the-way
+        const innerTile = new Polygon(); // [];
+        innerTile.addVertex(this.vertices[0].clone().scale(0.5, this.vertices[1]));
+        innerTile.addVertex(this.vertices[1].clone().scale(0.5, this.vertices[2]));
+        // Compute the next inner polygon vertex by the intersection of two circles
+        const circleA = new Circle(innerTile.vertices[1], innerTile.vertices[0].distance(innerTile.vertices[1]) * 0.73);
+        const circleB = new Circle(this.vertices[2].clone().scale(0.5, this.vertices[3]), circleA.radius);
+        // There is definitely an intersection
+        let intersection = circleA.circleIntersection(circleB);
+        // One of the two points is inside the tile, the other is outside.
+        // Locate the inside point.
+        if (this.containsVert(intersection.a))
+            innerTile.addVertex(intersection.b);
+        else
+            innerTile.addVertex(intersection.a);
+        innerTile.addVertex(circleB.center);
+        innerTile.addVertex(this.vertices[3].clone().scale(0.5, this.vertices[0]));
+        // Move circles
+        circleA.center = innerTile.vertices[4];
+        circleB.center = innerTile.vertices[0];
+        //window.alert( "circleA=" + circleA + ", circleB=" + circleB );
+        intersection = circleA.circleIntersection(circleB);
+        // There are two points again (one inside, one outside the tile)
+        if (this.containsVert(intersection.a))
+            innerTile.addVertex(intersection.b);
+        else
+            innerTile.addVertex(intersection.a);
+        this.innerTilePolygons.push(innerTile);
+    }
+    ;
+    _buildOuterPolygons() {
+        const indicesA = [0, 2]; // 4:2
+        const indicesB = [0, 3]; // 6:2
+        for (var i = 0; i < indicesA.length; i++) {
+            const indexA = indicesA[i];
+            const indexB = indicesB[i];
+            // The triangle
+            const outerTileX = new Polygon();
+            outerTileX.addVertex(this.getVertexAt(indexA + 1).clone());
+            outerTileX.addVertex(this.innerTilePolygons[0].getVertexAt(indexB).clone());
+            outerTileX.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 1).clone());
+            this.outerTilePolygons.push(outerTileX);
+            // The first 'kite'
+            const outerTileY = new Polygon();
+            outerTileY.addVertex(this.getVertexAt(indexA + 2).clone());
+            outerTileY.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 1).clone());
+            outerTileY.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 2).clone());
+            outerTileY.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 3).clone());
+            this.outerTilePolygons.push(outerTileY);
+        }
+    }
+    ;
+}
+
+/**
+ * @author   Ikaros Kappler
+ * @date     2020-11-24
+ * @modified 2020-11-25 Ported to TypeScript from vanilla JS.
+ * @modified 2024-03-10 Fixed some types for Typescript 5 compatibility.
+ * @modified 2026-01-06 Added method `Girih.locateContainingTileAndEdge` to locate tile/edge pairs.
+ * @modified 2026-01-12 Added method `Girih.getTileByCenter` to locate tiles by position.
+ * @modified 2026-01-18 Added method `Girih.removeAllTiles`.
+ * @version  1.1.0
+ * @file     Girih
+ **/
+/**
+ * @classdesc The Girih datastructure for generating patterns.
+ *
+ * @requires Vertex
+ * @requires GirihTile
+ * @requires GirihBowtie
+ * @requires GirihDecagon
+ * @requires GirihHexagon
+ * @requires GirihPenroseRhombus
+ * @requires GirihPentagon
+ * @requires GirihRhombus
+ */
+class Girih {
+    /**
+     * Create a new empty Girih pattern.
+     *
+     * @constructor
+     * @memberof Girih
+     * @param {number} edgeLength
+     */
+    constructor(edgeLength) {
+        this.edgeLength = edgeLength;
+        // Initialize templates, one for each Girih tile type.
+        // The template array will be filled on initialization (see below).
+        this.TILE_TEMPLATES = [];
+        // The set of all Girih tiles in scene
+        this.tiles = [];
+        this.initTemplates(edgeLength);
+    }
+    /**
+     * Initialize the TILE_TEMPLATES array.
+     *
+     * @name initTemplates
+     * @private
+     * @memberof Girih
+     * @instance
+     * @param {number} edgeLength - The edge length to use for the template tiles.
+     * @return {void}
+     */
+    initTemplates(edgeLength) {
+        // Positions actually don't matter here.
+        // Tiles will be moved to correct position conerning adjacency.
+        var decagon = new GirihDecagon(new Vertex$1(0, 0), edgeLength);
+        var pentagon = new GirihPentagon(new Vertex$1(0, 0), edgeLength);
+        var hexagon = new GirihHexagon(new Vertex$1(0, 0), edgeLength);
+        var bowtie = new GirihBowtie(new Vertex$1(0, 0), edgeLength);
+        var rhombus = new GirihRhombus(new Vertex$1(0, 0), edgeLength);
+        var penrose = new GirihPenroseRhombus(new Vertex$1(0, 0), edgeLength, true); // Add center polygon
+        // Add tiles to array and put them in the correct adjacency position.
+        this.TILE_TEMPLATES.push(decagon);
+        this.TILE_TEMPLATES.push(decagon.transformTilePositionToAdjacency(2, pentagon));
+        this.TILE_TEMPLATES.push(pentagon.transformTilePositionToAdjacency(1, penrose));
+        this.TILE_TEMPLATES.push(penrose.transformTilePositionToAdjacency(3, hexagon));
+        this.TILE_TEMPLATES.push(decagon.transformTilePositionToAdjacency(5, bowtie));
+        this.TILE_TEMPLATES.push(pentagon.transformTilePositionToAdjacency(4, rhombus));
+    }
+    /**
+     * Add a new tile to this Girih pattern.
+     *
+     * @name addTile
+     * @memberof Girih
+     * @instance
+     * @param {GirihTile} tile - The tile to add (instance must not already be part of this pattern).
+     * @return {void}
+     */
+    addTile(tile) {
+        this.tiles.push(tile);
+    }
+    /**
+     * Remove the tile at given array position. The index must be inside valid bounds.
+     *
+     * @name removeTile
+     * @memberof Girih
+     * @instance
+     * @param {number} index - The index in the `tiles` Array.
+     * @return {void}
+     */
+    removeTileAt(index) {
+        this.tiles.splice(index, 1);
+    }
+    /**
+     * Remove all tiles.
+     *
+     * @name removeAllTiles
+     * @memberof Girih
+     * @instance
+     * @return {void}
+     */
+    removeAllTiles() {
+        this.tiles.splice(0, this.tiles.length);
+    }
+    /**
+     * Replace all current tiles with the given ones.
+     *
+     * @param tiles
+     */
+    replaceTiles(tiles) {
+        this.tiles.splice(0, this.tiles.length);
+        for (var i in tiles) {
+            this.addTile(tiles[i]);
+        }
+    }
+    /**
+     * Find the tile with the given center.
+     *
+     * @name getTileByCenter
+     * @memberof Girih
+     * @instance
+     * @param {XYCoords} center - The center point to look for.
+     * @return {GirihTile} The tile or null if not found.
+     */
+    getTileByCenter(center) {
+        for (var i = 0; i < this.tiles.length; i++) {
+            const pos = this.tiles[i].position;
+            if (pos === center || (pos.x == center.x && pos.y == center.y)) {
+                return this.tiles[i];
+            }
+        }
+        return null;
+    }
+    /**
+     * Find that tile (index) which contains the given position. First match will be returned.
+     *
+     * @name locateContainingTile
+     * @memberof Girih
+     * @instance
+     * @param {Vertex} position
+     * @return {number} The index of the containing tile or -1 if none was found.
+     **/
+    locateConatiningTile(position) {
+        for (var i = 0; i < this.tiles.length; i++) {
+            if (this.tiles[i].containsVert(position))
+                return i;
+        }
+        return -1;
+    }
+    /**
+     * Find find a tile-edge-pair (indices) that contain the given position. First match will be returned.
+     *
+     * @name locateContainingTileAndEdge
+     * @memberof Girih
+     * @instance
+     * @param {Vertex} position
+     * @return {{ tileIndex: number; edgeIndex: number }} The index of the containing tile and edge or null if none was found.
+     **/
+    locateContainingTileAndEdge(position) {
+        var containedTileIndex = this.locateConatiningTile(position);
+        // Reset currently highlighted tile/edge (if re-detected nothing changed in the end)
+        var hoverTileIndex = -1;
+        var hoverEdgeIndex = -1;
+        // Find Girih edge nearby ...
+        if (containedTileIndex == -1) {
+            return null;
+        }
+        var i = containedTileIndex;
+        do {
+            var tile = this.tiles[i];
+            // May be -1
+            hoverEdgeIndex = tile.locateEdgeAtPoint(position, this.edgeLength / 2);
+            if (hoverEdgeIndex != -1) {
+                hoverTileIndex = i;
+            }
+            i++;
+        } while (i < this.tiles.length && containedTileIndex == -1 && hoverEdgeIndex == -1);
+        if (hoverTileIndex == -1) {
+            hoverTileIndex = containedTileIndex;
+        }
+        // Find the next possible tile to place?
+        if (hoverTileIndex == -1 || hoverEdgeIndex == -1) {
+            return null;
+        }
+        return { tileIndex: hoverTileIndex, edgeIndex: hoverEdgeIndex };
+    }
+    /**
+     * Turn the tile the mouse is hovering over.
+     * The turnCount is ab abstract number: -1 for one turn left, +1 for one turn right.
+     * The turning angle is defined by the tile with the lowest turn symmetry: the Decagon,
+     * so angle is 36°.
+     *
+     * @name turnTile
+     * @memberof Girih
+     * @instance
+     * @param {number} tileIndex - The index of the tile to rotate.
+     * @param {number} turnCount - A discrete number indicating the number of turn steps.
+     * @return {void}
+     */
+    turnTile(tileIndex, turnCount) {
+        if (tileIndex == -1)
+            // TODO: still required?
+            return;
+        const tile = this.tiles[tileIndex];
+        tile.rotate((turnCount * Math.PI * 2) / tile.symmetry);
+    }
+    /**
+     * Move that tile the mouse is hovering over.
+     * The move amounts are abstract numbers, 1 indicating one unit along each axis.
+     *
+     * @name moveTile
+     * @memberof Girih
+     * @instance
+     * @param {number} tileIndex - The index of the tile to rotate.
+     * @param {number} moveXAmount - The amount to move along the x axis (in pixels).
+     * @param {number} moveYAmount - The amount to move along the y axis (in pixels).
+     * @return {void}
+     */
+    moveTile(tileIndex, moveXAmount, moveYAmount) {
+        if (tileIndex == -1)
+            // TODO: still required?
+            return;
+        const tile = this.tiles[tileIndex];
+        tile.move({ x: moveXAmount * 10, y: moveYAmount * 10 });
+    }
+    /**
+     * Find all possible adjadent tiles and their locations (type, rotation and offset). The
+     * function will return an array of all possible tiles matching at the given tile and edge.
+     *
+     * @name findPossibleAdjacentTiles
+     * @memberof Girih
+     * @instance
+     * @param {number} tileIndex - The index of the tile to rotate.
+     * @param {number} edgeIndex - The index of the tile's edge.
+     * @return {Array<GirihTile>} - An array of possible adjecent tiles (already positioned and rotated).
+     */
+    findPossibleAdjacentTiles(tileIndex, edgeIndex) {
+        var adjTiles = [];
+        if (tileIndex == -1 || edgeIndex == -1)
+            // TODO: still required?
+            return [];
+        let template = null;
+        for (var i in this.TILE_TEMPLATES) {
+            template = this.TILE_TEMPLATES[i].clone();
+            // Find all rotations and positions for that tile to match
+            const foundTiles = this.tiles[tileIndex].transformTileToAdjacencies(edgeIndex, template);
+            if (foundTiles.length != 0) {
+                adjTiles = adjTiles.concat(foundTiles);
+            }
+        }
+        // Set pointer to save range.
+        // previewTilePointer = Math.min( adjTiles.length-1, previewTiilePointer );
+        return adjTiles;
+    }
+} // END class Girih
+
+/**
+ * This file defines a Matrix4x4 class for 3d transformations.
+ *
+ * [ xx xy yz xw
+ *   yx yy yz yw
+ *   zx zy zz zw
+ *   wx wy wz ww ]
+ *
+ * Original class found at
+ *    https://www.migenius.com/articles/3d-transformations-part1-matrices
+ * by Paul Arden
+ *
+ * @file Matrix4x4.js
+ */
+class Matrix4x4 {
+    /**
+     * Generic class for representing 4x4 matrices.
+     * @constructor
+     * @param {Object} matrix - An object with the initial values for the Matrix4x4.
+     * Can be either an Object or Matrix4x4.
+     */
+    constructor(matrix) {
+        if (matrix) {
+            this.setFromObject(matrix);
+        }
+        else {
+            this.setIdentity();
+        }
+    }
+    /**
+     * Set matrix components from object
+     * @param {Object} mat - Object with each component of the matrix, all components must be present.
+     * @public
+     */
+    setFromObject(mat) {
+        this.xx = mat.xx;
+        this.xy = mat.xy;
+        this.xz = mat.xz;
+        this.xw = mat.xw;
+        this.yx = mat.yx;
+        this.yy = mat.yy;
+        this.yz = mat.yz;
+        this.yw = mat.yw;
+        this.zx = mat.zx;
+        this.zy = mat.zy;
+        this.zz = mat.zz;
+        this.zw = mat.zw;
+        this.wx = mat.wx;
+        this.wy = mat.wy;
+        this.wz = mat.wz;
+        this.ww = mat.ww;
+    }
+    // A vector {x,y,z,w=1}
+    apply4(vec4) {
+        return {
+            x: vec4.x * this.xx + vec4.y * this.xy + vec4.z * this.xz + vec4.w * this.xw,
+            y: vec4.x * this.yx + vec4.y * this.yy + vec4.z * this.yz + vec4.w * this.yw,
+            z: vec4.x * this.zx + vec4.y * this.zy + vec4.z * this.zz + vec4.w * this.zw,
+            w: vec4.x * this.wx + vec4.y * this.wy + vec4.z * this.wz + vec4.w * this.ww
+        };
+    }
+    apply3(vec3) {
+        const vec4 = Object.assign(Object.assign({}, vec3), { w: 1.0 });
+        var result4 = this.apply4(vec4);
+        // Divide by w: project result on the 4d sphere into 3d space.
+        return { x: result4.x / result4.w, y: result4.y / result4.w, z: result4.z / result4.w };
+    }
+    /**
+     * Set all matrix components to 0.
+     * @public
+     */
+    clear() {
+        this.xx = this.xy = this.xz = this.xw = this.yx = this.yy = this.yz = this.yw = this.zx = this.zy = this.zz = this.zw = this.wx = this.wy = this.wz = this.ww = 0;
+    }
+    /**
+     * Set matrix to the identity matrix.
+     * @public
+     */
+    setIdentity() {
+        this.clear();
+        this.xx = this.yy = this.zz = this.ww = 1;
+        return this;
+    }
+    /**
+     * Sets this matrix to a rotation matrix.
+     * @param {Vec3} axis - The vector to rotate around.
+     * @param {Number} angle - The angle to rotate in radians.
+     * @public
+     */
+    setRotation(axis, angle) {
+        this.setIdentity();
+        var c = Math.cos(angle);
+        var s = Math.sin(angle);
+        var t = 1 - c;
+        var X = axis.x;
+        var Y = axis.y;
+        var Z = axis.z;
+        this.xx = t * X * X + c;
+        this.xy = t * X * Y + s * Z;
+        this.xz = t * X * Z - s * Y;
+        this.yx = t * X * Y - s * Z;
+        this.yy = t * Y * Y + c;
+        this.yz = t * Y * Z + s * X;
+        this.zx = t * X * Z + s * Y;
+        this.zy = t * Y * Z - s * X;
+        this.zz = t * Z * Z + c;
+        return this;
+    }
+    /**
+     * Sets this matrix to a rotation matrix.
+     * @param {Number} x - Scaling factor in the x axis.
+     * @param {Number} y - Scaling factor in the y axis.
+     * @param {Number} z - Scaling factor in the z axis.
+     * @public
+     */
+    setScaling(x, y, z) {
+        this.setIdentity();
+        this.xx = x;
+        this.yy = y;
+        this.zz = z;
+        return this;
+    }
+    /**
+     * Sets the translation elements of this matrix while leaving the
+     * rest of the matrix untouched.
+     * @param {Number} x - Translation amount in the x axis.
+     * @param {Number} y - Translation amount in the y axis.
+     * @param {Number} z - Translation amount in the z axis.
+     */
+    setTranslation(x, y, z) {
+        this.setIdentity();
+        // There was an error in the original implementation.
+        //    See https://pages.mtu.edu/~shene/COURSES/cs3621/NOTES/geometry/geo-tran.html
+        // This is fixed:
+        this.xw = x;
+        this.yw = y;
+        this.zw = z;
+        return this;
+    }
+    /**
+     * Sets this matrix to the dot product between this matrix and the
+     * matrix specified by rhs.
+     * @param {Matrix4x4} matrix - The matrix on the right hand side of the dot product.
+     */
+    multiply(matrix) {
+        var _mat = new Matrix4x4(this);
+        this.xx = _mat.xx * matrix.xx + _mat.xy * matrix.yx + _mat.xz * matrix.zx + _mat.xw * matrix.wx;
+        this.xy = _mat.xx * matrix.xy + _mat.xy * matrix.yy + _mat.xz * matrix.zy + _mat.xw * matrix.wy;
+        this.xz = _mat.xx * matrix.xz + _mat.xy * matrix.yz + _mat.xz * matrix.zz + _mat.xw * matrix.wz;
+        this.xw = _mat.xx * matrix.xw + _mat.xy * matrix.yw + _mat.xz * matrix.zw + _mat.xw * matrix.ww;
+        this.yx = _mat.yx * matrix.xx + _mat.yy * matrix.yx + _mat.yz * matrix.zx + _mat.yw * matrix.wx;
+        this.yy = _mat.yx * matrix.xy + _mat.yy * matrix.yy + _mat.yz * matrix.zy + _mat.yw * matrix.wy;
+        this.yz = _mat.yx * matrix.xz + _mat.yy * matrix.yz + _mat.yz * matrix.zz + _mat.yw * matrix.wz;
+        this.yw = _mat.yx * matrix.xw + _mat.yy * matrix.yw + _mat.yz * matrix.zw + _mat.yw * matrix.ww;
+        this.zx = _mat.zx * matrix.xx + _mat.zy * matrix.yx + _mat.zz * matrix.zx + _mat.zw * matrix.wx;
+        this.zy = _mat.zx * matrix.xy + _mat.zy * matrix.yy + _mat.zz * matrix.zy + _mat.zw * matrix.wy;
+        this.zz = _mat.zx * matrix.xz + _mat.zy * matrix.yz + _mat.zz * matrix.zz + _mat.zw * matrix.wz;
+        this.zw = _mat.zx * matrix.xw + _mat.zy * matrix.yw + _mat.zz * matrix.zw + _mat.zw * matrix.ww;
+        this.wx = _mat.wx * matrix.xx + _mat.wy * matrix.yx + _mat.wz * matrix.zx + _mat.ww * matrix.wx;
+        this.wy = _mat.wx * matrix.xy + _mat.wy * matrix.yy + _mat.wz * matrix.zy + _mat.ww * matrix.wy;
+        this.wz = _mat.wx * matrix.xz + _mat.wy * matrix.yz + _mat.wz * matrix.zz + _mat.ww * matrix.wz;
+        this.ww = _mat.wx * matrix.xw + _mat.wy * matrix.yw + _mat.wz * matrix.zw + _mat.ww * matrix.ww;
+        return this;
+    }
+    /**
+     * Create the rotation matrix from the given axis and angle.
+     *
+     * @param {Vec3} axis - The axis to rotate around.
+     * @param {number} angle - The angle to use for rotation (in radians).
+     * @returns Matrix4x4
+     */
+    static makeRotationMatrix(axis, angle) {
+        return new Matrix4x4().setRotation(axis, angle);
+    }
+    /**
+     * Create the scaling matrix from the given x-, y- and z- scaling factors (use 1.0 for no scaling).
+     *
+     * @param {number} scaleX - The x scaling factor.
+     * @param {number} scaleY - The y scaling factor.
+     * @param {number} scaleZ - The z scaling factor.
+     * @returns Matrix4x4
+     */
+    static makeScalingMatrix(scaleX, scaleY, scaleZ) {
+        return new Matrix4x4().setScaling(scaleX, scaleY, scaleZ);
+    }
+    /**
+     * Create the translation matrix from the given x-, y- and z- translation amounts (use 0.0 for no translation).
+     *
+     * @param {number} translateX - The x translation amount.
+     * @param {number} translateY - The y translation amount.
+     * @param {number} translateZ - The z translation amount.
+     * @returns Matrix4x4
+     */
+    static makeTranslationMatrix(translateX, translateY, translateZ) {
+        return new Matrix4x4().setTranslation(translateX, translateY, translateZ);
+    }
+    /**
+     * Create a full transform matrix from the rotation, scaling and translation params.
+     *
+     * @param {number} rotateX - The rotation angle around the x axis.
+     * @param {number} rotateY - The rotation angle around the y axis.
+     * @param {number} rotateZ - The rotation angle around the z axis.
+     * @param {number} scaleX - The x scaling factor.
+     * @param {number} scaleY - The y scaling factor.
+     * @param {number} scaleZ - The z scaling factor.
+     * @param {number} translateX - The x translation amount.
+     * @param {number} translateY - The y translation amount.
+     * @param {number} translateZ - The z translation amount.
+     * @returns Matrix4x4
+     */
+    static makeTransformationMatrix(rotateX, rotateY, rotateZ, scaleX, scaleY, scaleZ, translateX, translateY, translateZ) {
+        var matrixRx = new Matrix4x4().setRotation({ x: 1, y: 0, z: 0 }, rotateX);
+        var matrixRy = new Matrix4x4().setRotation({ x: 0, y: 1, z: 0 }, rotateY);
+        var matrixRz = new Matrix4x4().setRotation({ x: 0, y: 0, z: 1 }, rotateZ);
+        var matrixS = new Matrix4x4().setScaling(scaleX, scaleY, scaleZ);
+        var matrixT0 = new Matrix4x4().setTranslation(translateX, translateY, translateZ);
+        var transformMatrix = new Matrix4x4()
+            .multiply(matrixRx)
+            .multiply(matrixRy)
+            .multiply(matrixRz)
+            .multiply(matrixS)
+            .multiply(matrixT0);
+        return transformMatrix;
+    }
+    /**
+     * Returns a deep copy of this matrix.
+     * @return {Matrix4x4} A deep copy of this matrix.
+     */
+    clone() {
+        return new Matrix4x4(this);
+    }
+    /**
+     * Returns a pretty print string representation of the matrix.
+     * @return {String} Pretty printed string of the matrix.
+     */
+    toJSON() {
+        // prettier-ignore
+        return ("{\n" +
+            '\t"xx": ' + this.xx + ', "xy": ' + this.xy + ', "xz": ' + this.xz + ', "xw": ' + this.xw + ",\n" +
+            '\t"yx": ' + this.yx + ', "yy": ' + this.yy + ', "yz": ' + this.yz + ', "yw": ' + this.yw + ",\n" +
+            '\t"zx": ' + this.zx + ', "zy": ' + this.zy + ', "zz": ' + this.zz + ', "zw": ' + this.zw + ",\n" +
+            '\t"wx": ' + this.wx + ', "wy": ' + this.wy + ', "wz": ' + this.wz + ', "ww": ' + this.ww + "\n" +
+            "}");
+    }
+}
+
+class Ref {
+    constructor(value) {
+        this.current = value;
+    }
+}
+const useRef = () => {
+    return new Ref(undefined);
+};
+
+/**
+ * Approach for a 'simple' color gradient picker for my PlotBoilerplate library.
+ *
+ * As it turned out a bit more complex in the end – due to the fact that color gradient
+ * picking is not a super simple task – so I used JSX here. Thus a JSX library is required
+ * to get this running: NoReact.
+ *
+ *
+ * @author   Ikaros Kappler
+ * @date     2025-06-27
+ * @modified 2025-09-10 Fixing a color select bug on MacOS.
+ * @version  1.0.0
+ */
+class ColorGradientPicker {
+    /**
+     * The constructor: creates a new color gradient picker in the given container.
+     * If no container or ID is given then a new unbound `container` will be created (DIV).
+     *
+     * Pass a container ID or nothing – in the latter case the constructor will create
+     * a new DIV element.
+     *
+     * @param {string?} containerID - (optional) If you want to use an existing container (should be a DIV).
+     * @param {boolean?} isMobileMode - (optional) If `true` then the elements are rendered in double size.
+     */
+    constructor(containerID, isMobileMode) {
+        this._sliderElementRefs = [];
+        this.sliderMin = 0;
+        this.sliderMax = 100;
+        // Only used during initialization!
+        this.isMobileMode = false;
+        this.css_indicatorWidth_num = 1.0;
+        this.css_indicatorWidth = "1em";
+        this.css_indicatorHeight = "1em";
+        this.css_thumbWidth = "0.5em";
+        this.css_thumbHeight = "1.333em";
+        this.css_containerHeight = "20px";
+        this.installedChangeListeners = [];
+        this.__mouseDownPosition = null;
+        /**
+         * Creates a callback function for range slider.
+         *
+         * @returns
+         */
+        this.__createSliderChangeHandler = () => {
+            const _self = this;
+            return (e) => {
+                const targetSlider = e.target;
+                // console.log("Clicked", targetSlider ? targetSlider.getAttribute("id") : null);
+                if (!targetSlider) {
+                    return false;
+                }
+                const currentSliderValue = Number.parseFloat(targetSlider.value);
+                const rangeSliderIndexRaw = targetSlider.dataset["rangeSliderIndex"];
+                // console.log("rangeSliderIndexRaw", rangeSliderIndexRaw);
+                if (!rangeSliderIndexRaw) {
+                    return false;
+                }
+                const rangeSliderIndex = Number.parseInt(rangeSliderIndexRaw);
+                var leftSliderValue = this.__getSliderValue(rangeSliderIndex - 1, _self.sliderMin);
+                var rightSliderValue = this.__getSliderValue(rangeSliderIndex + 1, _self.sliderMax);
+                if (leftSliderValue >= currentSliderValue) {
+                    targetSlider.value = `${leftSliderValue}`;
+                    _self.__updateBackgroundGradient();
+                    _self.__updateColorIndicator(rangeSliderIndex);
+                    return false;
+                }
+                else if (rightSliderValue <= currentSliderValue) {
+                    targetSlider.value = `${rightSliderValue}`;
+                    _self.__updateBackgroundGradient();
+                    _self.__updateColorIndicator(rangeSliderIndex);
+                    return false;
+                }
+                else {
+                    _self.__updateBackgroundGradient();
+                    _self.__updateColorIndicator(rangeSliderIndex);
+                    return true;
+                }
+            };
+        };
+        /**
+         * Adds custom styles (global STYLE tag).
+         *
+         * @private
+         */
+        this.__createCustomStylesElement = () => {
+            // Thanks to Ana Tudor
+            //    https://css-tricks.com/multi-thumb-sliders-particular-two-thumb-case/
+            return (undefined("style", null, `
+    #${this.elementID} {
+      margin-top: 1em;
+    }
+
+    #${this.elementID} input[type='range'] {
+
+      -webkit-appearance: none;
+
+      grid-column: 1;
+      grid-row: 2;
+      
+      /* same as before */
+      background: none; /* get rid of white Chrome background */
+      color: #000;
+      font: inherit; /* fix too small font-size in both Chrome & Firefox */
+      margin: 0;
+      pointer-events: none; /* let clicks pass through */
+    }
+
+    #${this.elementID} input[type='range']::-webkit-slider-runnable-track {
+      -webkit-appearance: none;
+
+      background: none; /* get rid of Firefox track background */
+      height: 100%;
+      width: 100%;
+
+      pointer-events: none;
+    }
+
+    #${this.elementID} input[type='range']::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      background: currentcolor;
+      border: none; /* get rid of Firefox thumb border */
+      border-radius: 6px; /* get rid of Firefox corner rounding */
+      pointer-events: auto; /* catch clicks */
+      width: ${this.css_thumbWidth}; 
+      height: ${this.css_thumbHeight};
+    }
+
+    #${this.elementID} input[type='range']:focus::-webkit-slider-thumb {
+      border: 2px solid white;
+    }
+
+    #${this.elementID} input[type='range']::-moz-range-track {
+      -webkit-appearance: none;
+      background: none; /* get rid of Firefox track background */
+      height: 100%;
+      width: 100%;
+      pointer-events: none;
+    }
+
+    #${this.elementID} input[type='range']::-moz-range-thumb {
+      /* -webkit-appearance: none; */
+      background: currentcolor;
+      border: none; /* get rid of Firefox thumb border */
+      border-radius: 6px; /* get rid of Firefox corner rounding */
+      pointer-events: auto; /* catch clicks */
+      width: ${this.css_thumbWidth}; 
+      height: ${this.css_thumbHeight};
+    }
+
+    #${this.elementID} input[type='range']:focus::-moz-range-thumb {
+      border: 2px solid white;
+    }
+
+    #${this.elementID} input[type='range'] {
+      /* same as before */
+      z-index: 1;
+    }
+    
+    #${this.elementID} input[type='range']:focus {
+        z-index: 2;
+        /* outline: dotted 1px orange; */
+        color: darkorange;
+    }
+
+    body.darkmode #${this.elementID} .color-remove-button {    
+      background-color: #1e2937;
+      color: grey;
+    }
+
+    body.darkmode #${this.elementID} .color-remove-button:hover,
+    body.darkmode #${this.elementID} .color-remove-button:active {    
+      background-color: rgba(216,216,216,0.9);
+    }
+
+    `));
+        };
+        if (containerID) {
+            const cont = document.getElementById(containerID);
+            if (!cont) {
+                throw "Cannot create ColorGradientPicker. Component ID does not exist.";
+            }
+            this.container = cont;
+        }
+        else {
+            this.container = document.createElement("div");
+        }
+        this.baseID = Math.floor(Math.random() * 65535);
+        this.elementID = `color-gradient-picker-${this.baseID}`;
+        this.colorGradient = ColorGradient.createDefault();
+        this.isMobileMode = Boolean(isMobileMode);
+        if (isMobileMode) {
+            // Double size :)
+            this.css_indicatorWidth_num = 2.0;
+            this.css_indicatorWidth = "2em";
+            this.css_indicatorHeight = "2em";
+            this.css_thumbWidth = "1.0em";
+            this.css_thumbHeight = "2.666em";
+            this.css_containerHeight = "40px";
+        }
+        document.head.appendChild(this.__createCustomStylesElement());
+        this.container.append(this._render());
+        this.__initializeDataSets();
+        this.__updateColorIndicator(0);
+        this.__updateBackgroundGradient();
+    } // END constructor
+    setGradient(gradient, fireChangeEvent) {
+        // We are lazy: just throw away everything and rebuild all.
+        this.__removeAllChildNodes(this.container);
+        this.colorGradient = gradient;
+        this.container.append(this._render());
+        this.__initializeDataSets();
+        this.__updateColorIndicator(0);
+        this.__updateBackgroundGradient();
+        if (fireChangeEvent) {
+            this.__fireChangeEvent();
+        }
+    }
+    // +---------------------------------------------------------------------------------
+    // | A helper function to remove all child nodes.
+    // +-------------------------------
+    __removeAllChildNodes(node) {
+        while (node.lastChild) {
+            node.removeChild(node.lastChild);
+        }
+    }
+    // +---------------------------------------------------------------------------------
+    // | Used during initialization: define dataset values for each slider.
+    // +-------------------------------
+    __initializeDataSets() {
+        for (var i = 0; i < this._sliderElementRefs.length; i++) {
+            const sliderColor = this.colorGradient.values[i].color;
+            // console.log("Setting up slider color data set", i, sliderColor, sliderColor.cssRGB(), sliderColor.cssHEX());
+            this._sliderElementRefs[i].current.dataset.colorValue = sliderColor.cssRGB();
+            this._sliderElementRefs[i].current.dataset.colorValueHEX = sliderColor.cssHEX();
+        }
+    }
+    /**
+     * Adds a new color gradient change listener to this ColorGradientPicker.
+     *
+     * @param {ColorGradientChangeListener} listener - The listener to add.
+     * @returns {boolean} True, if the listener was added and did not exist before.
+     */
+    addChangeListener(listener) {
+        for (var i = 0; i < this.installedChangeListeners.length; i++) {
+            if (this.installedChangeListeners[i] === listener) {
+                return false;
+            }
+        }
+        this.installedChangeListeners.push(listener);
+        return true;
+    }
+    /**
+     *
+     * @param {ColorGradientChangeListener} listener The listener to remove.
+     * @returns {boolean} True, if the listener existed and has been removed.
+     */
+    removeChangeListener(listener) {
+        for (var i = 0; i < this.installedChangeListeners.length; i++) {
+            if (this.installedChangeListeners[i] === listener) {
+                this.installedChangeListeners.splice(i, 1);
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * Fires a change event to all installed listeners.
+     */
+    __fireChangeEvent() {
+        const newColorGradient = this.getColorGradient();
+        for (var i = 0; i < this.installedChangeListeners.length; i++) {
+            this.installedChangeListeners[i](newColorGradient, this);
+        }
+    }
+    /**
+     * Creates a new color range input element.
+     *
+     * @private
+     * @param {number} baseID
+     * @param index
+     * @param sliderMin
+     * @param sliderMax
+     * @param initialValue
+     * @param initialColor
+     * @returns
+     */
+    __createColorRangeInput(index, sliderMin, sliderMax, initialValue, initialColor) {
+        const sliderHandler = this.__createSliderChangeHandler();
+        const ref = useRef();
+        // this._sliderElementRefs.push(ref);
+        this._sliderElementRefs.splice(index, 0, ref);
+        // console.log("new _sliderElementRefs", this._sliderElementRefs);
+        // Update all elements to the right of the new elelemt
+        this.__updateSliderDataSetIndices(index + 1);
+        return (undefined("input", { id: `rage-slider-${this.baseID}-${index}`, type: "range", min: sliderMin, max: sliderMax, value: initialValue, style: { pos: "absolute", l: "0px", t: "0px", w: "100%", h: "60%" }, "data-range-slider-index": `${index}`, "data-colorValue": initialColor.cssRGB(), "data-colorValueHEX": initialColor.cssHEX(), onChange: sliderHandler, onClick: sliderHandler, ref: ref }));
+    }
+    /**
+     * Get the absolute length of this range, in slider units.
+     * @returns
+     */
+    getRangeLength() {
+        return this.sliderMax - this.sliderMin;
+    }
+    /**
+     * Handles color value changes.
+     *
+     * @returns
+     */
+    __colorChangeHandler() {
+        const _self = this;
+        return (_evt) => {
+            // console.log("__colorChangeHandler");
+            const activeSliderIndex_raw = this.colorInputRef.current.dataset.activeSliderIndex;
+            if (!activeSliderIndex_raw) {
+                console.warn("Cannot update color indicator; no active range slider set. This is likely a program error and should not happen.");
+                return false;
+            }
+            const activeSliderIndex = Number.parseInt(activeSliderIndex_raw);
+            if (Number.isNaN(activeSliderIndex) || activeSliderIndex < 0 || activeSliderIndex >= _self._sliderElementRefs.length) {
+                console.warn("Cannot update color indicator; active index invalid or out of bounds. This is likely a program error and should not happen.", activeSliderIndex);
+                return false;
+            }
+            const newColor = _self.colorInputRef.current.value;
+            const rangeSlider = _self._sliderElementRefs[activeSliderIndex].current;
+            rangeSlider.dataset.colorValue = newColor;
+            // rangeSlider.dataset["colorValue"] = newColor;
+            this.colorIndicatorColorButtonRef.current.style["background-color"] = newColor;
+            _self.__updateBackgroundGradient();
+            _self.__fireChangeEvent();
+            return true;
+        };
+    }
+    /**
+     * Removed the current color slider from the DOM and highlights the left neighbour.
+     *
+     * @returns {boolean} True if the element could be successfully removed.
+     */
+    __handleRemoveColor() {
+        // const colorInput : HTMLInputElement | null = evt.target;
+        // console.log("__colorChangeHandler");
+        const activeSliderIndex_raw = this.colorInputRef.current.dataset.activeSliderIndex;
+        if (!activeSliderIndex_raw) {
+            console.warn("Cannot remove color indicator; no active range slider set.");
+            return false;
+        }
+        const activeSliderIndex = Number.parseInt(activeSliderIndex_raw);
+        if (Number.isNaN(activeSliderIndex) || activeSliderIndex < 0 || activeSliderIndex >= this._sliderElementRefs.length) {
+            console.warn("Cannot remove color indicator; active index invalid or out of bounds.", activeSliderIndex);
+            return false;
+        }
+        if (activeSliderIndex === 0 || activeSliderIndex + 1 === this.getRangeLength()) {
+            console.warn("Cannot remove color indicator; leftmost and rightmost slider must not be removed.", activeSliderIndex);
+            return false;
+        }
+        const sliderElementRef = this._sliderElementRefs[activeSliderIndex];
+        sliderElementRef.current.remove();
+        this._sliderElementRefs.splice(activeSliderIndex, 1);
+        // Update all elements to the right of the removed elelemt
+        this.__updateSliderDataSetIndices(activeSliderIndex);
+        // Set left element active
+        this.__updateColorIndicator(activeSliderIndex - 1);
+        this.__updateBackgroundGradient();
+        this.__fireChangeEvent();
+        return true;
+    }
+    /**
+     * Once a slider element was added or removed then the following indices must be updated.
+     *
+     * @param {number} startIndex - The slider index to start updating at.
+     */
+    __updateSliderDataSetIndices(startIndex) {
+        // Update all elements to the right of the new elelemt
+        for (var i = startIndex; i < this._sliderElementRefs.length; i++) {
+            this._sliderElementRefs[i].current.setAttribute("data-range-slider-index", `${i}`);
+            this._sliderElementRefs[i].current.setAttribute("id", `rage-slider-${this.baseID}-${i}`);
+        }
+    }
+    /**
+     * To avoid too many sliders added on each click, check if the mouse was moved in the meantime (detect drag event).
+     *
+     * @returns
+     */
+    __containerMouseDownHandler() {
+        const _self = this;
+        return (event) => {
+            _self.__mouseDownPosition = { x: event.clientX, y: event.clientY };
+            // console.log("__containerMouseDownHandler _self.__mouseDownPosition", _self.__mouseDownPosition);
+        };
+    }
+    /**
+     * Creates a handler for click events on the container. If the click event is far
+     * enough from existing sliders, then it can be added.
+     *
+     * @returns
+     */
+    __containerClickHandler() {
+        const _self = this;
+        const maxDifference = _self.getRangeLength() * 0.03;
+        return (evt) => {
+            // console.log("Container click handler");
+            const relativeValue = _self.__clickEventToRelativeValue(evt);
+            if (relativeValue < 0 || relativeValue > 1.0) {
+                // Clicked somewhere outside the range
+                return;
+            }
+            // Check if element was moved in the meantime
+            if (_self.__mouseDownPosition && Math.abs(_self.__mouseDownPosition.x - evt.clientX) >= 10.0) {
+                // Ignore event if mouse was moved more than 10 pixels between down- and up-event
+                // console.log("Mouse was moved more than 10 px. Cancelling.");
+                _self.__mouseDownPosition = null;
+                return;
+            }
+            const absoluteValue = this.__relativeToAbsolute(relativeValue);
+            // console.log("click", "relativeValue", relativeValue, "absoluteValue", absoluteValue);
+            // Check if click position (ratio) is far enough away from any slider
+            const [leftSliderIndex, closestSliderValue] = _self.__locateClosestSliderValue(absoluteValue);
+            const diff = Math.abs(closestSliderValue - absoluteValue);
+            if (diff >= maxDifference) {
+                // console.log("Add slider here");
+                _self.__addSliderAt(absoluteValue, leftSliderIndex);
+            }
+            // Finally clear mousedown-position
+            _self.__mouseDownPosition = null;
+        };
+    }
+    /**
+     * Find that slider (index) that's value is closest to the given absolute value. The function will return
+     * the closest value and the left index, indicating the containing interval index.
+     *
+     * @param {number} absoluteValue - The value to look for.
+     * @returns {[number,number]} A pair of left slider index and closest value.
+     */
+    __locateClosestSliderValue(absoluteValue) {
+        // As the colorGradient always reflects the slider values we can just ust the color gradient itself to search.
+        const relativeValue = this.__absoluteToRelative(absoluteValue);
+        const colorGradientEntry = this.colorGradient.locateClosestRatio(relativeValue);
+        return [colorGradientEntry[0], this.__relativeToAbsolute(colorGradientEntry[1].ratio)];
+    }
+    /**
+     * Convert the click event to the relative x value in [0..1].
+     *
+     * @param {MouseEvent} evt - The mouse event.
+     * @returns {number} The relative x value.
+     */
+    __clickEventToRelativeValue(evt) {
+        const target = evt.target;
+        const rect = target.getBoundingClientRect();
+        const x = evt.clientX - rect.left; //x position within the element.
+        const width = rect.width; // target.clientWidth;
+        const relativeValue = x / width;
+        // console.log("width", width, "x", x, "relativeValue", relativeValue);
+        return relativeValue;
+    }
+    /**
+     * Adds a slider at the given interval index.
+     *
+     * @param {number} absoluteValue - The absolute new slider value.
+     * @param {number} leftSliderIndex - The new slider's position (interval index).
+     */
+    __addSliderAt(absoluteValue, leftSliderIndex) {
+        // console.log("__addSliderAt", "absoluteValue", absoluteValue, "leftSliderIndex", leftSliderIndex);
+        const leftSlider = this._sliderElementRefs[leftSliderIndex].current;
+        // const colorAtPosition = this.__getSliderColorAt(relativeValue);
+        const newColor = this.__getSliderColorAt(absoluteValue);
+        const newSliderIndex = leftSliderIndex + 1;
+        this.__createColorRangeInput(newSliderIndex, this.sliderMin, this.sliderMax, absoluteValue, newColor // initialColor: string
+        );
+        const sliderRef = this._sliderElementRefs[newSliderIndex];
+        leftSlider.after(sliderRef.current);
+        sliderRef.current.dataset.colorValue = newColor.cssRGB();
+        sliderRef.current.dataset.colorValueHEX = newColor.cssHEX();
+        // No visible change, but let's reflect this in the output gradient anyway
+        this.__updateBackgroundGradient();
+        // Highlight the newly added range slider
+        this.__updateColorIndicator(newSliderIndex);
+        this.__fireChangeEvent();
+    }
+    /**
+     * Get the slider color at the given absolute value. That value must be inside the [MIN_VALUE, MAX_VALUE] interval.
+     * @param absoluteValue
+     * @returns
+     */
+    __getSliderColorAt(absoluteValue) {
+        // console.log("__getSliderColorAt", "absoluteValue", absoluteValue);
+        // Locate interval
+        const leftIndex = this.__locateIntervalAt(absoluteValue);
+        const leftSliderValue = this.__getSliderValue(leftIndex, NaN);
+        const rightSliderValue = this.__getSliderValue(leftIndex + 1, NaN);
+        if (Number.isNaN(leftSliderValue) || Number.isNaN(rightSliderValue)) {
+            console.warn(`[Warn] Failed to determine left/right slider values at indices ${leftIndex} or ${rightSliderValue}. Cannot proceed for absolute value ${absoluteValue}.`);
+            return null;
+        }
+        const leftColorString = this.__getSliderColorString(leftIndex, null);
+        const rightColorString = this.__getSliderColorString(leftIndex + 1, null);
+        if (!leftColorString || !rightColorString) {
+            console.warn(`[Warn] Failed to determine left/right color string values at indices ${leftIndex} or ${rightSliderValue}. Cannot proceed for absolute value ${absoluteValue}.`);
+            return null;
+        }
+        const positionInsideInterval = (absoluteValue - leftSliderValue) / (rightSliderValue - leftSliderValue);
+        // console.log("leftColorString", leftColorString, "rightColorString", rightColorString);
+        const leftColorObject = Color.parse(leftColorString);
+        const rightColorObject = Color.parse(rightColorString);
+        const newColor = leftColorObject.interpolate(rightColorObject, positionInsideInterval);
+        return newColor;
+    }
+    /**
+     * Locate the slider interval that contains the given (absolute) slider value. The given value must be
+     * somewhere between MIN_VALUE and MAX_VALUE (usually between 0 and 100 in the default configuraion.).
+     *
+     * @param {number} absoluteValue - The absolute value to search for.
+     * @returns {number} The left slider inder the containing interval is starting with – or -1 if out of bounds.
+     */
+    __locateIntervalAt(absoluteValue) {
+        for (var i = 0; i + 1 < this._sliderElementRefs.length; i++) {
+            if (this.__getSliderValue(i, this.sliderMin) <= absoluteValue &&
+                absoluteValue < this.__getSliderValue(i + 1, this.sliderMax)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    /**
+     * Converts a relative value in [0..1] to [min..max].
+     * @param relativeValue
+     */
+    __relativeToAbsolute(relativeValue) {
+        return this.sliderMin + (this.sliderMax - this.sliderMin) * relativeValue;
+    }
+    /**
+     * Converts a relative value in [0..1] to [min..max].
+     * @param relativeValue
+     */
+    __absoluteToRelative(absolute) {
+        return (absolute - this.sliderMin) / (this.sliderMax - this.sliderMin);
+    }
+    /**
+     * Get the value of the n-th rangel slider.
+     *
+     * @param {number} sliderIndex
+     * @param {number} fallback
+     * @returns
+     */
+    __getSliderValue(sliderIndex, fallback) {
+        if (sliderIndex < 0 || sliderIndex >= this._sliderElementRefs.length) {
+            return fallback;
+        }
+        return Number.parseFloat(this._sliderElementRefs[sliderIndex].current.value);
+    }
+    /**
+     * Get all current slider values as an array.
+     * @returns
+     */
+    __getAllSliderValues() {
+        return this._sliderElementRefs.map((ref, index) => this.__getSliderValue(index, NaN));
+    }
+    /**
+     * Updates the container's background to display the configured color gradient.
+     *
+     * @private
+     */
+    __updateBackgroundGradient() {
+        // const colorGradient = this.getColorGradient();
+        this.colorGradient = new ColorGradient(this.__getAllSliderValues().map((sliderValue, sliderIndex) => ({
+            color: this.__getSliderColor(sliderIndex, null),
+            ratio: this.__absoluteToRelative(sliderValue)
+        })), this.colorGradient.angle);
+        this.containerRef.current.style["background"] = this.colorGradient.toColorGradientString();
+    }
+    /**
+     * After changes this function updates the color indicator button.
+     *
+     * @param {number} rangeSliderIndex - The new active slider index.
+     */
+    __updateColorIndicator(rangeSliderIndex) {
+        const colorValue = this.__getSliderColorHEXString(rangeSliderIndex, "#808080");
+        const ratio = this.__getSliderPercentage(rangeSliderIndex);
+        // Set left offset of color input container
+        this.colorInputContainerRef.current.style["left"] = `calc( ${ratio * 100}% + ${(1.0 - ratio) * this.css_indicatorWidth_num * 0.5}em - ${ratio * this.css_indicatorWidth_num * 0.5}em)`;
+        // Also set offset of colot input element (safari will open the native color dialog at this position)
+        this.colorInputRef.current.style["left"] = `calc( ${ratio * 100}% + ${(1.0 - ratio) * this.css_indicatorWidth_num * 0.5}em - ${ratio * this.css_indicatorWidth_num * 0.5}em)`;
+        this.colorIndicatorColorButtonRef.current.style["background-color"] = colorValue;
+        this.colorInputRef.current.value = colorValue;
+        // console.log("Setting new color value", this.colorInputRef.current.value, colorValue);
+        this.colorInputRef.current.dataset.activeSliderIndex = `${rangeSliderIndex}`;
+        if (rangeSliderIndex <= 0 || rangeSliderIndex + 1 >= this._sliderElementRefs.length) {
+            this.colorIndicatorRemoveButtonRef.current.style["visibility"] = "hidden";
+        }
+        else {
+            this.colorIndicatorRemoveButtonRef.current.style["visibility"] = "visible";
+        }
+    }
+    /**
+     * Get a color gradient CSS value string from the current editor settings.
+     *
+     * @instance
+     * @memberof ColorGradientPicker
+     * @returns {ColorGradient}
+     */
+    getColorGradient() {
+        return this.colorGradient;
+    }
+    /**
+     * Get the configured color value of the n-th rangel slider.
+     *
+     * @param {number} sliderIndex
+     * @param {string} fallback
+     * @returns
+     */
+    __getSliderColorString(sliderIndex, fallback) {
+        if (sliderIndex < 0 || sliderIndex >= this._sliderElementRefs.length) {
+            return fallback;
+        }
+        const colorValue = this._sliderElementRefs[sliderIndex].current.dataset.colorValue;
+        return colorValue ? colorValue : fallback;
+    }
+    /**
+     * Get the configured color value of the n-th rangel slider.
+     *
+     * @param {number} sliderIndex
+     * @param {string} fallback
+     * @returns
+     */
+    __getSliderColorHEXString(sliderIndex, fallback) {
+        if (sliderIndex < 0 || sliderIndex >= this._sliderElementRefs.length) {
+            return fallback;
+        }
+        const colorValue = this._sliderElementRefs[sliderIndex].current.dataset.colorValueHEX;
+        return colorValue ? colorValue : fallback;
+    }
+    /**
+     * Get get color of this gradient picker at the given slider index.
+     *
+     * @param {number} sliderIndex - The index to get the slider color from. Something between 0 and _sliderElementRefs.length.
+     * @param {Color} fallback
+     * @returns
+     */
+    __getSliderColor(sliderIndex, fallback) {
+        if (sliderIndex < 0 || sliderIndex >= this._sliderElementRefs.length) {
+            return fallback;
+        }
+        const colorValueString = this._sliderElementRefs[sliderIndex].current.dataset["colorValue"];
+        const colorValue = Color.parse(colorValueString);
+        return colorValue ? colorValue : fallback;
+    }
+    /**
+     * Get the slider's value in a mapped range of 0.0 ... 1.0.
+     *
+     * @param sliderIndex
+     * @returns
+     */
+    __getSliderPercentage(sliderIndex) {
+        const sliderValue = this.__getSliderValue(sliderIndex, 0.0);
+        const percentage = (this.sliderMin + sliderValue) / (this.sliderMax - this.sliderMin);
+        return percentage;
+    }
+    /**
+     * Init the container contents.
+     *
+     * @private
+     */
+    _render() {
+        const _self = this;
+        // console.log("Rendering ...", NoReact);
+        this._sliderElementRefs = [];
+        this.colorIndicatorColorButtonRef = useRef();
+        this.colorIndicatorRemoveButtonRef = useRef();
+        this.colorInputRef = useRef();
+        this.colorInputContainerRef = useRef();
+        this.containerRef = useRef();
+        /**
+         * This helper method is called when the tiny color button below the active slider is clicked. The method
+         * triggers the colorInput dialog to be triggered.
+         *
+         * @param {Event} evt
+         */
+        const handleIndicatorButtonClick = (evt) => {
+            evt.preventDefault(); // Prevent other inputs to react to this event.
+            evt.stopPropagation();
+            // But fake a click on the input element
+            // console.log("Current selected color: " + _self.colorInputRef.current.value);
+            _self.colorInputRef.current.click();
+        };
+        /**
+         * This helper method is called when the remove-color button is clicked. It removes the
+         * currently active color slider – if possible (leftmost and rightmost slider cannot be removed).
+         * @param evt
+         */
+        const handleRemoveColorButtonClick = (evt) => {
+            evt.preventDefault(); // Prevent other inputs to react to this event.
+            evt.stopPropagation();
+            _self.__handleRemoveColor();
+        };
+        return (undefined("div", { id: this.elementID, style: {
+                d: "flex",
+                fd: "column",
+                w: "100%",
+                h: this.css_containerHeight,
+                pos: "relative",
+                mb: this.isMobileMode ? "5em" : "3em"
+            }, ref: this.containerRef, onMouseDown: this.__containerMouseDownHandler(), onClick: this.__containerClickHandler() },
+            this.colorGradient.values.map((colorGradientItem, index) => {
+                const initialValue = _self.__relativeToAbsolute(colorGradientItem.ratio);
+                return this.__createColorRangeInput(index, this.sliderMin, this.sliderMax, initialValue, colorGradientItem.color);
+            }),
+            undefined("div", { style: { w: "100%" } },
+                undefined("input", { id: `color-indicator-input-${this.baseID}`, type: "color", style: { v: "hidden", pos: "absolute", l: 0 }, 
+                    // data-active-slider-index=""
+                    ref: this.colorInputRef, onInput: this.__colorChangeHandler() }),
+                undefined("div", { ref: this.colorInputContainerRef, style: {
+                        pos: "absolute",
+                        b: "0px",
+                        l: "0%",
+                        d: "flex",
+                        fd: "column",
+                        transform: "translate(0%, 100%)"
+                    } },
+                    undefined("button", { id: `color-indicator-button-${this.baseID}`, className: "color-indicator-button", style: {
+                            backgroundColor: "grey",
+                            borderRadius: "50%",
+                            border: "1px solid grey",
+                            w: this.css_indicatorWidth, // "1em",
+                            h: this.css_indicatorHeight, // "1em",
+                            transform: "translate(-50%, 0%)"
+                        }, onClick: handleIndicatorButtonClick, ref: this.colorIndicatorColorButtonRef }),
+                    undefined("button", { id: `color-remove-button-${this.baseID}`, className: "color-remove-button", style: {
+                            borderRadius: "10%",
+                            border: "1px solid grey",
+                            w: this.css_indicatorWidth, // "1em",
+                            h: this.css_indicatorHeight, // "1em",
+                            transform: "translate(-50%, 50%)",
+                            lineHeight: "0.5em",
+                            p: 0
+                        }, onClick: handleRemoveColorButtonClick, ref: this.colorIndicatorRemoveButtonRef },
+                        undefined("span", { style: { fontSize: this.isMobileMode ? "1.0em" : "0.5em" } }, "\uD83D\uDDD1"))))));
+    } // END function render()
+}
+
+/**
+ * A simple class for rendering color gradient dropdowns.
+ *
+ * As native dropdown do not support custom stylings in the way we need, we will implement
+ * our own dropdown class.
+ *
+ * @author  Ikaros Kappler
+ * @date    2025-08-19
+ * @version 1.0.0
+ */
+class ColorGradientSelector {
+    /**
+     * The constructor: creates a new color gradient picker in the given container.
+     * If no container or ID is given then a new unbound `container` will be created (DIV).
+     *
+     * Pass a container ID or nothing – in the latter case the constructor will create
+     * a new DIV element.
+     *
+     * @param {string?} containerID - (optional) If you want to use an existing container (should be a DIV).
+     */
+    constructor(options) {
+        this.isDropdownOpen = false;
+        this.css_buttonWidth = "100px";
+        this.css_buttonHeight = "1.8em";
+        this.css_buttonFontSize = "0.725em";
+        this.css_buttonFontSize_larger = "1.0em";
+        this.colorGradients = [];
+        // TODO: this does not really need to be a pair, does it?
+        this.colorGradientOptionRefs = [];
+        this.selectedGradientIndex = -1;
+        this.installedChangeListeners = [];
+        /**
+         * Adds custom styles (global STYLE tag).
+         *
+         * @private
+         */
+        this.__createCustomStylesElement = () => {
+            // Thanks to Ana Tudor
+            //    https://css-tricks.com/multi-thumb-sliders-particular-two-thumb-case/
+            return (undefined("style", null, `
+
+    #${this.elementID} button {
+      border: 0px solid lightgray;
+      padding: 0.25em;
+      /* background-color: rgba(255,255,255,0.9); */
+    }
+
+    #${this.elementID} .positioning-container button {
+      border-radius: 0;
+    }
+
+    #${this.elementID} .main-button:hover {
+      background-color: rgba(216,216,216,0.9);
+    }
+
+    #${this.elementID} .option-gradient-button:hover, #${this.elementID} .option-delete-button:hover {
+      background-color: rgba(216,216,216,0.9);
+    }
+
+
+    `));
+        };
+        options = options || {};
+        if (options.containerID) {
+            const cont = document.getElementById(options.containerID);
+            if (!cont) {
+                throw "Cannot create ColorGradientPicker. Component ID does not exist.";
+            }
+            this.container = cont;
+        }
+        else {
+            this.container = document.createElement("div");
+        }
+        this.isMobileMode = Boolean(options.isMobileMode);
+        if (this.isMobileMode) {
+            this.css_buttonWidth = "200px";
+            this.css_buttonHeight = "2.5em";
+            this.css_buttonFontSize = "1.25em";
+            this.css_buttonFontSize_larger = "1.45em";
+        }
+        this.baseID = Math.floor(Math.random() * 65535);
+        this.elementID = `color-gradient-selector-${this.baseID}`;
+        this.colorGradients =
+            typeof options.initialGradients === "undefined" ? ColorGradientSelector.DEFAULT_COLOR_GRADIENTS : options.initialGradients;
+        this.selectedGradientIndex = typeof options.selectedGradientIndex === "undefined" ? 0 : options.selectedGradientIndex;
+        document.head.appendChild(this.__createCustomStylesElement());
+        this.container.append(this._render());
+    } // END constructor
+    // TODO: implement this?
+    setGradients(gradients, selectedIndex) {
+        // First empty the container
+        this.__removeAllChildNodes(this.positioningContainerRef.current);
+        this.colorGradients = [];
+        this.colorGradientOptionRefs = [];
+        this.selectedGradientIndex = selectedIndex;
+        // Re-render button array
+        gradients.map((grad) => {
+            this.addGradient(grad);
+        });
+    }
+    addGradient(gradient) {
+        // Render a new button
+        const index = this.colorGradients.length;
+        const refMainContainer = useRef();
+        const refActionButton = useRef();
+        const refDeleteButton = useRef();
+        this.__renderOptionButton(gradient, index, refMainContainer, refActionButton, refDeleteButton);
+        this.colorGradients.push(gradient);
+        this.colorGradientOptionRefs.push({ mainButton: refActionButton, deleteButton: refDeleteButton });
+        // Add to container
+        this.positioningContainerRef.current.appendChild(refMainContainer.current);
+    }
+    // +---------------------------------------------------------------------------------
+    // | A helper function to remove all child nodes.
+    // +-------------------------------
+    __removeAllChildNodes(node) {
+        while (node.lastChild) {
+            node.removeChild(node.lastChild);
+        }
+    }
+    /**
+     * Adds a new color gradient change listener to this ColorGradientPicker.
+     *
+     * @param {ColorGradientChangeListener} listener - The listener to add.
+     * @returns {boolean} True, if the listener was added and did not exist before.
+     */
+    addChangeListener(listener) {
+        for (var i = 0; i < this.installedChangeListeners.length; i++) {
+            if (this.installedChangeListeners[i] === listener) {
+                return false;
+            }
+        }
+        this.installedChangeListeners.push(listener);
+        return true;
+    }
+    /**
+     *
+     * @param {ColorGradientChangeListener} listener The listener to remove.
+     * @returns {boolean} True, if the listener existed and has been removed.
+     */
+    removeChangeListener(listener) {
+        for (var i = 0; i < this.installedChangeListeners.length; i++) {
+            if (this.installedChangeListeners[i] === listener) {
+                this.installedChangeListeners.splice(i, 1);
+                return true;
+            }
+        }
+        return false;
+    }
+    getSelectedColorGradient() {
+        return this.colorGradients[this.selectedGradientIndex];
+    }
+    __fireChangeEvent() {
+        const newColorGradient = this.getSelectedColorGradient();
+        for (var i = 0; i < this.installedChangeListeners.length; i++) {
+            this.installedChangeListeners[i](newColorGradient, this.selectedGradientIndex, this);
+        }
+    }
+    /**
+     * Creates a handler for click events on the main button.
+     *
+     * @returns
+     */
+    __mainButtonClickHandler() {
+        const _self = this;
+        return (_evt) => {
+            // _self.mainButtonContainerRef.current.style.visibility = "hidden";
+            _self.positioningContainerRef.current.style.visibility = _self.isDropdownOpen ? "hidden" : "visible";
+            _self.isDropdownOpen = !_self.isDropdownOpen;
+        };
+    }
+    /**
+     * Creates a handler for click events on one of the option button in the dropdown.
+     *
+     * @returns
+     */
+    __optionButtonClickHandler() {
+        const _self = this;
+        return (evt) => {
+            _self.positioningContainerRef.current.style.visibility = "hidden";
+            _self.isDropdownOpen = false;
+            const targetButton = evt.currentTarget;
+            const clickedIndex_raw = targetButton.dataset["gradientIndex"];
+            const clickedIndex = Number.parseInt(clickedIndex_raw);
+            console.log("clickedIndex", clickedIndex, clickedIndex_raw, targetButton.dataset, targetButton);
+            if (Number.isNaN(clickedIndex)) {
+                // Stop here. This is not what we want.
+                return;
+            }
+            // Find child: and set selected.
+            _self.__setSelectedIndex(clickedIndex);
+            _self.__fireChangeEvent();
+        };
+    }
+    __optionButtonDeleteHandler() {
+        return (evt) => {
+            if (this.colorGradientOptionRefs.length === 1) {
+                // Keep the last record
+                return;
+            }
+            const targetButton = evt.currentTarget;
+            const clickedIndex_raw = targetButton.dataset["gradientIndex"];
+            const clickedIndex = Number.parseInt(clickedIndex_raw);
+            console.log("clickedIndex", clickedIndex, clickedIndex_raw, targetButton.dataset, targetButton);
+            if (Number.isNaN(clickedIndex)) {
+                // Stop here. This is not what we want.
+                return;
+            }
+            // Find child: and remove from DOM
+            console.log("this.colorGradientOptionRefs", this.colorGradientOptionRefs, "clickedIndex", clickedIndex);
+            const refPair = this.colorGradientOptionRefs[clickedIndex];
+            refPair.mainButton.current.parentElement.remove();
+            // Remove from logic
+            // Remove 1 element at the given index
+            this.colorGradients.splice(clickedIndex, 1);
+            this.colorGradientOptionRefs.splice(clickedIndex, 1);
+            // Update all following elements in the list.
+            this.__updateOptionDataSetIndices(clickedIndex);
+            if (this.selectedGradientIndex >= clickedIndex) {
+                // this.selectedGradientIndex--;
+                this.__setSelectedIndex(this.selectedGradientIndex);
+            }
+            console.log("All refs", this.colorGradientOptionRefs);
+        };
+    }
+    /**
+     * Once a slider element was added or removed then the following indices must be updated.
+     *
+     * @param {number} startIndex - The slider index to start updating at.
+     */
+    __updateOptionDataSetIndices(startIndex) {
+        // Update all elements to the right of the new elelemt
+        for (var i = startIndex; i < this.colorGradientOptionRefs.length; i++) {
+            this.colorGradientOptionRefs[i].mainButton.current.dataset["gradientIndex"] = `${i}`;
+            this.colorGradientOptionRefs[i].deleteButton.current.dataset["gradientIndex"] = `${i}`;
+        }
+    }
+    __setSelectedIndex(newSelectedIndex) {
+        for (var i = 0; i < this.colorGradientOptionRefs.length; i++) {
+            const ref = this.colorGradientOptionRefs[i].mainButton;
+            // Find child: and set selected.
+            ref.current.querySelectorAll(".option-gradient-radio-circle")[0].innerHTML = newSelectedIndex === i ? "🞊" : "🞅";
+        }
+        this.selectedGradientIndex = newSelectedIndex;
+        const selectedGradient = this.colorGradients[this.selectedGradientIndex];
+        // Display new gradient in the main button
+        this.__setMainButtonGradient(selectedGradient);
+    }
+    /**
+     * Sets the backround color of the main button (of this dropdown) element.
+     *
+     * @param {ColorGradient} gradient - The gradient color to display. Must not be null.
+     */
+    __setMainButtonGradient(gradient) {
+        const colorDisplay = this.mainButtonContainerRef.current.querySelectorAll(".main-button-gradient-display")[0];
+        colorDisplay.style["background"] = gradient.toColorGradientString();
+    }
+    /**
+     * Renders a new option button for the dropdown menu.
+     *
+     * @param {ColorGradient} gradient
+     * @returns {JsxElement}
+     */
+    __renderOptionButton(gradient, index, refMainContainer, refActionButton, refDelButton) {
+        return (undefined("div", { sx: { d: "flex", flexDirection: "row" }, ref: refMainContainer },
+            undefined("button", { className: "option-gradient-button", onClick: this.__optionButtonClickHandler(), style: {
+                    d: "flex",
+                    w: "100%",
+                    fontSize: this.css_buttonFontSize,
+                    minHeight: this.css_buttonHeight,
+                    maxHeight: this.css_buttonHeight
+                }, ref: refActionButton, "data-gradientIndex": `${index}` },
+                undefined("div", { className: "option-gradient-radio-circle", sx: { w: "2em", flexShrink: 2, alignContent: "center" } }, index === 0 ? "🞊" : "🞅"),
+                undefined("div", { sx: { w: "calc( 100% - 2em )", mr: "1em", background: gradient.toColorGradientString() } }, "\u00A0")),
+            undefined("button", { classname: "option-delete-button", sx: { fontSize: this.css_buttonFontSize, minHeight: this.css_buttonHeight, maxHeight: this.css_buttonHeight }, onClick: this.__optionButtonDeleteHandler(), "data-gradientIndex": `${index}`, ref: refDelButton },
+                undefined("div", { sx: { w: "2em", flexShrink: 2, alignContent: "center" } }, "\uD83D\uDDD1"))));
+    }
+    /**
+     * Creates a new array of option buttons (refs).
+     * @returns
+     */
+    _renderAllOptionButtons() {
+        const _self = this;
+        // First clear all references
+        _self.colorGradientOptionRefs = [];
+        return this.colorGradients.map((colorGradient, index) => {
+            // console.log("num", num, index);
+            const refMainContainer = useRef();
+            const refActionButton = useRef();
+            const refDelButton = useRef();
+            _self.colorGradientOptionRefs.push({ mainButton: refActionButton, deleteButton: refDelButton });
+            return this.__renderOptionButton(colorGradient, index, refMainContainer, refActionButton, refDelButton);
+        });
+    }
+    /**
+     * Init the container contents.
+     *
+     * @private
+     */
+    _render() {
+        const _self = this;
+        // console.log("Rendering ...", NoReact);
+        this.containerRef = useRef();
+        this.mainButtonContainerRef = useRef();
+        this.positioningContainerRef = useRef();
+        const selectedGradient = this.colorGradients[this.selectedGradientIndex];
+        return (undefined("div", { id: this.elementID, className: "color-gradient-selector", style: { minWidth: this.css_buttonWidth, maxWidth: this.css_buttonWidth, pos: "relative" }, ref: this.containerRef },
+            undefined("button", { className: "main-button", ref: this.mainButtonContainerRef, style: {
+                    d: "flex",
+                    minWidth: this.css_buttonWidth,
+                    maxWidth: this.css_buttonWidth,
+                    minHeight: this.css_buttonHeight,
+                    maxHeight: this.css_buttonHeight
+                }, onClick: this.__mainButtonClickHandler() },
+                undefined("div", { className: "main-button-gradient-display", sx: { w: `calc( 100% - ${this.css_buttonFontSize} )`, background: selectedGradient.toColorGradientString() } }, "\u00A0"),
+                undefined("div", { sx: { w: this.css_buttonHeight, flexShrink: 2, fontSize: this.css_buttonFontSize_larger } }, "\u25BE")),
+            undefined("div", { className: "positioning-container", ref: this.positioningContainerRef, style: {
+                    minWidth: this.css_buttonWidth,
+                    maxHeight: "25vh",
+                    overflowY: "auto",
+                    v: "hidden",
+                    d: "flex",
+                    fd: "column",
+                    pos: "absolute",
+                    l: 0,
+                    zIndex: 999
+                } }, _self._renderAllOptionButtons())));
+    } // END function render()
+}
+ColorGradientSelector.DEFAULT_COLOR_GRADIENTS = [
+    ColorGradient.createDefault(),
+    ColorGradient.createFrom(Color.Red, Color.Green),
+    ColorGradient.createFrom(Color.Blue, Color.Gold)
+];
+
+/**
+ * Internal helper function used to get 'float' properties from elements.
+ * Used to determine border withs and paddings that were defined using CSS.
+ */
+const getFProp = (elem, propName) => {
+    return parseFloat(globalThis.getComputedStyle(elem, null).getPropertyValue(propName));
+};
+
+const getAvailableContainerSpace = (element) => {
+    // const _self: PlotBoilerplate = this;
+    const container = element.parentNode; // Element | Document | DocumentFragment;
+    // var canvas : HTMLCanvasElement = _self.canvas;
+    // _self.canvas.style.display = "none";
+    /* var
+    padding : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding') ) || 0,
+    border : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-width') ) || 0,
+    pl : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-left') ) || padding,
+    pr : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-right') ) || padding,
+    pt : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-top') ) || padding,
+    pb : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-bottom') ) || padding,
+    bl : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-left-width') ) || border,
+    br : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-right-width') ) || border,
+    bt : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-top-width') ) || border,
+    bb : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-bottom-width') ) || border;
+    */
+    var padding = getFProp(container, "padding") || 0, border = getFProp(element, "border-width") || 0, pl = getFProp(container, "padding-left") || padding, pr = getFProp(container, "padding-right") || padding, pt = getFProp(container, "padding-top") || padding, pb = getFProp(container, "padding-bottom") || padding, bl = getFProp(element, "border-left-width") || border, br = getFProp(element, "border-right-width") || border, bt = getFProp(element, "border-top-width") || border, bb = getFProp(element, "border-bottom-width") || border;
+    var w = container.clientWidth;
+    var h = container.clientHeight;
+    // _self.canvas.style.display = "block";
+    return { width: w - pl - pr - bl - br, height: h - pt - pb - bt - bb };
+};
+
+/**
+ * @requires lil-gui
+ *
+ * @author   Ikaros Kappler
+ * @date     2021-12-13
+ * @modified 2022-01-10
+ * @modified 2024-06-25 Ported to typescript and moved to utils/dom (was located inside demos before).
+ * @modified 2024-10-02 Added a transition time.
+ * @version  1.1.1
+ */
+/**
+ * @param {GUI} gui - The GUI (compatible with dat.gui and lil-gui).
+ * @param {boolean} guiDoubleSize - True or false.
+ * @param {Record<string,string>} cssProps - The CSS props to use.
+ */
+const applyGuiSize = (gui, guiDoubleSize, cssProps) => {
+    if (cssProps && cssProps.hasOwnProperty("transformOrigin")) {
+        gui.domElement.style["transform-origin"] = cssProps["transformOrigin"];
+    }
+    else {
+        gui.domElement.style["transform-origin"] = "100% 0%";
+    }
+    const transform = cssProps && cssProps.hasOwnProperty("transform") ? cssProps["transform"] + " " : "";
+    // console.log("transform", transform);
+    if (guiDoubleSize) {
+        gui.domElement.style["transform"] = transform + "scale(2.0)";
+    }
+    else {
+        gui.domElement.style["transform"] = transform + "scale(1.0)";
+    }
+};
+const guiSizeToggler = (gui, config, cssProps) => {
+    gui.domElement.style["transition"] = "transform 0.5s";
+    return {
+        update: function () {
+            applyGuiSize(gui, Boolean(config.guiDoubleSize), cssProps);
+        }
+    };
+};
+
+/**
+ * Interfaces and class for automatically handling Bézier curves.
+ *
+ * @requires AlloyFinger
+ * @requires BezierPath
+ * @requires CubicBezierPath
+ * @requires KeyHandler
+ * @requires MouseHandler
+ * @requires PlotBoilerplate
+ * @requires VertEvent
+ * @requires Vertex
+ * @requires XMouseEvent
+ * @requires XYCoords
+ *
+ *
+ * @author   Ikaros Kappler
+ * @date     2020-07-31
+ * @modified 2020-08-03 Ported this class from vanilla JS to Typescript.
+ * @modified 2020-08-12 Added a distance check before handling the click/tap event.
+ * @modified 2021-01-03 Changed property to `autoAdjustPaths` in the HandlerOptions interface (typo).
+ * @modified 2021-01-03 Added following new functions: `addPathVertexDragStartListeners`, `removePathVertexDragStartListeners`, `addPathVertexDragEndListeners` and `removePathVertexDragEndListeners`.
+ * @modified 2021-03-31 Fixed the issue with the new AlloyFinger (Typescript).
+ * @modified 2022-02-03 Changing the element to catch events (eventCatcher instead of canvas).
+ * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
+ * @modified 2025-04-14 Added the `BezierPathInteractionHelper.drawHandleLines` method.
+ * @modified 2025-04-14 Fixing correct event types for touch events in `BezierPathInteractionHelper`.
+ * @modified 2025-04-14 BezierPathInteractionHelper: Changed default value of `HelperOptions.autoAdjustPaths` from `true` to `false`.
+ * @modified 2025-05-05 Added optional params `draw` and `fill` to BezierPathInteractionHelper.drawHandleLines` method.
+ * @modified 2025-05-05 Class `BezierPathInteractionHelper` now implementing `IShapeInteractionHelper`.
+ * @modified 2025-05-07 Tweaking performance of `BezierPathInteractionHelper`: only triggering redraw now when mouse move within given detect range.
+ * @version  1.2.1
+ *
+ * @file BezierPathInteractionHelper
+ * @public
+ **/
+/**
+ * @classdesc A helper for adding vertices to and remove vertices from Bézier paths.
+ * By default the 'delete' key is used to remove vertices or paths.
+ *
+ * For convenience this helper is capable of handling multiple paths which are kept
+ * in an array.
+ *
+ * [Demo](https://www.plotboilerplate.io/repo/demos/23-bezier-point-distance/ "Demo")
+ *
+ * @public
+ **/
+class BezierPathInteractionHelper {
+    /**
+     * Pre: all paths must have been added to the PlotBoilerplate's drawable buffer (use the add(Drawable) function).
+     *
+     * The move callback accepts four params:
+     *   * The point on the closest curve (Vertex)
+     *   * The mouse or touch position (Vertex)
+     *   * The curve position (float t)
+     *   * The curve index on the array (integer)
+     *
+     *
+     * @constructor
+     * @name BezierPathInteractionHelper
+     * @param {PlotBoilerplate} pb
+     * @param {Array<BezierPath>} paths
+     * @param {boolean} options.autoAdjustPaths - If true then inner path points will be auto-adjusted to keep the curve smooth.
+     * @param {boolean} options.allowPathRemoval - If true then full paths can be removed (by removing selected vertices).
+     * @param {number} maxDetectDistance - The max detection distance. No events will be fired if the mouse/touch pointer is outside this range (default is Number.MAX_VALUE).
+     * @param {function(number,Vertex,Vertex,number)} options.onPointerMoved (pathIndex,pathPoint,pointer,t)
+     * @param {function(number,number,BezierPath,BezierPath)} options.onVertexInserted (pathIndex,insertIndex,newPath,oldPath)
+     * @param {function(number,number[],BezierPath,BezierPath)} options.onVerticesDeleted (pathIndex,removedVertexIndices,newPath,oldPath)
+     * @param {function(number,BezierPath)} options.onPathRemoved (pathIndex,oldPath)
+     **/
+    constructor(pb, paths, options) {
+        options = options || {};
+        this.pb = pb;
+        this.paths = [];
+        this.onPointerMoved =
+            typeof options.onPointerMoved === "function"
+                ? options.onPointerMoved
+                : (i, a, b, t) => { };
+        this.onVertexInserted =
+            typeof options.onVertexInserted === "function"
+                ? options.onVertexInserted
+                : (i, j, n, o) => { };
+        this.onVerticesDeleted =
+            typeof options.onVerticesDeleted === "function"
+                ? options.onVerticesDeleted
+                : (i, r, n, o) => { };
+        this.onPathRemoved = typeof options.onPathRemoved === "function" ? options.onPathRemoved : (i, o) => { };
+        this.autoAdjustPaths = typeof options.autoAdjustPaths === "boolean" ? options.autoAdjustPaths : false; // true;
+        this.allowPathRemoval = typeof options.allowPathRemoval === "boolean" ? options.allowPathRemoval : true;
+        this.maxDetectDistance = typeof options.maxDetectDistance === "number" ? options.maxDetectDistance : Number.MAX_VALUE;
+        this.mouseIsOver = false;
+        this.currentPathIndex = -1;
+        this.currentDistance = Number.MAX_VALUE;
+        this.currentT = 0.0;
+        this.currentA = new Vertex$1(0, 0); // Position on the curve
+        this.currentB = new Vertex$1(0, 0); // Mouse/Touch position
+        // Rebuild the array to avoid outside manipulations.
+        for (var i = 0; i < paths.length; i++) {
+            this.addPath(paths[i]);
+        }
+        this._mouseEnterListener = () => {
+            this.mouseIsOver = true;
+        };
+        this._mouseLeaveListener = () => {
+            this.mouseIsOver = false;
+            this._clearMoveEvent();
+        };
+        this._mouseHandler = this._installMouseListener();
+        this._touchHandler = this._installTouchListener();
+        this._keyHandler = this._installKeyListener();
+        // Paths might have changed by auto-adjustment.
+        if (this.autoAdjustPaths) {
+            pb.redraw();
+        }
+    }
+    /**
+     * Manually add a path to this helper.
+     * Note that if `autoAdjustPaths==true` then listeners will be installed to the path's vertices to
+     * keep the path smooth at all times.
+     *
+     * @method addPath
+     * @instance
+     * @memberof BezierPathInteractionHelper
+     * @param {BezierPath} path - The path to add.
+     * @return {boolean} Duplicate path instances cannot be added; function will return false if path already exists.
+     **/
+    addPath(path) {
+        const pathIndex = this._locatePath(path);
+        if (pathIndex != -1)
+            return false;
+        this.paths.push(path);
+        if (this.autoAdjustPaths)
+            BezierPathInteractionHelper.setPathAutoAdjust(path);
+        return true;
+    }
+    /**
+     * Manually remove a path from this helper.
+     * Note that this method ignores the `allowPathRemoval` option.
+     *
+     * @method removePath
+     * @instance
+     * @memberof BezierPathInteractionHelper
+     * @param {BezierPath} path - The path to remove.
+     * @return {boolean} Returns false if the path could not be found.
+     **/
+    removePath(path) {
+        const pathIndex = this._locatePath(path);
+        if (pathIndex == -1)
+            return false;
+        this.removePathAt(pathIndex);
+        return true;
+    }
+    /**
+     * Remove the path at the given index.
+     *
+     * @method removePathAt
+     * @instance
+     * @memberof BezierPathInteractionHelper
+     * @param {number} pathIndex - The index of the path (must be inside bounds, see `this.paths` array).
+     * @return {void}
+     **/
+    removePathAt(pathIndex) {
+        const path = this.paths[pathIndex];
+        this.paths = this.paths.filter((value, index) => index != pathIndex);
+        this._removeDefaultPathListeners(path);
+        this.pb.remove(path, false, true); // Remove with vertices
+        this.onPathRemoved(pathIndex, path);
+    }
+    /**
+     * Update the inner status by running the distance calculation again with the current settings.
+     *
+     * Call this if any of the properties changed (like maxDetecDistance).
+     *
+     * @method update
+     * @instance
+     * @memberof BezierPathInteractionHelper
+     * @return {void}
+     **/
+    update() {
+        // Just re-run the calculation with the recent mouse/touch position
+        this._handleMoveEvent(this.currentB.x, this.currentB.y);
+    }
+    /**
+     * Draw grey handle lines.
+     *
+     * @param {DrawLib<any>} draw - (optional) The draw library to use. If not provided then `pb.draw` will be used.
+     * @param {DrawLib<any>} fill - (optional) The fill library to use. If not provided then `pb.fill` will be used.
+     */
+    drawHandleLines(draw, fill) {
+        draw = draw || this.pb.draw;
+        fill = fill || this.pb.fill;
+        this.paths.forEach((path) => {
+            path.bezierCurves.forEach((curve) => {
+                this.pb.draw.line(curve.startPoint, curve.startControlPoint, "rgba(64,192,128,0.333)", 1.0, {
+                    dashOffset: 0.0,
+                    dashArray: [4, 2]
+                });
+                this.pb.draw.line(curve.endPoint, curve.endControlPoint, "rgba(64,192,128,0.333)", 1.0, {
+                    dashOffset: 0.0,
+                    dashArray: [4, 2]
+                });
+            });
+        });
+    }
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used any more.
+     *
+     * @method destroy
+     * @instance
+     * @memberof BezierPathInteractionHelper
+     * @return {void}
+     **/
+    destroy() {
+        for (var i = 0; i < this.paths.length; i++) {
+            this._removeDefaultPathListeners(this.paths[i]);
+            // removePathVertexDragStartListeners(this.paths[i], listener);
+        }
+        this.paths = [];
+        this.pb.eventCatcher.removeEventListener("mouseenter", this._mouseEnterListener);
+        this.pb.eventCatcher.removeEventListener("mouseleave", this._mouseLeaveListener);
+        this._mouseHandler.destroy();
+        this._keyHandler.destroy();
+    }
+    // +---------------------------------------------------------------------------------
+    // | A helper function to locate a given path instance inside the array.
+    // |
+    // | @return The index of the path or -1 if not found.
+    // +-------------------------------
+    _locatePath(path) {
+        for (var i = 0; i < this.paths.length; i++) {
+            if (this.paths[i] == path)
+                return i;
+        }
+        return -1;
+    }
+    // +---------------------------------------------------------------------------------
+    // | Handle deletion of any selecte vertex and/or paths.
+    // | Note that this function will trigger a `redraw`.
+    // +-------------------------------
+    _handleDelete() {
+        const pathDeleteIndices = this._handleSingleVertexDelete();
+        // Remove enqueued paths
+        if (this.allowPathRemoval) {
+            // Remove paths starting with the last (!) index.
+            for (var i = pathDeleteIndices.length - 1; i >= 0; i--) {
+                this.removePathAt(pathDeleteIndices[i]);
+            }
+        }
+        this.pb.redraw();
+    }
+    // +---------------------------------------------------------------------------------
+    // | This function removes all selected vertices on the paths without deleting
+    // | full paths (at least two path vertices remaining).
+    // |
+    // | Returned (sorted) array contains indices of those paths that should
+    // | be deleted completely.
+    // +-------------------------------
+    _handleSingleVertexDelete() {
+        // Check all path points (on all paths) for deletion.
+        // Note: whole paths are not meant to be removed this way.
+        //       Keep track of their indices (ascending order) for later removal.
+        const pathDeleteIndices = [];
+        for (var p = 0; p < this.paths.length; p++) {
+            const allVerticesSelected = this._handleDeleteOnPath(p);
+            if (allVerticesSelected)
+                pathDeleteIndices.push(p);
+        }
+        return pathDeleteIndices;
+    }
+    // +---------------------------------------------------------------------------------
+    // | This function removes all selected vertices on the given path (index)
+    // | without deleting the full path (at least two path vertices remaining).
+    // |
+    // | Returns true if path should be fully removed, false otherwise.
+    // +-------------------------------
+    _handleDeleteOnPath(pathIndex) {
+        const path = this.paths[pathIndex];
+        const newCurves = [];
+        const deletedVertIndices = [];
+        // Find first non-selected path point
+        let curveIndex = 0;
+        while (curveIndex < path.bezierCurves.length && path.bezierCurves[curveIndex].startPoint.attr.isSelected) {
+            deletedVertIndices.push(curveIndex), curveIndex++;
+        }
+        // All points selected? Enqueue for deletion.
+        if (curveIndex == path.bezierCurves.length) {
+            // Indicate: path removal required.
+            return true;
+        }
+        // Only keep those curves that have no selected path point (=delete selected)
+        let curStart = path.bezierCurves[curveIndex].startPoint;
+        let curStartControl = path.bezierCurves[curveIndex].startControlPoint;
+        for (var i = curveIndex; i < path.bezierCurves.length; i++) {
+            if (!path.bezierCurves[i].endPoint.attr.isSelected) {
+                newCurves.push([
+                    curStart.clone(),
+                    path.bezierCurves[i].endPoint.clone(),
+                    curStartControl.clone(),
+                    path.bezierCurves[i].endControlPoint.clone()
+                ]);
+                if (i + 1 < path.bezierCurves.length) {
+                    curStart = path.bezierCurves[i].endPoint;
+                    curStartControl = path.bezierCurves[i + 1].startControlPoint;
+                }
+            }
+            else {
+                // TODO: remove drag listener from removed vertex!
+                deletedVertIndices.push(i);
+            }
+        }
+        // Do not remove the whole path.
+        // Do not replace the path if no vertices were deleted.
+        if (newCurves.length != 0 && newCurves.length != path.bezierCurves.length) {
+            const newPath = BezierPath.fromArray(newCurves);
+            const oldPath = this.paths[pathIndex];
+            this._replacePathAt(pathIndex, newPath);
+            this.onVerticesDeleted(pathIndex, deletedVertIndices, newPath, oldPath);
+            // Indicate: no path removal required
+            return false;
+        }
+        else {
+            // Indicate full path removal if no curve would be left.
+            return newCurves.length == 0;
+        }
+    }
+    // +---------------------------------------------------------------------------------
+    // | This function replaces a path at the given index with a new one (after change
+    // | of vertex count).
+    // +-------------------------------
+    _replacePathAt(pathIndex, newPath) {
+        const oldPath = this.paths[pathIndex];
+        this.pb.remove(oldPath, false, true); // Remove with vertices
+        oldPath.destroy();
+        this._removeDefaultPathListeners(oldPath);
+        BezierPathInteractionHelper.setPathAutoAdjust(newPath);
+        this.paths[pathIndex] = newPath;
+        this.pb.add(newPath);
+    }
+    // +---------------------------------------------------------------------------------
+    // | Touch and mouse events should call this fuction when the pointer was moved.
+    // +-------------------------------
+    _handleMoveEvent(posX, posY) {
+        const oldA = this.currentA.clone();
+        const oldB = this.currentB.clone();
+        const oldDistance = this.currentDistance;
+        const point = this.pb.transformMousePosition(posX, posY);
+        this.currentB.set(point);
+        this._updateMinDistance();
+        // Always fire even if nothing visually changed?
+        if (this.currentDistance <= this.maxDetectDistance && this.mouseIsOver && this.pb.getDraggedElementCount() == 0) {
+            this.onPointerMoved(this.currentPathIndex, this.currentA, this.currentB, this.currentT);
+        }
+        else {
+            this.onPointerMoved(-1, null, null, 0.0);
+        }
+        // Only redraw when moving inside the detection distance
+        if ((this.currentDistance <= this.maxDetectDistance ||
+            (this.currentDistance > this.maxDetectDistance && oldDistance <= this.maxDetectDistance)) &&
+            (!oldA.equals(this.currentA) || !oldB.equals(this.currentB))) {
+            this.pb.redraw();
+        }
+    }
+    // +---------------------------------------------------------------------------------
+    // | This is called when the mouse pointer leaves the canvas or
+    // | when the touch progress ends.
+    // +-------------------------------
+    _clearMoveEvent() {
+        this.onPointerMoved(-1, null, null, 0.0);
+        this.pb.redraw();
+    }
+    // +---------------------------------------------------------------------------------
+    // | Called once upon initialization.
+    // +-------------------------------
+    _installTouchListener() {
+        var _self = this;
+        const afProps = {
+            touchStart: function (_event) {
+                _self.mouseIsOver = true;
+            },
+            touchMove: function (event) {
+                if (_self.pb.getDraggedElementCount() == 0 && event.touches.length > 0) {
+                    _self._handleMoveEvent(event.touches[0].clientX, event.touches[0].clientY);
+                }
+            },
+            touchEnd: function (_event) {
+                _self.mouseIsOver = false;
+                _self._clearMoveEvent();
+            }
+        };
+        if (window["createAlloyFinger"]) {
+            return window["createAlloyFinger"](this.pb.eventCatcher ? this.pb.eventCatcher : this.pb.eventCatcher, afProps);
+        }
+        else {
+            return new AlloyFinger(this.pb.eventCatcher ? this.pb.eventCatcher : this.pb.eventCatcher, afProps);
+        }
+    }
+    // +---------------------------------------------------------------------------------
+    // | Called once upon initialization.
+    // +-------------------------------
+    _installMouseListener() {
+        var _self = this;
+        var mouseHandler = new MouseHandler(this.pb.eventCatcher)
+            .up(function (e) {
+            if (e.params.wasDragged)
+                return;
+            if (_self._keyHandler.isDown("shift"))
+                return;
+            if (_self.currentDistance > _self.maxDetectDistance || !_self.mouseIsOver)
+                return;
+            const path = _self.paths[_self.currentPathIndex];
+            const vertex = _self.pb.getVertexNear(e.params.pos, PlotBoilerplate.DEFAULT_CLICK_TOLERANCE);
+            if (vertex)
+                return;
+            // Check if there is already a path point at the given split position
+            const pathPoint = path.getPointAt(_self.currentT);
+            const pointNear = _self.pb.getVertexNear(_self.pb.revertMousePosition(pathPoint.x, pathPoint.y), 6.0);
+            if (pointNear) {
+                for (var i = 0; i < path.bezierCurves.length; i++) {
+                    if (path.bezierCurves[i].startPoint.distance(pointNear) <= 6.0 ||
+                        path.bezierCurves[i].endPoint.distance(pointNear) <= 6.0) {
+                        // console.log("There is already a path point near this position.");
+                        return;
+                    }
+                }
+            }
+            //console.log('Inserting vertex at', _self.currentT );
+            const leftPath = path.getSubPathAt(0.0, _self.currentT);
+            const rightPath = path.getSubPathAt(_self.currentT, 1.0);
+            const newCurves = [];
+            for (var i = 0; i < leftPath.bezierCurves.length; i++) {
+                newCurves.push(leftPath.bezierCurves[i]);
+            }
+            for (var i = 0; i < rightPath.bezierCurves.length; i++) {
+                newCurves.push(rightPath.bezierCurves[i]);
+            }
+            const newPath = BezierPath.fromArray(newCurves);
+            const oldPath = _self.paths[_self.currentPathIndex];
+            _self._replacePathAt(_self.currentPathIndex, newPath);
+            _self.onVertexInserted(_self.currentPathIndex, leftPath.bezierCurves.length, newPath, oldPath);
+        })
+            .move(function (e) {
+            _self.mouseIsOver = true;
+            _self._handleMoveEvent(e.params.pos.x, e.params.pos.y);
+        });
+        this.pb.eventCatcher.addEventListener("mouseenter", this._mouseEnterListener);
+        this.pb.eventCatcher.addEventListener("mouseleave", this._mouseLeaveListener);
+        return mouseHandler;
+    }
+    // +---------------------------------------------------------------------------------
+    // | Called once upon initialization.
+    // |
+    // | @return {KeyHandler}
+    // +-------------------------------
+    _installKeyListener() {
+        var _self = this;
+        return new KeyHandler({ trackAll: true }).down("delete", function () {
+            _self._handleDelete();
+        });
+    }
+    // +---------------------------------------------------------------------------------
+    // | Removes vertex listeners from all path points.
+    // |
+    // | @param {BezierPath} path - The path to remove vertex listeners from.
+    // +-------------------------------
+    _removeDefaultPathListeners(path) {
+        BezierPathInteractionHelper.removePathVertexDragListeners(path, this._updateMinDistance);
+    }
+    // +---------------------------------------------------------------------------------
+    // | Update the min distance from point `line.b` to the curve. And redraw.
+    // +-------------------------------
+    _updateMinDistance() {
+        if (this.paths.length == 0) {
+            return;
+        }
+        let pathIndex = -1;
+        let minDist = Number.MAX_VALUE;
+        let closestPoint = null;
+        let closestT = 0.0;
+        for (var i = 0; i < this.paths.length; i++) {
+            let path = this.paths[i];
+            let t = path.getClosestT(this.currentB);
+            let point = path.getPointAt(t);
+            let dist = point.distance(this.currentB);
+            if (dist < minDist) {
+                pathIndex = i;
+                minDist = dist;
+                closestT = t;
+                closestPoint = point;
+            }
+        }
+        this.currentT = closestT;
+        this.currentPathIndex = pathIndex;
+        this.currentDistance = minDist;
+        closestPoint && this.currentA.set(closestPoint);
+    }
+    // +---------------------------------------------------------------------------------
+    // | Sets all vertices on the given path to `bezierAutoAdjust=true`.
+    // |
+    // | @static
+    // +-------------------------------
+    static setPathAutoAdjust(path) {
+        for (var i = 0; i < path.bezierCurves.length; i++) {
+            const curve = path.bezierCurves[i];
+            path.adjustPredecessorControlPoint(i, true, // obtainHandleLength
+            false // updateArcLength  (we will do this after the loop)
+            );
+            if (i > 0 || path.adjustCircular)
+                curve.startPoint.attr.bezierAutoAdjust = true;
+        }
+        path.updateArcLengths();
+    }
+    /**
+     * A helper function to add drag-start listeners to all vertices of the given path.
+     *
+     * @static
+     * @method addPathVertexDragStartListeners
+     * @memberof BezierPathInteractionHelper
+     * @param {BezierPath} path - The Bézier path to add vertex listeners to.
+     * @param {function} vertexDragStartListener - The drag listeners to add to each path vertex.
+     * @return void
+     **/
+    static addPathVertexDragStartListeners(path, vertexDragStartListener) {
+        for (var i = 0; i < path.bezierCurves.length; i++) {
+            const curve = path.bezierCurves[i];
+            curve.startPoint.listeners.addDragStartListener(vertexDragStartListener);
+            curve.startControlPoint.listeners.addDragStartListener(vertexDragStartListener);
+            curve.endControlPoint.listeners.addDragStartListener(vertexDragStartListener);
+            if (i + 1 == path.bezierCurves.length && !path.adjustCircular)
+                curve.endPoint.listeners.addDragStartListener(vertexDragStartListener);
+            // if( i+1 == path.bezierCurves.length && !path.adjustCircular )
+            // BezierPathIntractionHelper._addVertsDragListener( [curve.startPoint, curve.startControlPoint, curve.endPoint, curve.endControlPoint ], vertexDragListener );
+        }
+    }
+    /**
+     * A helper function to remove drag-start listeners to all vertices of the given path.
+     *
+     * @static
+     * @method removePathVertexDragStartListeners
+     * @memberof BezierPathInteractionHelper
+     * @param {BezierPath} path - The Bézier path to remove vertex listeners from.
+     * @param {function} vertexDragListener - The drag listeners to remove from each path vertex.
+     * @return void
+     **/
+    static removePathVertexDragStartListeners(path, vertexDragStartListener) {
+        for (var i = 0; i < path.bezierCurves.length; i++) {
+            const curve = path.bezierCurves[i];
+            curve.startPoint.listeners.removeDragStartListener(vertexDragStartListener);
+            curve.startControlPoint.listeners.removeDragStartListener(vertexDragStartListener);
+            curve.endControlPoint.listeners.removeDragStartListener(vertexDragStartListener);
+            if (i + 1 == path.bezierCurves.length && !path.adjustCircular)
+                curve.endPoint.listeners.removeDragStartListener(vertexDragStartListener);
+        }
+    }
+    /**
+     * A helper function to add drag listeners to all vertices of the given path.
+     *
+     * @static
+     * @method addPathVertexDragListeners
+     * @memberof BezierPathInteractionHelper
+     * @param {BezierPath} path - The Bézier path to add vertex listeners to.
+     * @param {function} vertexDragListener - The drag listeners to add to each path vertex.
+     * @return void
+     **/
+    static addPathVertexDragListeners(path, vertexDragListener) {
+        for (var i = 0; i < path.bezierCurves.length; i++) {
+            const curve = path.bezierCurves[i];
+            curve.startPoint.listeners.addDragListener(vertexDragListener);
+            curve.startControlPoint.listeners.addDragListener(vertexDragListener);
+            curve.endControlPoint.listeners.addDragListener(vertexDragListener);
+            if (i + 1 == path.bezierCurves.length && !path.adjustCircular)
+                curve.endPoint.listeners.addDragListener(vertexDragListener);
+            // if( i+1 == path.bezierCurves.length && !path.adjustCircular )
+            // BezierPathIntractionHelper._addVertsDragListener( [curve.startPoint, curve.startControlPoint, curve.endPoint, curve.endControlPoint ], vertexDragListener );
+        }
+    }
+    /**
+     * A helper function to remove drag listeners to all vertices of the given path.
+     *
+     * @static
+     * @method removePathVertexDragListeners
+     * @memberof BezierPathInteractionHelper
+     * @param {BezierPath} path - The Bézier path to remove vertex listeners from.
+     * @param {function} vertexDragListener - The drag listeners to remove from each path vertex.
+     * @return void
+     **/
+    static removePathVertexDragListeners(path, vertexDragListener) {
+        for (var i = 0; i < path.bezierCurves.length; i++) {
+            const curve = path.bezierCurves[i];
+            curve.startPoint.listeners.removeDragListener(vertexDragListener);
+            curve.startControlPoint.listeners.removeDragListener(vertexDragListener);
+            curve.endControlPoint.listeners.removeDragListener(vertexDragListener);
+            if (i + 1 == path.bezierCurves.length && !path.adjustCircular)
+                curve.endPoint.listeners.removeDragListener(vertexDragListener);
+        }
+    }
+    /**
+     * A helper function to add drag-end listeners to all vertices of the given path.
+     *
+     * @static
+     * @method addPathVertexDragEndListeners
+     * @memberof BezierPathInteractionHelper
+     * @param {BezierPath} path - The Bézier path to add vertex listeners to.
+     * @param {function} vertexDragEndListener - The drag listeners to add to each path vertex.
+     * @return void
+     **/
+    static addPathVertexDragEndListeners(path, vertexDragEndListener) {
+        for (var i = 0; i < path.bezierCurves.length; i++) {
+            const curve = path.bezierCurves[i];
+            curve.startPoint.listeners.addDragEndListener(vertexDragEndListener);
+            curve.startControlPoint.listeners.addDragEndListener(vertexDragEndListener);
+            curve.endControlPoint.listeners.addDragEndListener(vertexDragEndListener);
+            if (i + 1 == path.bezierCurves.length && !path.adjustCircular)
+                curve.endPoint.listeners.addDragEndListener(vertexDragEndListener);
+            // if( i+1 == path.bezierCurves.length && !path.adjustCircular )
+            // BezierPathIntractionHelper._addVertsDragListener( [curve.startPoint, curve.startControlPoint, curve.endPoint, curve.endControlPoint ], vertexDragListener );
+        }
+    }
+    /**
+     * A helper function to remove drag-end listeners to all vertices of the given path.
+     *
+     * @static
+     * @method removePathVertexDragEndListeners
+     * @memberof BezierPathInteractionHelper
+     * @param {BezierPath} path - The Bézier path to remove vertex listeners from.
+     * @param {function} vertexDragListener - The drag listeners to remove from each path vertex.
+     * @return void
+     **/
+    static removePathVertexDragEndListeners(path, vertexDragEndListener) {
+        for (var i = 0; i < path.bezierCurves.length; i++) {
+            const curve = path.bezierCurves[i];
+            curve.startPoint.listeners.removeDragEndListener(vertexDragEndListener);
+            curve.startControlPoint.listeners.removeDragEndListener(vertexDragEndListener);
+            curve.endControlPoint.listeners.removeDragEndListener(vertexDragEndListener);
+            if (i + 1 == path.bezierCurves.length && !path.adjustCircular)
+                curve.endPoint.listeners.removeDragEndListener(vertexDragEndListener);
+        }
+    }
+}
+
+/**
+ * Easily handle circles (mouse or touch) with this circle helper.
+ *
+ * The circle has the center point and a second point to determine the radius.
+ *
+ * @author   Ikaros Kappler
+ * @date     2020-09-07
+ * @modified 2020-10-18 Ported to Typescript from vanilla JS.
+ * @modified 2021-01-22 Removed `pb.redraw()` call from update handlers (changed vertices already triggered redraw).
+ * @modified 2024-02-26 Removed the constructor param `pb` (unused).
+ * @modified 2024-02-25 Added `circle` and `radiusPoint` attributes.
+ * @modified 2024-03-10 Fixed some issues in the `destroy` method; listeners were not properly removed.
+ * @modified 2025-05-05 Class `BezierPathInteractionHelper` now implementing `IShapeInteractionHelper`.
+ * @version  1.2.1
+ **/
+/**
+ * @classdesc A helper for handling circles with an additional radius-control-point.
+ */
+class CircleHelper {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name CircleHelper
+     * @param {Circle} circle - The circle to handle.
+     * @param {Vertex} radiusPoint - A point to define the radius (distance from center).
+     * @param {PlotBoilerplate} pb - The PlotBoilerplate which contains the circle and point.
+     **/
+    constructor(circle, radiusPoint) {
+        this.circle = circle;
+        this.radiusPoint = radiusPoint;
+        circle.center.listeners.addDragListener((this.centerHandler = this._handleDragCenter()));
+        radiusPoint.listeners.addDragListener((this.radiusHandler = this._handleDragRadiusPoint()));
+    }
+    //--- BEGIN --- Implement ISHapeInteractionHelper ---
+    /**
+     * Let this shape helper draw it's handle lines. It's up to the helper what they look like.
+     * @param {DrawLib<any>} draw - The draw library to use.
+     * @param {DrawLib<any>} fill - The fill library to use.
+     */
+    drawHandleLines(_draw, _fill) {
+        // NOOP
+    }
+    /**
+     * Destroy this circle helper.
+     * The listeners will be removed from the circle points.
+     *
+     * @method destroy
+     * @instance
+     * @memberof CircleHelper
+     */
+    destroy() {
+        this.circle.center.listeners.removeDragListener(this.centerHandler);
+        this.radiusPoint.listeners.removeDragListener(this.radiusHandler);
+    }
+    //--- END --- Implement ISHapeInteractionHelper ---
+    /**
+     * Creates a new drag handler for the circle's center point.
+     *
+     * @private
+     * @method _handleDragCenter
+     * @instance
+     * @memberof CircleHelper
+     * @returns A new event handler.
+     */
+    _handleDragCenter() {
+        const _self = this;
+        return (evt) => {
+            _self.radiusPoint.add(evt.params.dragAmount);
+        };
+    }
+    /**
+     * Creates a new drag handler for the circle's radius control point.
+     *
+     * @private
+     * @method _handleDragCenter
+     * @instance
+     * @memberof CircleHelper
+     * @returns A new event handler.
+     */
+    _handleDragRadiusPoint() {
+        const _self = this;
+        return (_evt) => {
+            _self.circle.radius = _self.circle.center.distance(_self.radiusPoint);
+        };
+    }
+}
+
+/**
+ * @author   Ikaros Kappler
+ * @modified 2021-01-22
+ * @version  1.0.0
+ */
+/**
+ * @classdesc A helper for handling circles with an additional radius-control-point.
+ */
+class CircleSectorHelper {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name CircleSectorHelper
+     * @param {CircleSector} circleSector - The circle sector to handle.
+     * @param {Vertex} controlPointStart - A point to define the radius and start angle (distance and angle from center).
+     * @param {Vertex} controlPointEnd - A point to define the radius and end angle (distance and angle from center).
+     * @param {PlotBoilerplate} pb - The PlotBoilerplate which contains the circle sector and both points.
+     **/
+    constructor(circleSector, controlPointStart, controlPointEnd, pb) {
+        this.circleSector = circleSector;
+        this.controlPointStart = controlPointStart;
+        this.controlPointEnd = controlPointEnd;
+        this.circleSector.circle.center.listeners.addDragListener((this.centerListener = this._handleDragCenter()));
+        this.controlPointStart.listeners.addDragListener((this.radiusStartListener = this._handleDragStartControlPoint()));
+        this.controlPointEnd.listeners.addDragListener((this.radiusEndListener = this._handleDragEndControlPoint()));
+    }
+    /**
+     * Creates a new drag handler for the circle sector's center point.
+     *
+     * @private
+     * @method handleDragCenter
+     * @instance
+     * @memberof CircleSectorHelper
+     * @returns A new event handler.
+     */
+    _handleDragCenter() {
+        const _self = this;
+        return (e) => {
+            _self.controlPointStart.add(e.params.dragAmount);
+            _self.controlPointEnd.add(e.params.dragAmount);
+        };
+    }
+    /**
+     * Creates a new drag handler for the circle sector's start control point.
+     *
+     * @private
+     * @method _handleDragStartControlPoint
+     * @instance
+     * @memberof CircleSectorHelper
+     * @returns A new event handler.
+     */
+    _handleDragStartControlPoint() {
+        const _self = this;
+        return (e) => {
+            _self.circleSector.circle.radius = _self.circleSector.circle.center.distance(_self.controlPointStart);
+            _self.controlPointEnd.set(_self.circleSector.circle.vertAt(_self.circleSector.endAngle));
+            _self.circleSector.startAngle = _self.circleSector.circle.center.angle(_self.controlPointStart);
+        };
+    }
+    /**
+     * Creates a new drag handler for the circle sector's end control point.
+     *
+     * @private
+     * @method _handleDragEndControlPoint
+     * @instance
+     * @memberof CircleSectorHelper
+     * @returns A new event handler.
+     */
+    _handleDragEndControlPoint() {
+        const _self = this;
+        return (e) => {
+            _self.circleSector.circle.radius = _self.circleSector.circle.center.distance(_self.controlPointEnd);
+            _self.controlPointStart.set(_self.circleSector.circle.vertAt(_self.circleSector.startAngle));
+            _self.circleSector.endAngle = _self.circleSector.circle.center.angle(_self.controlPointEnd);
+        };
+    }
+    //--- BEGIN --- Implement IShapeInteractionHelper ---
+    /**
+     * Draw grey handle lines.
+     *
+     * @param {DrawLib<any>} draw - The draw library instance to use.
+     * @param {DrawLib<any>} fill - The fill library instance to use.
+     */
+    drawHandleLines(draw, fill) {
+        draw.line(this.circleSector.circle.center, this.controlPointStart, "rgba(64,192,128,0.333)", 1.0, {
+            dashOffset: 0.0,
+            dashArray: [4, 2]
+        });
+        draw.line(this.circleSector.circle.center, this.controlPointEnd, "rgba(64,192,128,0.333)", 1.0, {
+            dashOffset: 0.0,
+            dashArray: [4, 2]
+        });
+    }
+    /**
+     * Destroy this circle helper.
+     * The listeners will be removed from the circle sector's points.
+     *
+     * @method destroy
+     * @instance
+     * @memberof CircleSectorHelper
+     */
+    destroy() {
+        this.circleSector.circle.center.listeners.removeDragListener(this.centerListener);
+        this.controlPointStart.listeners.removeDragListener(this.radiusStartListener);
+        this.controlPointEnd.listeners.removeDragListener(this.radiusEndListener);
+    }
+}
+
+/**
+ * Easily handle triangles with this triangle interaction helper: always keep your
+ * triangles equilateral.
+ *
+ * @author   Ikaros Kappler
+ * @date     2025-05-05
+ * @version  1.0.0
+ **/
+/**
+ * @classdesc A helper for handling circles with an additional radius-control-point.
+ */
+class TriangleHelper {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name TriangleHelper
+     * @param {Triangle} triangle - The triangle to handle.
+     * @param {Vertex} radiusPoint - A point to define the radius (distance from center).
+     * @param {PlotBoilerplate} pb - The PlotBoilerplate which contains the circle and point.
+     **/
+    constructor(triangle, setInitiallyEquilateral) {
+        this.triangle = triangle;
+        triangle.a.listeners.addDragListener((this.handlerA = this._handleTrianglePoint(this.triangle.a, this.triangle.b, this.triangle.c)));
+        triangle.b.listeners.addDragListener((this.handlerB = this._handleTrianglePoint(this.triangle.b, this.triangle.c, this.triangle.a)));
+        triangle.c.listeners.addDragListener((this.handlerC = this._handleTrianglePoint(this.triangle.c, this.triangle.a, this.triangle.b)));
+        // Trigger to set equilateral
+        if (setInitiallyEquilateral) {
+            this.handlerC(null); // We know by construction that _here_ the param is optional!
+        }
+    }
+    //--- BEGIN --- Implement ISHapeInteractionHelper ---
+    /**
+     * Let this shape helper draw it's handle lines. It's up to the helper what they look like.
+     * @param {DrawLib<any>} draw - The draw library to use.
+     * @param {DrawLib<any>} fill - The fill library to use.
+     */
+    drawHandleLines(_draw, _fill) {
+        // NOOP
+    }
+    /**
+     * Destroy this circle helper.
+     * The listeners will be removed from the circle points.
+     *
+     * @method destroy
+     * @instance
+     * @memberof TriangleHelper
+     */
+    destroy() {
+        this.triangle.a.listeners.removeDragListener(this.handlerA);
+        this.triangle.b.listeners.removeDragListener(this.handlerB);
+        this.triangle.c.listeners.removeDragListener(this.handlerC);
+    }
+    //--- END --- Implement ISHapeInteractionHelper ---
+    /**
+     * Creates a new drag handler for the circle's radius control point.
+     *
+     * @private
+     * @method _handleDragCenter
+     * @instance
+     * @memberof TriangleHelper
+     * @returns A new event handler.
+     */
+    _handleTrianglePoint(vertex1, vertex2, vertex3) {
+        return (_evt) => {
+            //   _self.circle.radius = _self.circle.center.distance(_self.radiusPoint);
+            // Calculate new side length: set equialateral
+            const vec = new Vector(vertex1, vertex2);
+            const mid = vec.vertAt(0.5);
+            const perp = vec.perp().add(mid).sub(vec.a);
+            perp.setLength((vec.length() * Math.sqrt(3)) / 2); // The height of a equilateral triangle
+            vertex3.set(perp.b);
+        };
+    }
+}
+
+/**
+ * A helper for VEllipses.
+ *
+ * @author   Ikaros Kappler
+ * @date     2025-03-31
+ * @modified 2025-04-02 Adding `VEllipseHelper.drawHandleLines()`.
+ * @modified 2025-04-09 Adding `VEllipseHelper.destroy()`.
+ * @modified 2025-05-05 Fixed a typo in the `VEllipseHelper.destroy` method (was named `detroy`).
+ * @modified 2025-05-05 `VEllipseHelper` is now implementing `IShapeInteractionHelper`.
+ * @version  1.0.1
+ */
+class VEllipseHelper {
+    constructor(ellipse, rotationControlPoint) {
+        this.ellipse = ellipse;
+        this.rotationControlPoint = rotationControlPoint;
+        // const rotationControlLine: Line = new Line(ellipse.center, rotationControlPoint);
+        this._rotationControlLine = new Line(ellipse.center, rotationControlPoint);
+        // +---------------------------------------------------------------------
+        // | Listen for the center to be moved.
+        // +-------------------------------------------
+        // ellipse.center.listeners.addDragListener((event: VertEvent) => {
+        //   rotationControlPoint.add(event.params.dragAmount);
+        // });
+        ellipse.center.listeners.addDragListener((this._centerPointHandler = this._handleDragCenterPoint()));
+        // +---------------------------------------------------------------------
+        // | Listen for rotation changes.
+        // +-------------------------------------------
+        // rotationControlPoint.listeners.addDragListener((_event: VertEvent) => {
+        //   var newRotation = rotationControlLine.angle();
+        //   var rDiff = newRotation - ellipse.rotation;
+        //   ellipse.rotation = newRotation;
+        //   ellipse.axis.rotate(rDiff, ellipse.center);
+        // });
+        rotationControlPoint.listeners.addDragListener((this._rotationPointHandler = this._handleRotationCenterPoint()));
+    }
+    _handleDragCenterPoint() {
+        const _self = this;
+        return (event) => {
+            _self.rotationControlPoint.add(event.params.dragAmount);
+        };
+    }
+    _handleRotationCenterPoint() {
+        const _self = this;
+        return (_event) => {
+            var newRotation = _self._rotationControlLine.angle();
+            var rDiff = newRotation - _self.ellipse.rotation;
+            _self.ellipse.rotation = newRotation;
+            _self.ellipse.axis.rotate(rDiff, _self.ellipse.center);
+        };
+    }
+    /**
+     * Draw grey handle lines.
+     *
+     * @param {DrawLib<any>} draw - The draw library instance to use.
+     * @param {DrawLib<any>} fill - The fill library instance to use.
+     */
+    drawHandleLines(draw, fill) {
+        // Draw rotation handle line
+        draw.line(this.ellipse.center, this.rotationControlPoint, "rgba(192,64,128,0.333)", 1.0, {
+            dashOffset: 0.0,
+            dashArray: [4, 2]
+        });
+        // Draw helper box
+        draw.setCurrentId(`${this.ellipse.uid}_e0`);
+        draw.setCurrentClassName(`${this.ellipse.className}-v-line`);
+        draw.line(this.ellipse.center.clone().add(0, this.ellipse.signedRadiusV()).rotate(this.ellipse.rotation, this.ellipse.center), this.ellipse.axis, "rgba(64,128,192,0.333)", 1.0, {
+            dashOffset: 0.0,
+            dashArray: [4, 2]
+        });
+        draw.setCurrentId(`${this.ellipse.uid}_e1`);
+        draw.setCurrentClassName(`${this.ellipse.className}-h-line`);
+        draw.line(this.ellipse.center.clone().add(this.ellipse.signedRadiusH(), 0).rotate(this.ellipse.rotation, this.ellipse.center), this.ellipse.axis, "rgba(64,128,192,0.333)", 1.0, {
+            dashOffset: 0.0,
+            dashArray: [4, 2]
+        });
+    }
+    destroy() {
+        this.ellipse.center.listeners.removeDragListener(this._centerPointHandler);
+        this.rotationControlPoint.listeners.removeDragListener(this._rotationPointHandler);
+    }
+}
+
+/**
+ * A helper for VEllipseSectors.
+ *
+ * @author   Ikaros Kappler
+ * @date     2021-03-24
+ * @modified 2025-04-02 Adding `VEllipseSectorHelper.drawHandleLines`.
+ * @modified 2025-04-07 Modifying the calculation of `startAngle` and `endAngle` from the rotation control point: wrapping result into [0,TWO_PI).
+ * @modified 2025-04-09 Adding the `VEllipseSectorHelper.destroy` method.
+ * @modified 2025-05-05 `VEllipseSectorHelper` is now implementing `IShapeInteractionHelper`.
+ * @version  1.1.0
+ */
+class VEllipseSectorHelper {
+    constructor(sector, startAngleControlPoint, endAngleControlPoint, rotationControlPoint) {
+        this.sector = sector;
+        this.startAngleControlPoint = startAngleControlPoint;
+        this.endAngleControlPoint = endAngleControlPoint;
+        this.rotationControlPoint = rotationControlPoint;
+        // const rotationControlLine: Line = new Line(sector.ellipse.center, rotationControlPoint);
+        this._rotationControlLine = new Line(sector.ellipse.center, rotationControlPoint);
+        // const startAngleControlLine: Line = new Line(sector.ellipse.center, startAngleControlPoint);
+        this._startAngleControlLine = new Line(sector.ellipse.center, startAngleControlPoint);
+        // const endAngleControlLine: Line = new Line(sector.ellipse.center, endAngleControlPoint);
+        this._endAngleControlLine = new Line(sector.ellipse.center, endAngleControlPoint);
+        // +---------------------------------------------------------------------
+        // | Listen for the center to be moved.
+        // +-------------------------------------------
+        sector.ellipse.center.listeners.addDragListener((this._centerHandler = this._handleDragCenterPoint()));
+        // +---------------------------------------------------------------------
+        // | Listen for rotation changes.
+        // +-------------------------------------------
+        rotationControlPoint.listeners.addDragListener((this._rotationHandler = this._handleDragRotationControlPoint()));
+        // +---------------------------------------------------------------------
+        // | Listen for start angle changes.
+        // +-------------------------------------------
+        startAngleControlPoint.listeners.addDragListener((this._startAngleHandler = this._handleDragStartAngleControlPoint()));
+        // +---------------------------------------------------------------------
+        // | Listen for end angle changes.
+        // +-------------------------------------------
+        endAngleControlPoint.listeners.addDragListener((this._endAngleHandler = this._handleDragEndAngleControlPoint()));
+    }
+    /**
+     * Creates a new drag handler for the circle sector's start control point.
+     *
+     * @private
+     * @method _handleDragStartControlPoint
+     * @instance
+     * @memberof CircleSectorHelper
+     * @returns A new event handler.
+     */
+    _handleDragCenterPoint() {
+        const _self = this;
+        return (event) => {
+            _self.startAngleControlPoint.add(event.params.dragAmount);
+            _self.endAngleControlPoint.add(event.params.dragAmount);
+            _self.rotationControlPoint.add(event.params.dragAmount);
+        };
+    }
+    _handleDragRotationControlPoint() {
+        const _self = this;
+        return (event) => {
+            const newRotation = _self._rotationControlLine.angle();
+            const rDiff = newRotation - _self.sector.ellipse.rotation;
+            _self.sector.ellipse.rotation = newRotation;
+            _self.sector.ellipse.axis.rotate(rDiff, _self.sector.ellipse.center);
+            _self.startAngleControlPoint.rotate(rDiff, _self.sector.ellipse.center);
+            _self.endAngleControlPoint.rotate(rDiff, _self.sector.ellipse.center);
+        };
+    }
+    _handleDragStartAngleControlPoint() {
+        const _self = this;
+        return (_event) => {
+            // sector.startAngle = startAngleControlLine.angle() - sector.ellipse.rotation;
+            _self.sector.startAngle = geomutils.mapAngleTo2PI(_self._startAngleControlLine.angle() - _self.sector.ellipse.rotation);
+        };
+    }
+    _handleDragEndAngleControlPoint() {
+        const _self = this;
+        return (event) => {
+            _self.sector.endAngle = geomutils.mapAngleTo2PI(_self._endAngleControlLine.angle() - _self.sector.ellipse.rotation);
+        };
+    }
+    /**
+     * Draw grey handle lines.
+     *
+     * @param {DrawLib<any>} draw - The draw library instance to use.
+     * @param {DrawLib<any>} fill - The fill library instance to use.
+     */
+    drawHandleLines(draw, fill) {
+        draw.line(this.sector.ellipse.center, this.startAngleControlPoint, "rgba(64,192,128,0.333)", 1.0, {
+            dashOffset: 0.0,
+            dashArray: [4, 2]
+        });
+        draw.line(this.sector.ellipse.center, this.endAngleControlPoint, "rgba(64,192,128,0.333)", 1.0, {
+            dashOffset: 0.0,
+            dashArray: [4, 2]
+        });
+        // Draw rotation handle line
+        draw.line(this.sector.ellipse.center, this.rotationControlPoint, "rgba(192,64,128,0.333)", 1.0, {
+            dashOffset: 0.0,
+            dashArray: [4, 2]
+        });
+        // Draw helper box
+        draw.line(this.sector.ellipse.center
+            .clone()
+            .add(0, this.sector.ellipse.signedRadiusV())
+            .rotate(this.sector.ellipse.rotation, this.sector.ellipse.center), this.sector.ellipse.axis, "rgba(64,128,192,0.333)", 1.0, {
+            dashOffset: 0.0,
+            dashArray: [4, 2]
+        });
+        draw.line(this.sector.ellipse.center
+            .clone()
+            .add(this.sector.ellipse.signedRadiusH(), 0)
+            .rotate(this.sector.ellipse.rotation, this.sector.ellipse.center), this.sector.ellipse.axis, "rgba(64,128,192,0.333)", 1.0, {
+            dashOffset: 0.0,
+            dashArray: [4, 2]
+        });
+    } // END drawHandleLines
+    /**
+     * Destroy this VEllipseHandler which means: all listeners are being removed.
+     */
+    destroy() {
+        this.sector.ellipse.center.listeners.removeDragListener(this._centerHandler);
+        this.rotationControlPoint.listeners.removeDragListener(this._rotationHandler);
+        this.startAngleControlPoint.listeners.removeDragListener(this._startAngleHandler);
+        this.endAngleControlPoint.listeners.removeDragListener(this._endAngleHandler);
+    }
+}
+
+/**
+ * A basic IO handler for file drop (Drag-and-drop).
+ *
+ * Example use:
+ * ```javascript
+ *  var body = document.getElememtByTagName("body")[0];
+ *  var fileDrop = new FileDrop(body);
+ *    fileDrop.onFileJSONDropped(function (jsonObject) {
+ *    console.log("jsonObject", jsonObject);
+ *  });
+ * ```
+ *
+ * @author   Ikaros Kappler
+ * @date     2021-10-13
+ * @modified 2022-01-31 (ported from the ngdg project, then generalized)
+ * @modified 2023-01-03 Fixing some minor type issues and adding SVG reading capabilities.
+ * @version  2.1.0
+ */
+class FileDrop {
+    /**
+     *
+     * @param {HTMLElement} element - The element you wish to operate as the drop zone (like <body/>).
+     */
+    constructor(element) {
+        /**
+         * Internally handle a drop event.
+         *
+         * @param {DragEvent} event
+         * @returns {void}
+         */
+        this.handleDropEvent = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            this.element.style.opacity = "1.0";
+            if (!event.dataTransfer || !event.dataTransfer.files || event.dataTransfer.files.length === 0) {
+                // No files were dropped
+                return;
+            }
+            if (event.dataTransfer.files.length > 1) {
+                // Multiple file drop is not nupported
+                return;
+            }
+            // if (!this.fileDroppedCallbackJSON) {
+            //   // No handling callback defined.
+            //   return;
+            // }
+            if (event.dataTransfer.files[0]) {
+                const file = event.dataTransfer.files[0];
+                // console.log("file", file);
+                if (file.type.match(/json.*/) && this.fileDroppedCallbackJSON !== null) {
+                    var reader = new FileReader();
+                    reader.onload = (readEvent) => {
+                        if (!readEvent.target) {
+                            console.warn("Cannot process JSON ProgressEvent data: target is null.");
+                            return;
+                        }
+                        // Finished reading file data.
+                        const jsonObject = JSON.parse(readEvent.target.result);
+                        // TODO: what happens on fail?
+                        this.fileDroppedCallbackJSON && this.fileDroppedCallbackJSON(jsonObject);
+                    };
+                    reader.readAsText(file); // start reading the file data.
+                }
+                else if (file.type.match(/text\/plain.*/) && this.fileDroppedCallbackText) {
+                    var reader = new FileReader();
+                    reader.onload = (readEvent) => {
+                        if (!readEvent.target) {
+                            console.warn("Cannot process Text ProgressEvent data: target is null.");
+                            return;
+                        }
+                        // Finished reading file data.
+                        this.fileDroppedCallbackText && this.fileDroppedCallbackText(readEvent.target.result);
+                    };
+                    reader.readAsText(file); // start reading the file data.
+                }
+                else if (this.fileDroppedCallbackBinary) {
+                    var reader = new FileReader();
+                    reader.onload = (readEvent) => {
+                        if (!readEvent.target) {
+                            console.warn("Cannot process Binary ProgressEvent data: target is null.");
+                            return;
+                        }
+                        // Finished reading file data.
+                        this.fileDroppedCallbackBinary &&
+                            this.fileDroppedCallbackBinary(new Blob([readEvent.target.result]), file);
+                    };
+                    reader.readAsBinaryString(file); // start reading the file data.
+                }
+                else if (this.fileDroppedCallbackSVG) {
+                    var reader = new FileReader();
+                    reader.onload = (readEvent) => {
+                        if (!readEvent.target) {
+                            console.warn("Cannot process SVG ProgressEvent data: target is null.");
+                            return;
+                        }
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(readEvent.target.result, "image/svg+xml");
+                        // Finished reading file data.
+                        this.fileDroppedCallbackSVG && this.fileDroppedCallbackSVG(doc);
+                    };
+                    reader.readAsText(file); // start reading the file data.
+                }
+            }
+        };
+        /**
+         * Toggles the drop sensitive element's opacity to 0.5.
+         *
+         * @param {DragEvent} event - The event.
+         */
+        this.handleDragOverEvent = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            this.element.style.opacity = "0.5";
+        };
+        /**
+         * Restored the drop sensitive element's opacity back to 1.0.
+         *
+         * @param {DragEvent} event - The event.
+         */
+        this.handleDragLeaveEvent = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            this.element.style.opacity = "1.0";
+        };
+        this.element = element;
+        // Init the drop listeners
+        element.addEventListener("drop", this.handleDropEvent.bind(this));
+        element.addEventListener("dragover", this.handleDragOverEvent.bind(this));
+        element.addEventListener("dragleave", this.handleDragLeaveEvent.bind(this));
+    }
+    /**
+     * Install the JSON (MIME type json*) file drop callback. Note than only one callback can be installed
+     * in this implementation. Calling this method multiple times will overwrite previously
+     * installed listeners.
+     *
+     * The callback will receive the dropped file content as an object (parsed JSON).
+     *
+     * @param {(data:object)=>void} callback
+     */
+    onFileJSONDropped(callback) {
+        this.fileDroppedCallbackJSON = callback;
+    }
+    /**
+     * Install the text file (MIME type text/plain) drop callback. Note than only one callback can be installed
+     * in this implementation. Calling this method multiple times will overwrite previously
+     * installed listeners.
+     *
+     * The callback will receive the dropped file content as a string.
+     *
+     * @param {(data:object)=>void} callback
+     */
+    onFileTextDropped(callback) {
+        this.fileDroppedCallbackText = callback;
+    }
+    // TODO: docs
+    onFileSVGDropped(callback) {
+        this.fileDroppedCallbackSVG = callback;
+    }
+    onFileBinaryDropped(callback) {
+        this.fileDroppedCallbackBinary = callback;
+    }
+    /**
+     * Removes all listeners (drop, dragover and dragleave).
+     */
+    destroy() {
+        this.element.removeEventListener("drop", this.handleDropEvent);
+        this.element.removeEventListener("dragover", this.handleDragOverEvent);
+        this.element.removeEventListener("dragleave", this.handleDragLeaveEvent);
+    }
+}
+
+/**
+ * Split SVG path data `d` strings.
+ *
+ * As this helper function does not detect all possible path data strings it should cover the most daily use-cases.
+ *
+ * For more insight see
+ *    https://www.w3.org/TR/SVG/paths.html
+ *
+ * @author   Ikaros Kappler
+ * @date     2022-11-22
+ * @modified 2022-12-21 Ported to Typescript
+ * @version  0.0.1-alpha
+ */
+/**
+ * @name splitSVGPathData
+ * @static
+ * @param {string} dataString - The SVG path data to split. This should be some string
+ **/
+const splitSVGPathData = (dataString) => {
+    // I used a modified version of this Josh Frank's SVG path data RexEx.
+    // Source
+    //    https://javascript.plainenglish.io/june-3-parsing-and-validating-svg-paths-with-regex-7bd0e245115
+    // const validCommand =
+    // /([ml](\s?-?((\d+(\.\d+)?)|(\.\d+)))[,\s]?(-?((\d+(\.\d+)?)|(\.\d+))))|([hv](\s?-?((\d+(\.\d+)?)|(\.\d+))))|(c(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){5})|(q(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){3}(\s?t?(\s?-?((\d+(\.\d+)?)|(\.\d+)))[,\s]?(-?((\d+(\.\d+)?)|(\.\d+))))*)|(a(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){2}[,\s]?[01][,\s]+[01][,\s]+([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){2})|(s(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){3})|z/gi;
+    //
+    // My Version allows multiple param sets, too, like 'm|M (x y)+' or 'q|Q (x1 y1 x y)+'. Look at the plus.
+    const validCommand = /([ml]((\s?-?((\d+(\.\d+)?)|(\.\d+)))[,\s]?(-?((\d+(\.\d+)?)|(\.\d+))))+)|([hv]((\s?-?((\d+(\.\d+)?)|(\.\d+))))+)|(c((\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){5})+)|(q((\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){3})+(\s?(t?(\s?-?((\d+(\.\d+)?)|(\.\d+)))[,\s]?(-?((\d+(\.\d+)?)|(\.\d+))))*)+)|(a((\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){2}[,\s]?[01][,\s]+[01][,\s]+([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){2})+)|(s(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){3})|z/gi;
+    const dataElements = dataString.match(validCommand);
+    if (!dataElements) {
+        return null;
+    }
+    const result = [];
+    var i = 0;
+    while (i < dataElements.length) {
+        const token = dataElements[i];
+        // Ctwheels comment was really useful here
+        //    https://stackoverflow.com/questions/47801455/what-is-the-regex-that-properly-splits-svg-d-attributes-into-tokens
+        const dataRaw = token.match(/-?(?:\d*\.)?\d+|[a-z]/gi);
+        if (dataRaw) {
+            result.push(dataRaw);
+        }
+        i++;
+    }
+    return result;
+}; // END splitSVGPathData
+
+/**
+ * Parse SVG path data strings and convert to PlotBoilerplate path objects.
+ *
+ * As this parser function does not detect all possible path data strings it should cover the most daily use-cases.
+ *
+ * For more insight see
+ *    https://www.w3.org/TR/SVG/paths.html
+ *
+ * @author  Ikaros Kappler
+ * @date    2022-11-06
+ * @modified 2022-12-21 (winter solstice) Porting this to Typescript.
+ * @modified 2023-01-17 Handling multiple parameter sets now.
+ * @version 0.0.2-alpha
+ **/
+const DEG_TO_RAD = Math.PI / 180;
+/**
+ * Transform the given path data (translate and scale. rotating is not intended here).
+ *
+ * @date 2022-11-06
+ *
+ * @name parseSVGPathData
+ * @static
+ * @param {string} data - The data to parse.
+ * @return An array of straight line segments (Line) or curve segments (CubicBezierCurve) representing the path.
+ */
+const parseSVGPathData = (dataString) => {
+    const dataElements = splitSVGPathData(dataString);
+    if (!dataElements) {
+        return null;
+    }
+    // Array<PathSegments>
+    const result = [];
+    var i = 0;
+    const firstPoint = { x: NaN, y: NaN };
+    const lastPoint = { x: NaN, y: NaN };
+    const lastControlPoint = { x: NaN, y: NaN };
+    while (i < dataElements.length) {
+        // Could this also be SVGPathShorthandQuadraticCurveToCommand?
+        const data = dataElements[i];
+        const cmd = data[0];
+        // console.log("cmd", cmd, "data", data);
+        switch (data[0]) {
+            case "M":
+                // MoveTo: M|m x y
+                _handleMove(data, false, firstPoint, lastPoint, lastControlPoint);
+                break;
+            case "m":
+                // MoveTo: M|m x y
+                _handleMove(data, true, firstPoint, lastPoint, lastControlPoint);
+                break;
+            case "L":
+                // LineTo L|l x y
+                _handleLineTo(data, false, firstPoint, lastPoint, lastControlPoint, result);
+                break;
+            case "l":
+                // LineTo L|l x y
+                _handleLineTo(data, true, firstPoint, lastPoint, lastControlPoint, result);
+                break;
+            case "H":
+                // HorizontalLineTo: H|h x
+                _handleHorizontalLineTo(data, false, firstPoint, lastPoint, lastControlPoint, result);
+                break;
+            case "h":
+                // HorizontalLineTo: H|h x
+                _handleHorizontalLineTo(data, true, firstPoint, lastPoint, lastControlPoint, result);
+                break;
+            case "V":
+                // VerticalLineTo: V|v y
+                _handleVerticalLineTo(data, false, firstPoint, lastPoint, lastControlPoint, result);
+                break;
+            case "v":
+                // VerticalLineTo: V|v y
+                _handleVerticalLineTo(data, true, firstPoint, lastPoint, lastControlPoint, result);
+                break;
+            case "C":
+                // CurveTo: C|c x1 y1 x2 y2 x y
+                _handleCubicBezierTo(data, false, firstPoint, lastPoint, lastControlPoint, result);
+                break;
+            case "c":
+                // CurveTo: C|c x1 y1 x2 y2 x y
+                _handleCubicBezierTo(data, true, firstPoint, lastPoint, lastControlPoint, result);
+                break;
+            case "S":
+                _handleShorthandCubicCurveTo(data, false, firstPoint, lastPoint, lastControlPoint, result);
+                break;
+            case "s":
+                _handleShorthandCubicCurveTo(data, true, firstPoint, lastPoint, lastControlPoint, result);
+                break;
+            case "Q":
+                // QuadraticCurveTo: Q|q x1 y1 x y
+                _handleQuadraticCurveTo(data, false, firstPoint, lastPoint, lastControlPoint, result);
+                break;
+            case "q":
+                // QuadraticCurveTo: Q|q x1 y1 x y
+                _handleQuadraticCurveTo(data, true, firstPoint, lastPoint, lastControlPoint, result);
+                break;
+            case "A":
+                // EllipticalArcTo: A|a rx ry x-axis-rotation large-arc-flag sweep-flag x y
+                _handleArcTo(data, false, firstPoint, lastPoint, lastControlPoint, result);
+                break;
+            case "a":
+                // EllipticalArcTo: A|a rx ry x-axis-rotation large-arc-flag sweep-flag x y
+                _handleArcTo(data, true, firstPoint, lastPoint, lastControlPoint, result);
+                break;
+            case "z":
+                _handleClosePath(data, false, firstPoint, lastPoint, lastControlPoint, result);
+                break;
+            case "Z":
+                // ClosePath: Z|z (no arguments)
+                _handleClosePath(data, true, firstPoint, lastPoint, lastControlPoint, result);
+                // i++;
+                break;
+            default:
+                if (cmd === "T") {
+                    throw "T command only allowed after q command.";
+                }
+                if (cmd === "t") {
+                    throw "t command only allowed after q command.";
+                }
+                throw "Unknown SVG path command found: " + cmd + ".";
+        }
+        // Safepoint: continue reading token by token until something is recognized again
+        i++;
+    } // END while
+    return result;
+}; // END parseSVGPathData
+// Just update the current position
+const _handleMove = (data, isRelative, firstPoint, lastPoint, lastControlPoint, _result) => {
+    if (data.length < 3) {
+        throw "Unsufficient params for MOVE";
+    }
+    // result.push( new)
+    if (isRelative && !isNaN(lastPoint.x) && !isNaN(lastPoint.y)) {
+        lastPoint.x += Number(data[1]);
+        lastPoint.y += Number(data[2]);
+        lastControlPoint.x = lastPoint.x;
+        lastControlPoint.y = lastPoint.y;
+    }
+    else {
+        lastPoint.x = Number(data[1]);
+        lastPoint.y = Number(data[2]);
+        lastControlPoint.x = lastPoint.x;
+        lastControlPoint.y = lastPoint.y;
+    }
+    // console.log("AFTER MOVE", lastPoint);
+    if (isNaN(firstPoint.y)) {
+        firstPoint.x = lastPoint.x;
+        firstPoint.y = lastPoint.y;
+    }
+};
+// Draw a line segment from the current position
+const _handleLineTo = (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) => {
+    if (data.length < 3) {
+        throw "Unsufficient params for LINETO";
+    }
+    for (var i = 1; i + 1 < data.length; i += 2) {
+        const line = new Line(new Vertex$1(lastPoint), new Vertex$1(lastPoint));
+        if (isRelative) {
+            line.b.x += Number(data[i]);
+            line.b.y += Number(data[i + 1]);
+        }
+        else {
+            line.b.x = Number(data[i]);
+            line.b.y = Number(data[i + 1]);
+        }
+        result.push(line);
+        lastPoint.x = line.b.x;
+        lastPoint.y = line.b.y;
+        lastControlPoint.x = line.b.x;
+        lastControlPoint.y = line.b.y;
+        if (isNaN(firstPoint.y)) {
+            firstPoint.x = line.a.x;
+            firstPoint.y = line.a.y;
+        }
+        console.log("LINETO LINE", i, line.toString());
+    }
+};
+const _handleHorizontalLineTo = (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) => {
+    //   console.log("Handle HORIZONTALLINETO", data);
+    if (data.length < 2) {
+        throw "Unsufficient params for HORIZONTALLINETO";
+    }
+    for (var i = 1; i < data.length; i++) {
+        const line = new Line(new Vertex$1(lastPoint), new Vertex$1(lastPoint));
+        if (isRelative) {
+            line.b.x += Number(data[i]);
+            // line.b.y += Number(data[2]);
+        }
+        else {
+            line.b.x = Number(data[i]);
+            // line.b.y = Number(data[2]);
+        }
+        result.push(line);
+        lastPoint.x = line.b.x;
+        // lastPoint.y = line.b.y;
+        lastControlPoint.x = line.b.x;
+        if (isNaN(firstPoint.y)) {
+            firstPoint.x = line.a.x;
+            firstPoint.y = line.a.y;
+        }
+    }
+};
+const _handleVerticalLineTo = (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) => {
+    if (data.length < 2) {
+        throw "Unsufficient params for VERTICALLINETO";
+    }
+    for (var i = 1; i < data.length; i++) {
+        const line = new Line(new Vertex$1(lastPoint), new Vertex$1(lastPoint));
+        if (isRelative) {
+            line.b.y += Number(data[i]);
+        }
+        else {
+            line.b.y = Number(data[i]);
+        }
+        result.push(line);
+        // lastPoint.x = line.b.x;
+        lastPoint.y = line.b.y;
+        lastControlPoint.y = line.b.y;
+        if (isNaN(firstPoint.y)) {
+            firstPoint.x = line.a.x;
+            firstPoint.y = line.a.y;
+        }
+    }
+};
+// CurveTo: C|c x1 y1 x2 y2 x y
+const _handleCubicBezierTo = (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) => {
+    //   console.log("Handle CUBICBEZIERTO", data);
+    if (data.length < 7) {
+        throw "Unsufficient params for CUBICBEZIERTO";
+    }
+    for (var i = 1; i + 5 < data.length; i += 6) {
+        const curve = new CubicBezierCurve(new Vertex$1(lastPoint), new Vertex$1(lastPoint), new Vertex$1(lastPoint), new Vertex$1(lastPoint));
+        if (isRelative) {
+            curve.startControlPoint.x += Number(data[i]);
+            curve.startControlPoint.y += Number(data[i + 1]);
+            curve.endControlPoint.x += Number(data[i + 2]);
+            curve.endControlPoint.y += Number(data[i + 3]);
+            curve.endPoint.x += Number(data[i + 4]);
+            curve.endPoint.y += Number(data[i + 5]);
+        }
+        else {
+            curve.startControlPoint.x = Number(data[i]);
+            curve.startControlPoint.y = Number(data[i + 1]);
+            curve.endControlPoint.x = Number(data[i + 2]);
+            curve.endControlPoint.y = Number(data[i + 3]);
+            curve.endPoint.x = Number(data[i + 4]);
+            curve.endPoint.y = Number(data[i + 5]);
+        }
+        result.push(curve);
+        lastPoint.x = curve.endPoint.x;
+        lastPoint.y = curve.endPoint.y;
+        lastControlPoint.x = curve.endControlPoint.x;
+        lastControlPoint.y = curve.endControlPoint.y;
+        if (isNaN(firstPoint.x)) {
+            firstPoint.x = curve.startPoint.x;
+            firstPoint.y = curve.startPoint.y;
+        }
+    }
+};
+// QuadraticCurveTo: Q|q x1 y1 x y
+const _handleQuadraticCurveTo = (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) => {
+    //   console.log("Handle QUADRATICBEZIERTO", data);
+    if (data.length < 5) {
+        throw "Unsufficient params for QUADRATICBEZIERTO";
+    }
+    var i = 1;
+    var localLastQuadraticControlPoint = { x: 0, y: 0 };
+    // This loops runs at least once
+    while (i + 3 < data.length && data[i] !== "t" && data[i] !== "T") {
+        const curve = new CubicBezierCurve(new Vertex$1(lastPoint), new Vertex$1(lastPoint), new Vertex$1(lastPoint), new Vertex$1(lastPoint));
+        if (isRelative) {
+            curve.startControlPoint.x += curve.startPoint.x + (Number(data[i]) - curve.startControlPoint.x); // * 0.666;
+            curve.startControlPoint.y += curve.startPoint.y + (Number(data[i + 1]) - curve.startControlPoint.y); // * 0.666;
+            curve.endPoint.x += Number(data[i + 2]);
+            curve.endPoint.y += Number(data[i + 3]);
+            curve.endControlPoint.x = curve.startControlPoint.x;
+            curve.endControlPoint.y = curve.startControlPoint.y;
+        }
+        else {
+            curve.startControlPoint.x = curve.startPoint.x + (Number(data[i]) - curve.startControlPoint.x); // * 0.666;
+            curve.startControlPoint.y = curve.startPoint.y + (Number(data[i + 1]) - curve.startControlPoint.y); // * 0.666;
+            curve.endPoint.x = Number(data[i + 2]);
+            curve.endPoint.y = Number(data[i + 3]);
+            curve.endControlPoint.x = curve.startControlPoint.x;
+            curve.endControlPoint.y = curve.startControlPoint.y;
+        }
+        // var lastQuadraticControlPoint = { x: Number(data[1]), y: Number(data[2]) };
+        localLastQuadraticControlPoint = { x: curve.endControlPoint.x, y: curve.endControlPoint.y };
+        // Convert quadratic curve to cubic curve
+        curve.startControlPoint.x = curve.startPoint.x + (curve.startControlPoint.x - curve.startPoint.x) * 0.666;
+        curve.startControlPoint.y = curve.startPoint.y + (curve.startControlPoint.y - curve.startPoint.y) * 0.666;
+        curve.endControlPoint.x = curve.endPoint.x + (curve.endControlPoint.x - curve.endPoint.x) * 0.666;
+        curve.endControlPoint.y = curve.endPoint.y + (curve.endControlPoint.y - curve.endPoint.y) * 0.666;
+        result.push(curve);
+        lastPoint.x = curve.endPoint.x;
+        lastPoint.y = curve.endPoint.y;
+        lastControlPoint.x = curve.endControlPoint.x;
+        lastControlPoint.y = curve.endControlPoint.y;
+        if (isNaN(firstPoint.x)) {
+            firstPoint.x = curve.startPoint.x;
+            firstPoint.y = curve.startPoint.y;
+        }
+        i += 4;
+    } // END while
+    // 'T' or 't' command may follow
+    // if (data.length >= 8) {
+    if (i < data.length && (data[i] == "t" || data[i] === "T")) {
+        // TODO: think about this type cast!
+        const subData = data.slice(5);
+        // var lastQuadraticControlPoint = { x: Number(data[1]), y: Number(data[2]) };
+        if (subData[0] === "T") {
+            // _handleShorthandQuadraticCurveTo(subData, false, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
+            _handleShorthandQuadraticCurveTo(subData, false, firstPoint, lastPoint, lastControlPoint, localLastQuadraticControlPoint, result);
+        }
+        else if (subData[0] === "t") {
+            // _handleShorthandQuadraticCurveTo(subData, true, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
+            _handleShorthandQuadraticCurveTo(subData, true, firstPoint, lastPoint, lastControlPoint, localLastQuadraticControlPoint, result);
+        }
+    }
+};
+// This is a helper function and works only in combination with Quadratic Bézier Curves
+// T|t (x y)+
+const _handleShorthandQuadraticCurveTo = (data, isRelative, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result) => {
+    if (data.length < 3) {
+        throw "Unsufficient params for SHORTHANDQUADRATICCURVETO";
+    }
+    var i = 1;
+    while (i + 1 < data.length) {
+        // Respect multiple 'T|t' commands here
+        if (data[i] === "T" || data[i] === "t") {
+            i++;
+            continue;
+        }
+        const curve = new CubicBezierCurve(new Vertex$1(lastPoint), new Vertex$1(lastPoint), new Vertex$1(lastPoint), new Vertex$1(lastPoint));
+        if (isRelative) {
+            curve.endPoint.x += Number(data[i]);
+            curve.endPoint.y += Number(data[i + 1]);
+            curve.startControlPoint.x += curve.startPoint.x - (lastQuadraticControlPoint.x - lastPoint.x);
+            curve.startControlPoint.y += curve.startPoint.y - (lastQuadraticControlPoint.y - lastPoint.y);
+        }
+        else {
+            curve.endPoint.x = Number(data[i]);
+            curve.endPoint.y = Number(data[i + 1]);
+            curve.startControlPoint.x = curve.startPoint.x - (lastQuadraticControlPoint.x - lastPoint.x);
+            curve.startControlPoint.y = curve.startPoint.y - (lastQuadraticControlPoint.y - lastPoint.y);
+        }
+        // First handle as symmetrical cubic curve
+        curve.endControlPoint.x = curve.startControlPoint.x;
+        curve.endControlPoint.y = curve.startControlPoint.y;
+        lastQuadraticControlPoint.y = curve.endControlPoint.y;
+        lastQuadraticControlPoint.x = curve.endControlPoint.x;
+        // Convert quadratic curve to cubic curve
+        var scaleFactor = 0.666; // i === 1 ? 0.666 : 1.0;
+        curve.startControlPoint.x = curve.startPoint.x + (curve.startControlPoint.x - curve.startPoint.x) * scaleFactor;
+        curve.startControlPoint.y = curve.startPoint.y + (curve.startControlPoint.y - curve.startPoint.y) * scaleFactor;
+        curve.endControlPoint.x = curve.endPoint.x + (curve.endControlPoint.x - curve.endPoint.x) * scaleFactor;
+        curve.endControlPoint.y = curve.endPoint.y + (curve.endControlPoint.y - curve.endPoint.y) * scaleFactor;
+        //   console.log("ADDING T CURVE", curve);
+        result.push(curve);
+        lastPoint.x = curve.endPoint.x;
+        lastPoint.y = curve.endPoint.y;
+        lastControlPoint.x = curve.endControlPoint.x;
+        lastControlPoint.y = curve.endControlPoint.y;
+        if (isNaN(firstPoint.x)) {
+            firstPoint.x = curve.startPoint.x;
+            firstPoint.y = curve.startPoint.y;
+        }
+        i += 2;
+    }
+};
+// The S|s x2 y2 x y
+const _handleShorthandCubicCurveTo = (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) => {
+    //   console.log("Handle SHORTHANDCUBICBEZIERTO", data);
+    if (data.length < 5) {
+        throw "Unsufficient params for SHORTHANDCUBICBEZIERTO";
+    }
+    const curve = new CubicBezierCurve(new Vertex$1(lastPoint), new Vertex$1(lastPoint), new Vertex$1(lastPoint), new Vertex$1(lastPoint));
+    if (isRelative) {
+        curve.startControlPoint.x = lastPoint.x - (lastControlPoint.x - lastPoint.x);
+        curve.startControlPoint.y = lastPoint.y - (lastControlPoint.y - lastPoint.y);
+        curve.endControlPoint.x += Number(data[1]);
+        curve.endControlPoint.y += Number(data[2]);
+        curve.endPoint.x += Number(data[3]);
+        curve.endPoint.y += Number(data[4]);
+    }
+    else {
+        curve.startControlPoint.x = lastPoint.x - (lastControlPoint.x - lastPoint.x);
+        curve.startControlPoint.y = lastPoint.y - (lastControlPoint.y - lastPoint.y);
+        curve.endControlPoint.x = Number(data[1]);
+        curve.endControlPoint.y = Number(data[2]);
+        curve.endPoint.x = Number(data[3]);
+        curve.endPoint.y = Number(data[4]);
+    }
+    result.push(curve);
+    lastPoint.x = curve.endPoint.x;
+    lastPoint.y = curve.endPoint.y;
+    lastControlPoint.x = curve.endControlPoint.x;
+    lastControlPoint.y = curve.endControlPoint.y;
+    if (isNaN(firstPoint.x)) {
+        firstPoint.x = curve.startPoint.x;
+        firstPoint.y = curve.startPoint.y;
+    }
+};
+// EllipticalArcTo: A|a rx ry x-axis-rotation large-arc-flag sweep-flag x y
+const _handleArcTo = (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) => {
+    if (data.length < 8) {
+        throw "Unsufficient params for ARCTO";
+    }
+    for (var i = 1; i + 6 < data.length; i += 7) {
+        const arcEndPoint = { x: Number(data[i + 5]), y: Number(data[i + 6]) };
+        if (isRelative) {
+            arcEndPoint.x += lastPoint.x;
+            arcEndPoint.y += lastPoint.y;
+        }
+        // console.log(
+        //   "ARC",
+        //   "data.length",
+        //   data.length,
+        //   "i",
+        //   i,
+        //   "lastPoint.x",
+        //   lastPoint.x, // x1
+        //   "lastPoint.y",
+        //   lastPoint.y, // y1
+        //   "data[i]",
+        //   Number(data[i]), // rx
+        //   "data[i+1]",
+        //   Number(data[i + 1]), // ry
+        //   "data[i+2]",
+        //   Number(data[i + 2]), // phi: number,
+        //   "data[i+3]",
+        //   Boolean(data[i + 3]), // fa: boolean,
+        //   "data[i+4]",
+        //   Boolean(data[i + 4]), // fs: boolean,
+        //   "data[i+5]",
+        //   arcEndPoint.x, // Number(data[6]), // x2: number,
+        //   "data[i+6]",
+        //   arcEndPoint.y // Number(data[7]) // y2: number
+        // );
+        // A 5 4 0 1 1 -10 -5
+        // TODO: respect relative/absolute here
+        const ellipseSector = VEllipseSector.ellipseSectorUtils.endpointToCenterParameters(lastPoint.x, lastPoint.y, Number(data[i]), Number(data[i + 1]), Number(data[i + 2]) * DEG_TO_RAD, Boolean(data[i + 3]), Boolean(data[i + 4]), arcEndPoint.x, arcEndPoint.y // Number(data[7]) // y2: number
+        );
+        //   console.log("ellipseSector", ellipseSector);
+        const curves = ellipseSector.toCubicBezier(4); // 4 segments already seems to be a good approximation
+        for (var j = 0; j < curves.length; j++) {
+            result.push(curves[j]); // Destruct!
+        }
+        // result.push(ellipseSector.ellipse);
+        if (curves.length > 0) {
+            // console.log("curves", curves);
+            const lastCurve = curves[curves.length - 1];
+            // lastPoint.x = lastCurve.endPoint.x;
+            // lastPoint.y = lastCurve.endPoint.y;
+            lastControlPoint.x = lastCurve.endControlPoint.x;
+            lastControlPoint.y = lastCurve.endControlPoint.y;
+            if (isNaN(firstPoint.x)) {
+                firstPoint.x = curves[0].startPoint.x;
+                firstPoint.y = curves[0].startPoint.y;
+            }
+        }
+        lastPoint.x = arcEndPoint.x;
+        lastPoint.y = arcEndPoint.y;
+    } // END for
+    // TODO: track first/last/control point
+};
+const _handleClosePath = (_data, _isRelative, firstPoint, lastPoint, lastControlPoint, result) => {
+    //   console.log("Handle CLOSEPATH", "lastPoint", lastPoint, "firstPoint", firstPoint);
+    const line = new Line(new Vertex$1(lastPoint), new Vertex$1(firstPoint));
+    result.push(line);
+    lastPoint.x = line.b.x;
+    lastPoint.y = line.b.y;
+    lastControlPoint.x = line.b.x;
+    lastControlPoint.y = line.b.y;
+};
+
+/**
+ * A CSS gradient string parser.
+ *
+ * Source:
+ *  https://stackoverflow.com/questions/20215440/parse-css-gradient-rule-with-javascript-regex
+ * Thanks to Dean Taylor
+ *
+ * @date           2025-09-04
+ * @OriginalAuthor Dean Taylor
+ * @RefactoredBy   Ikaros Kappler, ported to Typescript.
+ * @version        1.0.0
+ */
+/**
+ * The default implementation of `PositionToRatioConverter`.
+ * @param positionString
+ * @returns
+ */
+const DefaultPositionConverter = (positionString) => {
+    if (typeof positionString === "undefined") {
+        throw new Error("Cannot parse positioning string `null`.");
+    }
+    const tmp = positionString.trim();
+    if (tmp.length === 0) {
+        throw new Error('Cannot parse empty positioning string "".');
+    }
+    if (!tmp.endsWith("%")) {
+        throw new Error(`Cannot parse positioning string, must end with '%': '${tmp}'`);
+    }
+    return Number.parseFloat(tmp) / 100.0;
+};
+/**
+ * Utility combine multiple regular expressions.
+ *
+ * Source:
+ *  https://stackoverflow.com/questions/20215440/parse-css-gradient-rule-with-javascript-regex
+ * Thanks to Dean Taylor
+ *
+ * @param {Array<RegExp | string>} regexpList List of regular expressions or strings.
+ * @param {string} flags Normal RegExp flags.
+ */
+const __combineRegExp = (regexpList, flags) => {
+    var source = "";
+    for (var i = 0; i < regexpList.length; i++) {
+        const regex = regexpList[i];
+        if (typeof regex === "string") {
+            source += regex;
+        }
+        else {
+            source += regex.source;
+        }
+    }
+    return new RegExp(source, flags);
+};
+/**
+ * Generate the required regular expressions once.
+ *
+ * Regular Expressions are easier to manage this way and can be well described.
+ *
+ * @result {object} Object containing regular expressions.
+ */
+const __generateDefaultRegExpLib = () => {
+    // Note any variables with "Capture" in name include capturing bracket set(s).
+    const searchFlags = "gi", // ignore case for angles, "rgb" etc
+    rAngle = /(?:[+-]?\d*\.?\d+)(?:deg|grad|rad|turn)/, // Angle +ive, -ive and angle types
+    rSideCornerCapture = /to\s+((?:(?:left|right)(?:\s+(?:top|bottom))?))/, // optional 2nd part
+    rComma = /\s*,\s*/, // Allow space around comma.
+    rColorHex = /\#(?:[a-f0-9]{6}|[a-f0-9]{3})/, // 3 or 6 character form
+    rDigits3 = /\(\s*(?:\d{1,3}\s*,\s*){2}\d{1,3}\s*\)/, // "(1, 2, 3)"
+    rDigits4 = /\(\s*(?:\d{1,3}\s*,\s*){2}\d{1,3}\s*,\s*\d*\.?\d+\)/, // "(1, 2, 3, 4)"
+    rValue = /(?:[+-]?\d*\.?\d+)(?:%|[a-z]+)?/, // ".9", "-5px", "100%".
+    rKeyword = /[_a-z-][_a-z0-9-]*/, // "red", "transparent", "border-collapse".
+    rColor = __combineRegExp(["(?:", rColorHex, "|", "(?:rgb|hsl)", rDigits3, "|", "(?:rgba|hsla)", rDigits4, "|", rKeyword, ")"], ""), rColorStop = __combineRegExp([rColor, "(?:\\s+", rValue, "(?:\\s+", rValue, ")?)?"], ""), // Single Color Stop, optional %, optional length.
+    rColorStopList = __combineRegExp(["(?:", rColorStop, rComma, ")*", rColorStop], ""), // List of color stops min 1.
+    rLineCapture = __combineRegExp(["(?:(", rAngle, ")|", rSideCornerCapture, ")"], ""), // Angle or SideCorner
+    rGradientSearch = __combineRegExp(["(?:(", rLineCapture, ")", rComma, ")?(", rColorStopList, ")"], searchFlags), // Capture 1:"line", 2:"angle" (optional), 3:"side corner" (optional) and 4:"stop list".
+    rColorStopSearch = __combineRegExp(["\\s*(", rColor, ")", "(?:\\s+", "(", rValue, "))?", "(?:", rComma, "\\s*)?"], searchFlags); // Capture 1:"color" and 2:"position" (optional).
+    return {
+        gradientSearch: rGradientSearch,
+        colorStopSearch: rColorStopSearch
+    };
+};
+/**
+ * Actually parse the input gradient parameters string into an object for reusability.
+ *
+ *
+ * @note Really this only supports the standard syntax not historical versions, see MDN for details
+ *       https://developer.mozilla.org/en-US/docs/Web/CSS/linear-gradient
+ *
+ * @param {ColorGradientParserRegExpLib} regExpLib
+ * @param {string} input Input string in the form "to right bottom, #FF0 0%, red 20px, rgb(0, 0, 255) 100%"
+ * @returns {object|undefined} Object containing break down of input string including array of stop points.
+ */
+var __parseGradient = (regExpLib, input) => {
+    var result;
+    var matchGradient, matchColorStop, stopResult;
+    // reset search position, because we reuse regex.
+    regExpLib.gradientSearch.lastIndex = 0;
+    matchGradient = regExpLib.gradientSearch.exec(input);
+    if (matchGradient !== null) {
+        result = {
+            original: matchGradient[0],
+            colorStopList: [],
+            line: null,
+            angle: null,
+            sideCorner: null
+        };
+        // Line (Angle or Side-Corner).
+        if (!!matchGradient[1]) {
+            result.line = matchGradient[1];
+        }
+        // Angle or undefined if side-corner.
+        if (!!matchGradient[2]) {
+            result.angle = matchGradient[2];
+        }
+        // Side-corner or undefined if angle.
+        if (!!matchGradient[3]) {
+            result.sideCorner = matchGradient[3];
+        }
+        // reset search position, because we reuse regex.
+        regExpLib.colorStopSearch.lastIndex = 0;
+        // Loop though all the color-stops.
+        matchColorStop = regExpLib.colorStopSearch.exec(matchGradient[4]);
+        while (matchColorStop !== null) {
+            stopResult = {
+                color: matchColorStop[1],
+                position: null
+            };
+            // Position (optional).
+            if (!!matchColorStop[2]) {
+                stopResult.position = matchColorStop[2];
+            }
+            result.colorStopList.push(stopResult);
+            // Continue searching from previous position.
+            matchColorStop = regExpLib.colorStopSearch.exec(matchGradient[4]);
+        }
+    }
+    // Can be undefined if match not found.
+    return result;
+};
+/**
+ * The actual parser class.
+ */
+class LinearColorGradientParser {
+    constructor(regExpLib) {
+        this.regExpLib = regExpLib || __generateDefaultRegExpLib();
+    }
+    parse(input, positionConverter) {
+        const result = this.parseRaw(input);
+        return LinearColorGradientParser.parseResultToColorGradient(result, positionConverter);
+    }
+    parseRaw(input) {
+        var result;
+        const rGradientEnclosedInBrackets = /.*gradient\s*\(((?:\([^\)]*\)|[^\)\(]*)*)\)/; // Captures inside brackets - max one additional inner set.
+        const match = rGradientEnclosedInBrackets.exec(input);
+        const bracketPos = input.indexOf("(");
+        const gradientType = bracketPos === -1 ? null : input.substring(0, bracketPos).toLowerCase();
+        if (match !== null) {
+            // Get the parameters for the gradient
+            result = __parseGradient(this.regExpLib, match[1]);
+            result.gradientType = gradientType;
+            if (result.original.trim() !== match[1].trim()) {
+                // Did not match the input exactly - possible parsing error.
+                result.parseWarning = true;
+            }
+        }
+        else {
+            //   result = new Error("Failed to find gradient");
+            throw new Error("Failed to find gradient");
+        }
+        return result;
+    }
+    static parseResultToColorGradient(result, positionConverter) {
+        if (!result.gradientType || result.gradientType.toLowerCase() != "linear-gradient") {
+            throw new Error(`Cannot create linear gradient from type '${result.gradientType}'.`);
+        }
+        if (!result.colorStopList || result.colorStopList.length <= 1) {
+            throw new Error(`Cannot create linear gradient from color stop list of length '${result.colorStopList.length}'. Too few elements.`);
+        }
+        const colorStops = [];
+        const converter = positionConverter !== null && positionConverter !== void 0 ? positionConverter : DefaultPositionConverter;
+        for (var i = 0; i < result.colorStopList.length; i++) {
+            const stopListItem = result.colorStopList[i];
+            console.log(stopListItem);
+            const color = Color.parse(stopListItem.color);
+            // var position: number = LinearColorGradientParser.parsePosition(stopListItem.position);
+            var ratio;
+            if (typeof stopListItem.position === "undefined") {
+                // Try to auto-fill undefined positions by their index in the list.
+                ratio = i / (result.colorStopList.length - 1);
+            }
+            else {
+                ratio = converter(stopListItem.position);
+            }
+            colorStops.push({ color: color, ratio: ratio });
+        }
+        return new ColorGradient(colorStops, result.line);
+    }
+} // END class
+// var test_this_one = function (regExpLib, input) {
+//   var result,
+//     rGradientEnclosedInBrackets = /.*gradient\s*\(((?:\([^\)]*\)|[^\)\(]*)*)\)/, // Captures inside brackets - max one additional inner set.
+//     match = rGradientEnclosedInBrackets.exec(input);
+//   if (match !== null) {
+//     // Get the parameters for the gradient
+//     result = parseGradient(regExpLib, match[1]);
+//     if (result.original.trim() !== match[1].trim()) {
+//       // Did not match the input exactly - possible parsing error.
+//       result.parseWarning = true;
+//     }
+//   } else {
+//     result = "Failed to find gradient";
+//   }
+//   return result;
+// };
+
+/**
+ * A simple wavefront OBJ parser.
+ *
+ * Inspired by
+ *    https://webglfundamentals.org/webgl/lessons/webgl-load-obj.html
+ *
+ * @param {*} handleVert
+ * @param {*} handleFace
+ *
+ * @author Ikaros Kappler
+ * @date 2021-04-21
+ * @version 0.0.1
+ */
+class OBJParser {
+    constructor(handleVert, handleFace) {
+        this.handleVert = handleVert;
+        this.handleFace = handleFace;
+    }
+    _seekEOL(byteView, curPosition) {
+        // Seek line break character (13)
+        while (curPosition < byteView.length && byteView[curPosition] !== 13 && byteView[curPosition] !== 10) {
+            curPosition++;
+        }
+        return curPosition;
+    }
+    _handleLine(line, lineNo) {
+        if (line === "" || line.startsWith("#")) {
+            return;
+        }
+        var split = line.split(/\s+/g);
+        if (split[0] === "v") {
+            // Parse string of form
+            // 'v x y z'
+            if (split.length < 4) {
+                console.warn("Parse error in line " + lineNo + ": too few arguments", line);
+                return;
+            }
+            // Assume all params are proper numbers.
+            this.handleVert(Number(split[1]), Number(split[2]), Number(split[3]));
+        }
+        else if (split[0] === "f") {
+            // Parse string of form
+            // 'f vA vB vC' or 'f vA/tA vB/tB vC/tC' or 'f vA/tA/nA vB/tB/nB vC/tC/nC'
+            if (split.length < 4) {
+                console.warn("Parse error in line " + lineNo + ": too few arguments", line);
+                return;
+            }
+            // Split each face argument into parts (vert-index/texture-coordindate/normal)
+            var faceParams = [];
+            for (var i = 1; i < 4; i++) {
+                var faceSplit = split[i].split("/");
+                faceParams.push(Number(faceSplit[0]));
+            }
+            this.handleFace(faceParams[0], faceParams[1], faceParams[2]);
+        }
+    }
+    parse(arrayBuffer) {
+        const byteView = new Int8Array(arrayBuffer);
+        var curStart = 0;
+        var curEnd = 0;
+        var lineNo = 0;
+        do {
+            curEnd = this._seekEOL(byteView, curStart);
+            var lineBuffer = byteView.slice(curStart, curEnd); // .toString();
+            var line = String.fromCharCode.apply(null, lineBuffer);
+            this._handleLine(line.trim(), lineNo);
+            curStart = curEnd + 1;
+            lineNo++;
+        } while (curEnd < arrayBuffer.byteLength);
+    }
+}
+
+/**
+ * Refactored 3daddict's js-stl-parser.
+ *
+ * Found at
+ *   https://github.com/3daddict/js-stl-parser/blob/master/index.js
+ *
+ * Refactored by Ikaros Kappler
+ *
+ * @date     2021-04-16
+ * @modified 2024-03-09 Added type checks for Typescript 5 compatibility.
+ * @version  0.0.2
+ */
+class Vertex {
+    constructor(x, y, z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+}
+// Vertex Holder
+class VertexHolder {
+    constructor(vertex1, vertex2, vertex3) {
+        this.vert1 = vertex1;
+        this.vert2 = vertex2;
+        this.vert3 = vertex3;
+    }
+}
+// transforming a Node.js Buffer into a V8 array buffer
+const _toArrayBuffer = (buffer) => {
+    const ab = new ArrayBuffer(buffer.length);
+    const view = new Uint8Array(ab);
+    for (var i = 0; i < buffer.length; ++i) {
+        view[i] = buffer.charCodeAt(i);
+    }
+    return ab;
+};
+/**
+ * @classdesc STLParser
+ */
+class STLParser {
+    /**
+     * Create a new STLParser with the given callback fuction for facets.
+     *
+     * @param {function} handleFacet function(x,y,z)
+     * @constructor
+     * */
+    constructor(handleFacet) {
+        this.handleFacet = handleFacet;
+    }
+    /**
+     * Parse an stl string (ASCII).
+     * @name _parseSTLString
+     * @method _parseSTLString
+     * @memberof STLParser
+     * @param {string} stl
+     * @private
+     */
+    _parseSTLString(stl) {
+        // yes, this is the regular expression, matching the vertexes
+        // it was kind of tricky but it is fast and does the job
+        const vertexes = stl.match(/facet\s+normal\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+outer\s+loop\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+endloop\s+endfacet/g);
+        if (!vertexes) {
+            throw "[STLParser] Failed to parse STL input; regex could not match.";
+        }
+        const _handleFacet = this.handleFacet;
+        vertexes.forEach((vert) => {
+            const preVertexHolder = new VertexHolder();
+            const vertValues = vert
+                .match(/vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s/g);
+            if (!vertValues) {
+                console.warn("[STLParser] Could not parse vertex values.", vertValues);
+            }
+            else {
+                vertValues.forEach((vertex, i) => {
+                    const tempVertex = vertex.replace("vertex", "").match(/[-+]?[0-9]*\.?[0-9]+/g);
+                    if (!tempVertex) {
+                        console.warn("[STLParser] Failed to parse vertex value.", tempVertex);
+                    }
+                    else {
+                        const preVertex = new Vertex(Number(tempVertex[0]), Number(tempVertex[1]), Number(tempVertex[2]));
+                        // preVertexHolder["vert" + (i + 1)] = preVertex;
+                        switch (i) {
+                            case 0:
+                                preVertexHolder.vert1 = preVertex;
+                                break;
+                            case 1:
+                                preVertexHolder.vert2 = preVertex;
+                                break;
+                            case 2:
+                                preVertexHolder.vert3 = preVertex;
+                                break;
+                            default: console.warn("[STLParse] Warning, vertex component index unexpeced.", i);
+                        }
+                    }
+                });
+            }
+            if (preVertexHolder.vert1 && preVertexHolder.vert2 && preVertexHolder.vert3) {
+                _handleFacet(preVertexHolder.vert1, preVertexHolder.vert2, preVertexHolder.vert3);
+            }
+            else {
+                console.warn("[STLParse] Warning, cannot add vertex to mesh. vertex not fully defined.");
+            }
+        });
+    }
+    /**
+     * Parse binary STL data.
+     * @param {ArrayBuffer} buf
+     */
+    _parseSTLBinary(buf) {
+        // parsing an STL Binary File
+        // (borrowed some code from here: https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/STLLoader.js)
+        const headerLength = 80;
+        const dataOffset = 84;
+        const faceLength = 12 * 4 + 2;
+        const le = true; // is little-endian
+        const dvTriangleCount = new DataView(buf, headerLength, 4);
+        const numTriangles = dvTriangleCount.getUint32(0, le);
+        for (var i = 0; i < numTriangles; i++) {
+            const dv = new DataView(buf, dataOffset + i * faceLength, faceLength);
+            const normal = new Vertex(dv.getFloat32(0, le), dv.getFloat32(4, le), dv.getFloat32(8, le));
+            const vertHolder = new VertexHolder();
+            for (var v = 3; v < 12; v += 3) {
+                var vert = new Vertex(dv.getFloat32(v * 4, le), dv.getFloat32((v + 1) * 4, le), dv.getFloat32((v + 2) * 4, le));
+                // vertHolder["vert" + v / 3] = vert;
+                const vIndex = v / 3;
+                switch (vIndex) {
+                    case 1:
+                        vertHolder.vert1 = vert;
+                        break;
+                    case 2:
+                        vertHolder.vert2 = vert;
+                        break;
+                    case 3:
+                        vertHolder.vert3 = vert;
+                        break;
+                    default: console.warn("[STLParser] Warning, binary vertex component index unexpeced.", vIndex);
+                }
+            }
+            if (vertHolder.vert1 && vertHolder.vert2 && vertHolder.vert3) {
+                this.handleFacet(vertHolder.vert1, vertHolder.vert2, vertHolder.vert3, normal);
+            }
+            else {
+                console.warn("[STLParser] Warning, cannot add binary vertex to mesh. vertex not fully defined.");
+            }
+        }
+    }
+    /**
+     * Parse any, binary or ascii, STL data.
+     *
+     * @name parse
+     * @method parse
+     * @member
+     * @memberof STLParser
+     * @param {ArrayBstringuffer} binaryOrAsciiString
+     * @returns
+     */
+    parse(binaryOrAsciiString) {
+        var isAscii = true;
+        for (var i = 0, len = binaryOrAsciiString.length; i < len && isAscii; i++) {
+            if (binaryOrAsciiString.charCodeAt(i) > 127) {
+                isAscii = false;
+                break;
+            }
+        }
+        if (isAscii) {
+            this._parseSTLString(binaryOrAsciiString.toString());
+        }
+        else {
+            const buffer = _toArrayBuffer(binaryOrAsciiString);
+            this._parseSTLBinary(buffer);
+        }
+    }
+}
+
+export { BezierPath, BezierPathInteractionHelper, Blue, Bounds, CatmullRomPath, Circle, CircleHelper, CircleIntersections, CircleSector, CircleSectorHelper, CircularIntervalSet, Color, ColorGradient, ColorGradientPicker, ColorGradientSelector, ContourLineDetection, CubicBezierCurve, CubicSplinePath, Cyan, DataGrid2dArrayMatrix, DataGrid2dListAdapter, DeepPurple, DefaultPositionConverter, Delaunay, FileDrop, GenericPath, GeometryMesh, Girih, GirihBowtie, GirihDecagon, GirihHexagon, GirihPenroseRhombus, GirihPentagon, GirihRhombus, GirihTile, Green, Grid, HobbyPath, Indigo, InitializationObserver, KeyHandler, LightBlue, LightGreen, Line, LinearColorGradientParser, LissajousFigure, Matrix4x4, Metaballs, MouseHandler, NGons, OBJParser, PBImage, PBText, Params, PerlinNoise, Pink, PlotBoilerplate, Polygon, PolygonInset, PolygonTesselationOutlines, Purple, Red, STLParser, SVGPathUtils, Teal, TileType, Triangle, TriangleHelper, UIDGenerator, VEllipse, VEllipseHelper, VEllipseSector, VEllipseSectorHelper, Vector, VertTuple, Vertex$1 as Vertex, VertexAttr, VertexListeners, VoronoiCell, WebColors, WebColorsContrast, WebColorsMalachite, XMouseEvent, XWheelEvent, __parseGradient, arrayFill, arrayResize, arrayShuffle, clearDuplicateVertices, clearPolygonDuplicateVertices, cloneVertexArray, convexPolygonIncircle, createRandomizedPolygon, delaunay2voronoi, detectDarkMode, detectPaths, drawutils, drawutilsgl, drawutilssvg, findInVertexArray, findPolygonSelfIntersections, geomutils, getAvailableContainerSpace, getContrastColor, getConvexHull, getFProp, guiSizeToggler, gup, matrixFill, parseSVGPathData, pixelCornersToRoundPaths, polygonTesselationToGraph, shuffleWebColors, splitPolygonToNonIntersecting, splitSVGPathData, sutherlandHodgman };
 //# sourceMappingURL=index.esm.js.map

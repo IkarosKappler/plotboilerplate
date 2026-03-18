@@ -25,3 +25,97 @@ export * from "./Vertex";
 export * from "./VertexAttr";
 export * from "./VertexListeners";
 export * from "./VertTuple";
+
+// Additional exports: utils
+export * from "./utils/cloneVertexArray";
+export * from "./utils/createRandomizedPolygon";
+export * from "./utils/detectDarkMode";
+export * from "./utils/findInVertexArray";
+export * from "./utils/gup";
+export * from "./utils/InitializationObserver";
+export * from "./utils/LissajousFigure";
+export * from "./utils/NGons";
+export * from "./utils/Params";
+export * from "./utils/PerlinNoise";
+export * from "./utils/SVGPathUtils";
+export * from "./utils/WebColors";
+export * from "./utils/WebColorsContrast";
+export * from "./utils/WebColorsMalachite";
+
+// Additional exports: utils/algorithms
+export * from "./utils/algorithms/arrayFill";
+export * from "./utils/algorithms/arrayResize";
+export * from "./utils/algorithms/arrayShuffle";
+export * from "./utils/algorithms/CatmullRomPath";
+export * from "./utils/algorithms/CircleIntersections";
+export * from "./utils/algorithms/clearDuplicateVertices";
+export * from "./utils/algorithms/clearPolygonDuplicateVertices";
+export * from "./utils/algorithms/ContourLineDetection";
+export * from "./utils/algorithms/convexHull";
+export * from "./utils/algorithms/convexPolygonIncircle";
+export * from "./utils/algorithms/CubicSplinePath";
+export * from "./utils/algorithms/delaunay";
+export * from "./utils/algorithms/delaunay2voronoi";
+export * from "./utils/algorithms/detectPaths";
+export * from "./utils/algorithms/findPolygonSelfIntersections";
+export * from "./utils/algorithms/getContrastColor";
+export * from "./utils/algorithms/HobbyPath";
+export * from "./utils/algorithms/matrixFill";
+export * from "./utils/algorithms/Metaballs";
+export * from "./utils/algorithms/pixelCornersToRoundPaths";
+export * from "./utils/algorithms/PolygonInset";
+export * from "./utils/algorithms/PolygonTesselationOutlines";
+export * from "./utils/algorithms/splitPolygonToNonIntersecting";
+export * from "./utils/algorithms/sutherlandHodgman";
+
+// Additional exports: utils/datastructures
+export * from "./utils/datastructures/CircularIntervalSet";
+export * from "./utils/datastructures/Color";
+export * from "./utils/datastructures/ColorGradient";
+export * from "./utils/datastructures/DataGrid2d";
+export * from "./utils/datastructures/DataGrid2dArrayMatrix";
+export * from "./utils/datastructures/DataGrid2dListAdapter";
+export * from "./utils/datastructures/GenericPath";
+export * from "./utils/datastructures/GeometryMesh";
+export * from "./utils/datastructures/Girih";
+export * from "./utils/datastructures/GirihBowtie";
+export * from "./utils/datastructures/GirihDecagon";
+export * from "./utils/datastructures/GirihHexagon";
+export * from "./utils/datastructures/GirihPenroseRhombus";
+export * from "./utils/datastructures/GirihPentagon";
+export * from "./utils/datastructures/GirihRhombus";
+export * from "./utils/datastructures/GirihTile";
+export * from "./utils/datastructures/interfaces";
+export * from "./utils/datastructures/Matrix4x4";
+export * from "./utils/datastructures/VoronoiCell";
+
+// Additional exports: utils/dom/components
+export * from "./utils/dom/components/ColorGradientPicker";
+export * from "./utils/dom/components/ColorGradientSelector";
+
+// Additional exports: utils/dom
+
+export * from "./utils/dom/getAvailableContainerSpace";
+export * from "./utils/dom/getFProp";
+export * from "./utils/dom/guiSizeToggler";
+
+// Additional exports: utils/helpers
+export * from "./utils/helpers/BezierPathInteractionHelper";
+export * from "./utils/helpers/CircleHelper";
+export * from "./utils/helpers/CircleSectorHelper";
+export * from "./utils/helpers/TriangleHelper";
+export * from "./utils/helpers/VEllipseHelper";
+export * from "./utils/helpers/VEllipseSectorHelper";
+
+// Additional exports: utils/io
+export * from "./utils/io/FileDrop";
+
+// Additional exports: utils/parsers/svg
+export * from "./utils/parsers/svg/parseSVGPathData";
+export * from "./utils/parsers/svg/splitSVGPathData";
+export * from "./utils/parsers/svg/types";
+
+// Additional exports: utils/parsers
+export * from "./utils/parsers/LinearColorGradientParser";
+export * from "./utils/parsers/OBJParser";
+export * from "./utils/parsers/STLParser";
