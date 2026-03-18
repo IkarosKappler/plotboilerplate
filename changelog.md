@@ -9,6 +9,8 @@
 - Add 'onclose' and 'onopen' to the Modal (demos).
 
 - 2026-03-18
+  - Exporting _all_ classes/functions/constants now from index.ts
+- 2026-03-18 [1.27.0]
   - Adding demo `69-freedraw`.
   - Adding `isOpen` parameter to `DrawLib.cubicBezierPath` draw method. And to respective `draw`, `drawutilssvg` and `drawgl` libraries.
 - 2026-03-13
