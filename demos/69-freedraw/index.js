@@ -1,8 +1,8 @@
 /**
- * A script for calculating Sheperd weighted polynomials.
+ * A script for freedrawing line shapes.
  *
  * @author   Ikaros Kappler
- * @date     2025-12-09
+ * @date     2026-03-18
  * @version  1.0.0
  **/
 

@@ -9,6 +9,7 @@
 - Add 'onclose' and 'onopen' to the Modal (demos).
 
 - 2026-03-18
+  - Adding demo `69-freedraw`.
   - Adding `isOpen` parameter to `DrawLib.cubicBezierPath` draw method. And to respective `draw`, `drawutilssvg` and `drawgl` libraries.
 - 2026-03-13
   Changed visibility of `PlotBoilerplate.setZoom` and `PlotBoilerplate.setOffset` to public. There was no good reason to have the private.
