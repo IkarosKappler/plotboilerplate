@@ -1,5 +1,49 @@
 # Changelog
 
+++ Todos
+
+- Bezier handle Line color aus der drawconfig is not in use!
+- Website: demos, add #anchors
+- replace lib/Color.min.js by proper color class.
+- Add 'Rulers' class from the ngdg project.
+- Add 'onclose' and 'onopen' to the Modal (demos).
+
+- 2026-03-18
+  - Adding demo `69-freedraw`.
+  - Adding `isOpen` parameter to `DrawLib.cubicBezierPath` draw method. And to respective `draw`, `drawutilssvg` and `drawgl` libraries.
+- 2026-03-13
+  Changed visibility of `PlotBoilerplate.setZoom` and `PlotBoilerplate.setOffset` to public. There was no good reason to have the private.
+- 2026-03-03
+  - Adding `onFileBinaryDropped` to the `FileDrop` class.
+- 2026-01-21
+  - Adding algorithm for detecting polygon tesselation outer hull: `utils/algorithms/PolygonTesselationOutlines`.
+- 2026-01-18
+  - Added method `Girih.removeAllTiles`.
+- 2026-01-15
+  - Adding experimental `TileHelper` class to the Girih demo.
+- 2026-01-12
+  - Added method `Girih.getTileByCenter` to locate tiles by position.
+- 2026-01-06
+  - Added method `Girih.locateContainingTileAndEdge` to locate tile/edge pairs.
+- 2026-01-04
+  - Making the line colors and line widths of the Girih demo more configurable.
+  - Adding optional `lineJoin` attribute to the `DrawLib`'s `StrokeOptions` interface.
+  - Class `draw`: Adding `lineJoin` attribute to the `StrokeOptions`.
+  - Class `drawutilssvg`: Adding `lineJoin` attribute to the `StrokeOptions`.
+  - Fixing missing `strokeOptions` param in the `drawutilssvg.polygon` method.
+- 2026-01-02
+  - Added color gradients to demo 14-pursuit-curves.
+- 2025-12-08
+  - Adding a depth buffer to the `GeometryMeshRenderer`.
+  - Replaying self defined colors in `WebColors` by official web colors.
+- 2025-12-01
+  - Adding color gradients to demo `67-perlin-noise-3d-depth-mesh`.
+  - Adding experimental `ColorSpace2d` to the demo.
+  - Adding experimental `Bounds3d` to the demo.
+  - Adding `GeometryMesh.getGeometryBounds` method.
+- 2025-11-26
+  - Adding experimental class `Bounds3` in the demos.
+  - Fixing a bug in `ColorGradient.getColorAt(ratio)`: value at 1.0 caused runtime error.
 - 2025-11-17 [v1.26.0]
   - New release with Perlin and ring sector demos.
 - 2025-11-14

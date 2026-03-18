@@ -48,7 +48,10 @@
  * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
  * @modified 2024-07-24 Caching custom style defs in a private buffer variable.
  * @modified 2025-11-14 Fixing a bug in the CSS `mix-blend-mode` property handling (caused a runtime error).
- * @version  1.6.11
+ * @modified 2026-01-04 Adding `lineJoin` attribute to the methods' `StrokeOptions` param.
+ * @modified 2026-01-04 Fixing missing `strokeOptions` param in the `drawutilssvg.polygon` method.
+ * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
+ * @version  1.7.0
  **/
 import { CircleSector } from "./CircleSector";
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -453,6 +456,7 @@ export class drawutilssvg {
      * @param {StrokeOptions=} strokeOptions -
      */
     applyStrokeOpts(node, strokeOptions) {
+        // Set line dash options?
         if (strokeOptions &&
             strokeOptions.dashArray &&
             strokeOptions.dashArray.length > 0 &&
@@ -465,6 +469,10 @@ export class drawutilssvg {
             if (strokeOptions.dashOffset) {
                 node.setAttribute("stroke-dashoffset", `${strokeOptions.dashOffset * this.scale.x}`);
             }
+        }
+        // Set line join option?
+        if (strokeOptions && strokeOptions.lineJoin && drawutilssvg.nodeSupportsLineJoin(node.tagName)) {
+            node.setAttribute("stroke-linejoin", strokeOptions.lineJoin);
         }
     }
     _x(x) {
@@ -716,12 +724,12 @@ export class drawutilssvg {
      * @param {string} color - The CSS colot to draw the path with.
      * @param {number=1} lineWidth - (optional) The line width to use.
      * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
-     *
+     * @param {boolean} isOpen - (optional) Set to tur if the path should not be closed.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    cubicBezierPath(path, color, lineWidth, strokeOptions) {
+    cubicBezierPath(path, color, lineWidth, strokeOptions, isOpen) {
         const node = this.makeNode("path");
         this.applyStrokeOpts(node, strokeOptions);
         if (!path || path.length == 0) {
@@ -738,6 +746,9 @@ export class drawutilssvg {
             endControlPoint = path[i + 1];
             endPoint = path[i + 2];
             d.push("C", this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y));
+        }
+        if (!isOpen) {
+            d.push("Z");
         }
         node.setAttribute("d", d.join(" "));
         return this._bindFillDraw(node, "cubicBezierPath", color, lineWidth || 1);
@@ -1175,12 +1186,13 @@ export class drawutilssvg {
      * @param {Polygon} polygon - The polygon to draw.
      * @param {string} color - The CSS color to draw the polygon with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    polygon(polygon, color, lineWidth) {
-        return this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
+    polygon(polygon, color, lineWidth, strokeOptions) {
+        return this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth, strokeOptions);
     }
     /**
      * Draw a polygon line (alternative function to the polygon).
@@ -1557,6 +1569,9 @@ export class drawutilssvg {
         } // END while
     } // END transformPathData
     static nodeSupportsLineDash(nodeName) {
+        return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
+    }
+    static nodeSupportsLineJoin(nodeName) {
         return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
     }
     /**

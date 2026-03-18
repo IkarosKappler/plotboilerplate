@@ -9,8 +9,10 @@
  *
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
- * @date        2021-02-22
- * @version     1.0.0
+ * @date        2025-11-11
+ * @modified    2025-11-19 Adding alloy-finger to fetch touch events.
+ * @modified    2025-12-01 Adding color gradients.
+ * @version     1.1.0
  **/
 
 (function (_context) {
@@ -58,12 +60,6 @@
       )
     );
 
-    // new DarkModeHandler(function (_isDarkMode) {
-    //   pb.config.backgroundColor = _isDarkMode ? "#000000" : "#ffffff";
-    //   isDarkmode = _isDarkMode;
-    //   pb.redraw();
-    // });
-
     // prettier-ignore
     var blendModes = [
       'source-over', 'source-in', 'source-out', 'source-atop', 'destination-over', 'destination-in', 'destination-out', 'destination-atop', 'lighter', 'copy', 'xor', 'multiply', 'screen', 'overlay', 'darken', 'lighten', 'color-dodge', 'color-burn', 'hard-light', 'soft-light', 'difference', 'exclusion', 'hue', 'saturation', 'color', 'luminosity' 
@@ -74,8 +70,8 @@
     // +-------------------------------
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
-        far: -1000,
-        close: 0,
+        far: params.getNumber("far", -1000),
+        close: params.getNumber("close", 0),
         scaleX: params.getNumber("scaleX", 100),
         scaleY: params.getNumber("scaleY", 100),
         scaleZ: params.getNumber("scaleZ", 100),
@@ -83,21 +79,25 @@
         rotationX: params.getNumber("rotationX", 0),
         rotationY: params.getNumber("rotationY", 0),
         rotationZ: params.getNumber("rotationZ", 0),
-        translateX: params.getNumber("rotationZ", 0),
-        translateY: params.getNumber("rotationZ", 0),
-        translateZ: params.getNumber("rotationZ", 0),
+        translateX: params.getNumber("translateX", 0),
+        translateY: params.getNumber("translateX", 0),
+        translateZ: params.getNumber("translateX", 0),
         lineWidth: params.getNumber("lineWidth", 2.0),
         useDistanceThreshold: params.getBoolean("useDistanceThreshold", false),
         drawVertices: params.getBoolean("drawVertices", true),
         drawVertNumbers: params.getBoolean("drawVertNumbers", false),
         useBlendMode: params.getBoolean("useBlendMode", false),
         blendMode: params.getString("blendMode", "difference"),
+        useColorGradient: params.getBoolean("useColorGradient", false),
+        useDepthBuffer: params.getBoolean("useDepthBuffer", false),
         perlinGridWidth: params.getNumber("perlinGridWidth", 24),
         perlinGridHeight: params.getNumber("perlinGridHeight", 24),
         perlinSeed: params.getNumber("perlinSeed", 10),
         perlinXOffset: params.getNumber("perlinXOffset", 0.0),
         perlinYOffset: params.getNumber("perlinYOffset", 0.0),
         perlinZOffset: params.getNumber("perlinZOffset", 0.0),
+        perlinXScale: params.getNumber("perlinXScale", 1.0),
+        perlinYScale: params.getNumber("perlinYScale", 1.0),
         perlinValueScale: params.getNumber("perlinValueScale", 1.0),
         animate: params.getBoolean("animate", false),
         animateRotation: params.getBoolean("animateRotation", false),
@@ -109,6 +109,7 @@
     );
 
     var geometryMeshRenderer = new GeometryMeshRenderer(config);
+    var colorSpace2d = new ColorSpace2d(new Bounds3(new Vert3(), new Vert3()));
 
     // +---------------------------------------------------------------------------------
     // | Prepare all basic available geometries.
@@ -119,7 +120,8 @@
     var perlinFactor = 4;
     var matrixHeight = config.perlinGridHeight;
     var matrixWidth = config.perlinGridWidth;
-    var flatMeshGeometryPair = makeFlatMeshGeometry(matrixHeight, matrixWidth, 2.0, 2.0);
+    // { geometry, indexMatrix }
+    var flatMeshGeometryPair = null; // makeFlatMeshGeometry(matrixHeight, matrixWidth, 2.0, 2.0);
     var noise = new PerlinNoise().seed(config.perlinSeed);
     var data = new DataGrid2dArrayMatrix(matrixHeight, matrixWidth, 0.0);
 
@@ -131,22 +133,28 @@
       data = new DataGrid2dArrayMatrix(matrixHeight, matrixWidth, 0.0);
 
       noise = new PerlinNoise().seed(config.perlinSeed);
+      var minZ = Number.MAX_VALUE;
+      var maxZ = Number.MIN_VALUE;
       for (var y = 0; y < matrixHeight; y++) {
         var yIndex = y / matrixHeight;
         for (var x = 0; x < matrixWidth; x++) {
           var xIndex = x / matrixWidth;
           var perlinValue = noise.perlin3(
-            config.perlinXOffset + xIndex * perlinFactor,
-            config.perlinYOffset + yIndex * perlinFactor,
+            config.perlinXOffset + xIndex * perlinFactor * config.perlinXScale,
+            config.perlinYOffset + yIndex * perlinFactor * config.perlinYScale,
             config.perlinZOffset * perlinFactor
           );
           data.set(y, x, perlinValue);
           // Apply to mesh
           var vertIndex = flatMeshGeometryPair.indexMatrix[y][x];
           flatMeshGeometryPair.geometry.vertices[vertIndex].z = perlinValue * config.perlinValueScale;
+          minZ = Math.min(minZ, flatMeshGeometryPair.geometry.vertices[vertIndex].z);
+          maxZ = Math.max(maxZ, flatMeshGeometryPair.geometry.vertices[vertIndex].z);
         }
       }
-    };
+      colorSpace2d.bounds = flatMeshGeometryPair.geometry.getGeometryBounds();
+      // console.log("Rebuilt: max", maxZ, "min", minZ, "colorSpace2d.bounds", colorSpace2d.bounds);
+    }; // END function initNoiseData
     initNoiseData();
 
     // +---------------------------------------------------------------------------------
@@ -154,7 +162,11 @@
     // +-------------------------------
     pb.config.postDraw = function (draw, fill) {
       var textColor = getContrastColor(Color.parse(pb.config.backgroundColor)).cssRGB();
-      geometryMeshRenderer.drawGeometry(draw, fill, flatMeshGeometryPair.geometry, { textColor: textColor });
+      geometryMeshRenderer.drawGeometry(draw, fill, flatMeshGeometryPair.geometry, {
+        textColor: textColor,
+        colorSpace: config.useColorGradient ? colorSpace2d : null,
+        useDepthBuffer: config.useDepthBuffer
+      });
     };
 
     // +---------------------------------------------------------------------------------
@@ -174,6 +186,22 @@
         stats.mouseX = relPos.x;
         stats.mouseY = relPos.y;
       });
+
+    // +---------------------------------------------------------------------------------
+    // | Install a touch handler to rotate on mobile device.
+    // +-------------------------------
+    createAlloyFinger(pb.eventCatcher, {
+      touchMove: function (event) {
+        // console.log("event", event);
+        if (event.touches.length === 0) {
+          return;
+        }
+        // var relPos = pb.transformMousePosition(event.touches[0].clientX, event.touches[0].clientY);
+        config.rotationX = geomutils.wrapMinMax(config.rotationX + event.deltaY, 0.0, 360.0);
+        config.rotationZ = geomutils.wrapMinMax(config.rotationZ - event.deltaX, 0.0, 360.0);
+        pb.redraw();
+      }
+    });
 
     var stats = {
       mouseX: 0,
@@ -214,9 +242,9 @@
       // prettier-ignore
       f1.add(config, "translateZ").min(-1.0).max(1.0).title("The mesh translation Z.").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f1.add(config, "perlinGridWidth").min(2).max(32).step(1).title("Perlin matrix width.").onChange(function () { initNoiseData(); pb.redraw(); });
+      f1.add(config, "perlinGridWidth").min(2).max(64).step(1).title("Perlin matrix width.").onChange(function () { initNoiseData(); pb.redraw(); });
       // prettier-ignore
-      f1.add(config, "perlinGridHeight").min(2).max(32).step(1).title("Perlin matrix height.").onChange(function () { initNoiseData(); pb.redraw(); });
+      f1.add(config, "perlinGridHeight").min(2).max(64).step(1).title("Perlin matrix height.").onChange(function () { initNoiseData(); pb.redraw(); });
       // prettier-ignore
       f1.add(config, "perlinSeed").min(0.0).max(100.0).title("Perlin noise seed.").onChange(function () { initNoiseData(); pb.redraw(); });
       // prettier-ignore
@@ -226,17 +254,25 @@
       // prettier-ignore
       f1.add(config, "perlinZOffset").min(-1.0).max(1.0).listen().title("Perlin noise z offset.").onChange(function () { initNoiseData(); pb.redraw(); });
       // prettier-ignore
+      f1.add(config, "perlinXScale").min(1.0).max(10.0).title("Perlin X scale.").listen().onChange(function () { initNoiseData(); pb.redraw(); });
+      // prettier-ignore
+      f1.add(config, "perlinYScale").min(1.0).max(10.0).title("Perlin Y scale.").listen().onChange(function () { initNoiseData(); pb.redraw(); });
+      // prettier-ignore
       f1.add(config, "perlinValueScale").min(-1.0).max(1.0).title("Perlin value scale.").listen().onChange(function () { initNoiseData(); pb.redraw(); });
       // prettier-ignore
       f2.add(config, "lineWidth").min(1).max(10).title("Line width").onChange(function () { pb.redraw(); });
       // prettier-ignore
       f2.add(config, "useDistanceThreshold").title("Use distance threshold?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
+      f2.add(config, "useColorGradient").title("Use a color gradient?").listen().onChange(function () { pb.redraw(); });
+      // prettier-ignore
       f2.add(config, "drawVertices").title("Draw vertices?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
       f2.add(config, "drawVertNumbers").title("Draw vertex numbers?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
       f2.add(config, "useBlendMode").title("Use blend mode?").listen().onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      f2.add(config, "useDepthBuffer").title("Use depth buffer (slower)").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
       f2.add(config, "blendMode", blendModes).title("Which blend mode?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
@@ -252,6 +288,9 @@
 
       f1.open();
       f2.open();
+      if (params.getBoolean("closegui", false)) {
+        gui.close();
+      }
 
       // Add stats
       var uiStats = new UIStats(stats);
@@ -269,7 +308,7 @@
           config.perlinYOffset += 0.01;
         }
         if (config.animatePerlinZOffset) {
-          config.perlinZOffset += 0.01;
+          config.perlinZOffset += 0.002;
         }
         if (config.animateRotation) {
           // config.rotationX = (time / 80) % 360; // 50

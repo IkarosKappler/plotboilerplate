@@ -102,8 +102,13 @@ export class FileDrop {
     this.fileDroppedCallbackText = callback;
   }
 
+  // TODO: docs
   onFileSVGDropped(callback: IDroppedCallbackSVG) {
     this.fileDroppedCallbackSVG = callback;
+  }
+
+  onFileBinaryDropped(callback: IDroppedCallbackBinary) {
+    this.fileDroppedCallbackBinary = callback;
   }
 
   /**

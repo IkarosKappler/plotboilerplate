@@ -6444,7 +6444,10 @@ CircleSector.circleSectorUtils = {
  * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
  * @modified 2024-07-24 Caching custom style defs in a private buffer variable.
  * @modified 2025-11-14 Fixing a bug in the CSS `mix-blend-mode` property handling (caused a runtime error).
- * @version  1.6.11
+ * @modified 2026-01-04 Adding `lineJoin` attribute to the methods' `StrokeOptions` param.
+ * @modified 2026-01-04 Fixing missing `strokeOptions` param in the `drawutilssvg.polygon` method.
+ * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
+ * @version  1.7.0
  **/
 const RAD_TO_DEG = 180 / Math.PI;
 /**
@@ -6844,6 +6847,7 @@ class drawutilssvg {
      * @param {StrokeOptions=} strokeOptions -
      */
     applyStrokeOpts(node, strokeOptions) {
+        // Set line dash options?
         if (strokeOptions &&
             strokeOptions.dashArray &&
             strokeOptions.dashArray.length > 0 &&
@@ -6856,6 +6860,10 @@ class drawutilssvg {
             if (strokeOptions.dashOffset) {
                 node.setAttribute("stroke-dashoffset", `${strokeOptions.dashOffset * this.scale.x}`);
             }
+        }
+        // Set line join option?
+        if (strokeOptions && strokeOptions.lineJoin && drawutilssvg.nodeSupportsLineJoin(node.tagName)) {
+            node.setAttribute("stroke-linejoin", strokeOptions.lineJoin);
         }
     }
     _x(x) {
@@ -7106,12 +7114,12 @@ class drawutilssvg {
      * @param {string} color - The CSS colot to draw the path with.
      * @param {number=1} lineWidth - (optional) The line width to use.
      * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
-     *
+     * @param {boolean} isOpen - (optional) Set to tur if the path should not be closed.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    cubicBezierPath(path, color, lineWidth, strokeOptions) {
+    cubicBezierPath(path, color, lineWidth, strokeOptions, isOpen) {
         const node = this.makeNode("path");
         this.applyStrokeOpts(node, strokeOptions);
         if (!path || path.length == 0) {
@@ -7128,6 +7136,9 @@ class drawutilssvg {
             endControlPoint = path[i + 1];
             endPoint = path[i + 2];
             d.push("C", this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y));
+        }
+        if (!isOpen) {
+            d.push("Z");
         }
         node.setAttribute("d", d.join(" "));
         return this._bindFillDraw(node, "cubicBezierPath", color, lineWidth || 1);
@@ -7565,12 +7576,13 @@ class drawutilssvg {
      * @param {Polygon} polygon - The polygon to draw.
      * @param {string} color - The CSS color to draw the polygon with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    polygon(polygon, color, lineWidth) {
-        return this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
+    polygon(polygon, color, lineWidth, strokeOptions) {
+        return this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth, strokeOptions);
     }
     /**
      * Draw a polygon line (alternative function to the polygon).
@@ -7948,6 +7960,9 @@ class drawutilssvg {
     static nodeSupportsLineDash(nodeName) {
         return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
     }
+    static nodeSupportsLineJoin(nodeName) {
+        return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
+    }
     /**
      * Creates a basic <line> node with start and end coordinates. The created node will not
      * be bound to any root node.
@@ -8132,7 +8147,9 @@ drawutilssvg.HEAD_XML = [
  * @modified 2023-09-30 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
  * @modified 2023-10-07 Adding the optional `arrowHeadBasePositionBuffer` param to the arrowHead(...) method.
  * @modified 2024-09-13 Remoed the scaling of `lineWidth` in the `polygon` and `polyline` methods. This makes no sense here and doesn't match up with the behavior of other line functions.
- * @version  1.13.0
+ * @modified 2026-01-04 Adding `lineJoin` attribute to the `StrokeOptions`.
+ * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
+ * @version  1.14.0
  **/
 // Todo: rename this class to Drawutils?
 /**
@@ -8165,13 +8182,14 @@ class drawutils {
      * @param {StrokeOptions=} strokeOptions -
      */
     applyStrokeOpts(strokeOptions) {
-        var _a, _b;
+        var _a, _b, _c;
         this.ctx.setLineDash(((_a = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashArray) !== null && _a !== void 0 ? _a : []).map((dashArrayElem) => {
             // Note assume scale.x === scale.y
             // Invariant scale makes funny stuff anyway.
             return dashArrayElem * this.scale.x;
         }));
         this.ctx.lineDashOffset = ((_b = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashOffset) !== null && _b !== void 0 ? _b : 0) * this.scale.x;
+        this.ctx.lineJoin = (_c = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.lineJoin) !== null && _c !== void 0 ? _c : null;
     }
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff. It is not
@@ -8617,7 +8635,7 @@ class drawutils {
      * @instance
      * @memberof drawutils
      */
-    cubicBezierPath(path, color, lineWidth, strokeOptions) {
+    cubicBezierPath(path, color, lineWidth, strokeOptions, isOpen) {
         if (!path || path.length == 0) {
             return;
         }
@@ -8635,7 +8653,9 @@ class drawutils {
             endPoint = path[i + 2];
             this.ctx.bezierCurveTo(this.offset.x + startControlPoint.x * this.scale.x, this.offset.y + startControlPoint.y * this.scale.y, this.offset.x + endControlPoint.x * this.scale.x, this.offset.y + endControlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
         }
-        this.ctx.closePath();
+        if (!isOpen) {
+            this.ctx.closePath();
+        }
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
         this.ctx.restore();
@@ -9237,6 +9257,7 @@ drawutils.helpers = {
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `lineDashes` attribute.
+ * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @version  0.0.10
  **/
 /**
@@ -9549,7 +9570,7 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    cubicBezierPath(path, color, lineWidth) {
+    cubicBezierPath(path, color, lineWidth, strokeOptions, isOpen) {
         // NOT YET IMPLEMENTED
     }
     /**
@@ -12495,8 +12516,9 @@ VEllipseSector.ellipseSectorUtils = {
  * @modified 2025-05-07 Added `PlogBoilerplate.addContentChangeListener` and `.removeContentChangeListener`.
  * @modified 2025-05-07 Moving full vectors now by default when vector point a is moved.
  * @modified 2025-05-20 Applying `lineWith` parameter in the draw routine for vectors (had been missing).
+ * @modified 2026-03-13 Changed visibility of `setZoom` and `setOffset` to public. There was no good reason to have the private.
  *
- * @version  1.21.1
+ * @version  1.21.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.

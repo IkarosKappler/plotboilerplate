@@ -8,6 +8,7 @@
  * @author  Ikaros Kappler
  * @version 1.0.0
  * @date    2025-08-05
+ * @modified 2025-11-26 Fixing a bug in `ColorGradient.getColorAt(ratio)`: value at 1.0 caused runtime error.
  */
 import { Color } from "./Color";
 export type ColorGradientRotation = number | `${number}deg` | `${number}turn` | `to top` | "to bottom" | "to left" | "to right";
@@ -18,6 +19,7 @@ export interface ColorGradientItem {
 export declare class ColorGradient {
     values: Array<ColorGradientItem>;
     angle: ColorGradientRotation;
+    static DEFAULT_COLORSET: ColorGradientItem[];
     /**
      * Creates a new ColorGradient with the given values. Please be sure that the values appear in the correct
      * order regarding the `ratio` information. This will not be validated.

@@ -159,6 +159,8 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 
 [Basic Setup in a Codepen.io demo](https://codepen.io/ikaroskappler/pen/ZEjamVb)
 
+[Voronoi Diagram in a Codepen.io demo](https://codepen.io/ikaroskappler/pen/RNREmje)
+
 ### Screenshot
 
 ![Simple Demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")

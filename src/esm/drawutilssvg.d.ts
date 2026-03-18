@@ -48,7 +48,10 @@
  * @modified 2024-03-10 Fixing some types for Typescript 5 compatibility.
  * @modified 2024-07-24 Caching custom style defs in a private buffer variable.
  * @modified 2025-11-14 Fixing a bug in the CSS `mix-blend-mode` property handling (caused a runtime error).
- * @version  1.6.11
+ * @modified 2026-01-04 Adding `lineJoin` attribute to the methods' `StrokeOptions` param.
+ * @modified 2026-01-04 Fixing missing `strokeOptions` param in the `drawutilssvg.polygon` method.
+ * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
+ * @version  1.7.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -496,12 +499,12 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {string} color - The CSS colot to draw the path with.
      * @param {number=1} lineWidth - (optional) The line width to use.
      * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
-     *
+     * @param {boolean} isOpen - (optional) Set to tur if the path should not be closed.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    cubicBezierPath(path: Array<XYCoords>, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): SVGElement;
+    cubicBezierPath(path: Array<XYCoords>, color: string, lineWidth?: number, strokeOptions?: StrokeOptions, isOpen?: boolean): SVGElement;
     /**
      * Draw the given handle and handle point (used to draw interactive Bézier curves).
      *
@@ -747,11 +750,12 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {Polygon} polygon - The polygon to draw.
      * @param {string} color - The CSS color to draw the polygon with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    polygon(polygon: Polygon, color: string, lineWidth?: number): SVGElement;
+    polygon(polygon: Polygon, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): SVGElement;
     /**
      * Draw a polygon line (alternative function to the polygon).
      *
@@ -876,6 +880,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      */
     static transformPathData(data: SVGPathParams, offset: XYCoords, scale: XYCoords): void;
     private static nodeSupportsLineDash;
+    private static nodeSupportsLineJoin;
     /**
      * Creates a basic <line> node with start and end coordinates. The created node will not
      * be bound to any root node.

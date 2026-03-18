@@ -12,9 +12,16 @@
     this.config = config;
   };
 
-  // +---------------------------------------------------------------------------------
-  // | This is the part where the magic happens
-  // +-------------------------------
+  /**
+   * This is the part where the magic happens.
+   *
+   * @param {DrawLib} draw
+   * @param {DrawLib} fill
+   * @param {GeometryMesh} geometry
+   * @param {string} options.textColor
+   * @param {ColorSpace2d} options.colorSpace – (optional) With a function getColorAt(x,y,z) => Color
+   * @param {boolean} options.useDepthBuffer – (optional) Endable/disable depth buffer.
+   */
   GeometryMeshRenderer.prototype.drawGeometry = function (draw, fill, geometry, options) {
     // var minMax = getMinMax(geometry.vertices);
     var minMax = geometry.getGeometryBounds();
@@ -58,16 +65,43 @@
     if (this.config.useBlendMode) {
       draw.setConfiguration({ blendMode: this.config.blendMode });
       // Use this on black
-      this.drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(128, 255, 0));
-      this.drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix1, Color.makeRGB(0, 0, 255));
-      this.drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix2, Color.makeRGB(255, 0, 0));
+      var colorA = Color.makeRGB(128, 255, 0);
+      var colorB = Color.makeRGB(0, 0, 255);
+      var colorC = Color.makeRGB(255, 0, 0);
+      var fakeColorSpaceA = {
+        getColorAt: function (x, y, z) {
+          return colorA;
+        }
+      };
+      var fakeColorSpaceB = {
+        getColorAt: function (x, y, z) {
+          return colorB;
+        }
+      };
+      var fakeColorSpaceC = {
+        getColorAt: function (x, y, z) {
+          return colorC;
+        }
+      };
+      this.drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix0, fakeColorSpaceA, options); // Color.makeRGB(128, 255, 0));
+      this.drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix1, fakeColorSpaceB, options); // Color.makeRGB(0, 0, 255));
+      this.drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix2, fakeColorSpaceC, options); // Color.makeRGB(255, 0, 0));
       // Use this on white
       // this.drawGeometry(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(128, 0, 255));
       // this.drawGeometry(draw, fill, geometry, minMax, transformMatrix1, Color.makeRGB(255, 255, 0));
       // this.drawGeometry(draw, fill, geometry, minMax, transformMatrix2, Color.makeRGB(0, 255, 255));
+    } else if (options.colorSpace) {
+      // console.log("Use options.colorSpace");
+      this.drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix0, options.colorSpace, options);
     } else {
       // this.drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(92, 92, 92));
-      this.drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(192, 192, 192));
+      const edgeColor = Color.makeRGB(192, 192, 192);
+      var fakeColorSpace = {
+        getColorAt: function (x, y, z) {
+          return edgeColor;
+        }
+      };
+      this.drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix0, fakeColorSpace, options); // Color.makeRGB(192, 192, 192));
     }
 
     this.drawGeometryVertices(draw, fill, geometry, transformMatrix0, {
@@ -77,12 +111,59 @@
   };
 
   // +---------------------------------------------------------------------------------
+  // | Transform all vertices and store in a new array.
+  // +-------------------------------
+  GeometryMeshRenderer.prototype.createTransformedVertices = function (geometry, transformMatrix) {
+    var resultVertices = [];
+    var v3_original = null; // Vert3()
+    for (var v = 0; v < geometry.vertices.length; v++) {
+      // a3_original = geometry.vertices[geometry.edges[e][0]];
+      // b3_original = geometry.vertices[geometry.edges[e][1]];
+      v3_original = geometry.vertices[v];
+      var a3_transformed = transformMatrix.apply3(v3_original);
+      resultVertices.push(a3_transformed);
+    }
+    // return resultVertices;
+    return new GeometryMesh(resultVertices, geometry.edges); // COPY ARRAY???
+  };
+
+  // +---------------------------------------------------------------------------------
+  // | Sort edges by by z component (of first vertex)
+  // +-------------------------------
+  GeometryMeshRenderer.prototype.createZBufferVertices = function (geometry) {
+    geometry.edges.sort(function (edgeA, edgeB) {
+      var va = geometry.vertices[edgeA[0]];
+      var vb = geometry.vertices[edgeB[0]];
+      return va.z - vb.z;
+    });
+  };
+
+  // +---------------------------------------------------------------------------------
   // | Draw the edges of a geometry.
   // +-------------------------------
-  GeometryMeshRenderer.prototype.drawGeometryEdges = function (draw, fill, geometry, minMax, transformMatrix, colorObject) {
+  GeometryMeshRenderer.prototype.drawGeometryEdges = function (
+    draw,
+    fill,
+    geometry,
+    minMax,
+    transformMatrix,
+    colorSpace,
+    options
+  ) {
+    var a3_vert = new Vert3();
+    var a3_original = null; // Vert3()
+    var b3_original = null; // Vert3()
+    var transformedVerticesGeometry = this.createTransformedVertices(geometry, transformMatrix);
+    if (options && options.useDepthBuffer) {
+      this.createZBufferVertices(transformedVerticesGeometry);
+    }
     for (var e in geometry.edges) {
-      var a3 = transformMatrix.apply3(geometry.vertices[geometry.edges[e][0]]);
-      var b3 = transformMatrix.apply3(geometry.vertices[geometry.edges[e][1]]);
+      a3_original = geometry.vertices[geometry.edges[e][0]];
+      b3_original = geometry.vertices[geometry.edges[e][1]];
+      // var a3 = transformMatrix.apply3(a3_original);
+      // var b3 = transformMatrix.apply3(b3_original);
+      var a3 = transformedVerticesGeometry.vertices[geometry.edges[e][0]];
+      var b3 = transformedVerticesGeometry.vertices[geometry.edges[e][1]];
 
       var a2 = this.applyProjection(a3);
       var b2 = this.applyProjection(b3);
@@ -90,6 +171,14 @@
       var tA = this.getThreshold(a3, minMax.min.z, minMax.max.z);
       var tB = this.getThreshold(b3, minMax.min.z, minMax.max.z);
       var threshold = this.config.useDistanceThreshold ? Math.max(0, Math.min(1, Math.min(tA, tB))) : 1.0;
+
+      // console.log("a3", a3);
+      a3_vert.x = a3.x;
+      a3_vert.y = a3.y;
+      a3_vert.z = a3.z;
+      // var midpoint = a3_vert.lerp(b3, 0.5);
+      // var colorObject = colorSpace.getColorAt(midpoint.x, midpoint.y, midpoint.z);
+      var colorObject = colorSpace.getColorAt(a3_original.x, a3_original.y, a3_original.z);
 
       colorObject.a = threshold;
       draw.line(a2, b2, colorObject.cssRGBA(), this.config.lineWidth);

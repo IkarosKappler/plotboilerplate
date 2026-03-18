@@ -9,10 +9,21 @@
  *
  * @author   Ikaros Kappler
  * @date     2020-10-30
- * @version  1.0.0
+ * @modified 2026-01-04 Making the line colors and line widths of the Girih demo more configurable.
+ * @modified 2026-01-15 Refactoting everything into smaller classes.
+ * @version  1.1.0
  **/
 
 // TODOs
+//  * DONE: Reset (start over button) with only one tile
+//  * DONE: Clear selection button
+//  * DONE safe current setup in localstorage
+//  * DONE: Fill-highlight the hovering tile
+//  * Flip tile?
+//  * DONE PolygonTesselationOutlines requires proper documentation.
+//  * DONE Avoid removing the last tile.
+//  * DONE multiple random start setups
+//  * undo/redo pipeline
 //  * build auto-generation (random)
 //  * build grid of all possible positions (centers only)
 //  * detect connecting lines (inner polygons to max paths)
@@ -21,15 +32,23 @@
   "use strict";
 
   window.initializePB = function () {
-    if (window.pbInitialized) return;
+    if (window.pbInitialized) {
+      return;
+    }
     window.pbInitialized = true;
 
     // Fetch the GET params
     let GUP = gup();
+    var params = new Params(GUP);
     var isDarkmode = detectDarkMode(GUP);
-    var isDarkmode = detectDarkMode(GUP);
-
-    var textureImage = null;
+    var isMobile = detectMobileMode(params);
+    if (isMobile) {
+      try {
+        document.body.classList.add("mobile");
+      } catch (e) {
+        console.warn(e);
+      }
+    }
 
     // Initialize templates, one for each Girih tile type.
     var girih = new Girih(GirihTile.DEFAULT_EDGE_LENGTH);
@@ -41,12 +60,16 @@
     Press [Enter] or click to place new tiles onto the canvas.
     
     Press [o] to toggle the outlines on/off.
+
+    Press [h] to toggle the outer hull on/off.
     
     Press [p] to toggle the outer polygons on/off.
     
     Press [i] to toggle the inner polygons on/off.
     
-    Press [t] to toggle the textures on/off.`;
+    Press [t] to toggle the textures on/off.
+    
+    Press [c] to toggle center points on/off.`;
     // All config params are optional.
     var pb = new PlotBoilerplate(
       PlotBoilerplate.utils.safeMergeByKeys(
@@ -57,7 +80,7 @@
           scaleX: 1.0,
           scaleY: 1.0,
           rasterGrid: true,
-          drawGrid: true,
+          drawGrid: false,
           drawOrigin: false,
           rasterAdjustFactor: 2.0,
           redrawOnResize: true,
@@ -75,7 +98,6 @@
           enableMouse: true,
           enableKeys: true,
           enableTouch: true,
-
           enableSVGExport: true,
           title: title
         },
@@ -86,222 +108,150 @@
     pb.drawConfig.polygon.lineWidth = 2.0;
 
     // +---------------------------------------------------------------------------------
-    // | Initialize
+    // | A global Girih config that's attached to the lil.gui control interface.
     // +-------------------------------
-    // The index of the tile the mouse is hovering on or nearby (in the tiles-array)
-    var hoverTileIndex = -1;
-    // The index of the closest edge to the mouse pointer
-    var hoverEdgeIndex = -1;
-    // If the mouse hovers over an edge the next possible adjacent Girih tile will be this
-    var previewTiles = [];
-    var previewTilePointer = 0;
-    var initTiles = function () {
-      for (var i in girih.TILE_TEMPLATES) {
-        var tile = girih.TILE_TEMPLATES[i].clone();
-        addTile(tile);
+    var config = {
+      drawOutlines: params.getBoolean("drawOutlines", false),
+      drawOuterHull: params.getBoolean("drawOuterHull", true),
+      outerHullTolerance: params.getNumber("outerHullTolerance", PolygonTesselationOutlines.DEFAULT_TOLERANCE),
+      outerHullRemoveExcessiveVerts: params.getBoolean("outerHullRemoveExcessiveVerts", true),
+      drawCenters: params.getBoolean("drawCenters", true),
+      drawCornerNumbers: params.getBoolean("drawCornerNumbers", false),
+      drawTileNumbers: params.getBoolean("drawTileNumbers", false),
+      drawOuterPolygons: params.getBoolean("drawOuterPolygons", true),
+      drawInnerPolygons: params.getBoolean("drawInnerPolygons", true),
+      fillOuterPolygons: params.getBoolean("fillOuterPolygons", false),
+      fillInnerPolygons: params.getBoolean("fillInnerPolygons", false),
+      lineJoin: params.getString("lineJoin", "round"), // [ "bevel", "round", "miter" ]
+      drawTextures: params.getBoolean("drawTextures", false),
+      showPreviewOverlaps: params.getBoolean("showPreviewOverlaps", true),
+      allowOverlaps: params.getBoolean("allowOverlaps", false),
+      drawFullImages: params.getBoolean("drawFullImages", false),
+      drawBoundingBoxes: params.getBoolean("drawBoundingBoxes", false),
+      texturePath: params.getString("texturePath", "girihtexture-500px-2.png"),
+      outlineLineWidth: params.getNumber("drawFullImages", 4.0),
+      outlineLineColor: params.getString("outlineLineColor", Color.Navy.cssRGB()),
+      innerPolygonLineColor: params.getString("innerPolygonLineColor", "rgb(86,0,255)"),
+      innerPolygonLineWidth: params.getNumber("innerPolygonLineWidth", isMobile ? 4.0 : 2.0),
+      innerPolygonFillColor: params.getString("innerPolygonFillColor", "rgb(128,128,128)"),
+      outerPolygonLineColor: params.getString("outerPolygonLineColor", Color.Teal.cssRGB()),
+      outerPolygonLineWidth: params.getNumber("outerPolygonLineWidth", isMobile ? 4.0 : 2.0),
+      outerPolygonFillColor: params.getString("outerPolygonFillColor", "rgb(92,92,92)"),
+      outerHullLineWidth: params.getNumber("outerHullLineWidth", isMobile ? 24.0 : 12.0),
+      outerHullLineColor: params.getString("outerHullLineColor", "rgb(36,31,49)"),
+      previewPolygonLineWidth: params.getNumber("previewPolygonLineWidth", isMobile ? 4.0 : 2.0),
+
+      clearSelection: function () {
+        clearSelection();
+      },
+      deleteSelectedTile: function () {
+        tilingHelper.handleDeleteTile();
+        updateHoverMenu();
+      },
+      clearScene: function () {
+        clearScene();
+      },
+      randomPreset: function () {
+        tilingHelper.removeAllTiles();
+        initTiles();
+      },
+      exportFile: function () {
+        exportFile();
+      },
+      importFile: function () {
+        importFile();
       }
     };
 
-    var previewIntersectionPolygons = [];
-    var previewIntersectionAreas = [];
+    // +---------------------------------------------------------------------------------
+    // | Create a new renderer.
+    // +-------------------------------
+    var girihRenderer = new GirihRenderer(pb, girih, config);
 
     // +---------------------------------------------------------------------------------
-    // | Add a tile and install listeners.
+    // | Create a hover menu for mobile devices?
     // +-------------------------------
-    var addTile = function (tile) {
-      tile.position.listeners.addClickListener(
-        (function (vertex) {
-          return function (clickEvent) {
-            vertex.attr.isSelected = !vertex.attr.isSelected;
-            pb.redraw();
-          };
-        })(tile.position)
-      );
-      tile.position.attr.draggable = false;
-      tile.position.attr.visible = false;
-      pb.add(tile.position);
-      girih.addTile(tile);
+    var mobileHoverMenu = isMobile ? new MobileHoverMenu("left center-v hidden") : null;
+    if (mobileHoverMenu) {
+      mobileHoverMenu.addButton("♻", function () {
+        tilingHelper.handleDeleteTile();
+        updateHoverMenu();
+      });
+    }
+
+    // +---------------------------------------------------------------------------------
+    // | Initialize Stats
+    // +-------------------------------
+    var stats = {
+      intersectionArea: 0.0
     };
+    // Add stats
+    var uiStats = new UIStats(stats);
+    stats = uiStats.proxy;
+    uiStats.add("intersectionArea").precision(3).suffix(" spx");
 
     // +---------------------------------------------------------------------------------
-    // | Remove the tile at the given index.
+    // | Initialize TilingHelper
     // +-------------------------------
-    var removeTile = function (tileIndex) {
-      // Remove listeners?
-      pb.remove(girih.tiles[tileIndex].position);
-      girih.removeTileAt(tileIndex);
-    };
+    var tilingHelper = new TilingHelper(pb, girih, stats);
 
-    // +---------------------------------------------------------------------------------
-    // | Get the contrast color (string) for the given color (object).
-    // +-------------------------------
-    var toContrastColor = function (color) {
-      return getContrastColor(color).cssRGB();
+    var initTiles = function () {
+      // Templates from `girihTemplates.js`
+      var templateIndex = Math.floor(Math.random() * GIRIH_TEMPLATES.length);
+      var template = GIRIH_TEMPLATES[templateIndex];
+      console.log("templateIndex", templateIndex);
+      var initialTiles = girihFromJSON(template);
+      for (var i in initialTiles) {
+        var tile = initialTiles[i].clone();
+        tilingHelper.addTile(tile);
+      }
     };
 
     // +---------------------------------------------------------------------------------
     // | This is the actual render function.
     // +-------------------------------
     var drawAll = function (draw, fill) {
-      // if (draw.ctx) {
-      //   // This is quirky. Only works if target is a canvas (will not work on SVG nodes)
-      //   draw.ctx.lineJoin = config.lineJoin;
-      // }
-      // Draw the preview polygon first
-      if (hoverTileIndex != -1 && hoverEdgeIndex != -1 && 0 <= previewTilePointer && previewTilePointer < previewTiles.length) {
-        draw.polygon(previewTiles[previewTilePointer], "rgba(128,128,128,0.5)", 1.0); // Polygon is not open
+      // Draw tesselation graph?
+      girihRenderer.drawOuterHull(draw, fill);
 
-        // Draw intersection polygons (if there are any)
-        if (config.showPreviewOverlaps) {
-          for (var i = 0; i < previewIntersectionPolygons.length; i++) {
-            pb.fill.polygon(previewIntersectionPolygons[i], "rgba(255,0,0,0.25)");
-          }
-        }
-      }
+      // Draw the preview polygon before other polygons/tiles.
+      girihRenderer.drawPreviewIntersectionPolygons(
+        draw,
+        fill,
+        tilingHelper.previewTiles,
+        tilingHelper.previewIntersectionPolygons,
+        tilingHelper.hoverTileIndex,
+        tilingHelper.hoverEdgeIndex,
+        tilingHelper.previewTilePointer
+      );
 
       // Draw all tiles
-      for (var i in girih.tiles) {
-        var tile = girih.tiles[i];
-        // Fill polygon when highlighted (mouse hover)
-        drawTile(draw, fill, tile, i);
-      }
+      girihRenderer.drawAllTiles(draw, fill, tilingHelper.hoverTileIndex, girihRenderer.textureImage);
 
       // Draw intersection polygons? (if there are any)
-      if (
-        config.showPreviewOverlaps &&
-        hoverTileIndex != -1 &&
-        hoverEdgeIndex != -1 &&
-        0 <= previewTilePointer &&
-        previewTilePointer < previewTiles.length
-      ) {
-        for (var i = 0; i < previewIntersectionPolygons.length; i++) {
-          fill.polygon(previewIntersectionPolygons[i], "rgba(255,0,0,0.25)");
-        }
-      }
-
-      if (hoverTileIndex != -1 && hoverEdgeIndex != -1) {
-        var tile = girih.tiles[hoverTileIndex];
-        var edge = new Line(tile.vertices[hoverEdgeIndex], tile.vertices[(hoverEdgeIndex + 1) % tile.vertices.length]);
-        draw.line(edge.a, edge.b, Red.cssRGB(), 2.0);
-      }
+      girihRenderer.drawIntersectionPolygons(
+        draw,
+        fill,
+        tilingHelper.hoverTileIndex,
+        tilingHelper.hoverEdgeIndex,
+        tilingHelper.previewTiles,
+        tilingHelper.previewTilePointer,
+        tilingHelper.previewIntersectionPolygons
+      );
     };
 
-    // +---------------------------------------------------------------------------------
-    // | Draw the given tile.
-    // |
-    // | @param {GirihTile} tile - The tile itself.
-    // | @param {number} index - The index in the tiles-array (to highlight hover).
-    // +-------------------------------
-    var drawTile = function (draw, fill, tile, index) {
-      if (config.drawTextures && textureImage.complete && textureImage.naturalHeight !== 0) {
-        drawTileTexture(pb, tile, textureImage, config.drawFullImages, config.drawBoundingBoxes);
-      }
-      if (config.drawOutlines) {
-        draw.polygon(tile, pb.drawConfig.polygon.color, pb.drawConfig.polygon.lineWidth); // Polygon is not open
-      }
-      // Draw all inner polygons?
-      if (config.drawInnerPolygons) {
-        for (var j = 0; j < tile.innerTilePolygons.length; j++) {
-          draw.polygon(tile.innerTilePolygons[j], DeepPurple.cssRGB(), 1.0);
-        }
-      }
-      // Draw all outer polygons?
-      if (config.drawOuterPolygons) {
-        for (var j = 0; j < tile.outerTilePolygons.length; j++) {
-          draw.polygon(tile.outerTilePolygons[j], Teal.cssRGB(), 1.0);
-        }
-      }
-      // Draw a crosshair at the center
-      var isHighlighted = index == hoverTileIndex;
-      if (config.drawCenters) {
-        drawFancyCrosshair(
-          draw,
-          fill,
-          tile.position,
-          tile.position.attr.isSelected ? "red" : isHighlighted ? "rgba(192,0,0,0.5)" : "rgba(0,192,192,0.5)",
-          tile.position.attr.isSelected ? 2.0 : 1.0,
-          3.0
-        );
-      }
-
-      var contrastColor = toContrastColor(Color.parse(pb.config.backgroundColor));
-      // Draw corner numbers?
-      if (config.drawCornerNumbers) {
-        for (var i = 0; i < tile.vertices.length; i++) {
-          var pos = tile.vertices[i].clone().scale(0.85, tile.position);
-          fill.text("" + i, pos.x, pos.y, { color: contrastColor });
-        }
-      }
-
-      if (config.drawTileNumbers) {
-        fill.text("" + index, tile.position.x, tile.position.y, { color: contrastColor });
-      }
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | Turn the tile the mouse is hovering over.
-    // | The turnCount is ab abstract number: -1 for one turn left, +1 for one turn right.
-    // +-------------------------------
-    var handleTurnTile = function (turnCount) {
-      if (hoverTileIndex == -1) return;
-      girih.turnTile(hoverTileIndex, turnCount);
-      pb.redraw();
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | Move that tile the mouse is hovering over.
-    // | The move amounts are abstract numbers, 1 indicating one unit along each axis.
-    // +-------------------------------
-    var handleMoveTile = function (moveXAmount, moveYAmount) {
-      console.log("move");
-      if (hoverTileIndex == -1) return;
-      girih.moveTile(hoverTileIndex, moveXAmount, moveYAmount);
-      pb.redraw();
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | A helper function to find all tiles (indices) that are selected.
-    // +-------------------------------
-    var findSelectedTileIndices = function () {
-      var selectedTileIndices = [];
-      for (var i in girih.tiles) {
-        if (girih.tiles[i].position.attr.isSelected) selectedTileIndices.push(i);
-      }
-      return selectedTileIndices;
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | Delete all selected tiles.
-    // +-------------------------------
-    var handleDeleteTile = function () {
-      // Find selected tiles
-      var selectedTileIndices = findSelectedTileIndices();
-      for (var i = selectedTileIndices.length - 1; i >= 0; i--) {
-        removeTile(selectedTileIndices[i]);
-      }
-      pb.redraw();
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | Set the currently highlighted preview tile from the preview set.
-    // +-------------------------------
-    var setPreviewTilePointer = function (pointer) {
-      previewTilePointer = pointer;
-      pb.redraw();
-    };
-
-    var addPreviewTile = function () {
-      console.log("area", stats, stats.intersectionArea);
-
+    var addPreviewTile = function (doRedraw) {
       // Avoid overlaps?
       if (!config.allowOverlaps && stats.intersectionArea > 1) {
         console.log("Adding overlapping tiles not allowed.");
-        if (humane) humane.log("Adding overlapping tiles not allowed.");
+        if (humane) {
+          humane.log("Adding overlapping tiles not allowed.");
+        }
         return;
       }
 
-      addTile(previewTiles[previewTilePointer].clone());
-      pb.redraw();
+      tilingHelper.addTile(tilingHelper.previewTiles[tilingHelper.previewTilePointer].clone());
+      doRedraw && pb.redraw();
     };
 
     // +---------------------------------------------------------------------------------
@@ -309,48 +259,125 @@
     // +-------------------------------
     new MouseHandler(pb.eventCatcher, "girih-demo")
       .move(function (e) {
+        if (e.params.isTouchEvent || isMobile) {
+          return;
+        }
         var relPos = pb.transformMousePosition(e.params.pos.x, e.params.pos.y);
-        var cx = document.getElementById("cx");
-        var cy = document.getElementById("cy");
-        if (cx) cx.innerHTML = relPos.x.toFixed(2);
-        if (cy) cy.innerHTML = relPos.y.toFixed(2);
-
         handleMouseMove(relPos);
       })
       .click(function (e) {
         var clickedVert = pb.getVertexNear(e.params.pos, PlotBoilerplate.DEFAULT_CLICK_TOLERANCE);
-        if (!clickedVert && previewTilePointer < previewTiles.length) {
-          // Touch and mouse devices handle this differently
-          if (e.params.isTouchEvent || (!e.params.isTouchEvent && hoverTileIndex != -1 && hoverEdgeIndex != -1)) {
-            addPreviewTile();
+        console.log("clickedVert", clickedVert);
+        // Touch and mouse devices handle this differently
+        if (e.params.isTouchEvent || isMobile) {
+          console.log("isMobile");
+          if (clickedVert) {
+            console.log("Clicked");
+            handleClickedVert(clickedVert);
+            updateHoverMenu();
+            return;
           }
+          // Touch/Mobile mode: first touch identifies edge, second touch places the adjacent tile.
+          var relPos = pb.transformMousePosition(e.params.pos.x, e.params.pos.y);
+          var hoverTileAndEdgeIndex = girih.locateContainingTileAndEdge(relPos);
+          if (
+            hoverTileAndEdgeIndex &&
+            (hoverTileAndEdgeIndex.tileIndex != tilingHelper.hoverTileIndex ||
+              hoverTileAndEdgeIndex.edgeIndex != tilingHelper.hoverEdgeIndex)
+          ) {
+            tilingHelper.hoverTileIndex = hoverTileAndEdgeIndex.tileIndex;
+            tilingHelper.hoverEdgeIndex = hoverTileAndEdgeIndex.edgeIndex;
+            handleActiveHoverIndices();
+            updateHoverMenu();
+            pb.redraw();
+          } else if (
+            hoverTileAndEdgeIndex &&
+            tilingHelper.hoverTileIndex == hoverTileAndEdgeIndex.tileIndex &&
+            tilingHelper.hoverEdgeIndex == hoverTileAndEdgeIndex.edgeIndex
+          ) {
+            // The last clicked located the active tile and active edge.
+            //    -> we can safely add the adjacent tile here
+            addPreviewTile(false);
+            // Clear selected tile/edge after adding
+            tilingHelper.hoverTileIndex = -1;
+            tilingHelper.hoverEdgeIndex = -1;
+            updateHoverMenu();
+            pb.redraw();
+          } else {
+            // Active
+            handleMouseMove(relPos);
+          }
+        } else if (
+          tilingHelper.hoverTileIndex != -1 &&
+          tilingHelper.hoverEdgeIndex != -1 &&
+          tilingHelper.previewTilePointer < tilingHelper.previewTiles.length
+        ) {
+          // Desktop mode: just add (if center not clicked)
+          if (clickedVert) {
+            console.log("center Clicked");
+            return;
+          }
+          addPreviewTile(true);
         }
       });
+
+    var handleClickedVert = function (clickedVert) {
+      // Locate the Girih tile with the specified vert at center.
+      var clickedTile = girih.getTileByCenter(clickedVert);
+      if (clickedTile) {
+        clickedTile.position.attr.isSelected = !clickedTile.position.attr.isSelected;
+        pb.redraw();
+      }
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Mobile devices use a hover menu for additional features that would be usable
+    // | by keyboard events on desktop devices.
+    // +-------------------------------
+    var updateHoverMenu = function () {
+      if (!mobileHoverMenu) {
+        return;
+      }
+      // Is at least one tile selected?
+      var isOneSelected =
+        girih.tiles.find(function (tile) {
+          return tile.position.attr.isSelected;
+        }) != null;
+      if (isOneSelected) {
+        mobileHoverMenu.show();
+      } else {
+        mobileHoverMenu.hide();
+      }
+    };
 
     // +---------------------------------------------------------------------------------
     // | Add a key listener.
     // +-------------------------------
     var keyHandler = new KeyHandler({ trackAll: true })
       .down("q", function () {
-        handleTurnTile(-1);
+        tilingHelper.handleTurnTile(-1);
       })
       .down("e", function () {
-        handleTurnTile(1);
+        tilingHelper.handleTurnTile(1);
       })
       .down("uparrow", function (e) {
-        handleMoveTile(0, -1);
+        tilingHelper.handleMoveTile(0, -1);
       })
       .down("leftarrow", function (e) {
-        handleMoveTile(-1, 0);
+        tilingHelper.handleMoveTile(-1, 0);
       })
       .down("downarrow", function (e) {
-        handleMoveTile(0, 1);
+        tilingHelper.handleMoveTile(0, 1);
       })
       .down("rightarrow", function (e) {
-        handleMoveTile(1, 0);
+        tilingHelper.handleMoveTile(1, 0);
       })
       .down("o", function () {
         config.drawOutlines = !config.drawOutlines;
+        pb.redraw();
+      })
+      .down("h", function () {
+        config.drawOuterHull = !config.drawOuterHull;
         pb.redraw();
       })
       .down("n", function () {
@@ -374,178 +401,112 @@
         pb.redraw();
       })
       .down("d", function () {
-        previewTilePointer = (previewTilePointer + 1) % previewTiles.length;
-        highlightPreviewTile(previewTilePointer, pb);
-        if ((hoverTileIndex != -1) & (hoverEdgeIndex != -1)) {
-          findPreviewIntersections();
+        tilingHelper.previewTilePointer = (tilingHelper.previewTilePointer + 1) % tilingHelper.previewTiles.length;
+        highlightPreviewTile(tilingHelper.previewTilePointer, pb);
+        if (tilingHelper.hoverTileIndex != -1 && tilingHelper.hoverEdgeIndex != -1) {
+          tilingHelper.findPreviewIntersections();
           pb.redraw();
         }
       })
       .down("a", function () {
-        previewTilePointer--;
-        if (previewTilePointer < 0) previewTilePointer = previewTiles.length - 1;
-        highlightPreviewTile(previewTilePointer, pb);
-        if (hoverTileIndex != -1 && hoverEdgeIndex != -1) {
-          findPreviewIntersections();
+        tilingHelper.previewTilePointer--;
+        if (tilingHelper.previewTilePointer < 0) tilingHelper.previewTilePointer = tilingHelper.previewTiles.length - 1;
+        highlightPreviewTile(tilingHelper.previewTilePointer, pb);
+        if (tilingHelper.hoverTileIndex != -1 && tilingHelper.hoverEdgeIndex != -1) {
+          tilingHelper.findPreviewIntersections();
           pb.redraw();
         }
       })
       .down("enter", function () {
-        if (previewTilePointer < previewTiles.length) {
-          // addTile( previewTiles[previewTilePointer].clone() );
-          // pb.redraw();
-          addPreviewTile();
+        if (tilingHelper.previewTilePointer < tilingHelper.previewTiles.length) {
+          addPreviewTile(true);
         }
       })
       .down("delete", function () {
-        console.log("delete");
-        handleDeleteTile();
+        // console.log("delete");
+        tilingHelper.handleDeleteTile();
+        updateHoverMenu();
+      })
+      .down("backspace", function () {
+        // console.log("delete");
+        tilingHelper.handleDeleteTile();
+        updateHoverMenu();
+      })
+      .down("escape", function () {
+        // console.log("clear selection");
+        clearSelection();
       });
     // +---------------------------------------------------------------------------------
     // | @param {XYCoords} relPos
     // +-------------------------------
     var handleMouseMove = function (relPos) {
-      var containedTileIndex = girih.locateConatiningTile(relPos);
-
-      // Reset currently highlighted tile/edge (if re-detected nothing changed in the end)
-      var oldHoverTileIndex = hoverTileIndex;
-      var oldHoverEdgeIndex = hoverEdgeIndex;
-      hoverTileIndex = -1;
-      hoverEdgeIndex = -1;
-
-      // Find Girih edge nearby ...
-      if (containedTileIndex != -1) {
-        var i = containedTileIndex == -1 ? 0 : containedTileIndex;
-        do {
-          var tile = girih.tiles[i];
-          // May be -1
-          hoverEdgeIndex = tile.locateEdgeAtPoint(relPos, girih.edgeLength / 2);
-          if (hoverEdgeIndex != -1) hoverTileIndex = i;
-          i++;
-        } while (i < girih.tiles.length && containedTileIndex == -1 && hoverEdgeIndex == -1);
-        if (hoverTileIndex == -1) hoverTileIndex = containedTileIndex;
-
-        if (oldHoverTileIndex == hoverTileIndex && oldHoverEdgeIndex == hoverEdgeIndex) return;
-
-        // Find the next possible tile to place?
-        if (hoverTileIndex != -1) {
-          previewTiles = girih.findPossibleAdjacentTiles(hoverTileIndex, hoverEdgeIndex);
-          // Set pointer to save range
-          previewTilePointer = Math.min(Math.max(previewTiles.length - 1, previewTilePointer), previewTilePointer);
-          // Find any intersections for the new preview tile
-          findPreviewIntersections();
+      var hoverTileAndEdgeIndex = girih.locateContainingTileAndEdge(relPos);
+      if (hoverTileAndEdgeIndex) {
+        if (
+          tilingHelper.hoverTileIndex == hoverTileAndEdgeIndex.tileIndex &&
+          tilingHelper.hoverEdgeIndex == hoverTileAndEdgeIndex.edgeIndex
+        ) {
+          return; // Nochange
         }
+        tilingHelper.hoverTileIndex = hoverTileAndEdgeIndex.tileIndex;
+        tilingHelper.hoverEdgeIndex = hoverTileAndEdgeIndex.edgeIndex;
+        // // Set pointer to save range
+        tilingHelper.previewTilePointer = Math.min(
+          Math.max(tilingHelper.previewTiles.length - 1, tilingHelper.previewTilePointer),
+          tilingHelper.previewTilePointer
+        );
+      } else {
+        tilingHelper.hoverTileIndex = -1;
+        tilingHelper.hoverEdgeIndex = -1;
+        // previewTilePointer = 0;
       }
+
+      handleActiveHoverIndices();
+      updateHoverMenu();
       pb.redraw();
-      if (previewTiles.length != 0) {
-        createAdjacentTilePreview(previewTiles, previewTilePointer, setPreviewTilePointer, pb);
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Update adjacent possible preview tiles.
+    // +-------------------------------
+    var handleActiveHoverIndices = function () {
+      tilingHelper.previewTiles = girih.findPossibleAdjacentTiles(tilingHelper.hoverTileIndex, tilingHelper.hoverEdgeIndex);
+      // Find any intersections for the new preview tile
+      tilingHelper.findPreviewIntersections();
+      if (tilingHelper.previewTiles.length != 0) {
+        createAdjacentTilePreview(
+          tilingHelper.previewTiles,
+          tilingHelper.previewTilePointer,
+          function (pointer) {
+            tilingHelper.setPreviewTilePointer(pointer);
+          },
+          pb,
+          {
+            isMobile: detectMobileMode(params)
+          }
+        );
       }
     };
 
     // +---------------------------------------------------------------------------------
-    // | Find all intersections of the Girih tiles and the
-    // | currently selected preview polygon.
-    // |
-    // | Following global vars will be updated:
-    // |  * previewIntersectionPolygons
-    // |  * previewIntersectionAreas
+    // | Clear/reset the scene and add one
     // +-------------------------------
-    var findPreviewIntersections = function () {
-      previewIntersectionPolygons = [];
-      previewIntersectionAreas = [];
-      if (hoverTileIndex == -1 || hoverEdgeIndex == -1 || previewTilePointer < 0 || previewTilePointer >= previewTiles.length) {
-        stats.intersectionArea = 0.0;
-        return;
-      }
-      var totalArea = 0.0;
-      var currentPreviewTile = previewTiles[previewTilePointer];
-      for (var i = 0; i < girih.tiles.length; i++) {
-        if (i == hoverTileIndex) continue;
-        var intersections = findPreviewIntersectionsFor(currentPreviewTile, girih.tiles[i]);
-        for (var j = 0; j < intersections.length; j++) {
-          var poly = new Polygon(cloneVertexArray(intersections[j]), false);
-          var area = poly.area();
-          previewIntersectionAreas.push(area);
-          previewIntersectionPolygons.push(poly);
-          totalArea += area;
-        }
-      }
-      stats.intersectionArea = totalArea;
+    var clearScene = function () {
+      tilingHelper.removeAllTiles();
+      tilingHelper.addTile(girih.TILE_TEMPLATES[0].clone());
+      updateHoverMenu();
     };
 
     // +---------------------------------------------------------------------------------
-    // | Find the polygon intersections for the given preview tile and
-    // | girih tile.
-    // |
-    // | @param {Polygon} previewTile - The tile you want to place.
-    // | @param {Polygon} girihTile - The tile currently on the canvas.
-    // | @return {Vertex[][]} A set of intersection polygons.
+    // | Clears the `selected` flag for all vertices.
     // +-------------------------------
-    var findPreviewIntersectionsFor = function (previewTile, girihTile) {
-      // Check if there are intersec
-      var intersection = greinerHormann.intersection(
-        // This is a workaround about a colinearity problem with greiner-hormann:
-        // ... add some random jitter.
-        addPolygonJitter(cloneVertexArray(girihTile.vertices), 0.0001), // Source
-        addPolygonJitter(cloneVertexArray(previewTile.vertices), 0.0001) // Clip
-      );
-      if (!intersection) {
-        return [];
-      }
-
-      // Only one single polygon returned?
-      if (typeof intersection[0][0] === "number") intersection = [intersection];
-
-      // Calculate size or triangulation here?
-      return intersection;
+    var clearSelection = function () {
+      girih.tiles.forEach(function (tile) {
+        tile.position.attr.isSelected = false;
+      });
+      updateHoverMenu();
+      pb.redraw();
     };
-
-    // +---------------------------------------------------------------------------------
-    // | A global config that's attached to the dat.gui control interface.
-    // +-------------------------------
-    var config = PlotBoilerplate.utils.safeMergeByKeys(
-      {
-        drawOutlines: true,
-        drawCenters: true,
-        drawCornerNumbers: false,
-        drawTileNumbers: false,
-        drawOuterPolygons: true,
-        drawInnerPolygons: true,
-        lineJoin: "round", // [ "bevel", "round", "miter" ]
-        drawTextures: false,
-        showPreviewOverlaps: true,
-        allowOverlaps: false,
-        drawFullImages: false,
-        drawBoundingBoxes: false,
-        texturePath: "girihtexture-500px-2.png",
-        exportFile: function () {
-          exportFile();
-        },
-        importFile: function () {
-          importFile();
-        }
-      },
-      GUP
-    );
-
-    // Keep track of loaded textures
-    // var textureStore = new Map();
-    // var loadTextureImage = function (path, onLoad) {
-    //   var texture = textureStore.get(path);
-    //   if (!texture) {
-    //     texture = new Image();
-    //     texture.onload = onLoad;
-    //     texture.src = path;
-    //     textureStore.set(path, texture);
-    //   }
-    //   return texture;
-    // };
-    // var path = "girih-tiles-spatial-1.png";
-    // // var path = "girihtexture-500px-2.png";
-    // textureImage = loadTextureImage(path, function () {
-    //   console.log("Texture loaded");
-    //   pb.redraw();
-    // });
 
     var exportFile = function () {
       var data = girihToJSON(girih.tiles);
@@ -565,7 +526,8 @@
           var content = readerEvent.target.result;
           var jsonData = JSON.parse(content);
           var jsonObject = girihFromJSON(jsonData);
-          girih.replaceTiles(jsonObject);
+          // girih.replaceTiles(jsonObject);
+          tilingHelper.replaceAllTiles(jsonObject);
           pb.redraw();
         };
       };
@@ -584,7 +546,7 @@
       }
       return texture;
     };
-    textureImage = loadTextureImage(config.texturePath, function () {
+    girihRenderer.textureImage = loadTextureImage(config.texturePath, function () {
       console.log("Texture loaded");
       pb.redraw();
     });
@@ -594,7 +556,7 @@
       imagePath = config.texturePath;
       console.log("handleChange", imagePath);
       // Load texture image
-      textureImage = loadTextureImage(imagePath, function () {
+      girihRenderer.textureImage = loadTextureImage(imagePath, function () {
         console.log("Texture loaded");
         pb.redraw();
       });
@@ -605,12 +567,35 @@
     var fileDrop = new FileDrop(pb.eventCatcher);
     fileDrop.onFileJSONDropped(function (jsonObject) {
       var loadedGirihTiles = girihFromJSON(jsonObject);
-      girih.replaceTiles(loadedGirihTiles);
+      // girih.replaceTiles(loadedGirihTiles);
+      tilingHelper.replaceAllTiles(loadedGirihTiles);
       pb.redraw();
     });
 
-    var stats = {
-      intersectionArea: 0.0
+    const storeInLocalStorage = function () {
+      var setValue = girihToJSON(girih.tiles);
+      console.log("[storeInLocalStorage] setValue"); //, setValue);
+      localStorage.setItem("GirihEditor", setValue);
+    };
+
+    const restoreFromLocalStorage = function () {
+      // Storage value to array of ColorGradients
+      const value = localStorage.getItem("GirihEditor");
+      console.log("[restoreFromLocalStorage] value"); //, value);
+      if (!value) {
+        return false;
+      }
+      const jsonArray = JSON.parse(value);
+      if (!Array.isArray(jsonArray)) {
+        return false;
+      }
+      var jsonObject = girihFromJSON(jsonArray);
+      tilingHelper.removeAllTiles();
+      for (var i in jsonObject) {
+        var tile = jsonObject[i].clone();
+        tilingHelper.addTile(tile);
+      }
+      return true;
     };
 
     // +---------------------------------------------------------------------------------
@@ -618,53 +603,104 @@
     // +-------------------------------
     {
       var gui = pb.createGUI();
+      var foldGirihBasics = gui.addFolder("Girih Settings");
       // prettier-ignore
-      gui.add(config, 'drawCornerNumbers').listen().onChange( function() { pb.redraw(); } ).name("drawCornerNumbers").title("Draw the number of each tile corner?");
+      foldGirihBasics.add(config, 'drawCornerNumbers').listen().onChange( function() { pb.redraw(); } ).name("drawCornerNumbers").title("Draw the number of each tile corner?");
       // prettier-ignore
-      gui.add(config, 'drawTileNumbers').listen().onChange( function() { pb.redraw(); } ).name("drawTileNumbers").title("Draw the index of each tile?");
+      foldGirihBasics.add(config, 'drawTileNumbers').listen().onChange( function() { pb.redraw(); } ).name("drawTileNumbers").title("Draw the index of each tile?");
       // prettier-ignore
-      gui.add(config, 'drawOutlines').listen().onChange( function() { pb.redraw(); } ).name("drawOutlines").title("Draw the tile outlines?");
+      foldGirihBasics.add(config, 'drawCenters').listen().onChange( function() { pb.redraw(); } ).name("drawCenters").title("Draw the center points?");
       // prettier-ignore
-      gui.add(config, 'drawCenters').listen().onChange( function() { pb.redraw(); } ).name("drawCenters").title("Draw the center points?");
+      foldGirihBasics.add(config, 'lineJoin', [ "bevel", "round", "miter" ] ).onChange( function() { pb.redraw(); } ).name("lineJoin").title("The shape of the line joins.");
       // prettier-ignore
-      gui.add(config, 'drawOuterPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawOuterPolygons").title("Draw the outer polygons?");
+      foldGirihBasics.add(config, 'drawTextures').listen().onChange( function() { pb.redraw(); } ).name("drawTextures").title("Draw the Girih textures?");
       // prettier-ignore
-      gui.add(config, 'drawInnerPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawInnerPolygons").title("Draw the inner polygons?");
+      foldGirihBasics.add(config, 'showPreviewOverlaps').listen().onChange( function() { pb.redraw(); } ).name('showPreviewOverlaps').title('Detect and show preview overlaps?');
       // prettier-ignore
-      gui.add(config, 'lineJoin', [ "bevel", "round", "miter" ] ).onChange( function() { pb.redraw(); } ).name("lineJoin").title("The shape of the line joins.");
+      foldGirihBasics.add(config, 'allowOverlaps').listen().onChange( function() { pb.redraw(); } ).name('allowOverlaps').title('Allow placement of intersecting tiles?');
       // prettier-ignore
-      gui.add(config, 'drawTextures').listen().onChange( function() { pb.redraw(); } ).name("drawTextures").title("Draw the Girih textures?");
+      foldGirihBasics.add(config, 'drawFullImages').listen().onChange( function() { pb.redraw(); } ).name('drawFullImages').title('Show a hint of the full imagse?');
       // prettier-ignore
-      gui.add(config, 'showPreviewOverlaps').listen().onChange( function() { pb.redraw(); } ).name('showPreviewOverlaps').title('Detect and show preview overlaps?');
+      foldGirihBasics.add(config, 'drawBoundingBoxes').listen().onChange( function() { pb.redraw(); } ).name('drawBoundingBoxes').title('Show different kind of bounding boxes (textur mode only)?');
       // prettier-ignore
-      gui.add(config, 'allowOverlaps').listen().onChange( function() { pb.redraw(); } ).name('allowOverlaps').title('Allow placement of intersecting tiles?');
+      foldGirihBasics.add(config, 'texturePath', ["girihtexture-500px-2.png", "girih-tiles-spatial-1.png"]).listen().onChange( handleTextureChange ).name('texturePath').title('Choose a texture.');
+      foldGirihBasics.close();
+
+      var foldGirihDrawSettings = gui.addFolder("Girih lines and colors");
       // prettier-ignore
-      gui.add(config, 'drawFullImages').listen().onChange( function() { pb.redraw(); } ).name('drawFullImages').title('Show a hint of the full imagse?');
+      foldGirihDrawSettings.add(config, 'drawOutlines').listen().onChange( function() { pb.redraw(); } ).name("drawOutlines").title("Draw the tile outlines?");
       // prettier-ignore
-      gui.add(config, 'drawBoundingBoxes').listen().onChange( function() { pb.redraw(); } ).name('drawBoundingBoxes').title('Show different kind of bounding boxes?');
+      foldGirihDrawSettings.add(config, 'outlineLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the tiles' outline.").onChange( function() { pb.redraw(); } );
       // prettier-ignore
-      gui.add(config, 'texturePath', ["girihtexture-500px-2.png", "girih-tiles-spatial-1.png"]).listen().onChange( handleTextureChange ).name('texturePath').title('Choose a texture.');
+      foldGirihDrawSettings.addColor(config, 'outlineLineColor').title("The color of the tiles' outline.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'drawInnerPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawInnerPolygons").title("Draw the inner polygons?");
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'innerPolygonLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the inner polygons.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.addColor(config, 'innerPolygonLineColor').title("The line color of the inner polygons.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'fillInnerPolygons').listen().onChange( function() { pb.redraw(); } ).title("Fill the inner polygons?");
+      // prettier-ignore
+      foldGirihDrawSettings.addColor(config, 'innerPolygonFillColor').title("The fill color of the inner polygons.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'drawOuterPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawOuterPolygons").title("Draw the outer polygons?");
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'outerPolygonLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the outer polygons.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.addColor(config, 'outerPolygonLineColor').title("The line color of the outer polygons.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'fillOuterPolygons').listen().onChange( function() { pb.redraw(); } ).title("Fill the outer polygons?");
+      // prettier-ignore
+      foldGirihDrawSettings.addColor(config, 'outerPolygonFillColor').title("The fill color of the outer polygons.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'drawOuterHull').listen().onChange( function() { pb.redraw(); } ).title("Calculate and draw the outer hull?");
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'outerHullTolerance').min(0.0).max(4.0).step(0.01).title("The tolerance (max distance) to use for calculating the outer hull.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'outerHullRemoveExcessiveVerts').listen().onChange( function() { pb.redraw(); } ).title("If outer hull is calculated: remove unused vertices?");
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'outerHullLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the outer hull.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.addColor(config, 'outerHullLineColor').title("The line color of the outer hull.").onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      foldGirihDrawSettings.add(config, 'previewPolygonLineWidth').min(0.0).max(64.0).step(1.0).title("The line width of the preview polygon.").onChange( function() { pb.redraw(); } );
+      // foldGirihDrawSettings.close();
+
+      // prettier-ignore
+      gui.add(config, 'clearSelection').name("Clear Selection").title('De-selects all tiles.');
+      // prettier-ignore
+      gui.add(config, 'deleteSelectedTile').name("Delete Selected Tile").title('Delete selected tile.');
+      // prettier-ignore
+      gui.add(config, 'clearScene').name("Clear Scene").title('Clear the whole scene and add one default tile.');
+      // prettier-ignore
+      gui.add(config, 'randomPreset').name("Load random preset").title('Loads a random preset scene.');
+
       var foldImport = gui.addFolder("Import");
-      foldImport.add(config, "importFile");
+      foldImport.add(config, "importFile").name("Import Girih from JSON file");
 
       // Add to internal dat.gui folder (exists as enableSVGExport=true)
       var exportFolder = globalThis.utils.guiFolders["editor_settings.export"];
-      exportFolder.add(config, "exportFile");
-
-      // Add stats
-      var uiStats = new UIStats(stats);
-      stats = uiStats.proxy;
-      uiStats.add("intersectionArea").precision(3).suffix(" spx");
+      exportFolder.add(config, "exportFile").name("Export Girih to JSON file");
     }
 
-    initTiles();
+    if (!restoreFromLocalStorage()) {
+      initTiles();
+    }
     pb.config.preDraw = drawAll;
     var container = document.querySelector(".wrapper-bottom");
     // Apply canvas background color (this respects the darkmode in this component)
     container.style["background-color"] = pb.config.backgroundColor;
+
+    setInterval(() => {
+      storeInLocalStorage();
+    }, 10000);
+
     pb.redraw();
     pb.canvas.focus();
   };
 
-  if (!window.pbPreventAutoLoad) window.addEventListener("load", window.initializePB);
+  if (!window.pbPreventAutoLoad) {
+    window.addEventListener("load", window.initializePB);
+  }
 })(window);

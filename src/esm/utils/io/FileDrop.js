@@ -152,8 +152,12 @@ export class FileDrop {
     onFileTextDropped(callback) {
         this.fileDroppedCallbackText = callback;
     }
+    // TODO: docs
     onFileSVGDropped(callback) {
         this.fileDroppedCallbackSVG = callback;
+    }
+    onFileBinaryDropped(callback) {
+        this.fileDroppedCallbackBinary = callback;
     }
     /**
      * Removes all listeners (drop, dragover and dragleave).

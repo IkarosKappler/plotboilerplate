@@ -17,6 +17,7 @@
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `lineDashes` attribute.
+ * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @version  0.0.10
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -333,7 +334,7 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.cubicBezierPath = function (path, color, lineWidth) {
+    drawutilsgl.prototype.cubicBezierPath = function (path, color, lineWidth, strokeOptions, isOpen) {
         // NOT YET IMPLEMENTED
     };
     /**

@@ -89,6 +89,7 @@
         useDistanceThreshold: false,
         drawVertices: true,
         drawVertNumbers: false,
+        useDepthBuffer: false,
         useBlendMode: false,
         blendMode: "difference",
         geometryType: "dodecahedron",
@@ -171,69 +172,6 @@
       var textColor = getContrastColor(Color.parse(pb.config.backgroundColor)).cssRGB();
       var geometry = getGeometry();
       geometryMeshRenderer.drawGeometry(draw, fill, geometry, { textColor: textColor });
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | Draw the edges of a geometry.
-    // +-------------------------------
-    var drawGeometryEdges = function (draw, fill, geometry, minMax, transformMatrix, colorObject) {
-      for (var e in geometry.edges) {
-        var a3 = transformMatrix.apply3(geometry.vertices[geometry.edges[e][0]]);
-        var b3 = transformMatrix.apply3(geometry.vertices[geometry.edges[e][1]]);
-
-        var a2 = applyProjection(a3);
-        var b2 = applyProjection(b3);
-
-        var tA = getThreshold(a3, minMax.min.z, minMax.max.z);
-        var tB = getThreshold(b3, minMax.min.z, minMax.max.z);
-        var threshold = config.useDistanceThreshold ? Math.max(0, Math.min(1, Math.min(tA, tB))) : 1.0;
-
-        colorObject.a = threshold;
-        draw.line(a2, b2, colorObject.cssRGBA(), config.lineWidth);
-      }
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | Draw the vertices and/or vertex number of a geometry.
-    // +-------------------------------
-    var drawGeometryVertices = function (draw, fill, geometry, transformMatrix, options) {
-      for (var v in geometry.vertices) {
-        var projected = applyProjection(transformMatrix.apply3(geometry.vertices[v]));
-        if (config.drawVertices) {
-          draw.squareHandle(projected, 2, "grey", 1);
-        }
-        if (options.drawVertNumbers) {
-          fill.text("" + v, projected.x + 3, projected.y + 3, { color: options.textColor });
-        }
-      }
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | Determine the threshold in [0,1] of the given point.
-    // | 1: at camera plane (no distance)
-    // | 0: at max distance (as configured)
-    // +-------------------------------
-    var getThreshold = function (p, far, close) {
-      return (far - p.z) / (far - close);
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | Projects the given 3d point to the 2d plane (just before being rendered).
-    // +-------------------------------
-    var applyProjection = function (p) {
-      var threshold = getThreshold(p, config.far, config.close);
-      threshold = Math.max(0, threshold);
-      return { x: p.x * threshold, y: p.y * threshold };
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | We could also do this via a transformation matrix.
-    // +-------------------------------
-    var applyScale = function (p) {
-      p.x *= config.scaleX;
-      p.y *= config.scaleY;
-      p.z *= config.scaleZ;
-      return p;
     };
 
     // +---------------------------------------------------------------------------------
@@ -339,6 +277,22 @@
         stats.mouseY = relPos.y;
       });
 
+    // +---------------------------------------------------------------------------------
+    // | Install a touch handler to rotate on mobile device.
+    // +-------------------------------
+    createAlloyFinger(pb.eventCatcher, {
+      touchMove: function (event) {
+        // console.log("event", event);
+        if (event.touches.length === 0) {
+          return;
+        }
+        // var relPos = pb.transformMousePosition(event.touches[0].clientX, event.touches[0].clientY);
+        config.rotationX = geomutils.wrapMinMax(config.rotationX + event.deltaY, 0.0, 360.0);
+        config.rotationZ = geomutils.wrapMinMax(config.rotationZ - event.deltaX, 0.0, 360.0);
+        pb.redraw();
+      }
+    });
+
     var stats = {
       mouseX: 0,
       mouseY: 0
@@ -404,6 +358,8 @@
       f2.add(config, "drawVertices").title("Draw vertices?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
       f2.add(config, "drawVertNumbers").title("Draw vertex numbers?").listen().onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      f2.add(config, "useDepthBuffer").title("Use depth buffer (slower)").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
       f2.add(config, "useBlendMode").title("Use blend mode?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore

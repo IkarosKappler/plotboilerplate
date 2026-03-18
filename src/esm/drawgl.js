@@ -16,6 +16,7 @@
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `lineDashes` attribute.
+ * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @version  0.0.10
  **/
 import { Vertex } from "./Vertex";
@@ -329,7 +330,7 @@ export class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    cubicBezierPath(path, color, lineWidth) {
+    cubicBezierPath(path, color, lineWidth, strokeOptions, isOpen) {
         // NOT YET IMPLEMENTED
     }
     /**

@@ -91,8 +91,9 @@
  * @modified 2025-05-07 Added `PlogBoilerplate.addContentChangeListener` and `.removeContentChangeListener`.
  * @modified 2025-05-07 Moving full vectors now by default when vector point a is moved.
  * @modified 2025-05-20 Applying `lineWith` parameter in the draw routine for vectors (had been missing).
+ * @modified 2026-03-13 Changed visibility of `setZoom` and `setOffset` to public. There was no good reason to have the private.
  *
- * @version  1.21.1
+ * @version  1.21.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -804,7 +805,7 @@ export declare class PlotBoilerplate {
      *
      * @param {Vertex} newOffset - The new draw offset to use.
      **/
-    private setOffset;
+    setOffset(newOffset: XYCoords): void;
     /**
      * Set a new zoom value (and re-adjust the draw offset).
      *
@@ -814,7 +815,7 @@ export declare class PlotBoilerplate {
      * @param {number} zoomFactorY - The new vertical zoom value.
      * @param {Vertex} interactionPos - The position of mouse/touch interaction.
      **/
-    private setZoom;
+    setZoom(zoomFactorX: number, zoomFactorY: number, interactionPos: Vertex): void;
     private installInputListeners;
     /**
      * Creates a control GUI (a dat.gui instance) for this

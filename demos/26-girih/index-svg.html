@@ -23,7 +23,7 @@
 
     <script src="../../lib/humane.min.js"></script>
     <script src="../../lib/FileSaver.min.js"></script>
-    <script src="../../lib/Color.js"></script>
+    <!-- <script src="../../lib/Color.js"></script> -->
     <script src="../../lib/alloy_finger.js"></script>
     <script src="../../lib/uistats.min.js"></script>
     <script src="../../src/cjs/utils/module.js"></script>
@@ -35,6 +35,8 @@
     <script src="../../src/cjs/utils/lil.gui.title.polyfill.js"></script>
     <script src="../../src/cjs/utils/lil.gui.arrowbounce.polyfill.js"></script>
     <script src="../../src/cjs/utils/gup.js"></script>
+    <script src="../../src/cjs/utils/Params.js"></script>
+    <script src="../../src/cjs/utils/datastructures/Color.js"></script>
 
     <!-- For development -->
     <script src="../../src/cjs/UIDGenerator.js"></script>
@@ -69,8 +71,12 @@
     <!-- END For production -->
 
     <script src="../../src/cjs/utils/cloneVertexArray.js"></script>
+    <script src="../../src/cjs/utils/algorithms/arrayFill.js"></script>
+    <script src="../../src/cjs/utils/algorithms/detectPaths.js"></script>
     <script src="../../src/cjs/utils/algorithms/getContrastColor.js"></script>
+    <script src="../../src/cjs/utils/algorithms/PolygonTesselationOutlines.js"></script>
     <script src="../../src/cjs/utils/datastructures/Color.js"></script>
+    <script src="../../src/cjs/utils/datastructures/GenericPath.js"></script>
     <script src="../../src/cjs/utils/WebColors.js"></script>
     <script src="../../src/cjs/utils/datastructures/GirihTile.js"></script>
     <script src="../../src/cjs/utils/datastructures/GirihBowtie.js"></script>
@@ -83,9 +89,15 @@
     <script src="../../src/cjs/utils/io/FileDrop.js"></script>
     <script src="../addPolygonJitter.js"></script>
     <script src="../drawFancyCrosshair.js"></script>
+    <script src="../isMobileDevice.js"></script>
+    <script src="../detectMobileMode.js"></script>
+    <script src="MobileHoverMenu.js"></script>
     <script src="girihToJSON.js"></script>
     <script src="drawTileTexture.js"></script>
     <script src="tilePreview.js"></script>
+    <script src="TilingHelper.js"></script>
+    <script src="GirihRenderer.js"></script>
+    <script src="girihTemplates.js"></script>
 
     <script src="../../lib/greiner-hormann-typescript/dist/greiner-hormann.min.js"></script>
 
@@ -103,9 +115,5 @@
     <div class="wrapper-bottom">
       Preview
     </div>
-    <div class="info monospace">
-      [<span id="cx">-</span>,<span id="cy">-</span>]
-    </div>
-
   </body>
 </html>

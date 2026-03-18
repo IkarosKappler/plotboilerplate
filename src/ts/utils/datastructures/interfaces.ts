@@ -6,11 +6,11 @@
  * @version 1.0.0
  **/
 
-export type Interval = [ number, number ];
+export type Interval = [number, number];
 
 export type IndexPair = {
-    i : number;
-    j : number;
-}
+  i: number;
+  j: number;
+};
 
 export type Matrix<T> = Array<Array<T>>;

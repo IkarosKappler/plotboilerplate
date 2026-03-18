@@ -19,6 +19,7 @@
 type IDroppedCallbackJSON = (jsonData: object) => void;
 type IDroppedCallbackText = (textData: string) => void;
 type IDroppedCallbackSVG = (svgDocument: Document) => void;
+type IDroppedCallbackBinary = (binaryData: Blob, file: File) => void;
 export declare class FileDrop {
     /**
      * The 'dropzone' element.
@@ -81,6 +82,7 @@ export declare class FileDrop {
      */
     onFileTextDropped(callback: IDroppedCallbackText): void;
     onFileSVGDropped(callback: IDroppedCallbackSVG): void;
+    onFileBinaryDropped(callback: IDroppedCallbackBinary): void;
     /**
      * Internally handle a drop event.
      *
