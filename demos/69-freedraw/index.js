@@ -10,8 +10,8 @@
   "use strict";
 
   // Fetch the GET params
-  let GUP = gup();
   _context.addEventListener("load", function () {
+    let GUP = gup();
     var params = new Params(GUP);
     var isDarkmode = detectDarkMode(GUP);
     var isMobile = isMobileDevice();
@@ -91,14 +91,36 @@
 
     // +---------------------------------------------------------------------------------
     // | Adds a new Hobby path from the given poly line.
+    // | polyline: Array<Vertex>
     // +-------------------------------
     var addHobbyPath = function (polyline) {
       console.log("Add hobby path", polyline);
       // Hobby curve generation will fail if the vertex list contains duplicates.
       var cleanVertices = clearDuplicateVertices(polyline.vertices, 2.0); // epsilon=2.0
       var hobbyPath = new HobbyPath(cleanVertices);
+      // Array<CubicBezierCurve>
       var curves = hobbyPath.generateCurve(false, 0.0); // isCircular=false, hobbyOmega=0.0
-      hobbyCurves.push(curves);
+      var hobbyIndex = hobbyCurves.push(curves) - 1;
+      console.log("hobbyIndex", hobbyIndex);
+      installHobbyMoveListeners(polyline, hobbyIndex);
+    };
+
+    var installHobbyMoveListeners = function (polyline, hobbyIndex) {
+      // Todo: update the hobby path when an input vertex changed
+      for (var i = 0; i < polyline.vertices.length; i++) {
+        polyline.vertices[i].listeners.addDragEndListener(function (event) {
+          console.log("hobby curve changes", hobbyIndex);
+          recaululateHobbyPath(polyline, hobbyIndex);
+        });
+      }
+    };
+
+    var recaululateHobbyPath = function (polyline, hobbyIndex) {
+      var cleanVertices = clearDuplicateVertices(polyline.vertices, 2.0); // epsilon=2.0
+      var updatedHobbyPath = new HobbyPath(cleanVertices);
+      var updatedCurves = updatedHobbyPath.generateCurve(false, 0.0); // isCircular=false, hobbyOmega=0.0
+      hobbyCurves.splice(hobbyIndex, 1, updatedCurves);
+      pb.redraw();
     };
 
     // +---------------------------------------------------------------------------------
