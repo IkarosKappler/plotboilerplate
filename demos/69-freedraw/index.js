@@ -14,6 +14,7 @@
   _context.addEventListener("load", function () {
     var params = new Params(GUP);
     var isDarkmode = detectDarkMode(GUP);
+    var isMobile = isMobileDevice();
 
     // All config params except the canvas are optional.
     var pb = new PlotBoilerplate(
@@ -26,7 +27,7 @@
 
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
-      showVertices: params.getBoolean("showVertices", false),
+      showVertices: params.getBoolean("showVertices", true),
       lineColor: params.getString("lineColor", "rgb(255,128,0)"),
       lineWidth: params.getNumber("lineWidth", 7.0),
       showHobbyCurves: params.getBoolean("showHobbyCurves", true),
@@ -53,6 +54,9 @@
       }
     };
 
+    // +---------------------------------------------------------------------------------
+    // | This method is called before the library starts to draw anything.
+    // +-------------------------------
     var preDraw = function (draw, fill) {
       if (!config.showHobbyCurves) {
         return;
@@ -85,6 +89,9 @@
       }
     }; // END postDraw
 
+    // +---------------------------------------------------------------------------------
+    // | Adds a new Hobby path from the given poly line.
+    // +-------------------------------
     var addHobbyPath = function (polyline) {
       console.log("Add hobby path", polyline);
       // Hobby curve generation will fail if the vertex list contains duplicates.
@@ -94,10 +101,25 @@
       hobbyCurves.push(curves);
     };
 
-    // Install mouse listener
+    // +---------------------------------------------------------------------------------
+    // | Installs a mouse listener.
+    // +-------------------------------
     new MouseHandler(pb.eventCatcher)
       .down(function (event) {
         if (!event.params.leftButton || event.params.wasDragged) {
+          return;
+        }
+        // Check if there is a movable vertex at the location
+        var vertAtPos = pb.getVertexNear(
+          event.params.pos,
+          isMobile ? PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE : PlotBoilerplate.DEFAULT_CLICK_TOLERANCE
+        );
+        console.log("Vert clicked? ", vertAtPos);
+
+        if (vertAtPos && config.showVertices) {
+          console.log("Vert clicked.");
+          // There is a line vertex at the given position AND those are visible
+          // --> better do nothing here.
           return;
         }
         var relPos = new Vertex(pb.transformMousePosition(event.params.pos.x, event.params.pos.y));
@@ -109,7 +131,7 @@
       })
       .drag(function (event) {
         if (!curPolyline) {
-          console.warn("[WARN] curPolyline is null which is not expected here.");
+          // Probably a visible vertex was clicked to move.
           return;
         }
         var relPos = new Vertex(pb.transformMousePosition(event.params.pos.x, event.params.pos.y));
@@ -120,6 +142,10 @@
       // Event Type: XMouseEvent (an extension of the regular MouseEvent)
       .up(function (event) {
         if (!event.params.leftButton) {
+          return;
+        }
+        if (!curPolyline) {
+          // Probably a visible vertex was clicked to move.
           return;
         }
         freedrawLines.push(curPolyline);
