@@ -41,10 +41,7 @@
     var curPolyline = null; // Polygon
     var hobbyCurves = []; // Array< Array<CubicBezierPath> >
 
-    var postDraw = function (draw, fill) {
-      // ...
-      // draw.circle({ x: 0, y: 0 }, 100, "red", 1);
-
+    var postDraw = function (draw, _fill) {
       if (curPolyline) {
         draw.polyline(curPolyline.vertices, true, "orange", 2.0);
       }
@@ -67,7 +64,7 @@
           return;
         }
         // Convert sequence of CubicBezierCurve to bezier path data for direct draw.
-        // This avoid ugly visible micro-gaps between all segments.
+        // This avoid ugly visible micro-gaps between any segments.
         var pathData = hobbyCurves[p].reduce(
           function (accu, nextCubicCurve) {
             accu.push(nextCubicCurve.startControlPoint, nextCubicCurve.endControlPoint, nextCubicCurve.endPoint);
@@ -76,7 +73,7 @@
           [hobbyCurves[p][0].startPoint]
         );
         // console.log("pathData", pathData);
-        draw.cubicBezierPath(pathData, config.lineColor, config.lineWidth, null, true);
+        draw.cubicBezierPath(pathData, config.lineColor, config.lineWidth, { lineCap: "round" }, true);
         if (config.showHobbyTangents) {
           for (var i = 0; i < hobbyCurves[p].length; i++) {
             if (config.showHobbyTangents) {

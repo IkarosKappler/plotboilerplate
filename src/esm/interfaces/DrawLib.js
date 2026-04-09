@@ -27,6 +27,7 @@
  * @modified 2023-09-30 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
  * @modified 2026-01-04 Adding optional `lineJoin` attribute to the `StrokeOptions` interface.
  * @modified 2026-04-04 Added the method `bounds`.
+ * @modified 2026-04-04 Added the `lineCap` attribute to the `StrokeOptions`.
  **/
 export {};
 //# sourceMappingURL=DrawLib.js.map

@@ -27,6 +27,7 @@
  * @modified 2023-09-30 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
  * @modified 2026-01-04 Adding optional `lineJoin` attribute to the `StrokeOptions` interface.
  * @modified 2026-04-04 Added the method `bounds`.
+ * @modified 2026-04-04 Added the `lineCap` attribute to the `StrokeOptions`.
  **/
 import { Bounds } from "../Bounds";
 import { Polygon } from "../Polygon";
@@ -60,6 +61,7 @@ export interface StrokeOptions {
     dashOffset?: number;
     dashArray?: Array<number>;
     lineJoin?: "round" | "bevel" | "miter";
+    lineCap?: "butt" | "round" | "square";
 }
 /**
  * An interface all drawing libraries must implement to be used with PlotBoilerplate.

@@ -6452,6 +6452,7 @@ CircleSector.circleSectorUtils = {
  * @modified 2026-01-04 Fixing missing `strokeOptions` param in the `drawutilssvg.polygon` method.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @modified 2026-04-04 Added the method `bounds`.
+ * @modified 2026-04-04 Handling the `stroke-linecap` option now from the `StrokeOptions` interface.
  * @version  1.7.0
  **/
 const RAD_TO_DEG$1 = 180 / Math.PI;
@@ -6869,6 +6870,10 @@ class drawutilssvg {
         // Set line join option?
         if (strokeOptions && strokeOptions.lineJoin && drawutilssvg.nodeSupportsLineJoin(node.tagName)) {
             node.setAttribute("stroke-linejoin", strokeOptions.lineJoin);
+        }
+        // Set lineCap option?
+        if (strokeOptions && strokeOptions.lineCap && drawutilssvg.nodeSupportsLineCap(node.tagName)) {
+            node.setAttribute("stroke-linecap", strokeOptions.lineCap);
         }
     }
     _x(x) {
@@ -7984,6 +7989,9 @@ class drawutilssvg {
     static nodeSupportsLineJoin(nodeName) {
         return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
     }
+    static nodeSupportsLineCap(nodeName) {
+        return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
+    }
     /**
      * Creates a basic <line> node with start and end coordinates. The created node will not
      * be bound to any root node.
@@ -8171,6 +8179,7 @@ drawutilssvg.HEAD_XML = [
  * @modified 2026-01-04 Adding `lineJoin` attribute to the `StrokeOptions`.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @modified 2026-04-04 Added the method `bounds`.
+ * @modified 2026-04-04 Handling the `lineCap` attribute in the `StrokeOptions`.
  * @version  1.15.0
  **/
 // Todo: rename this class to Drawutils?
@@ -8204,7 +8213,7 @@ class drawutils {
      * @param {StrokeOptions=} strokeOptions -
      */
     applyStrokeOpts(strokeOptions) {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         this.ctx.setLineDash(((_a = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashArray) !== null && _a !== void 0 ? _a : []).map((dashArrayElem) => {
             // Note assume scale.x === scale.y
             // Invariant scale makes funny stuff anyway.
@@ -8212,6 +8221,7 @@ class drawutils {
         }));
         this.ctx.lineDashOffset = ((_b = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashOffset) !== null && _b !== void 0 ? _b : 0) * this.scale.x;
         this.ctx.lineJoin = (_c = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.lineJoin) !== null && _c !== void 0 ? _c : null;
+        this.ctx.lineCap = (_d = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.lineCap) !== null && _d !== void 0 ? _d : null;
     }
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff. It is not

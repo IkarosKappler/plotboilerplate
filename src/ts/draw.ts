@@ -60,6 +60,7 @@
  * @modified 2026-01-04 Adding `lineJoin` attribute to the `StrokeOptions`.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @modified 2026-04-04 Added the method `bounds`.
+ * @modified 2026-04-04 Handling the `lineCap` attribute in the `StrokeOptions`.
  * @version  1.15.0
  **/
 
@@ -154,6 +155,7 @@ export class drawutils implements DrawLib<void> {
     );
     this.ctx.lineDashOffset = (strokeOptions?.dashOffset ?? 0) * this.scale.x;
     this.ctx.lineJoin = strokeOptions?.lineJoin ?? null;
+    this.ctx.lineCap = strokeOptions?.lineCap ?? null;
   }
 
   // +---------------------------------------------------------------------------------

@@ -52,6 +52,7 @@
  * @modified 2026-01-04 Fixing missing `strokeOptions` param in the `drawutilssvg.polygon` method.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @modified 2026-04-04 Added the method `bounds`.
+ * @modified 2026-04-04 Handling the `stroke-linecap` option now from the `StrokeOptions` interface.
  * @version  1.7.0
  **/
 
@@ -682,6 +683,11 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     // Set line join option?
     if (strokeOptions && strokeOptions.lineJoin && drawutilssvg.nodeSupportsLineJoin(node.tagName)) {
       node.setAttribute("stroke-linejoin", strokeOptions.lineJoin);
+    }
+
+    // Set lineCap option?
+    if (strokeOptions && strokeOptions.lineCap && drawutilssvg.nodeSupportsLineCap(node.tagName)) {
+      node.setAttribute("stroke-linecap", strokeOptions.lineCap);
     }
   }
 
@@ -1999,6 +2005,10 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   }
 
   private static nodeSupportsLineJoin(nodeName: string) {
+    return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
+  }
+
+  private static nodeSupportsLineCap(nodeName: string) {
     return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
   }
 

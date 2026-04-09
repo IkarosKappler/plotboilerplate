@@ -14,6 +14,9 @@
   - Added the `bounds` method to the `DrawLib` interface.
   - Added the `bounds` method to the `draw`, `drawutilssvg` and `drawgl` classes.
   - Added the extended demo for Bézier path resizing.
+  - Added the `lineCap` attribute to the `StrokeOptions` interface.
+  - Handling the `lineCap` attribute in the `StrokeOptions` in the `draw` class.
+  - Handling the `lineCap` attribute in the `StrokeOptions` in the `drawutilssvg` class.
 - 2026-03-18
   - Exporting _all_ classes/functions/constants now from index.ts
 - 2026-03-18 [1.27.0]

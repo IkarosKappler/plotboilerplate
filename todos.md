@@ -1,71 +1,71 @@
 ## Todos
 
-- Remove duplicate script tags for 'detectDarkMode'.
-- Create a helper for triangles.
-- Resize/bestfit seems to fail in Firefoxe's dark mode (plugin).
-- Extend demo 07-voronoi: "randomize" could be a smooth transition :)
-- Todo: Bounding box of PBText
-- Todo: Bounding box of PBImage
-- Todo: think about if Vector should implement `Intersectable` as well.
-- Todo: PBText shoould implement Bounds.
-- Todo: TBImage should implement Bounds.
-- Todo: check if BezierPathInteractionHelper can work without every possible redraw (event mouseIsOver)
-- Removed `getAvailableContainerSpace` from main class. Is in dom-utils now.
-- Removed `getFProp` from main class. Is in dom-utils now.
-- Add a method to draw connected paths (different types of path segments: linear, curve, arc, ...). Useful for the circle intersections demo.
-- Use a sorted map in the line-point-distance demo.
-- The experimental WebGL support requires Color objects instead of color strings. Otherwise each color string will be parse on each roundtrip which is a nightmare for the performance.
-- The Color.parse(string) function does only recognize HEX, RGB and RGBA strings. HSL is still missing. Required?
-- Replace all color params: replace type string by color. (tinycolor?)
-- Measure the canvas' border when applying fitToParent! Currently a 1px border is expected.
-- Implement snap-to-grid.
-- Add image flipping.
-- Add image/svg support (adding SVG images).
-- Add a demo that draws a proper mathematical xy-grid.
-- Extend the leaf venation generator demo.
-- Add a retina detection
-- Change the behavior of Vector.intersection(...). The intersection should be on both vectors, not only on their line intersection!
-- Rename drawutils class to Drawutils or DrawUtils. Repective name DrawUtilsGL.
-- Use the new Bounds class in the RectSelector helper (use min:Vertex and max:Vertex).
-- Build a feature for line-styles; each 'color' param could also be gradient or a pattern (stroked, dotted, dashed, ... ).
-  See ctx.setLineDash(...).
-- Add an internal mapping to remember vertices and their installed listeners (for removing them later).
-- Destroy installed vertex listeners from vertices after removing them (like the Bézier auto-adjuster).
-- Port all demos from vanilla JS to TypeScript.
-- Add a TouchHandler (such as the MouseHandler) to wrap AlloyFinger? Add this to the main demo to keep track of touch positions?
-- Add a removeVertices() function (and use it in the threejs demo).
-- Replace drawables-to-svg.js by the new svg-draw library.
-- Remove all 'info' blocks and replace by uistats.
-- For convenience add an "Info" button to the UI of all demos with a short explanation about what's happening here.
-- Remove all <div id="dialog-wrapper" ...> from the demos. They are deprecated. Where needed use the 'modal.js' instead.
-- Add config params to the `saveFile` hook (png or svg plus options, like compression or line 'lineJoin').
-- Add the new text params to the `label` function, too (except size? style? weight?).
-- Make Images rotatetable.
-- Add `BezierResizeHelper` (from ndgd project).
-- Validate if the `./demos/detectDarkMode.js` or the `./demos/darkModeHandler.js` is better.
-- Draw a helper function to draw scaled and shifted textures with a clip polygon (think of the Girih demo).
-- Change drawutilssvg.copyPathData(...); this is a simple array-copy, nothing more, use a global generic helper function for this (re-usability).
-- Fix a bug in the textured-polygon demo (mouse coordinates in canvas demo do not match coordinates in svg demo).
-- Since refactoring the Girih demo does not respect the `Bevel` setting any more. Re-implement.
-- Add a function to create a Cubic Bézier Curve from quadratic parameters. Use this in the `parseSVGPath` function.
+[ ] Remove duplicate script tags for 'detectDarkMode'.
+[ ] Create a helper for triangles.
+[ ] Resize/bestfit seems to fail in Firefoxe's dark mode (plugin).
+[ ] Extend demo 07[ ]voronoi: "randomize" could be a smooth transition :)
+[ ] Todo: Bounding box of PBText
+[ ] Todo: Bounding box of PBImage
+[ ] Todo: think about if Vector should implement `Intersectable` as well.
+[ ] Todo: PBText shoould implement Bounds.
+[ ] Todo: TBImage should implement Bounds.
+[ ] Todo: check if BezierPathInteractionHelper can work without every possible redraw (event mouseIsOver)
+[ ] Removed `getAvailableContainerSpace` from main class. Is in dom[ ]utils now.
+[ ] Removed `getFProp` from main class. Is in dom[ ]utils now.
+[ ] Add a method to draw connected paths (different types of path segments: linear, curve, arc, ...). Useful for the circle intersections demo.
+[ ] Use a sorted map in the line[ ]point[ ]distance demo.
+[ ] The experimental WebGL support requires Color objects instead of color strings. Otherwise each color string will be parse on each roundtrip which is a nightmare for the performance.
+[ ] The Color.parse(string) function does only recognize HEX, RGB and RGBA strings. HSL is still missing. Required?
+[ ] Replace all color params: replace type string by color. (tinycolor?)
+[ ] Measure the canvas' border when applying fitToParent! Currently a 1px border is expected.
+[ ] Implement snap[ ]to[ ]grid.
+[ ] Add image flipping.
+[ ] Add image/svg support (adding SVG images).
+[ ] Add a demo that draws a proper mathematical xy[ ]grid.
+[ ] Extend the leaf venation generator demo.
+[ ] Add a retina detection
+[ ] Change the behavior of Vector.intersection(...). The intersection should be on both vectors, not only on their line intersection!
+[ ] Rename drawutils class to Drawutils or DrawUtils. Repective name DrawUtilsGL.
+[ ] Use the new Bounds class in the RectSelector helper (use min:Vertex and max:Vertex).
+[ ] Build a feature for line[ ]styles; each 'color' param could also be gradient or a pattern (stroked, dotted, dashed, ... ).
+See ctx.setLineDash(...).
+[ ] Add an internal mapping to remember vertices and their installed listeners (for removing them later).
+[ ] Destroy installed vertex listeners from vertices after removing them (like the Bézier auto[ ]adjuster).
+[ ] Port all demos from vanilla JS to TypeScript.
+[ ] Add a TouchHandler (such as the MouseHandler) to wrap AlloyFinger? Add this to the main demo to keep track of touch positions?
+[ ] Add a removeVertices() function (and use it in the threejs demo).
+[ ] Replace drawables[ ]to[ ]svg.js by the new svg[ ]draw library.
+[ ] Remove all 'info' blocks and replace by uistats.
+[ ] For convenience add an "Info" button to the UI of all demos with a short explanation about what's happening here.
+[ ] Remove all <div id="dialog[ ]wrapper" ...> from the demos. They are deprecated. Where needed use the 'modal.js' instead.
+[ ] Add config params to the `saveFile` hook (png or svg plus options, like compression or line 'lineJoin').
+[ ] Add the new text params to the `label` function, too (except size? style? weight?).
+[ ] Make Images rotatetable.
+[ ] Add `BezierResizeHelper` (from ndgd project).
+[ ] Validate if the `./demos/detectDarkMode.js` or the `./demos/darkModeHandler.js` is better.
+[ ] Draw a helper function to draw scaled and shifted textures with a clip polygon (think of the Girih demo).
+[ ] Change drawutilssvg.copyPathData(...); this is a simple array[ ]copy, nothing more, use a global generic helper function for this (re[ ]usability).
+[ ] Fix a bug in the textured[ ]polygon demo (mouse coordinates in canvas demo do not match coordinates in svg demo).
+[ ] Since refactoring the Girih demo does not respect the `Bevel` setting any more. Re[ ]implement.
+[ ] Add a function to create a Cubic Bézier Curve from quadratic parameters. Use this in the `parseSVGPath` function.
 
 ### Todos for future Version 2
 
-- Change the order of the DrawLib.ellipse params: color, lineWidth, rotation (rotation first).
-- Remove class member `PlotBoilerplate.ctx` (SVG renderes don't have such a context).
-- Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.
-- Change the bezier point path order from [start,end,startContro,endControl] to [start,startControl,endControl,end].
-- Change BezierPath.getPointAt to .getVertexAt (or .getVertAt or vertAt?).
-- Change BezierPath.scale( center, factor ) to BezierPath.scale( factor, center ) and make center optional (like in Polygon).
-- Rename BezierPath.adjustCircular to .isCircular, because cirularity does not only affect vertex adjustment.
-- The inverse-functions are called Vertex.inv() but Vector.inverse(). Harmonize this.
-- CubicBezierCurve.getTangentAt(number) and .getTangent(number) return Vertex, why not a Vector?
-- Add a pointDeleted event handler to PB? Would be helpful to delete objects outside the PB when their associated points are deleted by the user.
-- Tweak the SVGBuilder: make the style classes configurable (colors, line thickness, custom classes, ...).
-- Change `Bounds.computeFromVertices` to `Bounds.fromVertices`.
-- Change draw.image(image, position:Vertex, size:Vertex) to Bounds or XYDimension.
-- Change draw.text(text, x:number, y:number, ...) to (..., position:XYCoords, ...). Same with draw.label(...).
-- draw.label() requires color param.
-- Render dashed lines around images that cannot be rendered (e.g. file not found).
-- Each render method should also get the ID of the rendered element; this is required to keep track of changes in SVG documents.
-- Remove the toSVGString methods from all Drawables and the SVGSerializable interface. The drawutilssvg does everything with SVGs now.
+[ ] Change the order of the DrawLib.ellipse params: color, lineWidth, rotation (rotation first).
+[ ] Remove class member `PlotBoilerplate.ctx` (SVG renderes don't have such a context).
+[ ] Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.
+[ ] Change the bezier point path order from [start,end,startContro,endControl] to [start,startControl,endControl,end].
+[ ] Change BezierPath.getPointAt to .getVertexAt (or .getVertAt or vertAt?).
+[ ] Change BezierPath.scale( center, factor ) to BezierPath.scale( factor, center ) and make center optional (like in Polygon).
+[ ] Rename BezierPath.adjustCircular to .isCircular, because cirularity does not only affect vertex adjustment.
+[ ] The inverse[ ]functions are called Vertex.inv() but Vector.inverse(). Harmonize this.
+[ ] CubicBezierCurve.getTangentAt(number) and .getTangent(number) return Vertex, why not a Vector?
+[ ] Add a pointDeleted event handler to PB? Would be helpful to delete objects outside the PB when their associated points are deleted by the user.
+[ ] Tweak the SVGBuilder: make the style classes configurable (colors, line thickness, custom classes, ...).
+[ ] Change `Bounds.computeFromVertices` to `Bounds.fromVertices`.
+[ ] Change draw.image(image, position:Vertex, size:Vertex) to Bounds or XYDimension.
+[ ] Change draw.text(text, x:number, y:number, ...) to (..., position:XYCoords, ...). Same with draw.label(...).
+[X] draw.label() requires color param.
+[ ] Render dashed lines around images that cannot be rendered (e.g. file not found).
+[ ] Each render method should also get the ID of the rendered element; this is required to keep track of changes in SVG documents.
+[ ] Remove the toSVGString methods from all Drawables and the SVGSerializable interface. The drawutilssvg does everything with SVGs now.

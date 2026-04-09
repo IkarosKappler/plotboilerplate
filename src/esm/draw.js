@@ -60,6 +60,7 @@
  * @modified 2026-01-04 Adding `lineJoin` attribute to the `StrokeOptions`.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @modified 2026-04-04 Added the method `bounds`.
+ * @modified 2026-04-04 Handling the `lineCap` attribute in the `StrokeOptions`.
  * @version  1.15.0
  **/
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -97,7 +98,7 @@ export class drawutils {
      * @param {StrokeOptions=} strokeOptions -
      */
     applyStrokeOpts(strokeOptions) {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         this.ctx.setLineDash(((_a = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashArray) !== null && _a !== void 0 ? _a : []).map((dashArrayElem) => {
             // Note assume scale.x === scale.y
             // Invariant scale makes funny stuff anyway.
@@ -105,6 +106,7 @@ export class drawutils {
         }));
         this.ctx.lineDashOffset = ((_b = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashOffset) !== null && _b !== void 0 ? _b : 0) * this.scale.x;
         this.ctx.lineJoin = (_c = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.lineJoin) !== null && _c !== void 0 ? _c : null;
+        this.ctx.lineCap = (_d = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.lineCap) !== null && _d !== void 0 ? _d : null;
     }
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff. It is not

@@ -52,6 +52,7 @@
  * @modified 2026-01-04 Fixing missing `strokeOptions` param in the `drawutilssvg.polygon` method.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @modified 2026-04-04 Added the method `bounds`.
+ * @modified 2026-04-04 Handling the `stroke-linecap` option now from the `StrokeOptions` interface.
  * @version  1.7.0
  **/
 import { Polygon } from "./Polygon";
@@ -896,6 +897,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
     static transformPathData(data: SVGPathParams, offset: XYCoords, scale: XYCoords): void;
     private static nodeSupportsLineDash;
     private static nodeSupportsLineJoin;
+    private static nodeSupportsLineCap;
     /**
      * Creates a basic <line> node with start and end coordinates. The created node will not
      * be bound to any root node.
