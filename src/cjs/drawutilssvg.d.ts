@@ -51,11 +51,12 @@
  * @modified 2026-01-04 Adding `lineJoin` attribute to the methods' `StrokeOptions` param.
  * @modified 2026-01-04 Fixing missing `strokeOptions` param in the `drawutilssvg.polygon` method.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
+ * @modified 2026-04-04 Added the method `bounds`.
  * @version  1.7.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawConfig, DrawLib, XYCoords, XYDimension, SVGPathParams, UID, DrawLibConfiguration, FontStyle, FontWeight, StrokeOptions } from "./interfaces";
+import { DrawConfig, DrawLib, XYCoords, XYDimension, SVGPathParams, UID, DrawLibConfiguration, FontStyle, FontWeight, StrokeOptions, IBounds } from "./interfaces";
 import { Bounds } from "./Bounds";
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
@@ -633,6 +634,20 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @memberof drawutilssvg
      **/
     rect(position: XYCoords, width: number, height: number, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): SVGElement;
+    /**
+     * Draw a rectangle at the given bounds; and with the specified line width and (CSS-) color.<br>
+     *
+     * @method bounds
+     * @param {IBounds} bounds - The bounds rectangle to be drawn.
+     * @param {string} color - The CSS color to draw the rectangle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {R}
+     * @instance
+     * @memberof DrawLib
+     */
+    bounds(bounds: IBounds, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): void;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *

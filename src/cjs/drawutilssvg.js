@@ -52,6 +52,7 @@
  * @modified 2026-01-04 Adding `lineJoin` attribute to the methods' `StrokeOptions` param.
  * @modified 2026-01-04 Fixing missing `strokeOptions` param in the `drawutilssvg.polygon` method.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
+ * @modified 2026-04-04 Added the method `bounds`.
  * @version  1.7.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -953,6 +954,22 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute("width", "".concat(width * this.scale.x));
         node.setAttribute("height", "".concat(height * this.scale.y));
         return this._bindFillDraw(node, "rect", color, lineWidth || 1);
+    };
+    /**
+     * Draw a rectangle at the given bounds; and with the specified line width and (CSS-) color.<br>
+     *
+     * @method bounds
+     * @param {IBounds} bounds - The bounds rectangle to be drawn.
+     * @param {string} color - The CSS color to draw the rectangle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {R}
+     * @instance
+     * @memberof DrawLib
+     */
+    drawutilssvg.prototype.bounds = function (bounds, color, lineWidth, strokeOptions) {
+        this.rect(bounds.min, bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y, color, lineWidth, strokeOptions);
     };
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.

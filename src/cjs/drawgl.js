@@ -18,7 +18,8 @@
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
- * @version  0.0.10
+ * @modified 2026-04-04 Added the method `bounds`.
+ * @version  0.0.11
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilsgl = void 0;
@@ -467,8 +468,24 @@ var drawutilsgl = /** @class */ (function () {
      * @param {string} color - The color to use.
      * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
      **/
-    drawutilsgl.prototype.rect = function (position, width, height, color, lineWidth) {
+    drawutilsgl.prototype.rect = function (position, width, height, color, lineWidth, strokeOptions) {
         // NOT YET IMPLEMENTED
+    };
+    /**
+     * Draw a rectangle at the given bounds; and with the specified line width and (CSS-) color.<br>
+     *
+     * @method bounds
+     * @param {IBounds} bounds - The bounds rectangle to be drawn.
+     * @param {string} color - The CSS color to draw the rectangle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {R}
+     * @instance
+     * @memberof DrawLib
+     */
+    drawutilsgl.prototype.bounds = function (bounds, color, lineWidth, strokeOptions) {
+        this.rect(bounds.min, bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y, color, lineWidth, strokeOptions);
     };
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.

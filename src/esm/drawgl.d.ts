@@ -17,11 +17,12 @@
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
- * @version  0.0.10
+ * @modified 2026-04-04 Added the method `bounds`.
+ * @version  0.0.11
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, XYCoords, SVGPathParams, UID, DrawLibConfiguration, FontStyle, FontWeight, StrokeOptions } from "./interfaces";
+import { DrawLib, XYCoords, SVGPathParams, UID, DrawLibConfiguration, FontStyle, FontWeight, StrokeOptions, IBounds } from "./interfaces";
 import { Bounds } from "./Bounds";
 /**
  * @classdesc A wrapper class for basic drawing operations. This is the WebGL
@@ -339,7 +340,21 @@ export declare class drawutilsgl implements DrawLib<void> {
      * @param {string} color - The color to use.
      * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
      **/
-    rect(position: XYCoords, width: number, height: number, color: string, lineWidth?: number): void;
+    rect(position: XYCoords, width: number, height: number, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): void;
+    /**
+     * Draw a rectangle at the given bounds; and with the specified line width and (CSS-) color.<br>
+     *
+     * @method bounds
+     * @param {IBounds} bounds - The bounds rectangle to be drawn.
+     * @param {string} color - The CSS color to draw the rectangle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {R}
+     * @instance
+     * @memberof DrawLib
+     */
+    bounds(bounds: IBounds, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): void;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *

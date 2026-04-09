@@ -6,7 +6,8 @@
  * @modified 2020-02-22 Added 'return this' to the add* functions (for chanining).
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2020-11-17 Added the `click` handler.
- * @version  1.1.0
+ * @modified 2026-04-04 Adding null-listeners will now throw an error.
+ * @version  1.2.0
  *
  * @file VertexListeners
  * @public
@@ -241,6 +242,9 @@ export class VertexListeners {
      * @private
      */
     static _addListener(listeners, newListener) {
+        if (!newListener) {
+            throw new Error("Cannot add null listener. This would lead to unpredictable errors during event handling.");
+        }
         for (var i in listeners) {
             if (listeners[i] == newListener)
                 return false;

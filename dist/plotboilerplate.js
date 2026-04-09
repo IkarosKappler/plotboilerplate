@@ -272,7 +272,8 @@ exports.Vector = Vector;
  * @modified 2024-09-13 Remoed the scaling of `lineWidth` in the `polygon` and `polyline` methods. This makes no sense here and doesn't match up with the behavior of other line functions.
  * @modified 2026-01-04 Adding `lineJoin` attribute to the `StrokeOptions`.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
- * @version  1.14.0
+ * @modified 2026-04-04 Added the method `bounds`.
+ * @version  1.15.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
@@ -692,6 +693,22 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
         this.ctx.restore();
+    };
+    /**
+     * Draw a rectangle at the given bounds; and with the specified line width and (CSS-) color.<br>
+     *
+     * @method bounds
+     * @param {IBounds} bounds - The bounds rectangle to be drawn.
+     * @param {string} color - The CSS color to draw the rectangle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {R}
+     * @instance
+     * @memberof DrawLib
+     */
+    drawutils.prototype.bounds = function (bounds, color, lineWidth, strokeOptions) {
+        this.rect(bounds.min, bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y, color, lineWidth, strokeOptions);
     };
     /**
      * Draw the given (cubic) bézier curve.
@@ -2441,7 +2458,8 @@ exports.CircleSector = CircleSector;
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
- * @version  0.0.10
+ * @modified 2026-04-04 Added the method `bounds`.
+ * @version  0.0.11
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilsgl = void 0;
@@ -2890,8 +2908,24 @@ var drawutilsgl = /** @class */ (function () {
      * @param {string} color - The color to use.
      * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
      **/
-    drawutilsgl.prototype.rect = function (position, width, height, color, lineWidth) {
+    drawutilsgl.prototype.rect = function (position, width, height, color, lineWidth, strokeOptions) {
         // NOT YET IMPLEMENTED
+    };
+    /**
+     * Draw a rectangle at the given bounds; and with the specified line width and (CSS-) color.<br>
+     *
+     * @method bounds
+     * @param {IBounds} bounds - The bounds rectangle to be drawn.
+     * @param {string} color - The CSS color to draw the rectangle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {R}
+     * @instance
+     * @memberof DrawLib
+     */
+    drawutilsgl.prototype.bounds = function (bounds, color, lineWidth, strokeOptions) {
+        this.rect(bounds.min, bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y, color, lineWidth, strokeOptions);
     };
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
@@ -3503,6 +3537,7 @@ exports.geomutils = {
  * @modified 2026-01-04 Adding `lineJoin` attribute to the methods' `StrokeOptions` param.
  * @modified 2026-01-04 Fixing missing `strokeOptions` param in the `drawutilssvg.polygon` method.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
+ * @modified 2026-04-04 Added the method `bounds`.
  * @version  1.7.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -4404,6 +4439,22 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute("width", "".concat(width * this.scale.x));
         node.setAttribute("height", "".concat(height * this.scale.y));
         return this._bindFillDraw(node, "rect", color, lineWidth || 1);
+    };
+    /**
+     * Draw a rectangle at the given bounds; and with the specified line width and (CSS-) color.<br>
+     *
+     * @method bounds
+     * @param {IBounds} bounds - The bounds rectangle to be drawn.
+     * @param {string} color - The CSS color to draw the rectangle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {R}
+     * @instance
+     * @memberof DrawLib
+     */
+    drawutilssvg.prototype.bounds = function (bounds, color, lineWidth, strokeOptions) {
+        this.rect(bounds.min, bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y, color, lineWidth, strokeOptions);
     };
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
@@ -13675,7 +13726,8 @@ exports.MouseHandler = MouseHandler;
  * @modified 2020-02-22 Added 'return this' to the add* functions (for chanining).
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2020-11-17 Added the `click` handler.
- * @version  1.1.0
+ * @modified 2026-04-04 Adding null-listeners will now throw an error.
+ * @version  1.2.0
  *
  * @file VertexListeners
  * @public
@@ -13912,6 +13964,9 @@ var VertexListeners = /** @class */ (function () {
      * @private
      */
     VertexListeners._addListener = function (listeners, newListener) {
+        if (!newListener) {
+            throw new Error("Cannot add null listener. This would lead to unpredictable errors during event handling.");
+        }
         for (var i in listeners) {
             if (listeners[i] == newListener)
                 return false;

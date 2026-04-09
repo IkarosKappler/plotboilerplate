@@ -26,11 +26,12 @@
  * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @modified 2023-09-30 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
  * @modified 2026-01-04 Adding optional `lineJoin` attribute to the `StrokeOptions` interface.
+ * @modified 2026-04-04 Added the method `bounds`.
  **/
 import { Bounds } from "../Bounds";
 import { Polygon } from "../Polygon";
 import { Vertex } from "../Vertex";
-import { SVGPathParams, UID, XYCoords } from "./core";
+import { IBounds, SVGPathParams, UID, XYCoords } from "./core";
 export interface DrawLibConfiguration {
     blendMode?: 'source-over' | 'source-in' | 'source-out' | 'source-atop' | 'destination-over' | 'destination-in' | 'destination-out' | 'destination-atop' | 'lighter' | 'copy' | 'xor' | 'multiply' | 'screen' | 'overlay' | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' | 'hue' | 'saturation' | 'color' | 'luminosity' | null;
 }
@@ -379,6 +380,20 @@ export interface DrawLib<R> {
      * @memberof DrawLib
      */
     rect: (upperLeft: XYCoords, width: number, height: number, color: string, lineWidth?: number, strokeOptions?: StrokeOptions) => R;
+    /**
+     * Draw a rectangle at the given bounds; and with the specified line width and (CSS-) color.<br>
+     *
+     * @method bounds
+     * @param {IBounds} bounds - The bounds rectangle to be drawn.
+     * @param {string} color - The CSS color to draw the rectangle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {R}
+     * @instance
+     * @memberof DrawLib
+     */
+    bounds: (bounds: IBounds, color: string, lineWidth?: number, strokeOptions?: StrokeOptions) => R;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *

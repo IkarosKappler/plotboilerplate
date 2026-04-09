@@ -9,7 +9,11 @@
 - Add 'onclose' and 'onopen' to the Modal (demos).
 
 - 2026-04-04
-  - Class `VertexLusteners`: adding null-listeners will now throw an error.
+  - Class `VertexListeners`: adding null-listeners will now throw an error.
+  - Adding class `BezierResizeHelper` (copied from the `ngdg` project).
+  - Added the `bounds` method to the `DrawLib` interface.
+  - Added the `bounds` method to the `draw`, `drawutilssvg` and `drawgl` classes.
+  - Added the extended demo for Bézier path resizing.
 - 2026-03-18
   - Exporting _all_ classes/functions/constants now from index.ts
 - 2026-03-18 [1.27.0]
