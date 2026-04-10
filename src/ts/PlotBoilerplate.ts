@@ -92,8 +92,9 @@
  * @modified 2025-05-07 Moving full vectors now by default when vector point a is moved.
  * @modified 2025-05-20 Applying `lineWith` parameter in the draw routine for vectors (had been missing).
  * @modified 2026-03-13 Changed visibility of `setZoom` and `setOffset` to public. There was no good reason to have the private.
+ * @modified 2026-04-04 Added `isInPanningMode` attribute and `isPanning` method.
  *
- * @version  1.21.2
+ * @version  1.22.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -319,6 +320,15 @@ export class PlotBoilerplate {
    * @instance
    */
   hooks: IHooks;
+
+  /**
+   * Indicator if the instance is currently in 'panning' mode.
+   * Please use `isPanning()` method to determine value.
+   * @member {boolean}
+   * @memberof PlotBoilerplate
+   * @instance
+   */
+  private isInPanningMode: boolean;
 
   /**
    * A list of content change listeners.
@@ -754,6 +764,10 @@ export class PlotBoilerplate {
     this.config.canvasWidthFactor = this.config.canvasHeightFactor = pixelRatio;
     this.resizeCanvas();
     this.updateCSSscale();
+  }
+
+  public isPanning(): boolean {
+    return this.isInPanningMode;
   }
 
   /**
@@ -1714,22 +1728,21 @@ export class PlotBoilerplate {
    **/
   // TODO: this was moved to the DOM utils
   private getAvailableContainerSpace(): XYDimension {
-    const _self: PlotBoilerplate = this;
-    const container: HTMLElement = _self.canvas.parentNode as unknown as HTMLElement; // Element | Document | DocumentFragment;
-    _self.canvas.style.display = "none";
+    const container: HTMLElement = this.canvas.parentNode as unknown as HTMLElement; // Element | Document | DocumentFragment;
+    this.canvas.style.display = "none";
     var padding: number = this.getFProp(container, "padding") || 0,
-      border: number = this.getFProp(_self.canvas, "border-width") || 0,
+      border: number = this.getFProp(this.canvas, "border-width") || 0,
       pl: number = this.getFProp(container, "padding-left") || padding,
       pr: number = this.getFProp(container, "padding-right") || padding,
       pt: number = this.getFProp(container, "padding-top") || padding,
       pb: number = this.getFProp(container, "padding-bottom") || padding,
-      bl: number = this.getFProp(_self.canvas, "border-left-width") || border,
-      br: number = this.getFProp(_self.canvas, "border-right-width") || border,
-      bt: number = this.getFProp(_self.canvas, "border-top-width") || border,
-      bb: number = this.getFProp(_self.canvas, "border-bottom-width") || border;
+      bl: number = this.getFProp(this.canvas, "border-left-width") || border,
+      br: number = this.getFProp(this.canvas, "border-right-width") || border,
+      bt: number = this.getFProp(this.canvas, "border-top-width") || border,
+      bb: number = this.getFProp(this.canvas, "border-bottom-width") || border;
     var w: number = container.clientWidth;
     var h: number = container.clientHeight;
-    _self.canvas.style.display = "block";
+    this.canvas.style.display = "block";
     return { width: w - pl - pr - bl - br, height: h - pt - pb - bt - bb };
   }
 
@@ -1990,7 +2003,8 @@ export class PlotBoilerplate {
     //            not this one. So this tab will never receive any [Ctrl-down] events
     //            until next keypress; the implication is, that [Ctrl] would still
     //            considered to be pressed which is not true.
-    if (this.keyHandler && (this.keyHandler.isDown("alt") || this.keyHandler.isDown("spacebar"))) {
+    // if (this.keyHandler && (this.keyHandler.isDown("alt") || this.keyHandler.isDown("spacebar"))) {
+    if (this.isInPanningMode) {
       if (!this.config.enablePan) {
         return;
       }
@@ -2345,6 +2359,18 @@ export class PlotBoilerplate {
           _self.selectVerticesInPolygon(_self.selectPolygon);
           _self.selectPolygon = null;
           _self.redraw();
+        })
+        .down("alt", function () {
+          _self.isInPanningMode = true;
+        })
+        .up("alt", function () {
+          _self.isInPanningMode = false;
+        })
+        .down("spacebar", function () {
+          _self.isInPanningMode = true;
+        })
+        .up("spacebar", function () {
+          _self.isInPanningMode = false;
         });
     } // END IF enableKeys?
     else {

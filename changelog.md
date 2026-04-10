@@ -18,6 +18,9 @@
   - Handling the `lineCap` attribute in the `StrokeOptions` in the `draw` class.
   - Handling the `lineCap` attribute in the `StrokeOptions` in the `drawutilssvg` class.
   - Updating the freedraw demo: allowing updates on the curves and recalculation of the Hobby paths.
+  - Chaning the `drawutilssvg.copyPathData` method by usind `Array.slice()`.
+  - Added `PlotBoilerplate.isInPanningMode` attribute and `PlotBoilerplate.isPanning` method.
+  - Added fuzzy draw to the `freedraw` demo.
 - 2026-03-18
   - Exporting _all_ classes/functions/constants now from index.ts
 - 2026-03-18 [1.27.0]

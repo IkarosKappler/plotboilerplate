@@ -553,6 +553,9 @@ var PlotBoilerplate = /** @class */ (function () {
         this.resizeCanvas();
         this.updateCSSscale();
     };
+    PlotBoilerplate.prototype.isPanning = function () {
+        return this.isInPanningMode;
+    };
     /**
      * Set the current zoom and draw offset to fit the given bounds.
      *
@@ -1432,13 +1435,12 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     // TODO: this was moved to the DOM utils
     PlotBoilerplate.prototype.getAvailableContainerSpace = function () {
-        var _self = this;
-        var container = _self.canvas.parentNode; // Element | Document | DocumentFragment;
-        _self.canvas.style.display = "none";
-        var padding = this.getFProp(container, "padding") || 0, border = this.getFProp(_self.canvas, "border-width") || 0, pl = this.getFProp(container, "padding-left") || padding, pr = this.getFProp(container, "padding-right") || padding, pt = this.getFProp(container, "padding-top") || padding, pb = this.getFProp(container, "padding-bottom") || padding, bl = this.getFProp(_self.canvas, "border-left-width") || border, br = this.getFProp(_self.canvas, "border-right-width") || border, bt = this.getFProp(_self.canvas, "border-top-width") || border, bb = this.getFProp(_self.canvas, "border-bottom-width") || border;
+        var container = this.canvas.parentNode; // Element | Document | DocumentFragment;
+        this.canvas.style.display = "none";
+        var padding = this.getFProp(container, "padding") || 0, border = this.getFProp(this.canvas, "border-width") || 0, pl = this.getFProp(container, "padding-left") || padding, pr = this.getFProp(container, "padding-right") || padding, pt = this.getFProp(container, "padding-top") || padding, pb = this.getFProp(container, "padding-bottom") || padding, bl = this.getFProp(this.canvas, "border-left-width") || border, br = this.getFProp(this.canvas, "border-right-width") || border, bt = this.getFProp(this.canvas, "border-top-width") || border, bb = this.getFProp(this.canvas, "border-bottom-width") || border;
         var w = container.clientWidth;
         var h = container.clientHeight;
-        _self.canvas.style.display = "block";
+        this.canvas.style.display = "block";
         return { width: w - pl - pr - bl - br, height: h - pt - pb - bt - bb };
     };
     /**
@@ -1701,7 +1703,8 @@ var PlotBoilerplate = /** @class */ (function () {
         //            not this one. So this tab will never receive any [Ctrl-down] events
         //            until next keypress; the implication is, that [Ctrl] would still
         //            considered to be pressed which is not true.
-        if (this.keyHandler && (this.keyHandler.isDown("alt") || this.keyHandler.isDown("spacebar"))) {
+        // if (this.keyHandler && (this.keyHandler.isDown("alt") || this.keyHandler.isDown("spacebar"))) {
+        if (this.isInPanningMode) {
             if (!this.config.enablePan) {
                 return;
             }
@@ -2053,6 +2056,18 @@ var PlotBoilerplate = /** @class */ (function () {
                 _self.selectVerticesInPolygon(_self.selectPolygon);
                 _self.selectPolygon = null;
                 _self.redraw();
+            })
+                .down("alt", function () {
+                _self.isInPanningMode = true;
+            })
+                .up("alt", function () {
+                _self.isInPanningMode = false;
+            })
+                .down("spacebar", function () {
+                _self.isInPanningMode = true;
+            })
+                .up("spacebar", function () {
+                _self.isInPanningMode = false;
             });
         } // END IF enableKeys?
         else {

@@ -20,7 +20,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HobbyPath = void 0;
 var CubicBezierCurve_1 = require("../../CubicBezierCurve");
 var Vertex_1 = require("../../Vertex");
-;
 /**
  * @classdesc A HobbyCurve/HobbyPath calculation class: compute a set of optimal
  *            cubic Bézier curves from a sequence of vertices.
@@ -37,7 +36,6 @@ var HobbyPath = /** @class */ (function () {
     function HobbyPath(vertices) {
         this.vertices = vertices ? vertices : [];
     }
-    ;
     /**
      * Add a new point to the end of the vertex sequence.
      *
@@ -49,7 +47,6 @@ var HobbyPath = /** @class */ (function () {
     HobbyPath.prototype.addPoint = function (p) {
         this.vertices.push(p);
     };
-    ;
     /**
      * Generate a sequence of cubic Bézier curves from the point set.
      *
@@ -82,7 +79,6 @@ var HobbyPath = /** @class */ (function () {
             return [];
         }
     };
-    ;
     /**
      * Computes the control point coordinates for a Hobby curve through
      * the points given.
@@ -96,13 +92,17 @@ var HobbyPath = /** @class */ (function () {
      **/
     HobbyPath.prototype.hobbyControls = function (circular, omega) {
         // This is a version that works for both, closed and non-closed paths.
-        if (typeof omega === 'undefined')
+        if (typeof omega === "undefined")
             omega = 0;
         var n = this.vertices.length - (circular ? 0 : 1);
         var D = new Array(n);
         var ds = new Array(n);
-        var succ = function (i) { return circular ? ((i + 1) % n) : (i + 1); };
-        var pred = function (i) { return circular ? ((i + n - 1) % n) : (i - 1); };
+        var succ = function (i) {
+            return circular ? (i + 1) % n : i + 1;
+        };
+        var pred = function (i) {
+            return circular ? (i + n - 1) % n : i - 1;
+        };
         for (var i = 0; i < n; i++) {
             // the "next" point in a modular way
             var j = succ(i);
@@ -110,7 +110,7 @@ var HobbyPath = /** @class */ (function () {
             D[i] = Math.sqrt(ds[i].x * ds[i].x + ds[i].y * ds[i].y);
         }
         var gamma = new Array(n + (circular ? 0 : 1));
-        for (var i = (circular ? 0 : 1); i < n; i++) {
+        for (var i = circular ? 0 : 1; i < n; i++) {
             // the "previous" point in a modular way
             var k = pred(i);
             var sin = ds[k].y / D[k];
@@ -124,7 +124,7 @@ var HobbyPath = /** @class */ (function () {
         var b = new Array(n + (circular ? 0 : 1));
         var c = new Array(n + (circular ? 0 : 1));
         var d = new Array(n + (circular ? 0 : 1));
-        for (var i = (circular ? 0 : 1); i < n; i++) {
+        for (var i = circular ? 0 : 1; i < n; i++) {
             // j is the "next" point, k the "previous" one
             var j = succ(i);
             var k = pred(i);
@@ -174,16 +174,14 @@ var HobbyPath = /** @class */ (function () {
         var endControlPoints = new Array(n);
         for (var i = 0; i < n; i++) {
             var j = succ(i);
-            var a_1 = HobbyPath.utils.rho(alpha[i], beta[i]) * D[i] / 3;
-            var b_1 = HobbyPath.utils.rho(beta[i], alpha[i]) * D[i] / 3;
+            var a_1 = (HobbyPath.utils.rho(alpha[i], beta[i]) * D[i]) / 3;
+            var b_1 = (HobbyPath.utils.rho(beta[i], alpha[i]) * D[i]) / 3;
             var v = HobbyPath.utils.normalize(HobbyPath.utils.rotateAngle(ds[i], alpha[i]));
             startControlPoints[i] = new Vertex_1.Vertex(this.vertices[i].x + a_1 * v.x, this.vertices[i].y + a_1 * v.y);
             v = HobbyPath.utils.normalize(HobbyPath.utils.rotateAngle(ds[i], -beta[i]));
             endControlPoints[i] = new Vertex_1.Vertex(this.vertices[j].x - b_1 * v.x, this.vertices[j].y - b_1 * v.y);
         }
-        return { startControlPoints: startControlPoints,
-            endControlPoints: endControlPoints
-        };
+        return { startControlPoints: startControlPoints, endControlPoints: endControlPoints };
     };
     HobbyPath.utils = {
         // rotates a vector [x, y] about an angle; the angle is implicitly
@@ -272,7 +270,6 @@ var HobbyPath = /** @class */ (function () {
         }
     };
     return HobbyPath;
-}());
+}()); // END class
 exports.HobbyPath = HobbyPath;
-; // END class
 //# sourceMappingURL=HobbyPath.js.map

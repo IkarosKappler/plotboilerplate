@@ -53,6 +53,7 @@
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @modified 2026-04-04 Added the method `bounds`.
  * @modified 2026-04-04 Handling the `stroke-linecap` option now from the `StrokeOptions` interface.
+ * @modified 2026-04-04 Chaning the `copyPathData` method by usind `Array.slice()`.
  * @version  1.7.0
  **/
 
@@ -1826,11 +1827,8 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @memberof drawutilssvg
    */
   static copyPathData(data: SVGPathParams): SVGPathParams {
-    const copy: SVGPathParams = new Array(data.length);
-    for (var i = 0, n = data.length; i < n; i++) {
-      copy[i] = data[i];
-    }
-    return copy;
+    // To create a shallow copy we can just use the `slice` method.
+    return data.slice();
   }
 
   /**

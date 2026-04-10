@@ -259,6 +259,14 @@ export declare class PlotBoilerplate {
      */
     hooks: IHooks;
     /**
+     * Indicator if the instance is currently in 'panning' mode.
+     * Please use `isPanning()` method to determine value.
+     * @member {boolean}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
+    private isInPanningMode;
+    /**
      * A list of content change listeners.
      */
     contentChangeListeners: Array<PBContentChangeListener>;
@@ -370,6 +378,7 @@ export declare class PlotBoilerplate {
      * @private
      **/
     private _setToRetina;
+    isPanning(): boolean;
     /**
      * Set the current zoom and draw offset to fit the given bounds.
      *
