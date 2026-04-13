@@ -41,7 +41,10 @@
       fuzzySamplePointDistance: params.getNumber("fuzzySamplePointDistance", 20.0),
       fuzzyAmplitudeFactor: params.getNumber("fuzzyAmplitudeFactor", 10.0),
       fuzzLineCount: params.getNumber("fuzzLineCount", 10),
-      fuzzyLineWidth: params.getNumber("fuzzyLineWidth", 0.5)
+      fuzzyLineWidth: params.getNumber("fuzzyLineWidth", 0.5),
+      readme: function () {
+        globalThis.displayDemoMeta();
+      }
     };
 
     // +---------------------------------------------------------------------------------
@@ -310,20 +313,21 @@
     // +-------------------------------
     {
       var gui = pb.createGUI();
+      var foldFreedraw = gui.addFolder("Free draw");
       // prettier-ignore
-      gui.add(config, "showVertices").title("Draw the vertices?").onChange(function () { toggleVertexVisibility(); pb.redraw(); });
+      foldFreedraw.add(config, "showVertices").title("Draw the vertices?").onChange(function () { toggleVertexVisibility(); pb.redraw(); });
       // prettier-ignore
-      gui.addColor(config, "lineColor").title("The line's color to draw with.").onChange(function () { pb.redraw(); });
+      foldFreedraw.addColor(config, "lineColor").title("The line's color to draw with.").onChange(function () { pb.redraw(); });
       // prettier-ignore
-      gui.add(config, "lineWidth").min(0).max(20.0).step(0.5).title("The lines' with.").onChange(function () { pb.redraw(); });
+      foldFreedraw.add(config, "lineWidth").min(0).max(20.0).step(0.5).title("The lines' with.").onChange(function () { pb.redraw(); });
       // prettier-ignore
-      gui.add(config, "showHobbyCurves").title("Draw the respective hobby curves.").onChange(function () { pb.redraw(); });
+      foldFreedraw.add(config, "showHobbyCurves").title("Draw the respective hobby curves.").onChange(function () { pb.redraw(); });
       // prettier-ignore
-      gui.add(config, "showLinear").title("Draw the linear elements?").onChange(function () { pb.redraw(); } );
+      foldFreedraw.add(config, "showLinear").title("Draw the linear elements?").onChange(function () { pb.redraw(); } );
       // prettier-ignore
-      gui.add(config, "showHobbyTangents").title("Draw the linear Hobby curve tangents?").onChange(function () { pb.redraw(); } );
+      foldFreedraw.add(config, "showHobbyTangents").title("Draw the linear Hobby curve tangents?").onChange(function () { pb.redraw(); } );
       // prettier-ignore
-      var foldFuzzy = gui.addFolder("Fuzzy draw");
+      var foldFuzzy = gui.addFolder("Fuzzy draw settings");
       // prettier-ignore
       foldFuzzy.add(config, "isFuzzyDrawEnabled").title("Enable/disable experimental fuzzy draw.").onChange(function () { pb.redraw(); });
       // prettier-ignore
@@ -334,6 +338,8 @@
       foldFuzzy.add(config, "fuzzLineCount").min(1).max(100).step(1).title("Number of fuzzy lines to use.").onChange(function () { rebuildAllFuzzyPaths(); });
       // prettier-ignore
       foldFuzzy.add(config, "fuzzyLineWidth").min(0).max(20.0).step(0.5).title("The line width of the fuzzy components.").onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      gui.add(config, "readme").title("Show readme.md");
     }
 
     // +---------------------------------------------------------------------------------
