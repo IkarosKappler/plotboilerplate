@@ -47,24 +47,30 @@
       }
     };
 
+    // This is an experimental approach to make future event handling easier.
+    var appContext = new AppContext(pb, config);
+    appContext.isMobile = isMobile;
+
     // +---------------------------------------------------------------------------------
     // | Global vars
     // +-------------------------------
-    var freedrawLines = []; // Array<Polygon>
-    var curPolyline = null; // Polygon
+    // Define a new appContext attribute 'curPolyline'
+    appContext.freedrawLines = []; // Array<Polygon>
+    // Define a new appContext attribute 'curPolyline'
+    appContext.curPolyline = null; // Polygon
     // var hobbyCurves = []; // Array< Array<CubicBezierPath> >
     var hobbyPaths = []; // Array< BezierPath >
     // i -> mapping from hobby path to set of Bézier paths (fuzzy bundle)
     var fuzzyPaths = []; // Array< BezierPath[] >
 
     var postDraw = function (draw, _fill) {
-      if (curPolyline) {
-        draw.polyline(curPolyline.vertices, true, "orange", 2.0); // isOpen=true
+      if (appContext.curPolyline) {
+        draw.polyline(appContext.curPolyline.vertices, true, "orange", 2.0); // isOpen=true
       }
 
       if (config.showLinear) {
-        for (var i = 0; i < freedrawLines.length; i++) {
-          draw.polyline(freedrawLines[i].vertices, true, "blue", 1.0); // isOpen=true
+        for (var i = 0; i < appContext.freedrawLines.length; i++) {
+          draw.polyline(appContext.freedrawLines[i].vertices, true, "blue", 1.0); // isOpen=true
         }
       }
 
@@ -124,7 +130,7 @@
     // | Adds a new Hobby path from the given poly line.
     // | polyline: Array<Vertex>
     // +-------------------------------
-    var addHobbyPath = function (polyline) {
+    appContext.addHobbyPath = function (polyline) {
       if (!polyline || polyline.vertices.length <= 1) {
         console.log("Not adding Hobby path. polyline is null or empty.");
         return;
@@ -208,100 +214,10 @@
       }
     };
 
-    var handleInputDownEvent = function (absPos) {
-      if (pb.isPanning()) {
-        return;
-      }
-      console.log("absPos", absPos);
-      // Check if there is a movable vertex at the location
-      var vertAtPos = pb.getVertexNear(
-        absPos,
-        isMobile ? PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE : PlotBoilerplate.DEFAULT_CLICK_TOLERANCE
-      );
-      console.log("Vert clicked? ", vertAtPos);
-
-      if (vertAtPos && config.showVertices) {
-        console.log("Vert clicked.");
-        // There is a line vertex at the given position AND those are visible
-        // --> better do nothing here.
-        return;
-      }
-      var relPos = new Vertex(pb.transformMousePosition(absPos.x, absPos.y));
-      curPolyline = new Polygon([relPos], true); // isOpen=true
-      console.log("curPolyline", curPolyline);
-      relPos.attr.visible = config.showVertices;
-      pb.add(relPos, true); // triggerRedraw=true
-    };
-
-    var handleInputDragEvent = function (absPos) {
-      if (!curPolyline) {
-        console.log("Drag event ignored. No curPolyline defined.");
-        // Probably a visible vertex was clicked to move.
-        return;
-      }
-      var relPos = new Vertex(pb.transformMousePosition(absPos.x, absPos.y));
-      relPos.attr.visible = config.showVertices;
-      curPolyline.vertices.push(relPos);
-      pb.add(relPos);
-    };
-
-    var handleInputUpEvent = function () {
-      if (!curPolyline) {
-        // Probably a difference visible vertex was clicked to move.
-        return;
-      }
-      freedrawLines.push(curPolyline);
-      console.log("Adding ", curPolyline);
-      addHobbyPath(curPolyline);
-      curPolyline = null;
-      pb.redraw();
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | Installs a mouse listener.
-    // +-------------------------------
-    new MouseHandler(pb.eventCatcher)
-      .down(function (event) {
-        if (!event.params.leftButton || event.params.wasDragged) {
-          return;
-        }
-        handleInputDownEvent(event.params.pos);
-      })
-      .drag(function (event) {
-        // console.log("Dragging");
-        handleInputDragEvent(event.params.pos);
-      })
-      .up(function (event) {
-        // Event Type: XMouseEvent (an extension of the regular MouseEvent)
-        if (!event.params.leftButton) {
-          return;
-        }
-        handleInputUpEvent();
-      });
-
-    // +---------------------------------------------------------------------------------
-    // | Install a touch handler to rotate on mobile device.
-    // +-------------------------------
-    createAlloyFinger(pb.eventCatcher, {
-      touchStart: function (event) {
-        handleInputDownEvent({ x: event.touches[0].clientX, y: event.touches[0].clientY });
-      },
-      touchMove: function (event) {
-        // console.log("pb.getDraggedElementCount()", pb.getDraggedElementCount(), "event.touches.length", event.touches.length);
-        if (pb.getDraggedElementCount() > 1 || event.touches.length == 0) {
-          return;
-        }
-        handleInputDragEvent({ x: event.touches[0].clientX, y: event.touches[0].clientY });
-      },
-      touchEnd: function (_event) {
-        // _self.mouseIsOver = false;
-        // _self._clearMoveEvent();
-        handleInputUpEvent();
-      }
-    });
+    new InputHandler(appContext);
 
     var toggleVertexVisibility = function () {
-      freedrawLines.forEach(function (polyline) {
+      appContext.freedrawLines.forEach(function (polyline) {
         polyline.vertices.forEach(function (vertex) {
           vertex.attr.visible = config.showVertices;
         });
