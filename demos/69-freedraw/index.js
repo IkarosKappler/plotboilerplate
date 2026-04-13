@@ -262,53 +262,17 @@
         if (!event.params.leftButton || event.params.wasDragged) {
           return;
         }
-        // if (pb.isPanning()) {
-        //   return;
-        // }
-        // // Check if there is a movable vertex at the location
-        // var vertAtPos = pb.getVertexNear(
-        //   event.params.pos,
-        //   isMobile ? PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE : PlotBoilerplate.DEFAULT_CLICK_TOLERANCE
-        // );
-        // console.log("Vert clicked? ", vertAtPos);
-
-        // if (vertAtPos && config.showVertices) {
-        //   console.log("Vert clicked.");
-        //   // There is a line vertex at the given position AND those are visible
-        //   // --> better do nothing here.
-        //   return;
-        // }
-        // var relPos = new Vertex(pb.transformMousePosition(event.params.pos.x, event.params.pos.y));
-        // curPolyline = new Polygon([relPos], true); // isOpen=true
-        // relPos.attr.visible = config.showVertices;
-        // pb.add(relPos, true); // triggerRedraw=true
         handleInputDownEvent(event.params.pos);
       })
       .drag(function (event) {
-        console.log("Dragging");
-        // if (!curPolyline) {
-        //   // Probably a visible vertex was clicked to move.
-        //   return;
-        // }
-        // var relPos = new Vertex(pb.transformMousePosition(event.params.pos.x, event.params.pos.y));
-        // relPos.attr.visible = config.showVertices;
-        // curPolyline.vertices.push(relPos);
-        // pb.add(relPos);
+        // console.log("Dragging");
         handleInputDragEvent(event.params.pos);
       })
-      // Event Type: XMouseEvent (an extension of the regular MouseEvent)
       .up(function (event) {
+        // Event Type: XMouseEvent (an extension of the regular MouseEvent)
         if (!event.params.leftButton) {
           return;
         }
-        // if (!curPolyline) {
-        //   // Probably a difference visible vertex was clicked to move.
-        //   return;
-        // }
-        // freedrawLines.push(curPolyline);
-        // addHobbyPath(curPolyline);
-        // curPolyline = null;
-        // pb.redraw();
         handleInputUpEvent();
       });
 
@@ -324,9 +288,6 @@
         if (pb.getDraggedElementCount() > 1 || event.touches.length == 0) {
           return;
         }
-        // _self._handleMoveEvent(event.touches[0].clientX, event.touches[0].clientY);
-        // config.rotationX = geomutils.wrapMinMax(config.rotationX + event.deltaY, 0.0, 360.0);
-        // config.rotationZ = geomutils.wrapMinMax(config.rotationZ - event.deltaX, 0.0, 360.0);
         handleInputDragEvent({ x: event.touches[0].clientX, y: event.touches[0].clientY });
       },
       touchEnd: function (_event) {
