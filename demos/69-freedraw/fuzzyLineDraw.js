@@ -21,14 +21,14 @@
     var totalPathLength = bezierPath.getLength();
     // var uStepSize = samplePointDistance / totalPathLength;
     // var maxAmplitude = Math.sqrt(Math.pow(this.samplePointDistance / 2, 2) - this.samplePointDistance);
-    console.log(
-      "totalPathLength",
-      totalPathLength,
-      "samplePointDistance",
-      this.samplePointDistance,
-      "amplitudeFactor",
-      this.amplitudeFactor
-    );
+    // console.log(
+    //   "totalPathLength",
+    //   totalPathLength,
+    //   "samplePointDistance",
+    //   this.samplePointDistance,
+    //   "amplitudeFactor",
+    //   this.amplitudeFactor
+    // );
     var uPos = 0.0;
     var safetyLimit = 1000;
     var i = 0;

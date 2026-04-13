@@ -127,13 +127,6 @@
         return;
       }
       console.log("Add Hobby path", polyline);
-      // // Hobby curve generation will fail if the vertex list contains duplicates.
-      // var cleanVertices = clearDuplicateVertices(polyline.vertices, 2.0); // epsilon=2.0
-      // var hobbyPath = new HobbyPath(cleanVertices);
-      // // Array<CubicBezierCurve>
-      // var curves = hobbyPath.generateCurve(false, 0.0); // isCircular=false, hobbyOmega=0.0
-      // // Convert to BezierPath object
-      // var path = BezierPath.fromArray(curves);
       var path = convertPolylineToHobbyPath(polyline);
       var hobbyIndex = hobbyPaths.push(path) - 1;
       console.log("hobbyIndex", hobbyIndex);
@@ -160,9 +153,6 @@
     // | Re-calculate the hobby path at the given index.
     // +-------------------------------
     var recaululateHobbyPath = function (polyline, hobbyIndex) {
-      // var cleanVertices = clearDuplicateVertices(polyline.vertices, 2.0); // epsilon=2.0
-      // var updatedHobbyPath = new HobbyPath(cleanVertices);
-      // var updatedCurves = updatedHobbyPath.generateCurve(false, 0.0); // isCircular=false, hobbyOmega=0.0
       var updatedPath = convertPolylineToHobbyPath(polyline);
       hobbyPaths.splice(hobbyIndex, 1, updatedPath);
       var updatedFuzzyPaths = buildFuzzyPaths(updatedPath);
@@ -193,14 +183,11 @@
       // (means: visual amplitude should not grow when sample distance is increased)
       var amplituteFactor = config.fuzzyAmplitudeFactor / config.fuzzySamplePointDistance;
       var fuzzyGenerator = new FuzzyLineDraw(config.fuzzySamplePointDistance, amplituteFactor);
-      // for (var h = 0; h < hobbyPaths.length; h++) {
       var fuzzyPaths = []; // Array< BezierPath >
       for (var f = 0; f < config.fuzzLineCount; f++) {
         fuzzyGenerator.samplePointDistance = config.fuzzySamplePointDistance * (0.5 + Math.random() * 0.5);
         // Returns a new BézierPath
         var fuzzyCurve = fuzzyGenerator.variationFromBezierPath(bezierPath);
-        // var pathData = convertBezierPathToPathData(fuzzyCurve);
-        // draw.cubicBezierPath(pathData, "rgba(128,128,128,0.5)", 0.5, { lineCap: "butt" }, true); // isOpen=true
         fuzzyPaths.push(fuzzyCurve);
       }
       // }
@@ -218,6 +205,55 @@
       }
     };
 
+    var handleInputDownEvent = function (absPos) {
+      if (pb.isPanning()) {
+        return;
+      }
+      console.log("absPos", absPos);
+      // Check if there is a movable vertex at the location
+      var vertAtPos = pb.getVertexNear(
+        absPos,
+        isMobile ? PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE : PlotBoilerplate.DEFAULT_CLICK_TOLERANCE
+      );
+      console.log("Vert clicked? ", vertAtPos);
+
+      if (vertAtPos && config.showVertices) {
+        console.log("Vert clicked.");
+        // There is a line vertex at the given position AND those are visible
+        // --> better do nothing here.
+        return;
+      }
+      var relPos = new Vertex(pb.transformMousePosition(absPos.x, absPos.y));
+      curPolyline = new Polygon([relPos], true); // isOpen=true
+      console.log("curPolyline", curPolyline);
+      relPos.attr.visible = config.showVertices;
+      pb.add(relPos, true); // triggerRedraw=true
+    };
+
+    var handleInputDragEvent = function (absPos) {
+      if (!curPolyline) {
+        console.log("Drag event ignored. No curPolyline defined.");
+        // Probably a visible vertex was clicked to move.
+        return;
+      }
+      var relPos = new Vertex(pb.transformMousePosition(absPos.x, absPos.y));
+      relPos.attr.visible = config.showVertices;
+      curPolyline.vertices.push(relPos);
+      pb.add(relPos);
+    };
+
+    var handleInputUpEvent = function () {
+      if (!curPolyline) {
+        // Probably a difference visible vertex was clicked to move.
+        return;
+      }
+      freedrawLines.push(curPolyline);
+      console.log("Adding ", curPolyline);
+      addHobbyPath(curPolyline);
+      curPolyline = null;
+      pb.redraw();
+    };
+
     // +---------------------------------------------------------------------------------
     // | Installs a mouse listener.
     // +-------------------------------
@@ -226,53 +262,79 @@
         if (!event.params.leftButton || event.params.wasDragged) {
           return;
         }
-        if (pb.isPanning()) {
-          return;
-        }
-        // Check if there is a movable vertex at the location
-        var vertAtPos = pb.getVertexNear(
-          event.params.pos,
-          isMobile ? PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE : PlotBoilerplate.DEFAULT_CLICK_TOLERANCE
-        );
-        console.log("Vert clicked? ", vertAtPos);
+        // if (pb.isPanning()) {
+        //   return;
+        // }
+        // // Check if there is a movable vertex at the location
+        // var vertAtPos = pb.getVertexNear(
+        //   event.params.pos,
+        //   isMobile ? PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE : PlotBoilerplate.DEFAULT_CLICK_TOLERANCE
+        // );
+        // console.log("Vert clicked? ", vertAtPos);
 
-        if (vertAtPos && config.showVertices) {
-          console.log("Vert clicked.");
-          // There is a line vertex at the given position AND those are visible
-          // --> better do nothing here.
-          return;
-        }
-        var relPos = new Vertex(pb.transformMousePosition(event.params.pos.x, event.params.pos.y));
-        curPolyline = new Polygon([relPos], true); // isOpen=true
-        relPos.attr.visible = config.showVertices;
-        // pb.add([curPolyline, relPos], true); // triggerRedraw=true
-        // freedrawLines.push(curPolyline);
-        pb.add(relPos, true); // triggerRedraw=true
+        // if (vertAtPos && config.showVertices) {
+        //   console.log("Vert clicked.");
+        //   // There is a line vertex at the given position AND those are visible
+        //   // --> better do nothing here.
+        //   return;
+        // }
+        // var relPos = new Vertex(pb.transformMousePosition(event.params.pos.x, event.params.pos.y));
+        // curPolyline = new Polygon([relPos], true); // isOpen=true
+        // relPos.attr.visible = config.showVertices;
+        // pb.add(relPos, true); // triggerRedraw=true
+        handleInputDownEvent(event.params.pos);
       })
       .drag(function (event) {
-        if (!curPolyline) {
-          // Probably a visible vertex was clicked to move.
-          return;
-        }
-        var relPos = new Vertex(pb.transformMousePosition(event.params.pos.x, event.params.pos.y));
-        relPos.attr.visible = config.showVertices;
-        curPolyline.vertices.push(relPos);
-        pb.add(relPos);
+        console.log("Dragging");
+        // if (!curPolyline) {
+        //   // Probably a visible vertex was clicked to move.
+        //   return;
+        // }
+        // var relPos = new Vertex(pb.transformMousePosition(event.params.pos.x, event.params.pos.y));
+        // relPos.attr.visible = config.showVertices;
+        // curPolyline.vertices.push(relPos);
+        // pb.add(relPos);
+        handleInputDragEvent(event.params.pos);
       })
       // Event Type: XMouseEvent (an extension of the regular MouseEvent)
       .up(function (event) {
         if (!event.params.leftButton) {
           return;
         }
-        if (!curPolyline) {
-          // Probably a difference visible vertex was clicked to move.
+        // if (!curPolyline) {
+        //   // Probably a difference visible vertex was clicked to move.
+        //   return;
+        // }
+        // freedrawLines.push(curPolyline);
+        // addHobbyPath(curPolyline);
+        // curPolyline = null;
+        // pb.redraw();
+        handleInputUpEvent();
+      });
+
+    // +---------------------------------------------------------------------------------
+    // | Install a touch handler to rotate on mobile device.
+    // +-------------------------------
+    createAlloyFinger(pb.eventCatcher, {
+      touchStart: function (event) {
+        handleInputDownEvent({ x: event.touches[0].clientX, y: event.touches[0].clientY });
+      },
+      touchMove: function (event) {
+        // console.log("pb.getDraggedElementCount()", pb.getDraggedElementCount(), "event.touches.length", event.touches.length);
+        if (pb.getDraggedElementCount() > 1 || event.touches.length == 0) {
           return;
         }
-        freedrawLines.push(curPolyline);
-        addHobbyPath(curPolyline);
-        curPolyline = null;
-        pb.redraw();
-      });
+        // _self._handleMoveEvent(event.touches[0].clientX, event.touches[0].clientY);
+        // config.rotationX = geomutils.wrapMinMax(config.rotationX + event.deltaY, 0.0, 360.0);
+        // config.rotationZ = geomutils.wrapMinMax(config.rotationZ - event.deltaX, 0.0, 360.0);
+        handleInputDragEvent({ x: event.touches[0].clientX, y: event.touches[0].clientY });
+      },
+      touchEnd: function (_event) {
+        // _self.mouseIsOver = false;
+        // _self._clearMoveEvent();
+        handleInputUpEvent();
+      }
+    });
 
     var toggleVertexVisibility = function () {
       freedrawLines.forEach(function (polyline) {
