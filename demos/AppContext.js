@@ -1,4 +1,6 @@
 /**
+ * An experimental top class to wrap demo environments.
+ *
  * @date    2026-04-13
  * @author  Ikaros Kappler
  * @version 1.0.0

@@ -30,7 +30,8 @@
     // pb.drawConfig.drawHandlePoints = false;
 
     // Create a config: we want to have control about the arrow head size in this demo
-    var config = {
+    // `AppContext`: this is an experimental approach to make future event handling easier.
+    var appContext = new AppContext(pb, {
       showVertices: params.getBoolean("showVertices", true),
       lineColor: params.getString("lineColor", "rgb(255,128,0)"),
       lineWidth: params.getNumber("lineWidth", 7.0),
@@ -42,13 +43,13 @@
       fuzzyAmplitudeFactor: params.getNumber("fuzzyAmplitudeFactor", 10.0),
       fuzzLineCount: params.getNumber("fuzzLineCount", 10),
       fuzzyLineWidth: params.getNumber("fuzzyLineWidth", 0.5),
+      randomizeFuzzy: function () {
+        appContext.rebuildAllFuzzyPaths();
+      },
       readme: function () {
         globalThis.displayDemoMeta();
       }
-    };
-
-    // This is an experimental approach to make future event handling easier.
-    var appContext = new AppContext(pb, config);
+    });
     appContext.isMobile = isMobile;
 
     // +---------------------------------------------------------------------------------
@@ -68,18 +69,18 @@
         draw.polyline(appContext.curPolyline.vertices, true, "orange", 2.0); // isOpen=true
       }
 
-      if (config.showLinear) {
+      if (appContext.config.showLinear) {
         for (var i = 0; i < appContext.freedrawLines.length; i++) {
           draw.polyline(appContext.freedrawLines[i].vertices, true, "blue", 1.0); // isOpen=true
         }
       }
 
       // Draw fuzzy?
-      if (config.isFuzzyDrawEnabled) {
+      if (appContext.config.isFuzzyDrawEnabled) {
         for (var h = 0; h < fuzzyPaths.length; h++) {
           for (var f = 0; f < fuzzyPaths[h].length; f++) {
             var pathData = convertBezierPathToPathData(fuzzyPaths[h][f]);
-            draw.cubicBezierPath(pathData, "rgba(128,128,128,0.5)", config.fuzzyLineWidth, { lineCap: "butt" }, true); // isOpen=true
+            draw.cubicBezierPath(pathData, "rgba(128,128,128,0.5)", appContext.config.fuzzyLineWidth, { lineCap: "butt" }, true); // isOpen=true
           }
         }
       }
@@ -89,7 +90,7 @@
     // | This method is called before the library starts to draw anything.
     // +-------------------------------
     var preDraw = function (draw, fill) {
-      if (!config.showHobbyCurves) {
+      if (!appContext.config.showHobbyCurves) {
         return;
       }
       for (var p = 0; p < hobbyPaths.length; p++) {
@@ -102,8 +103,8 @@
         // This avoid ugly visible micro-gaps between any segments.
         var pathData = convertBezierPathToPathData(hobbyPaths[p]);
         // console.log("pathData", pathData);
-        draw.cubicBezierPath(pathData, config.lineColor, config.lineWidth, { lineCap: "round" }, true); // isOpen=true
-        if (config.showHobbyTangents) {
+        draw.cubicBezierPath(pathData, appContext.config.lineColor, appContext.config.lineWidth, { lineCap: "round" }, true); // isOpen=true
+        if (appContext.config.showHobbyTangents) {
           for (var i = 0; i < hobbyPaths[p].bezierCurves.length; i++) {
             var curve = hobbyPaths[p].bezierCurves[i];
             draw.line(curve.startPoint, curve.startControlPoint, "rgba(0,255,255,1.0)", 2.0);
@@ -190,11 +191,11 @@
       // var samplePointDistance = 20.0;
       // Adjust amplitude factor to grow/decrease disproportional to the sample distance.
       // (means: visual amplitude should not grow when sample distance is increased)
-      var amplituteFactor = config.fuzzyAmplitudeFactor / config.fuzzySamplePointDistance;
-      var fuzzyGenerator = new FuzzyLineDraw(config.fuzzySamplePointDistance, amplituteFactor);
+      var amplituteFactor = appContext.config.fuzzyAmplitudeFactor / appContext.config.fuzzySamplePointDistance;
+      var fuzzyGenerator = new FuzzyLineDraw(appContext.config.fuzzySamplePointDistance, amplituteFactor);
       var fuzzyPaths = []; // Array< BezierPath >
-      for (var f = 0; f < config.fuzzLineCount; f++) {
-        fuzzyGenerator.samplePointDistance = config.fuzzySamplePointDistance * (0.5 + Math.random() * 0.5);
+      for (var f = 0; f < appContext.config.fuzzLineCount; f++) {
+        fuzzyGenerator.samplePointDistance = appContext.config.fuzzySamplePointDistance * (0.5 + Math.random() * 0.5);
         // Returns a new BézierPath
         var fuzzyCurve = fuzzyGenerator.variationFromBezierPath(bezierPath);
         fuzzyPaths.push(fuzzyCurve);
@@ -206,7 +207,7 @@
     // +---------------------------------------------------------------------------------
     // | The name says all.
     // +-------------------------------
-    var rebuildAllFuzzyPaths = function () {
+    appContext.rebuildAllFuzzyPaths = function () {
       for (var h = 0; h < hobbyPaths.length; h++) {
         var updatedFuzzyPaths = buildFuzzyPaths(hobbyPaths[h]);
         fuzzyPaths.splice(h, 1, updatedFuzzyPaths);
@@ -216,47 +217,19 @@
 
     new InputHandler(appContext);
 
-    var toggleVertexVisibility = function () {
+    appContext.toggleVertexVisibility = function () {
       appContext.freedrawLines.forEach(function (polyline) {
         polyline.vertices.forEach(function (vertex) {
-          vertex.attr.visible = config.showVertices;
+          vertex.attr.visible = appContext.config.showVertices;
         });
       });
     };
 
     // +---------------------------------------------------------------------------------
     // | Create a GUI.
+    // | See `initDemoUI` for details.
     // +-------------------------------
-    {
-      var gui = pb.createGUI();
-      var foldFreedraw = gui.addFolder("Free draw");
-      // prettier-ignore
-      foldFreedraw.add(config, "showVertices").title("Draw the vertices?").onChange(function () { toggleVertexVisibility(); pb.redraw(); });
-      // prettier-ignore
-      foldFreedraw.addColor(config, "lineColor").title("The line's color to draw with.").onChange(function () { pb.redraw(); });
-      // prettier-ignore
-      foldFreedraw.add(config, "lineWidth").min(0).max(20.0).step(0.5).title("The lines' with.").onChange(function () { pb.redraw(); });
-      // prettier-ignore
-      foldFreedraw.add(config, "showHobbyCurves").title("Draw the respective hobby curves.").onChange(function () { pb.redraw(); });
-      // prettier-ignore
-      foldFreedraw.add(config, "showLinear").title("Draw the linear elements?").onChange(function () { pb.redraw(); } );
-      // prettier-ignore
-      foldFreedraw.add(config, "showHobbyTangents").title("Draw the linear Hobby curve tangents?").onChange(function () { pb.redraw(); } );
-      // prettier-ignore
-      var foldFuzzy = gui.addFolder("Fuzzy draw settings");
-      // prettier-ignore
-      foldFuzzy.add(config, "isFuzzyDrawEnabled").title("Enable/disable experimental fuzzy draw.").onChange(function () { pb.redraw(); });
-      // prettier-ignore
-      foldFuzzy.add(config, "fuzzySamplePointDistance").min(5).max(100).step(5).title("The average sample point distance.").onChange(function () { rebuildAllFuzzyPaths(); });
-      // prettier-ignore
-      foldFuzzy.add(config, "fuzzyAmplitudeFactor").min(0).max(20.0).step(0.5).title("The amplitude amplification factor – depending the sampling length.").onChange(function () {rebuildAllFuzzyPaths(); });
-      // prettier-ignore
-      foldFuzzy.add(config, "fuzzLineCount").min(1).max(100).step(1).title("Number of fuzzy lines to use.").onChange(function () { rebuildAllFuzzyPaths(); });
-      // prettier-ignore
-      foldFuzzy.add(config, "fuzzyLineWidth").min(0).max(20.0).step(0.5).title("The line width of the fuzzy components.").onChange(function () { pb.redraw(); });
-      // prettier-ignore
-      gui.add(config, "readme").title("Show readme.md");
-    }
+    initDemoUI(appContext);
 
     // +---------------------------------------------------------------------------------
     // | This renders a content list component on top, allowing to delete or add
@@ -267,8 +240,6 @@
     // +-------------------------------
     var contentList = new PBContentList(pb);
 
-    // reinit();
-    // updateGUI();
     pb.config.preDraw = preDraw;
     pb.config.postDraw = postDraw;
     pb.redraw();

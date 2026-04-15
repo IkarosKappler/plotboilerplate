@@ -7,17 +7,26 @@
  */
 
 (function (_context) {
+  /**
+   * @constructor
+   * @param {number} samplePointDistance – The average sample point distance along the path.
+   * @param {number} amplitudeFactor – A factor that's applied to the sub curve amplitude.
+   */
   var FuzzyLineDraw = function (samplePointDistance, amplitudeFactor) {
     this.samplePointDistance = samplePointDistance;
     this.amplitudeFactor = amplitudeFactor;
   };
 
+  /**
+   * Calculate one randomized path along the given path.
+   *
+   * @param {BezierPath} bezierPath
+   * @returns {BezierPath}
+   */
   FuzzyLineDraw.prototype.variationFromBezierPath = function (bezierPath) {
     if (!bezierPath || bezierPath.bezierCurves.length == 0) {
       return null;
     }
-    // var samplePointDistance = 20.0;
-    // var amplituteFactor = 1.0 / (samplePointDistance / 10);
     var totalPathLength = bezierPath.getLength();
     // var uStepSize = samplePointDistance / totalPathLength;
     // var maxAmplitude = Math.sqrt(Math.pow(this.samplePointDistance / 2, 2) - this.samplePointDistance);
