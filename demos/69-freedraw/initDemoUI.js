@@ -39,7 +39,7 @@
       // prettier-ignore
       foldFuzzy.add(appContext.config, "fuzzyLineWidth").min(0).max(20.0).step(0.5).title("The line width of the fuzzy components.").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
-      gui.add(appContext.config, "randomizeFuzzy").title("Randomize the fuzzy path.");
+      foldFuzzy.add(appContext.config, "randomizeFuzzy").title("Randomize the fuzzy path.");
       // prettier-ignore
       gui.add(appContext.config, "readme").title("Show readme.md");
     }
