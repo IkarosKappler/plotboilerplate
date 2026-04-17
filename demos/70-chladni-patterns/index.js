@@ -31,7 +31,8 @@
     // Create a config: we want to have control about the arrow head size in this demo
     // `AppContext`: this is an experimental approach to make future event handling easier.
     var appContext = new AppContext(pb, {
-      // showVertices: params.getBoolean("showVertices", true),
+      horizontalOffset: params.getNumber("horizontalOffset", 0.0),
+      verticalOffset: params.getNumber("verticalOffset", 0.0)
     });
     appContext.isMobile = isMobile;
 
@@ -96,20 +97,23 @@
         // var vertRelVal = (vertValue - leftBounds.min.y) / leftBounds.height;
         // var horiRelVal = (horiValue - bottomBounds.min.x) / bottomBounds.width;
 
-        var vertAbsVal = vertFunc(randomPoint.y);
-        var horiAbsVal = horiFunc(randomPoint.x);
+        var vertAbsVal = vertFunc(randomPoint.y); // in [bounds.min.y,bounds.max.x]
+        var horiAbsVal = horiFunc(randomPoint.x); // in [bounds.min.y,bounds.max.x]
 
-        var vertRelVal = (vertAbsVal - leftBounds.min.y) / leftBounds.height;
-        var horiRelVal = (horiAbsVal - bottomBounds.min.x) / bottomBounds.width;
+        var vertRelVal = (vertAbsVal - leftBounds.min.x) / leftBounds.width; // int [0.0,1.0]
+        var horiRelVal = (horiAbsVal - bottomBounds.min.y) / bottomBounds.height; // int [0.0,1.0]
+        if (i == 0) {
+          console.log("vertRelVal", vertRelVal, "horiRelVal", horiRelVal);
+        }
 
         var product = Math.abs(vertRelVal * horiRelVal);
 
-        if (i % 100) {
-          console.log("i", i, "vertRelVal", vertRelVal, "horiRelVal", horiRelVal);
+        // if (i % 100 === 0) {
+        //   console.log("i", i, "vertRelVal", vertRelVal, "horiRelVal", horiRelVal);
 
-          var radius = 1 + product * 10.0;
-          draw.circle(randomPoint, radius, "orange", 1);
-        }
+        // }
+        var radius = 1 + product * 10.0;
+        draw.circle(randomPoint, radius, "orange", 1);
       }
     };
 
