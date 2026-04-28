@@ -138,7 +138,7 @@
         var yVal = horiFunc(xVal, 0);
         points.push({ x: xVal, y: yVal });
       }
-      console.log(points);
+      // console.log(points);
       return points;
     };
 
@@ -155,7 +155,7 @@
         var xVal = vertFunc(0, yVal);
         points.push({ x: xVal, y: yVal });
       }
-      console.log(points);
+      // console.log(points);
       // draw.polyline(points, true, "red", 1);
       return points;
     };
