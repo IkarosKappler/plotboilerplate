@@ -32,7 +32,11 @@
     // `AppContext`: this is an experimental approach to make future event handling easier.
     var appContext = new AppContext(pb, {
       horizontalOffset: params.getNumber("horizontalOffset", 0.0),
-      verticalOffset: params.getNumber("verticalOffset", 0.0)
+      horizontalScale: params.getNumber("horizontalScale", 1.0),
+      verticalOffset: params.getNumber("verticalOffset", 0.0),
+      verticalScale: params.getNumber("verticalScale", 1.0),
+      numPoints: params.getNumber("numPoints", 1000),
+      distanceWeight: params.getNumber("distanceWeight", 2.0)
     });
     appContext.isMobile = isMobile;
 
@@ -76,10 +80,12 @@
 
       // Draw horizontal oscillation
       var bottomMath = new Math70(appContext.config);
-      horiFunc = bottomMath.sin(bottomBounds);
+      horiFunc = bottomMath.scale(appContext.config.horizontalScale, 1.0, bottomMath.sin(bottomBounds));
+      // horiFunc = bottomMath.sin(bottomBounds);
+
       // Draw vertical oscillation
       var leftMath = new Math70(appContext.config);
-      vertFunc = leftMath.sinVertical(leftBounds);
+      vertFunc = leftMath.scale(1.0, appContext.config.verticalScale, leftMath.sinVertical(leftBounds));
 
       horizontalValues = createBottomCurveValeus(horiFunc);
       verticalValues = createLeftCurveValues(vertFunc);
@@ -87,32 +93,35 @@
       draw.polyline(horizontalValues, true, "red", 1);
       draw.polyline(verticalValues, true, "red", 1);
 
-      makeRandomPoints(draw, fill, 1000);
+      makeRandomPoints(draw, fill);
     }; // END postDraw
 
-    var makeRandomPoints = function (draw, fill, pointCount) {
-      for (var i = 0; i < pointCount; i++) {
+    var weightAt = 0.0;
+    var rangeMin = -1.0;
+    var rangeMax = +1.0;
+    var makeRandomPoints = function (draw, fill) {
+      for (var i = 0; i < appContext.config.numPoints; i++) {
         var randomPoint = rightBounds.randomPoint(0, 0); // horizontalSafeArea=0, verticalSafeArea=0
 
-        // var vertRelVal = (vertValue - leftBounds.min.y) / leftBounds.height;
-        // var horiRelVal = (horiValue - bottomBounds.min.x) / bottomBounds.width;
-
-        var vertAbsVal = vertFunc(randomPoint.y); // in [bounds.min.y,bounds.max.x]
-        var horiAbsVal = horiFunc(randomPoint.x); // in [bounds.min.y,bounds.max.x]
+        var vertAbsVal = vertFunc(randomPoint.x, randomPoint.y); // in [bounds.min.y,bounds.max.x]
+        var horiAbsVal = horiFunc(randomPoint.x, randomPoint.y); // in [bounds.min.y,bounds.max.x]
 
         var vertRelVal = (vertAbsVal - leftBounds.min.x) / leftBounds.width; // int [0.0,1.0]
         var horiRelVal = (horiAbsVal - bottomBounds.min.y) / bottomBounds.height; // int [0.0,1.0]
-        if (i == 0) {
-          console.log("vertRelVal", vertRelVal, "horiRelVal", horiRelVal);
-        }
 
         var product = Math.abs(vertRelVal * horiRelVal);
+        // var weight = Math.sqrt(Math.abs(1.0 - weightAt - product));
+        var weight = Math.pow(Math.abs(product - 1.0), appContext.config.distanceWeight);
+        // var weight = Math.pow(Math.abs(product) - 1.0, 2.0);
 
+        if (i == 0) {
+          console.log("vertRelVal", vertRelVal, "horiRelVal", horiRelVal, "weight", weight);
+        }
         // if (i % 100 === 0) {
         //   console.log("i", i, "vertRelVal", vertRelVal, "horiRelVal", horiRelVal);
 
         // }
-        var radius = 1 + product * 10.0;
+        var radius = Math.abs(weight * 10.0);
         draw.circle(randomPoint, radius, "orange", 1);
       }
     };
@@ -126,7 +135,7 @@
         // if (xStep % 10 === 0) {
         //   console.log("xStep", xStep, "xVal", xVal);
         // }
-        var yVal = horiFunc(xVal);
+        var yVal = horiFunc(xVal, 0);
         points.push({ x: xVal, y: yVal });
       }
       console.log(points);
@@ -143,7 +152,7 @@
         // if (xStep % 10 === 0) {
         //   console.log("xStep", xStep, "xVal", xVal);
         // }
-        var xVal = vertFunc(yVal);
+        var xVal = vertFunc(0, yVal);
         points.push({ x: xVal, y: yVal });
       }
       console.log(points);
