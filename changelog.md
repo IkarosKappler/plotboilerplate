@@ -8,6 +8,8 @@
 - Add 'Rulers' class from the ngdg project.
 - Add 'onclose' and 'onopen' to the Modal (demos).
 
+- 2025-05-08
+  - Upgrading `mathjs` to version 15.2.0 in `demos/30-function-plot`and in`demos/70-chladni-patterns`.
 - 2026-04-04
   - Class `VertexListeners`: adding null-listeners will now throw an error.
   - Adding class `BezierResizeHelper` (copied from the `ngdg` project).

@@ -35,8 +35,17 @@
       horizontalScale: params.getNumber("horizontalScale", 1.0),
       verticalOffset: params.getNumber("verticalOffset", 0.0),
       verticalScale: params.getNumber("verticalScale", 1.0),
-      numPoints: params.getNumber("numPoints", 1000),
-      distanceWeight: params.getNumber("distanceWeight", 2.0)
+      numPoints: params.getNumber("numPoints", 10000),
+      distanceWeight: params.getNumber("distanceWeight", 10.0),
+      sampleScale: params.getNumber("sampleScale", 3.0),
+
+      // horizontalFnTerm: "sin(x) * cos(y * 0.25 + y0)",
+      // horizontalFnTerm: "sin(x) * cos(y * 0.25) * sin( sqrt( (x0-x)*(x0-x) + (y0-y)*(y0-y) ) )",
+      horizontalFnTerm: "sin( sqrt( (x0-x)*(x0-x) + (y0-y)*(y0-y) ) )",
+
+      // verticalFnTerm: "sin(x + x0) * cos(y * 0.5)"
+      // verticalFnTerm: "sin(x + x0) * cos(y * 0.5) * sin( sqrt( (x0-x)*(x0-x) + (y0-y)*(y0-y) ) )"
+      verticalFnTerm: "sin( sqrt( (x0-x)*(x0-x) + (y0-y)*(y0-y) ) )"
     });
     appContext.isMobile = isMobile;
 
@@ -48,9 +57,17 @@
     var bottomBounds;
     var vertFunc = null;
     var horiFunc = null;
-    var horizontalValues = [];
-    var verticalValues = [];
+    var inputPoints = []; // Array<Vertex>
 
+    // Create an input point to move around :)
+    var point = pb.viewport().randomPoint(0.2, 0.2);
+    inputPoints.push(point);
+    pb.add(point);
+
+    // +---------------------------------------------------------------------------------
+    // | Recaulculate the bounds for left, right, and bottom frame depending on
+    // | window size.
+    // +-------------------------------
     var updateCurrentBounds = function () {
       // Split screen into three/four areas
       var viewport = pb.viewport();
@@ -70,6 +87,9 @@
       );
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Triggered after the main draw routine.
+    // +-------------------------------
     var postDraw = function (draw, fill) {
       // TODO: this is only required on zoom in/out or on canvas resize
       updateCurrentBounds();
@@ -78,27 +98,40 @@
       draw.bounds(rightBounds, "grey", 1.0);
       draw.bounds(bottomBounds, "grey", 1.0);
 
-      // Draw horizontal oscillation
-      var bottomMath = new Math70(appContext.config);
-      horiFunc = bottomMath.scale(appContext.config.horizontalScale, 1.0, bottomMath.sin(bottomBounds));
-      // horiFunc = bottomMath.sin(bottomBounds);
+      // Creating the math object uses an expression parser taking input
+      // from the user. This might throw exceptions.
+      try {
+        // Draw horizontal oscillation
+        var bottomMath = new Math70(appContext.config, inputPoints);
+        // horiFunc = bottomMath.scale(appContext.config.horizontalScale, 1.0, bottomMath.sin(bottomBounds));
 
-      // Draw vertical oscillation
-      var leftMath = new Math70(appContext.config);
-      vertFunc = leftMath.scale(1.0, appContext.config.verticalScale, leftMath.sinVertical(leftBounds));
+        horiFunc = bottomMath.scale(appContext.config.horizontalScale, 1.0, bottomMath.sinHorizontal(bottomBounds));
 
-      horizontalValues = createBottomCurveValeus(horiFunc);
-      verticalValues = createLeftCurveValues(vertFunc);
+        // Draw vertical oscillation
+        var leftMath = new Math70(appContext.config, inputPoints);
+        vertFunc = leftMath.scale(1.0, appContext.config.verticalScale, leftMath.sinVertical(leftBounds));
+      } catch (e) {
+        humane.log(e);
+        console.error(e);
+      }
 
+      var horizontalValues = createBottomCurveValues(horiFunc);
+      var verticalValues = createLeftCurveValues(vertFunc);
       draw.polyline(horizontalValues, true, "red", 1);
       draw.polyline(verticalValues, true, "red", 1);
-
       makeRandomPoints(draw, fill);
+
+      // Draw crosshais around movable point
+      draw.crosshair(inputPoints[0], 10, "red", 1.0);
+
+      // Draw the virtual origin
+      draw.line(leftBounds.getWestPoint(), rightBounds.getEastPoint(), "rgba(128,128,128,0.5)", 1.0);
+      draw.line(rightBounds.getNorthPoint(), bottomBounds.getSouthPoint(), "rgba(128,128,128,0.5)", 1.0);
     }; // END postDraw
 
-    var weightAt = 0.0;
-    var rangeMin = -1.0;
-    var rangeMax = +1.0;
+    // +---------------------------------------------------------------------------------
+    // | Draw n random points.
+    // +-------------------------------
     var makeRandomPoints = function (draw, fill) {
       for (var i = 0; i < appContext.config.numPoints; i++) {
         var randomPoint = rightBounds.randomPoint(0, 0); // horizontalSafeArea=0, verticalSafeArea=0
@@ -114,19 +147,22 @@
         var weight = Math.pow(Math.abs(product - 1.0), appContext.config.distanceWeight);
         // var weight = Math.pow(Math.abs(product) - 1.0, 2.0);
 
-        if (i == 0) {
-          console.log("vertRelVal", vertRelVal, "horiRelVal", horiRelVal, "weight", weight);
-        }
+        // if (i == 0) {
+        //   console.log("vertRelVal", vertRelVal, "horiRelVal", horiRelVal, "weight", weight);
+        // }
         // if (i % 100 === 0) {
         //   console.log("i", i, "vertRelVal", vertRelVal, "horiRelVal", horiRelVal);
 
         // }
-        var radius = Math.abs(weight * 10.0);
+        var radius = Math.abs(weight * appContext.config.sampleScale); // 10.0);
         draw.circle(randomPoint, radius, "orange", 1);
       }
     };
 
-    var createBottomCurveValeus = function (horiFunc) {
+    // +---------------------------------------------------------------------------------
+    // | Create sample points on the bottom horizontal function graph.
+    // +-------------------------------
+    var createBottomCurveValues = function (horiFunc) {
       var points = [];
       var stepCount = 100;
       for (var xStep = 0; xStep <= stepCount; xStep++) {
@@ -142,6 +178,9 @@
       return points;
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Create sample points on the left vertical function graph.
+    // +-------------------------------
     var createLeftCurveValues = function (vertFunc) {
       // var vertFunc = leftMath.sinVertical(leftBounds);
       var points = [];
@@ -163,7 +202,9 @@
     // +---------------------------------------------------------------------------------
     // | This method is called before the library starts to draw anything.
     // +-------------------------------
-    var preDraw = function (draw, fill) {}; // END preDraw
+    var preDraw = function (draw, fill) {
+      // NOOP
+    }; // END preDraw
 
     // +---------------------------------------------------------------------------------
     // | Install a mouse handler to display current pointer position.
