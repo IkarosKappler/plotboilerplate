@@ -43,9 +43,9 @@
       // horizontalFnTerm: "sin(x) * cos(y * 0.25) * sin( sqrt( (x0-x)*(x0-x) + (y0-y)*(y0-y) ) )",
       horizontalFnTerm: "sin( sqrt( (x0-x)*(x0-x) + (y0-y)*(y0-y) ) )",
 
-      // verticalFnTerm: "sin(x + x0) * cos(y * 0.5)"
+      verticalFnTerm: "sin(x + x0) * cos(y * 0.5)"
       // verticalFnTerm: "sin(x + x0) * cos(y * 0.5) * sin( sqrt( (x0-x)*(x0-x) + (y0-y)*(y0-y) ) )"
-      verticalFnTerm: "sin( sqrt( (x0-x)*(x0-x) + (y0-y)*(y0-y) ) )"
+      // verticalFnTerm: "sin( sqrt( (x0-x)*(x0-x) + (y0-y)*(y0-y) ) )"
     });
     appContext.isMobile = isMobile;
 
