@@ -1,5 +1,5 @@
 /**
- * A script for generating Chladni patterns.
+ * A script for generating Chladni like sand patterns.
  *
  * @author   Ikaros Kappler
  * @date     2026-04-15
@@ -94,7 +94,11 @@
         true, // removeWithVertices?: boolean,
         true // doNotFireEvent?: boolean
       );
-      inputPoints = [rightBounds.randomPoint(0.2, 0.2), rightBounds.randomPoint(0.2, 0.2), rightBounds.randomPoint(0.2, 0.2)];
+      var POINT_COUNT = 3;
+      inputPoints = [];
+      for (var i = 0; i < POINT_COUNT; i++) {
+        inputPoints.push(rightBounds.randomPoint(0.2, 0.2));
+      }
       pb.add(inputPoints);
     };
     updateCurrentBounds();
@@ -104,9 +108,6 @@
     // | Triggered after the main draw routine.
     // +-------------------------------
     var postDraw = function (draw, fill) {
-      // TODO: this is only required on zoom in/out or on canvas resize
-      // updateCurrentBounds();
-
       draw.bounds(leftBounds, "grey", 1.0);
       draw.bounds(rightBounds, "grey", 1.0);
       draw.bounds(bottomBounds, "grey", 1.0);
@@ -159,18 +160,8 @@
         var vertRelVal = (vertAbsVal - leftBounds.min.x) / leftBounds.width; // int [0.0,1.0]
         var horiRelVal = (horiAbsVal - bottomBounds.min.y) / bottomBounds.height; // int [0.0,1.0]
 
-        var product = Math.abs(vertRelVal * horiRelVal);
-        // var weight = Math.sqrt(Math.abs(1.0 - weightAt - product));
+        var product = vertRelVal * horiRelVal;
         var weight = Math.pow(Math.abs(product - 1.0), appContext.config.distanceWeight);
-        // var weight = Math.pow(Math.abs(product) - 1.0, 2.0);
-
-        // if (i == 0) {
-        //   console.log("vertRelVal", vertRelVal, "horiRelVal", horiRelVal, "weight", weight);
-        // }
-        // if (i % 100 === 0) {
-        //   console.log("i", i, "vertRelVal", vertRelVal, "horiRelVal", horiRelVal);
-
-        // }
         var radius = Math.abs(weight * appContext.config.sampleScale); // 10.0);
         draw.circle(randomPoint, radius, "orange", 1);
       }
@@ -183,15 +174,10 @@
       var points = [];
       var stepCount = 100;
       for (var xStep = 0; xStep <= stepCount; xStep++) {
-        // var xVal = (xStep / stepCount) * Math.PI * 2;
         var xVal = bottomBounds.min.x + (xStep / stepCount) * bottomBounds.width;
-        // if (xStep % 10 === 0) {
-        //   console.log("xStep", xStep, "xVal", xVal);
-        // }
         var yVal = horiFunc(xVal, 0);
         points.push({ x: xVal, y: yVal });
       }
-      // console.log(points);
       return points;
     };
 
@@ -199,20 +185,13 @@
     // | Create sample points on the left vertical function graph.
     // +-------------------------------
     var createLeftCurveValues = function (vertFunc) {
-      // var vertFunc = leftMath.sinVertical(leftBounds);
       var points = [];
       var stepCount = 100;
       for (var yStep = 0; yStep <= stepCount; yStep++) {
-        // var xVal = (xStep / stepCount) * Math.PI * 2;
         var yVal = leftBounds.min.y + (yStep / stepCount) * leftBounds.height;
-        // if (xStep % 10 === 0) {
-        //   console.log("xStep", xStep, "xVal", xVal);
-        // }
         var xVal = vertFunc(0, yVal);
         points.push({ x: xVal, y: yVal });
       }
-      // console.log(points);
-      // draw.polyline(points, true, "red", 1);
       return points;
     };
 
@@ -263,7 +242,6 @@
     pb.redraw();
 
     window.addEventListener("resize", function () {
-      console.log("resize");
       updateCurrentBounds();
     });
 
