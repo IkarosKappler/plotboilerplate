@@ -19,7 +19,9 @@
    * @returns
    */
   _context.Math70.prototype._absToRelX = function (box, x) {
-    return ((x - box.min.x) / box.width) * Math.PI * 2 + this.config.horizontalOffset * RAD2DEG - Math.PI;
+    return (
+      ((x - box.min.x) / box.width) * this.config.horizontalScale * Math.PI * 2 + this.config.horizontalOffset * RAD2DEG - Math.PI
+    );
   };
 
   /**
@@ -31,7 +33,9 @@
    * @returns
    */
   _context.Math70.prototype._absToRelY = function (box, _y) {
-    return ((_y - box.min.y) / box.height) * Math.PI * 2 + this.config.verticalOffset * RAD2DEG - Math.PI;
+    return (
+      ((_y - box.min.y) / box.height) * this.config.verticalScale * Math.PI * 2 + this.config.verticalOffset * RAD2DEG - Math.PI
+    );
   };
 
   /**
@@ -45,30 +49,39 @@
     return { x: this._absToRelX(box, point.x), y: this._absToRelY(box, point.y) };
   };
 
-  // _context.Math70.prototype.sin = function (box) {
-  //   var _self = this;
-  //   return function (x, _y) {
-  //     // Map absolute to relative
-  //     var relX = _self._absToRelX(box, x);
-  //     var relY = _self._absToRelY(box, _y);
-  //     // Calculate function
-  //     var relOut = Math.sin(relX) * Math.cos(relY * 0.25);
-  //     // Map back to absolute
-  //     return box.max.y - box.height * 0.5 - relOut * box.height * 0.5;
-  //   };
-  // };
+  /**
+   * Build an object of function args compatible with Mathjs.
+   * @param {*} box
+   * @param {*} x
+   * @param {*} y
+   * @returns
+   */
+  _context.Math70.prototype.__mkFnArgs = function (box, x, y) {
+    var relX = this._absToRelX(box, x);
+    var relY = this._absToRelY(box, y);
+    var fnArgs = {
+      x: relX,
+      y: relY,
+      p: [relX, relY],
+      horizontalScale: this.config.horizontalScale,
+      verticalScale: this.config.verticalScale
+    };
+    for (var i = 0; i < this.inputPoints.length; i++) {
+      var relInputPoint = this._absToRel(box, this.inputPoints[i]);
+      fnArgs["x" + i] = relInputPoint.x;
+      fnArgs["y" + i] = relInputPoint.y;
+      fnArgs["p" + i] = [relInputPoint.x, relInputPoint.y];
+    }
+    return fnArgs;
+  };
 
   _context.Math70.prototype.sinHorizontal = function (box) {
     var _self = this;
     var fn = this.__parseHorizontalFn();
     return function (x, _y) {
       // Map absolute to relative
-      var relX = _self._absToRelX(box, x);
-      var relY = _self._absToRelY(box, _y);
-      // Calculate function
-      // var relOut = Math.sin(relX) * Math.cos(relY * 0.25);
-      var relInput0 = _self._absToRel(box, _self.inputPoints[0]);
-      var relOut = fn.evaluate({ x: relX, y: relY, x0: relInput0.x, y0: relInput0.y });
+      var fnArgs = _self.__mkFnArgs(box, x, _y);
+      var relOut = fn.evaluate(fnArgs);
       // Map back to absolute
       return box.max.y - box.height * 0.5 - relOut * box.height * 0.5;
     };
@@ -85,22 +98,13 @@
     var fn = this.__parseVerticalFn();
     return function (_x, y) {
       // Map absolute to relative
-      var relX = _self._absToRelX(box, _x);
-      var relY = _self._absToRelY(box, y);
-      // Calculate function
-      // var relOut = Math.sin(relX) * Math.cos(relY * 0.5);
-      // Calculate function
-      // var relOut = Math.sin(relX) * Math.cos(relY * 0.25);
-      var relInput0 = _self._absToRel(box, _self.inputPoints[0]);
-      var relOut = fn.evaluate({ x: relX, y: relY, x0: relInput0.x, y0: relInput0.y });
+      var fnArgs = _self.__mkFnArgs(box, _x, y);
+      var relOut = fn.evaluate(fnArgs);
       // Map back to absolute
       return box.max.x - box.width * 0.5 - relOut * box.width * 0.5;
     };
   };
 
-  // parsedFunction: function (x) {
-  //   return parsed.evaluate({ x: x });
-  // }
   _context.Math70.prototype.__parseVerticalFn = function () {
     var parsed = math.parse(this.config.verticalFnTerm);
     return parsed;

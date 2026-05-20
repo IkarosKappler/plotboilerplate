@@ -32,20 +32,24 @@
     // `AppContext`: this is an experimental approach to make future event handling easier.
     var appContext = new AppContext(pb, {
       horizontalOffset: params.getNumber("horizontalOffset", 0.0),
-      horizontalScale: params.getNumber("horizontalScale", 1.0),
+      horizontalScale: params.getNumber("horizontalScale", 0.75),
       verticalOffset: params.getNumber("verticalOffset", 0.0),
-      verticalScale: params.getNumber("verticalScale", 1.0),
+      verticalScale: params.getNumber("verticalScale", 0.5),
       numPoints: params.getNumber("numPoints", 10000),
       distanceWeight: params.getNumber("distanceWeight", 10.0),
       sampleScale: params.getNumber("sampleScale", 3.0),
 
-      // horizontalFnTerm: "sin(x) * cos(y * 0.25 + y0)",
-      // horizontalFnTerm: "sin(x) * cos(y * 0.25) * sin( sqrt( (x0-x)*(x0-x) + (y0-y)*(y0-y) ) )",
-      horizontalFnTerm: "sin( sqrt( (x0-x)*(x0-x) + (y0-y)*(y0-y) ) )",
+      // horizontalFnTerm:
+      //   "sin( sqrt( (x0-x)*(x0-x) + (y0-y)*(y0-y) ) * sqrt( (x1-x)*(x1-x) + (y1-y)*(y1-y) ) * sqrt( (x2-x)*(x2-x) + (y2-y)*(y2-y) ) )",
+      horizontalFnTerm: "sin( distance(p0,p) * distance(p1,p) * distance(p2,p))",
+      verticalFnTerm: "sin(x + x0) * sin(y + y1) * sin(y + y2) * cos(y * 0.5)",
 
-      verticalFnTerm: "sin(x + x0) * cos(y * 0.5)"
-      // verticalFnTerm: "sin(x + x0) * cos(y * 0.5) * sin( sqrt( (x0-x)*(x0-x) + (y0-y)*(y0-y) ) )"
-      // verticalFnTerm: "sin( sqrt( (x0-x)*(x0-x) + (y0-y)*(y0-y) ) )"
+      randomizeInputPoints: function () {
+        randomizeInputPoints();
+      },
+      readme: function () {
+        globalThis.displayDemoMeta();
+      }
     });
     appContext.isMobile = isMobile;
 
@@ -58,11 +62,6 @@
     var vertFunc = null;
     var horiFunc = null;
     var inputPoints = []; // Array<Vertex>
-
-    // Create an input point to move around :)
-    var point = pb.viewport().randomPoint(0.2, 0.2);
-    inputPoints.push(point);
-    pb.add(point);
 
     // +---------------------------------------------------------------------------------
     // | Recaulculate the bounds for left, right, and bottom frame depending on
@@ -87,12 +86,26 @@
       );
     };
 
+    // Create an input point to move around :)
+    var randomizeInputPoints = function () {
+      pb.remove(
+        inputPoints,
+        false, //  redraw?: boolean,
+        true, // removeWithVertices?: boolean,
+        true // doNotFireEvent?: boolean
+      );
+      inputPoints = [rightBounds.randomPoint(0.2, 0.2), rightBounds.randomPoint(0.2, 0.2), rightBounds.randomPoint(0.2, 0.2)];
+      pb.add(inputPoints);
+    };
+    updateCurrentBounds();
+    randomizeInputPoints();
+
     // +---------------------------------------------------------------------------------
     // | Triggered after the main draw routine.
     // +-------------------------------
     var postDraw = function (draw, fill) {
       // TODO: this is only required on zoom in/out or on canvas resize
-      updateCurrentBounds();
+      // updateCurrentBounds();
 
       draw.bounds(leftBounds, "grey", 1.0);
       draw.bounds(rightBounds, "grey", 1.0);
@@ -110,19 +123,23 @@
         // Draw vertical oscillation
         var leftMath = new Math70(appContext.config, inputPoints);
         vertFunc = leftMath.scale(1.0, appContext.config.verticalScale, leftMath.sinVertical(leftBounds));
+
+        var horizontalValues = createBottomCurveValues(horiFunc);
+        var verticalValues = createLeftCurveValues(vertFunc);
+        draw.polyline(horizontalValues, true, "red", 1);
+        draw.polyline(verticalValues, true, "red", 1);
       } catch (e) {
-        humane.log(e);
+        humane.log("Error: " + e.message);
         console.error(e);
+        return;
       }
 
-      var horizontalValues = createBottomCurveValues(horiFunc);
-      var verticalValues = createLeftCurveValues(vertFunc);
-      draw.polyline(horizontalValues, true, "red", 1);
-      draw.polyline(verticalValues, true, "red", 1);
       makeRandomPoints(draw, fill);
 
       // Draw crosshais around movable point
-      draw.crosshair(inputPoints[0], 10, "red", 1.0);
+      for (var i = 0; i < inputPoints.length; i++) {
+        draw.crosshair(inputPoints[i], 10, "red", 1.0);
+      }
 
       // Draw the virtual origin
       draw.line(leftBounds.getWestPoint(), rightBounds.getEastPoint(), "rgba(128,128,128,0.5)", 1.0);
@@ -245,6 +262,11 @@
     pb.config.postDraw = postDraw;
     pb.redraw();
 
-    // humane.log("Draw a line with your mouse / finger");
+    window.addEventListener("resize", function () {
+      console.log("resize");
+      updateCurrentBounds();
+    });
+
+    humane.log("Move the points around or edit the function terms.");
   });
 })(globalThis);
