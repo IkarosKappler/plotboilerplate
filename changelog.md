@@ -8,6 +8,9 @@
 - Add 'Rulers' class from the ngdg project.
 - Add 'onclose' and 'onopen' to the Modal (demos).
 
+- 2026-05-22
+  - Added the `isValueAllowed` function param to the getter methods of the `Params` class.
+  - Extending the demo `70-sand-patterns` with PointIterators (Random and Rectangular).
 - 2025-05-08
   - Upgrading `mathjs` to version 15.2.0 in `demos/30-function-plot`and in`demos/70-chladni-patterns`.
 - 2026-04-04

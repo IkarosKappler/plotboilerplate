@@ -3541,6 +3541,7 @@ exports.geomutils = {
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
  * @modified 2026-04-04 Added the method `bounds`.
  * @modified 2026-04-04 Handling the `stroke-linecap` option now from the `StrokeOptions` interface.
+ * @modified 2026-04-04 Chaning the `copyPathData` method by usind `Array.slice()`.
  * @version  1.7.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -4916,11 +4917,8 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.copyPathData = function (data) {
-        var copy = new Array(data.length);
-        for (var i = 0, n = data.length; i < n; i++) {
-            copy[i] = data[i];
-        }
-        return copy;
+        // To create a shallow copy we can just use the `slice` method.
+        return data.slice();
     };
     /**
      * Transform the given path data (translate and scale. rotating is not intended here).
@@ -5830,8 +5828,9 @@ exports.KeyHandler = KeyHandler;
  * @modified 2025-05-07 Moving full vectors now by default when vector point a is moved.
  * @modified 2025-05-20 Applying `lineWith` parameter in the draw routine for vectors (had been missing).
  * @modified 2026-03-13 Changed visibility of `setZoom` and `setOffset` to public. There was no good reason to have the private.
+ * @modified 2026-04-04 Added `isInPanningMode` attribute and `isPanning` method.
  *
- * @version  1.21.2
+ * @version  1.22.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -6289,6 +6288,9 @@ var PlotBoilerplate = /** @class */ (function () {
         this.config.canvasWidthFactor = this.config.canvasHeightFactor = pixelRatio;
         this.resizeCanvas();
         this.updateCSSscale();
+    };
+    PlotBoilerplate.prototype.isPanning = function () {
+        return this.isInPanningMode;
     };
     /**
      * Set the current zoom and draw offset to fit the given bounds.
@@ -7169,13 +7171,12 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     // TODO: this was moved to the DOM utils
     PlotBoilerplate.prototype.getAvailableContainerSpace = function () {
-        var _self = this;
-        var container = _self.canvas.parentNode; // Element | Document | DocumentFragment;
-        _self.canvas.style.display = "none";
-        var padding = this.getFProp(container, "padding") || 0, border = this.getFProp(_self.canvas, "border-width") || 0, pl = this.getFProp(container, "padding-left") || padding, pr = this.getFProp(container, "padding-right") || padding, pt = this.getFProp(container, "padding-top") || padding, pb = this.getFProp(container, "padding-bottom") || padding, bl = this.getFProp(_self.canvas, "border-left-width") || border, br = this.getFProp(_self.canvas, "border-right-width") || border, bt = this.getFProp(_self.canvas, "border-top-width") || border, bb = this.getFProp(_self.canvas, "border-bottom-width") || border;
+        var container = this.canvas.parentNode; // Element | Document | DocumentFragment;
+        this.canvas.style.display = "none";
+        var padding = this.getFProp(container, "padding") || 0, border = this.getFProp(this.canvas, "border-width") || 0, pl = this.getFProp(container, "padding-left") || padding, pr = this.getFProp(container, "padding-right") || padding, pt = this.getFProp(container, "padding-top") || padding, pb = this.getFProp(container, "padding-bottom") || padding, bl = this.getFProp(this.canvas, "border-left-width") || border, br = this.getFProp(this.canvas, "border-right-width") || border, bt = this.getFProp(this.canvas, "border-top-width") || border, bb = this.getFProp(this.canvas, "border-bottom-width") || border;
         var w = container.clientWidth;
         var h = container.clientHeight;
-        _self.canvas.style.display = "block";
+        this.canvas.style.display = "block";
         return { width: w - pl - pr - bl - br, height: h - pt - pb - bt - bb };
     };
     /**
@@ -7438,7 +7439,8 @@ var PlotBoilerplate = /** @class */ (function () {
         //            not this one. So this tab will never receive any [Ctrl-down] events
         //            until next keypress; the implication is, that [Ctrl] would still
         //            considered to be pressed which is not true.
-        if (this.keyHandler && (this.keyHandler.isDown("alt") || this.keyHandler.isDown("spacebar"))) {
+        // if (this.keyHandler && (this.keyHandler.isDown("alt") || this.keyHandler.isDown("spacebar"))) {
+        if (this.isInPanningMode) {
             if (!this.config.enablePan) {
                 return;
             }
@@ -7790,6 +7792,18 @@ var PlotBoilerplate = /** @class */ (function () {
                 _self.selectVerticesInPolygon(_self.selectPolygon);
                 _self.selectPolygon = null;
                 _self.redraw();
+            })
+                .down("alt", function () {
+                _self.isInPanningMode = true;
+            })
+                .up("alt", function () {
+                _self.isInPanningMode = false;
+            })
+                .down("spacebar", function () {
+                _self.isInPanningMode = true;
+            })
+                .up("spacebar", function () {
+                _self.isInPanningMode = false;
             });
         } // END IF enableKeys?
         else {

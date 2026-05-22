@@ -28,6 +28,8 @@
       )
     );
 
+    var POINT_SET_TYPES = ["Rectangular", "Random"];
+
     // Create a config: we want to have control about the arrow head size in this demo
     // `AppContext`: this is an experimental approach to make future event handling easier.
     var appContext = new AppContext(pb, {
@@ -38,6 +40,9 @@
       numPoints: params.getNumber("numPoints", 10000),
       distanceWeight: params.getNumber("distanceWeight", 10.0),
       sampleScale: params.getNumber("sampleScale", 3.0),
+      pointSetType: params.getString("pointSetType", "Rectangular", function (v) {
+        return POINT_SET_TYPES.indexOf(v) != -1;
+      }), // Rectangular or Random
 
       // horizontalFnTerm:
       //   "sin( sqrt( (x0-x)*(x0-x) + (y0-y)*(y0-y) ) * sqrt( (x1-x)*(x1-x) + (y1-y)*(y1-y) ) * sqrt( (x2-x)*(x2-x) + (y2-y)*(y2-y) ) )",
@@ -151,8 +156,14 @@
     // | Draw n random points.
     // +-------------------------------
     var makeRandomPoints = function (draw, fill) {
-      for (var i = 0; i < appContext.config.numPoints; i++) {
-        var randomPoint = rightBounds.randomPoint(0, 0); // horizontalSafeArea=0, verticalSafeArea=0
+      // var iterator = new PointIterator.Random(rightBounds, appContext.config.numPoints);
+      // var iterator = new PointIterator.Raster(rightBounds, appContext.config.numPoints);
+      var iterator = getPointIterator();
+      var i = 0;
+      // for (var i = 0; i < appContext.config.numPoints; i++) {
+      while (iterator.hasNext() && i++ < appContext.config.numPoints) {
+        // var randomPoint = rightBounds.randomPoint(0, 0); // horizontalSafeArea=0, verticalSafeArea=0
+        var randomPoint = iterator.next();
 
         var vertAbsVal = vertFunc(randomPoint.x, randomPoint.y); // in [bounds.min.y,bounds.max.x]
         var horiAbsVal = horiFunc(randomPoint.x, randomPoint.y); // in [bounds.min.y,bounds.max.x]
@@ -195,6 +206,14 @@
       return points;
     };
 
+    var getPointIterator = function () {
+      if (appContext.config.pointSetType == "Random") {
+        return new PointIterator.Random(rightBounds, appContext.config.numPoints);
+      } else {
+        return new PointIterator.Raster(rightBounds, appContext.config.numPoints);
+      }
+    };
+
     // +---------------------------------------------------------------------------------
     // | This method is called before the library starts to draw anything.
     // +-------------------------------
@@ -226,7 +245,7 @@
     // | Create a GUI.
     // | See `initDemoUI` for details.
     // +-------------------------------
-    initDemoUI(appContext);
+    initDemoUI(appContext, POINT_SET_TYPES);
 
     // +---------------------------------------------------------------------------------
     // | This renders a content list component on top, allowing to delete or add

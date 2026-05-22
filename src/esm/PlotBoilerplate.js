@@ -92,8 +92,9 @@
  * @modified 2025-05-07 Moving full vectors now by default when vector point a is moved.
  * @modified 2025-05-20 Applying `lineWith` parameter in the draw routine for vectors (had been missing).
  * @modified 2026-03-13 Changed visibility of `setZoom` and `setOffset` to public. There was no good reason to have the private.
+ * @modified 2026-04-04 Added `isInPanningMode` attribute and `isPanning` method.
  *
- * @version  1.21.2
+ * @version  1.22.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -550,6 +551,9 @@ export class PlotBoilerplate {
         this.config.canvasWidthFactor = this.config.canvasHeightFactor = pixelRatio;
         this.resizeCanvas();
         this.updateCSSscale();
+    }
+    isPanning() {
+        return this.isInPanningMode;
     }
     /**
      * Set the current zoom and draw offset to fit the given bounds.
@@ -1430,13 +1434,12 @@ export class PlotBoilerplate {
      **/
     // TODO: this was moved to the DOM utils
     getAvailableContainerSpace() {
-        const _self = this;
-        const container = _self.canvas.parentNode; // Element | Document | DocumentFragment;
-        _self.canvas.style.display = "none";
-        var padding = this.getFProp(container, "padding") || 0, border = this.getFProp(_self.canvas, "border-width") || 0, pl = this.getFProp(container, "padding-left") || padding, pr = this.getFProp(container, "padding-right") || padding, pt = this.getFProp(container, "padding-top") || padding, pb = this.getFProp(container, "padding-bottom") || padding, bl = this.getFProp(_self.canvas, "border-left-width") || border, br = this.getFProp(_self.canvas, "border-right-width") || border, bt = this.getFProp(_self.canvas, "border-top-width") || border, bb = this.getFProp(_self.canvas, "border-bottom-width") || border;
+        const container = this.canvas.parentNode; // Element | Document | DocumentFragment;
+        this.canvas.style.display = "none";
+        var padding = this.getFProp(container, "padding") || 0, border = this.getFProp(this.canvas, "border-width") || 0, pl = this.getFProp(container, "padding-left") || padding, pr = this.getFProp(container, "padding-right") || padding, pt = this.getFProp(container, "padding-top") || padding, pb = this.getFProp(container, "padding-bottom") || padding, bl = this.getFProp(this.canvas, "border-left-width") || border, br = this.getFProp(this.canvas, "border-right-width") || border, bt = this.getFProp(this.canvas, "border-top-width") || border, bb = this.getFProp(this.canvas, "border-bottom-width") || border;
         var w = container.clientWidth;
         var h = container.clientHeight;
-        _self.canvas.style.display = "block";
+        this.canvas.style.display = "block";
         return { width: w - pl - pr - bl - br, height: h - pt - pb - bt - bb };
     }
     /**
@@ -1698,7 +1701,8 @@ export class PlotBoilerplate {
         //            not this one. So this tab will never receive any [Ctrl-down] events
         //            until next keypress; the implication is, that [Ctrl] would still
         //            considered to be pressed which is not true.
-        if (this.keyHandler && (this.keyHandler.isDown("alt") || this.keyHandler.isDown("spacebar"))) {
+        // if (this.keyHandler && (this.keyHandler.isDown("alt") || this.keyHandler.isDown("spacebar"))) {
+        if (this.isInPanningMode) {
             if (!this.config.enablePan) {
                 return;
             }
@@ -2049,6 +2053,18 @@ export class PlotBoilerplate {
                 _self.selectVerticesInPolygon(_self.selectPolygon);
                 _self.selectPolygon = null;
                 _self.redraw();
+            })
+                .down("alt", function () {
+                _self.isInPanningMode = true;
+            })
+                .up("alt", function () {
+                _self.isInPanningMode = false;
+            })
+                .down("spacebar", function () {
+                _self.isInPanningMode = true;
+            })
+                .up("spacebar", function () {
+                _self.isInPanningMode = false;
             });
         } // END IF enableKeys?
         else {

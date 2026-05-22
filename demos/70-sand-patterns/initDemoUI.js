@@ -7,7 +7,7 @@
  */
 
 (function (_context) {
-  _context.initDemoUI = function (appContext) {
+  _context.initDemoUI = function (appContext, POINT_SET_TYPES) {
     // +---------------------------------------------------------------------------------
     // | Create a GUI.
     // +-------------------------------
@@ -32,6 +32,9 @@
       foldSand.add(appContext.config, "horizontalFnTerm").title("The horizontal base function termin, parameters are `x` and `y`, `x0` and `y0`.").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
       foldSand.add(appContext.config, "verticalFnTerm").title("The vertical base function termin, parameters are `x` and `y`, `x0` and `y0`.").onChange(function () { appContext.pb.redraw(); });
+      // prettier-ignore
+      foldSand.add(appContext.config, 'pointSetType',POINT_SET_TYPES).listen().onChange(function() { appContext.pb.redraw() }).name("pointSetType").title("pointSetType");
+
       // prettier-ignore
       foldSand.add(appContext.config, "randomizeInputPoints").title("Randomize the input points.");
       // prettier-ignore
