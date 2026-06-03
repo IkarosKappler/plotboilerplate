@@ -47,3 +47,7 @@ _tsconfig.browser.json
 tests/_test_colorgradientpicker.html
 tests/_test_colorgradientpicker.js
 steps-to-publish.md
+
+src/_cjs/
+src/_esm/
+_*

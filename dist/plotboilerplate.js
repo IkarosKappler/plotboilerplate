@@ -272,7 +272,9 @@ exports.Vector = Vector;
  * @modified 2024-09-13 Remoed the scaling of `lineWidth` in the `polygon` and `polyline` methods. This makes no sense here and doesn't match up with the behavior of other line functions.
  * @modified 2026-01-04 Adding `lineJoin` attribute to the `StrokeOptions`.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
- * @version  1.14.0
+ * @modified 2026-04-04 Added the method `bounds`.
+ * @modified 2026-04-04 Handling the `lineCap` attribute in the `StrokeOptions`.
+ * @version  1.15.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
@@ -312,7 +314,7 @@ var drawutils = /** @class */ (function () {
      */
     drawutils.prototype.applyStrokeOpts = function (strokeOptions) {
         var _this = this;
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         this.ctx.setLineDash(((_a = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashArray) !== null && _a !== void 0 ? _a : []).map(function (dashArrayElem) {
             // Note assume scale.x === scale.y
             // Invariant scale makes funny stuff anyway.
@@ -320,6 +322,7 @@ var drawutils = /** @class */ (function () {
         }));
         this.ctx.lineDashOffset = ((_b = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashOffset) !== null && _b !== void 0 ? _b : 0) * this.scale.x;
         this.ctx.lineJoin = (_c = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.lineJoin) !== null && _c !== void 0 ? _c : null;
+        this.ctx.lineCap = (_d = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.lineCap) !== null && _d !== void 0 ? _d : null;
     };
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff. It is not
@@ -692,6 +695,22 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
         this.ctx.restore();
+    };
+    /**
+     * Draw a rectangle at the given bounds; and with the specified line width and (CSS-) color.<br>
+     *
+     * @method bounds
+     * @param {IBounds} bounds - The bounds rectangle to be drawn.
+     * @param {string} color - The CSS color to draw the rectangle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {R}
+     * @instance
+     * @memberof DrawLib
+     */
+    drawutils.prototype.bounds = function (bounds, color, lineWidth, strokeOptions) {
+        this.rect(bounds.min, bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y, color, lineWidth, strokeOptions);
     };
     /**
      * Draw the given (cubic) bézier curve.
@@ -2441,7 +2460,8 @@ exports.CircleSector = CircleSector;
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
- * @version  0.0.10
+ * @modified 2026-04-04 Added the method `bounds`.
+ * @version  0.0.11
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilsgl = void 0;
@@ -2890,8 +2910,24 @@ var drawutilsgl = /** @class */ (function () {
      * @param {string} color - The color to use.
      * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
      **/
-    drawutilsgl.prototype.rect = function (position, width, height, color, lineWidth) {
+    drawutilsgl.prototype.rect = function (position, width, height, color, lineWidth, strokeOptions) {
         // NOT YET IMPLEMENTED
+    };
+    /**
+     * Draw a rectangle at the given bounds; and with the specified line width and (CSS-) color.<br>
+     *
+     * @method bounds
+     * @param {IBounds} bounds - The bounds rectangle to be drawn.
+     * @param {string} color - The CSS color to draw the rectangle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {R}
+     * @instance
+     * @memberof DrawLib
+     */
+    drawutilsgl.prototype.bounds = function (bounds, color, lineWidth, strokeOptions) {
+        this.rect(bounds.min, bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y, color, lineWidth, strokeOptions);
     };
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
@@ -3503,6 +3539,9 @@ exports.geomutils = {
  * @modified 2026-01-04 Adding `lineJoin` attribute to the methods' `StrokeOptions` param.
  * @modified 2026-01-04 Fixing missing `strokeOptions` param in the `drawutilssvg.polygon` method.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
+ * @modified 2026-04-04 Added the method `bounds`.
+ * @modified 2026-04-04 Handling the `stroke-linecap` option now from the `StrokeOptions` interface.
+ * @modified 2026-04-04 Chaning the `copyPathData` method by usind `Array.slice()`.
  * @version  1.7.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -3928,6 +3967,10 @@ var drawutilssvg = /** @class */ (function () {
         // Set line join option?
         if (strokeOptions && strokeOptions.lineJoin && drawutilssvg.nodeSupportsLineJoin(node.tagName)) {
             node.setAttribute("stroke-linejoin", strokeOptions.lineJoin);
+        }
+        // Set lineCap option?
+        if (strokeOptions && strokeOptions.lineCap && drawutilssvg.nodeSupportsLineCap(node.tagName)) {
+            node.setAttribute("stroke-linecap", strokeOptions.lineCap);
         }
     };
     drawutilssvg.prototype._x = function (x) {
@@ -4406,6 +4449,22 @@ var drawutilssvg = /** @class */ (function () {
         return this._bindFillDraw(node, "rect", color, lineWidth || 1);
     };
     /**
+     * Draw a rectangle at the given bounds; and with the specified line width and (CSS-) color.<br>
+     *
+     * @method bounds
+     * @param {IBounds} bounds - The bounds rectangle to be drawn.
+     * @param {string} color - The CSS color to draw the rectangle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {R}
+     * @instance
+     * @memberof DrawLib
+     */
+    drawutilssvg.prototype.bounds = function (bounds, color, lineWidth, strokeOptions) {
+        this.rect(bounds.min, bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y, color, lineWidth, strokeOptions);
+    };
+    /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
      * @method grid
@@ -4858,11 +4917,8 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.copyPathData = function (data) {
-        var copy = new Array(data.length);
-        for (var i = 0, n = data.length; i < n; i++) {
-            copy[i] = data[i];
-        }
-        return copy;
+        // To create a shallow copy we can just use the `slice` method.
+        return data.slice();
     };
     /**
      * Transform the given path data (translate and scale. rotating is not intended here).
@@ -5032,6 +5088,9 @@ var drawutilssvg = /** @class */ (function () {
         return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
     };
     drawutilssvg.nodeSupportsLineJoin = function (nodeName) {
+        return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
+    };
+    drawutilssvg.nodeSupportsLineCap = function (nodeName) {
         return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
     };
     /**
@@ -5769,8 +5828,9 @@ exports.KeyHandler = KeyHandler;
  * @modified 2025-05-07 Moving full vectors now by default when vector point a is moved.
  * @modified 2025-05-20 Applying `lineWith` parameter in the draw routine for vectors (had been missing).
  * @modified 2026-03-13 Changed visibility of `setZoom` and `setOffset` to public. There was no good reason to have the private.
+ * @modified 2026-04-04 Added `isInPanningMode` attribute and `isPanning` method.
  *
- * @version  1.21.2
+ * @version  1.22.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -6228,6 +6288,9 @@ var PlotBoilerplate = /** @class */ (function () {
         this.config.canvasWidthFactor = this.config.canvasHeightFactor = pixelRatio;
         this.resizeCanvas();
         this.updateCSSscale();
+    };
+    PlotBoilerplate.prototype.isPanning = function () {
+        return this.isInPanningMode;
     };
     /**
      * Set the current zoom and draw offset to fit the given bounds.
@@ -7108,13 +7171,12 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     // TODO: this was moved to the DOM utils
     PlotBoilerplate.prototype.getAvailableContainerSpace = function () {
-        var _self = this;
-        var container = _self.canvas.parentNode; // Element | Document | DocumentFragment;
-        _self.canvas.style.display = "none";
-        var padding = this.getFProp(container, "padding") || 0, border = this.getFProp(_self.canvas, "border-width") || 0, pl = this.getFProp(container, "padding-left") || padding, pr = this.getFProp(container, "padding-right") || padding, pt = this.getFProp(container, "padding-top") || padding, pb = this.getFProp(container, "padding-bottom") || padding, bl = this.getFProp(_self.canvas, "border-left-width") || border, br = this.getFProp(_self.canvas, "border-right-width") || border, bt = this.getFProp(_self.canvas, "border-top-width") || border, bb = this.getFProp(_self.canvas, "border-bottom-width") || border;
+        var container = this.canvas.parentNode; // Element | Document | DocumentFragment;
+        this.canvas.style.display = "none";
+        var padding = this.getFProp(container, "padding") || 0, border = this.getFProp(this.canvas, "border-width") || 0, pl = this.getFProp(container, "padding-left") || padding, pr = this.getFProp(container, "padding-right") || padding, pt = this.getFProp(container, "padding-top") || padding, pb = this.getFProp(container, "padding-bottom") || padding, bl = this.getFProp(this.canvas, "border-left-width") || border, br = this.getFProp(this.canvas, "border-right-width") || border, bt = this.getFProp(this.canvas, "border-top-width") || border, bb = this.getFProp(this.canvas, "border-bottom-width") || border;
         var w = container.clientWidth;
         var h = container.clientHeight;
-        _self.canvas.style.display = "block";
+        this.canvas.style.display = "block";
         return { width: w - pl - pr - bl - br, height: h - pt - pb - bt - bb };
     };
     /**
@@ -7377,7 +7439,8 @@ var PlotBoilerplate = /** @class */ (function () {
         //            not this one. So this tab will never receive any [Ctrl-down] events
         //            until next keypress; the implication is, that [Ctrl] would still
         //            considered to be pressed which is not true.
-        if (this.keyHandler && (this.keyHandler.isDown("alt") || this.keyHandler.isDown("spacebar"))) {
+        // if (this.keyHandler && (this.keyHandler.isDown("alt") || this.keyHandler.isDown("spacebar"))) {
+        if (this.isInPanningMode) {
             if (!this.config.enablePan) {
                 return;
             }
@@ -7729,6 +7792,18 @@ var PlotBoilerplate = /** @class */ (function () {
                 _self.selectVerticesInPolygon(_self.selectPolygon);
                 _self.selectPolygon = null;
                 _self.redraw();
+            })
+                .down("alt", function () {
+                _self.isInPanningMode = true;
+            })
+                .up("alt", function () {
+                _self.isInPanningMode = false;
+            })
+                .down("spacebar", function () {
+                _self.isInPanningMode = true;
+            })
+                .up("spacebar", function () {
+                _self.isInPanningMode = false;
             });
         } // END IF enableKeys?
         else {
@@ -13675,7 +13750,8 @@ exports.MouseHandler = MouseHandler;
  * @modified 2020-02-22 Added 'return this' to the add* functions (for chanining).
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2020-11-17 Added the `click` handler.
- * @version  1.1.0
+ * @modified 2026-04-04 Adding null-listeners will now throw an error.
+ * @version  1.2.0
  *
  * @file VertexListeners
  * @public
@@ -13912,6 +13988,9 @@ var VertexListeners = /** @class */ (function () {
      * @private
      */
     VertexListeners._addListener = function (listeners, newListener) {
+        if (!newListener) {
+            throw new Error("Cannot add null listener. This would lead to unpredictable errors during event handling.");
+        }
         for (var i in listeners) {
             if (listeners[i] == newListener)
                 return false;

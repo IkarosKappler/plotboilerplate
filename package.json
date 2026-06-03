@@ -26,6 +26,7 @@
     "mkdocs": "cd bin && ./run-mk-typedocs.sh",
     "server": "npx http-server",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "publish-npm-package": "echo 'PLEASE DO THIS IN THE WEBSITE PROJECT'",
     "webpack-browser": "npx webpack --mode production --config ./webpack5.browser.config.js",
     "webpack-dev": "npx webpack --mode development --config ./webpack5-dev.config.js",
     "rollup-module": "npx rollup -c",

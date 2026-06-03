@@ -92,8 +92,9 @@
  * @modified 2025-05-07 Moving full vectors now by default when vector point a is moved.
  * @modified 2025-05-20 Applying `lineWith` parameter in the draw routine for vectors (had been missing).
  * @modified 2026-03-13 Changed visibility of `setZoom` and `setOffset` to public. There was no good reason to have the private.
+ * @modified 2026-04-04 Added `isInPanningMode` attribute and `isPanning` method.
  *
- * @version  1.21.2
+ * @version  1.22.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -259,6 +260,14 @@ export declare class PlotBoilerplate {
      */
     hooks: IHooks;
     /**
+     * Indicator if the instance is currently in 'panning' mode.
+     * Please use `isPanning()` method to determine value.
+     * @member {boolean}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
+    private isInPanningMode;
+    /**
      * A list of content change listeners.
      */
     contentChangeListeners: Array<PBContentChangeListener>;
@@ -370,6 +379,7 @@ export declare class PlotBoilerplate {
      * @private
      **/
     private _setToRetina;
+    isPanning(): boolean;
     /**
      * Set the current zoom and draw offset to fit the given bounds.
      *

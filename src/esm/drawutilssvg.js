@@ -51,6 +51,9 @@
  * @modified 2026-01-04 Adding `lineJoin` attribute to the methods' `StrokeOptions` param.
  * @modified 2026-01-04 Fixing missing `strokeOptions` param in the `drawutilssvg.polygon` method.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
+ * @modified 2026-04-04 Added the method `bounds`.
+ * @modified 2026-04-04 Handling the `stroke-linecap` option now from the `StrokeOptions` interface.
+ * @modified 2026-04-04 Chaning the `copyPathData` method by usind `Array.slice()`.
  * @version  1.7.0
  **/
 import { CircleSector } from "./CircleSector";
@@ -473,6 +476,10 @@ export class drawutilssvg {
         // Set line join option?
         if (strokeOptions && strokeOptions.lineJoin && drawutilssvg.nodeSupportsLineJoin(node.tagName)) {
             node.setAttribute("stroke-linejoin", strokeOptions.lineJoin);
+        }
+        // Set lineCap option?
+        if (strokeOptions && strokeOptions.lineCap && drawutilssvg.nodeSupportsLineCap(node.tagName)) {
+            node.setAttribute("stroke-linecap", strokeOptions.lineCap);
         }
     }
     _x(x) {
@@ -946,6 +953,22 @@ export class drawutilssvg {
         return this._bindFillDraw(node, "rect", color, lineWidth || 1);
     }
     /**
+     * Draw a rectangle at the given bounds; and with the specified line width and (CSS-) color.<br>
+     *
+     * @method bounds
+     * @param {IBounds} bounds - The bounds rectangle to be drawn.
+     * @param {string} color - The CSS color to draw the rectangle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {R}
+     * @instance
+     * @memberof DrawLib
+     */
+    bounds(bounds, color, lineWidth, strokeOptions) {
+        this.rect(bounds.min, bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y, color, lineWidth, strokeOptions);
+    }
+    /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
      * @method grid
@@ -1398,11 +1421,8 @@ export class drawutilssvg {
      * @memberof drawutilssvg
      */
     static copyPathData(data) {
-        const copy = new Array(data.length);
-        for (var i = 0, n = data.length; i < n; i++) {
-            copy[i] = data[i];
-        }
-        return copy;
+        // To create a shallow copy we can just use the `slice` method.
+        return data.slice();
     }
     /**
      * Transform the given path data (translate and scale. rotating is not intended here).
@@ -1572,6 +1592,9 @@ export class drawutilssvg {
         return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
     }
     static nodeSupportsLineJoin(nodeName) {
+        return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
+    }
+    static nodeSupportsLineCap(nodeName) {
         return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
     }
     /**

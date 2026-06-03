@@ -16,11 +16,12 @@
 (function (_context) {
   "use strict";
 
-  // Fetch the GET params
-  let GUP = gup();
-  var isDarkmode = detectDarkMode(GUP);
-
   window.addEventListener("load", function () {
+    // Fetch the GET params
+    let GUP = gup();
+    var params = new Params(GUP);
+    var isDarkmode = detectDarkMode(GUP);
+
     // All config params are optional.
     var pb = new PlotBoilerplate(
       PlotBoilerplate.utils.safeMergeByKeys(
@@ -377,6 +378,9 @@
 
       f1.open();
       f2.open();
+      if (params.getBoolean("closegui", false)) {
+        gui.close();
+      }
 
       // Add stats
       var uiStats = new UIStats(stats);

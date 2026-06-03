@@ -51,6 +51,9 @@
  * @modified 2026-01-04 Adding `lineJoin` attribute to the methods' `StrokeOptions` param.
  * @modified 2026-01-04 Fixing missing `strokeOptions` param in the `drawutilssvg.polygon` method.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
+ * @modified 2026-04-04 Added the method `bounds`.
+ * @modified 2026-04-04 Handling the `stroke-linecap` option now from the `StrokeOptions` interface.
+ * @modified 2026-04-04 Chaning the `copyPathData` method by usind `Array.slice()`.
  * @version  1.7.0
  **/
 
@@ -69,7 +72,8 @@ import {
   DrawLibConfiguration,
   FontStyle,
   FontWeight,
-  StrokeOptions
+  StrokeOptions,
+  IBounds
 } from "./interfaces";
 import { Bounds } from "./Bounds";
 import { UIDGenerator } from "./UIDGenerator";
@@ -680,6 +684,11 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     // Set line join option?
     if (strokeOptions && strokeOptions.lineJoin && drawutilssvg.nodeSupportsLineJoin(node.tagName)) {
       node.setAttribute("stroke-linejoin", strokeOptions.lineJoin);
+    }
+
+    // Set lineCap option?
+    if (strokeOptions && strokeOptions.lineCap && drawutilssvg.nodeSupportsLineCap(node.tagName)) {
+      node.setAttribute("stroke-linecap", strokeOptions.lineCap);
     }
   }
 
@@ -1296,6 +1305,23 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   }
 
   /**
+   * Draw a rectangle at the given bounds; and with the specified line width and (CSS-) color.<br>
+   *
+   * @method bounds
+   * @param {IBounds} bounds - The bounds rectangle to be drawn.
+   * @param {string} color - The CSS color to draw the rectangle with.
+   * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
+   * @return {R}
+   * @instance
+   * @memberof DrawLib
+   */
+  bounds(bounds: IBounds, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): void {
+    this.rect(bounds.min, bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y, color, lineWidth, strokeOptions);
+  }
+
+  /**
    * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
    *
    * @method grid
@@ -1801,11 +1827,8 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @memberof drawutilssvg
    */
   static copyPathData(data: SVGPathParams): SVGPathParams {
-    const copy: SVGPathParams = new Array(data.length);
-    for (var i = 0, n = data.length; i < n; i++) {
-      copy[i] = data[i];
-    }
-    return copy;
+    // To create a shallow copy we can just use the `slice` method.
+    return data.slice();
   }
 
   /**
@@ -1980,6 +2003,10 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   }
 
   private static nodeSupportsLineJoin(nodeName: string) {
+    return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
+  }
+
+  private static nodeSupportsLineCap(nodeName: string) {
     return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
   }
 

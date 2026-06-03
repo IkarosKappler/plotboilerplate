@@ -4,7 +4,8 @@
  * @modified 2020-10-23 Ported to Typescript.
  * @modified 2020-10-30 Exporting each color under its name globally.
  * @modified 2025-12-08 Replaying self defined colors by official web colors.
- * @version  1.0.2
+ * @modified 2026-03-18 Fixing global `WebColors` array.
+ * @version  1.0.3
  **/
 
 import { Color } from "./datastructures/Color";
@@ -30,7 +31,19 @@ export const LightGreen: Color = Color.LightGreen; // Color.makeRGB(141,195,67);
  * @requires Color
  *
  */
-export const WebColors: Array<Color> = [Red, Pink, Purple, DeepPurple, Indigo, Blue, LightBlue, Cyan, Teal, Green, LightGreen];
+export const WebColors: Array<Color> = [
+  Color.Red,
+  Color.Pink,
+  Color.Purple,
+  Color.DeepPink,
+  Color.Indigo,
+  Color.Blue,
+  Color.LightBlue,
+  Color.Cyan,
+  Color.Teal,
+  Color.Green,
+  Color.LightGreen
+];
 
 /**
  * A helper function to shuffle the colors into a new order.

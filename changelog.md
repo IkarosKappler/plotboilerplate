@@ -8,6 +8,24 @@
 - Add 'Rulers' class from the ngdg project.
 - Add 'onclose' and 'onopen' to the Modal (demos).
 
+- 2026-05-22
+  - Added the `isValueAllowed` function param to the getter methods of the `Params` class.
+  - Extending the demo `70-sand-patterns` with PointIterators (Random and Rectangular).
+- 2025-05-08
+  - Upgrading `mathjs` to version 15.2.0 in `demos/30-function-plot`and in`demos/70-chladni-patterns`.
+- 2026-04-04
+  - Class `VertexListeners`: adding null-listeners will now throw an error.
+  - Adding class `BezierResizeHelper` (copied from the `ngdg` project).
+  - Added the `bounds` method to the `DrawLib` interface.
+  - Added the `bounds` method to the `draw`, `drawutilssvg` and `drawgl` classes.
+  - Added the extended demo for Bézier path resizing.
+  - Added the `lineCap` attribute to the `StrokeOptions` interface.
+  - Handling the `lineCap` attribute in the `StrokeOptions` in the `draw` class.
+  - Handling the `lineCap` attribute in the `StrokeOptions` in the `drawutilssvg` class.
+  - Updating the freedraw demo: allowing updates on the curves and recalculation of the Hobby paths.
+  - Chaning the `drawutilssvg.copyPathData` method by usind `Array.slice()`.
+  - Added `PlotBoilerplate.isInPanningMode` attribute and `PlotBoilerplate.isPanning` method.
+  - Added fuzzy draw to the `freedraw` demo.
 - 2026-03-18
   - Exporting _all_ classes/functions/constants now from index.ts
 - 2026-03-18 [1.27.0]

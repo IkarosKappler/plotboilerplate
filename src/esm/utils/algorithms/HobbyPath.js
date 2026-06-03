@@ -17,7 +17,6 @@
  **/
 import { CubicBezierCurve } from "../../CubicBezierCurve";
 import { Vertex } from "../../Vertex";
-;
 /**
  * @classdesc A HobbyCurve/HobbyPath calculation class: compute a set of optimal
  *            cubic Bézier curves from a sequence of vertices.
@@ -34,7 +33,6 @@ export class HobbyPath {
     constructor(vertices) {
         this.vertices = vertices ? vertices : [];
     }
-    ;
     /**
      * Add a new point to the end of the vertex sequence.
      *
@@ -46,7 +44,6 @@ export class HobbyPath {
     addPoint(p) {
         this.vertices.push(p);
     }
-    ;
     /**
      * Generate a sequence of cubic Bézier curves from the point set.
      *
@@ -79,7 +76,6 @@ export class HobbyPath {
             return [];
         }
     }
-    ;
     /**
      * Computes the control point coordinates for a Hobby curve through
      * the points given.
@@ -93,13 +89,17 @@ export class HobbyPath {
      **/
     hobbyControls(circular, omega) {
         // This is a version that works for both, closed and non-closed paths.
-        if (typeof omega === 'undefined')
+        if (typeof omega === "undefined")
             omega = 0;
         let n = this.vertices.length - (circular ? 0 : 1);
         let D = new Array(n);
         let ds = new Array(n);
-        var succ = (i) => { return circular ? ((i + 1) % n) : (i + 1); };
-        var pred = (i) => { return circular ? ((i + n - 1) % n) : (i - 1); };
+        var succ = (i) => {
+            return circular ? (i + 1) % n : i + 1;
+        };
+        var pred = (i) => {
+            return circular ? (i + n - 1) % n : i - 1;
+        };
         for (let i = 0; i < n; i++) {
             // the "next" point in a modular way
             let j = succ(i);
@@ -107,7 +107,7 @@ export class HobbyPath {
             D[i] = Math.sqrt(ds[i].x * ds[i].x + ds[i].y * ds[i].y);
         }
         let gamma = new Array(n + (circular ? 0 : 1));
-        for (let i = (circular ? 0 : 1); i < n; i++) {
+        for (let i = circular ? 0 : 1; i < n; i++) {
             // the "previous" point in a modular way
             let k = pred(i);
             let sin = ds[k].y / D[k];
@@ -121,7 +121,7 @@ export class HobbyPath {
         let b = new Array(n + (circular ? 0 : 1));
         let c = new Array(n + (circular ? 0 : 1));
         let d = new Array(n + (circular ? 0 : 1));
-        for (let i = (circular ? 0 : 1); i < n; i++) {
+        for (let i = circular ? 0 : 1; i < n; i++) {
             // j is the "next" point, k the "previous" one
             let j = succ(i);
             let k = pred(i);
@@ -171,18 +171,16 @@ export class HobbyPath {
         let endControlPoints = new Array(n);
         for (let i = 0; i < n; i++) {
             let j = succ(i);
-            let a = HobbyPath.utils.rho(alpha[i], beta[i]) * D[i] / 3;
-            let b = HobbyPath.utils.rho(beta[i], alpha[i]) * D[i] / 3;
+            let a = (HobbyPath.utils.rho(alpha[i], beta[i]) * D[i]) / 3;
+            let b = (HobbyPath.utils.rho(beta[i], alpha[i]) * D[i]) / 3;
             let v = HobbyPath.utils.normalize(HobbyPath.utils.rotateAngle(ds[i], alpha[i]));
             startControlPoints[i] = new Vertex(this.vertices[i].x + a * v.x, this.vertices[i].y + a * v.y);
             v = HobbyPath.utils.normalize(HobbyPath.utils.rotateAngle(ds[i], -beta[i]));
             endControlPoints[i] = new Vertex(this.vertices[j].x - b * v.x, this.vertices[j].y - b * v.y);
         }
-        return { startControlPoints: startControlPoints,
-            endControlPoints: endControlPoints
-        };
+        return { startControlPoints: startControlPoints, endControlPoints: endControlPoints };
     }
-}
+} // END class
 HobbyPath.utils = {
     // rotates a vector [x, y] about an angle; the angle is implicitly
     // determined by its sine and cosine
@@ -269,5 +267,4 @@ HobbyPath.utils = {
         return x;
     }
 };
-; // END class
 //# sourceMappingURL=HobbyPath.js.map

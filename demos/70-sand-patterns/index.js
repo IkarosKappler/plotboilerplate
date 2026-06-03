@@ -1,0 +1,269 @@
+/**
+ * A script for generating Chladni like sand patterns.
+ *
+ * @author   Ikaros Kappler
+ * @date     2026-04-15
+ * @version  1.0.0
+ **/
+
+(function (_context) {
+  "use strict";
+
+  // Fetch the GET params
+  _context.addEventListener("load", function () {
+    let GUP = gup();
+    var params = new Params(GUP);
+    var isDarkmode = detectDarkMode(GUP);
+    var isMobile = isMobileDevice();
+
+    // All config params except the canvas are optional.
+    var pb = new PlotBoilerplate(
+      PlotBoilerplate.utils.safeMergeByKeys(
+        {
+          canvas: document.getElementById("my-canvas"),
+          backgroundColor: isDarkmode ? "#000000" : "#ffffff",
+          fullSize: true
+        },
+        GUP
+      )
+    );
+
+    var POINT_SET_TYPES = ["Rectangular", "Random"];
+
+    // Create a config: we want to have control about the arrow head size in this demo
+    // `AppContext`: this is an experimental approach to make future event handling easier.
+    var appContext = new AppContext(pb, {
+      horizontalOffset: params.getNumber("horizontalOffset", 0.0),
+      horizontalScale: params.getNumber("horizontalScale", 0.75),
+      verticalOffset: params.getNumber("verticalOffset", 0.0),
+      verticalScale: params.getNumber("verticalScale", 0.5),
+      numPoints: params.getNumber("numPoints", 10000),
+      distanceWeight: params.getNumber("distanceWeight", 10.0),
+      sampleScale: params.getNumber("sampleScale", 3.0),
+      pointSetType: params.getString("pointSetType", "Rectangular", function (v) {
+        return POINT_SET_TYPES.indexOf(v) != -1;
+      }), // Rectangular or Random
+
+      // horizontalFnTerm:
+      //   "sin( sqrt( (x0-x)*(x0-x) + (y0-y)*(y0-y) ) * sqrt( (x1-x)*(x1-x) + (y1-y)*(y1-y) ) * sqrt( (x2-x)*(x2-x) + (y2-y)*(y2-y) ) )",
+      horizontalFnTerm: "sin( distance(p0,p) * distance(p1,p) * distance(p2,p))",
+      verticalFnTerm: "sin(x + x0) * sin(y + y1) * sin(y + y2) * cos(y * 0.5)",
+
+      randomizeInputPoints: function () {
+        randomizeInputPoints();
+      },
+      readme: function () {
+        globalThis.displayDemoMeta();
+      }
+    });
+    appContext.isMobile = isMobile;
+
+    // +---------------------------------------------------------------------------------
+    // | Global vars
+    // +-------------------------------
+    var leftBounds;
+    var rightBounds;
+    var bottomBounds;
+    var vertFunc = null;
+    var horiFunc = null;
+    var inputPoints = []; // Array<Vertex>
+
+    // +---------------------------------------------------------------------------------
+    // | Recaulculate the bounds for left, right, and bottom frame depending on
+    // | window size.
+    // +-------------------------------
+    var updateCurrentBounds = function () {
+      // Split screen into three/four areas
+      var viewport = pb.viewport();
+      var paddingX = 10 / appContext.pb.config.scaleX;
+      var paddingY = 10 / appContext.pb.config.scaleY;
+      leftBounds = new Bounds(
+        new Vertex(viewport.min).addXY(paddingX, paddingY),
+        new Vertex(viewport.max).subXY(viewport.width * 0.666, viewport.height * 0.333).subXY(paddingX / 2, paddingY / 2)
+      );
+      rightBounds = new Bounds(
+        new Vertex(viewport.min).addX(viewport.width * 0.333).addXY(paddingX / 2, paddingY),
+        new Vertex(viewport.max).subY(viewport.height * 0.333).subXY(paddingX, paddingY / 2)
+      );
+      bottomBounds = new Bounds(
+        new Vertex(viewport.min).addXY(viewport.width * 0.333, viewport.height * 0.666).addXY(paddingX / 2, paddingY / 2),
+        new Vertex(viewport.max).subXY(paddingX, paddingY)
+      );
+    };
+
+    // Create an input point to move around :)
+    var randomizeInputPoints = function () {
+      pb.remove(
+        inputPoints,
+        false, //  redraw?: boolean,
+        true, // removeWithVertices?: boolean,
+        true // doNotFireEvent?: boolean
+      );
+      var POINT_COUNT = 3;
+      inputPoints = [];
+      for (var i = 0; i < POINT_COUNT; i++) {
+        inputPoints.push(rightBounds.randomPoint(0.2, 0.2));
+      }
+      pb.add(inputPoints);
+    };
+    updateCurrentBounds();
+    randomizeInputPoints();
+
+    // +---------------------------------------------------------------------------------
+    // | Triggered after the main draw routine.
+    // +-------------------------------
+    var postDraw = function (draw, fill) {
+      draw.bounds(leftBounds, "grey", 1.0);
+      draw.bounds(rightBounds, "grey", 1.0);
+      draw.bounds(bottomBounds, "grey", 1.0);
+
+      // Creating the math object uses an expression parser taking input
+      // from the user. This might throw exceptions.
+      try {
+        // Draw horizontal oscillation
+        var bottomMath = new Math70(appContext.config, inputPoints);
+        // horiFunc = bottomMath.scale(appContext.config.horizontalScale, 1.0, bottomMath.sin(bottomBounds));
+
+        horiFunc = bottomMath.scale(appContext.config.horizontalScale, 1.0, bottomMath.sinHorizontal(bottomBounds));
+
+        // Draw vertical oscillation
+        var leftMath = new Math70(appContext.config, inputPoints);
+        vertFunc = leftMath.scale(1.0, appContext.config.verticalScale, leftMath.sinVertical(leftBounds));
+
+        var horizontalValues = createBottomCurveValues(horiFunc);
+        var verticalValues = createLeftCurveValues(vertFunc);
+        draw.polyline(horizontalValues, true, "red", 1);
+        draw.polyline(verticalValues, true, "red", 1);
+      } catch (e) {
+        humane.log("Error: " + e.message);
+        console.error(e);
+        return;
+      }
+
+      makeRandomPoints(draw, fill);
+
+      // Draw crosshais around movable point
+      for (var i = 0; i < inputPoints.length; i++) {
+        draw.crosshair(inputPoints[i], 10, "red", 1.0);
+      }
+
+      // Draw the virtual origin
+      draw.line(leftBounds.getWestPoint(), rightBounds.getEastPoint(), "rgba(128,128,128,0.5)", 1.0);
+      draw.line(rightBounds.getNorthPoint(), bottomBounds.getSouthPoint(), "rgba(128,128,128,0.5)", 1.0);
+    }; // END postDraw
+
+    // +---------------------------------------------------------------------------------
+    // | Draw n random points.
+    // +-------------------------------
+    var makeRandomPoints = function (draw, fill) {
+      // var iterator = new PointIterator.Random(rightBounds, appContext.config.numPoints);
+      // var iterator = new PointIterator.Raster(rightBounds, appContext.config.numPoints);
+      var iterator = getPointIterator();
+      var i = 0;
+      // for (var i = 0; i < appContext.config.numPoints; i++) {
+      while (iterator.hasNext() && i++ < appContext.config.numPoints) {
+        // var randomPoint = rightBounds.randomPoint(0, 0); // horizontalSafeArea=0, verticalSafeArea=0
+        var randomPoint = iterator.next();
+
+        var vertAbsVal = vertFunc(randomPoint.x, randomPoint.y); // in [bounds.min.y,bounds.max.x]
+        var horiAbsVal = horiFunc(randomPoint.x, randomPoint.y); // in [bounds.min.y,bounds.max.x]
+
+        var vertRelVal = (vertAbsVal - leftBounds.min.x) / leftBounds.width; // int [0.0,1.0]
+        var horiRelVal = (horiAbsVal - bottomBounds.min.y) / bottomBounds.height; // int [0.0,1.0]
+
+        var product = vertRelVal * horiRelVal;
+        var weight = Math.pow(Math.abs(product - 1.0), appContext.config.distanceWeight);
+        var radius = Math.abs(weight * appContext.config.sampleScale); // 10.0);
+        draw.circle(randomPoint, radius, "orange", 1);
+      }
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Create sample points on the bottom horizontal function graph.
+    // +-------------------------------
+    var createBottomCurveValues = function (horiFunc) {
+      var points = [];
+      var stepCount = 100;
+      for (var xStep = 0; xStep <= stepCount; xStep++) {
+        var xVal = bottomBounds.min.x + (xStep / stepCount) * bottomBounds.width;
+        var yVal = horiFunc(xVal, 0);
+        points.push({ x: xVal, y: yVal });
+      }
+      return points;
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Create sample points on the left vertical function graph.
+    // +-------------------------------
+    var createLeftCurveValues = function (vertFunc) {
+      var points = [];
+      var stepCount = 100;
+      for (var yStep = 0; yStep <= stepCount; yStep++) {
+        var yVal = leftBounds.min.y + (yStep / stepCount) * leftBounds.height;
+        var xVal = vertFunc(0, yVal);
+        points.push({ x: xVal, y: yVal });
+      }
+      return points;
+    };
+
+    var getPointIterator = function () {
+      if (appContext.config.pointSetType == "Random") {
+        return new PointIterator.Random(rightBounds, appContext.config.numPoints);
+      } else {
+        return new PointIterator.Raster(rightBounds, appContext.config.numPoints);
+      }
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | This method is called before the library starts to draw anything.
+    // +-------------------------------
+    var preDraw = function (draw, fill) {
+      // NOOP
+    }; // END preDraw
+
+    // +---------------------------------------------------------------------------------
+    // | Install a mouse handler to display current pointer position.
+    // | And to rotate the object.
+    // +-------------------------------
+    var stats = {
+      mouseX: 0,
+      mouseY: 0
+    };
+    // Add stats
+    var uiStats = new UIStats(stats);
+    stats = uiStats.proxy;
+    uiStats.add("mouseX");
+    uiStats.add("mouseY");
+    new MouseHandler(pb.eventCatcher, "draw-demo").move(function (e) {
+      // Display the mouse position
+      var relPos = pb.transformMousePosition(e.params.pos.x, e.params.pos.y);
+      stats.mouseX = relPos.x;
+      stats.mouseY = relPos.y;
+    });
+
+    // +---------------------------------------------------------------------------------
+    // | Create a GUI.
+    // | See `initDemoUI` for details.
+    // +-------------------------------
+    initDemoUI(appContext, POINT_SET_TYPES);
+
+    // +---------------------------------------------------------------------------------
+    // | This renders a content list component on top, allowing to delete or add
+    // | new shapes.
+    // |
+    // | You should add `contentList.drawHighlighted(draw, fill)`  to your draw
+    // | routine to see what's currently highlighted.
+    // +-------------------------------
+    // var contentList = new PBContentList(pb);
+
+    pb.config.preDraw = preDraw;
+    pb.config.postDraw = postDraw;
+    pb.redraw();
+
+    window.addEventListener("resize", function () {
+      updateCurrentBounds();
+    });
+
+    humane.log("Move the points around or edit the function terms.");
+  });
+})(globalThis);

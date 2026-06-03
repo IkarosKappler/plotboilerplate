@@ -74,7 +74,8 @@ UIDGenerator.current = 0;
  * @modified 2020-02-22 Added 'return this' to the add* functions (for chanining).
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2020-11-17 Added the `click` handler.
- * @version  1.1.0
+ * @modified 2026-04-04 Adding null-listeners will now throw an error.
+ * @version  1.2.0
  *
  * @file VertexListeners
  * @public
@@ -309,6 +310,9 @@ class VertexListeners {
      * @private
      */
     static _addListener(listeners, newListener) {
+        if (!newListener) {
+            throw new Error("Cannot add null listener. This would lead to unpredictable errors during event handling.");
+        }
         for (var i in listeners) {
             if (listeners[i] == newListener)
                 return false;
@@ -6447,6 +6451,9 @@ CircleSector.circleSectorUtils = {
  * @modified 2026-01-04 Adding `lineJoin` attribute to the methods' `StrokeOptions` param.
  * @modified 2026-01-04 Fixing missing `strokeOptions` param in the `drawutilssvg.polygon` method.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
+ * @modified 2026-04-04 Added the method `bounds`.
+ * @modified 2026-04-04 Handling the `stroke-linecap` option now from the `StrokeOptions` interface.
+ * @modified 2026-04-04 Chaning the `copyPathData` method by usind `Array.slice()`.
  * @version  1.7.0
  **/
 const RAD_TO_DEG$1 = 180 / Math.PI;
@@ -6864,6 +6871,10 @@ class drawutilssvg {
         // Set line join option?
         if (strokeOptions && strokeOptions.lineJoin && drawutilssvg.nodeSupportsLineJoin(node.tagName)) {
             node.setAttribute("stroke-linejoin", strokeOptions.lineJoin);
+        }
+        // Set lineCap option?
+        if (strokeOptions && strokeOptions.lineCap && drawutilssvg.nodeSupportsLineCap(node.tagName)) {
+            node.setAttribute("stroke-linecap", strokeOptions.lineCap);
         }
     }
     _x(x) {
@@ -7336,6 +7347,22 @@ class drawutilssvg {
         return this._bindFillDraw(node, "rect", color, lineWidth || 1);
     }
     /**
+     * Draw a rectangle at the given bounds; and with the specified line width and (CSS-) color.<br>
+     *
+     * @method bounds
+     * @param {IBounds} bounds - The bounds rectangle to be drawn.
+     * @param {string} color - The CSS color to draw the rectangle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {R}
+     * @instance
+     * @memberof DrawLib
+     */
+    bounds(bounds, color, lineWidth, strokeOptions) {
+        this.rect(bounds.min, bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y, color, lineWidth, strokeOptions);
+    }
+    /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
      * @method grid
@@ -7788,11 +7815,8 @@ class drawutilssvg {
      * @memberof drawutilssvg
      */
     static copyPathData(data) {
-        const copy = new Array(data.length);
-        for (var i = 0, n = data.length; i < n; i++) {
-            copy[i] = data[i];
-        }
-        return copy;
+        // To create a shallow copy we can just use the `slice` method.
+        return data.slice();
     }
     /**
      * Transform the given path data (translate and scale. rotating is not intended here).
@@ -7961,6 +7985,9 @@ class drawutilssvg {
         return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
     }
     static nodeSupportsLineJoin(nodeName) {
+        return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
+    }
+    static nodeSupportsLineCap(nodeName) {
         return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
     }
     /**
@@ -8149,7 +8176,9 @@ drawutilssvg.HEAD_XML = [
  * @modified 2024-09-13 Remoed the scaling of `lineWidth` in the `polygon` and `polyline` methods. This makes no sense here and doesn't match up with the behavior of other line functions.
  * @modified 2026-01-04 Adding `lineJoin` attribute to the `StrokeOptions`.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
- * @version  1.14.0
+ * @modified 2026-04-04 Added the method `bounds`.
+ * @modified 2026-04-04 Handling the `lineCap` attribute in the `StrokeOptions`.
+ * @version  1.15.0
  **/
 // Todo: rename this class to Drawutils?
 /**
@@ -8182,7 +8211,7 @@ class drawutils {
      * @param {StrokeOptions=} strokeOptions -
      */
     applyStrokeOpts(strokeOptions) {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         this.ctx.setLineDash(((_a = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashArray) !== null && _a !== void 0 ? _a : []).map((dashArrayElem) => {
             // Note assume scale.x === scale.y
             // Invariant scale makes funny stuff anyway.
@@ -8190,6 +8219,7 @@ class drawutils {
         }));
         this.ctx.lineDashOffset = ((_b = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashOffset) !== null && _b !== void 0 ? _b : 0) * this.scale.x;
         this.ctx.lineJoin = (_c = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.lineJoin) !== null && _c !== void 0 ? _c : null;
+        this.ctx.lineCap = (_d = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.lineCap) !== null && _d !== void 0 ? _d : null;
     }
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff. It is not
@@ -8559,6 +8589,22 @@ class drawutils {
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
         this.ctx.restore();
+    }
+    /**
+     * Draw a rectangle at the given bounds; and with the specified line width and (CSS-) color.<br>
+     *
+     * @method bounds
+     * @param {IBounds} bounds - The bounds rectangle to be drawn.
+     * @param {string} color - The CSS color to draw the rectangle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {R}
+     * @instance
+     * @memberof DrawLib
+     */
+    bounds(bounds, color, lineWidth, strokeOptions) {
+        this.rect(bounds.min, bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y, color, lineWidth, strokeOptions);
     }
     /**
      * Draw the given (cubic) bézier curve.
@@ -9258,7 +9304,8 @@ drawutils.helpers = {
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @modified 2026-03-18 Adding `isOpen` parameter to `cubicBezierPath` draw method.
- * @version  0.0.10
+ * @modified 2026-04-04 Added the method `bounds`.
+ * @version  0.0.11
  **/
 /**
  * @classdesc A wrapper class for basic drawing operations. This is the WebGL
@@ -9703,8 +9750,24 @@ class drawutilsgl {
      * @param {string} color - The color to use.
      * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
      **/
-    rect(position, width, height, color, lineWidth) {
+    rect(position, width, height, color, lineWidth, strokeOptions) {
         // NOT YET IMPLEMENTED
+    }
+    /**
+     * Draw a rectangle at the given bounds; and with the specified line width and (CSS-) color.<br>
+     *
+     * @method bounds
+     * @param {IBounds} bounds - The bounds rectangle to be drawn.
+     * @param {string} color - The CSS color to draw the rectangle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {R}
+     * @instance
+     * @memberof DrawLib
+     */
+    bounds(bounds, color, lineWidth, strokeOptions) {
+        this.rect(bounds.min, bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y, color, lineWidth, strokeOptions);
     }
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
@@ -12517,8 +12580,9 @@ VEllipseSector.ellipseSectorUtils = {
  * @modified 2025-05-07 Moving full vectors now by default when vector point a is moved.
  * @modified 2025-05-20 Applying `lineWith` parameter in the draw routine for vectors (had been missing).
  * @modified 2026-03-13 Changed visibility of `setZoom` and `setOffset` to public. There was no good reason to have the private.
+ * @modified 2026-04-04 Added `isInPanningMode` attribute and `isPanning` method.
  *
- * @version  1.21.2
+ * @version  1.22.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -12954,6 +13018,9 @@ class PlotBoilerplate {
         this.config.canvasWidthFactor = this.config.canvasHeightFactor = pixelRatio;
         this.resizeCanvas();
         this.updateCSSscale();
+    }
+    isPanning() {
+        return this.isInPanningMode;
     }
     /**
      * Set the current zoom and draw offset to fit the given bounds.
@@ -13834,13 +13901,12 @@ class PlotBoilerplate {
      **/
     // TODO: this was moved to the DOM utils
     getAvailableContainerSpace() {
-        const _self = this;
-        const container = _self.canvas.parentNode; // Element | Document | DocumentFragment;
-        _self.canvas.style.display = "none";
-        var padding = this.getFProp(container, "padding") || 0, border = this.getFProp(_self.canvas, "border-width") || 0, pl = this.getFProp(container, "padding-left") || padding, pr = this.getFProp(container, "padding-right") || padding, pt = this.getFProp(container, "padding-top") || padding, pb = this.getFProp(container, "padding-bottom") || padding, bl = this.getFProp(_self.canvas, "border-left-width") || border, br = this.getFProp(_self.canvas, "border-right-width") || border, bt = this.getFProp(_self.canvas, "border-top-width") || border, bb = this.getFProp(_self.canvas, "border-bottom-width") || border;
+        const container = this.canvas.parentNode; // Element | Document | DocumentFragment;
+        this.canvas.style.display = "none";
+        var padding = this.getFProp(container, "padding") || 0, border = this.getFProp(this.canvas, "border-width") || 0, pl = this.getFProp(container, "padding-left") || padding, pr = this.getFProp(container, "padding-right") || padding, pt = this.getFProp(container, "padding-top") || padding, pb = this.getFProp(container, "padding-bottom") || padding, bl = this.getFProp(this.canvas, "border-left-width") || border, br = this.getFProp(this.canvas, "border-right-width") || border, bt = this.getFProp(this.canvas, "border-top-width") || border, bb = this.getFProp(this.canvas, "border-bottom-width") || border;
         var w = container.clientWidth;
         var h = container.clientHeight;
-        _self.canvas.style.display = "block";
+        this.canvas.style.display = "block";
         return { width: w - pl - pr - bl - br, height: h - pt - pb - bt - bb };
     }
     /**
@@ -14102,7 +14168,8 @@ class PlotBoilerplate {
         //            not this one. So this tab will never receive any [Ctrl-down] events
         //            until next keypress; the implication is, that [Ctrl] would still
         //            considered to be pressed which is not true.
-        if (this.keyHandler && (this.keyHandler.isDown("alt") || this.keyHandler.isDown("spacebar"))) {
+        // if (this.keyHandler && (this.keyHandler.isDown("alt") || this.keyHandler.isDown("spacebar"))) {
+        if (this.isInPanningMode) {
             if (!this.config.enablePan) {
                 return;
             }
@@ -14453,6 +14520,18 @@ class PlotBoilerplate {
                 _self.selectVerticesInPolygon(_self.selectPolygon);
                 _self.selectPolygon = null;
                 _self.redraw();
+            })
+                .down("alt", function () {
+                _self.isInPanningMode = true;
+            })
+                .up("alt", function () {
+                _self.isInPanningMode = false;
+            })
+                .down("spacebar", function () {
+                _self.isInPanningMode = true;
+            })
+                .up("spacebar", function () {
+                _self.isInPanningMode = false;
             });
         } // END IF enableKeys?
         else {
@@ -15064,6 +15143,7 @@ const NGons = {
  * @version  1.0.0
  * @date     2023-03-13
  * @modified 2024-08-26 Added the `hasParam` method.
+ * @modified 2026-05-22 Added the `isValueAllowed` function param to the getter methods.
  */
 class Params {
     constructor(baseParams) {
@@ -15072,19 +15152,26 @@ class Params {
     hasParam(name) {
         return this.baseParams.hasOwnProperty(name);
     }
-    getString(name, fallback) {
+    getString(name, fallback, isValueAllowed) {
         let value = this.baseParams[name];
         if (typeof value === "undefined" || !value || (value = value.trim()).length === 0) {
+            return fallback;
+        }
+        if (isValueAllowed && !isValueAllowed(value)) {
             return fallback;
         }
         return value;
     }
-    getNumber(name, fallback) {
+    getNumber(name, fallback, isValueAllowed) {
         let value = this.baseParams[name];
         if (typeof value === "undefined" || !value || (value = value.trim()).length === 0) {
             return fallback;
         }
-        return Number(value);
+        var numericValue = Number(value);
+        if (isValueAllowed && !isValueAllowed(numericValue)) {
+            return fallback;
+        }
+        return numericValue;
     }
     getBoolean(name, fallback) {
         let value = this.baseParams[name];
@@ -16559,7 +16646,8 @@ Color.CSS_COLORS = {
  * @modified 2020-10-23 Ported to Typescript.
  * @modified 2020-10-30 Exporting each color under its name globally.
  * @modified 2025-12-08 Replaying self defined colors by official web colors.
- * @version  1.0.2
+ * @modified 2026-03-18 Fixing global `WebColors` array.
+ * @version  1.0.3
  **/
 const Red = Color.Red; // Color.makeRGB(255,67,55);
 const Pink = Color.Pink; // Color.makeRGB(232,31,100);
@@ -16581,7 +16669,19 @@ const LightGreen = Color.LightGreen; // Color.makeRGB(141,195,67);
  * @requires Color
  *
  */
-const WebColors = [Red, Pink, Purple, DeepPurple, Indigo, Blue, LightBlue, Cyan, Teal, Green, LightGreen];
+const WebColors = [
+    Color.Red,
+    Color.Pink,
+    Color.Purple,
+    Color.DeepPink,
+    Color.Indigo,
+    Color.Blue,
+    Color.LightBlue,
+    Color.Cyan,
+    Color.Teal,
+    Color.Green,
+    Color.LightGreen
+];
 /**
  * A helper function to shuffle the colors into a new order.
  */
@@ -18221,7 +18321,6 @@ class HobbyPath {
     constructor(vertices) {
         this.vertices = vertices ? vertices : [];
     }
-    ;
     /**
      * Add a new point to the end of the vertex sequence.
      *
@@ -18233,7 +18332,6 @@ class HobbyPath {
     addPoint(p) {
         this.vertices.push(p);
     }
-    ;
     /**
      * Generate a sequence of cubic Bézier curves from the point set.
      *
@@ -18266,7 +18364,6 @@ class HobbyPath {
             return [];
         }
     }
-    ;
     /**
      * Computes the control point coordinates for a Hobby curve through
      * the points given.
@@ -18280,13 +18377,17 @@ class HobbyPath {
      **/
     hobbyControls(circular, omega) {
         // This is a version that works for both, closed and non-closed paths.
-        if (typeof omega === 'undefined')
+        if (typeof omega === "undefined")
             omega = 0;
         let n = this.vertices.length - (circular ? 0 : 1);
         let D = new Array(n);
         let ds = new Array(n);
-        var succ = (i) => { return circular ? ((i + 1) % n) : (i + 1); };
-        var pred = (i) => { return circular ? ((i + n - 1) % n) : (i - 1); };
+        var succ = (i) => {
+            return circular ? (i + 1) % n : i + 1;
+        };
+        var pred = (i) => {
+            return circular ? (i + n - 1) % n : i - 1;
+        };
         for (let i = 0; i < n; i++) {
             // the "next" point in a modular way
             let j = succ(i);
@@ -18294,7 +18395,7 @@ class HobbyPath {
             D[i] = Math.sqrt(ds[i].x * ds[i].x + ds[i].y * ds[i].y);
         }
         let gamma = new Array(n + (circular ? 0 : 1));
-        for (let i = (circular ? 0 : 1); i < n; i++) {
+        for (let i = circular ? 0 : 1; i < n; i++) {
             // the "previous" point in a modular way
             let k = pred(i);
             let sin = ds[k].y / D[k];
@@ -18308,7 +18409,7 @@ class HobbyPath {
         let b = new Array(n + (circular ? 0 : 1));
         let c = new Array(n + (circular ? 0 : 1));
         let d = new Array(n + (circular ? 0 : 1));
-        for (let i = (circular ? 0 : 1); i < n; i++) {
+        for (let i = circular ? 0 : 1; i < n; i++) {
             // j is the "next" point, k the "previous" one
             let j = succ(i);
             let k = pred(i);
@@ -18358,18 +18459,16 @@ class HobbyPath {
         let endControlPoints = new Array(n);
         for (let i = 0; i < n; i++) {
             let j = succ(i);
-            let a = HobbyPath.utils.rho(alpha[i], beta[i]) * D[i] / 3;
-            let b = HobbyPath.utils.rho(beta[i], alpha[i]) * D[i] / 3;
+            let a = (HobbyPath.utils.rho(alpha[i], beta[i]) * D[i]) / 3;
+            let b = (HobbyPath.utils.rho(beta[i], alpha[i]) * D[i]) / 3;
             let v = HobbyPath.utils.normalize(HobbyPath.utils.rotateAngle(ds[i], alpha[i]));
             startControlPoints[i] = new Vertex$1(this.vertices[i].x + a * v.x, this.vertices[i].y + a * v.y);
             v = HobbyPath.utils.normalize(HobbyPath.utils.rotateAngle(ds[i], -beta[i]));
             endControlPoints[i] = new Vertex$1(this.vertices[j].x - b * v.x, this.vertices[j].y - b * v.y);
         }
-        return { startControlPoints: startControlPoints,
-            endControlPoints: endControlPoints
-        };
+        return { startControlPoints: startControlPoints, endControlPoints: endControlPoints };
     }
-}
+} // END class
 HobbyPath.utils = {
     // rotates a vector [x, y] about an angle; the angle is implicitly
     // determined by its sine and cosine
