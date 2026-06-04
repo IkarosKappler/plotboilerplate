@@ -13,9 +13,9 @@
     // +-------------------------------
     {
       var gui = appContext.pb.createGUI();
-      // var foldSand = gui.addFolder("Sand function settings");
-      // // prettier-ignore
-      // foldSand.add(appContext.config, "verticalOffset").min(0.0).max(3600.0).title("The vertical function offset.").onChange(function () { appContext.pb.redraw(); });
+      var foldApoll = gui.addFolder("Apollonian Circles");
+      // prettier-ignore
+      foldApoll.add(appContext.config, "circleRadius").step(1).title("The radius of the third circle.").onChange(function () { appContext.pb.redraw(); });
       // // prettier-ignore
       // foldSand.add(appContext.config, "verticalScale").min(0.01).max(2.0).step(0.01).title("The vertical scale offset.").onChange(function () { appContext.pb.redraw(); });
       // // prettier-ignore
@@ -36,7 +36,7 @@
       // foldSand.add(appContext.config, 'pointSetType',POINT_SET_TYPES).listen().onChange(function() { appContext.pb.redraw() }).name("pointSetType").title("pointSetType");
 
       // prettier-ignore
-      gui.add(appContext.config, "randomizeInputPoints").title("Randomize the input points.");
+      // gui.add(appContext.config, "randomizeInputPoints").title("Randomize the input points.");
       // prettier-ignore
       gui.add(appContext.config, "readme").title("Show the readme.");
     }

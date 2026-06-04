@@ -8,6 +8,11 @@
 - Add 'Rulers' class from the ngdg project.
 - Add 'onclose' and 'onopen' to the Modal (demos).
 
+- 2026-06-04
+  - Adding helper function `randomCircle` to demos.
+  - Tweaking the apollonian circles demo.
+- 2026-06-03 [v1.28.1 + v1.28.1]
+  - Fixing an export bug.
 - 2026-05-22
   - Added the `isValueAllowed` function param to the getter methods of the `Params` class.
   - Extending the demo `70-sand-patterns` with PointIterators (Random and Rectangular).
