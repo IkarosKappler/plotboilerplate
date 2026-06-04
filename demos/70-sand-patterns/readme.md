@@ -4,4 +4,4 @@ Define any two wave functions, a horizonal one and a vertical one. Ideally their
 
 Use the distance weight to modify the tolerance.
 
-![Sand patterns](../../screenshots/screenshot-20260520-2-sand-patterns.png)
+![Sand patterns](https://plotboilerplate.io/repo/screenshots/screenshot-20260520-2-sand-patterns.png)

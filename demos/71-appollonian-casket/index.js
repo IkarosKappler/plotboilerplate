@@ -64,22 +64,78 @@
     // Array<Circle>
     var circles = [];
 
+    var handleCircleCenterMove = function () {
+      // pb.redraw();
+    };
+
     var addRandomCircle = function () {
       var viewport = appContext.pb.viewport();
       var center = viewport.randomPoint(0.2, 0.2);
       var radius = Math.random() * viewport.getMinDimension() * 0.5;
-      circles.push(new Circle(center, radius));
+      var circle = new Circle(center, radius);
+      circles.push(circle);
+
+      // circle.center.listeners.addDragListener(function () {
+      //   handleCircleCenterMove();
+      // });
+
+      var radiusPoint = new Vertex(
+        center.clone().addXY(circle.radius * Math.sin(Math.PI / 4), circle.radius * Math.cos(Math.PI / 4))
+      );
+      new CircleHelper(circle, radiusPoint, pb);
+
+      pb.add([circle, center, radiusPoint]);
     };
+    addRandomCircle();
     addRandomCircle();
 
     // +---------------------------------------------------------------------------------
     // | Triggered after the main draw routine.
     // +-------------------------------
     var postDraw = function (draw, fill) {
-      circles.forEach(function (circle) {
-        draw.circle(circle.center, circle.radius, "orange", 1.0);
-      });
+      var contrastColor = getContrastColor(pb.config.backgroundColor).cssRGB();
+      // circles.forEach(function (circle) {
+      //   draw.circle(circle.center, circle.radius, "orange", 1.0);
+      // });
+
+      // Find tangent line
+      var circleA = circles[0];
+      var circleB = circles[1];
+      var connectLine = new Vector(circleA.center, circleB.center);
+
+      var intersectionLineA = circleA.lineIntersection(connectLine.a, connectLine.b);
+      var intersectionLineB = circleB.lineIntersection(connectLine.a, connectLine.b);
+      var closestPointOnA = findClosestPoint(circleB.center, intersectionLineA.a, intersectionLineA.b);
+      var closestPointOnB = findClosestPoint(circleA.center, intersectionLineB.a, intersectionLineB.b);
+
+      var connectionLineBetween = new Line(closestPointOnA, closestPointOnB);
+
+      var circleDifference = closestPointOnA.difference(closestPointOnB);
+      var newCenterB = circleB.center.clone().sub(circleDifference);
+      var perpVector = connectLine.perp().moveTo(closestPointOnA);
+
+      console.log("closestPointOnA", closestPointOnA);
+      draw.diamondHandle(closestPointOnA, 8, "orange");
+      draw.diamondHandle(closestPointOnB, 8, "orange");
+
+      draw.line(connectLine.a, connectLine.b, "grey", 1.0);
+      draw.arrow(perpVector.a, perpVector.b, "orange", 1.0);
+
+      fill.text("A", circleA.center.x + 5, circleA.center.y, { color: contrastColor });
+      fill.text("B", circleB.center.x + 5, circleB.center.y, { color: contrastColor });
+
+      draw.circle(newCenterB, circleB.radius, "grey", 2.0, { dashArray: [5, 10] });
     }; // END postDraw
+
+    var findClosestPoint = function (referencePoint, pointA, pointB) {
+      var distA = referencePoint.distance(pointA);
+      var distB = referencePoint.distance(pointB);
+      if (distA < distB) {
+        return pointA;
+      } else {
+        return pointB;
+      }
+    };
 
     // +---------------------------------------------------------------------------------
     // | This method is called before the library starts to draw anything.
@@ -131,6 +187,6 @@
       // updateCurrentBounds();
     });
 
-    humane.log("Move the points around or edit the function terms.");
+    humane.log("Move the circles around.");
   });
 })(globalThis);

@@ -38,7 +38,7 @@
       // prettier-ignore
       foldSand.add(appContext.config, "randomizeInputPoints").title("Randomize the input points.");
       // prettier-ignore
-      foldSand.add(appContext.config, "readme").title("Show the readme.");
+      gui.add(appContext.config, "readme").title("Show the readme.");
     }
   };
 })(globalThis);

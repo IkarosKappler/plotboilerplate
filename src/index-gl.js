@@ -73,8 +73,11 @@
     // +---------------------------------------------------------------------------------
     // | Initialize dat.gui
     // +-------------------------------
-    pb.createGUI();
-    // END init dat.gui
+    try {
+      pb.createGUI();
+    } catch (e) {
+      console.error("Failed to initialize GUI", e);
+    }
 
     // +---------------------------------------------------------------------------------
     // | Add a mouse listener to track the mouse position.
