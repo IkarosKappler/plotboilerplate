@@ -34,6 +34,7 @@
     // `AppContext`: this is an experimental approach to make future event handling easier.
     var appContext = new AppContext(pb, {
       circleRadius: params.getNumber("circleRadius", 100),
+      iterations: params.getNumber("iterations", 5),
       readme: function () {
         globalThis.displayDemoMeta();
       }
@@ -43,53 +44,58 @@
     // +---------------------------------------------------------------------------------
     // | Global vars
     // +-------------------------------
-    // Array<Circle>
-    // var circles = [];
+    // Circle
     var circleA = null;
     var circleB = null;
 
-    var handleCircleCenterMove = function () {
-      // pb.redraw();
+    var updateCircleRadiusB = function () {
+      circleB.radius = Math.abs(circleB.center.distance(circleA.center) - circleA.radius);
     };
 
-    var createRandomCircle = function () {
-      // var viewport = appContext.pb.viewport();
-      // var center = viewport.randomPoint(0.333, 0.333);
-      // var radius = Math.random() * viewport.getMinDimension() * 0.252525;
-      // var circle = new Circle(center, radius);
-      // circles.push(circle);
-      // var radiusPoint = new Vertex(
-      //   center.clone().addXY(circle.radius * Math.sin(Math.PI / 4), circle.radius * Math.cos(Math.PI / 4))
-      // );
-      // new CircleHelper(circle, radiusPoint, pb);
-
-      // pb.add([circle, center, radiusPoint]);
-      var circle = randomCircle(appContext.pb.viewport().getScaled(0.666));
-      // circles.push(circle);
-      var radiusPoint = new Vertex(
-        circle.center.clone().addXY(circle.radius * Math.sin(Math.PI / 4), circle.radius * Math.cos(Math.PI / 4))
-      );
-      new CircleHelper(circle, radiusPoint, pb);
-
-      // pb.add([circle, circle.center, radiusPoint]);
-      pb.add([circle.center, radiusPoint]);
-
-      return circle;
-    };
-    // addRandomCircle();
-    // addRandomCircle();
-    circleA = createRandomCircle(pb.viewport);
-    circleB = createRandomCircle(pb.viewport);
+    // +---------------------------------------------------------------------------------
+    // | Creates a random circle that fits nicely into the viewport.
+    // +-------------------------------
+    circleA = randomCircle(appContext.pb.viewport().getScaled(0.666));
+    var radiusPoint = new Vertex(
+      circleA.center.clone().addXY(circleA.radius * Math.sin(Math.PI / 4), circleA.radius * Math.cos(Math.PI / 4))
+    );
+    new CircleHelper(circleA, radiusPoint, pb);
+    // circleB = createRandomCircle(pb.viewport);
+    circleB = new Circle(appContext.pb.viewport().getScaled(0.666).randomPoint(), 100.0);
+    circleB.center.listeners.addDragListener(function () {
+      updateCircleRadiusB();
+    });
+    circleA.center.listeners.addDragListener(function () {
+      updateCircleRadiusB();
+    });
+    radiusPoint.listeners.addDragListener(function () {
+      updateCircleRadiusB();
+    });
+    updateCircleRadiusB();
+    pb.add([circleA.center, radiusPoint, circleB.center]);
 
     // +---------------------------------------------------------------------------------
     // | Triggered after the main draw routine.
     // +-------------------------------
     var postDraw = function (draw, fill) {
+      drawAppolonianCircles(
+        draw,
+        fill,
+        circleA,
+        circleB,
+        true, // draw helper elements
+        0, // iteration
+        appContext.config.circleRadius // desiredRadius
+      );
+    };
+
+    var drawAppolonianCircles = function (draw, fill, circleA, circleB, drawHelperElements, iterationNumber, desiredRadius) {
+      if (iterationNumber >= appContext.config.iterations) {
+        return;
+      }
       var contrastColor = getContrastColor(pb.config.backgroundColor).cssRGB();
 
       // Find tangent line
-      // var circleA = circles[0];
-      // var circleB = circles[1];
       var connectLine = new Vector(circleA.center, circleB.center);
 
       var intersectionLineA = circleA.lineIntersection(connectLine.a, connectLine.b);
@@ -97,32 +103,36 @@
       var closestPointOnA = findClosestPoint(circleB.center, intersectionLineA.a, intersectionLineA.b);
       var closestPointOnB = findClosestPoint(circleA.center, intersectionLineB.a, intersectionLineB.b);
 
-      var connectionLineBetween = new Line(closestPointOnA, closestPointOnB);
-
-      var circleDifference = closestPointOnA.difference(closestPointOnB);
-      var newCenterB = circleB.center.clone().sub(circleDifference);
-      var newCircleB = new Circle(newCenterB, circleB.radius);
+      // var circleDifference = closestPointOnA.difference(closestPointOnB);
+      // var newCenterB = circleB.center.clone().sub(circleDifference);
+      // var newCircleB = new Circle(newCenterB, circleB.radius);
       var perpVector = connectLine.perp().moveTo(closestPointOnA);
 
       // console.log("closestPointOnA", closestPointOnA);
-      draw.diamondHandle(closestPointOnA, 8, "orange");
-      draw.diamondHandle(closestPointOnB, 8, "orange");
+      if (drawHelperElements) {
+        draw.diamondHandle(closestPointOnA, 8, "orange");
+        draw.diamondHandle(closestPointOnB, 8, "orange");
 
-      draw.line(connectLine.a, connectLine.b, "grey", 1.0);
-      draw.arrow(perpVector.a, perpVector.b, "orange", 1.0);
+        draw.line(connectLine.a, connectLine.b, "grey", 1.0);
+        draw.arrow(perpVector.a, perpVector.b, "orange", 1.0);
 
-      fill.text("A", circleA.center.x + 5, circleA.center.y, { color: contrastColor });
-      fill.text("B", circleB.center.x + 5, circleB.center.y, { color: contrastColor });
+        fill.text("A", circleA.center.x + 5, circleA.center.y, { color: contrastColor });
+        fill.text("B", circleB.center.x + 5, circleB.center.y, { color: contrastColor });
+        // draw.circle(newCircleB.center, circleB.radius, "grey", 2.0, { dashArray: [5, 10] });
+        draw.circle(circleB.center, circleB.radius, "rgba(0,192,192)", 3.0, { dashArray: [5, 10] });
+      }
 
-      // draw.circle(newCircleB.center, circleB.radius, "grey", 2.0, { dashArray: [5, 10] });
-      draw.circle(newCircleB.center, newCircleB.radius, "rgba(0,192,192)", 3.0, { dashArray: [5, 10] });
+      // Draw containing circle
+      var containingCircle = getContainingCircle(circleA, circleB);
+      draw.circle(containingCircle.center, containingCircle.radius, "rgba(128,128,128, 0.25)", 1.0, { dashArray: [10, 10] });
 
       // Step 2: find attaching third circle.
 
       // [Circle,Circle] or null
       // var apollCircles = getApollonianCircles(circleA, circleB, appContext.config.circleRadius);
-      var apollCircles = getApollonianCircles(circleA, newCircleB, appContext.config.circleRadius);
+      var apollCircles = getApollonianCircles(circleA, circleB, desiredRadius);
       if (apollCircles) {
+        // Left and right solutions?
         var hullRadiusA = circleA.radius + appContext.config.circleRadius;
         var hullRadiusB = circleB.radius + appContext.config.circleRadius;
         draw.circle(circleA.center, hullRadiusA, "rgba(128,128,128, 0.25)", 2.0);
@@ -130,15 +140,15 @@
 
         draw.circle(apollCircles[0].center, apollCircles[0].radius, "rgba(255,0,255)", 2.0);
         draw.circle(apollCircles[1].center, apollCircles[1].radius, "rgba(255,0,255)", 2.0);
+
+        // Avoid endless recursion
+        drawAppolonianCircles(draw, fill, circleB, apollCircles[0], drawHelperElements, iterationNumber + 1, desiredRadius - 10);
       }
     }; // END postDraw
 
     var getApollonianCircles = function (circleA, circleB, desiredRadius) {
       if (circleA) var hullA = new Circle(circleA.center, circleA.radius + desiredRadius);
       var hullB = new Circle(circleB.center, circleB.radius + desiredRadius);
-
-      // draw.circle(hullA.center, hullA.radius, "rgba(128,128,128, 0.5)", 2.0);
-      // draw.circle(hullB.center, hullB.radius, "rgba(128,128,128, 0.5)", 2.0);
 
       var radicalLine = hullA.circleIntersection(hullB);
       if (!radicalLine) {
@@ -159,12 +169,48 @@
       return [apollonianCircleA, apollonianCircleB];
     };
 
-    var getContainingCircle = function (circleA, circleB) {};
+    // TODO: put this to Circle class?
+    var getContainingCircle = function (circleA, circleB) {
+      var connectLine = new Vector(circleA.center, circleB.center);
+      var intersectionLineA = circleA.lineIntersection(connectLine.a, connectLine.b);
+      var intersectionLineB = circleB.lineIntersection(connectLine.a, connectLine.b);
+      var farestPointOnA = findFarestPoint(circleB.center, intersectionLineA.a, intersectionLineA.b);
+      var farestPointOnB = findFarestPoint(circleA.center, intersectionLineB.a, intersectionLineB.b);
+      var totalDiagonalLine = new Line(farestPointOnA, farestPointOnB);
+      var center = totalDiagonalLine.vertAt(0.5);
+      return new Circle(center, center.distance(totalDiagonalLine.a));
+    };
 
+    // TODO: put this to geomutils?
     var findClosestPoint = function (referencePoint, pointA, pointB) {
       var distA = referencePoint.distance(pointA);
       var distB = referencePoint.distance(pointB);
       if (distA < distB) {
+        return pointA;
+      } else {
+        return pointB;
+      }
+    };
+    // var findClosestPoint = function (referencePoint, pointList) {
+    //   // var distA = referencePoint.distance(pointA);
+    //   // var distB = referencePoint.distance(pointB);
+    //   // if (distA < distB) {
+    //   //   return pointA;
+    //   // } else {
+    //   //   return pointB;
+    //   // }
+    //   // if( !pointList || pointList.length == 0 ) {
+    //   //   return null;
+    //   // }
+    //   // return pointList.reduce( function(accu,item) {
+
+    //   // },null);
+    // };
+
+    var findFarestPoint = function (referencePoint, pointA, pointB) {
+      var distA = referencePoint.distance(pointA);
+      var distB = referencePoint.distance(pointB);
+      if (distA > distB) {
         return pointA;
       } else {
         return pointB;
@@ -179,26 +225,6 @@
       // draw.circle(circleB.center, circleB.radius, "rgba(0,192,192)", 3.0);
       draw.circle(circleB.center, circleB.radius, "grey", 2.0, { dashArray: [10, 5] });
     }; // END preDraw
-
-    // +---------------------------------------------------------------------------------
-    // | Install a mouse handler to display current pointer position.
-    // | And to rotate the object.
-    // +-------------------------------
-    var stats = {
-      mouseX: 0,
-      mouseY: 0
-    };
-    // Add stats
-    var uiStats = new UIStats(stats);
-    stats = uiStats.proxy;
-    uiStats.add("mouseX");
-    uiStats.add("mouseY");
-    new MouseHandler(pb.eventCatcher, "draw-demo").move(function (e) {
-      // Display the mouse position
-      var relPos = pb.transformMousePosition(e.params.pos.x, e.params.pos.y);
-      stats.mouseX = relPos.x;
-      stats.mouseY = relPos.y;
-    });
 
     // +---------------------------------------------------------------------------------
     // | Create a GUI.

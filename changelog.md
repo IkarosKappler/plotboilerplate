@@ -11,6 +11,7 @@
 - 2026-06-04
   - Adding helper function `randomCircle` to demos.
   - Tweaking the apollonian circles demo.
+  - Changing the freedraw demo to draw fuzzy lines by default.
 - 2026-06-03 [v1.28.1 + v1.28.1]
   - Fixing an export bug.
 - 2026-05-22
