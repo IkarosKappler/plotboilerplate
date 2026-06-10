@@ -758,7 +758,7 @@ export class Vertex implements IBounded, XYCoords, SVGSerializable {
      * @param {number?} precision - (optional) The numeric precision to be used (number of precision digits).
      * @returns {string}
      */
-    arrayToJSON(vertices: Array<XYCoords>, precision?: number) {
+    arrayToJSON: (vertices: Array<XYCoords>, precision?: number) => {
       return JSON.stringify(
         vertices.map(function (vert) {
           return typeof precision === undefined

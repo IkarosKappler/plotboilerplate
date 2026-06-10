@@ -8,11 +8,17 @@
 - Add 'Rulers' class from the ngdg project.
 - Add 'onclose' and 'onopen' to the Modal (demos).
 
+- 2026-06-10
+  - Adding the utility function `Circle.circleUtils.containsPoint`.
+  - Adding algorithm `utils/algorithms/pointsMinimalContainingCircle`.
+  - Refactoring the `Trianble.bounds` method and added a plain `Triangle.utils.bounds` method.
+  - Refactoring the `Trianble.calcCircumCircle` method and added a plain `Triangle.utils.calcCircumCircle` method.
+  - Adding helper function `VertTuple.utils.calcCircumcircle`.
 - 2026-06-04
   - Adding helper function `randomCircle` to demos.
   - Tweaking the apollonian circles demo.
   - Changing the freedraw demo to draw fuzzy lines by default.
-- 2026-06-03 [v1.28.1 + v1.28.1]
+- 2026-06-03 [v1.28.1]+[v1.28.1]
   - Fixing an export bug.
 - 2026-05-22
   - Added the `isValueAllowed` function param to the getter methods of the `Params` class.

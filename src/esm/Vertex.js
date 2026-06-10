@@ -687,7 +687,7 @@ Vertex.utils = {
      * @param {number?} precision - (optional) The numeric precision to be used (number of precision digits).
      * @returns {string}
      */
-    arrayToJSON(vertices, precision) {
+    arrayToJSON: (vertices, precision) => {
         return JSON.stringify(vertices.map(function (vert) {
             return typeof precision === undefined
                 ? { x: vert.x, y: vert.y }

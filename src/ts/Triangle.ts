@@ -27,7 +27,9 @@
  * @modified  2025-14-16 Class `Triangle` now implements interface `IBounded`.
  * @modified  2025-14-16 Class `Triangle` now implements interface `Intersectable`.
  * @modified  2025-14-16 Added method `Triangle.move`.
- * @version   2.10.0
+ * @modified  2026-06-10 Refactoring the `Trianble.bounds` method and added a plain `Triangle.utils.bounds` method.
+ * @modified  2026-06-10 Refactoring the `Trianble.calcCircumCircle` method and added a plain `Triangle.utils.calcCircumCircle` method.
+ * @version   2.11.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -35,7 +37,7 @@
  **/
 
 import { Bounds } from "./Bounds";
-import { Circle } from "./Circle";
+import { Circle, ICircle } from "./Circle";
 import { Line } from "./Line";
 import { Polygon } from "./Polygon";
 import { UIDGenerator } from "./UIDGenerator";
@@ -324,37 +326,41 @@ export class Triangle implements IBounded, SVGSerializable, Intersectable {
    * @memberof Triangle
    */
   calcCircumcircle() {
-    // From
-    //    http://www.exaflop.org/docs/cgafaq/cga1.html
+    // // From
+    // //    http://www.exaflop.org/docs/cgafaq/cga1.html
 
-    const A: number = this.b.x - this.a.x;
-    const B: number = this.b.y - this.a.y;
-    const C: number = this.c.x - this.a.x;
-    const D: number = this.c.y - this.a.y;
+    // const A: number = this.b.x - this.a.x;
+    // const B: number = this.b.y - this.a.y;
+    // const C: number = this.c.x - this.a.x;
+    // const D: number = this.c.y - this.a.y;
 
-    const E: number = A * (this.a.x + this.b.x) + B * (this.a.y + this.b.y);
-    const F: number = C * (this.a.x + this.c.x) + D * (this.a.y + this.c.y);
+    // const E: number = A * (this.a.x + this.b.x) + B * (this.a.y + this.b.y);
+    // const F: number = C * (this.a.x + this.c.x) + D * (this.a.y + this.c.y);
 
-    const G: number = 2.0 * (A * (this.c.y - this.b.y) - B * (this.c.x - this.b.x));
+    // const G: number = 2.0 * (A * (this.c.y - this.b.y) - B * (this.c.x - this.b.x));
 
-    let dx: number, dy: number;
+    // let dx: number, dy: number;
 
-    if (Math.abs(G) < Triangle.EPSILON) {
-      // Collinear - find extremes and use the midpoint
-      const bounds: Bounds = this.bounds();
-      this.center = new Vertex((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
-      dx = this.center.x - bounds.min.x;
-      dy = this.center.y - bounds.min.y;
-    } else {
-      const cx: number = (D * E - B * F) / G;
-      const cy: number = (A * F - C * E) / G;
-      this.center = new Vertex(cx, cy);
-      dx = this.center.x - this.a.x;
-      dy = this.center.y - this.a.y;
-    }
+    // if (Math.abs(G) < Triangle.EPSILON) {
+    //   // Collinear - find extremes and use the midpoint
+    //   const bounds: Bounds = this.bounds();
+    //   this.center = new Vertex((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
+    //   dx = this.center.x - bounds.min.x;
+    //   dy = this.center.y - bounds.min.y;
+    // } else {
+    //   const cx: number = (D * E - B * F) / G;
+    //   const cy: number = (A * F - C * E) / G;
+    //   this.center = new Vertex(cx, cy);
+    //   dx = this.center.x - this.a.x;
+    //   dy = this.center.y - this.a.y;
+    // }
 
-    this.radius_squared = dx * dx + dy * dy;
-    this.radius = Math.sqrt(this.radius_squared);
+    // this.radius_squared = dx * dx + dy * dy;
+    // this.radius = Math.sqrt(this.radius_squared);
+    const tmpCircle = Triangle.utils.calcCircumcircle(this.a, this.b, this.c);
+    this.center = new Vertex(tmpCircle.center.x, tmpCircle.center.y);
+    this.radius = tmpCircle.radius;
+    this.radius_squared = tmpCircle.radius_squared;
   } // END calcCircumcircle
 
   /**
@@ -383,10 +389,11 @@ export class Triangle implements IBounded, SVGSerializable, Intersectable {
    * @memberof Triangle
    */
   bounds(): Bounds {
-    return new Bounds(
-      new Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)),
-      new Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y))
-    );
+    // return new Bounds(
+    //   new Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)),
+    //   new Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y))
+    // );
+    return Triangle.utils.bounds(this.a, this.b, this.c);
   }
 
   //--- BEGIN --- Implement interface `Intersectable`
@@ -594,8 +601,64 @@ export class Triangle implements IBounded, SVGSerializable, Intersectable {
      * @param {XYCords} c - The first vertex.
      * @returns {nmber}
      */
-    determinant(a: XYCoords, b: XYCoords, c: XYCoords): number {
+    determinant: (a: XYCoords, b: XYCoords, c: XYCoords): number => {
       return (b.y - a.y) * (c.x - b.x) - (c.y - b.y) * (b.x - a.x);
-    }
+    },
+
+    bounds: (a: XYCoords, b: XYCoords, c: XYCoords): Bounds => {
+      return new Bounds(
+        new Vertex(Triangle.utils.min3(a.x, b.x, c.x), Triangle.utils.min3(a.y, b.y, c.y)),
+        new Vertex(Triangle.utils.max3(a.x, b.x, c.x), Triangle.utils.max3(a.y, b.y, c.y))
+      );
+    },
+
+    /**
+     * Re-compute the circumcircle of this triangle (if the vertices
+     * have changed).
+     *
+     * The circumcenter and radius are stored in this.center and
+     * this.radius. There is a third result: radius_squared (for internal computations).
+     *
+     * @method calcCircumcircle
+     * @return void
+     * @instance
+     * @memberof Triangle
+     */
+    calcCircumcircle: (a: XYCoords, b: XYCoords, c: XYCoords): ICircle => {
+      // From
+      //    http://www.exaflop.org/docs/cgafaq/cga1.html
+
+      const A: number = b.x - a.x;
+      const B: number = b.y - a.y;
+      const C: number = c.x - a.x;
+      const D: number = c.y - a.y;
+
+      const E: number = A * (a.x + b.x) + B * (a.y + b.y);
+      const F: number = C * (a.x + c.x) + D * (a.y + c.y);
+
+      const G: number = 2.0 * (A * (c.y - b.y) - B * (c.x - b.x));
+
+      let dx: number, dy: number;
+
+      let center;
+      if (Math.abs(G) < Triangle.EPSILON) {
+        // Collinear - find extremes and use the midpoint
+        // const bounds: Bounds = this.bounds();
+        const bounds: Bounds = Triangle.utils.bounds(a, b, c);
+        center = new Vertex((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
+        dx = center.x - bounds.min.x;
+        dy = center.y - bounds.min.y;
+      } else {
+        const cx: number = (D * E - B * F) / G;
+        const cy: number = (A * F - C * E) / G;
+        center = new Vertex(cx, cy);
+        dx = center.x - a.x;
+        dy = center.y - a.y;
+      }
+
+      const radius_squared = dx * dx + dy * dy;
+      const radius = Math.sqrt(radius_squared);
+      return { center: center, radius: radius, radius_squared: radius_squared };
+    } // END calcCircumcircle
   };
 }

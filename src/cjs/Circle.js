@@ -15,7 +15,8 @@
  * @modified 2022-08-23 Added the `closestPoint` function.
  * @modified 2025-04-09 Added the `Circle.move(amount: XYCoords)` method.
  * @modified 2025-04-16 Class `Circle` now implements interface `Intersectable`.
- * @version  1.5.0
+ * @modified 2026-06-10 Adding the utility function `Circle.circleUtils.containsPoint`.
+ * @version  1.6.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Circle = void 0;
@@ -24,6 +25,7 @@ var Line_1 = require("./Line");
 var UIDGenerator_1 = require("./UIDGenerator");
 var Vector_1 = require("./Vector");
 var Vertex_1 = require("./Vertex");
+var geomutils_1 = require("./geomutils");
 /**
  * @classdesc A simple circle: center point and radius.
  *
@@ -331,6 +333,13 @@ var Circle = /** @class */ (function () {
             /* return new Vertex( Math.sin(angle) * radius,
                          Math.cos(angle) * radius ); */
             return new Vertex_1.Vertex(Math.cos(angle) * radius, Math.sin(angle) * radius);
+        },
+        containsPoint: function (point, circle) {
+            // return (
+            //   (circle.center.x - point.x) * (circle.center.x - point.x) + (circle.center.y - point.y) * (circle.center.y - point.y) <=
+            //   circle.radius * circle.radius
+            // );
+            return geomutils_1.geomutils.dist4(point.x, point.y, circle.center.x, circle.center.y) < circle.radius;
         }
     };
     return Circle;

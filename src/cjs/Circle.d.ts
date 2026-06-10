@@ -14,7 +14,8 @@
  * @modified 2022-08-23 Added the `closestPoint` function.
  * @modified 2025-04-09 Added the `Circle.move(amount: XYCoords)` method.
  * @modified 2025-04-16 Class `Circle` now implements interface `Intersectable`.
- * @version  1.5.0
+ * @modified 2026-06-10 Adding the utility function `Circle.circleUtils.containsPoint`.
+ * @version  1.6.0
  **/
 import { Bounds } from "./Bounds";
 import { Line } from "./Line";
@@ -22,6 +23,11 @@ import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 import { IBounded, Intersectable, SVGSerializable, UID, XYCoords } from "./interfaces";
+export interface ICircle {
+    center: XYCoords;
+    radius: number;
+    radius_squared?: number;
+}
 /**
  * @classdesc A simple circle: center point and radius.
  *
@@ -33,7 +39,7 @@ import { IBounded, Intersectable, SVGSerializable, UID, XYCoords } from "./inter
  * @requires UID
  * @requires UIDGenerator
  **/
-export declare class Circle implements IBounded, Intersectable, SVGSerializable {
+export declare class Circle implements IBounded, ICircle, Intersectable, SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
      **/
@@ -210,5 +216,6 @@ export declare class Circle implements IBounded, Intersectable, SVGSerializable 
     destroy(): void;
     static circleUtils: {
         vertAt: (angle: number, radius: number) => Vertex;
+        containsPoint: (point: XYCoords, circle: ICircle) => boolean;
     };
 }

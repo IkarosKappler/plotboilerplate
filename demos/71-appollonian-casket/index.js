@@ -119,12 +119,13 @@
         fill.text("A", circleA.center.x + 5, circleA.center.y, { color: contrastColor });
         fill.text("B", circleB.center.x + 5, circleB.center.y, { color: contrastColor });
         // draw.circle(newCircleB.center, circleB.radius, "grey", 2.0, { dashArray: [5, 10] });
-        draw.circle(circleB.center, circleB.radius, "rgba(0,192,192)", 3.0, { dashArray: [5, 10] });
+        draw.circle(circleB.center, circleB.radius, "rgb(0,192,192)", 3.0, { dashArray: [10, 5] });
       }
 
       // Draw containing circle
-      var containingCircle = getContainingCircle(circleA, circleB);
-      draw.circle(containingCircle.center, containingCircle.radius, "rgba(128,128,128, 0.25)", 1.0, { dashArray: [10, 10] });
+      // TODO: not working!
+      // var containingCircle = getContainingCircle(circleA, circleB);
+      // draw.circle(containingCircle.center, containingCircle.radius, "rgba(128,128,128, 0.25)", 1.0, { dashArray: [10, 10] });
 
       // Step 2: find attaching third circle.
 
@@ -223,7 +224,7 @@
     var preDraw = function (draw, fill) {
       draw.circle(circleA.center, circleA.radius, "rgba(0,192,192)", 3.0);
       // draw.circle(circleB.center, circleB.radius, "rgba(0,192,192)", 3.0);
-      draw.circle(circleB.center, circleB.radius, "grey", 2.0, { dashArray: [10, 5] });
+      // draw.circle(circleB.center, circleB.radius, "grey", 2.0, { dashArray: [10, 5] });
     }; // END preDraw
 
     // +---------------------------------------------------------------------------------

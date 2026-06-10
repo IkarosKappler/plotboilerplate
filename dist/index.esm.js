@@ -348,7 +348,8 @@ class VertexListeners {
  * @modified 2022-08-23 Added the `closestPoint` function.
  * @modified 2025-04-09 Added the `Circle.move(amount: XYCoords)` method.
  * @modified 2025-04-16 Class `Circle` now implements interface `Intersectable`.
- * @version  1.5.0
+ * @modified 2026-06-10 Adding the utility function `Circle.circleUtils.containsPoint`.
+ * @version  1.6.0
  **/
 /**
  * @classdesc A simple circle: center point and radius.
@@ -655,6 +656,13 @@ Circle.circleUtils = {
         /* return new Vertex( Math.sin(angle) * radius,
                      Math.cos(angle) * radius ); */
         return new Vertex$1(Math.cos(angle) * radius, Math.sin(angle) * radius);
+    },
+    containsPoint: (point, circle) => {
+        // return (
+        //   (circle.center.x - point.x) * (circle.center.x - point.x) + (circle.center.y - point.y) * (circle.center.y - point.y) <=
+        //   circle.radius * circle.radius
+        // );
+        return geomutils.dist4(point.x, point.y, circle.center.x, circle.center.y) < circle.radius;
     }
 };
 
@@ -687,7 +695,9 @@ Circle.circleUtils = {
  * @modified  2025-14-16 Class `Triangle` now implements interface `IBounded`.
  * @modified  2025-14-16 Class `Triangle` now implements interface `Intersectable`.
  * @modified  2025-14-16 Added method `Triangle.move`.
- * @version   2.10.0
+ * @modified  2026-06-10 Refactoring the `Trianble.bounds` method and added a plain `Triangle.utils.bounds` method.
+ * @modified  2026-06-10 Refactoring the `Trianble.calcCircumCircle` method and added a plain `Triangle.utils.calcCircumCircle` method.
+ * @version   2.11.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -892,32 +902,35 @@ class Triangle {
      * @memberof Triangle
      */
     calcCircumcircle() {
-        // From
-        //    http://www.exaflop.org/docs/cgafaq/cga1.html
-        const A = this.b.x - this.a.x;
-        const B = this.b.y - this.a.y;
-        const C = this.c.x - this.a.x;
-        const D = this.c.y - this.a.y;
-        const E = A * (this.a.x + this.b.x) + B * (this.a.y + this.b.y);
-        const F = C * (this.a.x + this.c.x) + D * (this.a.y + this.c.y);
-        const G = 2.0 * (A * (this.c.y - this.b.y) - B * (this.c.x - this.b.x));
-        let dx, dy;
-        if (Math.abs(G) < Triangle.EPSILON) {
-            // Collinear - find extremes and use the midpoint
-            const bounds = this.bounds();
-            this.center = new Vertex$1((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
-            dx = this.center.x - bounds.min.x;
-            dy = this.center.y - bounds.min.y;
-        }
-        else {
-            const cx = (D * E - B * F) / G;
-            const cy = (A * F - C * E) / G;
-            this.center = new Vertex$1(cx, cy);
-            dx = this.center.x - this.a.x;
-            dy = this.center.y - this.a.y;
-        }
-        this.radius_squared = dx * dx + dy * dy;
-        this.radius = Math.sqrt(this.radius_squared);
+        // // From
+        // //    http://www.exaflop.org/docs/cgafaq/cga1.html
+        // const A: number = this.b.x - this.a.x;
+        // const B: number = this.b.y - this.a.y;
+        // const C: number = this.c.x - this.a.x;
+        // const D: number = this.c.y - this.a.y;
+        // const E: number = A * (this.a.x + this.b.x) + B * (this.a.y + this.b.y);
+        // const F: number = C * (this.a.x + this.c.x) + D * (this.a.y + this.c.y);
+        // const G: number = 2.0 * (A * (this.c.y - this.b.y) - B * (this.c.x - this.b.x));
+        // let dx: number, dy: number;
+        // if (Math.abs(G) < Triangle.EPSILON) {
+        //   // Collinear - find extremes and use the midpoint
+        //   const bounds: Bounds = this.bounds();
+        //   this.center = new Vertex((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
+        //   dx = this.center.x - bounds.min.x;
+        //   dy = this.center.y - bounds.min.y;
+        // } else {
+        //   const cx: number = (D * E - B * F) / G;
+        //   const cy: number = (A * F - C * E) / G;
+        //   this.center = new Vertex(cx, cy);
+        //   dx = this.center.x - this.a.x;
+        //   dy = this.center.y - this.a.y;
+        // }
+        // this.radius_squared = dx * dx + dy * dy;
+        // this.radius = Math.sqrt(this.radius_squared);
+        const tmpCircle = Triangle.utils.calcCircumcircle(this.a, this.b, this.c);
+        this.center = new Vertex$1(tmpCircle.center.x, tmpCircle.center.y);
+        this.radius = tmpCircle.radius;
+        this.radius_squared = tmpCircle.radius_squared;
     } // END calcCircumcircle
     /**
      * Check if the passed vertex is inside this triangle's
@@ -944,7 +957,11 @@ class Triangle {
      * @memberof Triangle
      */
     bounds() {
-        return new Bounds(new Vertex$1(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)), new Vertex$1(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y)));
+        // return new Bounds(
+        //   new Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)),
+        //   new Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y))
+        // );
+        return Triangle.utils.bounds(this.a, this.b, this.c);
     }
     //--- BEGIN --- Implement interface `Intersectable`
     /**
@@ -1134,9 +1151,55 @@ Triangle.utils = {
      * @param {XYCords} c - The first vertex.
      * @returns {nmber}
      */
-    determinant(a, b, c) {
+    determinant: (a, b, c) => {
         return (b.y - a.y) * (c.x - b.x) - (c.y - b.y) * (b.x - a.x);
-    }
+    },
+    bounds: (a, b, c) => {
+        return new Bounds(new Vertex$1(Triangle.utils.min3(a.x, b.x, c.x), Triangle.utils.min3(a.y, b.y, c.y)), new Vertex$1(Triangle.utils.max3(a.x, b.x, c.x), Triangle.utils.max3(a.y, b.y, c.y)));
+    },
+    /**
+     * Re-compute the circumcircle of this triangle (if the vertices
+     * have changed).
+     *
+     * The circumcenter and radius are stored in this.center and
+     * this.radius. There is a third result: radius_squared (for internal computations).
+     *
+     * @method calcCircumcircle
+     * @return void
+     * @instance
+     * @memberof Triangle
+     */
+    calcCircumcircle: (a, b, c) => {
+        // From
+        //    http://www.exaflop.org/docs/cgafaq/cga1.html
+        const A = b.x - a.x;
+        const B = b.y - a.y;
+        const C = c.x - a.x;
+        const D = c.y - a.y;
+        const E = A * (a.x + b.x) + B * (a.y + b.y);
+        const F = C * (a.x + c.x) + D * (a.y + c.y);
+        const G = 2.0 * (A * (c.y - b.y) - B * (c.x - b.x));
+        let dx, dy;
+        let center;
+        if (Math.abs(G) < Triangle.EPSILON) {
+            // Collinear - find extremes and use the midpoint
+            // const bounds: Bounds = this.bounds();
+            const bounds = Triangle.utils.bounds(a, b, c);
+            center = new Vertex$1((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
+            dx = center.x - bounds.min.x;
+            dy = center.y - bounds.min.y;
+        }
+        else {
+            const cx = (D * E - B * F) / G;
+            const cy = (A * F - C * E) / G;
+            center = new Vertex$1(cx, cy);
+            dx = center.x - a.x;
+            dy = center.y - a.y;
+        }
+        const radius_squared = dx * dx + dy * dy;
+        const radius = Math.sqrt(radius_squared);
+        return { center: center, radius: radius, radius_squared: radius_squared };
+    } // END calcCircumcircle
 };
 
 /**
@@ -1944,7 +2007,7 @@ Vertex$1.utils = {
      * @param {number?} precision - (optional) The numeric precision to be used (number of precision digits).
      * @returns {string}
      */
-    arrayToJSON(vertices, precision) {
+    arrayToJSON: (vertices, precision) => {
         return JSON.stringify(vertices.map(function (vert) {
             return typeof precision === undefined
                 ? { x: vert.x, y: vert.y }
@@ -1971,7 +2034,8 @@ Vertex$1.utils = {
  * @modified 2025-03-31 Added the `VertTuple.revert` method.
  * @modified 2025-04-15 Changed param of `VertTuple.moveTo` method from `Vertex` to `XYCoords`.
  * @modified 2025-04-15 Added method `VertTuple.move` method.
- * @version 1.4.0
+ * @modified 2026-06-10 Adding helper function `VertTuple.utils.calcCircumcircle`.
+ * @version 1.5.0
  */
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
@@ -2291,6 +2355,10 @@ class VertTuple {
 VertTuple.vtutils = {
     dist2: (v, w) => {
         return (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y);
+    },
+    calcCircumcircle: (p1, p2) => {
+        const p1x = p1.x, p1y = p1.y, p2x = p2.x, p2y = p2.y, cx = 0.5 * (p1x + p2x), cy = 0.5 * (p1y + p2y);
+        return { center: { x: cx, y: cy }, radius: Math.sqrt((p1x - cx) * (p1x - cx) + (p1y - cy) * (p1y - cy)) };
     }
 };
 

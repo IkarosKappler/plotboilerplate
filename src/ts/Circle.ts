@@ -14,7 +14,8 @@
  * @modified 2022-08-23 Added the `closestPoint` function.
  * @modified 2025-04-09 Added the `Circle.move(amount: XYCoords)` method.
  * @modified 2025-04-16 Class `Circle` now implements interface `Intersectable`.
- * @version  1.5.0
+ * @modified 2026-06-10 Adding the utility function `Circle.circleUtils.containsPoint`.
+ * @version  1.6.0
  **/
 
 import { Bounds } from "./Bounds";
@@ -23,7 +24,14 @@ import { UIDGenerator } from "./UIDGenerator";
 import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
+import { geomutils } from "./geomutils";
 import { IBounded, Intersectable, SVGSerializable, UID, XYCoords } from "./interfaces";
+
+export interface ICircle {
+  center: XYCoords;
+  radius: number;
+  radius_squared?: number;
+}
 
 /**
  * @classdesc A simple circle: center point and radius.
@@ -36,7 +44,7 @@ import { IBounded, Intersectable, SVGSerializable, UID, XYCoords } from "./inter
  * @requires UID
  * @requires UIDGenerator
  **/
-export class Circle implements IBounded, Intersectable, SVGSerializable {
+export class Circle implements IBounded, ICircle, Intersectable, SVGSerializable {
   /**
    * Required to generate proper CSS classes and other class related IDs.
    **/
@@ -385,6 +393,14 @@ export class Circle implements IBounded, Intersectable, SVGSerializable {
       /* return new Vertex( Math.sin(angle) * radius,
 			       Math.cos(angle) * radius ); */
       return new Vertex(Math.cos(angle) * radius, Math.sin(angle) * radius);
+    },
+
+    containsPoint: (point: XYCoords, circle: ICircle): boolean => {
+      // return (
+      //   (circle.center.x - point.x) * (circle.center.x - point.x) + (circle.center.y - point.y) * (circle.center.y - point.y) <=
+      //   circle.radius * circle.radius
+      // );
+      return geomutils.dist4(point.x, point.y, circle.center.x, circle.center.y) < circle.radius;
     }
   };
 } // END class

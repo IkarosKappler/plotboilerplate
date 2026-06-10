@@ -16,10 +16,12 @@
  * @modified 2025-03-31 Added the `VertTuple.revert` method.
  * @modified 2025-04-15 Changed param of `VertTuple.moveTo` method from `Vertex` to `XYCoords`.
  * @modified 2025-04-15 Added method `VertTuple.move` method.
- * @version 1.4.0
+ * @modified 2026-06-10 Adding helper function `VertTuple.utils.calcCircumcircle`.
+ * @version 1.5.0
  */
 import { Vertex } from "./Vertex";
 import { XYCoords, UID } from "./interfaces";
+import { ICircle } from "./Circle";
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
  * @abstract
@@ -280,5 +282,6 @@ export declare class VertTuple<T extends VertTuple<T>> {
      **/
     static vtutils: {
         dist2: (v: XYCoords, w: XYCoords) => number;
+        calcCircumcircle: (p1: XYCoords, p2: XYCoords) => ICircle;
     };
 }
