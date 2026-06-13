@@ -33,6 +33,21 @@ var calculateCirclesCircumCircle = function (circles) {
   return minimalContainingCircleFromPoints(allTrianglePoints);
 };
 
+var findBasicExtendesLines = function (circles) {
+  // First find all triples of circles and their connecting triangles.
+  var lines = arrayLoop2(
+    circles,
+    function (result, circleA, circleB, i, j) {
+      var intersectionLine = circleB.lineIntersection(circleA.center, circleB.center);
+      var farestPointB = circleA.center.findFarestPoint(intersectionLine.a, intersectionLine.b);
+      result.push(new Line(circleA.center, farestPointB));
+      return result;
+    },
+    []
+  );
+  return lines;
+};
+
 var findAllTrianglesFromCircles = function (circles) {
   // First find all triples of circles and their connecting triangles.
   var triangles = arrayLoop3(
@@ -49,26 +64,17 @@ var findAllTrianglesFromCircles = function (circles) {
   return triangles;
 };
 
-var findAllExtendedTrianglesFromCircles = function (circles) {
+var findAllExtendedLinesFromCircles = function (circles) {
   // First find all triples of circles and their connecting triangles.
-  var triangles = arrayLoop3(
+  var lines = arrayLoop3(
     circles,
     function (result, circleA, circleB, circleC, i, j, k) {
       // Find both outermost intersection points
       // console.log("circleA", circleA, "circleB", circleB, "i", i, "j", j);
       var triangle = new Triangle(circleA.center, circleB.center, circleC.center);
-      // var minEnclosingCircle = triangle.getMinimumEnclosingCircle();
       var triangleCentroid = triangle.getCentroid();
       var triangleIncenter = triangle.getIncenter();
       // Extend the trinagle on each corner by the respective circle radius
-      // var intersectionLineA = circleA.lineIntersection(triangleCentroid, circleA.center);
-      // var intersectionLineB = circleB.lineIntersection(triangleCentroid, circleB.center);
-      // var intersectionLineC = circleC.lineIntersection(triangleCentroid, circleC.center);
-      // var farestPointA = triangleCentroid.findFarestPoint(intersectionLineA.a, intersectionLineA.b);
-      // var farestPointB = triangleCentroid.findFarestPoint(intersectionLineB.a, intersectionLineB.b);
-      // var farestPointC = triangleCentroid.findFarestPoint(intersectionLineC.a, intersectionLineC.b);
-      // var extendedTriangle = new Triangle(farestPointA, farestPointB, farestPointC);
-      // result.push(extendedTriangle);
       var extendedCentroidTriangle = extendTriangleFromPoint(circleA, circleB, circleC, triangleCentroid);
       var extendedIncenterTriangle = extendTriangleFromPoint(circleA, circleB, circleC, triangleIncenter);
 
@@ -76,15 +82,65 @@ var findAllExtendedTrianglesFromCircles = function (circles) {
       var extendedCentroidTriangle2 = extendTriangleFromPoint(circleA, circleB, circleC, extendedCentroidTriangle.getIncenter());
       var extendedIncenterTriangle2 = extendTriangleFromPoint(circleA, circleB, circleC, extendedIncenterTriangle.getIncenter());
 
-      result.push(extendedCentroidTriangle, extendedIncenterTriangle);
-      result.push(extendedCentroidTriangle2, extendedIncenterTriangle2);
+      // result.push(extendedCentroidTriangle, extendedIncenterTriangle);
+      // result.push(extendedCentroidTriangle2, extendedIncenterTriangle2);
+      result.push(
+        extendedCentroidTriangle.getEdgeAt(0),
+        extendedCentroidTriangle.getEdgeAt(1),
+        extendedCentroidTriangle.getEdgeAt(2)
+      );
+      result.push(
+        extendedIncenterTriangle.getEdgeAt(0),
+        extendedIncenterTriangle.getEdgeAt(1),
+        extendedIncenterTriangle.getEdgeAt(2)
+      );
+      result.push(
+        extendedCentroidTriangle2.getEdgeAt(0),
+        extendedCentroidTriangle2.getEdgeAt(1),
+        extendedCentroidTriangle2.getEdgeAt(2)
+      );
+      result.push(
+        extendedIncenterTriangle2.getEdgeAt(0),
+        extendedIncenterTriangle2.getEdgeAt(1),
+        extendedIncenterTriangle2.getEdgeAt(2)
+      );
+
+      // result.push(extendedCentroidTriangle2, extendedIncenterTriangle2);
 
       return result;
     },
     []
   );
-  return triangles;
+  return lines;
 };
+
+// var findAllExtendedTrianglesFromCircles = function (circles) {
+//   // First find all triples of circles and their connecting triangles.
+//   var triangles = arrayLoop3(
+//     circles,
+//     function (result, circleA, circleB, circleC, i, j, k) {
+//       // Find both outermost intersection points
+//       // console.log("circleA", circleA, "circleB", circleB, "i", i, "j", j);
+//       var triangle = new Triangle(circleA.center, circleB.center, circleC.center);
+//       var triangleCentroid = triangle.getCentroid();
+//       var triangleIncenter = triangle.getIncenter();
+//       // Extend the trinagle on each corner by the respective circle radius
+//       var extendedCentroidTriangle = extendTriangleFromPoint(circleA, circleB, circleC, triangleCentroid);
+//       var extendedIncenterTriangle = extendTriangleFromPoint(circleA, circleB, circleC, triangleIncenter);
+
+//       // And also make a second iteration.
+//       var extendedCentroidTriangle2 = extendTriangleFromPoint(circleA, circleB, circleC, extendedCentroidTriangle.getIncenter());
+//       var extendedIncenterTriangle2 = extendTriangleFromPoint(circleA, circleB, circleC, extendedIncenterTriangle.getIncenter());
+
+//       result.push(extendedCentroidTriangle, extendedIncenterTriangle);
+//       result.push(extendedCentroidTriangle2, extendedIncenterTriangle2);
+
+//       return result;
+//     },
+//     []
+//   );
+//   return triangles;
+// };
 
 var extendTriangleFromPoint = function (circleA, circleB, circleC, pointToExtendFrom) {
   // Extend the trinagle on each corner by the respective circle radius
@@ -95,7 +151,6 @@ var extendTriangleFromPoint = function (circleA, circleB, circleC, pointToExtend
   var farestPointB = pointToExtendFrom.findFarestPoint(intersectionLineB.a, intersectionLineB.b);
   var farestPointC = pointToExtendFrom.findFarestPoint(intersectionLineC.a, intersectionLineC.b);
   var extendedTriangle = new Triangle(farestPointA, farestPointB, farestPointC);
-  // result.push(extendedTriangle);
   return extendedTriangle;
 };
 
@@ -123,7 +178,10 @@ var arrayLoop2 = function (arr, callback, result) {
   var newResult = result;
   for (var i = 0; i < arr.length; i++) {
     var itemA = arr[i];
-    for (var j = i + 1; j < arr.length; j++) {
+    for (var j = 0; j < arr.length; j++) {
+      if (i == j) {
+        continue;
+      }
       var itemB = arr[j];
       newResult = callback(result, itemA, itemB, i, j);
     }
