@@ -17,6 +17,9 @@
       // prettier-ignore
       foldApoll.add(appContext.config, "numPoints").min(0).max(24).step(1).title("The radius of the third circle.").onChange(function () { appContext.handleNumPointsChanged(); appContext.pb.redraw(); });
       // prettier-ignore
+      foldApoll.add(appContext.config, "useCircles").title("Use circles or points.").onChange(function () { appContext.pb.redraw(); });
+
+      // prettier-ignore
       gui.add(appContext.config, "readme").title("Show the readme.");
     }
   };

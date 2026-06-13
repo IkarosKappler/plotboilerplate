@@ -10,7 +10,7 @@
  * @returns
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.pointsMinimalContainingCircle = void 0;
+exports.minimalContainingCircleFromPoints = void 0;
 var Circle_1 = require("../../Circle");
 var Triangle_1 = require("../../Triangle");
 var VertTuple_1 = require("../../VertTuple");
@@ -23,14 +23,14 @@ var Vertex_1 = require("../../Vertex");
  * @param {XYCoords[]} points
  * @returns {Circle | null} The minimal containing circle or null if the point count is lower than 2.
  */
-var pointsMinimalContainingCircle = function (points) {
+var minimalContainingCircleFromPoints = function (points) {
     if (points.length <= 1) {
         return null;
     }
     var circleObject = wetzlsAlgorithm(points);
     return new Circle_1.Circle(new Vertex_1.Vertex(circleObject.center.x, circleObject.center.y), circleObject.radius);
 };
-exports.pointsMinimalContainingCircle = pointsMinimalContainingCircle;
+exports.minimalContainingCircleFromPoints = minimalContainingCircleFromPoints;
 /**
  * This initiates the actual algorithm but return a shallow circle representation.
  *
@@ -63,11 +63,11 @@ var minimumContainingCircle = function (points, n, boundary, boundaryLength) {
     }
     else {
         var localCircle = minimumContainingCircle(points, n - 1, boundary, boundaryLength);
-        if (!Circle_1.Circle.circleUtils.containsPoint(points[n - 1], localCircle)) {
+        if (!Circle_1.Circle.circleUtils.containsPoint(localCircle.center, localCircle.radius, points[n - 1])) {
             boundary[boundaryLength++] = points[n - 1];
             return minimumContainingCircle(points, n - 1, boundary, boundaryLength);
         }
         return localCircle;
     }
 };
-//# sourceMappingURL=pointsMinimalContainingCircle.js.map
+//# sourceMappingURL=minimalContainingCircleFromPoints.js.map

@@ -124,8 +124,8 @@
 
       // Draw containing circle
       // TODO: not working!
-      // var containingCircle = getContainingCircle(circleA, circleB);
-      // draw.circle(containingCircle.center, containingCircle.radius, "rgba(128,128,128, 0.25)", 1.0, { dashArray: [10, 10] });
+      var containingCircle = getContainingCircle(circleA, circleB);
+      draw.circle(containingCircle.center, containingCircle.radius, "rgba(128,128,128, 0.55)", 2.0, { dashArray: [10, 10] });
 
       // Step 2: find attaching third circle.
 

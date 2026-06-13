@@ -30,6 +30,7 @@
  * @modified  2025-14-16 Added method `Triangle.move`.
  * @modified  2026-06-10 Refactoring the `Trianble.bounds` method and added a plain `Triangle.utils.bounds` method.
  * @modified  2026-06-10 Refactoring the `Trianble.calcCircumCircle` method and added a plain `Triangle.utils.calcCircumCircle` method.
+ * @modified  2026-06-13 Adding `Triangle.getVertices()`.
  * @version   2.11.0
  *
  * @file Triangle
@@ -44,6 +45,7 @@ var Line_1 = require("./Line");
 var Polygon_1 = require("./Polygon");
 var UIDGenerator_1 = require("./UIDGenerator");
 var Vector_1 = require("./Vector");
+var VertTuple_1 = require("./VertTuple");
 var Vertex_1 = require("./Vertex");
 var geomutils_1 = require("./geomutils");
 /**
@@ -185,7 +187,7 @@ var Triangle = /** @class */ (function () {
      * after triangle vertex changes.
      *
      * @method getCircumcircle
-     * @return {Object} - { center:Vertex, radius:float }
+     * @return {Circle} - The circle touching exactly all three triangle vertices.
      * @instance
      * @memberof Triangle
      */
@@ -193,6 +195,33 @@ var Triangle = /** @class */ (function () {
         // if( !this.center || !this.radius )
         this.calcCircumcircle();
         return new Circle_1.Circle(this.center.clone(), this.radius);
+    };
+    /**
+     * Calculates the minimun enclosing circle.
+     *
+     * @method getMinimumEnclosingCircle
+     * @return {Object} - { center:Vertex, radius:float }
+     * @instance
+     * @memberof Triangle
+     * @returns
+     */
+    Triangle.prototype.getMinimumEnclosingCircle = function () {
+        // First option: two points construct a circle and the third point is contained.
+        var circleAB = VertTuple_1.VertTuple.vtutils.calcCircumcircle(this.a, this.b);
+        if (Circle_1.Circle.circleUtils.containsPoint(circleAB.center, circleAB.radius, this.c)) {
+            return Circle_1.Circle.fromICircle(circleAB);
+        }
+        var circleBC = VertTuple_1.VertTuple.vtutils.calcCircumcircle(this.b, this.c);
+        if (Circle_1.Circle.circleUtils.containsPoint(circleBC.center, circleBC.radius, this.c)) {
+            return Circle_1.Circle.fromICircle(circleBC);
+        }
+        var circleCA = VertTuple_1.VertTuple.vtutils.calcCircumcircle(this.c, this.a);
+        if (Circle_1.Circle.circleUtils.containsPoint(circleCA.center, circleCA.radius, this.c)) {
+            return Circle_1.Circle.fromICircle(circleCA);
+        }
+        // If none of the three upper cases applies: return the circumcircle.
+        var circumCircle = Triangle.utils.calcCircumcircle(this.a, this.b, this.c);
+        return Circle_1.Circle.fromICircle(circumCircle);
     };
     /**
      * Check if this triangle and the passed triangle share an
@@ -231,6 +260,17 @@ var Triangle = /** @class */ (function () {
             return this.a;
         //if( this.c.equals(vert1) && this.a.equals(vert2) || this.c.equals(vert2) && this.a.equals(vert1) )
         return this.b;
+    };
+    /**
+     * Get the three triangele vertices in a 3-element array.
+     *
+     * @method getVertices
+     * @returns {[Vertex, Vertex, Vertex]} - The three vertices – real instances, not copies.
+     * @instance
+     * @memberof Triangle
+     */
+    Triangle.prototype.getVertices = function () {
+        return [this.a, this.b, this.c];
     };
     /**
      * Re-compute the circumcircle of this triangle (if the vertices
@@ -430,8 +470,9 @@ var Triangle = /** @class */ (function () {
      * @return Vertex The incenter of this triangle.
      **/
     Triangle.prototype.getIncenter = function () {
-        if (!this.center || !this.radius)
+        if (!this.center || !this.radius) {
             this.calcCircumcircle();
+        }
         return this.center.clone();
     };
     /**

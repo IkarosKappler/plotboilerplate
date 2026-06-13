@@ -8,12 +8,17 @@
 - Add 'Rulers' class from the ngdg project.
 - Add 'onclose' and 'onopen' to the Modal (demos).
 
+- 2026-06-13
+  - Adding `Triangle.getVertices()`.
+  - Adding helper function `Circle.circleUtils.containsPoint` and refactored the member method `containsPoint`.
 - 2026-06-10
   - Adding the utility function `Circle.circleUtils.containsPoint`.
   - Adding algorithm `utils/algorithms/pointsMinimalContainingCircle`.
   - Refactoring the `Trianble.bounds` method and added a plain `Triangle.utils.bounds` method.
   - Refactoring the `Trianble.calcCircumCircle` method and added a plain `Triangle.utils.calcCircumCircle` method.
   - Adding helper function `VertTuple.utils.calcCircumcircle`.
+  - Adding methods `Vertex.findClosestPoint` and `Vertex.findFarestPoint`.
+  - Adding the `Circle.clone` method.
 - 2026-06-04
   - Adding helper function `randomCircle` to demos.
   - Tweaking the apollonian circles demo.

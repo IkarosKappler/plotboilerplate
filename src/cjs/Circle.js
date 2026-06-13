@@ -16,6 +16,8 @@
  * @modified 2025-04-09 Added the `Circle.move(amount: XYCoords)` method.
  * @modified 2025-04-16 Class `Circle` now implements interface `Intersectable`.
  * @modified 2026-06-10 Adding the utility function `Circle.circleUtils.containsPoint`.
+ * @modified 2026-06-10 Adding the `Circle.clone` method.
+ * @modified 2026-01-13 Adding helper function `Circle.circleUtils.containsPoint` and refactored the member method `containsPoint`.
  * @version  1.6.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -78,7 +80,8 @@ var Circle = /** @class */ (function () {
      * @return {boolean} `true` if the given point is inside this circle.
      */
     Circle.prototype.containsPoint = function (point) {
-        return this.center.distance(point) < this.radius;
+        // return this.center.distance(point) < this.radius;//
+        return Circle.circleUtils.containsPoint(this.center, this.radius, point);
     };
     /**
      * Check if the given circle is fully contained inside this circle.
@@ -320,6 +323,42 @@ var Circle = /** @class */ (function () {
         }
     };
     /**
+     * Create a deep copy of this circle.
+     *
+     * @method clone
+     * @return {Circle} A new circle, an exact copy of this one.
+     * @instance
+     * @memberof Circle
+     **/
+    Circle.prototype.clone = function () {
+        return new Circle(this.center, this.radius);
+    };
+    Circle.fromICircle = function (obj) {
+        return new Circle(new Vertex_1.Vertex(obj.center), obj.radius);
+    };
+    // static fromObject(obj: object): Circle {
+    //   if (!obj) {
+    //     return null;
+    //   }
+    //   if (typeof obj !== "object") {
+    //     return null;
+    //   }
+    //   if (!obj.hasOwnProperty("center") || typeof (obj as any).center != "object") {
+    //     return null;
+    //   }
+    //   if (!obj.hasOwnProperty("radius") || typeof !(obj as any).radius != "number") {
+    //     return null;
+    //   }
+    //   var center = (obj as any).center;
+    //   if (!center.hasOwnProperty("x") || typeof (center as any).x != "number") {
+    //     return null;
+    //   }
+    //   if (!center.hasOwnProperty("y") || typeof (center as any).y != "number") {
+    //     return null;
+    //   }
+    //   return new Circle(new Vertex(center), (obj as any).radius);
+    // }
+    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.
@@ -334,12 +373,12 @@ var Circle = /** @class */ (function () {
                          Math.cos(angle) * radius ); */
             return new Vertex_1.Vertex(Math.cos(angle) * radius, Math.sin(angle) * radius);
         },
-        containsPoint: function (point, circle) {
+        containsPoint: function (circleCenter, circleRadius, point) {
             // return (
             //   (circle.center.x - point.x) * (circle.center.x - point.x) + (circle.center.y - point.y) * (circle.center.y - point.y) <=
             //   circle.radius * circle.radius
             // );
-            return geomutils_1.geomutils.dist4(point.x, point.y, circle.center.x, circle.center.y) < circle.radius;
+            return geomutils_1.geomutils.dist4(point.x, point.y, circleCenter.x, circleCenter.y) < circleRadius;
         }
     };
     return Circle;

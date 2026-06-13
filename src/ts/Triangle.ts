@@ -29,6 +29,7 @@
  * @modified  2025-14-16 Added method `Triangle.move`.
  * @modified  2026-06-10 Refactoring the `Trianble.bounds` method and added a plain `Triangle.utils.bounds` method.
  * @modified  2026-06-10 Refactoring the `Trianble.calcCircumCircle` method and added a plain `Triangle.utils.calcCircumCircle` method.
+ * @modified  2026-06-13 Adding `Triangle.getVertices()`.
  * @version   2.11.0
  *
  * @file Triangle
@@ -265,7 +266,7 @@ export class Triangle implements IBounded, SVGSerializable, Intersectable {
    * after triangle vertex changes.
    *
    * @method getCircumcircle
-   * @return {Object} - { center:Vertex, radius:float }
+   * @return {Circle} - The circle touching exactly all three triangle vertices.
    * @instance
    * @memberof Triangle
    */
@@ -273,6 +274,35 @@ export class Triangle implements IBounded, SVGSerializable, Intersectable {
     // if( !this.center || !this.radius )
     this.calcCircumcircle();
     return new Circle(this.center.clone(), this.radius);
+  }
+
+  /**
+   * Calculates the minimun enclosing circle.
+   *
+   * @method getMinimumEnclosingCircle
+   * @return {Object} - { center:Vertex, radius:float }
+   * @instance
+   * @memberof Triangle
+   * @returns
+   */
+  getMinimumEnclosingCircle(): Circle {
+    // First option: two points construct a circle and the third point is contained.
+    var circleAB: ICircle = VertTuple.vtutils.calcCircumcircle(this.a, this.b);
+    if (Circle.circleUtils.containsPoint(circleAB.center, circleAB.radius, this.c)) {
+      return Circle.fromICircle(circleAB);
+    }
+    var circleBC: ICircle = VertTuple.vtutils.calcCircumcircle(this.b, this.c);
+    if (Circle.circleUtils.containsPoint(circleBC.center, circleBC.radius, this.c)) {
+      return Circle.fromICircle(circleBC);
+    }
+    var circleCA: ICircle = VertTuple.vtutils.calcCircumcircle(this.c, this.a);
+    if (Circle.circleUtils.containsPoint(circleCA.center, circleCA.radius, this.c)) {
+      return Circle.fromICircle(circleCA);
+    }
+
+    // If none of the three upper cases applies: return the circumcircle.
+    var circumCircle = Triangle.utils.calcCircumcircle(this.a, this.b, this.c);
+    return Circle.fromICircle(circumCircle);
   }
 
   /**
@@ -311,6 +341,18 @@ export class Triangle implements IBounded, SVGSerializable, Intersectable {
     if ((this.b.equals(vert1) && this.c.equals(vert2)) || (this.b.equals(vert2) && this.c.equals(vert1))) return this.a;
     //if( this.c.equals(vert1) && this.a.equals(vert2) || this.c.equals(vert2) && this.a.equals(vert1) )
     return this.b;
+  }
+
+  /**
+   * Get the three triangele vertices in a 3-element array.
+   *
+   * @method getVertices
+   * @returns {[Vertex, Vertex, Vertex]} - The three vertices – real instances, not copies.
+   * @instance
+   * @memberof Triangle
+   */
+  getVertices(): [Vertex, Vertex, Vertex] {
+    return [this.a, this.b, this.c];
   }
 
   /**
@@ -528,7 +570,9 @@ export class Triangle implements IBounded, SVGSerializable, Intersectable {
    * @return Vertex The incenter of this triangle.
    **/
   getIncenter(): Vertex {
-    if (!this.center || !this.radius) this.calcCircumcircle();
+    if (!this.center || !this.radius) {
+      this.calcCircumcircle();
+    }
     return this.center.clone();
   }
 

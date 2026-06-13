@@ -29,6 +29,7 @@
  * @modified  2025-14-16 Added method `Triangle.move`.
  * @modified  2026-06-10 Refactoring the `Trianble.bounds` method and added a plain `Triangle.utils.bounds` method.
  * @modified  2026-06-10 Refactoring the `Trianble.calcCircumCircle` method and added a plain `Triangle.utils.calcCircumCircle` method.
+ * @modified  2026-06-13 Adding `Triangle.getVertices()`.
  * @version   2.11.0
  *
  * @file Triangle
@@ -214,11 +215,21 @@ export declare class Triangle implements IBounded, SVGSerializable, Intersectabl
      * after triangle vertex changes.
      *
      * @method getCircumcircle
-     * @return {Object} - { center:Vertex, radius:float }
+     * @return {Circle} - The circle touching exactly all three triangle vertices.
      * @instance
      * @memberof Triangle
      */
     getCircumcircle(): Circle;
+    /**
+     * Calculates the minimun enclosing circle.
+     *
+     * @method getMinimumEnclosingCircle
+     * @return {Object} - { center:Vertex, radius:float }
+     * @instance
+     * @memberof Triangle
+     * @returns
+     */
+    getMinimumEnclosingCircle(): Circle;
     /**
      * Check if this triangle and the passed triangle share an
      * adjacent edge.
@@ -245,6 +256,15 @@ export declare class Triangle implements IBounded, SVGSerializable, Intersectabl
      * @memberof Triangle
      */
     getThirdVertex(vert1: Vertex, vert2: Vertex): Vertex;
+    /**
+     * Get the three triangele vertices in a 3-element array.
+     *
+     * @method getVertices
+     * @returns {[Vertex, Vertex, Vertex]} - The three vertices – real instances, not copies.
+     * @instance
+     * @memberof Triangle
+     */
+    getVertices(): [Vertex, Vertex, Vertex];
     /**
      * Re-compute the circumcircle of this triangle (if the vertices
      * have changed).

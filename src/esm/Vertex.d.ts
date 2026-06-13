@@ -36,7 +36,8 @@
  * @modified 2025-03-24 Making the second parameter `center` of the `Vertex.rotate` method optional.
  * @modified 2025-04-13 Adding the `Vertex.move(amount: XYCoords)` method (does the same as `add`, added by naming convention).
  * @modified 2025-05-07 Class `Vertex` is now implementing interface `IBounded` (to meet convention).
- * @version  2.11.0
+ * @modified 2026-06-10 Adding methods `Vertex.findClosestPoint` and `Vertex.findFarestPoint`.
+ * @version  2.12.0
  *
  * @file Vertex
  * @public
@@ -435,6 +436,28 @@ export declare class Vertex implements IBounded, XYCoords, SVGSerializable {
      * @return {Bounds} The rectangular bounds of this Vertex (width and height are zero).
      **/
     getBounds(): Bounds;
+    /**
+     * Find the one of two given points that's closest to this point.
+     *
+     * @method findClosestPoint
+     * @instance
+     * @memberof Vertex
+     * @param {XYCoords | Vertex} pointA
+     * @param {XYCoords | Vertex} pointB
+     * @returns  {XYCoords | Vertex}
+     */
+    findClosestPoint<T extends XYCoords | Vertex>(pointA: T, pointB: T): T;
+    /**
+     * Find the one of two given points that's farest from this point.
+     *
+     * @method findFarestPoint
+     * @instance
+     * @memberof Vertex
+     * @param {XYCoords | Vertex} pointA
+     * @param {XYCoords | Vertex} pointB
+     * @returns  {XYCoords | Vertex}
+     */
+    findFarestPoint<T extends XYCoords | Vertex>(pointA: T, pointB: T): T;
     /**
      * Get a string representation of this vertex.
      *

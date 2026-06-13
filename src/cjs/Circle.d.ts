@@ -15,6 +15,8 @@
  * @modified 2025-04-09 Added the `Circle.move(amount: XYCoords)` method.
  * @modified 2025-04-16 Class `Circle` now implements interface `Intersectable`.
  * @modified 2026-06-10 Adding the utility function `Circle.circleUtils.containsPoint`.
+ * @modified 2026-06-10 Adding the `Circle.clone` method.
+ * @modified 2026-01-13 Adding helper function `Circle.circleUtils.containsPoint` and refactored the member method `containsPoint`.
  * @version  1.6.0
  **/
 import { Bounds } from "./Bounds";
@@ -209,6 +211,16 @@ export declare class Circle implements IBounded, ICircle, Intersectable, SVGSeri
      **/
     closestPoint(vert: XYCoords): Vertex;
     /**
+     * Create a deep copy of this circle.
+     *
+     * @method clone
+     * @return {Circle} A new circle, an exact copy of this one.
+     * @instance
+     * @memberof Circle
+     **/
+    clone(): Circle;
+    static fromICircle(obj: ICircle): Circle;
+    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.
@@ -216,6 +228,6 @@ export declare class Circle implements IBounded, ICircle, Intersectable, SVGSeri
     destroy(): void;
     static circleUtils: {
         vertAt: (angle: number, radius: number) => Vertex;
-        containsPoint: (point: XYCoords, circle: ICircle) => boolean;
+        containsPoint: (circleCenter: XYCoords, circleRadius: number, point: XYCoords) => boolean;
     };
 }

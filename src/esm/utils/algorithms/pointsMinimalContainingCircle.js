@@ -1,7 +1,11 @@
 /**
+ * Calculate the minimal containing circle from a set of points.
+ *
+ * The number of points must be at least 2. Otherwise the function returns null.
+ *
  * Inspired by https://github.com/rowanwins/smallest-enclosing-circle.
  *
- * @param {*} points
+ * @param {XYCoords[]} points
  * @returns
  */
 import { Circle } from "../../Circle";

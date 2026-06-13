@@ -23,7 +23,7 @@ import { XYCoords } from "../../interfaces";
  * @param {XYCoords[]} points
  * @returns {Circle | null} The minimal containing circle or null if the point count is lower than 2.
  */
-export const pointsMinimalContainingCircle = (points: XYCoords[]): Circle | null => {
+export const minimalContainingCircleFromPoints = (points: XYCoords[]): Circle | null => {
   if (points.length <= 1) {
     return null;
   }
@@ -60,7 +60,7 @@ const minimumContainingCircle = (points: XYCoords[], n: number, boundary: XYCoor
     return VertTuple.vtutils.calcCircumcircle(boundary[0], points[0]);
   } else {
     const localCircle: ICircle = minimumContainingCircle(points, n - 1, boundary, boundaryLength);
-    if (!Circle.circleUtils.containsPoint(points[n - 1], localCircle)) {
+    if (!Circle.circleUtils.containsPoint(localCircle.center, localCircle.radius, points[n - 1])) {
       boundary[boundaryLength++] = points[n - 1];
       return minimumContainingCircle(points, n - 1, boundary, boundaryLength);
     }

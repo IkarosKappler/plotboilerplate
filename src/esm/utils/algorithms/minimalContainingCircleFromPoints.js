@@ -1,4 +1,3 @@
-"use strict";
 /**
  * Calculate the minimal containing circle from a set of points.
  *
@@ -9,12 +8,10 @@
  * @param {XYCoords[]} points
  * @returns
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.pointsMinimalContainingCircle = void 0;
-var Circle_1 = require("../../Circle");
-var Triangle_1 = require("../../Triangle");
-var VertTuple_1 = require("../../VertTuple");
-var Vertex_1 = require("../../Vertex");
+import { Circle } from "../../Circle";
+import { Triangle } from "../../Triangle";
+import { VertTuple } from "../../VertTuple";
+import { Vertex } from "../../Vertex";
 /**
  * Calculate the minimal containing circle from a set of points.
  *
@@ -23,21 +20,20 @@ var Vertex_1 = require("../../Vertex");
  * @param {XYCoords[]} points
  * @returns {Circle | null} The minimal containing circle or null if the point count is lower than 2.
  */
-var pointsMinimalContainingCircle = function (points) {
+export const minimalContainingCircleFromPoints = (points) => {
     if (points.length <= 1) {
         return null;
     }
-    var circleObject = wetzlsAlgorithm(points);
-    return new Circle_1.Circle(new Vertex_1.Vertex(circleObject.center.x, circleObject.center.y), circleObject.radius);
+    const circleObject = wetzlsAlgorithm(points);
+    return new Circle(new Vertex(circleObject.center.x, circleObject.center.y), circleObject.radius);
 };
-exports.pointsMinimalContainingCircle = pointsMinimalContainingCircle;
 /**
  * This initiates the actual algorithm but return a shallow circle representation.
  *
  * @param points
  * @returns
  */
-var wetzlsAlgorithm = function (points) {
+const wetzlsAlgorithm = (points) => {
     return minimumContainingCircle(points, points.length, [], 0);
 };
 /**
@@ -48,26 +44,26 @@ var wetzlsAlgorithm = function (points) {
  * @param boundaryLength
  * @returns
  */
-var minimumContainingCircle = function (points, n, boundary, boundaryLength) {
+const minimumContainingCircle = (points, n, boundary, boundaryLength) => {
     if (boundaryLength === 3) {
-        return Triangle_1.Triangle.utils.calcCircumcircle(boundary[0], boundary[1], boundary[2]);
+        return Triangle.utils.calcCircumcircle(boundary[0], boundary[1], boundary[2]);
     }
     else if (n === 1 && boundaryLength === 0) {
         return { center: { x: points[0].x, y: points[0].y }, radius: 0 };
     }
     else if (n === 0 && boundaryLength === 2) {
-        return VertTuple_1.VertTuple.vtutils.calcCircumcircle(boundary[0], boundary[1]);
+        return VertTuple.vtutils.calcCircumcircle(boundary[0], boundary[1]);
     }
     else if (n === 1 && boundaryLength === 1) {
-        return VertTuple_1.VertTuple.vtutils.calcCircumcircle(boundary[0], points[0]);
+        return VertTuple.vtutils.calcCircumcircle(boundary[0], points[0]);
     }
     else {
-        var localCircle = minimumContainingCircle(points, n - 1, boundary, boundaryLength);
-        if (!Circle_1.Circle.circleUtils.containsPoint(points[n - 1], localCircle)) {
+        const localCircle = minimumContainingCircle(points, n - 1, boundary, boundaryLength);
+        if (!Circle.circleUtils.containsPoint(localCircle.center, localCircle.radius, points[n - 1])) {
             boundary[boundaryLength++] = points[n - 1];
             return minimumContainingCircle(points, n - 1, boundary, boundaryLength);
         }
         return localCircle;
     }
 };
-//# sourceMappingURL=pointsMinimalContainingCircle.js.map
+//# sourceMappingURL=minimalContainingCircleFromPoints.js.map

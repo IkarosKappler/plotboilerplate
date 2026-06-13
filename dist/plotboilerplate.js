@@ -1743,6 +1743,8 @@ exports.Bounds = Bounds;
  * @modified 2025-04-09 Added the `Circle.move(amount: XYCoords)` method.
  * @modified 2025-04-16 Class `Circle` now implements interface `Intersectable`.
  * @modified 2026-06-10 Adding the utility function `Circle.circleUtils.containsPoint`.
+ * @modified 2026-06-10 Adding the `Circle.clone` method.
+ * @modified 2026-01-13 Adding helper function `Circle.circleUtils.containsPoint` and refactored the member method `containsPoint`.
  * @version  1.6.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -1805,7 +1807,8 @@ var Circle = /** @class */ (function () {
      * @return {boolean} `true` if the given point is inside this circle.
      */
     Circle.prototype.containsPoint = function (point) {
-        return this.center.distance(point) < this.radius;
+        // return this.center.distance(point) < this.radius;//
+        return Circle.circleUtils.containsPoint(this.center, this.radius, point);
     };
     /**
      * Check if the given circle is fully contained inside this circle.
@@ -2047,6 +2050,42 @@ var Circle = /** @class */ (function () {
         }
     };
     /**
+     * Create a deep copy of this circle.
+     *
+     * @method clone
+     * @return {Circle} A new circle, an exact copy of this one.
+     * @instance
+     * @memberof Circle
+     **/
+    Circle.prototype.clone = function () {
+        return new Circle(this.center, this.radius);
+    };
+    Circle.fromICircle = function (obj) {
+        return new Circle(new Vertex_1.Vertex(obj.center), obj.radius);
+    };
+    // static fromObject(obj: object): Circle {
+    //   if (!obj) {
+    //     return null;
+    //   }
+    //   if (typeof obj !== "object") {
+    //     return null;
+    //   }
+    //   if (!obj.hasOwnProperty("center") || typeof (obj as any).center != "object") {
+    //     return null;
+    //   }
+    //   if (!obj.hasOwnProperty("radius") || typeof !(obj as any).radius != "number") {
+    //     return null;
+    //   }
+    //   var center = (obj as any).center;
+    //   if (!center.hasOwnProperty("x") || typeof (center as any).x != "number") {
+    //     return null;
+    //   }
+    //   if (!center.hasOwnProperty("y") || typeof (center as any).y != "number") {
+    //     return null;
+    //   }
+    //   return new Circle(new Vertex(center), (obj as any).radius);
+    // }
+    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.
@@ -2061,12 +2100,12 @@ var Circle = /** @class */ (function () {
                          Math.cos(angle) * radius ); */
             return new Vertex_1.Vertex(Math.cos(angle) * radius, Math.sin(angle) * radius);
         },
-        containsPoint: function (point, circle) {
+        containsPoint: function (circleCenter, circleRadius, point) {
             // return (
             //   (circle.center.x - point.x) * (circle.center.x - point.x) + (circle.center.y - point.y) * (circle.center.y - point.y) <=
             //   circle.radius * circle.radius
             // );
-            return geomutils_1.geomutils.dist4(point.x, point.y, circle.center.x, circle.center.y) < circle.radius;
+            return geomutils_1.geomutils.dist4(point.x, point.y, circleCenter.x, circleCenter.y) < circleRadius;
         }
     };
     return Circle;
@@ -11495,6 +11534,7 @@ exports.BezierPath = BezierPath;
  * @modified  2025-14-16 Added method `Triangle.move`.
  * @modified  2026-06-10 Refactoring the `Trianble.bounds` method and added a plain `Triangle.utils.bounds` method.
  * @modified  2026-06-10 Refactoring the `Trianble.calcCircumCircle` method and added a plain `Triangle.utils.calcCircumCircle` method.
+ * @modified  2026-06-13 Adding `Triangle.getVertices()`.
  * @version   2.11.0
  *
  * @file Triangle
@@ -11509,6 +11549,7 @@ var Line_1 = __webpack_require__(939);
 var Polygon_1 = __webpack_require__(687);
 var UIDGenerator_1 = __webpack_require__(938);
 var Vector_1 = __webpack_require__(30);
+var VertTuple_1 = __webpack_require__(590);
 var Vertex_1 = __webpack_require__(787);
 var geomutils_1 = __webpack_require__(328);
 /**
@@ -11650,7 +11691,7 @@ var Triangle = /** @class */ (function () {
      * after triangle vertex changes.
      *
      * @method getCircumcircle
-     * @return {Object} - { center:Vertex, radius:float }
+     * @return {Circle} - The circle touching exactly all three triangle vertices.
      * @instance
      * @memberof Triangle
      */
@@ -11658,6 +11699,33 @@ var Triangle = /** @class */ (function () {
         // if( !this.center || !this.radius )
         this.calcCircumcircle();
         return new Circle_1.Circle(this.center.clone(), this.radius);
+    };
+    /**
+     * Calculates the minimun enclosing circle.
+     *
+     * @method getMinimumEnclosingCircle
+     * @return {Object} - { center:Vertex, radius:float }
+     * @instance
+     * @memberof Triangle
+     * @returns
+     */
+    Triangle.prototype.getMinimumEnclosingCircle = function () {
+        // First option: two points construct a circle and the third point is contained.
+        var circleAB = VertTuple_1.VertTuple.vtutils.calcCircumcircle(this.a, this.b);
+        if (Circle_1.Circle.circleUtils.containsPoint(circleAB.center, circleAB.radius, this.c)) {
+            return Circle_1.Circle.fromICircle(circleAB);
+        }
+        var circleBC = VertTuple_1.VertTuple.vtutils.calcCircumcircle(this.b, this.c);
+        if (Circle_1.Circle.circleUtils.containsPoint(circleBC.center, circleBC.radius, this.c)) {
+            return Circle_1.Circle.fromICircle(circleBC);
+        }
+        var circleCA = VertTuple_1.VertTuple.vtutils.calcCircumcircle(this.c, this.a);
+        if (Circle_1.Circle.circleUtils.containsPoint(circleCA.center, circleCA.radius, this.c)) {
+            return Circle_1.Circle.fromICircle(circleCA);
+        }
+        // If none of the three upper cases applies: return the circumcircle.
+        var circumCircle = Triangle.utils.calcCircumcircle(this.a, this.b, this.c);
+        return Circle_1.Circle.fromICircle(circumCircle);
     };
     /**
      * Check if this triangle and the passed triangle share an
@@ -11696,6 +11764,17 @@ var Triangle = /** @class */ (function () {
             return this.a;
         //if( this.c.equals(vert1) && this.a.equals(vert2) || this.c.equals(vert2) && this.a.equals(vert1) )
         return this.b;
+    };
+    /**
+     * Get the three triangele vertices in a 3-element array.
+     *
+     * @method getVertices
+     * @returns {[Vertex, Vertex, Vertex]} - The three vertices – real instances, not copies.
+     * @instance
+     * @memberof Triangle
+     */
+    Triangle.prototype.getVertices = function () {
+        return [this.a, this.b, this.c];
     };
     /**
      * Re-compute the circumcircle of this triangle (if the vertices
@@ -11895,8 +11974,9 @@ var Triangle = /** @class */ (function () {
      * @return Vertex The incenter of this triangle.
      **/
     Triangle.prototype.getIncenter = function () {
-        if (!this.center || !this.radius)
+        if (!this.center || !this.radius) {
             this.calcCircumcircle();
+        }
         return this.center.clone();
     };
     /**
@@ -12060,7 +12140,8 @@ exports.Triangle = Triangle;
  * @modified 2025-03-24 Making the second parameter `center` of the `Vertex.rotate` method optional.
  * @modified 2025-04-13 Adding the `Vertex.move(amount: XYCoords)` method (does the same as `add`, added by naming convention).
  * @modified 2025-05-07 Class `Vertex` is now implementing interface `IBounded` (to meet convention).
- * @version  2.11.0
+ * @modified 2026-06-10 Adding methods `Vertex.findClosestPoint` and `Vertex.findFarestPoint`.
+ * @version  2.12.0
  *
  * @file Vertex
  * @public
@@ -12627,6 +12708,47 @@ var Vertex = /** @class */ (function () {
         return Bounds_1.Bounds.computeFromVertices([this]);
     };
     //--- END --- Implement interface `IBounded`
+    /**
+     * Find the one of two given points that's closest to this point.
+     *
+     * @method findClosestPoint
+     * @instance
+     * @memberof Vertex
+     * @param {XYCoords | Vertex} pointA
+     * @param {XYCoords | Vertex} pointB
+     * @returns  {XYCoords | Vertex}
+     */
+    Vertex.prototype.findClosestPoint = function (pointA, pointB) {
+        // TODO: put this implementation to geomutils?
+        var distA = this.distance(pointA);
+        var distB = this.distance(pointB);
+        if (distA < distB) {
+            return pointA;
+        }
+        else {
+            return pointB;
+        }
+    };
+    /**
+     * Find the one of two given points that's farest from this point.
+     *
+     * @method findFarestPoint
+     * @instance
+     * @memberof Vertex
+     * @param {XYCoords | Vertex} pointA
+     * @param {XYCoords | Vertex} pointB
+     * @returns  {XYCoords | Vertex}
+     */
+    Vertex.prototype.findFarestPoint = function (pointA, pointB) {
+        var distA = this.distance(pointA);
+        var distB = this.distance(pointB);
+        if (distA > distB) {
+            return pointA;
+        }
+        else {
+            return pointB;
+        }
+    };
     /**
      * Get a string representation of this vertex.
      *

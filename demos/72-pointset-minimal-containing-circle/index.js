@@ -28,35 +28,44 @@
       )
     );
 
+    var getCircleCenters = function (circles) {
+      return circles.map(function (circle) {
+        return circle.center;
+      });
+    };
+
     // Create a config: we want to have control about the arrow head size in this demo
     // `AppContext`: this is an experimental approach to make future event handling easier.
     var appContext = new AppContext(pb, {
       numPoints: params.getNumber("numPoints", 8),
+      useCircles: params.getBoolean("useCircles", false),
       readme: function () {
         globalThis.displayDemoMeta();
       }
     });
     appContext.handleNumPointsChanged = function () {
-      appContext.pb.remove(points, true, false);
-      points = makeRandomPoints();
-      appContext.pb.add(points);
+      appContext.pb.remove(getCircleCenters(circles), false, true); // redraw=false, removeWithVertices=false
+      circles = makeRandomCircles();
+      appContext.pb.add(getCircleCenters(circles));
     };
     appContext.isMobile = isMobile;
 
-    var makeRandomPoints = function () {
+    var makeRandomCircles = function () {
       var box = appContext.pb.viewport().getScaled(0.5);
-      var points = [];
+      var arr = [];
       for (var i = 0; i < appContext.config.numPoints; i++) {
-        points.push(box.randomPoint());
+        var center = box.randomPoint();
+        var radius = (0.1 + Math.random()) * (box.getMinDimension() * 0.1 + box.getMinDimension() * 0.2);
+        arr.push(new Circle(center, radius));
       }
-      return points;
+      return arr;
     };
 
     // +---------------------------------------------------------------------------------
     // | Global vars
     // +-------------------------------
-    var points = makeRandomPoints(10);
-    pb.add(points);
+    var circles = makeRandomCircles(10);
+    appContext.pb.add(getCircleCenters(circles));
 
     // +---------------------------------------------------------------------------------
     // | Triggered after the main draw routine.
@@ -66,16 +75,79 @@
       // console.log("circle", circle);
       // var circle = new Circle(new Vertex(circle.x, circle.y), circle.r);
 
-      var circle = pointsMinimalContainingCircle(points);
-      if (circle) {
-        draw.circle(circle.center, circle.radius, "orange", 2.0);
+      if (appContext.config.useCircles) {
+        // var tmpContainingCircle = getContainingCircle2(circles[0], circles[1]);
+        // draw.circle(tmpContainingCircle.center, tmpContainingCircle.radius, "red", 1.0);
+        drawCirclesMinContainingCircle(draw, fill);
+      } else {
+        var circle = minimalContainingCircleFromPoints(getCircleCenters(circles));
+        if (circle) {
+          draw.circle(circle.center, circle.radius, "orange", 2.0);
+        }
+      }
+    };
+
+    var drawCirclesMinContainingCircle = function (draw, fill) {
+      // var triangles = findAllTrianglesFromCircles(circles);
+      // drawHelperTriangles(draw, fill, triangles);
+
+      var extendedTriangles = findAllExtendedTrianglesFromCircles(circles);
+      drawHelperTriangles(draw, fill, extendedTriangles);
+
+      // var ccircle = calculateCirclesCircumCircle(circles);
+      // console.log("ccircle", ccircle);
+
+      var allTrianglePoints = new UniqueUUIDArray();
+      for (var t = 0; t < extendedTriangles.length; t++) {
+        var triangle = extendedTriangles[t];
+        allTrianglePoints.addUnique(triangle.c, triangle.b, triangle.c);
+      }
+      console.log("allTrianglePoints", allTrianglePoints);
+      var ccircle = minimalContainingCircleFromPoints(allTrianglePoints);
+      if (ccircle) {
+        draw.circle(ccircle.center, ccircle.radius, "green", 2.0);
+      }
+
+      // var farestPoints = findFarestPointsFromCircles(circles);
+      // for (var p = 0; p < farestPoints.length; p++) {
+      //   draw.diamondHandle(farestPoints[p], 8, "white");
+      // }
+    };
+
+    var drawHelperTriangles = function (draw, fill, triangles) {
+      var contrastColor = getContrastColor(pb.config.backgroundColor).setAlpha(0.5).cssRGBA();
+      console.log("contrastColor", contrastColor);
+      for (var t = 0; t < triangles.length; t++) {
+        pb.draw.polyline(triangles[t].getVertices(), false, contrastColor);
+        draw.diamondHandle(triangles[t].getIncenter(), 8, "yellow");
+        draw.diamondHandle(triangles[t].getCentroid(), 8, rgba(0, 192, 192, 1.0));
+
+        draw.diamondHandle(triangles[t].a, 8, contrastColor);
+        draw.diamondHandle(triangles[t].b, 8, contrastColor);
+        draw.diamondHandle(triangles[t].c, 8, contrastColor);
+
+        // var triangleMinimumEnclosingCircle = minimalContainingCircleFromPoints(triangles[t].getVertices());
+        var triangleMinimumEnclosingCircle = triangles[t].getMinimumEnclosingCircle();
+        // draw.circle(triangleMinimumEnclosingCircle.center, triangleMinimumEnclosingCircle.radius, "orange", 1.0, {
+        //   dashArray: [10, 5]
+        // });
+
+        // draw.diamondHandle(triangleMinimumEnclosingCircle.center, 8, "orange");
       }
     };
 
     // +---------------------------------------------------------------------------------
     // | This method is called before the library starts to draw anything.
     // +-------------------------------
-    var preDraw = function (draw, fill) {}; // END preDraw
+    var preDraw = function (draw, fill) {
+      var contrastColor = getContrastColor(pb.config.backgroundColor).cssRGB();
+      for (var i = 0; i < circles.length; i++) {
+        if (appContext.config.useCircles) {
+          draw.circle(circles[i].center, circles[i].radius, rgba(255, 0, 255, 0.5), 2.0);
+        }
+        fill.text("" + i, circles[i].center.x + 5, circles[i].center.y, { color: contrastColor });
+      }
+    }; // END preDraw
 
     // +---------------------------------------------------------------------------------
     // | Create a GUI.
@@ -100,6 +172,6 @@
       // updateCurrentBounds();
     });
 
-    humane.log("Move the circles around.");
+    humane.log("Move the points/circles around.");
   });
 })(globalThis);
