@@ -8,6 +8,22 @@
   var CirclesCircumCircle = {};
   _context.CirclesCircumCircle = CirclesCircumCircle;
 
+  var findByAppolonian = function (circles) {
+    var iter = allTripleSubsetsIterator(circles);
+    var item;
+    var minContainingCircle = null;
+    while ((item = iter.next()) && item.value) {
+      var triplet = item.value;
+      console.log(triplet);
+      var apollCircle = solveApollonius3(triplet[0], triplet[1], triplet[2], 1, 1, 1);
+    }
+    return minContainingCircle;
+  };
+
+  // +---------------------------------------------------------------------------------
+  // | Approximates the minimum enclosing circle by using a specific set of points
+  // | from the circles.
+  // +-------------------------------
   // Return:
   // {
   //    extendedTrianglesLines: Array<Line>;
@@ -15,7 +31,7 @@
   //    allExtendedPoints: Arra<Vertex>;
   //    enclosingCircle: Circle;
   // }
-  CirclesCircumCircle.approximateEnclosingCircle = function (circles) {
+  CirclesCircumCircle.approximateMinimumEnclosingCircle = function (circles) {
     // Idea: build circumcircle of _two_ random circles first.
 
     if (circles.length === 0) {
@@ -156,6 +172,10 @@
     for (var i = 0; i < arr.length; i++) {
       var itemA = arr[i];
       for (var j = i + 1; j < arr.length; j++) {
+        // for (var j = 0; j < arr.length; j++) {
+        //   if (j == i) {
+        //     continue;
+        //   }
         var itemB = arr[j];
         for (var k = 0; k < arr.length; k++) {
           if (k == i || k == j) {
@@ -169,55 +189,35 @@
     return newResult;
   };
 
-  var __calculateCirclesCircumCircle = function (circles) {
-    // Idea: build circumcircle of _two_ random circles first.
+  // var getAllSubsets = function (circles) {
+  //   // var partitions = [];
+  //   // for( var size = 1; size < circles.length; size++ ) {
+  //   //     var partition = [];
 
-    if (circles.length === 0) {
-      return null;
-    }
-    if (circles.length === 1) {
-      return circles[0];
-    }
-
-    //   var startCircle = getContainingCircle2(circles[0], circles[1]);
-    return calculateCirclesCircumCircle_iter(circles, circles[0].clone(), 1);
-  };
-
-  var calculateCirclesCircumCircle_iter = function (circles, tmpResult, n) {
-    // Idea: build circumcircle of _two_ random circles first.
-    if (n >= circles.length) {
-      return tmpResult;
-    }
-    var localCircle = getContainingCircle2(tmpResult, circles[n]);
-
-    return calculateCirclesCircumCircle_iter(circles, localCircle, n + 1);
-  };
-
-  // TODO: put this to Circle class?
-  var getContainingCircle2 = function (circleA, circleB) {
-    if (circleA.containsCircle(circleB)) {
-      return circleA;
-    }
-    if (circleB.containsCircle(circleA)) {
-      return circleB;
-    }
-    var connectLine = new Vector(circleA.center, circleB.center);
-    var intersectionLineA = circleA.lineIntersection(connectLine.a, connectLine.b);
-    var intersectionLineB = circleB.lineIntersection(connectLine.a, connectLine.b);
-    var farestPointOnA = circleB.center.findFarestPoint(intersectionLineA.a, intersectionLineA.b);
-    var farestPointOnB = circleA.center.findFarestPoint(intersectionLineB.a, intersectionLineB.b);
-    var totalDiagonalLine = new Line(farestPointOnA, farestPointOnB);
-    var center = totalDiagonalLine.vertAt(0.5);
-    return new Circle(center, center.distance(totalDiagonalLine.a));
-  };
-
-  var getAllSubsets = function (circles) {
-    // var partitions = [];
-    // for( var size = 1; size < circles.length; size++ ) {
-    //     var partition = [];
-
-    // }
-    // return partitions;
-    return circles.reduce((subsets, value) => subsets.concat(subsets.map(set => [value, ...set])), [[]]);
-  };
+  //   // }
+  //   // return partitions;
+  //   return circles.reduce((subsets, value) => subsets.concat(subsets.map(set => [value, ...set])), [[]]);
+  // };
 })(globalThis);
+
+var allTripleSubsetsIterator = function* (circles) {
+  var result;
+  for (var i = 0; i < circles.length; i++) {
+    var itemA = circles[i];
+    for (var j = i + 1; j < circles.length; j++) {
+      // for (var j = 0; j < arr.length; j++) {
+      //   if (j == i) {
+      //     continue;
+      //   }
+      var itemB = circles[j];
+      for (var k = 0; k < circles.length; k++) {
+        if (k == i || k == j) {
+          continue;
+        }
+        var itemC = circles[k];
+        result = [circles[i], circles[j], circles[k]];
+        yield result;
+      }
+    }
+  }
+};

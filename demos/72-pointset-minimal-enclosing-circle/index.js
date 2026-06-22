@@ -66,7 +66,12 @@
         var radius = (0.1 + Math.random()) * (box.getMinDimension() * 0.1 + box.getMinDimension() * 0.2);
         arr.push(new Circle(center, radius));
       }
-      return arr;
+      // var iter = allTripleSubsetsIterator(arr);
+      // var item;
+      // while ((item = iter.next()) && item.value) {
+      //   console.log(item.value);
+      // }
+      // return arr;
     };
 
     // +---------------------------------------------------------------------------------
@@ -101,7 +106,7 @@
       }
 
       // Draw extended triangles lines?
-      var enclosingCircleApprox = CirclesCircumCircle.approximateEnclosingCircle(circles);
+      var enclosingCircleApprox = CirclesCircumCircle.approximateMinimumEnclosingCircle(circles);
       if (appContext.config.drawTriangleExtendedLines) {
         drawHelperLines(draw, fill, enclosingCircleApprox.extendedTrianglesLines, "red");
       }
