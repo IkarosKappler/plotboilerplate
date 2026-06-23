@@ -171,12 +171,13 @@
     };
 
     // TODO: put this to Circle class?
+    // TODO: This is now part of the calculateCirclesCircumCircle class!!!
     var getContainingCircle = function (circleA, circleB) {
       var connectLine = new Vector(circleA.center, circleB.center);
       var intersectionLineA = circleA.lineIntersection(connectLine.a, connectLine.b);
       var intersectionLineB = circleB.lineIntersection(connectLine.a, connectLine.b);
-      var farestPointOnA = findFarestPoint(circleB.center, intersectionLineA.a, intersectionLineA.b);
-      var farestPointOnB = findFarestPoint(circleA.center, intersectionLineB.a, intersectionLineB.b);
+      var farestPointOnA = circleB.center.findFarestPoint(intersectionLineA.a, intersectionLineA.b);
+      var farestPointOnB = circleA.center.findFarestPoint(intersectionLineB.a, intersectionLineB.b);
       var totalDiagonalLine = new Line(farestPointOnA, farestPointOnB);
       var center = totalDiagonalLine.vertAt(0.5);
       return new Circle(center, center.distance(totalDiagonalLine.a));
@@ -208,15 +209,16 @@
     //   // },null);
     // };
 
-    var findFarestPoint = function (referencePoint, pointA, pointB) {
-      var distA = referencePoint.distance(pointA);
-      var distB = referencePoint.distance(pointB);
-      if (distA > distB) {
-        return pointA;
-      } else {
-        return pointB;
-      }
-    };
+    // TODO MOVED TO Vertex.utils
+    // var findFarestPoint = function (referencePoint, pointA, pointB) {
+    //   var distA = referencePoint.distance(pointA);
+    //   var distB = referencePoint.distance(pointB);
+    //   if (distA > distB) {
+    //     return pointA;
+    //   } else {
+    //     return pointB;
+    //   }
+    // };
 
     // +---------------------------------------------------------------------------------
     // | This method is called before the library starts to draw anything.

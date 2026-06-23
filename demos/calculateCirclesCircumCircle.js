@@ -20,6 +20,45 @@
     return minContainingCircle;
   };
 
+  CirclesCircumCircle.findMinCircleByTuples = function (circles) {
+    var iter = allTupleSubsetsIterator(circles);
+    var item;
+    var minContainingCircle = null;
+    var i = 0;
+    // while ((item = iter.next()) && item.value) {
+    //   var tuple = item.value;
+    //   console.log(tuple); // [ Circle, Circle ]
+    //   var enclosingCircle2 = getContainingCircle2(tuple[0], tuple[1]);
+    //   console.log("i", i, "enclosingCircle2", enclosingCircle2);
+    //   if (!enclosingCircle2) {
+    //     continue; // This should not happen
+    //   }
+    //   if (!minContainingCircle || enclosingCircle2.containsCircle(minContainingCircle)) {
+    //     minContainingCircle = enclosingCircle2;
+    //   }
+    //   i++;
+    // }
+    // return minContainingCircle;
+
+    var mcc = arrayLoop2(
+      circles,
+      function (minContainingCircle, circleA, circleB, i, j) {
+        console.log("tuple", circleA, circleB); // [ Circle, Circle ]
+        var enclosingCircle2 = getContainingCircle2(circleA, circleB);
+        console.log("i", i, "enclosingCircle2", enclosingCircle2);
+        if (!enclosingCircle2) {
+          return null; // This should not happen
+        }
+        if (!minContainingCircle || enclosingCircle2.containsCircle(minContainingCircle)) {
+          minContainingCircle = enclosingCircle2;
+        }
+        return minContainingCircle;
+      },
+      null // initial min circle unknown
+    );
+    return mcc;
+  };
+
   // +---------------------------------------------------------------------------------
   // | Approximates the minimum enclosing circle by using a specific set of points
   // | from the circles.
@@ -172,10 +211,6 @@
     for (var i = 0; i < arr.length; i++) {
       var itemA = arr[i];
       for (var j = i + 1; j < arr.length; j++) {
-        // for (var j = 0; j < arr.length; j++) {
-        //   if (j == i) {
-        //     continue;
-        //   }
         var itemB = arr[j];
         for (var k = 0; k < arr.length; k++) {
           if (k == i || k == j) {
@@ -198,26 +233,47 @@
   //   // return partitions;
   //   return circles.reduce((subsets, value) => subsets.concat(subsets.map(set => [value, ...set])), [[]]);
   // };
+
+  /**
+   * Calculat the minimum containing circle of two circles.
+   *
+   * @date 2026-06-23
+   */
+
+  // TODO: put this to Circle class?
+  var getContainingCircle2 = function (circleA, circleB) {
+    var connectLine = new Vector(circleA.center, circleB.center);
+    var intersectionLineA = circleA.lineIntersection(connectLine.a, connectLine.b);
+    var intersectionLineB = circleB.lineIntersection(connectLine.a, connectLine.b);
+    var farestPointOnA = circleB.center.findFarestPoint(intersectionLineA.a, intersectionLineA.b);
+    var farestPointOnB = circleA.center.findFarestPoint(intersectionLineB.a, intersectionLineB.b);
+    var totalDiagonalLine = new Line(farestPointOnA, farestPointOnB);
+    var center = totalDiagonalLine.vertAt(0.5);
+    return new Circle(center, center.distance(totalDiagonalLine.a));
+  };
 })(globalThis);
 
 var allTripleSubsetsIterator = function* (circles) {
   var result;
   for (var i = 0; i < circles.length; i++) {
-    var itemA = circles[i];
     for (var j = i + 1; j < circles.length; j++) {
-      // for (var j = 0; j < arr.length; j++) {
-      //   if (j == i) {
-      //     continue;
-      //   }
-      var itemB = circles[j];
       for (var k = 0; k < circles.length; k++) {
         if (k == i || k == j) {
           continue;
         }
-        var itemC = circles[k];
         result = [circles[i], circles[j], circles[k]];
         yield result;
       }
+    }
+  }
+};
+
+var allTupleSubsetsIterator = function* (circles) {
+  var result;
+  for (var i = 0; i < circles.length; i++) {
+    for (var j = i + 1; j < circles.length; j++) {
+      result = [circles[i], circles[j]];
+      yield result;
     }
   }
 };

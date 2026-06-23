@@ -66,12 +66,12 @@
         var radius = (0.1 + Math.random()) * (box.getMinDimension() * 0.1 + box.getMinDimension() * 0.2);
         arr.push(new Circle(center, radius));
       }
-      // var iter = allTripleSubsetsIterator(arr);
-      // var item;
-      // while ((item = iter.next()) && item.value) {
-      //   console.log(item.value);
-      // }
-      // return arr;
+      var iter = allTripleSubsetsIterator(arr);
+      var item;
+      while ((item = iter.next()) && item.value) {
+        console.log(item.value);
+      }
+      return arr;
     };
 
     // +---------------------------------------------------------------------------------
@@ -96,6 +96,13 @@
       if (appContext.config.drawAppolonianCircle) {
         var apollCircle = solveApollonius3(circles[0], circles[1], circles[2], 1, 1, 1);
         draw.circle(apollCircle.center, Math.abs(apollCircle.radius), "teal", 4.0);
+      }
+
+      var circumCircles2 = CirclesCircumCircle.findMinCircleByTuples(circles);
+      console.log("circumCircles2", circumCircles2);
+      console.log("Color.Indigo.cssRGB()", Color.Indigo.cssRGB());
+      if (circumCircles2) {
+        draw.circle(circumCircles2.center, Math.abs(circumCircles2.radius), "red", 4.0);
       }
     };
 
