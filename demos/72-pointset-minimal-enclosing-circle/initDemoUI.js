@@ -26,6 +26,13 @@
       foldApoll.add(appContext.config, "drawAppolonianCircle").title("Draw appolonian circle?").onChange(function () { appContext.pb.redraw(); });
 
       // prettier-ignore
+      foldApoll.add(appContext.config, "isAInsideApollolian3").title("Draw the Apollonian circle inside or outside the first circle A?").onChange(function () { appContext.pb.redraw(); });
+      // prettier-ignore
+      foldApoll.add(appContext.config, "isBInsideApollolian3").title("Draw the Apollonian circle inside or outside the second circle B?").onChange(function () { appContext.pb.redraw(); });
+      // prettier-ignore
+      foldApoll.add(appContext.config, "isCInsideApollolian3").title("Draw the Apollonian circle inside or outside the third circle C?").onChange(function () { appContext.pb.redraw(); });
+
+      // prettier-ignore
       gui.add(appContext.config, "readme").title("Show the readme.");
     }
   };

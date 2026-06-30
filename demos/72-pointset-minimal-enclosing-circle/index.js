@@ -42,6 +42,9 @@
       drawBasicExtendedLines: params.getBoolean("drawBasicExtendedLines", false),
       drawTriangleExtendedLines: params.getBoolean("drawTriangleExtendedLines", false),
       drawAppolonianCircle: params.getBoolean("drawAppolonianCircle", false),
+      isAInsideApollolian3: params.getBoolean("isAInsideApollolian3", true),
+      isBInsideApollolian3: params.getBoolean("isBInsideApollolian3", true),
+      isCInsideApollolian3: params.getBoolean("isCInsideApollolian3", true),
 
       readme: function () {
         globalThis.displayDemoMeta();
@@ -94,13 +97,17 @@
       }
 
       if (appContext.config.drawAppolonianCircle) {
-        var apollCircle = solveApollonius3(circles[0], circles[1], circles[2], 1, 1, 1);
+        var s1 = appContext.config.isAInsideApollolian3 ? 1 : -1;
+        var s2 = appContext.config.isBInsideApollolian3 ? 1 : -1;
+        var s3 = appContext.config.isCInsideApollolian3 ? 1 : -1;
+        // var apollCircle = solveApollonius3(circles[0], circles[1], circles[2], 1, 1, 1);
+        var apollCircle = solveApollonius3(circles[0], circles[1], circles[2], s1, s2, s3);
         draw.circle(apollCircle.center, Math.abs(apollCircle.radius), "teal", 4.0);
       }
 
       var circumCircles2 = CirclesCircumCircle.findMinCircleByTuples(circles);
-      console.log("circumCircles2", circumCircles2);
-      console.log("Color.Indigo.cssRGB()", Color.Indigo.cssRGB());
+      // console.log("circumCircles2", circumCircles2);
+      // console.log("Color.Indigo.cssRGB()", Color.Indigo.cssRGB());
       if (circumCircles2) {
         draw.circle(circumCircles2.center, Math.abs(circumCircles2.radius), "red", 4.0);
       }

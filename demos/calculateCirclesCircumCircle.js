@@ -43,9 +43,9 @@
     var mcc = arrayLoop2(
       circles,
       function (minContainingCircle, circleA, circleB, i, j) {
-        console.log("tuple", circleA, circleB); // [ Circle, Circle ]
+        // console.log("tuple", circleA, circleB); // [ Circle, Circle ]
         var enclosingCircle2 = getContainingCircle2(circleA, circleB);
-        console.log("i", i, "enclosingCircle2", enclosingCircle2);
+        // console.log("i", i, "enclosingCircle2", enclosingCircle2);
         if (!enclosingCircle2) {
           return null; // This should not happen
         }
