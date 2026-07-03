@@ -582,7 +582,8 @@ new MouseHandler(document.getElementById("mycanvas"))
 - Thanks to Rowan Winsemius for the (https://github.com/rowanwins/smallest-enclosing-circle "inspirational welzl algorithm implementation")
 - Thanks to [Matt R](https://matthewhr.wordpress.com/author/matthewhr/) for the article about [minimum enclosing circles and circumscribed circles](https://matthewhr.wordpress.com/2013/03/23/circumscribed-circle-vs-minimal-enclosing-circle-ii/)
 - Thanks to [Axel Kemper](https://math.stackexchange.com/users/58610/axel-kemper) for the idea of approximating the [minimum enclosing circle of three circles](https://math.stackexchange.com/questions/1017989/smallest-circle-enclosing-three-disjoint-circles)
-- Thanks to [micycle](https://stackoverflow.com/users/9808792/micycle) for the neat function to solve the [Appollonian Circle](https://stackoverflow.com/questions/79281573/algorithm-for-finding-enclosing-circles-for-3-other-circles)
+- Thanks to [micycle](https://stackoverflow.com/users/9808792/micycle) for the neat function to solve the [Apollonian Circle](https://stackoverflow.com/questions/79281573/algorithm-for-finding-enclosing-circles-for-3-other-circles)
+- And to [DIKU-Steiner](https://github.com/DIKU-Steiner) for the original Apollonian circle solver in Java.
 
 ## Todos
 

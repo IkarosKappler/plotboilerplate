@@ -17,7 +17,8 @@
  * @modified 2026-06-10 Adding the utility function `Circle.circleUtils.containsPoint`.
  * @modified 2026-06-10 Adding the `Circle.clone` method.
  * @modified 2026-01-13 Adding helper function `Circle.circleUtils.containsPoint` and refactored the member method `containsPoint`.
- * @version  1.6.0
+ * @modified 2026-07-03 Adding the optional `epsilon` parameter to the `Circle.containsCircle` method.
+ * @version  1.7.0
  **/
 
 import { Bounds } from "./Bounds";
@@ -135,8 +136,12 @@ export class Circle implements IBounded, ICircle, Intersectable, SVGSerializable
    * @memberof Circle
    * @return {boolean} `true` if any only if the given circle is completely inside this circle.
    */
-  containsCircle(circle: Circle): boolean {
-    return this.center.distance(circle.center) + circle.radius < this.radius;
+  containsCircle(circle: Circle, epsilon?: number): boolean {
+    if (typeof epsilon === "undefined" || Number.isNaN(epsilon)) {
+      return this.center.distance(circle.center) + circle.radius < this.radius;
+    } else {
+      return this.center.distance(circle.center) + circle.radius < this.radius + Math.abs(epsilon);
+    }
   }
 
   /**

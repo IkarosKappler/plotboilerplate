@@ -23,7 +23,7 @@ import { XYCoords } from "../../interfaces";
  * @param {XYCoords[]} points
  * @returns {Circle | null} The minimal containing circle or null if the point count is lower than 2.
  */
-export const minimalContainingCircleFromPoints = (points: XYCoords[]): Circle | null => {
+export const minimalEnclosingCircleFromPoints = (points: XYCoords[]): Circle | null => {
   if (points.length <= 1) {
     return null;
   }

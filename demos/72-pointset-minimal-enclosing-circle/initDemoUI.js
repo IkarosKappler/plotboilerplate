@@ -33,6 +33,12 @@
       foldApoll.add(appContext.config, "isCInsideApollolian3").title("Draw the Apollonian circle inside or outside the third circle C?").onChange(function () { appContext.pb.redraw(); });
 
       // prettier-ignore
+      foldApoll.add(appContext.config, "drawContainingCirclePairs").title("Draw pairs of circles and their containing circle.").onChange(function () { appContext.pb.redraw(); });
+
+      // prettier-ignore
+      foldApoll.add(appContext.config, "drawContainingCircleApproximation").title("Draw a linear approximation of the minimum enclosing circle (bad performance!).").onChange(function () { appContext.pb.redraw(); });
+
+      // prettier-ignore
       gui.add(appContext.config, "readme").title("Show the readme.");
     }
   };

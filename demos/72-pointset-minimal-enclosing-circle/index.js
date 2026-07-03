@@ -37,7 +37,7 @@
     // Create a config: we want to have control about the arrow head size in this demo
     // `AppContext`: this is an experimental approach to make future event handling easier.
     var appContext = new AppContext(pb, {
-      numPoints: params.getNumber("numPoints", 8),
+      numPoints: params.getNumber("numPoints", 3),
       useCircles: params.getBoolean("useCircles", false),
       drawBasicExtendedLines: params.getBoolean("drawBasicExtendedLines", false),
       drawTriangleExtendedLines: params.getBoolean("drawTriangleExtendedLines", false),
@@ -45,6 +45,9 @@
       isAInsideApollolian3: params.getBoolean("isAInsideApollolian3", true),
       isBInsideApollolian3: params.getBoolean("isBInsideApollolian3", true),
       isCInsideApollolian3: params.getBoolean("isCInsideApollolian3", true),
+
+      drawContainingCirclePairs: params.getBoolean("drawContainingCirclePairs", false),
+      drawContainingCircleApproximation: params.getBoolean("drawContainingCircleApproximation", false),
 
       readme: function () {
         globalThis.displayDemoMeta();
@@ -90,44 +93,120 @@
       if (appContext.config.useCircles) {
         drawCirclesMinContainingCircle(draw, fill);
       } else {
-        var circle = minimalContainingCircleFromPoints(getCircleCenters(circles));
+        var circle = minimalEnclosingCircleFromPoints(getCircleCenters(circles));
         if (circle) {
           draw.circle(circle.center, circle.radius, "orange", 2.0);
         }
       }
 
-      if (appContext.config.drawAppolonianCircle) {
-        var s1 = appContext.config.isAInsideApollolian3 ? 1 : -1;
-        var s2 = appContext.config.isBInsideApollolian3 ? 1 : -1;
-        var s3 = appContext.config.isCInsideApollolian3 ? 1 : -1;
-        // var apollCircle = solveApollonius3(circles[0], circles[1], circles[2], 1, 1, 1);
-        var apollCircle = solveApollonius3(circles[0], circles[1], circles[2], s1, s2, s3);
+      if (appContext.config.drawAppolonianCircle && circles.length >= 3) {
+        var ic1 = appContext.config.isAInsideApollolian3; // ? 1 : -1;
+        var ic2 = appContext.config.isBInsideApollolian3; // ? 1 : -1;
+        var ic3 = appContext.config.isCInsideApollolian3; //  ? 1 : -1;
+        var apollCircle = solveApollonius3(circles[0], circles[1], circles[2], ic1, ic2, ic3);
         draw.circle(apollCircle.center, Math.abs(apollCircle.radius), "teal", 4.0);
+        fillCircularText(fill, "apollCircle", apollCircle, "teal", 12);
       }
+
+      if (appContext.config.drawContainingCirclePairs) {
+        drawContainingCirclePairs(draw, fill);
+      }
+
+      var enclosing23 = CirclesCircumCircle.findMinContainingCircle(circles);
+      draw.circle(enclosing23.center, Math.abs(enclosing23.radius), "violet", 4.0);
+      fillCircularText(fill, "enclosing23", enclosing23, "violet", 12);
+    };
+
+    var drawContainingCirclePairs = function (draw, fill) {
+      for (var i = 0; i < circles.length; i++) {
+        var circleA = circles[i];
+        for (var j = i + 1; j < circles.length; j++) {
+          var circleB = circles[j];
+          var enclosingCircle2 = getContainingCircle2(circleA, circleB);
+          draw.circle(enclosingCircle2.center, Math.abs(enclosingCircle2.radius), "teal", 1.0);
+
+          var containsAll = circleContainsAllCircles(enclosingCircle2, circles);
+          console.log("containsAll? ", i, j, containsAll);
+        }
+      }
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Simple approach to draw a text on a circular path.
+    // +-------------------------------
+    var fillCircularText = function (fill, text, circle, color, fontSizePx, startAngle) {
+      startAngle = startAngle || -Math.PI / 2.0;
+      var curAngle = startAngle;
+      var textLen = text.length;
+      var charatcterAngle = (Math.PI / 180.0 / (circle.radius / fontSizePx / 25)) * 2;
+      // var totalAngle = charatcterAngle * textLen;
+
+      for (var i = 0; i < textLen; i++) {
+        var character = text.charAt(i);
+        var pointOnCircle = circle.vertAt(curAngle);
+        var angleOnCircle = curAngle + Math.PI / 2.0;
+        fill.text(character, pointOnCircle.x, pointOnCircle.y, {
+          color: color,
+          fontFamily: "Monospace",
+          fontSize: fontSizePx, // number;
+          // fontStyle?: FontStyle;
+          // fontWeight?: FontWeight;
+          lineHeight: fontSizePx * 2.2,
+          // textAlign?: CanvasRenderingContext2D["textAlign"];
+          rotation: angleOnCircle
+        });
+        curAngle += charatcterAngle;
+      }
+    };
+
+    var drawCirclesMinContainingCircle = function (draw, fill) {
+      drawLinearApproximation(draw, fill);
 
       var circumCircles2 = CirclesCircumCircle.findMinCircleByTuples(circles);
       // console.log("circumCircles2", circumCircles2);
       // console.log("Color.Indigo.cssRGB()", Color.Indigo.cssRGB());
       if (circumCircles2) {
         draw.circle(circumCircles2.center, Math.abs(circumCircles2.radius), "red", 4.0);
+        fillCircularText(fill, "circumCircles2", circumCircles2, "red", 12);
+      }
+
+      var circumCircles3 = CirclesCircumCircle.findMinCircleByTriples(circles);
+      // console.log("circumCircles2", circumCircles2);
+      // console.log("Color.Indigo.cssRGB()", Color.Indigo.cssRGB());
+      if (circumCircles3) {
+        console.log("circumCircles3", circumCircles3);
+        draw.circle(circumCircles3.center, Math.abs(circumCircles3.radius), "grey", 4.0);
+        fillCircularText(fill, "circumCircles3", circumCircles3, "grey", 12);
+      } else {
+        console.log("circumCircles3 is null.");
       }
     };
 
-    var drawCirclesMinContainingCircle = function (draw, fill) {
-      // Also draw basic extended lines?
-      if (appContext.config.drawBasicExtendedLines) {
-        drawHelperLines(draw, fill, enclosingCircleApprox.basicExtendedLines, "orange");
-      }
+    var drawLinearApproximation = function (draw, fill) {
+      if (appContext.config.drawContainingCircleApproximation) {
+        var enclosingCircleApprox = CirclesCircumCircle.approximateMinimumEnclosingCircle(circles);
+        // Also draw basic extended lines?
+        if (appContext.config.drawBasicExtendedLines) {
+          drawHelperLines(draw, fill, enclosingCircleApprox.basicExtendedLines, "orange");
+        }
 
-      // Draw extended triangles lines?
-      var enclosingCircleApprox = CirclesCircumCircle.approximateMinimumEnclosingCircle(circles);
-      if (appContext.config.drawTriangleExtendedLines) {
-        drawHelperLines(draw, fill, enclosingCircleApprox.extendedTrianglesLines, "red");
-      }
+        // Draw extended triangles lines?
+        if (appContext.config.drawTriangleExtendedLines) {
+          drawHelperLines(draw, fill, enclosingCircleApprox.extendedTrianglesLines, "red");
+        }
 
-      // var ccircle = minimalContainingCircleFromPoints(allExtendedPoints);
-      if (enclosingCircleApprox.enclosingCircle) {
-        draw.circle(enclosingCircleApprox.enclosingCircle.center, enclosingCircleApprox.enclosingCircle.radius, "green", 2.0);
+        // var ccircle = minimalContainingCircleFromPoints(allExtendedPoints);
+        if (enclosingCircleApprox.enclosingCircle) {
+          draw.circle(enclosingCircleApprox.enclosingCircle.center, enclosingCircleApprox.enclosingCircle.radius, "green", 2.0);
+          fillCircularText(
+            fill,
+            "enclosingCircleApprox.enclosingCircle",
+            enclosingCircleApprox.enclosingCircle,
+            "green",
+            12,
+            -Math.PI
+          );
+        }
       }
     };
 

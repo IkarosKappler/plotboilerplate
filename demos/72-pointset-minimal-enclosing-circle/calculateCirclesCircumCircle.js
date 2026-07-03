@@ -1,5 +1,7 @@
 /**
  *
+ * @requires getContainingCircle2
+ *
  * @param {*} circles
  * @returns
  */
@@ -8,38 +10,40 @@
   var CirclesCircumCircle = {};
   _context.CirclesCircumCircle = CirclesCircumCircle;
 
-  var findByAppolonian = function (circles) {
-    var iter = allTripleSubsetsIterator(circles);
-    var item;
-    var minContainingCircle = null;
-    while ((item = iter.next()) && item.value) {
-      var triplet = item.value;
-      console.log(triplet);
-      var apollCircle = solveApollonius3(triplet[0], triplet[1], triplet[2], 1, 1, 1);
+  // var findByAppolonian = function (circles) {
+  //   var iter = allTripleSubsetsIterator(circles);
+  //   var item;
+  //   var minContainingCircle = null;
+  //   while ((item = iter.next()) && item.value) {
+  //     var triplet = item.value;
+  //     console.log(triplet);
+  //     var apollCircle = solveApollonius3(triplet[0], triplet[1], triplet[2], 1, 1, 1);
+  //   }
+  //   return minContainingCircle;
+  // };
+
+  CirclesCircumCircle.findMinContainingCircle = function (circles) {
+    var minEnclosingCircle2 = this.findMinCircleByTuples(circles);
+    var minEnclosingCircle3 = this.findMinCircleByTriples(circles);
+    if (minEnclosingCircle2 && minEnclosingCircle3) {
+      // Return the smaller of both :)
+      if (minEnclosingCircle2.radius < minEnclosingCircle3.radius) {
+        return minEnclosingCircle2;
+      } else {
+        return minEnclosingCircle3;
+      }
     }
-    return minContainingCircle;
+    if (minEnclosingCircle2 && !minEnclosingCircle3) {
+      return minEnclosingCircle2;
+    }
+    if (!minEnclosingCircle2 && minEnclosingCircle3) {
+      return minEnclosingCircle3;
+    }
+    // None found???
+    return null;
   };
 
   CirclesCircumCircle.findMinCircleByTuples = function (circles) {
-    var iter = allTupleSubsetsIterator(circles);
-    var item;
-    var minContainingCircle = null;
-    var i = 0;
-    // while ((item = iter.next()) && item.value) {
-    //   var tuple = item.value;
-    //   console.log(tuple); // [ Circle, Circle ]
-    //   var enclosingCircle2 = getContainingCircle2(tuple[0], tuple[1]);
-    //   console.log("i", i, "enclosingCircle2", enclosingCircle2);
-    //   if (!enclosingCircle2) {
-    //     continue; // This should not happen
-    //   }
-    //   if (!minContainingCircle || enclosingCircle2.containsCircle(minContainingCircle)) {
-    //     minContainingCircle = enclosingCircle2;
-    //   }
-    //   i++;
-    // }
-    // return minContainingCircle;
-
     var mcc = arrayLoop2(
       circles,
       function (minContainingCircle, circleA, circleB, i, j) {
@@ -47,10 +51,56 @@
         var enclosingCircle2 = getContainingCircle2(circleA, circleB);
         // console.log("i", i, "enclosingCircle2", enclosingCircle2);
         if (!enclosingCircle2) {
-          return null; // This should not happen
+          return minContainingCircle; // This should not happen
         }
-        if (!minContainingCircle || enclosingCircle2.containsCircle(minContainingCircle)) {
-          minContainingCircle = enclosingCircle2;
+        if (
+          circleContainsAllCircles(enclosingCircle2, circles, [i, j]) &&
+          (!minContainingCircle || enclosingCircle2.radius < minContainingCircle.radius)
+        ) {
+          return enclosingCircle2;
+        }
+        return minContainingCircle;
+      },
+      null // initial min circle unknown
+    );
+    return mcc;
+
+    // var mmc = null;
+    // for (var i = 0; i < circles.length; i++) {
+    //   var circleA = circles[i];
+    //   for (var j = i + 1; j < circles.length; j++) {
+    //     console.log("x i", i, "j", j);
+    //     var circleB = circles[j];
+    //     var enclosingCircle2 = getContainingCircle2(circleA, circleB);
+    //     var circleContainsAll = circleContainsAllCircles(enclosingCircle2, circles);
+    //     console.log("circumcircle of ", i, j, "contains all?", circleContainsAll);
+    //     if (enclosingCircle2 && circleContainsAll && (!mmc || enclosingCircle2.radius < mmc.radius)) {
+    //       mmc = enclosingCircle2;
+    //     }
+    //   } // END for j
+    // } // END for i
+    // return mmc;
+  };
+
+  CirclesCircumCircle.findMinCircleByTriples = function (circles) {
+    var mcc = arrayLoop3(
+      circles,
+      function (minContainingCircle, circleA, circleB, circleC, i, j, k) {
+        // console.log("tuple", circleA, circleB); // [ Circle, Circle ]
+        var enclosingCircle3 = solveApollonius3(circleA, circleB, circleC, true, true, true);
+        // console.log("i", i, "enclosingCircle2", enclosingCircle2);
+        if (!enclosingCircle3) {
+          // In some rare cases (e.g. three circles are co-linear) the resulting
+          // Apollonian circle can be undefined. Just skipt these cases.
+          return minContainingCircle;
+        }
+        var containsAll = circleContainsAllCircles(enclosingCircle3, circles);
+        if (
+          (!minContainingCircle || enclosingCircle3.containsCircle(minContainingCircle, 0.0001)) &&
+          containsAll &&
+          (!minContainingCircle || enclosingCircle3.radius < minContainingCircle.radius)
+        ) {
+          return enclosingCircle3;
         }
         return minContainingCircle;
       },
@@ -94,7 +144,7 @@
       allExtendedPoints.addUnique(basicExtendedLines[i].b);
     }
 
-    var enclosingCircle = minimalContainingCircleFromPoints(allExtendedPoints);
+    var enclosingCircle = minimalEnclosingCircleFromPoints(allExtendedPoints);
 
     return {
       basicExtendedLines: basicExtendedLines,
@@ -200,7 +250,7 @@
           continue;
         }
         var itemB = arr[j];
-        newResult = callback(result, itemA, itemB, i, j);
+        newResult = callback(newResult, itemA, itemB, i, j);
       }
     }
     return newResult;
@@ -217,7 +267,7 @@
             continue;
           }
           var itemC = arr[k];
-          newResult = callback(result, itemA, itemB, itemC, i, j, k);
+          newResult = callback(newResult, itemA, itemB, itemC, i, j, k);
         }
       }
     }
@@ -240,17 +290,17 @@
    * @date 2026-06-23
    */
 
-  // TODO: put this to Circle class?
-  var getContainingCircle2 = function (circleA, circleB) {
-    var connectLine = new Vector(circleA.center, circleB.center);
-    var intersectionLineA = circleA.lineIntersection(connectLine.a, connectLine.b);
-    var intersectionLineB = circleB.lineIntersection(connectLine.a, connectLine.b);
-    var farestPointOnA = circleB.center.findFarestPoint(intersectionLineA.a, intersectionLineA.b);
-    var farestPointOnB = circleA.center.findFarestPoint(intersectionLineB.a, intersectionLineB.b);
-    var totalDiagonalLine = new Line(farestPointOnA, farestPointOnB);
-    var center = totalDiagonalLine.vertAt(0.5);
-    return new Circle(center, center.distance(totalDiagonalLine.a));
-  };
+  // // TODO: put this to Circle class?
+  // var getContainingCircle2 = function (circleA, circleB) {
+  //   var connectLine = new Vector(circleA.center, circleB.center);
+  //   var intersectionLineA = circleA.lineIntersection(connectLine.a, connectLine.b);
+  //   var intersectionLineB = circleB.lineIntersection(connectLine.a, connectLine.b);
+  //   var farestPointOnLineA = circleB.center.findFarestPoint(intersectionLineA.a, intersectionLineA.b);
+  //   var farestPointOnLineB = circleA.center.findFarestPoint(intersectionLineB.a, intersectionLineB.b);
+  //   var totalDiagonalLine = new Line(farestPointOnLineA, farestPointOnLineB);
+  //   var center = totalDiagonalLine.vertAt(0.5);
+  //   return new Circle(center, totalDiagonalLine.length() / 2.0); // center.distance(totalDiagonalLine.a));
+  // };
 })(globalThis);
 
 var allTripleSubsetsIterator = function* (circles) {
@@ -276,4 +326,19 @@ var allTupleSubsetsIterator = function* (circles) {
       yield result;
     }
   }
+};
+
+var circleContainsAllCircles = function (circle, circles, excludeList) {
+  for (var i = 0; i < circles.length; i++) {
+    if (circle === circles[i]) {
+      continue;
+    }
+    if (excludeList && excludeList.includes(i)) {
+      continue;
+    }
+    if (!circle.containsCircle(circles[i], 0.0001)) {
+      return false;
+    }
+  }
+  return true;
 };

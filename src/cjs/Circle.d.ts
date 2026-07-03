@@ -17,7 +17,8 @@
  * @modified 2026-06-10 Adding the utility function `Circle.circleUtils.containsPoint`.
  * @modified 2026-06-10 Adding the `Circle.clone` method.
  * @modified 2026-01-13 Adding helper function `Circle.circleUtils.containsPoint` and refactored the member method `containsPoint`.
- * @version  1.6.0
+ * @modified 2026-07-03 Adding the optional `epsilon` parameter to the `Circle.containsCircle` method.
+ * @version  1.7.0
  **/
 import { Bounds } from "./Bounds";
 import { Line } from "./Line";
@@ -112,7 +113,7 @@ export declare class Circle implements IBounded, ICircle, Intersectable, SVGSeri
      * @memberof Circle
      * @return {boolean} `true` if any only if the given circle is completely inside this circle.
      */
-    containsCircle(circle: Circle): boolean;
+    containsCircle(circle: Circle, epsilon?: number): boolean;
     /**
      * Calculate the distance from this circle to the given line.
      *
