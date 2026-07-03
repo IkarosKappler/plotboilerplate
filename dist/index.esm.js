@@ -352,6 +352,7 @@ class VertexListeners {
  * @modified 2026-06-10 Adding the `Circle.clone` method.
  * @modified 2026-01-13 Adding helper function `Circle.circleUtils.containsPoint` and refactored the member method `containsPoint`.
  * @modified 2026-07-03 Adding the optional `epsilon` parameter to the `Circle.containsCircle` method.
+ * @modified 2026-07-03 Fixing the `Circle.clone` method; the center had not been cloned at all, this was fixed.
  * @version  1.7.0
  **/
 /**
@@ -659,7 +660,7 @@ class Circle {
      * @memberof Circle
      **/
     clone() {
-        return new Circle(this.center, this.radius);
+        return new Circle(this.center.clone(), this.radius);
     }
     static fromICircle(obj) {
         return new Circle(new Vertex$1(obj.center), obj.radius);

@@ -11,6 +11,7 @@
 - 2026-07-03
   - Adding `utils/algorithms/solveApollonius3` to the library.
   - Adding the optional `epsilon` parameter to the `Circle.containsCircle` method.
+  - Fixing the `Circle.clone` method; the center had not been cloned at all, this was fixed.
 - 2026-06-13
   - Adding `Triangle.getVertices()`.
   - Adding helper function `Circle.circleUtils.containsPoint` and refactored the member method `containsPoint`.

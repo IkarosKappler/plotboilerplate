@@ -112,7 +112,7 @@ var solveApollonius3 = function (c1, c2, c3, circle1Inside, circle2Inside, circl
     var rs = (-b - Math.sqrt(D)) / (2 * a);
     var xs = M + N * rs;
     var ys = P + Q * rs;
-    return new Circle_1.Circle(new Vertex_1.Vertex(xs, ys), rs);
+    return new Circle_1.Circle(new Vertex_1.Vertex(xs, ys), Math.abs(rs));
 };
 exports.solveApollonius3 = solveApollonius3;
 //# sourceMappingURL=solveApollonius3.js.map

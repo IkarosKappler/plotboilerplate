@@ -10,19 +10,10 @@
   var CirclesCircumCircle = {};
   _context.CirclesCircumCircle = CirclesCircumCircle;
 
-  // var findByAppolonian = function (circles) {
-  //   var iter = allTripleSubsetsIterator(circles);
-  //   var item;
-  //   var minContainingCircle = null;
-  //   while ((item = iter.next()) && item.value) {
-  //     var triplet = item.value;
-  //     console.log(triplet);
-  //     var apollCircle = solveApollonius3(triplet[0], triplet[1], triplet[2], 1, 1, 1);
-  //   }
-  //   return minContainingCircle;
-  // };
-
   CirclesCircumCircle.findMinContainingCircle = function (circles) {
+    // var circlesTuples = this.collectMinCirclesByTuples(circles);
+    // var circlesTriples = this.collectMinCirclesByTriples(circles);
+    // var allCircles = circles.concat(circlesTuples, circlesTriples);
     var minEnclosingCircle2 = this.findMinCircleByTuples(circles);
     var minEnclosingCircle3 = this.findMinCircleByTriples(circles);
     if (minEnclosingCircle2 && minEnclosingCircle3) {
@@ -41,6 +32,23 @@
     }
     // None found???
     return null;
+  };
+
+  CirclesCircumCircle.collectMinCirclesByTuples = function (circles) {
+    var mcc = arrayLoop2(
+      circles,
+      function (minContainingCircles, circleA, circleB, i, j) {
+        // console.log("tuple", circleA, circleB); // [ Circle, Circle ]
+        var enclosingCircle2 = getContainingCircle2(circleA, circleB);
+        // console.log("i", i, "enclosingCircle2", enclosingCircle2);
+        if (enclosingCircle2) {
+          minContainingCircles.push(enclosingCircle2);
+        }
+        return minContainingCircles;
+      },
+      [] // Initial empty array
+    );
+    return mcc;
   };
 
   CirclesCircumCircle.findMinCircleByTuples = function (circles) {
@@ -64,22 +72,26 @@
       null // initial min circle unknown
     );
     return mcc;
+  };
 
-    // var mmc = null;
-    // for (var i = 0; i < circles.length; i++) {
-    //   var circleA = circles[i];
-    //   for (var j = i + 1; j < circles.length; j++) {
-    //     console.log("x i", i, "j", j);
-    //     var circleB = circles[j];
-    //     var enclosingCircle2 = getContainingCircle2(circleA, circleB);
-    //     var circleContainsAll = circleContainsAllCircles(enclosingCircle2, circles);
-    //     console.log("circumcircle of ", i, j, "contains all?", circleContainsAll);
-    //     if (enclosingCircle2 && circleContainsAll && (!mmc || enclosingCircle2.radius < mmc.radius)) {
-    //       mmc = enclosingCircle2;
-    //     }
-    //   } // END for j
-    // } // END for i
-    // return mmc;
+  CirclesCircumCircle.collectMinCirclesByTriples = function (circles) {
+    var mcc = arrayLoop3(
+      circles,
+      function (minContainingCircles, circleA, circleB, circleC, i, j, k) {
+        // console.log("tuple", circleA, circleB); // [ Circle, Circle ]
+        var enclosingCircle3 = solveApollonius3(circleA, circleB, circleC, true, true, true);
+        // console.log("i", i, "enclosingCircle2", enclosingCircle2);
+        if (enclosingCircle3) {
+          // In some rare cases (e.g. three circles are co-linear) the resulting
+          // Apollonian circle can be undefined. Just skipt these cases.
+          minContainingCircles.push(enclosingCircle3);
+        }
+
+        return minContainingCircles;
+      },
+      [] // Initially empty array
+    );
+    return mcc;
   };
 
   CirclesCircumCircle.findMinCircleByTriples = function (circles) {

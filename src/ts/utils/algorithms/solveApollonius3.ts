@@ -128,5 +128,5 @@ export const solveApollonius3 = (
   var xs = M + N * rs;
   var ys = P + Q * rs;
 
-  return new Circle(new Vertex(xs, ys), rs);
+  return new Circle(new Vertex(xs, ys), Math.abs(rs));
 };

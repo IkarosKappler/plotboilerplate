@@ -17,7 +17,7 @@
       // prettier-ignore
       foldApoll.add(appContext.config, "numPoints").min(0).max(24).step(1).title("The radius of the third circle.").onChange(function () { appContext.handleNumPointsChanged(); appContext.pb.redraw(); });
       // prettier-ignore
-      foldApoll.add(appContext.config, "useCircles").title("Use circles or points.").onChange(function () { appContext.pb.redraw(); });
+      foldApoll.add(appContext.config, "useCircles").title("Use circles or points.").onChange(function () { appContext.toggleCircleControlPoints();});
       // prettier-ignore
       foldApoll.add(appContext.config, "drawBasicExtendedLines").title("Draw basic extended circle set lines.").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
@@ -34,6 +34,9 @@
 
       // prettier-ignore
       foldApoll.add(appContext.config, "drawContainingCirclePairs").title("Draw pairs of circles and their containing circle.").onChange(function () { appContext.pb.redraw(); });
+
+      // prettier-ignore
+      foldApoll.add(appContext.config, "drawContainingCircleTriples").title("Draw triples of circles and their containing circle.").onChange(function () { appContext.pb.redraw(); });
 
       // prettier-ignore
       foldApoll.add(appContext.config, "drawContainingCircleApproximation").title("Draw a linear approximation of the minimum enclosing circle (bad performance!).").onChange(function () { appContext.pb.redraw(); });

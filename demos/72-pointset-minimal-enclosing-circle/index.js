@@ -47,6 +47,7 @@
       isCInsideApollolian3: params.getBoolean("isCInsideApollolian3", true),
 
       drawContainingCirclePairs: params.getBoolean("drawContainingCirclePairs", false),
+      drawContainingCircleTriples: params.getBoolean("drawContainingCircleTriples", false),
       drawContainingCircleApproximation: params.getBoolean("drawContainingCircleApproximation", false),
 
       readme: function () {
@@ -54,9 +55,10 @@
       }
     });
     appContext.handleNumPointsChanged = function () {
-      appContext.pb.remove(getCircleCenters(circles), false, true); // redraw=false, removeWithVertices=false
-      circles = makeRandomCircles();
-      appContext.pb.add(getCircleCenters(circles));
+      // appContext.pb.remove(getCircleCenters(circles), false, true); // redraw=false, removeWithVertices=false
+      // circles = makeRandomCircles();
+      // appContext.pb.add(getCircleCenters(circles));
+      initRandomCircles();
     };
     appContext.isMobile = isMobile;
 
@@ -83,8 +85,33 @@
     // +---------------------------------------------------------------------------------
     // | Global vars
     // +-------------------------------
-    var circles = makeRandomCircles(10);
-    appContext.pb.add(getCircleCenters(circles));
+    var circles = [];
+    var circleHelpers = [];
+
+    appContext.toggleCircleControlPoints = function () {
+      for (var i = 0; i < circleHelpers.length; i++) {
+        circleHelpers[i].radiusPoint.attr.visible = appContext.config.useCircles;
+        circleHelpers[i].radiusPoint.attr.draggable = appContext.config.useCircles;
+        circleHelpers[i].radiusPoint.attr.selectable = appContext.config.useCircles;
+      }
+      appContext.pb.redraw();
+    };
+
+    var initRandomCircles = function () {
+      appContext.pb.remove(getCircleCenters(circles), false, true); // redraw=false, removeWithVertices=false
+      circles = makeRandomCircles();
+      appContext.pb.add(getCircleCenters(circles));
+
+      circleHelpers = [];
+      for (var i = 0; i < circles.length; i++) {
+        var circleRadiusPoint = circles[i].vertAt(0.0);
+        var circleHelper = new CircleHelper(circles[i], circleRadiusPoint);
+        appContext.pb.add([circleRadiusPoint]);
+        circleHelpers.push(circleHelper);
+      }
+      appContext.toggleCircleControlPoints();
+    };
+    initRandomCircles();
 
     // +---------------------------------------------------------------------------------
     // | Triggered after the main draw routine.
@@ -112,9 +139,17 @@
         drawContainingCirclePairs(draw, fill);
       }
 
+      if (appContext.config.drawContainingCircleTriples) {
+        drawContainingCircleTriples(draw, fill);
+      }
+
       var enclosing23 = CirclesCircumCircle.findMinContainingCircle(circles);
-      draw.circle(enclosing23.center, Math.abs(enclosing23.radius), "violet", 4.0);
-      fillCircularText(fill, "enclosing23", enclosing23, "violet", 12);
+      if (enclosing23) {
+        draw.circle(enclosing23.center, Math.abs(enclosing23.radius), "violet", 4.0);
+        fillCircularText(fill, "enclosing23", enclosing23, "violet", 12);
+      } else {
+        console.log("enclosing23 is null");
+      }
     };
 
     var drawContainingCirclePairs = function (draw, fill) {
@@ -127,6 +162,23 @@
 
           var containsAll = circleContainsAllCircles(enclosingCircle2, circles);
           console.log("containsAll? ", i, j, containsAll);
+        }
+      }
+    };
+
+    var drawContainingCircleTriples = function (draw, fill) {
+      for (var i = 0; i < circles.length; i++) {
+        var circleA = circles[i];
+        for (var j = i + 1; j < circles.length; j++) {
+          var circleB = circles[j];
+          for (var k = 0; k < circles.length; k++) {
+            var circleC = circles[k];
+            var enclosingCircle3 = solveApollonius3(circleA, circleB, circleC, true, true, true);
+            draw.circle(enclosingCircle3.center, Math.abs(enclosingCircle3.radius), "cyan", 1.0);
+
+            var containsAll = circleContainsAllCircles(enclosingCircle3, circles);
+            console.log("containsAll? ", i, j, k, containsAll);
+          }
         }
       }
     };
