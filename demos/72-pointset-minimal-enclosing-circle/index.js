@@ -41,7 +41,7 @@
       useCircles: params.getBoolean("useCircles", false),
       drawBasicExtendedLines: params.getBoolean("drawBasicExtendedLines", false),
       drawTriangleExtendedLines: params.getBoolean("drawTriangleExtendedLines", false),
-      drawAppolonianCircle: params.getBoolean("drawAppolonianCircle", false),
+      drawApollonianCircle: params.getBoolean("drawApollonianCircle", false),
       isAInsideApollolian3: params.getBoolean("isAInsideApollolian3", true),
       isBInsideApollolian3: params.getBoolean("isBInsideApollolian3", true),
       isCInsideApollolian3: params.getBoolean("isCInsideApollolian3", true),
@@ -126,13 +126,13 @@
         }
       }
 
-      if (appContext.config.drawAppolonianCircle && circles.length >= 3) {
-        var ic1 = appContext.config.isAInsideApollolian3; // ? 1 : -1;
-        var ic2 = appContext.config.isBInsideApollolian3; // ? 1 : -1;
-        var ic3 = appContext.config.isCInsideApollolian3; //  ? 1 : -1;
+      if (appContext.config.drawApollonianCircle && circles.length >= 3) {
+        var ic1 = appContext.config.isAInsideApollolian3;
+        var ic2 = appContext.config.isBInsideApollolian3;
+        var ic3 = appContext.config.isCInsideApollolian3;
         var apollCircle = solveApollonius3(circles[0], circles[1], circles[2], ic1, ic2, ic3);
         draw.circle(apollCircle.center, Math.abs(apollCircle.radius), "teal", 4.0);
-        fillCircularText(fill, "apollCircle", apollCircle, "teal", 12);
+        fillCircularText(fill, "apollCircle", apollCircle, "teal", 12, Math.PI * 0.666);
       }
 
       if (appContext.config.drawContainingCirclePairs) {
@@ -146,7 +146,7 @@
       var enclosing23 = CirclesCircumCircle.findMinContainingCircle(circles);
       if (enclosing23) {
         draw.circle(enclosing23.center, Math.abs(enclosing23.radius), "violet", 4.0);
-        fillCircularText(fill, "enclosing23", enclosing23, "violet", 12);
+        fillCircularText(fill, "enclosing23", enclosing23, "violet", 12, Math.PI);
       } else {
         console.log("enclosing23 is null");
       }
@@ -280,7 +280,8 @@
         if (appContext.config.useCircles) {
           draw.circle(circles[i].center, circles[i].radius, rgba(255, 0, 255, 0.5), 2.0);
         }
-        fill.text("" + i, circles[i].center.x + 5, circles[i].center.y, { color: contrastColor });
+        var label = String.fromCharCode(64 + i + 1);
+        fill.text(label, circles[i].center.x + 5, circles[i].center.y, { color: contrastColor });
       }
     }; // END preDraw
 

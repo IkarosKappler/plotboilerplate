@@ -47,6 +47,7 @@
     // Circle
     var circleA = null;
     var circleB = null;
+    var containingCircle = null;
 
     var updateCircleRadiusB = function () {
       circleB.radius = Math.abs(circleB.center.distance(circleA.center) - circleA.radius);
@@ -64,15 +65,26 @@
     circleB = new Circle(appContext.pb.viewport().getScaled(0.666).randomPoint(), 100.0);
     circleB.center.listeners.addDragListener(function () {
       updateCircleRadiusB();
+      updateContainingCircle();
     });
     circleA.center.listeners.addDragListener(function () {
       updateCircleRadiusB();
+      updateContainingCircle();
     });
     radiusPoint.listeners.addDragListener(function () {
       updateCircleRadiusB();
+      updateContainingCircle();
     });
     updateCircleRadiusB();
-    pb.add([circleA.center, radiusPoint, circleB.center]);
+    containingCircle = getContainingCircle2(circleA, circleB);
+    var containingCircle_radiusPoint = new Vertex(
+      containingCircle.center
+        .clone()
+        .addXY(containingCircle.radius * Math.sin(Math.PI / 4), containingCircle.radius * Math.cos(Math.PI / 4))
+    );
+    new CircleHelper(containingCircle, containingCircle_radiusPoint, pb);
+
+    pb.add([circleA.center, radiusPoint, circleB.center, containingCircle.center, containingCircle_radiusPoint]);
 
     // +---------------------------------------------------------------------------------
     // | Triggered after the main draw routine.
@@ -80,8 +92,8 @@
     var postDraw = function (draw, fill) {
       // Draw containing circle
       // TODO: not working!
-      var containingCircle = getContainingCircle2(circleA, circleB);
-      draw.circle(containingCircle.center, containingCircle.radius, "rgba(128,128,128, 0.55)", 2.0, { dashArray: [10, 10] });
+
+      // containingCircle = getContainingCircle2(circleA, circleB);
 
       drawAppolonianCircles(
         draw,
@@ -123,6 +135,22 @@
       // var newCircleB = new Circle(newCenterB, circleB.radius);
       var perpVector = connectLine.perp().moveTo(closestPointOnA);
 
+      // Move for one pixel
+      var circleB_clone = circleB.clone();
+      // leftCircleB.center.set(perpVector.vertAt(10 / perpVector.length()));
+      // circleB_clone.radius -= 5;
+      var containingCircle_clone = containingCircle.clone();
+      var perpForContainingCircle = perpVector.clone().moveTo(containingCircle_clone.center);
+      // containingCircle_clone.center.x += 5;
+      // NOTE: The Apollonian calculation will fail if all three circles are co-linear!
+      //       move the containing circle about -5 units (pixels) along the perpendicular.
+      containingCircle_clone.center.set(perpForContainingCircle.vertAt(-5 / perpForContainingCircle.length()));
+      // containingCircle_clone.radius += 1;
+
+      draw.circle(containingCircle_clone.center, containingCircle_clone.radius, "rgba(128,128,128, 0.55)", 2.0, {
+        dashArray: [10, 10]
+      });
+
       // console.log("closestPointOnA", closestPointOnA);
       if (drawHelperElements) {
         draw.diamondHandle(closestPointOnA, 8, "orange");
@@ -132,60 +160,19 @@
         draw.arrow(perpVector.a, perpVector.b, "orange", 1.0);
 
         fill.text("A", circleA.center.x + 5, circleA.center.y, { color: contrastColor });
-        fill.text("B", circleB.center.x + 5, circleB.center.y, { color: contrastColor });
+        fill.text("B", circleB_clone.center.x + 5, circleB_clone.center.y, { color: contrastColor });
         // draw.circle(newCircleB.center, circleB.radius, "grey", 2.0, { dashArray: [5, 10] });
-        draw.circle(circleB.center, circleB.radius, "rgb(0,192,192)", 3.0, { dashArray: [10, 5] });
+        draw.circle(circleB_clone.center, circleB_clone.radius, "rgb(0,192,192)", 3.0, { dashArray: [10, 5] });
       }
 
       // Step 2: find attaching third circle.
       // The Apollonian circle solution will not be unque if circles are co-linear!
       var perpVector = connectLine.perp().moveTo(closestPointOnA);
 
-      // Move for one pixel
-      var leftCircleB = circleB.clone();
-      leftCircleB.center.set(perpVector.vertAt(10 / perpVector.length()));
-      var containingCircleB = containingCircle.clone();
-      containingCircleB.center.set(perpVector.vertAt(-5 / perpVector.length()));
-      var enclosingCircle3 = solveApollonius3(containingCircleB, circleA, leftCircleB, true, true, true);
-      console.log("enclosingCircle3", enclosingCircle3);
-      draw.circle(enclosingCircle3.center, enclosingCircle3.radius, "rgba(255,0,255)", 2.0);
+      var apollonianCircle = solveApollonius3(containingCircle_clone, circleA.clone(), circleB_clone, true, false, false);
+      console.log("apollonianCircle", apollonianCircle);
+      draw.circle(apollonianCircle.center, apollonianCircle.radius, "rgba(255,0,255)", 2.0);
     }; // END postDraw
-
-    // var getApollonianCircles = function (circleA, circleB, desiredRadius) {
-    //   if (circleA) var hullA = new Circle(circleA.center, circleA.radius + desiredRadius);
-    //   var hullB = new Circle(circleB.center, circleB.radius + desiredRadius);
-
-    //   var radicalLine = hullA.circleIntersection(hullB);
-    //   if (!radicalLine) {
-    //     // Not possible, radius too small or one circle too small inside the other.
-    //     return null;
-    //   }
-
-    //   var radicalClosestA = circleA.closestPoint(radicalLine.a);
-    //   // var radicalClosestB = circleB.closestPoint(radicalLine.a);
-
-    //   // This distance is the same as to radicalClosestB by construction :)
-    //   var apollRadius = radicalLine.a.distance(radicalClosestA);
-    //   var apollonianCircleA = new Circle(radicalLine.a, apollRadius);
-    //   var apollonianCircleB = new Circle(radicalLine.b, apollRadius);
-
-    //   // draw.circle(apollonianCircle.center, apollonianCircle.radius, "rgba(255,0,255)", 2.0);
-
-    //   return [apollonianCircleA, apollonianCircleB];
-    // };
-
-    // // TODO: put this to Circle class?
-    // // TODO: This is now part of the calculateCirclesCircumCircle class!!!
-    // var getContainingCircle = function (circleA, circleB) {
-    //   var connectLine = new Vector(circleA.center, circleB.center);
-    //   var intersectionLineA = circleA.lineIntersection(connectLine.a, connectLine.b);
-    //   var intersectionLineB = circleB.lineIntersection(connectLine.a, connectLine.b);
-    //   var farestPointOnA = circleB.center.findFarestPoint(intersectionLineA.a, intersectionLineA.b);
-    //   var farestPointOnB = circleA.center.findFarestPoint(intersectionLineB.a, intersectionLineB.b);
-    //   var totalDiagonalLine = new Line(farestPointOnA, farestPointOnB);
-    //   var center = totalDiagonalLine.vertAt(0.5);
-    //   return new Circle(center, center.distance(totalDiagonalLine.a));
-    // };
 
     // TODO: put this to geomutils?
     var findClosestPoint = function (referencePoint, pointA, pointB) {
@@ -197,32 +184,18 @@
         return pointB;
       }
     };
-    // var findClosestPoint = function (referencePoint, pointList) {
-    //   // var distA = referencePoint.distance(pointA);
-    //   // var distB = referencePoint.distance(pointB);
-    //   // if (distA < distB) {
-    //   //   return pointA;
-    //   // } else {
-    //   //   return pointB;
-    //   // }
-    //   // if( !pointList || pointList.length == 0 ) {
-    //   //   return null;
-    //   // }
-    //   // return pointList.reduce( function(accu,item) {
 
-    //   // },null);
-    // };
-
-    // TODO MOVED TO Vertex.utils
-    // var findFarestPoint = function (referencePoint, pointA, pointB) {
-    //   var distA = referencePoint.distance(pointA);
-    //   var distB = referencePoint.distance(pointB);
-    //   if (distA > distB) {
-    //     return pointA;
-    //   } else {
-    //     return pointB;
-    //   }
-    // };
+    var updateContainingCircle = function () {
+      var tmp_containingCircle = getContainingCircle2(circleA, circleB);
+      containingCircle.center.set(tmp_containingCircle.center);
+      containingCircle.radius = tmp_containingCircle.radius;
+      containingCircle_radiusPoint.set(
+        containingCircle.center
+          .clone()
+          .addXY(containingCircle.radius * Math.sin(Math.PI / 4), containingCircle.radius * Math.cos(Math.PI / 4))
+      );
+    };
+    updateContainingCircle();
 
     // +---------------------------------------------------------------------------------
     // | This method is called before the library starts to draw anything.

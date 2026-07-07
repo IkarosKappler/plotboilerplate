@@ -23,7 +23,7 @@
       // prettier-ignore
       foldApoll.add(appContext.config, "drawTriangleExtendedLines").title("Draw triangles' extended circle set lines.").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
-      foldApoll.add(appContext.config, "drawAppolonianCircle").title("Draw appolonian circle?").onChange(function () { appContext.pb.redraw(); });
+      foldApoll.add(appContext.config, "drawApollonianCircle").title("Draw apolonian circle?").onChange(function () { appContext.pb.redraw(); });
 
       // prettier-ignore
       foldApoll.add(appContext.config, "isAInsideApollolian3").title("Draw the Apollonian circle inside or outside the first circle A?").onChange(function () { appContext.pb.redraw(); });
