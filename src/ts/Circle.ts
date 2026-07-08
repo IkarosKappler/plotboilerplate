@@ -19,6 +19,8 @@
  * @modified 2026-01-13 Adding helper function `Circle.circleUtils.containsPoint` and refactored the member method `containsPoint`.
  * @modified 2026-07-03 Adding the optional `epsilon` parameter to the `Circle.containsCircle` method.
  * @modified 2026-07-03 Fixing the `Circle.clone` method; the center had not been cloned at all, this was fixed.
+ * @modified 2026-07-08 Adding the `Circle.setRadius` method.
+ *
  * @version  1.7.0
  **/
 
@@ -98,6 +100,21 @@ export class Circle implements IBounded, ICircle, Intersectable, SVGSerializable
     this.uid = UIDGenerator.next();
     this.center = center;
     this.radius = radius;
+  }
+
+  /**
+   * Set the radius of this circle.
+   * The method is meant for chaining, you may also alter the `radius` attribute directly.
+   *
+   * @method setRadius
+   * @param {number} radius - The amount to move.
+   * @instance
+   * @memberof Circle
+   * @return {Circle} this for chaining
+   **/
+  setRadius(radius: number): Circle {
+    this.radius = radius;
+    return this;
   }
 
   /**

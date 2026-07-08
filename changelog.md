@@ -8,6 +8,8 @@
 - Add 'Rulers' class from the ngdg project.
 - Add 'onclose' and 'onopen' to the Modal (demos).
 
+- 2026-07-08
+  - Adding the `Circle.setRadius` method.
 - 2026-07-03
   - Adding `utils/algorithms/solveApollonius3` to the library.
   - Adding the optional `epsilon` parameter to the `Circle.containsCircle` method.

@@ -53,10 +53,15 @@
       circleB.radius = Math.abs(circleB.center.distance(circleA.center) - circleA.radius);
     };
 
+    var createRadiusPoint = function (circle) {
+      return circle.vertAt(Math.PI / 4);
+    };
+
     // +---------------------------------------------------------------------------------
     // | Creates a random circle that fits nicely into the viewport.
     // +-------------------------------
     circleA = randomCircle(appContext.pb.viewport().getScaled(0.666));
+    // TODO: use createRadiusPoint here
     var radiusPoint = new Vertex(
       circleA.center.clone().addXY(circleA.radius * Math.sin(Math.PI / 4), circleA.radius * Math.cos(Math.PI / 4))
     );

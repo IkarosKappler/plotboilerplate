@@ -86,6 +86,17 @@ export declare class Circle implements IBounded, ICircle, Intersectable, SVGSeri
      */
     constructor(center: Vertex, radius: number);
     /**
+     * Set the radius of this circle.
+     * The method is meant for chaining, you may also alter the `radius` attribute directly.
+     *
+     * @method setRadius
+     * @param {number} radius - The amount to move.
+     * @instance
+     * @memberof Circle
+     * @return {Circle} this for chaining
+     **/
+    setRadius(radius: number): Circle;
+    /**
      * Move the circle by the given amount.
      *
      * @method move

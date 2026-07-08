@@ -1787,6 +1787,20 @@ var Circle = /** @class */ (function () {
         this.radius = radius;
     }
     /**
+     * Set the radius of this circle.
+     * The method is meant for chaining, you may also alter the `radius` attribute directly.
+     *
+     * @method setRadius
+     * @param {number} radius - The amount to move.
+     * @instance
+     * @memberof Circle
+     * @return {Circle} this for chaining
+     **/
+    Circle.prototype.setRadius = function (radius) {
+        this.radius = radius;
+        return this;
+    };
+    /**
      * Move the circle by the given amount.
      *
      * @method move
