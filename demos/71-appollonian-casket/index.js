@@ -34,7 +34,8 @@
     // `AppContext`: this is an experimental approach to make future event handling easier.
     var appContext = new AppContext(pb, {
       circleRadius: params.getNumber("circleRadius", 100),
-      iterations: params.getNumber("iterations", 5),
+      iterations: params.getNumber("iterations", 8),
+      drawPerpendiculars: params.getBoolean("drawPerpendiculars", false),
       readme: function () {
         globalThis.displayDemoMeta();
       }
@@ -100,6 +101,12 @@
 
       // containingCircle = getContainingCircle2(circleA, circleB);
 
+      draw.circle(containingCircle.center, containingCircle.radius, "rgba(128,128,128, 0.55)", 2.0, {
+        dashArray: [10, 10]
+      });
+
+      draw.circle(circleB.center, circleB.radius, "rgb(0,192,192)", 3.0, { dashArray: [8, 15] });
+
       drawAppolonianCircles(
         draw,
         fill,
@@ -134,10 +141,6 @@
       var intersectionLineB = circleB.lineIntersection(connectLine.a, connectLine.b);
       var closestPointOnA = findClosestPoint(circleB.center, intersectionLineA.a, intersectionLineA.b);
       var closestPointOnB = findClosestPoint(circleA.center, intersectionLineB.a, intersectionLineB.b);
-
-      // var circleDifference = closestPointOnA.difference(closestPointOnB);
-      // var newCenterB = circleB.center.clone().sub(circleDifference);
-      // var newCircleB = new Circle(newCenterB, circleB.radius);
       var perpVector = connectLine.perp().moveTo(closestPointOnA);
 
       // Move for one pixel
@@ -149,25 +152,19 @@
       // containingCircle_clone.center.x += 5;
       // NOTE: The Apollonian calculation will fail if all three circles are co-linear!
       //       move the containing circle about -5 units (pixels) along the perpendicular.
-      containingCircle_clone.center.set(perpForContainingCircle.vertAt(-5 / perpForContainingCircle.length()));
-      // containingCircle_clone.radius += 1;
+      containingCircle_clone.center.set(perpForContainingCircle.vertAt(-1 / perpForContainingCircle.length()));
 
-      draw.circle(containingCircle_clone.center, containingCircle_clone.radius, "rgba(128,128,128, 0.55)", 2.0, {
-        dashArray: [10, 10]
-      });
-
-      // console.log("closestPointOnA", closestPointOnA);
       if (drawHelperElements) {
         draw.diamondHandle(closestPointOnA, 8, "orange");
         draw.diamondHandle(closestPointOnB, 8, "orange");
 
         draw.line(connectLine.a, connectLine.b, "grey", 1.0);
-        draw.arrow(perpVector.a, perpVector.b, "orange", 1.0);
 
         fill.text("A", circleA.center.x + 5, circleA.center.y, { color: contrastColor });
         fill.text("B", circleB_clone.center.x + 5, circleB_clone.center.y, { color: contrastColor });
-        // draw.circle(newCircleB.center, circleB.radius, "grey", 2.0, { dashArray: [5, 10] });
-        draw.circle(circleB_clone.center, circleB_clone.radius, "rgb(0,192,192)", 3.0, { dashArray: [10, 5] });
+      }
+      if (appContext.config.drawPerpendiculars) {
+        draw.arrow(perpVector.a, perpVector.b, "orange", 1.0);
       }
 
       // Step 2: find attaching third circle.
@@ -177,6 +174,20 @@
       var apollonianCircle = solveApollonius3(containingCircle_clone, circleA.clone(), circleB_clone, true, false, false);
       console.log("apollonianCircle", apollonianCircle);
       draw.circle(apollonianCircle.center, apollonianCircle.radius, "rgba(255,0,255)", 2.0);
+
+      // Recursion?
+      if (iterationNumber < appContext.config.iterations) {
+        drawAppolonianCircles(
+          draw,
+          fill,
+          apollonianCircle, // circleA,
+          circleB,
+          containingCircle,
+          false, // don't draw helper elements
+          iterationNumber + 1, // iteration
+          appContext.config.circleRadius // desiredRadius
+        );
+      }
     }; // END postDraw
 
     // TODO: put this to geomutils?
