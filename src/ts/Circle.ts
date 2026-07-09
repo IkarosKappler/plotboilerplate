@@ -461,6 +461,7 @@ export class Circle implements IBounded, ICircle, Intersectable, SVGSerializable
     },
 
     containsPoint: (circleCenter: XYCoords, circleRadius: number, point: XYCoords): boolean => {
+      // TODO: cleanup
       // return (
       //   (circle.center.x - point.x) * (circle.center.x - point.x) + (circle.center.y - point.y) * (circle.center.y - point.y) <=
       //   circle.radius * circle.radius

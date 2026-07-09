@@ -125,6 +125,21 @@
       draw.diamondHandle(radiusPointA, 13, "cyan");
       draw.diamondHandle(radiusPointB, 13, "cyan");
       draw.diamondHandle(radiusPointC, 13, "cyan");
+
+      var pointA = hometheticCentersAB[1];
+      var pointB = hometheticCentersBC[1];
+      var pointC = hometheticCentersCA[0];
+      var resultCircle = Triangle.utils.calcCircumcircle(pointA, pointB, pointC);
+      // var resultCircle = new Triangle(pointA, pointB, pointC).getCircumcircle();
+      // var resultCircle = new Triangle(pointA, pointB, pointC).getMinimumEnclosingCircle();
+
+      pb.draw.circleHandle(pointA, 5, "violet");
+      pb.draw.circleHandle(pointB, 5, "violet");
+      pb.draw.circleHandle(pointC, 5, "violet");
+      // this.center = new Vertex(tmpCircle.center.x, tmpCircle.center.y);
+      // this.radius = tmpCircle.radius;
+      // this.radius_squared = tmpCircle.radius_squared;
+      // draw.circle(resultCircle.center, resultCircle.radius, "rgba(0,192,192,0.5)", 1.0);
     };
 
     // +---------------------------------------------------------------------------------
@@ -143,23 +158,27 @@
     ) {
       var circleConnectLine = new Line(firstCircle.center, secondCircle.center);
       // Draw the extended lines for the first homothetic center ...
-      drawExtendedHomotherticCenterLine(
-        draw,
-        fill,
-        circleConnectLine,
-        firstRadiusPoints,
-        secondRadiusPoints,
-        hometheticCenters[0]
-      );
+      if (hometheticCenters[0]) {
+        drawExtendedHomotherticCenterLine(
+          draw,
+          fill,
+          circleConnectLine,
+          firstRadiusPoints,
+          secondRadiusPoints,
+          hometheticCenters[0]
+        );
+      }
       // ... and also for the second one.
-      // drawExtendedHomotherticCenterLine(
-      //   draw,
-      //   fill,
-      //   circleConnectLine,
-      //   firstRadiusPoints,
-      //   secondRadiusPoints,
-      //   hometheticCenters[1]
-      // );
+      if (hometheticCenters[1]) {
+        drawExtendedHomotherticCenterLine(
+          draw,
+          fill,
+          circleConnectLine,
+          firstRadiusPoints,
+          secondRadiusPoints,
+          hometheticCenters[1]
+        );
+      }
     };
 
     // +---------------------------------------------------------------------------------
@@ -175,24 +194,22 @@
       secondRadiusPoints,
       hometheticCenter
     ) {
-      if (hometheticCenter) {
-        var closestT_first = circleCentersConnectLine.getClosestT(hometheticCenter);
-        if (closestT_first < 0.0) {
-          draw.line(firstRadiusPoints[0], hometheticCenter, appContext.config.colorRadiusConnectLine, 2.0, {
-            dashArray: [10, 5]
-          });
-          draw.line(circleCentersConnectLine.a, hometheticCenter, appContext.config.colorCenterConnectLine, 2.0, {
-            dashArray: [10, 5]
-          });
-        }
-        if (closestT_first > 1.0) {
-          draw.line(secondRadiusPoints[0], hometheticCenter, appContext.config.colorRadiusConnectLine, 2.0, {
-            dashArray: [10, 5]
-          });
-          draw.line(circleCentersConnectLine.b, hometheticCenter, appContext.config.colorCenterConnectLine, 2.0, {
-            dashArray: [10, 5]
-          });
-        }
+      var closestT_first = circleCentersConnectLine.getClosestT(hometheticCenter);
+      if (closestT_first < 0.0) {
+        draw.line(firstRadiusPoints[0], hometheticCenter, appContext.config.colorRadiusConnectLine, 2.0, {
+          dashArray: [10, 5]
+        });
+        draw.line(circleCentersConnectLine.a, hometheticCenter, appContext.config.colorCenterConnectLine, 2.0, {
+          dashArray: [10, 5]
+        });
+      }
+      if (closestT_first > 1.0) {
+        draw.line(secondRadiusPoints[0], hometheticCenter, appContext.config.colorRadiusConnectLine, 2.0, {
+          dashArray: [10, 5]
+        });
+        draw.line(circleCentersConnectLine.b, hometheticCenter, appContext.config.colorCenterConnectLine, 2.0, {
+          dashArray: [10, 5]
+        });
       }
     };
 
