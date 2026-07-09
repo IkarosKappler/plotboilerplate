@@ -33,6 +33,8 @@
     var appContext = new AppContext(pb, {
       // circleRadius: params.getNumber("circleRadius", 100),
       // iterations: params.getNumber("iterations", 5),
+      colorCenterConnectLine: params.getString("colorCenterConnectLine", "blue"),
+      colorRadiusConnectLine: params.getString("colorRadiusConnectLine", "green"),
       readme: function () {
         globalThis.displayDemoMeta();
       }
@@ -47,10 +49,6 @@
     var circleC = null;
     var angle = 0.0;
     var anglePointA = null;
-
-    var updateCircleRadiusB = function () {
-      // circleB.radius = Math.abs(circleB.center.distance(circleA.center) - circleA.radius);
-    };
 
     var updateAngle = function () {
       angle = new Line(circleA.center, anglePointA).angle();
@@ -108,10 +106,6 @@
     var postDraw = function (draw, fill) {
       var contrastColor = getContrastColor(pb.config.backgroundColor).cssRGB();
 
-      // draw.circle(containingCircle_clone.center, containingCircle_clone.radius, "rgba(128,128,128, 0.55)", 2.0, {
-      //   dashArray: [10, 10]
-      // });
-
       var radiusPointsA = drawAngleLines(draw, fill, circleA);
       var radiusPointsB = drawAngleLines(draw, fill, circleB);
       var radiusPointsC = drawAngleLines(draw, fill, circleC);
@@ -124,8 +118,20 @@
       drawExtendedLines(draw, fill, circleA, circleB, radiusPointsA, radiusPointsB, hometheticCentersAB);
       drawExtendedLines(draw, fill, circleB, circleC, radiusPointsB, radiusPointsC, hometheticCentersBC);
       drawExtendedLines(draw, fill, circleC, circleA, radiusPointsC, radiusPointsA, hometheticCentersCA);
+
+      // Visualize the angle control point to make it more prominent.
+
+      draw.diamondHandle(anglePointA, 13, "magenta");
+      draw.diamondHandle(radiusPointA, 13, "cyan");
+      draw.diamondHandle(radiusPointB, 13, "cyan");
+      draw.diamondHandle(radiusPointC, 13, "cyan");
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Draw extented lines from the homothetic centers. The centers might
+    // | be located beyond both points (not between them), so extend the
+    // | circle connect line and radius connect line.
+    // +-------------------------------
     var drawExtendedLines = function (
       draw,
       fill,
@@ -136,46 +142,64 @@
       hometheticCenters
     ) {
       var circleConnectLine = new Line(firstCircle.center, secondCircle.center);
-      if (hometheticCenters[0]) {
-        var closestT_first = circleConnectLine.getClosestT(hometheticCenters[0]);
+      // Draw the extended lines for the first homothetic center ...
+      drawExtendedHomotherticCenterLine(
+        draw,
+        fill,
+        circleConnectLine,
+        firstRadiusPoints,
+        secondRadiusPoints,
+        hometheticCenters[0]
+      );
+      // ... and also for the second one.
+      // drawExtendedHomotherticCenterLine(
+      //   draw,
+      //   fill,
+      //   circleConnectLine,
+      //   firstRadiusPoints,
+      //   secondRadiusPoints,
+      //   hometheticCenters[1]
+      // );
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Draw extented lines from one homothetic center. The center might
+    // | be located beyond both points (not between them), so extend the
+    // | circle connect line and radius connect line.
+    // +-------------------------------
+    var drawExtendedHomotherticCenterLine = function (
+      draw,
+      fill,
+      circleCentersConnectLine,
+      firstRadiusPoints,
+      secondRadiusPoints,
+      hometheticCenter
+    ) {
+      if (hometheticCenter) {
+        var closestT_first = circleCentersConnectLine.getClosestT(hometheticCenter);
         if (closestT_first < 0.0) {
-          draw.line(firstRadiusPoints[0], hometheticCenters[0], "red", 3.0, {
-            dashArray: [10, 10]
+          draw.line(firstRadiusPoints[0], hometheticCenter, appContext.config.colorRadiusConnectLine, 2.0, {
+            dashArray: [10, 5]
           });
-          draw.line(firstCircle.center, hometheticCenters[0], "magenta", 3.0, {
-            dashArray: [10, 10]
+          draw.line(circleCentersConnectLine.a, hometheticCenter, appContext.config.colorCenterConnectLine, 2.0, {
+            dashArray: [10, 5]
           });
         }
         if (closestT_first > 1.0) {
-          draw.line(secondRadiusPoints[0], hometheticCenters[0], "cyan", 3.0, {
-            dashArray: [10, 10]
+          draw.line(secondRadiusPoints[0], hometheticCenter, appContext.config.colorRadiusConnectLine, 2.0, {
+            dashArray: [10, 5]
           });
-          draw.line(secondCircle.center, hometheticCenters[0], "rgba(128,128,128, 0.55)", 3.0, {
-            dashArray: [10, 10]
-          });
-        }
-      }
-      if (hometheticCenters[1]) {
-        var closestT_second = circleConnectLine.getClosestT(hometheticCenters[1]);
-        if (closestT_second < 0.0) {
-          draw.line(firstRadiusPoints[0], hometheticCenters[1], "orange", 3.0, {
-            dashArray: [10, 10]
-          });
-          draw.line(firstCircle.center, hometheticCenters[1], "purple", 3.0, {
-            dashArray: [10, 10]
-          });
-        }
-        if (closestT_second > 1.0) {
-          draw.line(secondRadiusPoints[0], hometheticCenters[1], "green", 3.0, {
-            dashArray: [10, 10]
-          });
-          draw.line(secondCircle.center, hometheticCenters[1], "blue", 3.0, {
-            dashArray: [10, 10]
+          draw.line(circleCentersConnectLine.b, hometheticCenter, appContext.config.colorCenterConnectLine, 2.0, {
+            dashArray: [10, 5]
           });
         }
       }
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Calculate and draw the homothetic centers of two crircles and their radius points.
+    // | The function will return a 2-element array with the two calculated points.
+    // +-------------------------------
     var drawHomotheticCenters = function (draw, fill, firstCircle, secondCircle, firstRadiusPoints, secondRadiusPoints) {
       var connectCentersAB = new Line(firstCircle.center, secondCircle.center);
       var connectLinesAB = [
@@ -202,6 +226,11 @@
       return [firstIntersectionAB, secondIntersectionAB];
     }; // END postDraw
 
+    // +---------------------------------------------------------------------------------
+    // | This method just draw radius lines to visualize the
+    // | currently configured angle in the given circle.
+    // | Also the method will return both radius end points.
+    // +-------------------------------
     var drawAngleLines = function (draw, fill, circle) {
       var angleEndPoint = circle.vertAt(angle);
       pb.draw.line(circle.center, angleEndPoint, "orange", 2.0);
@@ -217,8 +246,6 @@
       draw.circle(circleA.center, circleA.radius, "rgba(0,192,192)", 3.0);
       draw.circle(circleB.center, circleB.radius, "rgba(0,192,192)", 3.0);
       draw.circle(circleC.center, circleC.radius, "rgba(0,192,192)", 3.0);
-      // draw.circle(circleB.center, circleB.radius, "rgba(0,192,192)", 3.0);
-      // draw.circle(circleB.center, circleB.radius, "grey", 2.0, { dashArray: [10, 5] });
     }; // END preDraw
 
     // +---------------------------------------------------------------------------------
