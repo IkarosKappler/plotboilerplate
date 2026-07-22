@@ -98,7 +98,7 @@
     };
 
     var initRandomCircles = function () {
-      appContext.pb.remove(getCircleCenters(circles), false, true); // redraw=false, removeWithVertices=false
+      appContext.pb.remove(getCircleCenters(circles), false, true); // redraw=false, removeWithVertices=true
       circles = makeRandomCircles();
       appContext.pb.add(getCircleCenters(circles));
 

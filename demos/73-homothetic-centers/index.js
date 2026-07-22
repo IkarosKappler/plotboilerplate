@@ -33,13 +33,20 @@
     var appContext = new AppContext(pb, {
       // circleRadius: params.getNumber("circleRadius", 100),
       // iterations: params.getNumber("iterations", 5),
-      colorCenterConnectLine: params.getString("colorCenterConnectLine", "blue"),
-      colorRadiusConnectLine: params.getString("colorRadiusConnectLine", "green"),
+      colorCenterConnectLine: params.getString("colorCenterConnectLine", "#0048e0"),
+      colorRadiusConnectLine: params.getString("colorRadiusConnectLine", "#00e048"),
+      isTwoCircles: params.getBoolean("isTwoCircles", true),
       readme: function () {
         globalThis.displayDemoMeta();
       }
     });
     appContext.isMobile = isMobile;
+    appContext.onTwoCircleSettingChanged = function () {
+      //
+      circleC.center.attr.visible = !appContext.config.isTwoCircles;
+      radiusPointC.attr.visible = !appContext.config.isTwoCircles;
+      appContext.pb.redraw();
+    };
 
     // +---------------------------------------------------------------------------------
     // | Global vars
@@ -108,34 +115,44 @@
 
       var radiusPointsA = drawAngleLines(draw, fill, circleA);
       var radiusPointsB = drawAngleLines(draw, fill, circleB);
-      var radiusPointsC = drawAngleLines(draw, fill, circleC);
+      var radiusPointsC = appContext.config.isTwoCircles ? null : drawAngleLines(draw, fill, circleC);
 
       var hometheticCentersAB = drawHomotheticCenters(draw, fill, circleA, circleB, radiusPointsA, radiusPointsB);
-      var hometheticCentersBC = drawHomotheticCenters(draw, fill, circleB, circleC, radiusPointsB, radiusPointsC);
-      var hometheticCentersCA = drawHomotheticCenters(draw, fill, circleC, circleA, radiusPointsC, radiusPointsA);
+      var hometheticCentersBC = appContext.config.isTwoCircles
+        ? null
+        : drawHomotheticCenters(draw, fill, circleB, circleC, radiusPointsB, radiusPointsC);
+      var hometheticCentersCA = appContext.config.isTwoCircles
+        ? null
+        : drawHomotheticCenters(draw, fill, circleC, circleA, radiusPointsC, radiusPointsA);
 
       // Extend lines that are outside the connecting lines
       drawExtendedLines(draw, fill, circleA, circleB, radiusPointsA, radiusPointsB, hometheticCentersAB);
-      drawExtendedLines(draw, fill, circleB, circleC, radiusPointsB, radiusPointsC, hometheticCentersBC);
-      drawExtendedLines(draw, fill, circleC, circleA, radiusPointsC, radiusPointsA, hometheticCentersCA);
+      if (!appContext.config.isTwoCircles) {
+        drawExtendedLines(draw, fill, circleB, circleC, radiusPointsB, radiusPointsC, hometheticCentersBC);
+        drawExtendedLines(draw, fill, circleC, circleA, radiusPointsC, radiusPointsA, hometheticCentersCA);
+      }
 
       // Visualize the angle control point to make it more prominent.
 
       draw.diamondHandle(anglePointA, 13, "magenta");
       draw.diamondHandle(radiusPointA, 13, "cyan");
       draw.diamondHandle(radiusPointB, 13, "cyan");
-      draw.diamondHandle(radiusPointC, 13, "cyan");
+      if (!appContext.config.isTwoCircles) {
+        draw.diamondHandle(radiusPointC, 13, "cyan");
+      }
 
       var pointA = hometheticCentersAB[1];
-      var pointB = hometheticCentersBC[1];
-      var pointC = hometheticCentersCA[0];
-      var resultCircle = Triangle.utils.calcCircumcircle(pointA, pointB, pointC);
+      var pointB = appContext.config.isTwoCircles ? null : hometheticCentersBC[1];
+      var pointC = appContext.config.isTwoCircles ? null : hometheticCentersCA[0];
+      // var resultCircle = Triangle.utils.calcCircumcircle(pointA, pointB, pointC);
       // var resultCircle = new Triangle(pointA, pointB, pointC).getCircumcircle();
       // var resultCircle = new Triangle(pointA, pointB, pointC).getMinimumEnclosingCircle();
 
       pb.draw.circleHandle(pointA, 5, "violet");
-      pb.draw.circleHandle(pointB, 5, "violet");
-      pb.draw.circleHandle(pointC, 5, "violet");
+      if (!appContext.config.isTwoCircles) {
+        pb.draw.circleHandle(pointB, 5, "violet");
+        pb.draw.circleHandle(pointC, 5, "violet");
+      }
       // this.center = new Vertex(tmpCircle.center.x, tmpCircle.center.y);
       // this.radius = tmpCircle.radius;
       // this.radius_squared = tmpCircle.radius_squared;
@@ -262,7 +279,9 @@
     var preDraw = function (draw, fill) {
       draw.circle(circleA.center, circleA.radius, "rgba(0,192,192)", 3.0);
       draw.circle(circleB.center, circleB.radius, "rgba(0,192,192)", 3.0);
-      draw.circle(circleC.center, circleC.radius, "rgba(0,192,192)", 3.0);
+      if (!appContext.config.isTwoCircles) {
+        draw.circle(circleC.center, circleC.radius, "rgba(0,192,192)", 3.0);
+      }
     }; // END preDraw
 
     // +---------------------------------------------------------------------------------
@@ -283,12 +302,8 @@
     pb.config.preDraw = preDraw;
     pb.config.postDraw = postDraw;
     updateAnglePointA();
-    pb.redraw();
-
-    window.addEventListener("resize", function () {
-      // updateCurrentBounds();
-    });
-
+    // pb.redraw();
+    appContext.onTwoCircleSettingChanged(); // This will trigger a redraw
     humane.log("Move the circles around.");
   });
 })(globalThis);

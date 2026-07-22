@@ -1,7 +1,10 @@
-# A script for generating Chladni like patterns.
+# Homothetic centers (or Ähnlichkeitspunkte)
 
-Define any two wave functions, a horizonal one and a vertical one. Ideally their values are inside -1.0 and 1.0. The product of both defines the threshold – any value near 0.0 will be considered to be drawn.
+Best described at
+[mathworld.wolfram.com/ApolloniusProblem.html](https://mathworld.wolfram.com/ApolloniusProblem.html)
 
-Use the distance weight to modify the tolerance.
+[mathworld.wolfram.com/HomotheticCenter.html](https://mathworld.wolfram.com/HomotheticCenter.html)
 
-![Sand patterns](https://plotboilerplate.io/repo/screenshots/screenshot-20260520-2-sand-patterns.png)
+[mathworld.wolfram.com/ApolloniusCircle.html](https://mathworld.wolfram.com/ApolloniusCircle.html)
+
+![Homothetic centers or Ähnlichkeitspunkte](https://plotboilerplate.io/repo/screenshots/screenshot-20260708-0-homothetic-centers.png)
