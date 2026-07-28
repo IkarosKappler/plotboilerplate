@@ -586,6 +586,7 @@ new MouseHandler(document.getElementById("mycanvas"))
 - And to [DIKU-Steiner](https://github.com/DIKU-Steiner) for the original Apollonian circle solver in Java.
 - Mathworld for the [Apollonius math](https://mathworld.wolfram.com/ApolloniusProblem.html)
 - Mathworld for the [Homothetic center math](https://mathworld.wolfram.com/HomotheticCenter.html)
+- cut-the-knot.org for the [Radical Axis calculation](https://www.cut-the-knot.org/Curriculum/Geometry/GeoGebra/RadicalAxes.shtml)
 
 ## Todos
 

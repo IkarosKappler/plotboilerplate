@@ -35,7 +35,7 @@
       // iterations: params.getNumber("iterations", 5),
       colorCenterConnectLine: params.getString("colorCenterConnectLine", "#0048e0"),
       colorRadiusConnectLine: params.getString("colorRadiusConnectLine", "#00e048"),
-      isTwoCircles: params.getBoolean("isTwoCircles", true),
+      isTwoCircles: params.getBoolean("isTwoCircles", false),
       readme: function () {
         globalThis.displayDemoMeta();
       }
