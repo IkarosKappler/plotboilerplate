@@ -19,7 +19,8 @@
  * @modified 2026-01-13 Adding helper function `Circle.circleUtils.containsPoint` and refactored the member method `containsPoint`.
  * @modified 2026-07-03 Adding the optional `epsilon` parameter to the `Circle.containsCircle` method.
  * @modified 2026-07-03 Fixing the `Circle.clone` method; the center had not been cloned at all, this was fixed.
- * @modified 2026-07-08 Adding the `Circle.setRadius` method.
+ * @modified 2026-07-08 Adding the `Circle.setRadius` method (for chaining).
+ * @mofified 2026-07-31 Adding the `radicalAxis(Circle)` method. Added the `Circle.circleUtils.createRadicalAxisHelperCircle` and `.circleDistance` helper methods.
  *
  * @version  1.7.0
  **/
@@ -382,6 +383,43 @@ export class Circle implements IBounded, ICircle, Intersectable, SVGSerializable
   //--- END --- Implement interface `Intersectable`
 
   /**
+   * Calculate the radical axis of this and a different circle.
+   * The two circles must not be co-centric.
+   *
+   * See this article for details:
+   *    https://www.cut-the-knot.org/Curriculum/Geometry/GeoGebra/RadicalAxes.shtml
+   *
+   * @method radicalAxis
+   * @instance
+   * @memberof Circle
+   * @param {Circle} circleB - The second circle to calculated the radical axis for.
+   * @return {Line} A line defining the radical axis of the two circles.
+   **/
+  radicalAxis(circleB: Circle): Line {
+    var helperCircle = Circle.circleUtils.createRadicalAxisHelperCircle(this, circleB);
+    var intersectionLineA = this.circleIntersection(helperCircle);
+    var intersectionLineB = circleB.circleIntersection(helperCircle);
+    var intersection = this.circleIntersection(circleB);
+
+    if (!intersectionLineA || !intersectionLineB) {
+      console.error("Critical error: none of the two intersections must be null.");
+      return intersection; // Fallback
+    }
+    var lineA = new Line(intersectionLineA.a, intersectionLineA.b);
+    var lineB = new Line(intersectionLineB.a, intersectionLineB.b);
+    var firstRadicalAxisPoint = lineA.intersection(lineB);
+    var centerConnectLine = new Line(this.center, circleB.center);
+    var secondRadicalAxisPoint = centerConnectLine.getClosestPoint(firstRadicalAxisPoint);
+    // Create a mirrored version of the second radical axis point so both are located
+    // symmetrical from the circle connect point.
+    // (currently the second point is located ON the connect line)
+    var secondRadicalAxisPoint_mirrored = secondRadicalAxisPoint.clone().scale(2.0, firstRadicalAxisPoint);
+
+    var radicalAxis = new Line(firstRadicalAxisPoint, secondRadicalAxisPoint_mirrored);
+    return intersection && intersection.length() > radicalAxis.length() ? intersection : radicalAxis;
+  }
+
+  /**
    * Calculate the closest point on the outline of this circle to the given point.
    *
    * @method closestPoint
@@ -467,6 +505,27 @@ export class Circle implements IBounded, ICircle, Intersectable, SVGSerializable
       //   circle.radius * circle.radius
       // );
       return geomutils.dist4(point.x, point.y, circleCenter.x, circleCenter.y) < circleRadius;
+    },
+
+    createRadicalAxisHelperCircle: (circleA: Circle, circleB: Circle): Circle => {
+      // We need to create a helper circle that intersects BOTH other circles,
+      // each in TWO points.
+      var circleConnectLine = new Vector(circleA.center.clone(), circleB.center);
+      circleConnectLine.a.set(circleConnectLine.vertAt(0.5));
+      // Get the perpendicular by half the circle distance.
+      var bisector = circleConnectLine.perp();
+      var bisectorLength = Math.max(circleA.radius, circleB.radius, bisector.length());
+      bisector.setLength(bisectorLength);
+      return new Circle(bisector.b, bisector.b.distance(circleA.center));
+    },
+
+    /**
+     * Calculate the outer distance between two circles. If the circles touch then the
+     * distance is 0.0.
+     * If the circles intersect then the distance in negative.
+     */
+    circleDistance: (circleA: Circle, circleB: Circle): number => {
+      return circleA.center.distance(circleB.center) - circleA.radius - circleB.radius;
     }
   };
 } // END class

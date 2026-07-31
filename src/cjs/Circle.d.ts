@@ -19,6 +19,9 @@
  * @modified 2026-01-13 Adding helper function `Circle.circleUtils.containsPoint` and refactored the member method `containsPoint`.
  * @modified 2026-07-03 Adding the optional `epsilon` parameter to the `Circle.containsCircle` method.
  * @modified 2026-07-03 Fixing the `Circle.clone` method; the center had not been cloned at all, this was fixed.
+ * @modified 2026-07-08 Adding the `Circle.setRadius` method (for chaining).
+ * @mofified 2026-07-31 Adding the `radicalAxis(Circle)` method. Added the `Circle.circleUtils.createRadicalAxisHelperCircle` and `.circleDistance` helper methods.
+ *
  * @version  1.7.0
  **/
 import { Bounds } from "./Bounds";
@@ -214,6 +217,20 @@ export declare class Circle implements IBounded, ICircle, Intersectable, SVGSeri
      */
     lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vector>;
     /**
+     * Calculate the radical axis of this and a different circle.
+     * The two circles must not be co-centric.
+     *
+     * See this article for details:
+     *    https://www.cut-the-knot.org/Curriculum/Geometry/GeoGebra/RadicalAxes.shtml
+     *
+     * @method radicalAxis
+     * @instance
+     * @memberof Circle
+     * @param {Circle} circleB - The second circle to calculated the radical axis for.
+     * @return {Line} A line defining the radical axis of the two circles.
+     **/
+    radicalAxis(circleB: Circle): Line;
+    /**
      * Calculate the closest point on the outline of this circle to the given point.
      *
      * @method closestPoint
@@ -242,5 +259,12 @@ export declare class Circle implements IBounded, ICircle, Intersectable, SVGSeri
     static circleUtils: {
         vertAt: (angle: number, radius: number) => Vertex;
         containsPoint: (circleCenter: XYCoords, circleRadius: number, point: XYCoords) => boolean;
+        createRadicalAxisHelperCircle: (circleA: Circle, circleB: Circle) => Circle;
+        /**
+         * Calculate the outer distance between two circles. If the circles touch then the
+         * distance is 0.0.
+         * If the circles intersect then the distance in negative.
+         */
+        circleDistance: (circleA: Circle, circleB: Circle) => number;
     };
 }

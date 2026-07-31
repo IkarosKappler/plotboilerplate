@@ -1,5 +1,5 @@
 /**
- * A script for generating power center and power circle of three given circles.
+ * A script for generating radical axis of two given circles.
  *
  * @author   Ikaros Kappler
  * @date     2026-07-28
@@ -62,24 +62,17 @@
     new CircleHelper(circleB, radiusPointB, pb);
 
     helperCircle = randomCircle(appContext.pb.viewport().getScaled(0.666));
-    var radiusPointC = createRadiusPoint(helperCircle);
-    new CircleHelper(helperCircle, radiusPointC, pb);
+    var helperCircleRadiusPoint = createRadiusPoint(helperCircle);
+    new CircleHelper(helperCircle, helperCircleRadiusPoint, pb);
 
-    pb.add([circleA.center, radiusPointA, circleB.center, radiusPointB, helperCircle.center, radiusPointC]);
+    pb.add([circleA.center, radiusPointA, circleB.center, radiusPointB, helperCircle.center, helperCircleRadiusPoint]);
 
     var updateHelperCircle = function () {
-      // We need to create a helper circle that intersects BOTH other circles,
-      // each in TWO points.
-      var circleConnectLine = new Vector(circleA.center.clone(), circleB.center);
-      circleConnectLine.a.set(circleConnectLine.vertAt(0.5));
-      // var bisectorPoint = circleConnectLine.vertAt(0.5);
-      // Get the perpendicular by half the circle distance.
-      var bisector = circleConnectLine.perp();
-      bisector.setLength(Math.max(circleA.radius, circleB.radius));
-      // bisector.a.set(bisector.vertAt(0.5));
-      helperCircle.center.set(bisector.b);
-      helperCircle.radius = helperCircle.center.distance(circleA.center);
-      radiusPointC.set(createRadiusPoint(helperCircle));
+      var tmpHelperCircle = Circle.circleUtils.createRadicalAxisHelperCircle(circleA, circleB);
+      helperCircle.center.set(tmpHelperCircle.center);
+      helperCircle.radius = tmpHelperCircle.radius;
+
+      helperCircleRadiusPoint.set(createRadiusPoint(helperCircle));
     };
 
     // +---------------------------------------------------------------------------------
@@ -102,6 +95,26 @@
     // | Triggered after the main draw routine.
     // +-------------------------------
     var postDraw = function (draw, fill) {
+      var calculatedRadicalAxis = circleA.radicalAxis(circleB);
+      draw.line(calculatedRadicalAxis.a, calculatedRadicalAxis.b, rgba(128, 128, 128, 0.5), 7);
+      makeRadicalLine(draw, fill);
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Note: the algorithm in this method is implemented in the `Circle.radicalAxis` method.
+    // |
+    // | Calculating the radical line:
+    // |  * the helper circle is positioned in a way that it always intersects both
+    // |    circles in two points.
+    // |  * Each pair onf intersection points defines line with length > 1.
+    // |  * By construction these lines intersect (are not parallel).
+    // |  * The intersection point of both lines is located ON the radical axis.
+    // |  * By this we can construct the Radical Axis as a perpendicular from the
+    // |    connecting center line.
+    // |  * To find a _beautiful_ Racical Axis we use the radical line from the circle
+    // |    intersection if it is longer.
+    // +-------------------------------
+    var makeRadicalLine = function (draw, fill) {
       var contrastColor = getContrastColor(pb.config.backgroundColor).cssRGB();
 
       var intersectionLineA = circleA.circleIntersection(helperCircle);
@@ -138,7 +151,17 @@
         // (currently the second point is located ON the connect line)
         var secondRadicalAxisPoint_mirrored = secondRadicalAxisPoint.clone().scale(2.0, firstRadicalAxisPoint);
         draw.diamondHandle(secondRadicalAxisPoint_mirrored, 13, "orange");
-        draw.line(firstRadicalAxisPoint, secondRadicalAxisPoint_mirrored, rgba(255, 0, 255, 1.0), 2, { dashArray: [10, 10] });
+
+        var radicalAxis = new Line(firstRadicalAxisPoint, secondRadicalAxisPoint_mirrored);
+        var intersection = circleA.circleIntersection(circleB);
+        if (intersection) {
+          // console.log(intersection.length(), radicalAxis.length());
+          draw.diamondHandle(intersection.a, 13, "cyan");
+          draw.diamondHandle(intersection.b, 13, "cyan");
+        }
+        var result = intersection && intersection.length() > radicalAxis.length() ? intersection : radicalAxis;
+
+        draw.line(result.a, result.b, rgba(255, 0, 255, 1.0), 2, { dashArray: [10, 10] });
       }
     };
 
@@ -149,7 +172,7 @@
       draw.circle(circleA.center, circleA.radius, "rgba(0,192,192,1.0)", 3.0);
       draw.circle(circleB.center, circleB.radius, "rgba(0,192,192,1.0)", 3.0);
       // draw.circle(circleC.center, circleC.radius, "rgba(0,192,192,1.0)", 3.0);
-      draw.circle(helperCircle.center, helperCircle.radius, "rgba(192,192,192,1.0)", 3.0);
+      draw.circle(helperCircle.center, helperCircle.radius, "rgba(192,192,192,0.5)", 3.0);
     }; // END preDraw
 
     // +---------------------------------------------------------------------------------
