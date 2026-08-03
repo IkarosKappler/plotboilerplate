@@ -14,7 +14,15 @@
  * @modified 2022-08-23 Added the `closestPoint` function.
  * @modified 2025-04-09 Added the `Circle.move(amount: XYCoords)` method.
  * @modified 2025-04-16 Class `Circle` now implements interface `Intersectable`.
- * @version  1.5.0
+ * @modified 2026-06-10 Adding the utility function `Circle.circleUtils.containsPoint`.
+ * @modified 2026-06-10 Adding the `Circle.clone` method.
+ * @modified 2026-01-13 Adding helper function `Circle.circleUtils.containsPoint` and refactored the member method `containsPoint`.
+ * @modified 2026-07-03 Adding the optional `epsilon` parameter to the `Circle.containsCircle` method.
+ * @modified 2026-07-03 Fixing the `Circle.clone` method; the center had not been cloned at all, this was fixed.
+ * @modified 2026-07-08 Adding the `Circle.setRadius` method (for chaining).
+ * @mofified 2026-07-31 Adding the `radicalAxis(Circle)` method. Added the `Circle.circleUtils.createRadicalAxisHelperCircle` and `.circleDistance` helper methods.
+ * @modified 2026-08-03 Adding `Circle.tangentsFromPoint`.
+ * @version  1.7.0
  **/
 import { Bounds } from "./Bounds";
 import { Line } from "./Line";
@@ -22,6 +30,11 @@ import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 import { IBounded, Intersectable, SVGSerializable, UID, XYCoords } from "./interfaces";
+export interface ICircle {
+    center: XYCoords;
+    radius: number;
+    radius_squared?: number;
+}
 /**
  * @classdesc A simple circle: center point and radius.
  *
@@ -33,7 +46,7 @@ import { IBounded, Intersectable, SVGSerializable, UID, XYCoords } from "./inter
  * @requires UID
  * @requires UIDGenerator
  **/
-export declare class Circle implements IBounded, Intersectable, SVGSerializable {
+export declare class Circle implements IBounded, ICircle, Intersectable, SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
      **/
@@ -76,6 +89,17 @@ export declare class Circle implements IBounded, Intersectable, SVGSerializable 
      */
     constructor(center: Vertex, radius: number);
     /**
+     * Set the radius of this circle.
+     * The method is meant for chaining, you may also alter the `radius` attribute directly.
+     *
+     * @method setRadius
+     * @param {number} radius - The amount to move.
+     * @instance
+     * @memberof Circle
+     * @return {Circle} this for chaining
+     **/
+    setRadius(radius: number): Circle;
+    /**
      * Move the circle by the given amount.
      *
      * @method move
@@ -104,7 +128,7 @@ export declare class Circle implements IBounded, Intersectable, SVGSerializable 
      * @memberof Circle
      * @return {boolean} `true` if any only if the given circle is completely inside this circle.
      */
-    containsCircle(circle: Circle): boolean;
+    containsCircle(circle: Circle, epsilon?: number): boolean;
     /**
      * Calculate the distance from this circle to the given line.
      *
@@ -193,6 +217,20 @@ export declare class Circle implements IBounded, Intersectable, SVGSerializable 
      */
     lineIntersectionTangents(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vector>;
     /**
+     * Calculate the radical axis of this and a different circle.
+     * The two circles must not be co-centric.
+     *
+     * See this article for details:
+     *    https://www.cut-the-knot.org/Curriculum/Geometry/GeoGebra/RadicalAxes.shtml
+     *
+     * @method radicalAxis
+     * @instance
+     * @memberof Circle
+     * @param {Circle} circleB - The second circle to calculated the radical axis for.
+     * @return {Line} A line defining the radical axis of the two circles.
+     **/
+    radicalAxis(circleB: Circle): Line;
+    /**
      * Calculate the closest point on the outline of this circle to the given point.
      *
      * @method closestPoint
@@ -203,6 +241,27 @@ export declare class Circle implements IBounded, Intersectable, SVGSerializable 
      **/
     closestPoint(vert: XYCoords): Vertex;
     /**
+     * Get the two tangent vectors for the given point.
+     * If the point is on or in the circle then null is returned.
+     *
+     * @method tangentsFromPoint
+     * @instance
+     * @memberof Circle
+     * @param {Vertex} vert - The point to find the two tangents for.
+     * @return {[Vector,Vector]} The two tangent vector
+     **/
+    tangentsFromPoint(vert: Vertex): [Vector, Vector];
+    /**
+     * Create a deep copy of this circle.
+     *
+     * @method clone
+     * @return {Circle} A new circle, an exact copy of this one.
+     * @instance
+     * @memberof Circle
+     **/
+    clone(): Circle;
+    static fromICircle(obj: ICircle): Circle;
+    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.
@@ -210,5 +269,13 @@ export declare class Circle implements IBounded, Intersectable, SVGSerializable 
     destroy(): void;
     static circleUtils: {
         vertAt: (angle: number, radius: number) => Vertex;
+        containsPoint: (circleCenter: XYCoords, circleRadius: number, point: XYCoords) => boolean;
+        createRadicalAxisHelperCircle: (circleA: Circle, circleB: Circle) => Circle;
+        /**
+         * Calculate the outer distance between two circles. If the circles touch then the
+         * distance is 0.0.
+         * If the circles intersect then the distance in negative.
+         */
+        circleDistance: (circleA: Circle, circleB: Circle) => number;
     };
 }

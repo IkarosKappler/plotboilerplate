@@ -579,6 +579,14 @@ new MouseHandler(document.getElementById("mycanvas"))
 - Thanks to Ana Tudor for the Multi-Range-Slider tutorial: https://css-tricks.com/multi-thumb-sliders-particular-two-thumb-case/
 - Thanks to Dean Taylor for the css linear gradient parser howto: https://stackoverflow.com/questions/20215440/parse-css-gradient-rule-with-javascript-regex
 - Thanks to Stefan Gustavson (stegu@itn.liu.se) for the Perlin noise on example C code (https://github.com/MethanePowered/PerlinNoise). And for Peter Eastman (peastman@drizzle.stanford.edu) for Perlin noise optimizations.
+- Thanks to Rowan Winsemius for the (https://github.com/rowanwins/smallest-enclosing-circle "inspirational welzl algorithm implementation")
+- Thanks to [Matt R](https://matthewhr.wordpress.com/author/matthewhr/) for the article about [minimum enclosing circles and circumscribed circles](https://matthewhr.wordpress.com/2013/03/23/circumscribed-circle-vs-minimal-enclosing-circle-ii/)
+- Thanks to [Axel Kemper](https://math.stackexchange.com/users/58610/axel-kemper) for the idea of approximating the [minimum enclosing circle of three circles](https://math.stackexchange.com/questions/1017989/smallest-circle-enclosing-three-disjoint-circles)
+- Thanks to [micycle](https://stackoverflow.com/users/9808792/micycle) for the neat function to solve the [Apollonian Circle](https://stackoverflow.com/questions/79281573/algorithm-for-finding-enclosing-circles-for-3-other-circles)
+- And to [DIKU-Steiner](https://github.com/DIKU-Steiner) for the original Apollonian circle solver in Java.
+- Mathworld for the [Apollonius math](https://mathworld.wolfram.com/ApolloniusProblem.html)
+- Mathworld for the [Homothetic center math](https://mathworld.wolfram.com/HomotheticCenter.html)
+- cut-the-knot.org for the [Radical Axis calculation](https://www.cut-the-knot.org/Curriculum/Geometry/GeoGebra/RadicalAxes.shtml)
 
 ## Todos
 

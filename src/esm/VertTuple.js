@@ -16,7 +16,8 @@
  * @modified 2025-03-31 Added the `VertTuple.revert` method.
  * @modified 2025-04-15 Changed param of `VertTuple.moveTo` method from `Vertex` to `XYCoords`.
  * @modified 2025-04-15 Added method `VertTuple.move` method.
- * @version 1.4.0
+ * @modified 2026-06-10 Adding helper function `VertTuple.utils.calcCircumcircle`.
+ * @version 1.5.0
  */
 import { Vertex } from "./Vertex";
 import { UIDGenerator } from "./UIDGenerator";
@@ -338,6 +339,10 @@ export class VertTuple {
 VertTuple.vtutils = {
     dist2: (v, w) => {
         return (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y);
+    },
+    calcCircumcircle: (p1, p2) => {
+        const p1x = p1.x, p1y = p1.y, p2x = p2.x, p2y = p2.y, cx = 0.5 * (p1x + p2x), cy = 0.5 * (p1y + p2y);
+        return { center: { x: cx, y: cy }, radius: Math.sqrt((p1x - cx) * (p1x - cx) + (p1y - cy) * (p1y - cy)) };
     }
 };
 //# sourceMappingURL=VertTuple.js.map

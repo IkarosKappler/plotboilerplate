@@ -32,13 +32,13 @@
     // Create a config: we want to have control about the arrow head size in this demo
     // `AppContext`: this is an experimental approach to make future event handling easier.
     var appContext = new AppContext(pb, {
-      showVertices: params.getBoolean("showVertices", true),
+      showVertices: params.getBoolean("showVertices", false),
       lineColor: params.getString("lineColor", "rgb(255,128,0)"),
       lineWidth: params.getNumber("lineWidth", 7.0),
-      showHobbyCurves: params.getBoolean("showHobbyCurves", true),
+      showHobbyCurves: params.getBoolean("showHobbyCurves", false),
       showLinear: params.getBoolean("showLinear", false),
       showHobbyTangents: params.getBoolean("showHobbyTangents", false),
-      isFuzzyDrawEnabled: params.getBoolean("isFuzzyDrawEnabled", false),
+      isFuzzyDrawEnabled: params.getBoolean("isFuzzyDrawEnabled", true),
       fuzzySamplePointDistance: params.getNumber("fuzzySamplePointDistance", 20.0),
       fuzzyAmplitudeFactor: params.getNumber("fuzzyAmplitudeFactor", 10.0),
       fuzzLineCount: params.getNumber("fuzzLineCount", 10),

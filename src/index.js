@@ -81,28 +81,36 @@
     // +---------------------------------------------------------------------------------
     // | Initialize dat.gui
     // +-------------------------------
-    pb.createGUI();
+    try {
+      pb.createGUI();
+    } catch (e) {
+      console.error("Failed to initialize GUI", e);
+    }
 
     // +---------------------------------------------------------------------------------
     // | Add stats.
     // +-------------------------------
-    var stats = {
-      mouseX: 0,
-      mouseY: 0
-    };
-    var uiStats = new UIStats(stats);
-    stats = uiStats.proxy;
-    uiStats.add("mouseX");
-    uiStats.add("mouseY");
+    try {
+      var stats = {
+        mouseX: 0,
+        mouseY: 0
+      };
+      var uiStats = new UIStats(stats);
+      stats = uiStats.proxy;
+      uiStats.add("mouseX");
+      uiStats.add("mouseY");
 
-    // +---------------------------------------------------------------------------------
-    // | Add a mouse listener to track the mouse position.
-    // +-------------------------------
-    new MouseHandler(pb.eventCatcher).move(function (e) {
-      var relPos = pb.transformMousePosition(e.params.pos.x, e.params.pos.y);
-      stats.mouseX = relPos.x;
-      stats.mouseY = relPos.y;
-    });
+      // +---------------------------------------------------------------------------------
+      // | Add a mouse listener to track the mouse position.
+      // +-------------------------------
+      new MouseHandler(pb.eventCatcher).move(function (e) {
+        var relPos = pb.transformMousePosition(e.params.pos.x, e.params.pos.y);
+        stats.mouseX = relPos.x;
+        stats.mouseY = relPos.y;
+      });
+    } catch (e) {
+      console.error("Failed to initialize stats and/or mouse handler.", e);
+    }
 
     // Use a helper function to build all demo-drawables.
     var drawables = createDemoDrawables(pb, "example-image.png", function () {

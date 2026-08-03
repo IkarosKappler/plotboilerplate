@@ -14,13 +14,22 @@
  * @modified 2022-08-23 Added the `closestPoint` function.
  * @modified 2025-04-09 Added the `Circle.move(amount: XYCoords)` method.
  * @modified 2025-04-16 Class `Circle` now implements interface `Intersectable`.
- * @version  1.5.0
+ * @modified 2026-06-10 Adding the utility function `Circle.circleUtils.containsPoint`.
+ * @modified 2026-06-10 Adding the `Circle.clone` method.
+ * @modified 2026-01-13 Adding helper function `Circle.circleUtils.containsPoint` and refactored the member method `containsPoint`.
+ * @modified 2026-07-03 Adding the optional `epsilon` parameter to the `Circle.containsCircle` method.
+ * @modified 2026-07-03 Fixing the `Circle.clone` method; the center had not been cloned at all, this was fixed.
+ * @modified 2026-07-08 Adding the `Circle.setRadius` method (for chaining).
+ * @mofified 2026-07-31 Adding the `radicalAxis(Circle)` method. Added the `Circle.circleUtils.createRadicalAxisHelperCircle` and `.circleDistance` helper methods.
+ * @modified 2026-08-03 Adding `Circle.tangentsFromPoint`.
+ * @version  1.7.0
  **/
 import { Bounds } from "./Bounds";
 import { Line } from "./Line";
 import { UIDGenerator } from "./UIDGenerator";
 import { Vector } from "./Vector";
 import { Vertex } from "./Vertex";
+import { geomutils } from "./geomutils";
 /**
  * @classdesc A simple circle: center point and radius.
  *
@@ -51,6 +60,20 @@ export class Circle {
         this.radius = radius;
     }
     /**
+     * Set the radius of this circle.
+     * The method is meant for chaining, you may also alter the `radius` attribute directly.
+     *
+     * @method setRadius
+     * @param {number} radius - The amount to move.
+     * @instance
+     * @memberof Circle
+     * @return {Circle} this for chaining
+     **/
+    setRadius(radius) {
+        this.radius = radius;
+        return this;
+    }
+    /**
      * Move the circle by the given amount.
      *
      * @method move
@@ -73,7 +96,8 @@ export class Circle {
      * @return {boolean} `true` if the given point is inside this circle.
      */
     containsPoint(point) {
-        return this.center.distance(point) < this.radius;
+        // return this.center.distance(point) < this.radius;//
+        return Circle.circleUtils.containsPoint(this.center, this.radius, point);
     }
     /**
      * Check if the given circle is fully contained inside this circle.
@@ -84,8 +108,13 @@ export class Circle {
      * @memberof Circle
      * @return {boolean} `true` if any only if the given circle is completely inside this circle.
      */
-    containsCircle(circle) {
-        return this.center.distance(circle.center) + circle.radius < this.radius;
+    containsCircle(circle, epsilon) {
+        if (typeof epsilon === "undefined" || Number.isNaN(epsilon)) {
+            return this.center.distance(circle.center) + circle.radius < this.radius;
+        }
+        else {
+            return this.center.distance(circle.center) + circle.radius < this.radius + Math.abs(epsilon);
+        }
     }
     /**
      * Calculate the distance from this circle to the given line.
@@ -289,6 +318,40 @@ export class Circle {
     }
     //--- END --- Implement interface `Intersectable`
     /**
+     * Calculate the radical axis of this and a different circle.
+     * The two circles must not be co-centric.
+     *
+     * See this article for details:
+     *    https://www.cut-the-knot.org/Curriculum/Geometry/GeoGebra/RadicalAxes.shtml
+     *
+     * @method radicalAxis
+     * @instance
+     * @memberof Circle
+     * @param {Circle} circleB - The second circle to calculated the radical axis for.
+     * @return {Line} A line defining the radical axis of the two circles.
+     **/
+    radicalAxis(circleB) {
+        var helperCircle = Circle.circleUtils.createRadicalAxisHelperCircle(this, circleB);
+        var intersectionLineA = this.circleIntersection(helperCircle);
+        var intersectionLineB = circleB.circleIntersection(helperCircle);
+        var intersection = this.circleIntersection(circleB);
+        if (!intersectionLineA || !intersectionLineB) {
+            console.error("Critical error: none of the two intersections must be null.");
+            return intersection; // Fallback
+        }
+        var lineA = new Line(intersectionLineA.a, intersectionLineA.b);
+        var lineB = new Line(intersectionLineB.a, intersectionLineB.b);
+        var firstRadicalAxisPoint = lineA.intersection(lineB);
+        var centerConnectLine = new Line(this.center, circleB.center);
+        var secondRadicalAxisPoint = centerConnectLine.getClosestPoint(firstRadicalAxisPoint);
+        // Create a mirrored version of the second radical axis point so both are located
+        // symmetrical from the circle connect point.
+        // (currently the second point is located ON the connect line)
+        var secondRadicalAxisPoint_mirrored = secondRadicalAxisPoint.clone().scale(2.0, firstRadicalAxisPoint);
+        var radicalAxis = new Line(firstRadicalAxisPoint, secondRadicalAxisPoint_mirrored);
+        return intersection && intersection.length() > radicalAxis.length() ? intersection : radicalAxis;
+    }
+    /**
      * Calculate the closest point on the outline of this circle to the given point.
      *
      * @method closestPoint
@@ -312,6 +375,71 @@ export class Circle {
         }
     }
     /**
+     * Get the two tangent vectors for the given point.
+     * If the point is on or in the circle then null is returned.
+     *
+     * @method tangentsFromPoint
+     * @instance
+     * @memberof Circle
+     * @param {Vertex} vert - The point to find the two tangents for.
+     * @return {[Vector,Vector]} The two tangent vector
+     **/
+    tangentsFromPoint(vert) {
+        // Inspired by
+        //   https://www.omnicalculator.com/math/tangent-circle
+        const centerDistance = this.center.distance(vert);
+        const tangentLength = Math.sqrt(centerDistance * centerDistance - this.radius * this.radius);
+        // console.log("this.radius ", this.radius, "centerDistance", centerDistance, "tangentLength", tangentLength);
+        if (Number.isNaN(tangentLength)) {
+            // vertex is inside circle
+            console.log("tangentLength is NaN", tangentLength);
+            return null;
+        }
+        const helperCircle = new Circle(vert, tangentLength);
+        const intersection = this.circleIntersection(helperCircle);
+        if (!intersection) {
+            // No intersection (vertex is inside circle)
+            return null;
+        }
+        return [new Vector(intersection.a, vert), new Vector(intersection.b, vert)];
+    }
+    /**
+     * Create a deep copy of this circle.
+     *
+     * @method clone
+     * @return {Circle} A new circle, an exact copy of this one.
+     * @instance
+     * @memberof Circle
+     **/
+    clone() {
+        return new Circle(this.center.clone(), this.radius);
+    }
+    static fromICircle(obj) {
+        return new Circle(new Vertex(obj.center), obj.radius);
+    }
+    // static fromObject(obj: object): Circle {
+    //   if (!obj) {
+    //     return null;
+    //   }
+    //   if (typeof obj !== "object") {
+    //     return null;
+    //   }
+    //   if (!obj.hasOwnProperty("center") || typeof (obj as any).center != "object") {
+    //     return null;
+    //   }
+    //   if (!obj.hasOwnProperty("radius") || typeof !(obj as any).radius != "number") {
+    //     return null;
+    //   }
+    //   var center = (obj as any).center;
+    //   if (!center.hasOwnProperty("x") || typeof (center as any).x != "number") {
+    //     return null;
+    //   }
+    //   if (!center.hasOwnProperty("y") || typeof (center as any).y != "number") {
+    //     return null;
+    //   }
+    //   return new Circle(new Vertex(center), (obj as any).radius);
+    // }
+    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.
@@ -326,6 +454,33 @@ Circle.circleUtils = {
         /* return new Vertex( Math.sin(angle) * radius,
                      Math.cos(angle) * radius ); */
         return new Vertex(Math.cos(angle) * radius, Math.sin(angle) * radius);
+    },
+    containsPoint: (circleCenter, circleRadius, point) => {
+        // TODO: cleanup
+        // return (
+        //   (circle.center.x - point.x) * (circle.center.x - point.x) + (circle.center.y - point.y) * (circle.center.y - point.y) <=
+        //   circle.radius * circle.radius
+        // );
+        return geomutils.dist4(point.x, point.y, circleCenter.x, circleCenter.y) < circleRadius;
+    },
+    createRadicalAxisHelperCircle: (circleA, circleB) => {
+        // We need to create a helper circle that intersects BOTH other circles,
+        // each in TWO points.
+        var circleConnectLine = new Vector(circleA.center.clone(), circleB.center);
+        circleConnectLine.a.set(circleConnectLine.vertAt(0.5));
+        // Get the perpendicular by half the circle distance.
+        var bisector = circleConnectLine.perp();
+        var bisectorLength = Math.max(circleA.radius, circleB.radius, bisector.length());
+        bisector.setLength(bisectorLength);
+        return new Circle(bisector.b, bisector.b.distance(circleA.center));
+    },
+    /**
+     * Calculate the outer distance between two circles. If the circles touch then the
+     * distance is 0.0.
+     * If the circles intersect then the distance in negative.
+     */
+    circleDistance: (circleA, circleB) => {
+        return circleA.center.distance(circleB.center) - circleA.radius - circleB.radius;
     }
 };
 //# sourceMappingURL=Circle.js.map

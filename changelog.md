@@ -8,6 +8,34 @@
 - Add 'Rulers' class from the ngdg project.
 - Add 'onclose' and 'onopen' to the Modal (demos).
 
+- 2026-08-03
+  - Adding `Circle.tangentsFromPoint`.
+  - // The day while wearing my rainbow socks outside a lady spit at me in public.
+- 2026-07-31
+  - Adding the `radicalAxis(Circle)` method. Added the `Circle.circleUtils.createRadicalAxisHelperCircle` and `.circleDistance` helper methods.
+- 2026-07-08
+  - Adding the `Circle.setRadius` method.
+- 2026-07-03
+  - Adding `utils/algorithms/solveApollonius3` to the library.
+  - Adding the optional `epsilon` parameter to the `Circle.containsCircle` method.
+  - Fixing the `Circle.clone` method; the center had not been cloned at all, this was fixed.
+- 2026-06-13
+  - Adding `Triangle.getVertices()`.
+  - Adding helper function `Circle.circleUtils.containsPoint` and refactored the member method `containsPoint`.
+- 2026-06-10
+  - Adding the utility function `Circle.circleUtils.containsPoint`.
+  - Adding algorithm `utils/algorithms/pointsMinimalContainingCircle`.
+  - Refactoring the `Trianble.bounds` method and added a plain `Triangle.utils.bounds` method.
+  - Refactoring the `Trianble.calcCircumCircle` method and added a plain `Triangle.utils.calcCircumCircle` method.
+  - Adding helper function `VertTuple.utils.calcCircumcircle`.
+  - Adding methods `Vertex.findClosestPoint` and `Vertex.findFarestPoint`.
+  - Adding the `Circle.clone` method.
+- 2026-06-04
+  - Adding helper function `randomCircle` to demos.
+  - Tweaking the apollonian circles demo.
+  - Changing the freedraw demo to draw fuzzy lines by default.
+- 2026-06-03 [v1.28.1]+[v1.28.1]
+  - Fixing an export bug.
 - 2026-05-22
   - Added the `isValueAllowed` function param to the getter methods of the `Params` class.
   - Extending the demo `70-sand-patterns` with PointIterators (Random and Rectangular).
