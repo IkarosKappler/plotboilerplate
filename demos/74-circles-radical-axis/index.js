@@ -99,7 +99,7 @@
       draw.line(calculatedRadicalAxis.a, calculatedRadicalAxis.b, rgba(128, 128, 128, 0.5), 7);
       var radicalAxis = makeRadicalLine(draw, fill);
 
-      if (appContext.config.showFinalTangents) {
+      if (radicalAxis && appContext.config.showFinalTangents) {
         drawFinalTangents(draw, fill, radicalAxis);
       }
     };
