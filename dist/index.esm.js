@@ -355,7 +355,7 @@ class VertexListeners {
  * @modified 2026-07-03 Fixing the `Circle.clone` method; the center had not been cloned at all, this was fixed.
  * @modified 2026-07-08 Adding the `Circle.setRadius` method (for chaining).
  * @mofified 2026-07-31 Adding the `radicalAxis(Circle)` method. Added the `Circle.circleUtils.createRadicalAxisHelperCircle` and `.circleDistance` helper methods.
- *
+ * @modified 2026-08-03 Adding `Circle.tangentsFromPoint`.
  * @version  1.7.0
  **/
 /**
@@ -716,8 +716,8 @@ class Circle {
         // Inspired by
         //   https://www.omnicalculator.com/math/tangent-circle
         const centerDistance = this.center.distance(vert);
-        const tangentLength = Math.sqrt(this.radius * this.radius - centerDistance * centerDistance);
-        console.log("this.radius ", this.radius, "centerDistance", centerDistance, "tangentLength", tangentLength);
+        const tangentLength = Math.sqrt(centerDistance * centerDistance - this.radius * this.radius);
+        // console.log("this.radius ", this.radius, "centerDistance", centerDistance, "tangentLength", tangentLength);
         if (Number.isNaN(tangentLength)) {
             // vertex is inside circle
             console.log("tangentLength is NaN", tangentLength);
