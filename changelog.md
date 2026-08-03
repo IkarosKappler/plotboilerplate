@@ -8,6 +8,9 @@
 - Add 'Rulers' class from the ngdg project.
 - Add 'onclose' and 'onopen' to the Modal (demos).
 
+- 2026-08-03
+  - Adding `Circle.tangentsFromPoint`.
+  - // The day while wearing my rainbow socks outside a lady spit at me in public.
 - 2026-07-31
   - Adding the `radicalAxis(Circle)` method. Added the `Circle.circleUtils.createRadicalAxisHelperCircle` and `.circleDistance` helper methods.
 - 2026-07-08

@@ -15,12 +15,10 @@
       var gui = appContext.pb.createGUI();
       var fold = gui.addFolder("Power Centers and Power Circle");
 
-      // // prettier-ignore
-      // fold.addColor(appContext.config, "colorCenterConnectLine").title("The color of the center-connect-line.").onChange(function () { appContext.pb.redraw(); });
-      // // prettier-ignore
-      // fold.addColor(appContext.config, "colorRadiusConnectLine").title("The color of the radius-connect-line.").onChange(function () { appContext.pb.redraw(); });
-      // // prettier-ignore
-      // fold.add(appContext.config, "isTwoCircles").title("Show homothetic centers of two or three circles?").onChange(function () { appContext.onTwoCircleSettingChanged(); });
+      // prettier-ignore
+      fold.add(appContext.config, "showFinalTangents").title("Show the final tangents from the radical axis?").onChange(function () { appContext.pb.redraw(); });
+      // prettier-ignore
+      fold.add(appContext.config, "finalTangentsPosition").min(-1.0).max(2.0).step(0.01).title("Pick a posisition.").onChange(function () { appContext.pb.redraw(); });
 
       // prettier-ignore
       gui.add(appContext.config, "readme").title("Show the readme.");

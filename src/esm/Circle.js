@@ -375,6 +375,35 @@ export class Circle {
         }
     }
     /**
+     * Get the two tangent vectors for the given point.
+     * If the point is on or in the circle then null is returned.
+     *
+     * @method tangentsFromPoint
+     * @instance
+     * @memberof Circle
+     * @param {Vertex} vert - The point to find the two tangents for.
+     * @return {[Vector,Vector]} The two tangent vector
+     **/
+    tangentsFromPoint(vert) {
+        // Inspired by
+        //   https://www.omnicalculator.com/math/tangent-circle
+        const centerDistance = this.center.distance(vert);
+        const tangentLength = Math.sqrt(this.radius * this.radius - centerDistance * centerDistance);
+        console.log("this.radius ", this.radius, "centerDistance", centerDistance, "tangentLength", tangentLength);
+        if (Number.isNaN(tangentLength)) {
+            // vertex is inside circle
+            console.log("tangentLength is NaN", tangentLength);
+            return null;
+        }
+        const helperCircle = new Circle(vert, tangentLength);
+        const intersection = this.circleIntersection(helperCircle);
+        if (!intersection) {
+            // No intersection (vertex is inside circle)
+            return null;
+        }
+        return [new Vector(intersection.a, vert), new Vector(intersection.b, vert)];
+    }
+    /**
      * Create a deep copy of this circle.
      *
      * @method clone

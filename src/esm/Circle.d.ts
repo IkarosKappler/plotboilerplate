@@ -241,6 +241,17 @@ export declare class Circle implements IBounded, ICircle, Intersectable, SVGSeri
      **/
     closestPoint(vert: XYCoords): Vertex;
     /**
+     * Get the two tangent vectors for the given point.
+     * If the point is on or in the circle then null is returned.
+     *
+     * @method tangentsFromPoint
+     * @instance
+     * @memberof Circle
+     * @param {Vertex} vert - The point to find the two tangents for.
+     * @return {[Vector,Vector]} The two tangent vector
+     **/
+    tangentsFromPoint(vert: Vertex): [Vector, Vector];
+    /**
      * Create a deep copy of this circle.
      *
      * @method clone

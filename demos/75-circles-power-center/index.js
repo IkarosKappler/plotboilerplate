@@ -31,8 +31,9 @@
     // Create a config: we want to have control about the arrow head size in this demo
     // `AppContext`: this is an experimental approach to make future event handling easier.
     var appContext = new AppContext(pb, {
-      // colorCenterConnectLine: params.getString("colorCenterConnectLine", "#0048e0"),
-      // colorRadiusConnectLine: params.getString("colorRadiusConnectLine", "#00e048"),
+      showRadicalAxes: params.getBoolean("showRadicalAxes", true),
+      showRadicalCenter: params.getBoolean("showRadicalCenter", true),
+      showRadicalCircle: params.getBoolean("showRadicalCircle", true),
       readme: function () {
         globalThis.displayDemoMeta();
       }
@@ -87,15 +88,29 @@
       var radicalAxisBC = circleB.radicalAxis(circleC);
       var radicalAxisCA = circleC.radicalAxis(circleA);
 
-      draw.line(radicalAxisAB.a, radicalAxisAB.b, rgba(128, 128, 128, 0.5), 7);
-      draw.line(radicalAxisBC.a, radicalAxisBC.b, rgba(128, 128, 128, 0.5), 7);
-      draw.line(radicalAxisCA.a, radicalAxisCA.b, rgba(128, 128, 128, 0.5), 7);
+      if (appContext.config.showRadicalAxes) {
+        draw.line(radicalAxisAB.a, radicalAxisAB.b, rgba(128, 128, 128, 0.5), 5);
+        draw.line(radicalAxisBC.a, radicalAxisBC.b, rgba(128, 128, 128, 0.5), 5);
+        draw.line(radicalAxisCA.a, radicalAxisCA.b, rgba(128, 128, 128, 0.5), 5);
+      }
 
       var powerCenter = radicalAxisAB.intersection(radicalAxisBC);
-      draw.diamondHandle(powerCenter, 13, "magenta");
+      if (appContext.config.showRadicalCenter) {
+        draw.diamondHandle(powerCenter, 13, "magenta");
+      }
 
-      var powerCircle = new Circle(powerCenter, powerCenter.distance(circleA.center));
-      draw.circle(powerCircle.center, powerCircle.radius, "rgba(192,192,192,0.5)", 3.0);
+      if (appContext.config.showRadicalCircle) {
+        // For the power circle we need the tangents from the power center.
+        var tangentVecs = circleA.tangentsFromPoint(powerCenter);
+        // console.log("tangentVecs", tangentVecs);
+        if (tangentVecs) {
+          var powerRadius = tangentVecs[0].length(); // Both vectors have equal length
+          // console.log("powerRadius", powerRadius);
+          var powerCircle = new Circle(powerCenter, powerRadius);
+          draw.circle(powerCircle.center, powerCircle.radius, "rgba(192,0,192,0.75)", 2.0);
+          fillCircularText(fill, "powerCircle", powerCircle, "rgba(192,0,192,0.75)", 12, 0.0);
+        }
+      }
     };
 
     // +---------------------------------------------------------------------------------

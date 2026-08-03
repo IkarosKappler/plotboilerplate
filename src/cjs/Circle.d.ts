@@ -21,7 +21,7 @@
  * @modified 2026-07-03 Fixing the `Circle.clone` method; the center had not been cloned at all, this was fixed.
  * @modified 2026-07-08 Adding the `Circle.setRadius` method (for chaining).
  * @mofified 2026-07-31 Adding the `radicalAxis(Circle)` method. Added the `Circle.circleUtils.createRadicalAxisHelperCircle` and `.circleDistance` helper methods.
- *
+ * @modified 2026-08-03 Adding `Circle.tangentsFromPoint`.
  * @version  1.7.0
  **/
 import { Bounds } from "./Bounds";
@@ -240,6 +240,17 @@ export declare class Circle implements IBounded, ICircle, Intersectable, SVGSeri
      * @return {Vertex} The closest point on this circle.
      **/
     closestPoint(vert: XYCoords): Vertex;
+    /**
+     * Get the two tangent vectors for the given point.
+     * If the point is on or in the circle then null is returned.
+     *
+     * @method tangentsFromPoint
+     * @instance
+     * @memberof Circle
+     * @param {Vertex} vert - The point to find the two tangents for.
+     * @return {[Vector,Vector]} The two tangent vector
+     **/
+    tangentsFromPoint(vert: Vertex): [Vector, Vector];
     /**
      * Create a deep copy of this circle.
      *

@@ -31,8 +31,8 @@
     // Create a config: we want to have control about the arrow head size in this demo
     // `AppContext`: this is an experimental approach to make future event handling easier.
     var appContext = new AppContext(pb, {
-      // colorCenterConnectLine: params.getString("colorCenterConnectLine", "#0048e0"),
-      // colorRadiusConnectLine: params.getString("colorRadiusConnectLine", "#00e048"),
+      showFinalTangents: params.getBoolean("showFinalTangents", false),
+      finalTangentsPosition: params.getNumber("finalTangentsPosition", 0.0),
       readme: function () {
         globalThis.displayDemoMeta();
       }
@@ -97,7 +97,11 @@
     var postDraw = function (draw, fill) {
       var calculatedRadicalAxis = circleA.radicalAxis(circleB);
       draw.line(calculatedRadicalAxis.a, calculatedRadicalAxis.b, rgba(128, 128, 128, 0.5), 7);
-      makeRadicalLine(draw, fill);
+      var radicalAxis = makeRadicalLine(draw, fill);
+
+      if (appContext.config.showFinalTangents) {
+        drawFinalTangents(draw, fill, radicalAxis);
+      }
     };
 
     // +---------------------------------------------------------------------------------
@@ -130,6 +134,13 @@
         draw.diamondHandle(intersectionLineB.b, 13, "magenta");
       }
 
+      var intersection = circleA.circleIntersection(circleB);
+      if (!intersectionLineA && !intersectionLineB) {
+        // Console: woops, this must not happen!
+        // Return a fallback (the intersection line is ON the rdical line)
+        return intersection;
+      }
+
       if (intersectionLineA && intersectionLineB) {
         var lineA = new Line(intersectionLineA.a, intersectionLineA.b);
         var lineB = new Line(intersectionLineB.a, intersectionLineB.b);
@@ -153,7 +164,7 @@
         draw.diamondHandle(secondRadicalAxisPoint_mirrored, 13, "orange");
 
         var radicalAxis = new Line(firstRadicalAxisPoint, secondRadicalAxisPoint_mirrored);
-        var intersection = circleA.circleIntersection(circleB);
+        // var intersection = circleA.circleIntersection(circleB);
         if (intersection) {
           // console.log(intersection.length(), radicalAxis.length());
           draw.diamondHandle(intersection.a, 13, "cyan");
@@ -162,6 +173,29 @@
         var result = intersection && intersection.length() > radicalAxis.length() ? intersection : radicalAxis;
 
         draw.line(result.a, result.b, rgba(255, 0, 255, 1.0), 2, { dashArray: [10, 10] });
+        return result;
+      }
+    };
+
+    var drawFinalTangents = function (draw, fill, radicalAxis) {
+      // console.log("radicalAxis", radicalAxis);
+      var vertA = radicalAxis.vertAt(appContext.config.finalTangentsPosition);
+
+      fill.circleHandle(vertA, 5.0, rgba(0, 192, 192, 0.25));
+      draw.circleHandle(vertA, 5.0, rgba(0, 192, 192, 0.5));
+
+      var tangentVecsA = circleA.tangentsFromPoint(vertA);
+      if (tangentVecsA) {
+        // console.log("tangentVecs", tangentVecsA);
+        draw.line(tangentVecsA[0].a, tangentVecsA[0].b, rgba(0, 192, 192, 1.0), 2, { dashArray: [5, 5] });
+        draw.line(tangentVecsA[1].a, tangentVecsA[1].b, rgba(0, 192, 192, 1.0), 2, { dashArray: [5, 5] });
+      }
+
+      var tangentVecsB = circleB.tangentsFromPoint(vertA);
+      if (tangentVecsB) {
+        // console.log("tangentVecs", tangentVecsA);
+        draw.line(tangentVecsB[0].a, tangentVecsB[0].b, rgba(0, 192, 192, 1.0), 2, { dashArray: [5, 5] });
+        draw.line(tangentVecsB[1].a, tangentVecsB[1].b, rgba(0, 192, 192, 1.0), 2, { dashArray: [5, 5] });
       }
     };
 
@@ -172,7 +206,8 @@
       draw.circle(circleA.center, circleA.radius, "rgba(0,192,192,1.0)", 3.0);
       draw.circle(circleB.center, circleB.radius, "rgba(0,192,192,1.0)", 3.0);
       // draw.circle(circleC.center, circleC.radius, "rgba(0,192,192,1.0)", 3.0);
-      draw.circle(helperCircle.center, helperCircle.radius, "rgba(192,192,192,0.5)", 3.0);
+      draw.circle(helperCircle.center, helperCircle.radius, "rgba(192,192,192,0.333)", 2.0);
+      fillCircularText(fill, "helperCircle", helperCircle, "teal", 12, 0.0);
     }; // END preDraw
 
     // +---------------------------------------------------------------------------------

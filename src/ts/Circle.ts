@@ -21,7 +21,7 @@
  * @modified 2026-07-03 Fixing the `Circle.clone` method; the center had not been cloned at all, this was fixed.
  * @modified 2026-07-08 Adding the `Circle.setRadius` method (for chaining).
  * @mofified 2026-07-31 Adding the `radicalAxis(Circle)` method. Added the `Circle.circleUtils.createRadicalAxisHelperCircle` and `.circleDistance` helper methods.
- *
+ * @modified 2026-08-03 Adding `Circle.tangentsFromPoint`.
  * @version  1.7.0
  **/
 
@@ -440,6 +440,38 @@ export class Circle implements IBounded, ICircle, Intersectable, SVGSerializable
     } else {
       return lineIntersection.b;
     }
+  }
+
+  /**
+   * Get the two tangent vectors for the given point.
+   * If the point is on or in the circle then null is returned.
+   *
+   * @method tangentsFromPoint
+   * @instance
+   * @memberof Circle
+   * @param {Vertex} vert - The point to find the two tangents for.
+   * @return {[Vector,Vector]} The two tangent vector
+   **/
+  tangentsFromPoint(vert: Vertex): [Vector, Vector] {
+    // Inspired by
+    //   https://www.omnicalculator.com/math/tangent-circle
+    const centerDistance: number = this.center.distance(vert);
+    const tangentLength: number = Math.sqrt(centerDistance * centerDistance - this.radius * this.radius);
+    // console.log("this.radius ", this.radius, "centerDistance", centerDistance, "tangentLength", tangentLength);
+    if (Number.isNaN(tangentLength)) {
+      // vertex is inside circle
+      console.log("tangentLength is NaN", tangentLength);
+      return null;
+    }
+
+    const helperCircle = new Circle(vert, tangentLength);
+    const intersection = this.circleIntersection(helperCircle);
+    if (!intersection) {
+      // No intersection (vertex is inside circle)
+      return null;
+    }
+
+    return [new Vector(intersection.a, vert), new Vector(intersection.b, vert)];
   }
 
   /**
