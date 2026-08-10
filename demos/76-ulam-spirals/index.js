@@ -33,6 +33,7 @@
     // `AppContext`: this is an experimental approach to make future event handling easier.
     var appContext = new AppContext(pb, {
       angleStepDeg: params.getNumber("angleStepDeg", 12.0),
+      stepInRadians: params.getNumber("stepInRadians", 60.0),
       radiusStep: params.getNumber("radiusStep", 5.0),
       circleRadius: params.getNumber("circleRadius", 8.0),
       iterations: params.getNumber("iterations", 100),
@@ -114,6 +115,51 @@
 
       pathData = ["M", 0, 0];
 
+      var pos, lastPos;
+      var midPoint = null;
+      var curIsPrime = false;
+      var lastIsPrime = false;
+      var curAngle = 0.0;
+      for (var i = 1; i <= steps; i++) {
+        curIsPrime = isPrime(i);
+        // midPoint = center.clone();
+        // midPoint.x = (angle + angleStep / 2.0) * 1.005 * appContext.config.radiusStep;
+        // midPoint.rotate(angle + angleStep / 2.0);
+        // angle += angleStep;
+        // pos = makeSpiralPoint(angle);
+        var result = makeEquidistSpiralPoint(i, curAngle);
+        pos = result[0];
+        curAngle = result[1];
+
+        pathData.push("L", pos.x, pos.y);
+
+        if (curIsPrime) {
+          draw.circle(pos, circleRadius, "orange", 1.0);
+        }
+
+        // Move to next position
+        lastPos = pos;
+        lastIsPrime = curIsPrime;
+      }
+
+      // inplace=true, because we can drop the path data afterwards
+      draw.path(pathData, "orange", 1.0, { inplace: true });
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Triggered after the main draw routine.
+    // +-------------------------------
+    var _postDraw = function (draw, fill) {
+      // draw.line(calculatedRadicalAxis.a, calculatedRadicalAxis.b, rgba(128, 128, 128, 0.5), 7);
+      // makePowerCircle(draw, fill);
+
+      var circleRadius = appContext.config.circleRadius;
+      var angle = 0.0;
+      var steps = appContext.config.iterations;
+      var angleStep = appContext.config.angleStepDeg * DEG_TO_RAD;
+
+      pathData = ["M", 0, 0];
+
       // var pos = new Vertex(0, 0);
       var pos = center.clone();
       pos.x = angleStep * appContext.config.radiusStep;
@@ -177,6 +223,32 @@
       return spiralPoint;
     };
 
+    var makeEquidistSpiralPoint = function (iterationNumber, curAngle) {
+      // var angleStepDeg = appContext.config.angleStepDeg;
+      // const stepInRadians = 60.0; // px
+      const stepInRadians = appContext.config.stepInRadians;
+      var curRadius = iterationNumber * appContext.config.radiusStep;
+      var angle = stepInRadians / curRadius;
+      var spiralPoint = center.clone();
+      spiralPoint.x = curRadius;
+      spiralPoint.rotate(curAngle + angle);
+      console.log(
+        "stepInRadians",
+        stepInRadians,
+        "appContext.config.radiusStep",
+        appContext.config.radiusStep,
+        "curRadius",
+        curRadius,
+        "curAngle",
+        curAngle,
+        "angle",
+        angle,
+        "spiralPoint",
+        spiralPoint
+      );
+      return [spiralPoint, curAngle + angle];
+    };
+
     function isPrime(num) {
       if (num <= 1) return false; // Not prime
       if (num === 2) return true; // 2 is prime
@@ -218,6 +290,6 @@
     pb.config.postDraw = postDraw;
     // updateHelperCircle();
     pb.redraw();
-    humane.log("Move the circles around.");
+    humane.log("Chose from different sytles of Ulam spirals.");
   });
 })(globalThis);

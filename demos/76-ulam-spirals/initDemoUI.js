@@ -18,6 +18,8 @@
       // prettier-ignore
       fold.add(appContext.config, "circleRadius").min(0.0).max(23.0).title("The radius of each prime circle.").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
+      fold.add(appContext.config, "stepInRadians").min(1.0).max(120.0).title("Each step on the spiral in radians.").onChange(function () { appContext.pb.redraw(); });
+      // prettier-ignore
       fold.add(appContext.config, "angleStepDeg").min(0.0).max(23.0).title("The angle iteration step.").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
       fold.add(appContext.config, "radiusStep").min(0.0).max(10).title("How much increase the radius in each step?").onChange(function () { appContext.pb.redraw(); });
