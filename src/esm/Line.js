@@ -18,7 +18,8 @@
  * @modified 2023-09-25 Changed param type of `intersection()` from Line to VertTuple.
  * @modified 2025-04-15 Class `Line` now implements interface `Intersectable`.
  * @modified 2025-04-16 Class `Line` now implements interface `IBounded`.
- * @version  2.4.0
+ * @modified 2026-08-16 Adding methods `Line.trimStart` and `Line.trimEnd`. Adding methods `Line.trimStartAt` and `Line.trimEndAt`.
+ * @version  2.5.0
  *
  * @file Line
  * @public
@@ -149,6 +150,84 @@ export class Line extends VertTuple {
         return this;
     }
     //--- END Implement PathSegment ---
+    /**
+     * Trim this line segment from the start point by the given amount.
+     * The amount must be positive and should be withing the segment's length. If the amount exceeds the segment's length
+     * then the length of the resulting line will be zero (0.0).
+     *
+     * @method trimStart
+     * @memberof Line
+     * @param {number} amount - The positive amount to trim the line from the start point `a`.
+     * @returns {Line} This for chaining, with updated point `a`.
+     */
+    trimStart(amount) {
+        // Calculate the relative position `t` on this line.
+        var t = amount / this.length();
+        // `t` should be inside 0..1 – otherwise the amount was too large or negative.
+        if (t < 0.0) {
+            return this;
+        }
+        if (t > 1.0) {
+            // Set the line to length zero (endpoint only)
+            this.a = this.b.clone();
+            return this;
+        }
+        this.a = this.vertAt(t);
+        return this;
+    }
+    /**
+     * Trim this line segment from the start point by the given relative amount.
+     * The amount must be positive and should be within 0.0 and 1.0. If the amount exceeds the segment's length
+     * then the length of the resulting line will be zero (0.0).
+     *
+     * @method trimStartAt
+     * @memberof Line
+     * @param {number} amount - The positive amount to trim the line from the start point `a`.
+     * @returns {Line} This for chaining, with updated point `a`.
+     */
+    trimStartAt(relativeAmount) {
+        // Calculate the relative position `t` on this line.
+        return this.trimStart(relativeAmount / this.length());
+    }
+    /**
+     * Trim this line segment from the end point by the given amount.
+     * The amount must be positive and should be withing the segment's length. If the amount exceeds the segment's length
+     * then the length of the resulting line will be zero (0.0).
+     *
+     * @method trimEnd
+     * @memberof Line
+     * @param {number} amount - The positive amount to trim the line from the end point `b`.
+     * @returns {Line} This for chaining, with updated point `b`.
+     */
+    trimEnd(amount) {
+        // Calculate the relative position `t` on this line.
+        var t = 1.0 - amount / this.length();
+        // `t` should be inside 0..1 – otherwise the amount was too large or negative.
+        if (t < 0.0) {
+            return this;
+        }
+        if (t > 1.0) {
+            // Set the line to length zero (endpoint only)
+            this.b = this.a.clone();
+            return this;
+        }
+        this.b = this.vertAt(t);
+        return this;
+    }
+    /**
+     * Trim this line segment from the end point by the given relative amount.
+     * The amount must be positive and should be within 0.0 and 1.0. If the amount exceeds the segment's length
+     * then the length of the resulting line will be zero (0.0).
+     *
+     * @method trimEndAt
+     * @memberof Line
+     * @param {number} amount - The positive amount to trim the line from the start point `a`.
+     * @returns {Line} This for chaining, with updated point `a`.
+     */
+    trimEndAt(relativeAmount) {
+        // Calculate the relative position `t` on this line.
+        return this.trimEnd(relativeAmount / this.length());
+    }
     //--- BEGIN --- Implement interface `Intersectable`
     /**
      * Get all line intersections with this polygon.

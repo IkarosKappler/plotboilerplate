@@ -18,7 +18,7 @@
       // prettier-ignore
       fold.add(appContext.config, "startAngleDeg").min(-180.0).max(180.0).title("The sector length in units/pixels.").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
-      fold.add(appContext.config, "sectorLength").min(1.0).max(512.0).title("The sector length in units/pixels.").onChange(function () { appContext.pb.redraw(); }); // prettier-ignore
+      fold.add(appContext.config, "sectorLength").min(-512.0).max(512.0).title("The sector length in units/pixels.").onChange(function () { appContext.pb.redraw(); }); // prettier-ignore
 
       // prettier-ignore
       gui.add(appContext.config, "readme").title("Show the readme.");

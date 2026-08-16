@@ -18,7 +18,8 @@
  * @modified 2023-09-25 Changed param type of `intersection()` from Line to VertTuple.
  * @modified 2025-04-15 Class `Line` now implements interface `Intersectable`.
  * @modified 2025-04-16 Class `Line` now implements interface `IBounded`.
- * @version  2.4.0
+ * @modified 2026-08-16 Adding methods `Line.trimStart` and `Line.trimEnd`. Adding methods `Line.trimStartAt` and `Line.trimEndAt`.
+ * @version  2.5.0
  *
  * @file Line
  * @public
@@ -109,6 +110,50 @@ export declare class Line extends VertTuple<Line> implements IBounded, Intersect
      * @return {PathSegment} This path segment instance (for chaining).
      */
     reverse(): Line;
+    /**
+     * Trim this line segment from the start point by the given amount.
+     * The amount must be positive and should be withing the segment's length. If the amount exceeds the segment's length
+     * then the length of the resulting line will be zero (0.0).
+     *
+     * @method trimStart
+     * @memberof Line
+     * @param {number} amount - The positive amount to trim the line from the start point `a`.
+     * @returns {Line} This for chaining, with updated point `a`.
+     */
+    trimStart(amount: number): this;
+    /**
+     * Trim this line segment from the start point by the given relative amount.
+     * The amount must be positive and should be within 0.0 and 1.0. If the amount exceeds the segment's length
+     * then the length of the resulting line will be zero (0.0).
+     *
+     * @method trimStartAt
+     * @memberof Line
+     * @param {number} amount - The positive amount to trim the line from the start point `a`.
+     * @returns {Line} This for chaining, with updated point `a`.
+     */
+    trimStartAt(relativeAmount: number): this;
+    /**
+     * Trim this line segment from the end point by the given amount.
+     * The amount must be positive and should be withing the segment's length. If the amount exceeds the segment's length
+     * then the length of the resulting line will be zero (0.0).
+     *
+     * @method trimEnd
+     * @memberof Line
+     * @param {number} amount - The positive amount to trim the line from the end point `b`.
+     * @returns {Line} This for chaining, with updated point `b`.
+     */
+    trimEnd(amount: number): this;
+    /**
+     * Trim this line segment from the end point by the given relative amount.
+     * The amount must be positive and should be within 0.0 and 1.0. If the amount exceeds the segment's length
+     * then the length of the resulting line will be zero (0.0).
+     *
+     * @method trimEndAt
+     * @memberof Line
+     * @param {number} amount - The positive amount to trim the line from the start point `a`.
+     * @returns {Line} This for chaining, with updated point `a`.
+     */
+    trimEndAt(relativeAmount: number): this;
     /**
      * Get all line intersections with this polygon.
      *

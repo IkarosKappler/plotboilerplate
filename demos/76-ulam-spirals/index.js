@@ -31,16 +31,24 @@
 
     // Create a config: we want to have control about the arrow head size in this demo
     // `AppContext`: this is an experimental approach to make future event handling easier.
-    var SPIRAL_TYPES = ["Ulam", "Round Equidistant"];
+    var SPIRAL_TYPES = ["Ulam", "Round-Equidistant"];
     var appContext = new AppContext(pb, {
+      startingNumber: params.getNumber("startingNumber", 1),
       angleStepDeg: params.getNumber("angleStepDeg", 12.0),
-      stepInRadians: params.getNumber("stepInRadians", 60.0),
-      radiusStep: params.getNumber("radiusStep", 5.0),
-      circleRadius: params.getNumber("circleRadius", 8.0),
+      stepInUnits: params.getNumber("stepInUnits", 60.0),
+      radiusStep: params.getNumber("radiusStep", 18.0),
+      circleRadius: params.getNumber("circleRadius", 6.0),
       iterations: params.getNumber("iterations", 100),
       arcThreshold: params.getNumber("arcThreshold", 0.666),
       showSpiralTangents: params.getBoolean("showSpiralTangents", false),
       spiralType: params.getString("spiralType", SPIRAL_TYPES[1]),
+      lineColorSpiral: params.getString("lineColorSpiral", "#3584e4"),
+      lineWidthSpiral: params.getNumber("lineWidthPiral", 1.0),
+      lineColorPrimeMarker: params.getString("lineColorPrimeMarker", "#ff8800"),
+      lineWidthPrimeMarker: params.getNumber("lineWidthPrimeMarker", 1.0),
+
+      showSpiralPath: params.getBoolean("showSpiralPath", true),
+      showPrimeLabel: params.getBoolean("showPrimeLabel", true),
       readme: function () {
         globalThis.displayDemoMeta();
       }
@@ -111,48 +119,163 @@
       // makePowerCircle(draw, fill);
       if (appContext.config.spiralType == "Ulam") {
         // TODO
-      } else if (appContext.config.spiralType == "Round Equidistant") {
-        drawRoundEquidistant(draw, fill);
+        drawUlamSpiral(draw, fill);
+      } else if (appContext.config.spiralType == "Round-Equidistant") {
+        drawRoundEquidistantSpiral(draw, fill);
       }
     };
 
-    var drawRoundEquidistant = function (draw, fill) {
-      var circleRadius = appContext.config.circleRadius;
+    // +---------------------------------------------------------------------------------
+    // | Draw the Ulam spiral.
+    // +-------------------------------
+    var drawUlamSpiral = function (draw, fill) {
+      var discretePosition = new Vertex(0, 0);
+      var discreteDirection = new Vertex(1, 0);
+      var discreteMin = new Vertex(0, 0);
+      var discreteMax = new Vertex(0, 0);
+      var lastWasPrime = false;
+
+      var pathData = ["M", 0, 0];
+      var stepSize = appContext.config.radiusStep;
+
+      var line = new Line(new Vertex(), new Vertex());
+
+      for (var i = 0; i <= appContext.config.iterations; i++) {
+        var naturalNumber = appContext.config.startingNumber + i + 1;
+        var curIsPrime = isPrime(naturalNumber);
+        var nextDiscretePos = getNextUlamPosition(discretePosition, discreteDirection, discreteMin, discreteMax);
+        // Convert discrete position to pixels.
+        var curPos = discretePosition.clone().scale(stepSize);
+        var nextPos = nextDiscretePos.clone().scale(stepSize);
+        line.a = curPos;
+        line.b = nextPos;
+
+        // var line = new Line(pos, nextPos);
+        if (lastWasPrime || curIsPrime) {
+          shortenLinearConnection(line, lastWasPrime, curIsPrime);
+          pathData.push("M", line.a.x, line.a.y);
+        }
+
+        pathData.push("L", line.b.x, line.b.y);
+        // draw.line(pos, nextPos, "grey", 3.0);
+
+        if (curIsPrime) {
+          drawPrimeMarker(draw, fill, nextPos, naturalNumber);
+        }
+
+        discretePosition = nextDiscretePos;
+        lastWasPrime = curIsPrime;
+      }
+
+      if (appContext.config.showSpiralPath) {
+        draw.path(pathData, appContext.config.lineColorSpiral, appContext.config.lineWidthSpiral, { inplace: true });
+      }
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Draw an equidistant spiral.
+    // +-------------------------------
+    var drawRoundEquidistantSpiral = function (draw, fill) {
+      // var circleRadius = appContext.config.circleRadius;
       var angle = 0.0;
       var steps = appContext.config.iterations;
       var angleStep = appContext.config.angleStepDeg * DEG_TO_RAD;
+      var radiusStep = appContext.config.radiusStep;
 
       pathData = ["M", 0, 0];
 
-      var pos, lastPos;
+      var curRadius = appContext.config.stepInUnits; // Make sure the first arc fits into the first circle/radius
+      var lastRadius = 0.0;
+      var curAngle = 0.0,
+        lastAngle = 0.0;
+      var helperCircle = new Circle(new Vertex(0, 0), curRadius);
+      var curPos,
+        lastPos = helperCircle.vertAt(curAngle); // new Vertex(0, 0);
+      var curTangentVec,
+        lastTangentVec = helperCircle.tangentAt(curAngle);
       var midPoint = null;
       var curIsPrime = false;
-      var lastIsPrime = false;
-      var curAngle = 0.0;
-      for (var i = 1; i <= steps; i++) {
-        curIsPrime = isPrime(i);
-        // midPoint = center.clone();
-        // midPoint.x = (angle + angleStep / 2.0) * 1.005 * appContext.config.radiusStep;
-        // midPoint.rotate(angle + angleStep / 2.0);
-        // angle += angleStep;
-        // pos = makeSpiralPoint(angle);
-        var result = makeEquidistSpiralPoint(i, curAngle);
-        pos = result[0];
+      var lastWasPrime = false;
+      var line = new Line(new Vertex(), new Vertex());
+      for (var i = 0; i < steps; i++) {
+        var naturalNumber = appContext.config.startingNumber + i + 1;
+        curIsPrime = isPrime(naturalNumber);
+        var result = makeEquidistSpiralPoint(i + 1, curAngle, curRadius);
+        curPos = result[0];
         curAngle = result[1];
+        curRadius = result[2];
+        var intersection = helperCircle
+          .setRadius(lastRadius + (curRadius - lastRadius) / 3)
+          .vertAt(lastAngle + (curAngle - lastAngle) / 2.0);
+        draw.diamondHandle(intersection);
+        helperCircle.radius = curRadius;
+        curTangentVec = helperCircle.tangentAt(curAngle); // .add(curPos);
+        // draw.handleLine(curTangentVec.a, curTangentVec.b);
+        // var lastTangentLine = lastTangentVec.clone().add(lastTangentVec.a).asLine();
+        // var curTangentLine = curTangentVec.clone().add(curTangentVec.a).asLine();
+        var lastTangentLine = lastTangentVec.asLine();
+        var curTangentLine = curTangentVec.asLine();
+        // var intersection = lastTangentLine.intersection(curTangentLine);
+        var controlLineA = new Line(lastPos, intersection).trimEndAt(appContext.config.arcThreshold); // 0.166);
+        var controlLineB = new Line(curPos, intersection).trimEndAt(appContext.config.arcThreshold);
 
-        pathData.push("L", pos.x, pos.y);
+        line.a = lastPos;
+        line.b = curPos;
+
+        // var bezierSector = new CubicBezierCurve(lastPos, curPos, controlLineA.b, controlLineB.b);
+
+        // var line = new Line(pos, nextPos);
+        if (lastWasPrime || curIsPrime) {
+          shortenLinearConnection(line, lastWasPrime, curIsPrime);
+          pathData.push("M", line.a.x, line.a.y);
+        }
+
+        // pathData.push("L", line.b.x, line.b.y);
+        // pathData.push("C", intersection.x, intersection.y, intersection.x, intersection.y, line.b.x, line.b.y);
+        pathData.push("C", controlLineA.b.x, controlLineA.b.y, controlLineB.b.x, controlLineB.b.y, line.b.x, line.b.y);
+
+        // pathData.push("L", curPos.x, curPos.y);
 
         if (curIsPrime) {
-          draw.circle(pos, circleRadius, "orange", 1.0);
+          // draw.circle(pos, circleRadius, "orange", 1.0);
+          drawPrimeMarker(draw, fill, curPos, naturalNumber);
         }
 
         // Move to next position
-        lastPos = pos;
-        lastIsPrime = curIsPrime;
+        lastPos = curPos;
+        lastWasPrime = curIsPrime;
+        lastTangentVec = curTangentVec;
+        lastAngle = curAngle;
+        lastRadius = curRadius;
       }
 
       // inplace=true, because we can drop the path data afterwards
-      draw.path(pathData, "orange", 1.0, { inplace: true });
+      if (appContext.config.showSpiralPath) {
+        draw.path(pathData, appContext.config.lineColorSpiral, appContext.config.lineWidthSpiral, { inplace: true });
+      }
+    };
+
+    var drawPrimeMarker = function (draw, fill, position, primeNumber) {
+      // var circleRadius = appContext.config.circleRadius;
+      draw.circle(
+        position,
+        appContext.config.circleRadius,
+        appContext.config.lineColorPrimeMarker,
+        appContext.config.lineWidthPrimeMarker
+      );
+      if (appContext.config.showPrimeLabel) {
+        fill.text("" + primeNumber, position.x, position.y, {
+          // options
+          color: appContext.config.lineColorPrimeMarker,
+          // fontFamily?: string;
+          fontSize: 7, // number;
+          // fontStyle?: FontStyle;
+          // fontWeight?: FontWeight;
+          lineHeight: 4, // number;
+          textAlign: "center" // CanvasRenderingContext2D["textAlign"];
+          // rotation?: number;
+        });
+      }
     };
 
     // +---------------------------------------------------------------------------------
@@ -225,6 +348,49 @@
       draw.path(pathData, "orange", 1.0, { inplace: true });
     };
 
+    var getNextUlamPosition = function (position, curDirection, minDiscrete, maxDiscrete) {
+      var newPosition = position.clone().add(curDirection);
+      if (newPosition.x > maxDiscrete.x) {
+        // Right bound reached -> continue top
+        curDirection.x = 0;
+        curDirection.y = -1;
+        // newPosition.x = position.x;
+        // newPosition.y--;
+        maxDiscrete.x = newPosition.x;
+      } else if (newPosition.y < minDiscrete.y) {
+        // Upper bound reached -> continue left
+        curDirection.x = -1;
+        curDirection.y = 0;
+        // newPosition.y = position.y;
+        // newPosition.x--;
+        minDiscrete.y = newPosition.y;
+      } else if (newPosition.x < minDiscrete.x) {
+        // Left bound reached -> continue down
+        curDirection.x = 0;
+        curDirection.y = 1;
+        // newPosition.x = position.x;
+        // newPosition.y++;
+        minDiscrete.x = newPosition.x;
+      } else if (newPosition.y > maxDiscrete.y) {
+        // Lower bound reached -> continue right
+        curDirection.x = 1;
+        curDirection.y = 0;
+        // newPosition.y = position.y;
+        // newPosition.x++;
+        maxDiscrete.y = newPosition.y;
+      }
+      return newPosition;
+    };
+
+    var shortenLinearConnection = function (line, isTrimStart, isTrimEnd) {
+      if (isTrimStart) {
+        line.trimStart(appContext.config.circleRadius + appContext.config.lineWidthPrimeMarker / 2 / pb.draw.scale.x);
+      }
+      if (isTrimEnd) {
+        line.trimEnd(appContext.config.circleRadius + appContext.config.lineWidthPrimeMarker / 2 / pb.draw.scale.x);
+      }
+    };
+
     var makeSpiralPoint = function (angle) {
       var spiralPoint = center.clone();
       spiralPoint.x = angle * appContext.config.radiusStep;
@@ -232,30 +398,39 @@
       return spiralPoint;
     };
 
-    var makeEquidistSpiralPoint = function (iterationNumber, curAngle) {
+    var makeEquidistSpiralPoint = function (iterationNumber, curAngle, curRadius) {
       // var angleStepDeg = appContext.config.angleStepDeg;
       // const stepInRadians = 60.0; // px
-      const stepInRadians = appContext.config.stepInRadians;
-      var curRadius = iterationNumber * appContext.config.radiusStep;
-      var angle = stepInRadians / curRadius;
+      const stepInUnits = appContext.config.stepInUnits;
+      // var curRadius = iterationNumber * appContext.config.radiusStep;
+      var angle = Circle.circleUtils.sectorAngleByArcLength(stepInUnits, curRadius);
+      var nextRadius = curRadius + stepInUnits * (angle / (Math.PI * 2));
+      // var curRadius = Math.log(1 + 2 * iterationNumber) * appContext.config.radiusStep;
+      // var angle = stepInUnits / curRadius;
       var spiralPoint = center.clone();
-      spiralPoint.x = curRadius;
+      spiralPoint.x = nextRadius;
       spiralPoint.rotate(curAngle + angle);
-      console.log(
-        "stepInRadians",
-        stepInRadians,
-        "appContext.config.radiusStep",
-        appContext.config.radiusStep,
-        "curRadius",
-        curRadius,
-        "curAngle",
-        curAngle,
-        "angle",
-        angle,
-        "spiralPoint",
-        spiralPoint
-      );
-      return [spiralPoint, curAngle + angle];
+      if (iterationNumber < 10) {
+        console.log(
+          "iterationNumber",
+          iterationNumber,
+          "Math.log(iterationNumber)",
+          Math.log(iterationNumber),
+          "stepInUnits",
+          stepInUnits,
+          "appContext.config.radiusStep",
+          appContext.config.radiusStep,
+          "curRadius",
+          nextRadius,
+          "curAngle",
+          curAngle,
+          "angle",
+          angle,
+          "spiralPoint",
+          spiralPoint
+        );
+      }
+      return [spiralPoint, curAngle + angle, nextRadius];
     };
 
     // function isPrime(num) {
