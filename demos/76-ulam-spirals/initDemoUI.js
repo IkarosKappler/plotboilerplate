@@ -7,7 +7,7 @@
  */
 
 (function (_context) {
-  _context.initDemoUI = function (appContext) {
+  _context.initDemoUI = function (appContext, SPIRAL_TYPES) {
     // +---------------------------------------------------------------------------------
     // | Create a GUI.
     // +-------------------------------
@@ -29,6 +29,8 @@
       fold.add(appContext.config, "arcThreshold").min(0).max(1.0).title("The threshold for cubic arc segments.").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
       fold.add(appContext.config, "showSpiralTangents").title("Draw the spiral tangents.").onChange(function () { appContext.pb.redraw(); });
+      // prettier-ignore
+      fold.add(appContext.config, "spiralType", SPIRAL_TYPES).title("Which spiral type to draw?").onChange(function () { appContext.pb.redraw(); });
 
       // prettier-ignore
       gui.add(appContext.config, "readme").title("Show the readme.");

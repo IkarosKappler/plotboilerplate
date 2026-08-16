@@ -356,7 +356,8 @@ class VertexListeners {
  * @modified 2026-07-08 Adding the `Circle.setRadius` method (for chaining).
  * @mofified 2026-07-31 Adding the `radicalAxis(Circle)` method. Added the `Circle.circleUtils.createRadicalAxisHelperCircle` and `.circleDistance` helper methods.
  * @modified 2026-08-03 Adding `Circle.tangentsFromPoint`.
- * @version  1.7.0
+ * @modified 2026-08-16 Adding the `Circle.sectorAngleByArcLength` method and the `Circle.circleUtils.sectorAngleByArcLength` helper method.
+ * @version  1.8.0
  **/
 /**
  * @classdesc A simple circle: center point and radius.
@@ -732,6 +733,15 @@ class Circle {
         return [new Vector(intersection.a, vert), new Vector(intersection.b, vert)];
     }
     /**
+     * Calculate inner sector angle for this circle and a given circle arc length.
+     *
+     * @param {number} sectorArcLength - The desired arc length (in units).
+     * @returns The sector's inner angle (in radians).
+     */
+    sectorAngleByArcLength(sectorArcLength) {
+        return Circle.circleUtils.sectorAngleByArcLength(sectorArcLength, this.radius);
+    }
+    /**
      * Create a deep copy of this circle.
      *
      * @method clone
@@ -809,6 +819,16 @@ Circle.circleUtils = {
      */
     circleDistance: (circleA, circleB) => {
         return circleA.center.distance(circleB.center) - circleA.radius - circleB.radius;
+    },
+    /**
+     * Calculate the inner sector angle for a given circle arc length and radius.
+     *
+     * @param {number} sectorArcLength - The desired arc length.
+     * @param {number} circleRadius - The circle's radius.
+     * @returns The sector angle in radians.
+     */
+    sectorAngleByArcLength: (sectorArcLength, circleRadius) => {
+        return sectorArcLength / circleRadius;
     }
 };
 
@@ -5051,10 +5071,7 @@ CubicBezierCurve.END_POINT = 3;
  */
 CubicBezierCurve.utils = {
     evaluateT: (p0, p1, p2, p3, t) => {
-        return p0 * Math.pow(1.0 - t, 3) +
-            p1 * 3 * t * Math.pow(1.0 - t, 2) +
-            p2 * 3 * Math.pow(t, 2) * (1.0 - t) +
-            p3 * Math.pow(t, 3);
+        return (p0 * Math.pow(1.0 - t, 3) + p1 * 3 * t * Math.pow(1.0 - t, 2) + p2 * 3 * Math.pow(t, 2) * (1.0 - t) + p3 * Math.pow(t, 3));
     },
     cubicPolyMinMax: (p0, p1, p2, p3) => {
         // var polyX = CubicBezierCurve.utils.cubicPoly2(
@@ -5215,11 +5232,7 @@ CubicBezierCurve.utils = {
      * @returns {[number,number,number]}
      */
     cubicPoly: (p0, p1, p2, p3) => {
-        return [
-            3 * p3 - 9 * p2 + 9 * p1 - 3 * p0,
-            6 * p0 - 12 * p1 + 6 * p2,
-            3 * p1 - 3 * p0
-        ];
+        return [3 * p3 - 9 * p2 + 9 * p1 - 3 * p0, 6 * p0 - 12 * p1 + 6 * p2, 3 * p1 - 3 * p0];
     },
     /**
      * sign of number, but is division safe: no zero returned :)

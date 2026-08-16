@@ -31,6 +31,7 @@
 
     // Create a config: we want to have control about the arrow head size in this demo
     // `AppContext`: this is an experimental approach to make future event handling easier.
+    var SPIRAL_TYPES = ["Ulam", "Round Equidistant"];
     var appContext = new AppContext(pb, {
       angleStepDeg: params.getNumber("angleStepDeg", 12.0),
       stepInRadians: params.getNumber("stepInRadians", 60.0),
@@ -39,6 +40,7 @@
       iterations: params.getNumber("iterations", 100),
       arcThreshold: params.getNumber("arcThreshold", 0.666),
       showSpiralTangents: params.getBoolean("showSpiralTangents", false),
+      spiralType: params.getString("spiralType", SPIRAL_TYPES[1]),
       readme: function () {
         globalThis.displayDemoMeta();
       }
@@ -107,7 +109,14 @@
     var postDraw = function (draw, fill) {
       // draw.line(calculatedRadicalAxis.a, calculatedRadicalAxis.b, rgba(128, 128, 128, 0.5), 7);
       // makePowerCircle(draw, fill);
+      if (appContext.config.spiralType == "Ulam") {
+        // TODO
+      } else if (appContext.config.spiralType == "Round Equidistant") {
+        drawRoundEquidistant(draw, fill);
+      }
+    };
 
+    var drawRoundEquidistant = function (draw, fill) {
       var circleRadius = appContext.config.circleRadius;
       var angle = 0.0;
       var steps = appContext.config.iterations;
@@ -249,18 +258,18 @@
       return [spiralPoint, curAngle + angle];
     };
 
-    function isPrime(num) {
-      if (num <= 1) return false; // Not prime
-      if (num === 2) return true; // 2 is prime
-      if (num % 2 === 0) return false; // Even numbers > 2 are not prime
+    // function isPrime(num) {
+    //   if (num <= 1) return false; // Not prime
+    //   if (num === 2) return true; // 2 is prime
+    //   if (num % 2 === 0) return false; // Even numbers > 2 are not prime
 
-      for (let i = 3; i <= Math.sqrt(num); i += 2) {
-        if (num % i === 0) {
-          return false;
-        }
-      }
-      return true;
-    }
+    //   for (let i = 3; i <= Math.sqrt(num); i += 2) {
+    //     if (num % i === 0) {
+    //       return false;
+    //     }
+    //   }
+    //   return true;
+    // }
 
     // +---------------------------------------------------------------------------------
     // | This method is called before the library starts to draw anything.
@@ -275,7 +284,7 @@
     // | Create a GUI.
     // | See `initDemoUI` for details.
     // +-------------------------------
-    initDemoUI(appContext);
+    initDemoUI(appContext, SPIRAL_TYPES);
 
     // +---------------------------------------------------------------------------------
     // | This renders a content list component on top, allowing to delete or add

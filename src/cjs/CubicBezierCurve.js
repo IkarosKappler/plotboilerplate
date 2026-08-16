@@ -879,10 +879,7 @@ var CubicBezierCurve = /** @class */ (function () {
      */
     CubicBezierCurve.utils = {
         evaluateT: function (p0, p1, p2, p3, t) {
-            return p0 * Math.pow(1.0 - t, 3) +
-                p1 * 3 * t * Math.pow(1.0 - t, 2) +
-                p2 * 3 * Math.pow(t, 2) * (1.0 - t) +
-                p3 * Math.pow(t, 3);
+            return (p0 * Math.pow(1.0 - t, 3) + p1 * 3 * t * Math.pow(1.0 - t, 2) + p2 * 3 * Math.pow(t, 2) * (1.0 - t) + p3 * Math.pow(t, 3));
         },
         cubicPolyMinMax: function (p0, p1, p2, p3) {
             // var polyX = CubicBezierCurve.utils.cubicPoly2(
@@ -1043,11 +1040,7 @@ var CubicBezierCurve = /** @class */ (function () {
          * @returns {[number,number,number]}
          */
         cubicPoly: function (p0, p1, p2, p3) {
-            return [
-                3 * p3 - 9 * p2 + 9 * p1 - 3 * p0,
-                6 * p0 - 12 * p1 + 6 * p2,
-                3 * p1 - 3 * p0
-            ];
+            return [3 * p3 - 9 * p2 + 9 * p1 - 3 * p0, 6 * p0 - 12 * p1 + 6 * p2, 3 * p1 - 3 * p0];
         },
         /**
          * sign of number, but is division safe: no zero returned :)

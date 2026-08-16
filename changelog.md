@@ -8,6 +8,8 @@
 - Add 'Rulers' class from the ngdg project.
 - Add 'onclose' and 'onopen' to the Modal (demos).
 
+- 2026-08-16
+  - Adding the `Circle.sectorAngleByArcLength` method and the `Circle.circleUtils.sectorAngleByArcLength` helper method.
 - 2026-08-03
   - Adding `Circle.tangentsFromPoint`.
   - // The day while wearing my rainbow socks outside a lady spit at me in public.

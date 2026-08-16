@@ -23,7 +23,8 @@
  * @modified 2026-07-08 Adding the `Circle.setRadius` method (for chaining).
  * @mofified 2026-07-31 Adding the `radicalAxis(Circle)` method. Added the `Circle.circleUtils.createRadicalAxisHelperCircle` and `.circleDistance` helper methods.
  * @modified 2026-08-03 Adding `Circle.tangentsFromPoint`.
- * @version  1.7.0
+ * @modified 2026-08-16 Adding the `Circle.sectorAngleByArcLength` method and the `Circle.circleUtils.sectorAngleByArcLength` helper method.
+ * @version  1.8.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Circle = void 0;
@@ -410,6 +411,15 @@ var Circle = /** @class */ (function () {
         return [new Vector_1.Vector(intersection.a, vert), new Vector_1.Vector(intersection.b, vert)];
     };
     /**
+     * Calculate inner sector angle for this circle and a given circle arc length.
+     *
+     * @param {number} sectorArcLength - The desired arc length (in units).
+     * @returns The sector's inner angle (in radians).
+     */
+    Circle.prototype.sectorAngleByArcLength = function (sectorArcLength) {
+        return Circle.circleUtils.sectorAngleByArcLength(sectorArcLength, this.radius);
+    };
+    /**
      * Create a deep copy of this circle.
      *
      * @method clone
@@ -486,6 +496,16 @@ var Circle = /** @class */ (function () {
          */
         circleDistance: function (circleA, circleB) {
             return circleA.center.distance(circleB.center) - circleA.radius - circleB.radius;
+        },
+        /**
+         * Calculate the inner sector angle for a given circle arc length and radius.
+         *
+         * @param {number} sectorArcLength - The desired arc length.
+         * @param {number} circleRadius - The circle's radius.
+         * @returns The sector angle in radians.
+         */
+        sectorAngleByArcLength: function (sectorArcLength, circleRadius) {
+            return sectorArcLength / circleRadius;
         }
     };
     return Circle;

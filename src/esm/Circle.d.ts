@@ -22,7 +22,8 @@
  * @modified 2026-07-08 Adding the `Circle.setRadius` method (for chaining).
  * @mofified 2026-07-31 Adding the `radicalAxis(Circle)` method. Added the `Circle.circleUtils.createRadicalAxisHelperCircle` and `.circleDistance` helper methods.
  * @modified 2026-08-03 Adding `Circle.tangentsFromPoint`.
- * @version  1.7.0
+ * @modified 2026-08-16 Adding the `Circle.sectorAngleByArcLength` method and the `Circle.circleUtils.sectorAngleByArcLength` helper method.
+ * @version  1.8.0
  **/
 import { Bounds } from "./Bounds";
 import { Line } from "./Line";
@@ -252,6 +253,13 @@ export declare class Circle implements IBounded, ICircle, Intersectable, SVGSeri
      **/
     tangentsFromPoint(vert: Vertex): [Vector, Vector];
     /**
+     * Calculate inner sector angle for this circle and a given circle arc length.
+     *
+     * @param {number} sectorArcLength - The desired arc length (in units).
+     * @returns The sector's inner angle (in radians).
+     */
+    sectorAngleByArcLength(sectorArcLength: number): number;
+    /**
      * Create a deep copy of this circle.
      *
      * @method clone
@@ -277,5 +285,13 @@ export declare class Circle implements IBounded, ICircle, Intersectable, SVGSeri
          * If the circles intersect then the distance in negative.
          */
         circleDistance: (circleA: Circle, circleB: Circle) => number;
+        /**
+         * Calculate the inner sector angle for a given circle arc length and radius.
+         *
+         * @param {number} sectorArcLength - The desired arc length.
+         * @param {number} circleRadius - The circle's radius.
+         * @returns The sector angle in radians.
+         */
+        sectorAngleByArcLength: (sectorArcLength: number, circleRadius: number) => number;
     };
 }
