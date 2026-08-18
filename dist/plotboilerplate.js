@@ -14585,7 +14585,7 @@ var Line = /** @class */ (function (_super) {
      */
     Line.prototype.trimStartAt = function (relativeAmount) {
         // Calculate the relative position `t` on this line.
-        return this.trimStart(relativeAmount / this.length());
+        return this.trimStart(relativeAmount * this.length());
     };
     /**
      * Trim this line segment from the end point by the given amount.
@@ -14624,7 +14624,7 @@ var Line = /** @class */ (function (_super) {
      */
     Line.prototype.trimEndAt = function (relativeAmount) {
         // Calculate the relative position `t` on this line.
-        return this.trimEnd(relativeAmount / this.length());
+        return this.trimEnd(relativeAmount * this.length());
     };
     //--- BEGIN --- Implement interface `Intersectable`
     /**

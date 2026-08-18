@@ -2982,7 +2982,7 @@ class Line extends VertTuple {
      */
     trimStartAt(relativeAmount) {
         // Calculate the relative position `t` on this line.
-        return this.trimStart(relativeAmount / this.length());
+        return this.trimStart(relativeAmount * this.length());
     }
     /**
      * Trim this line segment from the end point by the given amount.
@@ -3021,7 +3021,7 @@ class Line extends VertTuple {
      */
     trimEndAt(relativeAmount) {
         // Calculate the relative position `t` on this line.
-        return this.trimEnd(relativeAmount / this.length());
+        return this.trimEnd(relativeAmount * this.length());
     }
     //--- BEGIN --- Implement interface `Intersectable`
     /**

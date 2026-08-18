@@ -31,19 +31,20 @@
 
     // Create a config: we want to have control about the arrow head size in this demo
     // `AppContext`: this is an experimental approach to make future event handling easier.
-    var SPIRAL_TYPES = ["Ulam", "Round-Equidistant"];
+    var SPIRAL_TYPES = ["Ulam", "Archimedean-Sack"];
     var appContext = new AppContext(pb, {
       startingNumber: params.getNumber("startingNumber", 1),
-      angleStepDeg: params.getNumber("angleStepDeg", 12.0),
+      angleStepDeg: params.getNumber("angleStepDeg", 90.0),
       stepInUnits: params.getNumber("stepInUnits", 60.0),
-      radiusStep: params.getNumber("radiusStep", 18.0),
+      ulamRadiusStep: params.getNumber("ulamRadiusStep", 18.0),
       circleRadius: params.getNumber("circleRadius", 6.0),
       iterations: params.getNumber("iterations", 100),
-      arcThreshold: params.getNumber("arcThreshold", 0.666),
+      arcThreshold: params.getNumber("arcThreshold", 0.157),
       showSpiralTangents: params.getBoolean("showSpiralTangents", false),
       spiralType: params.getString("spiralType", SPIRAL_TYPES[1]),
       lineColorSpiral: params.getString("lineColorSpiral", "#3584e4"),
       lineWidthSpiral: params.getNumber("lineWidthPiral", 1.0),
+      spiralLinearSegments: params.getBoolean("spiralLinearSegments", false),
       lineColorPrimeMarker: params.getString("lineColorPrimeMarker", "#ff8800"),
       lineWidthPrimeMarker: params.getNumber("lineWidthPrimeMarker", 1.0),
 
@@ -120,7 +121,7 @@
       if (appContext.config.spiralType == "Ulam") {
         // TODO
         drawUlamSpiral(draw, fill);
-      } else if (appContext.config.spiralType == "Round-Equidistant") {
+      } else if (appContext.config.spiralType == "Archimedean-Sack") {
         drawRoundEquidistantSpiral(draw, fill);
       }
     };
@@ -136,7 +137,7 @@
       var lastWasPrime = false;
 
       var pathData = ["M", 0, 0];
-      var stepSize = appContext.config.radiusStep;
+      var stepSize = appContext.config.ulamRadiusStep;
 
       var line = new Line(new Vertex(), new Vertex());
 
@@ -180,12 +181,12 @@
       var angle = 0.0;
       var steps = appContext.config.iterations;
       var angleStep = appContext.config.angleStepDeg * DEG_TO_RAD;
-      var radiusStep = appContext.config.radiusStep;
+      // var radiusStep = appContext.config.radiusStep;
 
       pathData = ["M", 0, 0];
 
       var curRadius = appContext.config.stepInUnits; // Make sure the first arc fits into the first circle/radius
-      var lastRadius = 0.0;
+      var lastRadius = appContext.config.stepInUnits; // 0.0;
       var curAngle = 0.0,
         lastAngle = 0.0;
       var helperCircle = new Circle(new Vertex(0, 0), curRadius);
@@ -205,9 +206,8 @@
         curAngle = result[1];
         curRadius = result[2];
         var intersection = helperCircle
-          .setRadius(lastRadius + (curRadius - lastRadius) / 3)
+          .setRadius(lastRadius + (curRadius - lastRadius) / 1.5)
           .vertAt(lastAngle + (curAngle - lastAngle) / 2.0);
-        draw.diamondHandle(intersection);
         helperCircle.radius = curRadius;
         curTangentVec = helperCircle.tangentAt(curAngle); // .add(curPos);
         // draw.handleLine(curTangentVec.a, curTangentVec.b);
@@ -216,23 +216,44 @@
         var lastTangentLine = lastTangentVec.asLine();
         var curTangentLine = curTangentVec.asLine();
         // var intersection = lastTangentLine.intersection(curTangentLine);
+        // draw.diamondHandle(intersection, 1.0, "cyan");
         var controlLineA = new Line(lastPos, intersection).trimEndAt(appContext.config.arcThreshold); // 0.166);
         var controlLineB = new Line(curPos, intersection).trimEndAt(appContext.config.arcThreshold);
 
         line.a = lastPos;
         line.b = curPos;
 
+        // draw.handleLine(controlLineA.a, controlLineA.b);
+        // draw.handleLine(controlLineB.a, controlLineB.b);
+
         // var bezierSector = new CubicBezierCurve(lastPos, curPos, controlLineA.b, controlLineB.b);
 
         // var line = new Line(pos, nextPos);
         if (lastWasPrime || curIsPrime) {
           shortenLinearConnection(line, lastWasPrime, curIsPrime);
+          // shortenBezierConnection(bezierSector, lastWasPrime, curIsPrime);
           pathData.push("M", line.a.x, line.a.y);
+          // pathData.push("M", bezierSector.startPoint.x, bezierSector.startPoint.y);
         }
 
-        // pathData.push("L", line.b.x, line.b.y);
-        // pathData.push("C", intersection.x, intersection.y, intersection.x, intersection.y, line.b.x, line.b.y);
-        pathData.push("C", controlLineA.b.x, controlLineA.b.y, controlLineB.b.x, controlLineB.b.y, line.b.x, line.b.y);
+        // draw.handleLine(bezierSector.startPoint, bezierSector.startControlPoint);
+        // draw.handleLine(bezierSector.endPoint, bezierSector.endControlPoint);
+
+        if (appContext.config.spiralLinearSegments) {
+          pathData.push("L", line.b.x, line.b.y);
+        } else {
+          // pathData.push("C", intersection.x, intersection.y, intersection.x, intersection.y, line.b.x, line.b.y);
+          pathData.push("C", controlLineA.b.x, controlLineA.b.y, controlLineB.b.x, controlLineB.b.y, line.b.x, line.b.y);
+          // pathData.push(
+          //   "C",
+          //   bezierSector.startControlPoint.x,
+          //   bezierSector.startControlPoint.y,
+          //   bezierSector.endControlPoint.x,
+          //   bezierSector.endControlPoint.y,
+          //   bezierSector.endPoint.x,
+          //   bezierSector.endPoint.y
+          // );
+        }
 
         // pathData.push("L", curPos.x, curPos.y);
 
@@ -294,11 +315,11 @@
 
       // var pos = new Vertex(0, 0);
       var pos = center.clone();
-      pos.x = angleStep * appContext.config.radiusStep;
+      pos.x = angleStep * appContext.config.ulamRadiusStep;
       pos.rotate(angle);
       var lastPos = center.clone();
       // var nextPos = center.clone();
-      // nextPos.x = angleStep * 2 * appContext.config.radiusStep;
+      // nextPos.x = angleStep * 2 * appContext.config.ulamRadiusStep;
       // nextPos.rotate(angle);
       var midPoint = null;
       var curIsPrime = false;
@@ -306,7 +327,7 @@
       for (var i = 0; i < steps; i++) {
         curIsPrime = isPrime(i);
         midPoint = center.clone();
-        midPoint.x = (angle + angleStep / 2.0) * 1.005 * appContext.config.radiusStep;
+        midPoint.x = (angle + angleStep / 2.0) * 1.005 * appContext.config.ulamRadiusStep;
         midPoint.rotate(angle + angleStep / 2.0);
         angle += angleStep;
         pos = makeSpiralPoint(angle);
@@ -391,9 +412,18 @@
       }
     };
 
+    var shortenBezierConnection = function (bezierCurve, isTrimStart, isTrimEnd) {
+      if (isTrimStart) {
+        bezierCurve.trimStart(appContext.config.circleRadius + appContext.config.lineWidthPrimeMarker / 2 / pb.draw.scale.x);
+      }
+      if (isTrimEnd) {
+        bezierCurve.trimEnd(appContext.config.circleRadius + appContext.config.lineWidthPrimeMarker / 2 / pb.draw.scale.x);
+      }
+    };
+
     var makeSpiralPoint = function (angle) {
       var spiralPoint = center.clone();
-      spiralPoint.x = angle * appContext.config.radiusStep;
+      spiralPoint.x = angle * appContext.config.ulamRadiusStep;
       spiralPoint.rotate(angle);
       return spiralPoint;
     };
@@ -402,35 +432,42 @@
       // var angleStepDeg = appContext.config.angleStepDeg;
       // const stepInRadians = 60.0; // px
       const stepInUnits = appContext.config.stepInUnits;
-      // var curRadius = iterationNumber * appContext.config.radiusStep;
+      // const radiusStep = appContext.config.ulamRadiusStep;
+      const angleStepRad = appContext.config.angleStepDeg * DEG_TO_RAD;
+      // var curRadius = iterationNumber * appContext.config.ulamRadiusStep;
       var angle = Circle.circleUtils.sectorAngleByArcLength(stepInUnits, curRadius);
-      var nextRadius = curRadius + stepInUnits * (angle / (Math.PI * 2));
-      // var curRadius = Math.log(1 + 2 * iterationNumber) * appContext.config.radiusStep;
+      // var nextRadius = curRadius + stepInUnits * (angle / (Math.PI * 2));
+      // var nextRadius = curRadius + stepInUnits * (((angle / appContext.config.angleStepDeg) * DEG_TO_RAD) / (Math.PI * 2));
+      // var nextRadius = curRadius + angleStepRad * (angle / (Math.PI * 2));
+      // var nextRadius = curRadius + stepInUnits * (angle / angleStepRad / (Math.PI * 2));
+      var nextRadius = curRadius + stepInUnits * (angle / angleStepRad / (Math.PI * 2));
+
+      // var curRadius = Math.log(1 + 2 * iterationNumber) * appContext.config.ulamRadiusStep;
       // var angle = stepInUnits / curRadius;
       var spiralPoint = center.clone();
       spiralPoint.x = nextRadius;
-      spiralPoint.rotate(curAngle + angle);
-      if (iterationNumber < 10) {
-        console.log(
-          "iterationNumber",
-          iterationNumber,
-          "Math.log(iterationNumber)",
-          Math.log(iterationNumber),
-          "stepInUnits",
-          stepInUnits,
-          "appContext.config.radiusStep",
-          appContext.config.radiusStep,
-          "curRadius",
-          nextRadius,
-          "curAngle",
-          curAngle,
-          "angle",
-          angle,
-          "spiralPoint",
-          spiralPoint
-        );
-      }
-      return [spiralPoint, curAngle + angle, nextRadius];
+      spiralPoint.rotate(curAngle - angle);
+      // if (iterationNumber < 10) {
+      //   console.log(
+      //     "iterationNumber",
+      //     iterationNumber,
+      //     "Math.log(iterationNumber)",
+      //     Math.log(iterationNumber),
+      //     "stepInUnits",
+      //     stepInUnits,
+      //     "appContext.config.ulamRadiusStep",
+      //     appContext.config.ulamRadiusStep,
+      //     "curRadius",
+      //     nextRadius,
+      //     "curAngle",
+      //     curAngle,
+      //     "angle",
+      //     angle,
+      //     "spiralPoint",
+      //     spiralPoint
+      //   );
+      // }
+      return [spiralPoint, curAngle - angle, nextRadius];
     };
 
     // function isPrime(num) {

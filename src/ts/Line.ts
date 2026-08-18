@@ -204,7 +204,7 @@ export class Line extends VertTuple<Line> implements IBounded, Intersectable, Pa
    */
   trimStartAt(relativeAmount: number) {
     // Calculate the relative position `t` on this line.
-    return this.trimStart(relativeAmount / this.length());
+    return this.trimStart(relativeAmount * this.length());
   }
 
   /**
@@ -245,7 +245,7 @@ export class Line extends VertTuple<Line> implements IBounded, Intersectable, Pa
    */
   trimEndAt(relativeAmount: number) {
     // Calculate the relative position `t` on this line.
-    return this.trimEnd(relativeAmount / this.length());
+    return this.trimEnd(relativeAmount * this.length());
   }
 
   //--- BEGIN --- Implement interface `Intersectable`

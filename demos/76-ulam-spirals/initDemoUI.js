@@ -23,9 +23,9 @@
       // prettier-ignore
       fold.add(appContext.config, "stepInUnits").min(1.0).max(120.0).title("Each step on the spiral in units/pixels.").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
-      fold.add(appContext.config, "angleStepDeg").min(0.0).max(23.0).title("The angle iteration step.").onChange(function () { appContext.pb.redraw(); });
+      fold.add(appContext.config, "angleStepDeg").min(0.0).max(180.0).title("The angle iteration step.").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
-      fold.add(appContext.config, "radiusStep").min(0.0).max(32.0).title("How much increase the radius in each step?").onChange(function () { appContext.pb.redraw(); });
+      fold.add(appContext.config, "ulamRadiusStep").min(0.0).max(32.0).title("How much increase the radius in each step in the Ulam spiral?").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
       fold.add(appContext.config, "iterations").min(0).max(100000).title("The numer of steps.").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
@@ -42,6 +42,8 @@
       fold.add(appContext.config, "showPrimeLabel").title("Draw the prime numbers as labels?").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
       fold.add(appContext.config, "showSpiralPath").title("Draw the spiral path?.").onChange(function () { appContext.pb.redraw(); });
+      // prettier-ignore
+      fold.add(appContext.config, "spiralLinearSegments").title("Use linear segments for the spiral.").onChange(function () { appContext.pb.redraw(); });
 
       // prettier-ignore
       fold.add(appContext.config, "lineWidthSpiral").min(1.0).max(16.0).title("The spiral's line with.").onChange(function () { appContext.pb.redraw(); });
