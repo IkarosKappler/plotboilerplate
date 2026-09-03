@@ -32,8 +32,9 @@
  * @modified 2025-04-18 Added evaluation method for cubic Bézier curves `CubicBezierCurve.utils.evaluateT`.
  * @modified 2025-04-18 Refactored method `CubicBezierCurve.getPointAt` to use `evaluateT`.
  * @modified 2025-04-18 Fixed the `CubicBezierCurve.getBounds` method: now returning the real bounding box. Before it was an approximated one.
- * @modified 2025-ß4-18 Added helper methods for bounding box calculation `CubucBezierCurve.util.cubicPolyMinMax` and `cubicPoly`.
- * @version 2.9.0
+ * @modified 2025-04-18 Added helper methods for bounding box calculation `CubucBezierCurve.util.cubicPolyMinMax` and `cubicPoly`.
+ * @modified 2026-09-09 Adding methods `CubicBezierCurve.trimStartEnd` and `CubicBezierCurve.trimStartEndAt`.
+ * @version 2.10.0
  *
  * @file CubicBezierCurve
  * @public
@@ -665,15 +666,48 @@ export class CubicBezierCurve implements IBounded, Intersectable, PathSegment {
   }
 
   /**
-   * Trim off a start section of this curve. The position parameter `t` is the relative position in [0..1].
-   * The remaining curve will be the one in the bounds `[uValue,1]` (so `[0.0,uValue]` is cut off).
+   * Trim off a start and end section of this curve. The position parameters `uStart` and `uEnd` are the absolute positions in [0..arcLength].
+   * The remaining curve will be the one in the bounds `[uStart,uEnd]` (so `[0.0,uStart]` and `[uEnd,1.0]` are cut off).
    *
-   * @method trimStartAt
+   * Parameters out of bounds (< 0.0 or > arcLength) are ignored.
+   * If `uEnd` is smaller than `uStart` then a curve with length zero (0) at `uStart` is returned.
+   *
+   * @method trimStartEndAt
    * @instance
    * @memberof CubicBezierCurve
    * @param {number} tStart - The relative position parameter where to cut off the head curve.
+   * @param {number} tEnd - The relative position parameter where to cut off the tail curve.
    * @returns {CubicBezierCurve} `this` for chanining.
    */
+
+  trimStartEnd(uStart: number, uEnd: number): CubicBezierCurve {
+    return this.trimStartEndAt(this.convertU2T(uStart), this.convertU2T(uEnd));
+  }
+
+  /**
+   * Trim off a start and end section of this curve. The position parameters `tStart` and `tEnd` are the relative positions in [0..1].
+   * The remaining curve will be the one in the bounds `[tStart,tEnd]` (so `[0.0,tStart]` and `[tEnd,1.0]` are cut off).
+   *
+   * Parameters out of bounds (< 0.0 or > 1.0) are ignored.
+   * If `tEnd` is smaller than `tStart` then a curve with length zero (0) at `tStart` is returned.
+   *
+   * @method trimStartEndAt
+   * @instance
+   * @memberof CubicBezierCurve
+   * @param {number} tStart - The relative position parameter where to cut off the head curve.
+   * @param {number} tEnd - The relative position parameter where to cut off the tail curve.
+   * @returns {CubicBezierCurve} `this` for chanining.
+   */
+
+  trimStartEndAt(tStart: number, tEnd: number): CubicBezierCurve {
+    const cleanTrimStart = Math.min(Math.max(0.0, tStart), 1.0);
+    const cleanTrimEnd = Math.min(Math.max(cleanTrimStart, tEnd), 1.0);
+    this.trimStartAt(cleanTrimStart);
+    const relativeTrimEnd = (cleanTrimEnd - cleanTrimStart) / (1.0 - cleanTrimStart);
+    this.trimEndAt(relativeTrimEnd);
+    return this;
+  }
+
   // __trimStartEndAt(tStart: number, tEnd: number): CubicBezierCurve {
   //   var finalCurvePoints = [
   //     this.startPoint.clone(),

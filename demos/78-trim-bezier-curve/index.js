@@ -35,6 +35,9 @@
     var appContext = new AppContext(pb, {
       trimStart: params.getNumber("trimStart", 0.25),
       trimEnd: params.getNumber("trimEnd", 0.75),
+      useAbsoluteValue: params.getBoolean("useAbsoluteValue", false),
+      trimStartAbsolute: params.getNumber("trimStartAbsolute", 20),
+      trimEndAbsolute: params.getNumber("trimEndAbsolute", 80),
       readme: function () {
         globalThis.displayDemoMeta();
       }
@@ -60,34 +63,19 @@
     var postDraw = function (draw, fill) {
       var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor)).cssRGB();
 
-      // var cleanTrimStart = appContext.config.trimStart; // Math.min( Math.max(0.0, appContext.config.trimStart), 1.0);
-      // var cleanTrimEnd = appContext.config.trimEnd; // Math.min( Math.max(0.0, appContext.config.trimEnd), cleanTrimStart);
-      var cleanTrimStart = Math.min(Math.max(0.0, appContext.config.trimStart), 1.0);
-      var cleanTrimEnd = Math.min(Math.max(cleanTrimStart, appContext.config.trimEnd), 1.0);
+      var finalCurve = null;
+      var startPoint = null;
+      var endPoint = null;
 
-      var startPoint = bCurve.getPointAt(cleanTrimStart);
-      var endPoint = bCurve.getPointAt(cleanTrimEnd);
-
-      // bCurve.curveIntervals = 60;
-      // bCurve.updateArcLengths();
-      // var absoluteTrimStart = bCurve.arcLength * cleanTrimStart;
-      // var bothTrimmed = bCurve.clone().trimStart(absoluteTrimStart);
-      var bothTrimmed = bCurve.clone().trimStartAt(cleanTrimStart);
-
-      // bothTrimmed.curveIntervals = 60;
-      var relativeTrimEnd = (cleanTrimEnd - cleanTrimStart) / (1.0 - cleanTrimStart);
-
-      // var absoluteTrimEnd = bCurve.arcLength * relativeTrimEnd;
-
-      // console.log("relativeTrimEnd", relativeTrimEnd);
-
-      var tmpEndPoint = bothTrimmed.getPointAt(relativeTrimEnd);
-      draw.cross(tmpEndPoint, 5, "green", 1.0);
-
-      // bothTrimmed.trimEnd(absoluteTrimEnd);
-      bothTrimmed.trimEndAt(relativeTrimEnd);
-
-      var finalCurve = bothTrimmed;
+      if (appContext.config.useAbsoluteValue) {
+        finalCurve = bCurve.clone().trimStartEnd(appContext.config.trimStartAbsolute, appContext.config.trimEndAbsolute);
+        startPoint = bCurve.getPoint(appContext.config.trimStartAbsolute);
+        endPoint = bCurve.getPoint(appContext.config.trimEndAbsolute);
+      } else {
+        finalCurve = bCurve.clone().trimStartEndAt(appContext.config.trimStart, appContext.config.trimEnd);
+        startPoint = bCurve.getPointAt(appContext.config.trimStart);
+        endPoint = bCurve.getPointAt(appContext.config.trimEnd);
+      }
 
       fill.text("Start", bCurve.startPoint.x + 5, bCurve.startPoint.y, { color: contrastColor });
       fill.text("End", bCurve.endPoint.x + 5, bCurve.endPoint.y, { color: contrastColor });

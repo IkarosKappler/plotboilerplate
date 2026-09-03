@@ -41,6 +41,7 @@
       iterations: params.getNumber("iterations", 100),
       arcThreshold: params.getNumber("arcThreshold", 0.312), // 0.41), // 0.157),
       showSpiralTangents: params.getBoolean("showSpiralTangents", false),
+      trimSpiralSegments: params.getBoolean("trimSpiralSegments", false),
       spiralType: params.getString("spiralType", SPIRAL_TYPES[1]),
       lineColorSpiral: params.getString("lineColorSpiral", "#3584e4"),
       lineWidthSpiral: params.getNumber("lineWidthPiral", 1.0),
@@ -49,8 +50,8 @@
       lineWidthPrimeMarker: params.getNumber("lineWidthPrimeMarker", 1.0),
 
       showSpiralPath: params.getBoolean("showSpiralPath", true),
-      showSpiraBezierHandles: params.getBoolean("showSpiraBezierHandles", false),
-      showSpiraBezierControlsPoints: params.getBoolean("showSpiraBezierControlsPoints", false),
+      showSpiralBezierHandles: params.getBoolean("showSpiralBezierHandles", false),
+      showSpiralBezierControlsPoints: params.getBoolean("showSpiralBezierControlsPoints", false),
       showPrimeLabel: params.getBoolean("showPrimeLabel", true),
       showPrimeLabel: params.getBoolean("showPrimeLabel", true),
       readme: function () {
@@ -155,7 +156,7 @@
         line.b = nextPos;
 
         // var line = new Line(pos, nextPos);
-        if (lastWasPrime || curIsPrime) {
+        if (appContext.config.trimSpiralSegments && (lastWasPrime || curIsPrime)) {
           shortenLinearConnection(line, lastWasPrime, curIsPrime);
           pathData.push("M", line.a.x, line.a.y);
         }
@@ -212,14 +213,9 @@
           .setRadius(lastRadius + (curRadius - lastRadius) / 0.6)
           .vertAt(lastAngle + (curAngle - lastAngle) / 2.0);
         helperCircle.radius = curRadius;
-        curTangentVec = helperCircle.tangentAt(curAngle); // .add(curPos);
-        // draw.handleLine(curTangentVec.a, curTangentVec.b);
-        // var lastTangentLine = lastTangentVec.clone().add(lastTangentVec.a).asLine();
-        // var curTangentLine = curTangentVec.clone().add(curTangentVec.a).asLine();
-        var lastTangentLine = lastTangentVec.asLine();
-        var curTangentLine = curTangentVec.asLine();
-        // var intersection = lastTangentLine.intersection(curTangentLine);
-        if (appContext.config.showSpiraBezierControlsPoints) {
+        curTangentVec = helperCircle.tangentAt(curAngle);
+
+        if (appContext.config.showSpiralBezierControlsPoints) {
           draw.diamondHandle(intersection, 1.0, "cyan");
         }
         var controlLineA = new Line(lastPos, intersection).trimEndAt(appContext.config.arcThreshold); // 0.166);
@@ -234,16 +230,19 @@
         var bezierSector = new CubicBezierCurve(line.a, line.b, controlLineA.b, controlLineB.b);
 
         // var line = new Line(pos, nextPos);
-        if (lastWasPrime || curIsPrime) {
-          // shortenLinearConnection(line, lastWasPrime, curIsPrime);
-          // shortenBezierConnection(bezierSector, lastWasPrime, curIsPrime);
-          pathData.push("M", line.a.x, line.a.y);
-          // pathData.push("M", bezierSector.startPoint.x, bezierSector.startPoint.y);
+        if (appContext.config.trimSpiralSegments && (lastWasPrime || curIsPrime)) {
+          if (appContext.config.spiralLinearSegments) {
+            shortenLinearConnection(line, lastWasPrime, curIsPrime);
+            pathData.push("M", line.a.x, line.a.y);
+          } else {
+            shortenBezierConnection(bezierSector, lastWasPrime, curIsPrime);
+            pathData.push("M", bezierSector.startPoint.x, bezierSector.startPoint.y);
+          }
         }
 
         // draw.handleLine(bezierSector.startPoint, bezierSector.startControlPoint);
         // draw.handleLine(bezierSector.endPoint, bezierSector.endControlPoint);
-        if (appContext.config.showSpiraBezierHandles) {
+        if (appContext.config.showSpiralBezierHandles) {
           draw.handleLine(line.a, controlLineA.b);
           draw.handleLine(line.b, controlLineB.b);
         }
@@ -252,16 +251,16 @@
           pathData.push("L", line.b.x, line.b.y);
         } else {
           // pathData.push("C", intersection.x, intersection.y, intersection.x, intersection.y, line.b.x, line.b.y);
-          pathData.push("C", controlLineA.b.x, controlLineA.b.y, controlLineB.b.x, controlLineB.b.y, line.b.x, line.b.y);
-          // pathData.push(
-          //   "C",
-          //   bezierSector.startControlPoint.x,
-          //   bezierSector.startControlPoint.y,
-          //   bezierSector.endControlPoint.x,
-          //   bezierSector.endControlPoint.y,
-          //   bezierSector.endPoint.x,
-          //   bezierSector.endPoint.y
-          // );
+          // pathData.push("C", controlLineA.b.x, controlLineA.b.y, controlLineB.b.x, controlLineB.b.y, line.b.x, line.b.y);
+          pathData.push(
+            "C",
+            bezierSector.startControlPoint.x,
+            bezierSector.startControlPoint.y,
+            bezierSector.endControlPoint.x,
+            bezierSector.endControlPoint.y,
+            bezierSector.endPoint.x,
+            bezierSector.endPoint.y
+          );
         }
 
         // pathData.push("L", curPos.x, curPos.y);
@@ -359,7 +358,7 @@
         // }
 
         if (curIsPrime) {
-          console.log("curIsPrime, draw circl", i);
+          console.log("curIsPrime, draw circle", i);
           // Add a circle to the path
           // prettier-ignore
           draw.circle( pos, circleRadius, 'orange', 1.0);
@@ -384,29 +383,21 @@
         // Right bound reached -> continue top
         curDirection.x = 0;
         curDirection.y = -1;
-        // newPosition.x = position.x;
-        // newPosition.y--;
         maxDiscrete.x = newPosition.x;
       } else if (newPosition.y < minDiscrete.y) {
         // Upper bound reached -> continue left
         curDirection.x = -1;
         curDirection.y = 0;
-        // newPosition.y = position.y;
-        // newPosition.x--;
         minDiscrete.y = newPosition.y;
       } else if (newPosition.x < minDiscrete.x) {
         // Left bound reached -> continue down
         curDirection.x = 0;
         curDirection.y = 1;
-        // newPosition.x = position.x;
-        // newPosition.y++;
         minDiscrete.x = newPosition.x;
       } else if (newPosition.y > maxDiscrete.y) {
         // Lower bound reached -> continue right
         curDirection.x = 1;
         curDirection.y = 0;
-        // newPosition.y = position.y;
-        // newPosition.x++;
         maxDiscrete.y = newPosition.y;
       }
       return newPosition;
@@ -422,11 +413,19 @@
     };
 
     var shortenBezierConnection = function (bezierCurve, isTrimStart, isTrimEnd) {
-      if (isTrimStart) {
-        bezierCurve.trimStart(appContext.config.circleRadius + appContext.config.lineWidthPrimeMarker / 2 / pb.draw.scale.x);
-      }
-      if (isTrimEnd) {
-        bezierCurve.trimEnd(appContext.config.circleRadius + appContext.config.lineWidthPrimeMarker / 2 / pb.draw.scale.x);
+      // if (isTrimStart) {
+      //   bezierCurve.trimStart(appContext.config.circleRadius + appContext.config.lineWidthPrimeMarker / 2 / pb.draw.scale.x);
+      // }
+      // if (isTrimEnd) {
+      //   bezierCurve.trimEnd(appContext.config.circleRadius + appContext.config.lineWidthPrimeMarker / 2 / pb.draw.scale.x);
+      // }
+      var cutOffAmount = appContext.config.circleRadius + appContext.config.lineWidthPrimeMarker / 2 / pb.draw.scale.x;
+      if (isTrimStart && !isTrimEnd) {
+        bezierCurve.trimStart(cutOffAmount);
+      } else if (!isTrimStart && isTrimEnd) {
+        bezierCurve.trimEnd(cutOffAmount);
+      } else if (isTrimStart && isTrimEnd) {
+        bezierCurve.trimStartEnd(cutOffAmount, cutOffAmount);
       }
     };
 

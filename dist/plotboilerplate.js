@@ -14716,8 +14716,9 @@ exports.Line = Line;
  * @modified 2025-04-18 Added evaluation method for cubic Bézier curves `CubicBezierCurve.utils.evaluateT`.
  * @modified 2025-04-18 Refactored method `CubicBezierCurve.getPointAt` to use `evaluateT`.
  * @modified 2025-04-18 Fixed the `CubicBezierCurve.getBounds` method: now returning the real bounding box. Before it was an approximated one.
- * @modified 2025-ß4-18 Added helper methods for bounding box calculation `CubucBezierCurve.util.cubicPolyMinMax` and `cubicPoly`.
- * @version 2.9.0
+ * @modified 2025-04-18 Added helper methods for bounding box calculation `CubucBezierCurve.util.cubicPolyMinMax` and `cubicPoly`.
+ * @modified 2026-09-09 Adding methods `CubicBezierCurve.trimStartEnd` and `CubicBezierCurve.trimStartEndAt`.
+ * @version 2.10.0
  *
  * @file CubicBezierCurve
  * @public
@@ -15211,47 +15212,76 @@ var CubicBezierCurve = /** @class */ (function () {
         // return this.trimStartEndAt(null, t);
     };
     /**
-     * Trim off a start section of this curve. The position parameter `t` is the relative position in [0..1].
-     * The remaining curve will be the one in the bounds `[uValue,1]` (so `[0.0,uValue]` is cut off).
+     * Trim off a start and end section of this curve. The position parameters `uStart` and `uEnd` are the absolute positions in [0..arcLength].
+     * The remaining curve will be the one in the bounds `[uStart,uEnd]` (so `[0.0,uStart]` and `[uEnd,1.0]` are cut off).
      *
-     * @method trimStartAt
+     * Parameters out of bounds (< 0.0 or > arcLength) are ignored.
+     * If `uEnd` is smaller than `uStart` then a curve with length zero (0) at `uStart` is returned.
+     *
+     * @method trimStartEndAt
      * @instance
      * @memberof CubicBezierCurve
      * @param {number} tStart - The relative position parameter where to cut off the head curve.
+     * @param {number} tEnd - The relative position parameter where to cut off the tail curve.
      * @returns {CubicBezierCurve} `this` for chanining.
      */
-    CubicBezierCurve.prototype.__trimStartEndAt = function (tStart, tEnd) {
-        var finalCurvePoints = [
-            this.startPoint.clone(),
-            this.endPoint.clone(),
-            this.startControlPoint.clone(),
-            this.endControlPoint.clone()
-        ];
-        if (typeof tStart === "number" && !Number.isNaN(tStart)) {
-            var subCurvePointsStart = CubicBezierCurve.utils.getSubCurvePointsAt(this, tStart, 1.0);
-            finalCurvePoints[0].set(subCurvePointsStart[0]);
-            finalCurvePoints[2].set(subCurvePointsStart[2]);
-            // this.startPoint.set(subCurvePointsStart[0]);
-            // this.startControlPoint.set(subCurvePointsStart[2]);
-            // this.endPoint.set(subCurvePointsStart[1]);
-            // this.endControlPoint.set(subCurvePointsStart[3]);
-        }
-        if (typeof tEnd === "number" && !Number.isNaN(tEnd)) {
-            var subCurvePointsEnd = CubicBezierCurve.utils.getSubCurvePointsAt(this, 0.0, tEnd);
-            // this.startPoint.set(subCurvePointsEnd[0]);
-            // this.startControlPoint.set(subCurvePointsEnd[2]);
-            // this.endPoint.set(subCurvePointsEnd[1]);
-            // this.endControlPoint.set(subCurvePointsEnd[3]);
-            finalCurvePoints[1].set(subCurvePointsEnd[1]);
-            finalCurvePoints[3].set(subCurvePointsEnd[3]);
-        }
-        this.startPoint.set(finalCurvePoints[0]);
-        this.endPoint.set(finalCurvePoints[1]);
-        this.startControlPoint.set(finalCurvePoints[2]);
-        this.endControlPoint.set(finalCurvePoints[3]);
-        this.updateArcLengths();
+    CubicBezierCurve.prototype.trimStartEnd = function (uStart, uEnd) {
+        return this.trimStartEndAt(this.convertU2T(uStart), this.convertU2T(uEnd));
+    };
+    /**
+     * Trim off a start and end section of this curve. The position parameters `tStart` and `tEnd` are the relative positions in [0..1].
+     * The remaining curve will be the one in the bounds `[tStart,tEnd]` (so `[0.0,tStart]` and `[tEnd,1.0]` are cut off).
+     *
+     * Parameters out of bounds (< 0.0 or > 1.0) are ignored.
+     * If `tEnd` is smaller than `tStart` then a curve with length zero (0) at `tStart` is returned.
+     *
+     * @method trimStartEndAt
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} tStart - The relative position parameter where to cut off the head curve.
+     * @param {number} tEnd - The relative position parameter where to cut off the tail curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
+    CubicBezierCurve.prototype.trimStartEndAt = function (tStart, tEnd) {
+        var cleanTrimStart = Math.min(Math.max(0.0, tStart), 1.0);
+        var cleanTrimEnd = Math.min(Math.max(cleanTrimStart, tEnd), 1.0);
+        this.trimStartAt(cleanTrimStart);
+        var relativeTrimEnd = (cleanTrimEnd - cleanTrimStart) / (1.0 - cleanTrimStart);
+        this.trimEndAt(relativeTrimEnd);
         return this;
     };
+    // __trimStartEndAt(tStart: number, tEnd: number): CubicBezierCurve {
+    //   var finalCurvePoints = [
+    //     this.startPoint.clone(),
+    //     this.endPoint.clone(),
+    //     this.startControlPoint.clone(),
+    //     this.endControlPoint.clone()
+    //   ];
+    //   if (typeof tStart === "number" && !Number.isNaN(tStart)) {
+    //     const subCurvePointsStart = CubicBezierCurve.utils.getSubCurvePointsAt(this, tStart, 1.0);
+    //     finalCurvePoints[0].set(subCurvePointsStart[0]);
+    //     finalCurvePoints[2].set(subCurvePointsStart[2]);
+    //     // this.startPoint.set(subCurvePointsStart[0]);
+    //     // this.startControlPoint.set(subCurvePointsStart[2]);
+    //     // this.endPoint.set(subCurvePointsStart[1]);
+    //     // this.endControlPoint.set(subCurvePointsStart[3]);
+    //   }
+    //   if (typeof tEnd === "number" && !Number.isNaN(tEnd)) {
+    //     const subCurvePointsEnd = CubicBezierCurve.utils.getSubCurvePointsAt(this, 0.0, tEnd);
+    //     // this.startPoint.set(subCurvePointsEnd[0]);
+    //     // this.startControlPoint.set(subCurvePointsEnd[2]);
+    //     // this.endPoint.set(subCurvePointsEnd[1]);
+    //     // this.endControlPoint.set(subCurvePointsEnd[3]);
+    //     finalCurvePoints[1].set(subCurvePointsEnd[1]);
+    //     finalCurvePoints[3].set(subCurvePointsEnd[3]);
+    //   }
+    //   this.startPoint.set(finalCurvePoints[0]);
+    //   this.endPoint.set(finalCurvePoints[1]);
+    //   this.startControlPoint.set(finalCurvePoints[2]);
+    //   this.endControlPoint.set(finalCurvePoints[3]);
+    //   this.updateArcLengths();
+    //   return this;
+    // }
     /**
      * Get a sub curve at the given start end end positions (values on the curve's length, between 0 and curve.arcLength).
      *

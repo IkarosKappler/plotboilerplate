@@ -8,6 +8,9 @@
 - Add 'Rulers' class from the ngdg project.
 - Add 'onclose' and 'onopen' to the Modal (demos).
 
+- 2026-09-03
+  - Adding methods `CubicBezierCurve.trimStartEnd` and `CubicBezierCurve.trimStartEndAt`.
+  - Adding demo `78-trim-bezier-curve` for trimming cubic Bézier curves at the start and end simultaneously.
 - 2026-08-16
   - Adding the `Circle.sectorAngleByArcLength` method and the `Circle.circleUtils.sectorAngleByArcLength` helper method.
   - Adding methods `Line.trimStart` and `Line.trimEnd`. Adding methods `Line.trimStartAt` and `Line.trimEndAt`.

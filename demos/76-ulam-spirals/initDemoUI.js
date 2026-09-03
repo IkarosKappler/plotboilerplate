@@ -41,9 +41,11 @@
       // prettier-ignore
       fold.add(appContext.config, "showPrimeLabel").title("Draw the prime numbers as labels?").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
-      fold.add(appContext.config, "showSpiraBezierHandles").title("Draw the spiral's bezier handles?").onChange(function () { appContext.pb.redraw(); });
+      fold.add(appContext.config, "showSpiralBezierHandles").title("Draw the spiral's bezier handles?").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
-      fold.add(appContext.config, "showSpiraBezierControlsPoints").title("Draw the spiral's bezier control points?").onChange(function () { appContext.pb.redraw(); });
+      fold.add(appContext.config, "showSpiralBezierControlsPoints").title("Draw the spiral's bezier control points?").onChange(function () { appContext.pb.redraw(); });
+      // prettier-ignore
+      fold.add(appContext.config, "trimSpiralSegments").title("Trim spiral segments at prime markers?").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
       fold.add(appContext.config, "showSpiralPath").title("Draw the spiral path?.").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore

@@ -18,7 +18,15 @@
       // prettier-ignore
       fold.add(appContext.config, "trimStart").min(0.0).max(1.0).title("The start ratio to trim.").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
-      fold.add(appContext.config, "trimEnd").min(0.0).max(1.0).title("The end ratio to trim.").onChange(function () { appContext.pb.redraw(); }); // prettier-ignore
+      fold.add(appContext.config, "trimEnd").min(0.0).max(1.0).title("The end ratio to trim.").onChange(function () { appContext.pb.redraw(); });
+
+      // prettier-ignore
+      fold.add(appContext.config, "useAbsoluteValue").title("Use absolute or relative values.").onChange(function () { appContext.pb.redraw(); });
+
+      // prettier-ignore
+      fold.add(appContext.config, "trimStartAbsolute").min(0.0).title("The start value in units to trim.").onChange(function () { appContext.pb.redraw(); });
+      // prettier-ignore
+      fold.add(appContext.config, "trimEndAbsolute").min(0.0).title("The end value in units to trim.").onChange(function () { appContext.pb.redraw(); });
 
       // prettier-ignore
       gui.add(appContext.config, "readme").title("Show the readme.");
