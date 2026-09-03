@@ -39,7 +39,7 @@
       ulamRadiusStep: params.getNumber("ulamRadiusStep", 18.0),
       circleRadius: params.getNumber("circleRadius", 6.0),
       iterations: params.getNumber("iterations", 100),
-      arcThreshold: params.getNumber("arcThreshold", 0.157),
+      arcThreshold: params.getNumber("arcThreshold", 0.312), // 0.41), // 0.157),
       showSpiralTangents: params.getBoolean("showSpiralTangents", false),
       spiralType: params.getString("spiralType", SPIRAL_TYPES[1]),
       lineColorSpiral: params.getString("lineColorSpiral", "#3584e4"),
@@ -49,6 +49,9 @@
       lineWidthPrimeMarker: params.getNumber("lineWidthPrimeMarker", 1.0),
 
       showSpiralPath: params.getBoolean("showSpiralPath", true),
+      showSpiraBezierHandles: params.getBoolean("showSpiraBezierHandles", false),
+      showSpiraBezierControlsPoints: params.getBoolean("showSpiraBezierControlsPoints", false),
+      showPrimeLabel: params.getBoolean("showPrimeLabel", true),
       showPrimeLabel: params.getBoolean("showPrimeLabel", true),
       readme: function () {
         globalThis.displayDemoMeta();
@@ -187,8 +190,8 @@
 
       var curRadius = appContext.config.stepInUnits; // Make sure the first arc fits into the first circle/radius
       var lastRadius = appContext.config.stepInUnits; // 0.0;
-      var curAngle = 0.0,
-        lastAngle = 0.0;
+      var curAngle = 0.0, // (Math.PI / 4) * 3, // 0.0,
+        lastAngle = 0.0; // (Math.PI / 4) * 2; // 0.0;
       var helperCircle = new Circle(new Vertex(0, 0), curRadius);
       var curPos,
         lastPos = helperCircle.vertAt(curAngle); // new Vertex(0, 0);
@@ -206,7 +209,7 @@
         curAngle = result[1];
         curRadius = result[2];
         var intersection = helperCircle
-          .setRadius(lastRadius + (curRadius - lastRadius) / 1.5)
+          .setRadius(lastRadius + (curRadius - lastRadius) / 0.6)
           .vertAt(lastAngle + (curAngle - lastAngle) / 2.0);
         helperCircle.radius = curRadius;
         curTangentVec = helperCircle.tangentAt(curAngle); // .add(curPos);
@@ -216,7 +219,9 @@
         var lastTangentLine = lastTangentVec.asLine();
         var curTangentLine = curTangentVec.asLine();
         // var intersection = lastTangentLine.intersection(curTangentLine);
-        // draw.diamondHandle(intersection, 1.0, "cyan");
+        if (appContext.config.showSpiraBezierControlsPoints) {
+          draw.diamondHandle(intersection, 1.0, "cyan");
+        }
         var controlLineA = new Line(lastPos, intersection).trimEndAt(appContext.config.arcThreshold); // 0.166);
         var controlLineB = new Line(curPos, intersection).trimEndAt(appContext.config.arcThreshold);
 
@@ -226,11 +231,11 @@
         // draw.handleLine(controlLineA.a, controlLineA.b);
         // draw.handleLine(controlLineB.a, controlLineB.b);
 
-        // var bezierSector = new CubicBezierCurve(lastPos, curPos, controlLineA.b, controlLineB.b);
+        var bezierSector = new CubicBezierCurve(line.a, line.b, controlLineA.b, controlLineB.b);
 
         // var line = new Line(pos, nextPos);
         if (lastWasPrime || curIsPrime) {
-          shortenLinearConnection(line, lastWasPrime, curIsPrime);
+          // shortenLinearConnection(line, lastWasPrime, curIsPrime);
           // shortenBezierConnection(bezierSector, lastWasPrime, curIsPrime);
           pathData.push("M", line.a.x, line.a.y);
           // pathData.push("M", bezierSector.startPoint.x, bezierSector.startPoint.y);
@@ -238,6 +243,10 @@
 
         // draw.handleLine(bezierSector.startPoint, bezierSector.startControlPoint);
         // draw.handleLine(bezierSector.endPoint, bezierSector.endControlPoint);
+        if (appContext.config.showSpiraBezierHandles) {
+          draw.handleLine(line.a, controlLineA.b);
+          draw.handleLine(line.b, controlLineB.b);
+        }
 
         if (appContext.config.spiralLinearSegments) {
           pathData.push("L", line.b.x, line.b.y);

@@ -4775,6 +4775,7 @@ class CubicBezierCurve {
         this.endControlPoint.set(subCurbePoints[3]);
         this.updateArcLengths();
         return this;
+        // return this.trimStartEndAt(t, null);
     }
     /**
      * Trim off the end of this curve. The position parameter `uValue` is the absolute position on the
@@ -4808,6 +4809,49 @@ class CubicBezierCurve {
         this.startControlPoint.set(subCurbePoints[2]);
         this.endPoint.set(subCurbePoints[1]);
         this.endControlPoint.set(subCurbePoints[3]);
+        this.updateArcLengths();
+        return this;
+        // return this.trimStartEndAt(null, t);
+    }
+    /**
+     * Trim off a start section of this curve. The position parameter `t` is the relative position in [0..1].
+     * The remaining curve will be the one in the bounds `[uValue,1]` (so `[0.0,uValue]` is cut off).
+     *
+     * @method trimStartAt
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} tStart - The relative position parameter where to cut off the head curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
+    __trimStartEndAt(tStart, tEnd) {
+        var finalCurvePoints = [
+            this.startPoint.clone(),
+            this.endPoint.clone(),
+            this.startControlPoint.clone(),
+            this.endControlPoint.clone()
+        ];
+        if (typeof tStart === "number" && !Number.isNaN(tStart)) {
+            const subCurvePointsStart = CubicBezierCurve.utils.getSubCurvePointsAt(this, tStart, 1.0);
+            finalCurvePoints[0].set(subCurvePointsStart[0]);
+            finalCurvePoints[2].set(subCurvePointsStart[2]);
+            // this.startPoint.set(subCurvePointsStart[0]);
+            // this.startControlPoint.set(subCurvePointsStart[2]);
+            // this.endPoint.set(subCurvePointsStart[1]);
+            // this.endControlPoint.set(subCurvePointsStart[3]);
+        }
+        if (typeof tEnd === "number" && !Number.isNaN(tEnd)) {
+            const subCurvePointsEnd = CubicBezierCurve.utils.getSubCurvePointsAt(this, 0.0, tEnd);
+            // this.startPoint.set(subCurvePointsEnd[0]);
+            // this.startControlPoint.set(subCurvePointsEnd[2]);
+            // this.endPoint.set(subCurvePointsEnd[1]);
+            // this.endControlPoint.set(subCurvePointsEnd[3]);
+            finalCurvePoints[1].set(subCurvePointsEnd[1]);
+            finalCurvePoints[3].set(subCurvePointsEnd[3]);
+        }
+        this.startPoint.set(finalCurvePoints[0]);
+        this.endPoint.set(finalCurvePoints[1]);
+        this.startControlPoint.set(finalCurvePoints[2]);
+        this.endControlPoint.set(finalCurvePoints[3]);
         this.updateArcLengths();
         return this;
     }
@@ -5234,7 +5278,7 @@ CubicBezierCurve.utils = {
      * @param {number} tEnd – The end offset if the desired cub curve (must be in [0..1]).
      * @instance
      * @memberof CubicBezierCurve
-     * @return {CubicBezierCurve} The sub curve as a new curve.
+     * @return {[Vertex, Vertex, Vertex, Vertex]} The sub curve as curve vertices.
      **/
     getSubCurvePointsAt: (curve, tStart, tEnd) => {
         const startVec = new Vector(curve.getPointAt(tStart), curve.getTangentAt(tStart));

@@ -402,6 +402,17 @@ export declare class CubicBezierCurve implements IBounded, Intersectable, PathSe
      */
     trimEndAt(t: number): CubicBezierCurve;
     /**
+     * Trim off a start section of this curve. The position parameter `t` is the relative position in [0..1].
+     * The remaining curve will be the one in the bounds `[uValue,1]` (so `[0.0,uValue]` is cut off).
+     *
+     * @method trimStartAt
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} tStart - The relative position parameter where to cut off the head curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
+    __trimStartEndAt(tStart: number, tEnd: number): CubicBezierCurve;
+    /**
      * Get a sub curve at the given start end end positions (values on the curve's length, between 0 and curve.arcLength).
      *
      * tStart >= tEnd is allowed, you will get a reversed sub curve then.
@@ -612,7 +623,7 @@ export declare class CubicBezierCurve implements IBounded, Intersectable, PathSe
          * @param {number} tEnd – The end offset if the desired cub curve (must be in [0..1]).
          * @instance
          * @memberof CubicBezierCurve
-         * @return {CubicBezierCurve} The sub curve as a new curve.
+         * @return {[Vertex, Vertex, Vertex, Vertex]} The sub curve as curve vertices.
          **/
         getSubCurvePointsAt: (curve: CubicBezierCurve, tStart: number, tEnd: number) => [Vertex, Vertex, Vertex, Vertex];
         /**

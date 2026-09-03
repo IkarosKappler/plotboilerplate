@@ -7,7 +7,8 @@
  * @author      Ikaros Kappler
  * @date        2019-11-22
  * @modified    2020-05-06 Replace the direct subcurve calculation by the new CubicBezierPath.getSubCurveAt(number,number) function call.
- * @version     1.0.1
+ * @modified    2026-08-26 Making `t` configurable.
+ * @version     1.0.2
  **/
 
 (function (_context) {
@@ -74,6 +75,7 @@
     // +-------------------------------
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
+        t: 0.0,
         animate: false
       },
       GUP
@@ -88,7 +90,7 @@
       // Each redraw loop determines the current start vector and the current
       // end vector on the curve. (get a subcurve for that)
 
-      var subCurve = path.bezierCurves[0].getSubCurveAt(0, t);
+      var subCurve = path.bezierCurves[0].getSubCurveAt(0, config.t);
       pb.draw.cubicBezier(
         subCurve.startPoint,
         subCurve.endPoint,
@@ -102,8 +104,10 @@
       // And draw the current position on the curve as a grey point.
       pb.fill.circle(subCurve.endPoint, 3, "rgba(255,255,255,0.5)");
 
-      t += step;
-      if (t >= 1.0) t = 0.0; // Reset t after each rendering loop
+      config.t += step;
+      if (config.t >= 1.0) {
+        config.t = 0.0; // Reset t after each rendering loop
+      }
     };
 
     // +---------------------------------------------------------------------------------
@@ -163,23 +167,15 @@
       }
     };
 
-    /**
-     * Unfortunately the animator is not smart, so we have to create a new
-     * one (and stop the old one) each time the vertex count changes.
-     **/
-    var updateAnimator = function () {
-      if (!animator) return;
-      animator.stop();
-      animator = null;
-      toggleAnimation();
-    };
-
     // +---------------------------------------------------------------------------------
     // | Initialize dat.gui
     // +-------------------------------
     {
       var gui = pb.createGUI();
       var f0 = gui.addFolder("Points");
+      // prettier-ignore
+      f0.add(config, "t").min(0.0).max(1.0).onChange( function() { pb.redraw(); }).title("Toggle point animation on/off.");
+      // prettier-ignore
       f0.add(config, "animate").onChange(toggleAnimation).title("Toggle point animation on/off.");
       f0.open();
 
