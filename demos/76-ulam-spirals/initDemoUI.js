@@ -47,7 +47,9 @@
       // prettier-ignore
       fold.add(appContext.config, "trimSpiralSegments").title("Trim spiral segments at prime markers?").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
-      fold.add(appContext.config, "showSpiralPath").title("Draw the spiral path?.").onChange(function () { appContext.pb.redraw(); });
+      fold.add(appContext.config, "showSpiralPath").title("Draw the spiral path?").onChange(function () { appContext.pb.redraw(); });
+      // prettier-ignore
+      fold.add(appContext.config, "showAllNumbers").title("Show markers for all number?").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
       fold.add(appContext.config, "spiralLinearSegments").title("Use linear segments for the spiral.").onChange(function () { appContext.pb.redraw(); });
 

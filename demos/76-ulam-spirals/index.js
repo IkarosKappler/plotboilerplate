@@ -41,7 +41,7 @@
       iterations: params.getNumber("iterations", 100),
       arcThreshold: params.getNumber("arcThreshold", 0.312), // 0.41), // 0.157),
       showSpiralTangents: params.getBoolean("showSpiralTangents", false),
-      trimSpiralSegments: params.getBoolean("trimSpiralSegments", false),
+      trimSpiralSegments: params.getBoolean("trimSpiralSegments", true),
       spiralType: params.getString("spiralType", SPIRAL_TYPES[1]),
       lineColorSpiral: params.getString("lineColorSpiral", "#3584e4"),
       lineWidthSpiral: params.getNumber("lineWidthPiral", 1.0),
@@ -50,9 +50,9 @@
       lineWidthPrimeMarker: params.getNumber("lineWidthPrimeMarker", 1.0),
 
       showSpiralPath: params.getBoolean("showSpiralPath", true),
+      showAllNumbers: params.getBoolean("showAllNumbers", false),
       showSpiralBezierHandles: params.getBoolean("showSpiralBezierHandles", false),
       showSpiralBezierControlsPoints: params.getBoolean("showSpiralBezierControlsPoints", false),
-      showPrimeLabel: params.getBoolean("showPrimeLabel", true),
       showPrimeLabel: params.getBoolean("showPrimeLabel", true),
       readme: function () {
         globalThis.displayDemoMeta();
@@ -166,6 +166,8 @@
 
         if (curIsPrime) {
           drawPrimeMarker(draw, fill, nextPos, naturalNumber);
+        } else if (appContext.config.showAllNumbers) {
+          draw.circle(nextPos, 3, "red", 1);
         }
 
         discretePosition = nextDiscretePos;
@@ -221,13 +223,13 @@
         var controlLineA = new Line(lastPos, intersection).trimEndAt(appContext.config.arcThreshold); // 0.166);
         var controlLineB = new Line(curPos, intersection).trimEndAt(appContext.config.arcThreshold);
 
-        line.a = lastPos;
-        line.b = curPos;
+        line.a = lastPos.clone();
+        line.b = curPos.clone();
 
         // draw.handleLine(controlLineA.a, controlLineA.b);
         // draw.handleLine(controlLineB.a, controlLineB.b);
 
-        var bezierSector = new CubicBezierCurve(line.a, line.b, controlLineA.b, controlLineB.b);
+        var bezierSector = new CubicBezierCurve(line.a.clone(), line.b.clone(), controlLineA.b.clone(), controlLineB.b.clone());
 
         // var line = new Line(pos, nextPos);
         if (appContext.config.trimSpiralSegments && (lastWasPrime || curIsPrime)) {
@@ -236,7 +238,9 @@
             pathData.push("M", line.a.x, line.a.y);
           } else {
             shortenBezierConnection(bezierSector, lastWasPrime, curIsPrime);
-            pathData.push("M", bezierSector.startPoint.x, bezierSector.startPoint.y);
+            if (lastWasPrime) {
+              pathData.push("M", bezierSector.startPoint.x, bezierSector.startPoint.y);
+            }
           }
         }
 
@@ -268,6 +272,8 @@
         if (curIsPrime) {
           // draw.circle(pos, circleRadius, "orange", 1.0);
           drawPrimeMarker(draw, fill, curPos, naturalNumber);
+        } else if (appContext.config.showAllNumbers) {
+          draw.circle(curPos, 3, "red", 1);
         }
 
         // Move to next position
@@ -363,6 +369,8 @@
           // prettier-ignore
           draw.circle( pos, circleRadius, 'orange', 1.0);
           // pathData.push("M", segmentbCurve.endPoint.x, segmentbCurve.endPoint.y);
+        } else if (appContext.config.showAllNumbers) {
+          draw.circle(pos, 3, "red", 1);
         }
         // if (lastIsPrime) {
         //   pathData.push("M", segmentbCurve.endPoint.x, segmentbCurve.endPoint.y);
@@ -423,9 +431,9 @@
       if (isTrimStart && !isTrimEnd) {
         bezierCurve.trimStart(cutOffAmount);
       } else if (!isTrimStart && isTrimEnd) {
-        bezierCurve.trimEnd(cutOffAmount);
+        bezierCurve.trimEnd(bezierCurve.arcLength - cutOffAmount);
       } else if (isTrimStart && isTrimEnd) {
-        bezierCurve.trimStartEnd(cutOffAmount, cutOffAmount);
+        bezierCurve.trimStartEnd(cutOffAmount, bezierCurve.arcLength - cutOffAmount);
       }
     };
 
