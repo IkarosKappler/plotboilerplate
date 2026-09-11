@@ -7,7 +7,7 @@
  */
 
 (function (_context) {
-  _context.initDemoUI = function (appContext, SPIRAL_TYPES) {
+  _context.initDemoUI = function (appContext, SPIRAL_TYPES, AVAILABLE_SPURS) {
     // +---------------------------------------------------------------------------------
     // | Create a GUI.
     // +-------------------------------
@@ -31,6 +31,9 @@
       // prettier-ignore
       fold.add(appContext.config, "arcThreshold").min(0).max(1.0).title("The threshold for cubic arc segments.").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
+      fold.add(appContext.config, "spiralBezierControlThreshold").min(0.0).max(1.0).title("Controls the strength of the Bézier curvature.").onChange(function () { appContext.pb.redraw(); });
+
+      // prettier-ignore
       fold.add(appContext.config, "showSpiralTangents").title("Draw the spiral tangents.").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
       fold.add(appContext.config, "spiralType", SPIRAL_TYPES).title("Which spiral type to draw?").onChange(function () { appContext.pb.redraw(); });
@@ -41,9 +44,13 @@
       // prettier-ignore
       fold.add(appContext.config, "showPrimeLabel").title("Draw the prime numbers as labels?").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
+      fold.add(appContext.config, "showPrimeCircle").title("Draw the prime numbers as circles?").onChange(function () { appContext.pb.redraw(); });
+
+      // prettier-ignore
       fold.add(appContext.config, "showSpiralBezierHandles").title("Draw the spiral's bezier handles?").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
       fold.add(appContext.config, "showSpiralBezierControlsPoints").title("Draw the spiral's bezier control points?").onChange(function () { appContext.pb.redraw(); });
+
       // prettier-ignore
       fold.add(appContext.config, "trimSpiralSegments").title("Trim spiral segments at prime markers?").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
@@ -60,6 +67,9 @@
       fold.add(appContext.config, "lineWidthSpiral").min(1.0).max(16.0).title("The spiral's line with.").onChange(function () { appContext.pb.redraw(); });
       // prettier-ignore
       fold.add(appContext.config, "lineWidthPrimeMarker").min(1.0).max(16.0).title("The prime markers' line width.").onChange(function () { appContext.pb.redraw(); });
+
+      // prettier-ignore
+      fold.add(appContext.config, "selectedSpur", AVAILABLE_SPURS).title("Do you want to highlight a particular spur?").onChange(function () { appContext.pb.redraw(); });
 
       // prettier-ignore
       gui.add(appContext.config, "readme").title("Show the readme.");

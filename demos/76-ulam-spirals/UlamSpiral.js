@@ -26,8 +26,19 @@
 
     var line = new Line(new Vertex(), new Vertex());
 
+    var selectedSpurFn = this.appContext.config.selectedSpur ? math.parse(this.appContext.config.selectedSpur) : null;
+    // console.log(this.appContext.config.selectedSpur, "selectedSpurFn", selectedSpurFn);
+    var spurIndex = 0;
+    var fnArgs = { n: 0 };
+    var currentSpurValue = 0;
+
     for (var i = 0; i <= this.appContext.config.iterations; i++) {
       var naturalNumber = this.appContext.config.startingNumber + i + 1;
+      if (selectedSpurFn && currentSpurValue < naturalNumber) {
+        currentSpurValue = selectedSpurFn.evaluate(fnArgs);
+        console.log("naturalNumber", naturalNumber, "currentSpurValue", currentSpurValue);
+        fnArgs.n = spurIndex++;
+      }
       var curIsPrime = isPrime(naturalNumber);
       var nextDiscretePos = getNextUlamPosition(discretePosition, discreteDirection, discreteMin, discreteMax);
       // Convert discrete position to pixels.
@@ -38,15 +49,26 @@
 
       // var line = new Line(pos, nextPos);
       if (this.appContext.config.trimSpiralSegments && (lastWasPrime || curIsPrime)) {
-        this.shortenLinearConnection(line, lastWasPrime, curIsPrime);
+        shortenLinearConnection(line, lastWasPrime, curIsPrime, this.appContext, this.pb);
         pathData.push("M", line.a.x, line.a.y);
       }
 
       pathData.push("L", line.b.x, line.b.y);
       // draw.line(pos, nextPos, "grey", 3.0);
 
-      if (curIsPrime) {
-        this.drawPrimeMarker(draw, fill, nextPos, naturalNumber);
+      // Draw spur?
+      if (currentSpurValue === naturalNumber) {
+        // fill.diamondHandle(curPos, 15, "green");
+        fill.circle(
+          nextPos,
+          this.appContext.config.circleRadius * 1.5,
+          "green", // this.appContext.config.lineColorPrimeMarker,
+          this.appContext.config.lineWidthPrimeMarker
+        );
+      }
+
+      if (curIsPrime && this.appContext.config.showPrimeCircle) {
+        drawPrimeMarker(draw, fill, nextPos, naturalNumber, this.appContext, this.pb);
       } else if (this.appContext.config.showAllNumbers) {
         draw.circle(nextPos, 3, "red", 1);
       }
@@ -57,40 +79,6 @@
 
     if (this.appContext.config.showSpiralPath) {
       draw.path(pathData, this.appContext.config.lineColorSpiral, this.appContext.config.lineWidthSpiral, { inplace: true });
-    }
-  };
-
-  _context.UlamSpiral.prototype.shortenLinearConnection = function (line, isTrimStart, isTrimEnd) {
-    if (isTrimStart) {
-      line.trimStart(
-        this.appContext.config.circleRadius + this.appContext.config.lineWidthPrimeMarker / 2 / this.pb.draw.scale.x
-      );
-    }
-    if (isTrimEnd) {
-      line.trimEnd(this.appContext.config.circleRadius + this.appContext.config.lineWidthPrimeMarker / 2 / this.pb.draw.scale.x);
-    }
-  };
-
-  _context.UlamSpiral.prototype.drawPrimeMarker = function (draw, fill, position, primeNumber) {
-    // var circleRadius = appContext.config.circleRadius;
-    draw.circle(
-      position,
-      this.appContext.config.circleRadius,
-      this.appContext.config.lineColorPrimeMarker,
-      this.appContext.config.lineWidthPrimeMarker
-    );
-    if (this.appContext.config.showPrimeLabel) {
-      fill.text("" + primeNumber, position.x, position.y, {
-        // options
-        color: this.appContext.config.lineColorPrimeMarker,
-        // fontFamily?: string;
-        fontSize: 7, // number;
-        // fontStyle?: FontStyle;
-        // fontWeight?: FontWeight;
-        lineHeight: 4, // number;
-        textAlign: "center" // CanvasRenderingContext2D["textAlign"];
-        // rotation?: number;
-      });
     }
   };
 

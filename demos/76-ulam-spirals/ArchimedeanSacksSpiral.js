@@ -27,8 +27,6 @@
     var angleStep = this.appContext.config.angleStepDeg * DEG_TO_RAD;
     // var radiusStep = appContext.config.radiusStep;
 
-    var pathData = ["M", 0, 0];
-
     var curRadius = this.appContext.config.stepInUnits; // Make sure the first arc fits into the first circle/radius
     var lastRadius = this.appContext.config.stepInUnits; // 0.0;
     var curAngle = 0.0, // (Math.PI / 4) * 3, // 0.0,
@@ -36,19 +34,30 @@
     var helperCircle = new Circle(new Vertex(0, 0), curRadius);
     var curPos,
       lastPos = helperCircle.vertAt(curAngle); // new Vertex(0, 0);
+    var pathData = ["M", lastPos.x, lastPos.y];
     var curTangentVec;
     var curIsPrime = false;
     var lastWasPrime = false;
     var line = new Line(new Vertex(), new Vertex());
+    var selectedSpurFn = this.appContext.config.selectedSpur ? math.parse(this.appContext.config.selectedSpur) : null;
+    // console.log(this.appContext.config.selectedSpur, "selectedSpurFn", selectedSpurFn);
+    var spurIndex = 0;
+    var fnArgs = { n: 0 };
+    var currentSpurValue = 0;
     for (var i = 0; i < steps; i++) {
       var naturalNumber = this.appContext.config.startingNumber + i + 1;
+      if (selectedSpurFn && currentSpurValue < naturalNumber) {
+        currentSpurValue = selectedSpurFn.evaluate(fnArgs);
+        // console.log("naturalNumber", naturalNumber, "currentSpurValue", currentSpurValue);
+        fnArgs.n = spurIndex++;
+      }
       curIsPrime = isPrime(naturalNumber);
       var result = this.makeEquidistSpiralPoint(i + 1, curAngle, curRadius);
       curPos = result[0];
       curAngle = result[1];
       curRadius = result[2];
       var intersection = helperCircle
-        .setRadius(lastRadius + (curRadius - lastRadius) / 0.6)
+        .setRadius(lastRadius + (curRadius - lastRadius) / this.appContext.config.spiralBezierControlThreshold) // 0.6
         .vertAt(lastAngle + (curAngle - lastAngle) / 2.0);
       helperCircle.radius = curRadius;
       curTangentVec = helperCircle.tangentAt(curAngle);
@@ -66,10 +75,10 @@
 
       if (this.appContext.config.trimSpiralSegments && (lastWasPrime || curIsPrime)) {
         if (this.appContext.config.spiralLinearSegments) {
-          this.shortenLinearConnection(line, lastWasPrime, curIsPrime);
+          shortenLinearConnection(line, lastWasPrime, curIsPrime, this.appContext, this.pb);
           pathData.push("M", line.a.x, line.a.y);
         } else {
-          this.shortenBezierConnection(bezierSector, lastWasPrime, curIsPrime);
+          shortenBezierConnection(bezierSector, lastWasPrime, curIsPrime, this.appContext, this.pb);
           if (lastWasPrime) {
             pathData.push("M", bezierSector.startPoint.x, bezierSector.startPoint.y);
           }
@@ -95,8 +104,19 @@
         );
       }
 
-      if (curIsPrime) {
-        this.drawPrimeMarker(draw, fill, curPos, naturalNumber);
+      // Draw spur?
+      if (currentSpurValue === naturalNumber) {
+        // fill.diamondHandle(curPos, 15, "green");
+        fill.circle(
+          curPos,
+          this.appContext.config.circleRadius * 1.5,
+          "green", // this.appContext.config.lineColorPrimeMarker,
+          this.appContext.config.lineWidthPrimeMarker
+        );
+      }
+
+      if (curIsPrime && this.appContext.config.showPrimeCircle) {
+        drawPrimeMarker(draw, fill, curPos, naturalNumber, this.appContext);
       } else if (this.appContext.config.showAllNumbers) {
         draw.circle(curPos, 3, "red", 1);
       }
@@ -123,51 +143,5 @@
     spiralPoint.x = nextRadius;
     spiralPoint.rotate(curAngle - angle);
     return [spiralPoint, curAngle - angle, nextRadius];
-  };
-
-  _context.ArchimedeanSacksSpiral.prototype.drawPrimeMarker = function (draw, fill, position, primeNumber) {
-    // var circleRadius = appContext.config.circleRadius;
-    draw.circle(
-      position,
-      this.appContext.config.circleRadius,
-      this.appContext.config.lineColorPrimeMarker,
-      this.appContext.config.lineWidthPrimeMarker
-    );
-    if (this.appContext.config.showPrimeLabel) {
-      fill.text("" + primeNumber, position.x, position.y, {
-        // options
-        color: this.appContext.config.lineColorPrimeMarker,
-        // fontFamily?: string;
-        fontSize: 7, // number;
-        // fontStyle?: FontStyle;
-        // fontWeight?: FontWeight;
-        lineHeight: 4, // number;
-        textAlign: "center" // CanvasRenderingContext2D["textAlign"];
-        // rotation?: number;
-      });
-    }
-  };
-
-  _context.ArchimedeanSacksSpiral.prototype.shortenLinearConnection = function (line, isTrimStart, isTrimEnd) {
-    if (isTrimStart) {
-      line.trimStart(
-        this.appContext.config.circleRadius + this.appContext.config.lineWidthPrimeMarker / 2 / this.pb.draw.scale.x
-      );
-    }
-    if (isTrimEnd) {
-      line.trimEnd(this.appContext.config.circleRadius + this.appContext.config.lineWidthPrimeMarker / 2 / this.pb.draw.scale.x);
-    }
-  };
-
-  _context.ArchimedeanSacksSpiral.prototype.shortenBezierConnection = function (bezierCurve, isTrimStart, isTrimEnd) {
-    var cutOffAmount =
-      this.appContext.config.circleRadius + this.appContext.config.lineWidthPrimeMarker / 2 / this.pb.draw.scale.x;
-    if (isTrimStart && !isTrimEnd) {
-      bezierCurve.trimStart(cutOffAmount);
-    } else if (!isTrimStart && isTrimEnd) {
-      bezierCurve.trimEnd(bezierCurve.arcLength - cutOffAmount);
-    } else if (isTrimStart && isTrimEnd) {
-      bezierCurve.trimStartEnd(cutOffAmount, bezierCurve.arcLength - cutOffAmount);
-    }
   };
 })(globalThis);

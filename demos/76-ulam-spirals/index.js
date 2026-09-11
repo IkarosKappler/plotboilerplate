@@ -32,9 +32,15 @@
     // Create a config: we want to have control about the arrow head size in this demo
     // `AppContext`: this is an experimental approach to make future event handling easier.
     var SPIRAL_TYPES = ["Ulam", "Archimedean-Sack"];
+    var AVAILABLE_SPURS = {
+      "none": null,
+      "Euler n^2 + n + 17": "n^2 + n + 17",
+      "n^2 - n + 41": "n^2 - n + 41",
+      "2n^2 + 796n - 79003": "2n^2 + 796n - 79003"
+    };
     var appContext = new AppContext(pb, {
       startingNumber: params.getNumber("startingNumber", 1),
-      angleStepDeg: params.getNumber("angleStepDeg", 90.0),
+      angleStepDeg: params.getNumber("angleStepDeg", 180.0),
       stepInUnits: params.getNumber("stepInUnits", 60.0),
       ulamRadiusStep: params.getNumber("ulamRadiusStep", 18.0),
       circleRadius: params.getNumber("circleRadius", 6.0),
@@ -52,8 +58,13 @@
       showSpiralPath: params.getBoolean("showSpiralPath", true),
       showAllNumbers: params.getBoolean("showAllNumbers", false),
       showSpiralBezierHandles: params.getBoolean("showSpiralBezierHandles", false),
+      spiralBezierControlThreshold: params.getNumber("spiralBezierControlThreshold", 0.4),
       showSpiralBezierControlsPoints: params.getBoolean("showSpiralBezierControlsPoints", false),
       showPrimeLabel: params.getBoolean("showPrimeLabel", true),
+      showPrimeCircle: params.getBoolean("showPrimeCircle", true),
+
+      selectedSpur: params.getString("selectedSpur", null),
+
       readme: function () {
         globalThis.displayDemoMeta();
       }
@@ -90,7 +101,7 @@
     // | Create a GUI.
     // | See `initDemoUI` for details.
     // +-------------------------------
-    initDemoUI(appContext, SPIRAL_TYPES);
+    initDemoUI(appContext, SPIRAL_TYPES, AVAILABLE_SPURS);
 
     // +---------------------------------------------------------------------------------
     // | This renders a content list component on top, allowing to delete or add
