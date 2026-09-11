@@ -36,7 +36,7 @@
       var naturalNumber = this.appContext.config.startingNumber + i + 1;
       if (selectedSpurFn && currentSpurValue < naturalNumber) {
         currentSpurValue = selectedSpurFn.evaluate(fnArgs);
-        console.log("naturalNumber", naturalNumber, "currentSpurValue", currentSpurValue);
+        // console.log("naturalNumber", naturalNumber, "currentSpurValue", currentSpurValue);
         fnArgs.n = spurIndex++;
       }
       var curIsPrime = isPrime(naturalNumber);
