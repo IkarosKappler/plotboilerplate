@@ -14,7 +14,6 @@
   // Fetch the GET params
   let GUP = gup();
   var isDarkmode = detectDarkMode(GUP);
-  var isDarkmode = detectDarkMode(GUP);
 
   _context.addEventListener("load", function () {
     // All config params except the canvas are optional.

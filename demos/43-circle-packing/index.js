@@ -25,7 +25,6 @@
     // Fetch the GET params
     let GUP = gup();
     var isDarkmode = detectDarkMode(GUP);
-    var isDarkmode = detectDarkMode(GUP);
 
     // All config params are optional.
     var pb = new PlotBoilerplate(

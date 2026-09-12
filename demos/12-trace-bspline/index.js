@@ -16,7 +16,6 @@
 
   // Fetch the GET params
   let GUP = gup();
-  var isDarkmode = detectDarkMode(GUP);
   window.addEventListener("load", function () {
     var isDarkmode = detectDarkMode(GUP);
 
@@ -174,7 +173,7 @@
       var gui = pb.createGUI();
       var f0 = gui.addFolder("Points");
       // prettier-ignore
-      f0.add(config, "t").min(0.0).max(1.0).onChange( function() { pb.redraw(); }).title("Toggle point animation on/off.");
+      f0.add(config, "t").listen().min(0.0).max(1.0).onChange( function() { pb.redraw(); }).title("Toggle point animation on/off.");
       // prettier-ignore
       f0.add(config, "animate").onChange(toggleAnimation).title("Toggle point animation on/off.");
       f0.open();
