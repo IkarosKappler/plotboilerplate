@@ -88,16 +88,19 @@
           drawVoronoiOutlines: params.getBoolean("drawVoronoiOutlines", true),
           pointCount: 25,
           rebuild: function () {
+            updateAnimator();
             rebuild();
           },
           randomize: function () {
-            randomPoints(true, false, false);
+            pointSet.randomPoints(appContext.config.pointCount, true, false);
             trianglesPointCount = -1;
+            updateAnimator();
             rebuild();
           },
           fullCover: function () {
-            randomPoints(true, true, false);
+            pointSet.randomPoints(appContext.config.pointCount, true, true);
             trianglesPointCount = -1;
+            updateAnimator();
             rebuild();
           },
           animate: params.getBoolean("animate", false),
@@ -109,20 +112,6 @@
         GUP
       )
     );
-    //   {
-    //   startAngleDeg: params.getNumber("startAngleDeg", 0.0),
-    //   sectorLength: params.getNumber("sectorLength", 60.0),
-    //   // radiusep: params.getNumber("radiusStep", 5.0),
-    //   // radiusStep: params.getNumber("radiusStep", 5.0),
-    //   // circleRadius: params.getNumber("circleRadius", 8.0),
-    //   // iterations: params.getNumber("iterations", 100),
-    //   // arcThreshold: params.getNumber("arcThreshold", 0.666),
-    //   // showSpiralTangents: params.getBoolean("showSpiralTangents", false),
-    //   // spiralType: params.getString("spiralType", SPIRAL_TYPES[1]),
-    //   readme: function () {
-    //     globalThis.displayDemoMeta();
-    //   }
-    // });
     appContext.rebuild = function () {
       rebuild();
     };
@@ -131,6 +120,8 @@
     };
     appContext.updatePointCount = function () {
       updatePointCount();
+      updateAnimator();
+      rebuild();
     };
     appContext.isMobile = isMobile;
 
@@ -151,74 +142,38 @@
       if (cy) cy.innerHTML = relPos.y.toFixed(2);
     });
 
-    // +---------------------------------------------------------------------------------
-    // | A global config that's attached to the dat.gui control interface.
-    // +-------------------------------
-    // var config = PlotBoilerplate.utils.safeMergeByKeys(
-    //   {
-    //     makeVoronoiDiagram: true,
-    //     drawPoints: true,
-    //     drawTriangles: true,
-    //     drawCircumCircles: false,
-    //     drawCubicCurves: false,
-    //     fillVoronoiCells: true,
-    //     voronoiOutlineColor: "#00a828", // "rgba(0,168,40,1.0)",
-    //     voronoiCellColor: "#0080c0", // "rgba(0,128,192, 0.5)",
-    //     voronoiCubicThreshold: 1.0,
-    //     voronoiCellScale: 0.8,
-    //     clipVoronoiCells: false,
-    //     drawClipBox: false,
-    //     drawUnclippedVoronoiCells: false,
-    //     drawVoronoiIncircles: false,
-    //     drawVoronoiOutlines: true,
-    //     pointCount: 25,
-    //     rebuild: function () {
-    //       rebuild();
-    //     },
-    //     randomize: function () {
-    //       randomPoints(true, false, false);
-    //       trianglesPointCount = -1;
-    //       rebuild();
-    //     },
-    //     fullCover: function () {
-    //       randomPoints(true, true, false);
-    //       trianglesPointCount = -1;
-    //       rebuild();
-    //     },
-    //     animate: false,
-    //     animationType: "linear" // 'linear' or 'radial'
-    //   },
-    //   GUP
-    // );
-
     var triangles = [];
     var trianglesPointCount = -1; // Keep track of the number of points when the triangles were generated.
     var voronoiDiagram = []; // An array of VoronoiCells.
 
     // A list of points.
-    var pointList = [];
+    // var pointList = [];
+    var pointSet = new PointSet(pb);
+    pointSet.dragListeners.push(function () {
+      rebuild();
+    });
 
-    // +---------------------------------------------------------------------------------
-    // | Adds a random point to the point list. Needed for initialization.
-    // +-------------------------------
-    var addRandomPoint = function () {
-      addVertex(Vertex.randomVertex(appContext.pb.viewport()).scale(0.5));
-    };
+    // // +---------------------------------------------------------------------------------
+    // // | Adds a random point to the point list. Needed for initialization.
+    // // +-------------------------------
+    // var addRandomPoint = function () {
+    //   addVertex(Vertex.randomVertex(appContext.pb.viewport()).scale(0.5));
+    // };
 
-    var addVertex = function (vert) {
-      pointList.push(vert);
-      appContext.pb.add(vert);
-      vert.listeners.addDragListener(function () {
-        rebuild();
-      });
-    };
+    // var addVertex = function (vert) {
+    //   pointList.push(vert);
+    //   appContext.pb.add(vert);
+    //   vert.listeners.addDragListener(function () {
+    //     rebuild();
+    //   });
+    // };
 
-    // +---------------------------------------------------------------------------------
-    // | Generates a random int value between 0 and max (both inclusive).
-    // +-------------------------------
-    var randomInt = function (max) {
-      return Math.round(Math.random() * max);
-    };
+    // // +---------------------------------------------------------------------------------
+    // // | Generates a random int value between 0 and max (both inclusive).
+    // // +-------------------------------
+    // var randomInt = function (max) {
+    //   return Math.round(Math.random() * max);
+    // };
 
     // +---------------------------------------------------------------------------------
     // | Draw the given triangle with the specified (CSS-) color.
@@ -263,7 +218,7 @@
      * Draw the stored voronoi diagram.
      */
     var drawVoronoiDiagram = function (draw, fill) {
-      var clipBoxPolygon = Bounds.computeFromVertices(pointList).toPolygon();
+      var clipBoxPolygon = Bounds.computeFromVertices(pointSet.points).toPolygon();
       if (appContext.config.drawClipBox) {
         draw.polygon(clipBoxPolygon, "rgba(192,192,192,0.25)");
       }
@@ -346,9 +301,9 @@
      * Make the triangulation (Delaunay).
      */
     var triangulate = function () {
-      var delau = new Delaunay(pointList, {});
+      var delau = new Delaunay(pointSet.points, {});
       triangles = delau.triangulate();
-      trianglesPointCount = pointList.length;
+      trianglesPointCount = pointSet.points.length;
       voronoiDiagram = [];
       redraw(appContext.pb.draw, appContext.pb.fill);
     };
@@ -357,7 +312,7 @@
      * Convert the triangle set to the Voronoi diagram.
      */
     var makeVoronoiDiagram = function () {
-      var voronoiBuilder = new delaunay2voronoi(pointList, triangles);
+      var voronoiBuilder = new delaunay2voronoi(pointSet.points, triangles);
       voronoiDiagram = voronoiBuilder.build();
       redraw(appContext.pb.draw, appContext.pb.fill);
       // Handle errors if vertices are too close and/or co-linear:
@@ -382,80 +337,81 @@
       }
     };
 
-    /**
-     * Add or remove n random points; depends on the config settings.
-     *
-     * I have no idea how tired I was when I wrote this function but it seems working pretty well.
-     */
-    var randomPoints = function (clear, fullCover, doRebuild) {
-      if (clear) {
-        for (var i in pointList) appContext.pb.remove(pointList[i], false);
-        pointList = [];
-      }
-      // Generate random points on image border?
-      if (fullCover) {
-        var remainingPoints = config.pointCount - pointList.length;
-        var borderPoints = Math.sqrt(remainingPoints);
-        var ratio = appContext.pb.canvasSize.height / appContext.pb.canvasSize.width;
-        var hCount = Math.round((borderPoints / 2) * ratio);
-        var vCount = borderPoints / 2 - hCount;
+    // /**
+    //  * Add or remove n random points; depends on the config settings.
+    //  *
+    //  * I have no idea how tired I was when I wrote this function but it seems working pretty well.
+    //  */
+    // var randomPoints = function (clear, fullCover, doRebuild) {
+    //   if (clear) {
+    //     for (var i in pointList) appContext.pb.remove(pointList[i], false);
+    //     pointList = [];
+    //   }
+    //   // Generate random points on image border?
+    //   if (fullCover) {
+    //     var remainingPoints = config.pointCount - pointList.length;
+    //     var borderPoints = Math.sqrt(remainingPoints);
+    //     var ratio = appContext.pb.canvasSize.height / appContext.pb.canvasSize.width;
+    //     var hCount = Math.round((borderPoints / 2) * ratio);
+    //     var vCount = borderPoints / 2 - hCount;
 
-        while (vCount > 0) {
-          addVertex(
-            new Vertex(
-              -appContext.pb.canvasSize.width / 2,
-              randomInt(appContext.pb.canvasSize.height / 2) - appContext.pb.canvasSize.height / 2
-            )
-          );
-          addVertex(
-            new Vertex(
-              appContext.pb.canvasSize.width / 2,
-              randomInt(appContext.pb.canvasSize.height / 2) - appContext.pb.canvasSize.height / 2
-            )
-          );
-          vCount--;
-        }
+    //     while (vCount > 0) {
+    //       addVertex(
+    //         new Vertex(
+    //           -appContext.pb.canvasSize.width / 2,
+    //           randomInt(appContext.pb.canvasSize.height / 2) - appContext.pb.canvasSize.height / 2
+    //         )
+    //       );
+    //       addVertex(
+    //         new Vertex(
+    //           appContext.pb.canvasSize.width / 2,
+    //           randomInt(appContext.pb.canvasSize.height / 2) - appContext.pb.canvasSize.height / 2
+    //         )
+    //       );
+    //       vCount--;
+    //     }
 
-        while (hCount > 0) {
-          addVertex(new Vertex(randomInt(appContext.pb.canvasSize.width / 2) - appContext.pb.canvasSize.width / 2, 0));
-          addVertex(
-            new Vertex(
-              randomInt(appContext.pb.canvasSize.width / 2) - appContext.pb.canvasSize.width / 2,
-              appContext.pb.canvasSize.height / 2
-            )
-          );
-          hCount--;
-        }
+    //     while (hCount > 0) {
+    //       addVertex(new Vertex(randomInt(appContext.pb.canvasSize.width / 2) - appContext.pb.canvasSize.width / 2, 0));
+    //       addVertex(
+    //         new Vertex(
+    //           randomInt(appContext.pb.canvasSize.width / 2) - appContext.pb.canvasSize.width / 2,
+    //           appContext.pb.canvasSize.height / 2
+    //         )
+    //       );
+    //       hCount--;
+    //     }
 
-        // Additionally add 4 points to the corners
-        addVertex(new Vertex(0, 0));
-        addVertex(new Vertex(appContext.pb.canvasSize.width / 2, 0));
-        addVertex(new Vertex(appContext.pb.canvasSize.width / 2, appContext.pb.canvasSize.height / 2));
-        addVertex(new Vertex(0, appContext.pb.canvasSize.height / 2));
-      }
+    //     // Additionally add 4 points to the corners
+    //     addVertex(new Vertex(0, 0));
+    //     addVertex(new Vertex(appContext.pb.canvasSize.width / 2, 0));
+    //     addVertex(new Vertex(appContext.pb.canvasSize.width / 2, appContext.pb.canvasSize.height / 2));
+    //     addVertex(new Vertex(0, appContext.pb.canvasSize.height / 2));
+    //   }
 
-      // Generate random points.
-      for (var i = pointList.length; i < appContext.config.pointCount; i++) {
-        addRandomPoint();
-      }
-      updateAnimator();
-      if (doRebuild) rebuild();
-    };
+    //   // Generate random points.
+    //   for (var i = pointList.length; i < appContext.config.pointCount; i++) {
+    //     addRandomPoint();
+    //   }
+    //   updateAnimator();
+    //   if (doRebuild) rebuild();
+    // };
 
     /**
      * Called when the desired number of points changes.
      **/
     var updatePointCount = function () {
-      if (appContext.config.pointCount > pointList.length) {
-        randomPoints(false, false, true);
+      if (appContext.config.pointCount > pointSet.points.length) {
+        pointSet.randomPoints(appContext.config.pointCount, false, false);
       }
       // Do not clear ; no full cover ; do rebuild
-      else if (appContext.config.pointCount < pointList.length) {
+      else if (appContext.config.pointCount < pointSet.points.length) {
         // Remove n-m points
-        for (var i = appContext.config.pointCount; i < pointList.length; i++) {
-          appContext.pb.remove(pointList[i]);
+        for (var i = appContext.config.pointCount; i < pointSet.points.length; i++) {
+          appContext.pb.remove(pointSet.points[i]);
         }
-        pointList = pointList.slice(0, appContext.config.pointCount);
+        // TODO: MOVE THIS TO THE PointSet class.
+        pointSet.points = pointSet.points.slice(0, appContext.config.pointCount);
         updateAnimator();
         rebuild();
       }
@@ -468,9 +424,10 @@
     var toggleAnimation = function () {
       if (config.animate) {
         if (animator) animator.stop();
-        if (config.animationType == "radial") animator = new CircularVertexAnimator(pointList, appContext.pb.viewport(), rebuild);
+        if (config.animationType == "radial")
+          animator = new CircularVertexAnimator(pointSet.points, appContext.pb.viewport(), rebuild);
         // 'linear'
-        else animator = new LinearVertexAnimator(pointList, appContext.pb.viewport(), rebuild);
+        else animator = new LinearVertexAnimator(pointSet.points, appContext.pb.viewport(), rebuild);
         animator.start();
       } else {
         if (animator) animator.stop();
@@ -590,7 +547,8 @@
     // }
 
     // Init
-    randomPoints(true, false, false); // clear ; no full cover ; do not redraw
+    pointSet.randomPoints(appContext.config.pointCount, true, false); // clear ; no full cover
+    updateAnimator();
     rebuild();
     appContext.pb.redraw();
   }); // END document.ready / window.onload
