@@ -56,13 +56,12 @@
       var segmentEnd = _self.points[segmentIndex + 1];
       if (segmentStart.x < x || segmentEnd.x >= x) {
         var ratio = (x - segmentStart.x) / (segmentEnd.x - segmentStart.x);
-        if (ratio > 0.3 && ratio <= 0.6) {
-          console.log("Viewport", _self.viewport.min.x, _self.viewport.max.x, "ratio", ratio, "x", x);
-          console.log("Jo", "segmentIndex", segmentIndex, "segmentStart.x", segmentStart.x, "segmentEnd.x", segmentEnd.x);
-        }
+        // if (ratio > 0.3 && ratio <= 0.6) {
+        //   console.log("Viewport", _self.viewport.min.x, _self.viewport.max.x, "ratio", ratio, "x", x);
+        //   console.log("Jo", "segmentIndex", segmentIndex, "segmentStart.x", segmentStart.x, "segmentEnd.x", segmentEnd.x);
+        // }
         return segmentStart.y + (segmentEnd.y - segmentStart.y) * ratio;
       }
-      // console.log("JAAAAAA", ratio);
       return 0.0;
     };
   };
@@ -70,9 +69,6 @@
   _context.PolyMath68.prototype.distanceWeight = function (k, func) {
     const _self = this;
     return function (x) {
-      // var relX = (x - viewport.min.x) / viewport.width;
-      // var relkX = (points[k].x - viewport.min.x) / viewport.width;
-      // return (1 / (1 + Math.pow(relkX - relX, 2))) * func(x);
       var pow = _self.config.pow; // 2.0
       var width = _self.viewport.width / 2.0; // 20.0;
       return (width / (width + Math.pow(Math.abs(_self.points[k].x - x), pow))) * func(x);

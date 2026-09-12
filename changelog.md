@@ -1,14 +1,15 @@
 # Changelog
 
-++ Todos
-
-- Bezier handle Line color aus der drawconfig is not in use!
-- Website: demos, add #anchors
-- replace lib/Color.min.js by proper color class.
-- Add 'Rulers' class from the ngdg project.
-- Add 'onclose' and 'onopen' to the Modal (demos).
-
-- 2026-08-03
+- 2026-09-11
+  - Finalizing the Ulam spiral and Archimedean Sacks spiral demo.
+- 2026-09-03
+  - Adding methods `CubicBezierCurve.trimStartEnd` and `CubicBezierCurve.trimStartEndAt`.
+  - Adding demo `78-trim-bezier-curve` for trimming cubic Bézier curves at the start and end simultaneously.
+- 2026-08-16
+  - Adding the `Circle.sectorAngleByArcLength` method and the `Circle.circleUtils.sectorAngleByArcLength` helper method.
+  - Adding methods `Line.trimStart` and `Line.trimEnd`. Adding methods `Line.trimStartAt` and `Line.trimEndAt`.
+  - Adding method `VertTuple.asLine` for converting Vector to Line instances.
+- 2026-08-03 [v1.29.0]
   - Adding `Circle.tangentsFromPoint`.
   - // The day while wearing my rainbow socks outside a lady spit at me in public.
 - 2026-07-31

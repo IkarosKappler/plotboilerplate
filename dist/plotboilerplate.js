@@ -1750,7 +1750,8 @@ exports.Bounds = Bounds;
  * @modified 2026-07-08 Adding the `Circle.setRadius` method (for chaining).
  * @mofified 2026-07-31 Adding the `radicalAxis(Circle)` method. Added the `Circle.circleUtils.createRadicalAxisHelperCircle` and `.circleDistance` helper methods.
  * @modified 2026-08-03 Adding `Circle.tangentsFromPoint`.
- * @version  1.7.0
+ * @modified 2026-08-16 Adding the `Circle.sectorAngleByArcLength` method and the `Circle.circleUtils.sectorAngleByArcLength` helper method.
+ * @version  1.8.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Circle = void 0;
@@ -2137,6 +2138,15 @@ var Circle = /** @class */ (function () {
         return [new Vector_1.Vector(intersection.a, vert), new Vector_1.Vector(intersection.b, vert)];
     };
     /**
+     * Calculate inner sector angle for this circle and a given circle arc length.
+     *
+     * @param {number} sectorArcLength - The desired arc length (in units).
+     * @returns The sector's inner angle (in radians).
+     */
+    Circle.prototype.sectorAngleByArcLength = function (sectorArcLength) {
+        return Circle.circleUtils.sectorAngleByArcLength(sectorArcLength, this.radius);
+    };
+    /**
      * Create a deep copy of this circle.
      *
      * @method clone
@@ -2213,6 +2223,16 @@ var Circle = /** @class */ (function () {
          */
         circleDistance: function (circleA, circleB) {
             return circleA.center.distance(circleB.center) - circleA.radius - circleB.radius;
+        },
+        /**
+         * Calculate the inner sector angle for a given circle arc length and radius.
+         *
+         * @param {number} sectorArcLength - The desired arc length.
+         * @param {number} circleRadius - The circle's radius.
+         * @returns The sector angle in radians.
+         */
+        sectorAngleByArcLength: function (sectorArcLength, circleRadius) {
+            return sectorArcLength / circleRadius;
         }
     };
     return Circle;
@@ -8278,12 +8298,14 @@ exports["default"] = PlotBoilerplate;
  * @modified 2025-04-15 Changed param of `VertTuple.moveTo` method from `Vertex` to `XYCoords`.
  * @modified 2025-04-15 Added method `VertTuple.move` method.
  * @modified 2026-06-10 Adding helper function `VertTuple.utils.calcCircumcircle`.
- * @version 1.5.0
+ * @modified 2026-06-17 Adding method `VertTuple.asLine` for converting Vector to Line instances.
+ * @version 1.6.0
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VertTuple = void 0;
 var Vertex_1 = __webpack_require__(787);
 var UIDGenerator_1 = __webpack_require__(938);
+var Line_1 = __webpack_require__(939);
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
  * @abstract
@@ -8566,13 +8588,24 @@ var VertTuple = /** @class */ (function () {
     /**
      * Create a deep clone of this instance.
      *
-     * @method cloneLine
+     * @method clone
      * @return {T} A type safe clone if this instance.
      * @instance
      * @memberof VertTuple
      **/
     VertTuple.prototype.clone = function () {
         return this.factory(this.a.clone(), this.b.clone());
+    };
+    /**
+     * Converts this `Vector` to a `Line` (segment).
+     *
+     * @method asLine
+     * @return {T} A type safe clone if this instance.
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.asLine = function () {
+        return new Line_1.Line(this.a, this.b);
     };
     /**
      * Create a string representation of this line.
@@ -14364,7 +14397,8 @@ exports.UIDGenerator = UIDGenerator;
  * @modified 2023-09-25 Changed param type of `intersection()` from Line to VertTuple.
  * @modified 2025-04-15 Class `Line` now implements interface `Intersectable`.
  * @modified 2025-04-16 Class `Line` now implements interface `IBounded`.
- * @version  2.4.0
+ * @modified 2026-08-16 Adding methods `Line.trimStart` and `Line.trimEnd`. Adding methods `Line.trimStartAt` and `Line.trimEndAt`.
+ * @version  2.5.0
  *
  * @file Line
  * @public
@@ -14514,6 +14548,84 @@ var Line = /** @class */ (function (_super) {
         return this;
     };
     //--- END Implement PathSegment ---
+    /**
+     * Trim this line segment from the start point by the given amount.
+     * The amount must be positive and should be withing the segment's length. If the amount exceeds the segment's length
+     * then the length of the resulting line will be zero (0.0).
+     *
+     * @method trimStart
+     * @memberof Line
+     * @param {number} amount - The positive amount to trim the line from the start point `a`.
+     * @returns {Line} This for chaining, with updated point `a`.
+     */
+    Line.prototype.trimStart = function (amount) {
+        // Calculate the relative position `t` on this line.
+        var t = amount / this.length();
+        // `t` should be inside 0..1 – otherwise the amount was too large or negative.
+        if (t < 0.0) {
+            return this;
+        }
+        if (t > 1.0) {
+            // Set the line to length zero (endpoint only)
+            this.a = this.b.clone();
+            return this;
+        }
+        this.a = this.vertAt(t);
+        return this;
+    };
+    /**
+     * Trim this line segment from the start point by the given relative amount.
+     * The amount must be positive and should be within 0.0 and 1.0. If the amount exceeds the segment's length
+     * then the length of the resulting line will be zero (0.0).
+     *
+     * @method trimStartAt
+     * @memberof Line
+     * @param {number} amount - The positive amount to trim the line from the start point `a`.
+     * @returns {Line} This for chaining, with updated point `a`.
+     */
+    Line.prototype.trimStartAt = function (relativeAmount) {
+        // Calculate the relative position `t` on this line.
+        return this.trimStart(relativeAmount * this.length());
+    };
+    /**
+     * Trim this line segment from the end point by the given amount.
+     * The amount must be positive and should be withing the segment's length. If the amount exceeds the segment's length
+     * then the length of the resulting line will be zero (0.0).
+     *
+     * @method trimEnd
+     * @memberof Line
+     * @param {number} amount - The positive amount to trim the line from the end point `b`.
+     * @returns {Line} This for chaining, with updated point `b`.
+     */
+    Line.prototype.trimEnd = function (amount) {
+        // Calculate the relative position `t` on this line.
+        var t = 1.0 - amount / this.length();
+        // `t` should be inside 0..1 – otherwise the amount was too large or negative.
+        if (t < 0.0) {
+            return this;
+        }
+        if (t > 1.0) {
+            // Set the line to length zero (endpoint only)
+            this.b = this.a.clone();
+            return this;
+        }
+        this.b = this.vertAt(t);
+        return this;
+    };
+    /**
+     * Trim this line segment from the end point by the given relative amount.
+     * The amount must be positive and should be within 0.0 and 1.0. If the amount exceeds the segment's length
+     * then the length of the resulting line will be zero (0.0).
+     *
+     * @method trimEndAt
+     * @memberof Line
+     * @param {number} amount - The positive amount to trim the line from the start point `a`.
+     * @returns {Line} This for chaining, with updated point `a`.
+     */
+    Line.prototype.trimEndAt = function (relativeAmount) {
+        // Calculate the relative position `t` on this line.
+        return this.trimEnd(relativeAmount * this.length());
+    };
     //--- BEGIN --- Implement interface `Intersectable`
     /**
      * Get all line intersections with this polygon.
@@ -14604,8 +14716,9 @@ exports.Line = Line;
  * @modified 2025-04-18 Added evaluation method for cubic Bézier curves `CubicBezierCurve.utils.evaluateT`.
  * @modified 2025-04-18 Refactored method `CubicBezierCurve.getPointAt` to use `evaluateT`.
  * @modified 2025-04-18 Fixed the `CubicBezierCurve.getBounds` method: now returning the real bounding box. Before it was an approximated one.
- * @modified 2025-ß4-18 Added helper methods for bounding box calculation `CubucBezierCurve.util.cubicPolyMinMax` and `cubicPoly`.
- * @version 2.9.0
+ * @modified 2025-04-18 Added helper methods for bounding box calculation `CubucBezierCurve.util.cubicPolyMinMax` and `cubicPoly`.
+ * @modified 2026-09-09 Adding methods `CubicBezierCurve.trimStartEnd` and `CubicBezierCurve.trimStartEndAt`.
+ * @version 2.10.0
  *
  * @file CubicBezierCurve
  * @public
@@ -15060,6 +15173,7 @@ var CubicBezierCurve = /** @class */ (function () {
         this.endControlPoint.set(subCurbePoints[3]);
         this.updateArcLengths();
         return this;
+        // return this.trimStartEndAt(t, null);
     };
     /**
      * Trim off the end of this curve. The position parameter `uValue` is the absolute position on the
@@ -15095,7 +15209,79 @@ var CubicBezierCurve = /** @class */ (function () {
         this.endControlPoint.set(subCurbePoints[3]);
         this.updateArcLengths();
         return this;
+        // return this.trimStartEndAt(null, t);
     };
+    /**
+     * Trim off a start and end section of this curve. The position parameters `uStart` and `uEnd` are the absolute positions in [0..arcLength].
+     * The remaining curve will be the one in the bounds `[uStart,uEnd]` (so `[0.0,uStart]` and `[uEnd,1.0]` are cut off).
+     *
+     * Parameters out of bounds (< 0.0 or > arcLength) are ignored.
+     * If `uEnd` is smaller than `uStart` then a curve with length zero (0) at `uStart` is returned.
+     *
+     * @method trimStartEndAt
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} tStart - The relative position parameter where to cut off the head curve.
+     * @param {number} tEnd - The relative position parameter where to cut off the tail curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
+    CubicBezierCurve.prototype.trimStartEnd = function (uStart, uEnd) {
+        return this.trimStartEndAt(this.convertU2T(uStart), this.convertU2T(uEnd));
+    };
+    /**
+     * Trim off a start and end section of this curve. The position parameters `tStart` and `tEnd` are the relative positions in [0..1].
+     * The remaining curve will be the one in the bounds `[tStart,tEnd]` (so `[0.0,tStart]` and `[tEnd,1.0]` are cut off).
+     *
+     * Parameters out of bounds (< 0.0 or > 1.0) are ignored.
+     * If `tEnd` is smaller than `tStart` then a curve with length zero (0) at `tStart` is returned.
+     *
+     * @method trimStartEndAt
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} tStart - The relative position parameter where to cut off the head curve.
+     * @param {number} tEnd - The relative position parameter where to cut off the tail curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
+    CubicBezierCurve.prototype.trimStartEndAt = function (tStart, tEnd) {
+        var cleanTrimStart = Math.min(Math.max(0.0, tStart), 1.0);
+        var cleanTrimEnd = Math.min(Math.max(cleanTrimStart, tEnd), 1.0);
+        this.trimStartAt(cleanTrimStart);
+        var relativeTrimEnd = (cleanTrimEnd - cleanTrimStart) / (1.0 - cleanTrimStart);
+        this.trimEndAt(relativeTrimEnd);
+        return this;
+    };
+    // __trimStartEndAt(tStart: number, tEnd: number): CubicBezierCurve {
+    //   var finalCurvePoints = [
+    //     this.startPoint.clone(),
+    //     this.endPoint.clone(),
+    //     this.startControlPoint.clone(),
+    //     this.endControlPoint.clone()
+    //   ];
+    //   if (typeof tStart === "number" && !Number.isNaN(tStart)) {
+    //     const subCurvePointsStart = CubicBezierCurve.utils.getSubCurvePointsAt(this, tStart, 1.0);
+    //     finalCurvePoints[0].set(subCurvePointsStart[0]);
+    //     finalCurvePoints[2].set(subCurvePointsStart[2]);
+    //     // this.startPoint.set(subCurvePointsStart[0]);
+    //     // this.startControlPoint.set(subCurvePointsStart[2]);
+    //     // this.endPoint.set(subCurvePointsStart[1]);
+    //     // this.endControlPoint.set(subCurvePointsStart[3]);
+    //   }
+    //   if (typeof tEnd === "number" && !Number.isNaN(tEnd)) {
+    //     const subCurvePointsEnd = CubicBezierCurve.utils.getSubCurvePointsAt(this, 0.0, tEnd);
+    //     // this.startPoint.set(subCurvePointsEnd[0]);
+    //     // this.startControlPoint.set(subCurvePointsEnd[2]);
+    //     // this.endPoint.set(subCurvePointsEnd[1]);
+    //     // this.endControlPoint.set(subCurvePointsEnd[3]);
+    //     finalCurvePoints[1].set(subCurvePointsEnd[1]);
+    //     finalCurvePoints[3].set(subCurvePointsEnd[3]);
+    //   }
+    //   this.startPoint.set(finalCurvePoints[0]);
+    //   this.endPoint.set(finalCurvePoints[1]);
+    //   this.startControlPoint.set(finalCurvePoints[2]);
+    //   this.endControlPoint.set(finalCurvePoints[3]);
+    //   this.updateArcLengths();
+    //   return this;
+    // }
     /**
      * Get a sub curve at the given start end end positions (values on the curve's length, between 0 and curve.arcLength).
      *
@@ -15450,10 +15636,7 @@ var CubicBezierCurve = /** @class */ (function () {
      */
     CubicBezierCurve.utils = {
         evaluateT: function (p0, p1, p2, p3, t) {
-            return p0 * Math.pow(1.0 - t, 3) +
-                p1 * 3 * t * Math.pow(1.0 - t, 2) +
-                p2 * 3 * Math.pow(t, 2) * (1.0 - t) +
-                p3 * Math.pow(t, 3);
+            return (p0 * Math.pow(1.0 - t, 3) + p1 * 3 * t * Math.pow(1.0 - t, 2) + p2 * 3 * Math.pow(t, 2) * (1.0 - t) + p3 * Math.pow(t, 3));
         },
         cubicPolyMinMax: function (p0, p1, p2, p3) {
             // var polyX = CubicBezierCurve.utils.cubicPoly2(
@@ -15525,7 +15708,7 @@ var CubicBezierCurve = /** @class */ (function () {
          * @param {number} tEnd – The end offset if the desired cub curve (must be in [0..1]).
          * @instance
          * @memberof CubicBezierCurve
-         * @return {CubicBezierCurve} The sub curve as a new curve.
+         * @return {[Vertex, Vertex, Vertex, Vertex]} The sub curve as curve vertices.
          **/
         getSubCurvePointsAt: function (curve, tStart, tEnd) {
             var startVec = new Vector_1.Vector(curve.getPointAt(tStart), curve.getTangentAt(tStart));
@@ -15614,11 +15797,7 @@ var CubicBezierCurve = /** @class */ (function () {
          * @returns {[number,number,number]}
          */
         cubicPoly: function (p0, p1, p2, p3) {
-            return [
-                3 * p3 - 9 * p2 + 9 * p1 - 3 * p0,
-                6 * p0 - 12 * p1 + 6 * p2,
-                3 * p1 - 3 * p0
-            ];
+            return [3 * p3 - 9 * p2 + 9 * p1 - 3 * p0, 6 * p0 - 12 * p1 + 6 * p2, 3 * p1 - 3 * p0];
         },
         /**
          * sign of number, but is division safe: no zero returned :)

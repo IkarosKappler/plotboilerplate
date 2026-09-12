@@ -16,7 +16,6 @@
   // Fetch the GET params
   let GUP = gup();
   var isDarkmode = detectDarkMode(GUP);
-  var isDarkmode = detectDarkMode(GUP);
 
   window.addEventListener("load", function () {
     // All config params are optional.
@@ -91,7 +90,7 @@
     });
 
     // Use a helper function to build all demo-drawables.
-    var drawables = createDemoDrawables(pb.canvasSize, "example-image.png", function () {
+    var drawables = createDemoDrawables(pb, "example-image.png", function () {
       pb.redraw();
     });
     pb.add(drawables);

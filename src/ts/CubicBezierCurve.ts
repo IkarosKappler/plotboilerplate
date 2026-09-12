@@ -32,8 +32,9 @@
  * @modified 2025-04-18 Added evaluation method for cubic Bézier curves `CubicBezierCurve.utils.evaluateT`.
  * @modified 2025-04-18 Refactored method `CubicBezierCurve.getPointAt` to use `evaluateT`.
  * @modified 2025-04-18 Fixed the `CubicBezierCurve.getBounds` method: now returning the real bounding box. Before it was an approximated one.
- * @modified 2025-ß4-18 Added helper methods for bounding box calculation `CubucBezierCurve.util.cubicPolyMinMax` and `cubicPoly`.
- * @version 2.9.0
+ * @modified 2025-04-18 Added helper methods for bounding box calculation `CubucBezierCurve.util.cubicPolyMinMax` and `cubicPoly`.
+ * @modified 2026-09-09 Adding methods `CubicBezierCurve.trimStartEnd` and `CubicBezierCurve.trimStartEndAt`.
+ * @version 2.10.0
  *
  * @file CubicBezierCurve
  * @public
@@ -401,30 +402,30 @@ export class CubicBezierCurve implements IBounded, Intersectable, PathSegment {
     // Thanks to Richard "RM" for the Bézier bounds calculatin
     //    https://jsfiddle.net/SalixAlba/QQnvm/4/
 
-      const xMinMax = CubicBezierCurve.utils.cubicPolyMinMax(
-        this.startPoint.x,
-        this.startControlPoint.x,
-        this.endControlPoint.x,
-        this.endPoint.x
-      );
-      const xl = xMinMax.min;
-      const xh = xMinMax.max;
+    const xMinMax = CubicBezierCurve.utils.cubicPolyMinMax(
+      this.startPoint.x,
+      this.startControlPoint.x,
+      this.endControlPoint.x,
+      this.endPoint.x
+    );
+    const xl = xMinMax.min;
+    const xh = xMinMax.max;
 
-      const yMinMax = CubicBezierCurve.utils.cubicPolyMinMax(
-        this.startPoint.y,
-        this.startControlPoint.y,
-        this.endControlPoint.y,
-        this.endPoint.y
-      );
-      const yl = yMinMax.min;
-      const yh = yMinMax.max;
+    const yMinMax = CubicBezierCurve.utils.cubicPolyMinMax(
+      this.startPoint.y,
+      this.startControlPoint.y,
+      this.endControlPoint.y,
+      this.endPoint.y
+    );
+    const yl = yMinMax.min;
+    const yh = yMinMax.max;
 
-      return Bounds.computeFromVertices([
-        { x: xl, y: yl },
-        { x: xl, y: yh },
-        { x: xh, y: yh },
-        { x: xh, y: yl }
-      ]);
+    return Bounds.computeFromVertices([
+      { x: xl, y: yl },
+      { x: xl, y: yh },
+      { x: xh, y: yh },
+      { x: xh, y: yl }
+    ]);
   }
   //--- END --- Implement interface `IBounded`
 
@@ -526,8 +527,20 @@ export class CubicBezierCurve implements IBounded, Intersectable, PathSegment {
     //   this.startControlPoint.y * 3 * t * Math.pow(1.0 - t, 2) +
     //   this.endControlPoint.y * 3 * Math.pow(t, 2) * (1.0 - t) +
     //   this.endPoint.y * Math.pow(t, 3);
-    const x: number = CubicBezierCurve.utils.evaluateT(this.startPoint.x, this.startControlPoint.x, this.endControlPoint.x, this.endPoint.x, t);
-    const y: number = CubicBezierCurve.utils.evaluateT(this.startPoint.y, this.startControlPoint.y, this.endControlPoint.y, this.endPoint.y, t);
+    const x: number = CubicBezierCurve.utils.evaluateT(
+      this.startPoint.x,
+      this.startControlPoint.x,
+      this.endControlPoint.x,
+      this.endPoint.x,
+      t
+    );
+    const y: number = CubicBezierCurve.utils.evaluateT(
+      this.startPoint.y,
+      this.startControlPoint.y,
+      this.endControlPoint.y,
+      this.endPoint.y,
+      t
+    );
     return new Vertex(x, y);
   }
 
@@ -611,6 +624,7 @@ export class CubicBezierCurve implements IBounded, Intersectable, PathSegment {
     this.endControlPoint.set(subCurbePoints[3]);
     this.updateArcLengths();
     return this;
+    // return this.trimStartEndAt(t, null);
   }
 
   /**
@@ -648,7 +662,87 @@ export class CubicBezierCurve implements IBounded, Intersectable, PathSegment {
     this.endControlPoint.set(subCurbePoints[3]);
     this.updateArcLengths();
     return this;
+    // return this.trimStartEndAt(null, t);
   }
+
+  /**
+   * Trim off a start and end section of this curve. The position parameters `uStart` and `uEnd` are the absolute positions in [0..arcLength].
+   * The remaining curve will be the one in the bounds `[uStart,uEnd]` (so `[0.0,uStart]` and `[uEnd,1.0]` are cut off).
+   *
+   * Parameters out of bounds (< 0.0 or > arcLength) are ignored.
+   * If `uEnd` is smaller than `uStart` then a curve with length zero (0) at `uStart` is returned.
+   *
+   * @method trimStartEndAt
+   * @instance
+   * @memberof CubicBezierCurve
+   * @param {number} tStart - The relative position parameter where to cut off the head curve.
+   * @param {number} tEnd - The relative position parameter where to cut off the tail curve.
+   * @returns {CubicBezierCurve} `this` for chanining.
+   */
+
+  trimStartEnd(uStart: number, uEnd: number): CubicBezierCurve {
+    return this.trimStartEndAt(this.convertU2T(uStart), this.convertU2T(uEnd));
+  }
+
+  /**
+   * Trim off a start and end section of this curve. The position parameters `tStart` and `tEnd` are the relative positions in [0..1].
+   * The remaining curve will be the one in the bounds `[tStart,tEnd]` (so `[0.0,tStart]` and `[tEnd,1.0]` are cut off).
+   *
+   * Parameters out of bounds (< 0.0 or > 1.0) are ignored.
+   * If `tEnd` is smaller than `tStart` then a curve with length zero (0) at `tStart` is returned.
+   *
+   * @method trimStartEndAt
+   * @instance
+   * @memberof CubicBezierCurve
+   * @param {number} tStart - The relative position parameter where to cut off the head curve.
+   * @param {number} tEnd - The relative position parameter where to cut off the tail curve.
+   * @returns {CubicBezierCurve} `this` for chanining.
+   */
+
+  trimStartEndAt(tStart: number, tEnd: number): CubicBezierCurve {
+    const cleanTrimStart = Math.min(Math.max(0.0, tStart), 1.0);
+    const cleanTrimEnd = Math.min(Math.max(cleanTrimStart, tEnd), 1.0);
+    this.trimStartAt(cleanTrimStart);
+    const relativeTrimEnd = (cleanTrimEnd - cleanTrimStart) / (1.0 - cleanTrimStart);
+    this.trimEndAt(relativeTrimEnd);
+    return this;
+  }
+
+  // __trimStartEndAt(tStart: number, tEnd: number): CubicBezierCurve {
+  //   var finalCurvePoints = [
+  //     this.startPoint.clone(),
+  //     this.endPoint.clone(),
+  //     this.startControlPoint.clone(),
+  //     this.endControlPoint.clone()
+  //   ];
+  //   if (typeof tStart === "number" && !Number.isNaN(tStart)) {
+  //     const subCurvePointsStart = CubicBezierCurve.utils.getSubCurvePointsAt(this, tStart, 1.0);
+  //     finalCurvePoints[0].set(subCurvePointsStart[0]);
+  //     finalCurvePoints[2].set(subCurvePointsStart[2]);
+  //     // this.startPoint.set(subCurvePointsStart[0]);
+  //     // this.startControlPoint.set(subCurvePointsStart[2]);
+  //     // this.endPoint.set(subCurvePointsStart[1]);
+  //     // this.endControlPoint.set(subCurvePointsStart[3]);
+  //   }
+
+  //   if (typeof tEnd === "number" && !Number.isNaN(tEnd)) {
+  //     const subCurvePointsEnd = CubicBezierCurve.utils.getSubCurvePointsAt(this, 0.0, tEnd);
+  //     // this.startPoint.set(subCurvePointsEnd[0]);
+  //     // this.startControlPoint.set(subCurvePointsEnd[2]);
+  //     // this.endPoint.set(subCurvePointsEnd[1]);
+  //     // this.endControlPoint.set(subCurvePointsEnd[3]);
+  //     finalCurvePoints[1].set(subCurvePointsEnd[1]);
+  //     finalCurvePoints[3].set(subCurvePointsEnd[3]);
+  //   }
+
+  //   this.startPoint.set(finalCurvePoints[0]);
+  //   this.endPoint.set(finalCurvePoints[1]);
+  //   this.startControlPoint.set(finalCurvePoints[2]);
+  //   this.endControlPoint.set(finalCurvePoints[3]);
+
+  //   this.updateArcLengths();
+  //   return this;
+  // }
 
   /**
    * Get a sub curve at the given start end end positions (values on the curve's length, between 0 and curve.arcLength).
@@ -1027,15 +1121,13 @@ export class CubicBezierCurve implements IBounded, Intersectable, PathSegment {
    * Helper utils.
    */
   public static utils = {
-
-    evaluateT: (p0:number, p1:number, p2:number, p3:number, t:number) : number => {
-      return p0 * Math.pow(1.0 - t, 3) +
-        p1 * 3 * t * Math.pow(1.0 - t, 2) +
-        p2 * 3 * Math.pow(t, 2) * (1.0 - t) +
-        p3 * Math.pow(t, 3);
+    evaluateT: (p0: number, p1: number, p2: number, p3: number, t: number): number => {
+      return (
+        p0 * Math.pow(1.0 - t, 3) + p1 * 3 * t * Math.pow(1.0 - t, 2) + p2 * 3 * Math.pow(t, 2) * (1.0 - t) + p3 * Math.pow(t, 3)
+      );
     },
 
-    cubicPolyMinMax: (p0:number, p1:number, p2:number, p3:number) : { min: number, max: number }=> {
+    cubicPolyMinMax: (p0: number, p1: number, p2: number, p3: number): { min: number; max: number } => {
       // var polyX = CubicBezierCurve.utils.cubicPoly2(
       //   p0, // P[0].X, // bezierCurve.startPoint.x,
       //   p1, // P[1].X, // bezierCurve.startControlPoint.x,
@@ -1047,7 +1139,6 @@ export class CubicBezierCurve implements IBounded, Intersectable, PathSegment {
       // var b = polyX.b;
       // var c = polyX.c;
       // var disc = polyX.b * polyX.b - 4 * polyX.a * polyX.c;
-
 
       var polyX = CubicBezierCurve.utils.cubicPoly(
         p0, // P[0].X, // bezierCurve.startPoint.x,
@@ -1061,7 +1152,6 @@ export class CubicBezierCurve implements IBounded, Intersectable, PathSegment {
       //alert("a "+a+" "+b+" "+c);
       // var disc = b * b - 4 * a * c;
       var disc = polyX[1] * polyX[1] - 4 * polyX[0] * polyX[2];
-
 
       // var polyX = CubicBezierCurve.utils.bezierCoeffs(p3,p2,p1,p0);
       // var a = polyX[0]; //polyX.a;
@@ -1111,7 +1201,7 @@ export class CubicBezierCurve implements IBounded, Intersectable, PathSegment {
      * @param {number} tEnd – The end offset if the desired cub curve (must be in [0..1]).
      * @instance
      * @memberof CubicBezierCurve
-     * @return {CubicBezierCurve} The sub curve as a new curve.
+     * @return {[Vertex, Vertex, Vertex, Vertex]} The sub curve as curve vertices.
      **/
     getSubCurvePointsAt: (curve: CubicBezierCurve, tStart: number, tEnd: number): [Vertex, Vertex, Vertex, Vertex] => {
       const startVec: Vector = new Vector(curve.getPointAt(tStart), curve.getTangentAt(tStart));
@@ -1196,8 +1286,8 @@ export class CubicBezierCurve implements IBounded, Intersectable, PathSegment {
      * @param {number} p3 - The end point coordinate.
      * @returns {[number,number,number,number]}
      */
-    bezierCoeffs: (p0: number, p1: number, p2: number, p3: number): [number,number,number,number] => {
-      const coeffs : [number,number,number,number]  = [NaN,NaN,NaN,NaN]; //Array(4);
+    bezierCoeffs: (p0: number, p1: number, p2: number, p3: number): [number, number, number, number] => {
+      const coeffs: [number, number, number, number] = [NaN, NaN, NaN, NaN]; //Array(4);
       coeffs[0] = -p0 + 3 * p1 + -3 * p2 + p3;
       coeffs[1] = 3 * p0 - 6 * p1 + 3 * p2;
       coeffs[2] = -3 * p0 + 3 * p1;
@@ -1207,21 +1297,16 @@ export class CubicBezierCurve implements IBounded, Intersectable, PathSegment {
 
     /**
      * Calculate the cubic polynomial coefficients used to find the bounding box.
-     * 
+     *
      * @param {number} p0 - The start point coordinate.
      * @param {number} p1 - The start control point coordinate.
      * @param {number} p2 - The end control point coordinate.
      * @param {number} p3 - The end point coordinate.
      * @returns {[number,number,number]}
      */
-    cubicPoly: (p0:number, p1:number, p2:number, p3:number) : [number,number,number] => {
-      return [
-         3 * p3 - 9 * p2 + 9 * p1 - 3 * p0,
-         6 * p0 - 12 * p1 + 6 * p2,
-         3 * p1 - 3 * p0
-      ]
+    cubicPoly: (p0: number, p1: number, p2: number, p3: number): [number, number, number] => {
+      return [3 * p3 - 9 * p2 + 9 * p1 - 3 * p0, 6 * p0 - 12 * p1 + 6 * p2, 3 * p1 - 3 * p0];
     },
-
 
     /**
      * sign of number, but is division safe: no zero returned :)

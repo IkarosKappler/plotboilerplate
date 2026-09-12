@@ -17,10 +17,12 @@
  * @modified 2025-04-15 Changed param of `VertTuple.moveTo` method from `Vertex` to `XYCoords`.
  * @modified 2025-04-15 Added method `VertTuple.move` method.
  * @modified 2026-06-10 Adding helper function `VertTuple.utils.calcCircumcircle`.
- * @version 1.5.0
+ * @modified 2026-06-17 Adding method `VertTuple.asLine` for converting Vector to Line instances.
+ * @version 1.6.0
  */
 import { Vertex } from "./Vertex";
 import { UIDGenerator } from "./UIDGenerator";
+import { Line } from "./Line";
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
  * @abstract
@@ -303,13 +305,24 @@ export class VertTuple {
     /**
      * Create a deep clone of this instance.
      *
-     * @method cloneLine
+     * @method clone
      * @return {T} A type safe clone if this instance.
      * @instance
      * @memberof VertTuple
      **/
     clone() {
         return this.factory(this.a.clone(), this.b.clone());
+    }
+    /**
+     * Converts this `Vector` to a `Line` (segment).
+     *
+     * @method asLine
+     * @return {T} A type safe clone if this instance.
+     * @instance
+     * @memberof VertTuple
+     **/
+    asLine() {
+        return new Line(this.a, this.b);
     }
     /**
      * Create a string representation of this line.
