@@ -9,7 +9,7 @@
   - Adding the `Circle.sectorAngleByArcLength` method and the `Circle.circleUtils.sectorAngleByArcLength` helper method.
   - Adding methods `Line.trimStart` and `Line.trimEnd`. Adding methods `Line.trimStartAt` and `Line.trimEndAt`.
   - Adding method `VertTuple.asLine` for converting Vector to Line instances.
-- 2026-08-03
+- 2026-08-03 [v1.29.0]
   - Adding `Circle.tangentsFromPoint`.
   - // The day while wearing my rainbow socks outside a lady spit at me in public.
 - 2026-07-31
