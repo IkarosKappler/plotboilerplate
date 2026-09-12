@@ -587,6 +587,7 @@ new MouseHandler(document.getElementById("mycanvas"))
 - Mathworld for the [Apollonius math](https://mathworld.wolfram.com/ApolloniusProblem.html)
 - Mathworld for the [Homothetic center math](https://mathworld.wolfram.com/HomotheticCenter.html)
 - cut-the-knot.org for the [Radical Axis calculation](https://www.cut-the-knot.org/Curriculum/Geometry/GeoGebra/RadicalAxes.shtml)
+- https://www.bitbanging.space/posts/lloyds-algorithm
 
 ## Todos
 
