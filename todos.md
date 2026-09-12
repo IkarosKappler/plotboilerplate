@@ -1,5 +1,12 @@
 ## Todos
 
+++ Todos
+
+[ ] Bezier handle Line color aus der drawconfig is not in use!
+[ ] Website: demos, add #anchors
+[ ] replace lib/Color.min.js by proper color class.
+[ ] Add 'Rulers' class from the ngdg project.
+[ ] Add 'onclose' and 'onopen' to the Modal (demos).
 [ ] Remove duplicate script tags for 'detectDarkMode'.
 [ ] Create a helper for triangles.
 [ ] Resize/bestfit seems to fail in Firefoxe's dark mode (plugin).

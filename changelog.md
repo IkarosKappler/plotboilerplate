@@ -1,13 +1,7 @@
 # Changelog
 
-++ Todos
-
-- Bezier handle Line color aus der drawconfig is not in use!
-- Website: demos, add #anchors
-- replace lib/Color.min.js by proper color class.
-- Add 'Rulers' class from the ngdg project.
-- Add 'onclose' and 'onopen' to the Modal (demos).
-
+- 2026-09-11
+  - Finalizing the Ulam spiral and Archimedean Sacks spiral demo.
 - 2026-09-03
   - Adding methods `CubicBezierCurve.trimStartEnd` and `CubicBezierCurve.trimStartEndAt`.
   - Adding demo `78-trim-bezier-curve` for trimming cubic Bézier curves at the start and end simultaneously.
