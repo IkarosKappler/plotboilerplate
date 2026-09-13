@@ -24,6 +24,19 @@
           })
         .title("The total number of points.");
       // prettier-ignore
+      f0.add(appContext.config, "horizontalSafeArea")
+        .min(0.0)
+        .max(0.999)
+        .onChange(function () { appContext.pb.redraw(); })
+        .title("The horizontal left and right safe area as a ratio.");
+      // prettier-ignore
+      f0.add(appContext.config, "verticalSafeArea")
+        .min(0.0)
+        .max(0.999)
+        .onChange(function () { appContext.pb.redraw(); })
+        .title("The vertical left and right safe area as a ratio.");
+
+      // prettier-ignore
       f0.add(appContext.config, "randomize").name("Randomize").title("Randomize the point set.");
       // prettier-ignore
       f0.add(appContext.config, "fullCover").name("Full Cover").title("Randomize the point set with full canvas coverage.");

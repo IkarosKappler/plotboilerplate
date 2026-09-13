@@ -87,18 +87,31 @@
           drawVoronoiIncircles: params.getBoolean("drawVoronoiIncircles", false),
           drawVoronoiOutlines: params.getBoolean("drawVoronoiOutlines", true),
           pointCount: 25,
+          horizontalSafeArea: params.getNumber("horizontalSafeArea", 0.25),
+          verticalSafeArea: params.getNumber("verticalSafeArea", 0.25),
           rebuild: function () {
             updateAnimator();
             rebuild();
           },
           randomize: function () {
-            pointSet.randomPoints(appContext.config.pointCount, true, false);
+            pointSet.clear();
+            pointSet.randomPoints(
+              appContext.config.pointCount,
+              appContext.config.horizontalSafeArea,
+              appContext.config.verticalSafeArea
+            );
             trianglesPointCount = -1;
             updateAnimator();
             rebuild();
           },
           fullCover: function () {
-            pointSet.randomPoints(appContext.config.pointCount, true, true);
+            pointSet.clear();
+            pointSet.randomPoints(appContext.config.pointCount - 4, 0.0, 0.0); //, true, true);
+            // Add 4 more points in the corners.
+            this.addVertex(new Vertex(0, 0));
+            this.addVertex(new Vertex(this.pb.canvasSize.width / 2, 0));
+            this.addVertex(new Vertex(this.pb.canvasSize.width / 2, this.pb.canvasSize.height / 2));
+            this.addVertex(new Vertex(0, this.pb.canvasSize.height / 2));
             trianglesPointCount = -1;
             updateAnimator();
             rebuild();
@@ -146,34 +159,11 @@
     var trianglesPointCount = -1; // Keep track of the number of points when the triangles were generated.
     var voronoiDiagram = []; // An array of VoronoiCells.
 
-    // A list of points.
-    // var pointList = [];
+    // A set of points.
     var pointSet = new PointSet(pb);
     pointSet.dragListeners.push(function () {
       rebuild();
     });
-
-    // // +---------------------------------------------------------------------------------
-    // // | Adds a random point to the point list. Needed for initialization.
-    // // +-------------------------------
-    // var addRandomPoint = function () {
-    //   addVertex(Vertex.randomVertex(appContext.pb.viewport()).scale(0.5));
-    // };
-
-    // var addVertex = function (vert) {
-    //   pointList.push(vert);
-    //   appContext.pb.add(vert);
-    //   vert.listeners.addDragListener(function () {
-    //     rebuild();
-    //   });
-    // };
-
-    // // +---------------------------------------------------------------------------------
-    // // | Generates a random int value between 0 and max (both inclusive).
-    // // +-------------------------------
-    // var randomInt = function (max) {
-    //   return Math.round(Math.random() * max);
-    // };
 
     // +---------------------------------------------------------------------------------
     // | Draw the given triangle with the specified (CSS-) color.
@@ -247,13 +237,13 @@
         }
 
         if (appContext.config.drawVoronoiOutlines && appContext.config.clipVoronoiCells) {
-          draw.polygon(polygon, config.voronoiOutlineColor);
+          draw.polygon(polygon, appContext.config.voronoiOutlineColor);
         }
 
         if ((!cell.isOpen() || appContext.config.clipVoronoiCells) && cell.triangles.length >= 3) {
           if (appContext.config.drawCubicCurves) {
             var cbezier = polygon.toCubicBezierData(appContext.config.voronoiCubicThreshold);
-            if (config.fillVoronoiCells) {
+            if (appContext.config.fillVoronoiCells) {
               fill.cubicBezierPath(cbezier, appContext.config.voronoiCellColor);
             } else {
               draw.cubicBezierPath(cbezier, appContext.config.voronoiCellColor);
@@ -288,13 +278,15 @@
      */
     var rebuild = function () {
       // Only re-triangulate if the point list changed.
-      var draw = true;
+      var isRedrawRequired = true;
       triangulate();
       if (appContext.config.makeVoronoiDiagram || appContext.config.drawCubicCurves) {
-        draw = makeVoronoiDiagram();
+        isRedrawRequired = makeVoronoiDiagram();
       }
 
-      if (draw) appContext.pb.redraw();
+      if (isRedrawRequired) {
+        appContext.pb.redraw();
+      }
     };
 
     /**
@@ -337,72 +329,12 @@
       }
     };
 
-    // /**
-    //  * Add or remove n random points; depends on the config settings.
-    //  *
-    //  * I have no idea how tired I was when I wrote this function but it seems working pretty well.
-    //  */
-    // var randomPoints = function (clear, fullCover, doRebuild) {
-    //   if (clear) {
-    //     for (var i in pointList) appContext.pb.remove(pointList[i], false);
-    //     pointList = [];
-    //   }
-    //   // Generate random points on image border?
-    //   if (fullCover) {
-    //     var remainingPoints = config.pointCount - pointList.length;
-    //     var borderPoints = Math.sqrt(remainingPoints);
-    //     var ratio = appContext.pb.canvasSize.height / appContext.pb.canvasSize.width;
-    //     var hCount = Math.round((borderPoints / 2) * ratio);
-    //     var vCount = borderPoints / 2 - hCount;
-
-    //     while (vCount > 0) {
-    //       addVertex(
-    //         new Vertex(
-    //           -appContext.pb.canvasSize.width / 2,
-    //           randomInt(appContext.pb.canvasSize.height / 2) - appContext.pb.canvasSize.height / 2
-    //         )
-    //       );
-    //       addVertex(
-    //         new Vertex(
-    //           appContext.pb.canvasSize.width / 2,
-    //           randomInt(appContext.pb.canvasSize.height / 2) - appContext.pb.canvasSize.height / 2
-    //         )
-    //       );
-    //       vCount--;
-    //     }
-
-    //     while (hCount > 0) {
-    //       addVertex(new Vertex(randomInt(appContext.pb.canvasSize.width / 2) - appContext.pb.canvasSize.width / 2, 0));
-    //       addVertex(
-    //         new Vertex(
-    //           randomInt(appContext.pb.canvasSize.width / 2) - appContext.pb.canvasSize.width / 2,
-    //           appContext.pb.canvasSize.height / 2
-    //         )
-    //       );
-    //       hCount--;
-    //     }
-
-    //     // Additionally add 4 points to the corners
-    //     addVertex(new Vertex(0, 0));
-    //     addVertex(new Vertex(appContext.pb.canvasSize.width / 2, 0));
-    //     addVertex(new Vertex(appContext.pb.canvasSize.width / 2, appContext.pb.canvasSize.height / 2));
-    //     addVertex(new Vertex(0, appContext.pb.canvasSize.height / 2));
-    //   }
-
-    //   // Generate random points.
-    //   for (var i = pointList.length; i < appContext.config.pointCount; i++) {
-    //     addRandomPoint();
-    //   }
-    //   updateAnimator();
-    //   if (doRebuild) rebuild();
-    // };
-
     /**
      * Called when the desired number of points changes.
      **/
     var updatePointCount = function () {
       if (appContext.config.pointCount > pointSet.points.length) {
-        pointSet.randomPoints(appContext.config.pointCount, false, false);
+        pointSet.randomPoints(appContext.config.pointCount, 0.25, 0.25);
       }
       // Do not clear ; no full cover ; do rebuild
       else if (appContext.config.pointCount < pointSet.points.length) {
@@ -422,9 +354,9 @@
     // +-------------------------------
     var animator = null;
     var toggleAnimation = function () {
-      if (config.animate) {
+      if (appContext.config.animate) {
         if (animator) animator.stop();
-        if (config.animationType == "radial")
+        if (appContext.config.animationType == "radial")
           animator = new CircularVertexAnimator(pointSet.points, appContext.pb.viewport(), rebuild);
         // 'linear'
         else animator = new LinearVertexAnimator(pointSet.points, appContext.pb.viewport(), rebuild);
@@ -440,7 +372,9 @@
     // | one (and stop the old one) each time the vertex count changes.
     // +-------------------------------
     var updateAnimator = function () {
-      if (!animator) return;
+      if (!animator) {
+        return;
+      }
       animator.stop();
       animator = null;
       toggleAnimation();
@@ -452,102 +386,8 @@
     // +-------------------------------
     initDemoUI(appContext);
 
-    // // +---------------------------------------------------------------------------------
-    // // | Initialize dat.gui
-    // // +-------------------------------
-    // {
-    //   var gui = appContext.pb.createGUI();
-
-    //   // prettier-ignore
-    //   gui.add(config, "rebuild").name("Rebuild all").title("Rebuild all.");
-
-    //   var f0 = gui.addFolder("Points");
-    //   // prettier-ignore
-    //   f0.add(config, "pointCount").min(3).max(200).onChange(function () { config.pointCount = Math.round(config.pointCount);
-    //       updatePointCount();
-    //     })
-    //   .title("The total number of points.");
-    //   // prettier-ignore
-    //   f0.add(config, "randomize").name("Randomize").title("Randomize the point set.");
-    //   // prettier-ignore
-    //   f0.add(config, "fullCover").name("Full Cover").title("Randomize the point set with full canvas coverage.");
-    //   // prettier-ignore
-    //   f0.add(config, "animate").onChange(toggleAnimation).title("Toggle point animation on/off.");
-    //   // prettier-ignore
-    //   f0.add(config, "animationType", { Linear: "linear", Radial: "radial" }).onChange(function () {
-    //     toggleAnimation();
-    //   });
-    //   f0.open();
-
-    //   var f1 = gui.addFolder("Delaunay");
-    //   // prettier-ignore
-    //   f1.add(config, "drawTriangles")
-    //     .onChange(function () {
-    //       appContext.pb.redraw();
-    //     })
-    //     .title("If checked the triangle edges will be drawn.");
-    //   // prettier-ignore
-    //   f1.add(config, "drawCircumCircles")
-    //     .onChange(function () {
-    //       appContext.pb.redraw();
-    //     })
-    //     .title("If checked the triangles circumcircles will be drawn.");
-
-    //   var f2 = gui.addFolder("Voronoi");
-    //   // prettier-ignore
-    //   f2.add(config, "makeVoronoiDiagram").onChange(rebuild).title("Make voronoi diagram from the triangle set.");
-    //   // prettier-ignore
-    //   f2.addColor(config, "voronoiOutlineColor")
-    //     .onChange(function () {
-    //       appContext.pb.redraw();
-    //     })
-    //     .title("Choose Voronoi outline color.");
-    //   // prettier-ignore
-    //   f2.add(config, "drawCubicCurves").onChange(rebuild).title("If checked the Voronoi's cubic curves will be drawn.");
-    //   // prettier-ignore
-    //   f2.add(config, "drawVoronoiOutlines").onChange(rebuild).title("If checked the Voronoi cells' outlines will be drawn.");
-    //   // prettier-ignore
-    //   f2.add(config, "drawVoronoiIncircles").onChange(rebuild).title("If checked the Voronoi cells' incircles will be drawn.");
-    //   // prettier-ignore
-    //   f2.add(config, "fillVoronoiCells").onChange(rebuild).title("If checked the Voronoi cells will be filled.");
-    //   // prettier-ignore
-    //   f2.add(config, "clipVoronoiCells")
-    //     .onChange(rebuild)
-    //     .title("If checked the Voronoi cells will be clipped by the bounding rectangle.");
-    //   // prettier-ignore
-    //   f2.add(config, "drawClipBox").onChange(rebuild).title("If checked the clipbox will be draw.");
-    //   // prettier-ignore
-    //   f2.add(config, "drawUnclippedVoronoiCells")
-    //     .onChange(rebuild)
-    //     .title("If checked unclipped Voronoi cells will always be drawn.");
-    //   // prettier-ignore
-    //   f2.addColor(config, "voronoiCellColor")
-    //     .onChange(function () {
-    //       appContext.pb.redraw();
-    //     })
-    //     .title("Choose Voronoi cell color.");
-    //   // prettier-ignore
-    //   f2.add(config, "voronoiCubicThreshold")
-    //     .min(0.0)
-    //     .max(1.0)
-    //     .onChange(function () {
-    //       appContext.pb.redraw();
-    //     })
-    //     .title("(Experimental) Specifiy the cubic or cell coefficients.");
-    //   // prettier-ignore
-    //   f2.add(config, "voronoiCellScale")
-    //     .min(-1.0)
-    //     .max(2.0)
-    //     .onChange(function () {
-    //       appContext.pb.redraw();
-    //     })
-    //     .title("Scale each voronoi cell before rendering.");
-
-    //   if (config.animate) toggleAnimation();
-    // }
-
     // Init
-    pointSet.randomPoints(appContext.config.pointCount, true, false); // clear ; no full cover
+    pointSet.randomPoints(appContext.config.pointCount, appContext.config.horizontalSafeArea, appContext.config.verticalSafeArea); // , true, false); // clear ; no full cover
     updateAnimator();
     rebuild();
     appContext.pb.redraw();
