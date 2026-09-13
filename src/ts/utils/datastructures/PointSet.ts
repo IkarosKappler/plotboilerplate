@@ -89,6 +89,27 @@ export class PointSet {
     }
   }
 
+  /**
+   * Call when the desired number of points changes.
+   **/
+  updatePointCount(newPointCount: number, horizontalSafeArea: number = 0, verticalSafeArea: number = 0) {
+    if (newPointCount > this.points.length) {
+      this.randomPoints(newPointCount, horizontalSafeArea, verticalSafeArea);
+    }
+    // Do not clear ; no full cover ; do rebuild
+    else if (newPointCount < this.points.length) {
+      // Remove n-m points
+      for (var i = newPointCount; i < this.points.length; i++) {
+        this.pb.remove(this.points[i]);
+      }
+      // TODO: MOVE THIS TO THE PointSet class.
+      this.points = this.points.slice(0, newPointCount);
+      // TODO: also remove listeners?
+      //   updateAnimator();
+      //   rebuild();
+    }
+  }
+
   // +---------------------------------------------------------------------------------
   // | Generates a random int value between 0 and max (both inclusive).
   // +-------------------------------

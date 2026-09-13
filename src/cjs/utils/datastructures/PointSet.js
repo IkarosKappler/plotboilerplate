@@ -83,6 +83,28 @@ var PointSet = /** @class */ (function () {
             this.addRandomPoint(horizontalSafeArea, verticalSafeArea);
         }
     };
+    /**
+     * Call when the desired number of points changes.
+     **/
+    PointSet.prototype.updatePointCount = function (newPointCount, horizontalSafeArea, verticalSafeArea) {
+        if (horizontalSafeArea === void 0) { horizontalSafeArea = 0; }
+        if (verticalSafeArea === void 0) { verticalSafeArea = 0; }
+        if (newPointCount > this.points.length) {
+            this.randomPoints(newPointCount, horizontalSafeArea, verticalSafeArea);
+        }
+        // Do not clear ; no full cover ; do rebuild
+        else if (newPointCount < this.points.length) {
+            // Remove n-m points
+            for (var i = newPointCount; i < this.points.length; i++) {
+                this.pb.remove(this.points[i]);
+            }
+            // TODO: MOVE THIS TO THE PointSet class.
+            this.points = this.points.slice(0, newPointCount);
+            // TODO: also remove listeners?
+            //   updateAnimator();
+            //   rebuild();
+        }
+    };
     return PointSet;
 }());
 exports.PointSet = PointSet;

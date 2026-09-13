@@ -50,4 +50,8 @@ export declare class PointSet {
      * I have no idea how tired I was when I wrote this function but it seems working pretty well.
      */
     randomPoints(pointCount: number, horizontalSafeArea?: number, verticalSafeArea?: number): void;
+    /**
+     * Call when the desired number of points changes.
+     **/
+    updatePointCount(newPointCount: number, horizontalSafeArea?: number, verticalSafeArea?: number): void;
 }

@@ -132,11 +132,20 @@
       toggleAnimation();
     };
     appContext.updatePointCount = function () {
-      updatePointCount();
+      pointSet.updatePointCount(
+        appContext.config.pointCount,
+        appContext.config.horizontalSafeArea,
+        appContext.config.verticalSafeArea
+      );
       updateAnimator();
       rebuild();
     };
     appContext.isMobile = isMobile;
+
+    // +---------------------------------------------------------------------------------
+    // | Global vars.
+    // +-------------------------------
+    var voronoiRenderer = new VoronoiRenderer(appContext);
 
     appContext.pb.config.postDraw = function (draw, fill) {
       // In this demo the PlotBoilerplate only draws the vertices.
@@ -165,109 +174,19 @@
       rebuild();
     });
 
-    // +---------------------------------------------------------------------------------
-    // | Draw the given triangle with the specified (CSS-) color.
-    // +-------------------------------
-    var drawTriangle = function (draw, t, color) {
-      draw.line(t.a, t.b, color);
-      draw.line(t.b, t.c, color);
-      draw.line(t.c, t.a, color);
-    };
-
     /**
      * The re-drawing function.
      */
     var redraw = function (drawLib, fillLib) {
       // Draw triangles
       if (appContext.config.drawTriangles) {
-        drawTriangles(drawLib);
-      }
-
-      // Draw circumcircles
-      if (appContext.config.drawCircumCircles) {
-        drawCircumCircles(drawLib);
+        voronoiRenderer.drawTriangles(drawLib, triangles);
       }
 
       // Draw voronoi diagram?
       if (appContext.config.makeVoronoiDiagram) {
-        drawVoronoiDiagram(drawLib, fillLib);
-      }
-    };
-
-    /**
-     * A function for drawing the triangles.
-     */
-    var drawTriangles = function (draw) {
-      for (var i in triangles) {
-        var t = triangles[i];
-        drawTriangle(draw, t, appContext.config.makeVoronoiDiagram ? "rgba(0,128,224,0.33)" : "#0088d8");
-      }
-    };
-
-    /**
-     * Draw the stored voronoi diagram.
-     */
-    var drawVoronoiDiagram = function (draw, fill) {
-      var clipBoxPolygon = Bounds.computeFromVertices(pointSet.points).toPolygon();
-      if (appContext.config.drawClipBox) {
-        draw.polygon(clipBoxPolygon, "rgba(192,192,192,0.25)");
-      }
-
-      for (var v in voronoiDiagram) {
-        var cell = voronoiDiagram[v];
-        var polygon = cell.toPolygon();
-        polygon.scale(appContext.config.voronoiCellScale, cell.sharedVertex);
-
-        // Draw large (unclipped) Voronoi cell
-        if (
-          appContext.config.drawVoronoiOutlines &&
-          (!appContext.config.clipVoronoiCells || appContext.config.drawUnclippedVoronoiCells)
-        ) {
-          draw.polyline(
-            polygon.vertices,
-            false,
-            appContext.config.clipVoronoiCells ? "rgba(128,128,128,0.333)" : appContext.config.voronoiOutlineColor
-          );
-        }
-
-        // Apply clipping?
-        if (appContext.config.clipVoronoiCells) {
-          // Clone the array here: convert Array<XYCoords> to Array<Vertex>
-          polygon = new Polygon(cloneVertexArray(sutherlandHodgman(polygon.vertices, clipBoxPolygon.vertices)), false);
-        }
-
-        if (appContext.config.drawVoronoiOutlines && appContext.config.clipVoronoiCells) {
-          draw.polygon(polygon, appContext.config.voronoiOutlineColor);
-        }
-
-        if ((!cell.isOpen() || appContext.config.clipVoronoiCells) && cell.triangles.length >= 3) {
-          if (appContext.config.drawCubicCurves) {
-            var cbezier = polygon.toCubicBezierData(appContext.config.voronoiCubicThreshold);
-            if (appContext.config.fillVoronoiCells) {
-              fill.cubicBezierPath(cbezier, appContext.config.voronoiCellColor);
-            } else {
-              draw.cubicBezierPath(cbezier, appContext.config.voronoiCellColor);
-            }
-          }
-          if (appContext.config.drawVoronoiIncircles) {
-            var result = convexPolygonIncircle(polygon);
-            var circle = result.circle;
-            var triangle = result.triangle;
-            // Here we should have found the best inlying circle (and the corresponding triangle)
-            // inside the Voronoi cell.
-            draw.circle(circle.center, circle.radius, "rgba(255,192,0,1.0)", 2);
-          }
-        } // END cell is not open
-      }
-    };
-
-    /**
-     * Draw the circumcircles of all triangles.
-     */
-    var drawCircumCircles = function (draw) {
-      for (var t in triangles) {
-        var cc = triangles[t].getCircumcircle();
-        draw.circle(cc.center, cc.radius, "#e86800");
+        // drawVoronoiDiagram(drawLib, fillLib);
+        voronoiRenderer.draw(drawLib, fillLib, voronoiDiagram, pointSet);
       }
     };
 
@@ -326,26 +245,6 @@
         return false;
       } else {
         return true;
-      }
-    };
-
-    /**
-     * Called when the desired number of points changes.
-     **/
-    var updatePointCount = function () {
-      if (appContext.config.pointCount > pointSet.points.length) {
-        pointSet.randomPoints(appContext.config.pointCount, 0.25, 0.25);
-      }
-      // Do not clear ; no full cover ; do rebuild
-      else if (appContext.config.pointCount < pointSet.points.length) {
-        // Remove n-m points
-        for (var i = appContext.config.pointCount; i < pointSet.points.length; i++) {
-          appContext.pb.remove(pointSet.points[i]);
-        }
-        // TODO: MOVE THIS TO THE PointSet class.
-        pointSet.points = pointSet.points.slice(0, appContext.config.pointCount);
-        updateAnimator();
-        rebuild();
       }
     };
 
