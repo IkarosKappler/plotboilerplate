@@ -17,7 +17,8 @@
  * @modified 2020-08-12 Ported this class from vanilla JS to TypeScript.
  * @modified 2020-08-17 Added some missing type declarations.
  * @modified 2021-01-20 Members `triangles` and `sharedVertex` are now public.
- * @version  1.1.3
+ * @modified 2026-09-15 Added the `VoronoiCell.sharedVertexIndex` attribute.
+ * @version  1.2.0
  *
  * @file VoronoiCell
  * @public
@@ -26,6 +27,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.VoronoiCell = void 0;
 var Line_1 = require("../../Line");
 var Polygon_1 = require("../../Polygon");
+var Triangle_1 = require("../../Triangle");
 var Vertex_1 = require("../../Vertex");
 var VoronoiCell = /** @class */ (function () {
     /**
@@ -38,15 +40,15 @@ var VoronoiCell = /** @class */ (function () {
      * @param {Vertex}     sharedVertex This is the 'center' of the voronoi cell; all triangles must share
      *                                  that vertex.
      **/
-    function VoronoiCell(triangles, sharedVertex) {
-        if (typeof triangles === 'undefined')
+    function VoronoiCell(triangles, sharedVertex, sharedVertexIndex) {
+        if (typeof triangles === "undefined")
             triangles = [];
-        if (typeof sharedVertex === 'undefined')
+        if (typeof sharedVertex === "undefined")
             sharedVertex = new Vertex_1.Vertex(0, 0);
         this.triangles = triangles;
         this.sharedVertex = sharedVertex;
+        this.sharedVertexIndex = sharedVertexIndex;
     }
-    ;
     /**
      * Check if the first and the last triangle in the path are NOT connected.
      *
@@ -59,7 +61,6 @@ var VoronoiCell = /** @class */ (function () {
         // There must be at least three triangles
         return this.triangles.length < 3 || !this.triangles[0].isAdjacent(this.triangles[this.triangles.length - 1]);
     };
-    ;
     /**
      * Convert this Voronoi cell to a path polygon, consisting of all Voronoi cell corner points.
      *
@@ -74,7 +75,21 @@ var VoronoiCell = /** @class */ (function () {
     VoronoiCell.prototype.toPolygon = function () {
         return new Polygon_1.Polygon(this.toPathArray(), this.isOpen());
     };
-    ;
+    VoronoiCell.prototype.getUmbrellaTriangles = function () {
+        var tris = [];
+        // for (var i = 0; i < this.triangles.length; i++) {
+        //   var delaunayTri = this.triangles[i];
+        //   var tri = new Triangle(this.sharedVertex, delaunayTri.b, delaunayTri.c);
+        //   tris.push(tri);
+        // }
+        var vertices = this.toPathArray();
+        var n = vertices.length;
+        for (var i = 0; i < n; i++) {
+            var tri = new Triangle_1.Triangle(this.sharedVertex, vertices[i], vertices[(i + 1) % n]);
+            tris.push(tri);
+        }
+        return tris;
+    };
     /**
      * Convert the voronoi cell path data to an SVG polygon data string.
      *
@@ -89,9 +104,12 @@ var VoronoiCell = /** @class */ (function () {
         if (this.triangles.length == 0)
             return "";
         var arr = this.toPathArray();
-        return arr.map(function (vert) { return '' + vert.x + ',' + vert.y; }).join(' ');
+        return arr
+            .map(function (vert) {
+            return "" + vert.x + "," + vert.y;
+        })
+            .join(" ");
     };
-    ;
     /**
      * Convert the voronoi cell path data to an array.
      *
@@ -146,7 +164,6 @@ var VoronoiCell = /** @class */ (function () {
         var openEdgePoint = new Vertex_1.Vertex(perpendicular.x + (center.x - perpendicular.x) * 1000, perpendicular.y + (center.y - perpendicular.y) * 1000);
         return openEdgePoint;
     };
-    ;
     /**
      * A helper function.
      *
@@ -170,13 +187,12 @@ var VoronoiCell = /** @class */ (function () {
                 return tri.a;
         }
         // Here:
-        //    tri.c.equals(sharedVertex) 
+        //    tri.c.equals(sharedVertex)
         if (neighbour.a.equals(tri.a) || neighbour.b.equals(tri.a) || neighbour.c.equals(tri.a))
             return tri.b;
         else
             return tri.a;
     };
-    ;
     return VoronoiCell;
 }());
 exports.VoronoiCell = VoronoiCell;

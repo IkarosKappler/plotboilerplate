@@ -1,6 +1,18 @@
 # Changelog
 
-- 2026-09-11
+- 2026-09-15
+  - In `delaynay2voronoi`: Added the `sharedVertexIndex` attribute to each Voronoi cell.
+  - Added the `VoronoiCell.sharedVertexIndex` attribute.
+  - Porting the `VoronoiRenderer` to Typescript.
+  - Adding demo helper function `randomPolygon.js`.
+  - Adding demo `80-polygon-centroid`.
+- 2026-09-13
+  - Refactored demo 07-voronoi with the new `VoronoiRenderer` class.
+  - Added helper `VoronoiRenderer.js` to wrap all Voronoi rendering methods togeher.
+- 2026-09-12
+  - Refactored demo 07-voronoi with the new `PointSet` class.
+  - Added utility class `utils/datastructures/PointSet` to hold, display and manipulate point sets.
+- 2026-09-11 [v1.30.0]
   - Finalizing the Ulam spiral and Archimedean Sacks spiral demo.
 - 2026-09-03
   - Adding methods `CubicBezierCurve.trimStartEnd` and `CubicBezierCurve.trimStartEndAt`.

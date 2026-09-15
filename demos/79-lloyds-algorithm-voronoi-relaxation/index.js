@@ -4,20 +4,8 @@
  * @requires Vertex, Triangle, Polygon, VoronoiCell, delaunay, delaunay2voronoi, saveAs
  *
  * @author   Ikaros Kappler
- * @date     2017-07-31
- * @modified 2018-04-03 Added the voronoi-from-delaunay computation.
- * @modified 2018-04-11 Added the option to draw circumcircles.
- * @modified 2018-04-14 Added quadratic bezier Voronoi cells.
- * @modified 2018-04-16 Added cubic bezier Voronoi cells.
- * @modified 2018-04-22 Added SVG export for cubic and quadratic voronoi cells.
- * @modified 2018-04-28 Added a better mouse handler.
- * @modified 2018-04-29 Added web colors.
- * @modified 2018-05-04 Drawing voronoi cells by their paths now, not the triangles' circumcenters.
- * @modified 2019-04-24 Refactored the whole code and added an animator.
- * @modified 2019-10-25 Using draw.polygon(...) to draw Voronoi cells now. Added configurable colors.
- * @modified 2020-05-18 Replaced new Polygon(cell.toPathArray(),...) by cell.toPolygon().
- * @modified 2020-05-18 Added convex-polygon-incircles to Voronoi cells.
- * @version  2.1.0
+ * @date     2026-09-15
+ * @version  1.0.0
  **/
 
 (function () {
@@ -73,22 +61,22 @@
         {
           makeVoronoiDiagram: params.getBoolean("makeVoronoiDiagram", true),
           drawPoints: params.getBoolean("drawPoints", true),
-          drawTriangles: params.getBoolean("drawTriangles", true),
+          drawTriangles: params.getBoolean("drawTriangles", false),
           drawCircumCircles: params.getBoolean("drawCircumCircles", false),
           drawCubicCurves: params.getBoolean("drawCubicCurves", false),
           fillVoronoiCells: params.getBoolean("fillVoronoiCells", true),
           voronoiOutlineColor: "#00a828", // "rgba(0,168,40,1.0)",
           voronoiCellColor: "#0080c0", // "rgba(0,128,192, 0.5)",
           voronoiCubicThreshold: 1.0,
-          voronoiCellScale: 0.8,
+          voronoiCellScale: 1.0,
           clipVoronoiCells: params.getBoolean("clipVoronoiCells", false),
           drawClipBox: params.getBoolean("drawClipBox", false),
           drawUnclippedVoronoiCells: params.getBoolean("drawUnclippedVoronoiCells", false),
           drawVoronoiIncircles: params.getBoolean("drawVoronoiIncircles", false),
           drawVoronoiOutlines: params.getBoolean("drawVoronoiOutlines", true),
           pointCount: 25,
-          horizontalSafeArea: params.getNumber("horizontalSafeArea", 0.25),
-          verticalSafeArea: params.getNumber("verticalSafeArea", 0.25),
+          horizontalSafeArea: params.getNumber("horizontalSafeArea", 0.0),
+          verticalSafeArea: params.getNumber("verticalSafeArea", 0.0),
           rebuild: function () {
             updateAnimator();
             rebuild();
@@ -163,17 +151,6 @@
       redraw(draw, fill);
     };
 
-    // +---------------------------------------------------------------------------------
-    // | Add a mouse listener to track the mouse position.
-    // +-------------------------------
-    new MouseHandler(appContext.pb.eventCatcher).move(function (e) {
-      var relPos = appContext.pb.transformMousePosition(e.params.pos.x, e.params.pos.y);
-      var cx = document.getElementById("cx");
-      var cy = document.getElementById("cy");
-      if (cx) cx.innerHTML = relPos.x.toFixed(2);
-      if (cy) cy.innerHTML = relPos.y.toFixed(2);
-    });
-
     /**
      * The re-drawing function.
      */
@@ -181,6 +158,23 @@
       // Draw triangles
       if (appContext.config.drawTriangles) {
         voronoiRenderer.drawTriangles(drawLib);
+      }
+
+      // Draw umbrella triangles
+      for (var i = 0; i < appContext.voronoiCells.length; i++) {
+        var cell = appContext.voronoiCells[i];
+        var umbrellaTris = cell.getUmbrellaTriangles();
+        umbrellaTris.forEach(function (tri) {
+          VoronoiRenderer.drawTriangle(drawLib, tri, "rgba(255,128,0,0.15)");
+        });
+      }
+
+      // Draw cell centroids
+      for (var i = 0; i < appContext.voronoiCells.length; i++) {
+        var cell = appContext.voronoiCells[i];
+        var centroid = cell.toPolygon().getCentroid();
+        drawLib.crosshair(centroid, 7, "red", 1.0);
+        drawLib.line(cell.sharedVertex, centroid, "red", 1.0);
       }
 
       // Draw voronoi diagram?
@@ -286,11 +280,12 @@
     initDemoUI(appContext);
 
     // Init
-    appContext.pointSet.randomPoints(
-      appContext.config.pointCount,
-      appContext.config.horizontalSafeArea,
-      appContext.config.verticalSafeArea
-    ); // , true, false); // clear ; no full cover
+    // appContext.pointSet.randomPoints(
+    //   appContext.config.pointCount,
+    //   appContext.config.horizontalSafeArea,
+    //   appContext.config.verticalSafeArea
+    // ); // , true, false); // clear ; no full cover
+    fullCover();
     updateAnimator();
     rebuild();
     appContext.pb.redraw();

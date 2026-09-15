@@ -16,7 +16,8 @@
  * @modified 2020-08-12 Ported this class from vanilla JS to TypeScript.
  * @modified 2020-08-17 Added some missing type declarations.
  * @modified 2021-01-20 Members `triangles` and `sharedVertex` are now public.
- * @version  1.1.3
+ * @modified 2026-09-15 Added the `VoronoiCell.sharedVertexIndex` attribute.
+ * @version  1.2.0
  *
  * @file VoronoiCell
  * @public
@@ -40,6 +41,10 @@ export declare class VoronoiCell {
      */
     sharedVertex: Vertex;
     /**
+     *
+     */
+    sharedVertexIndex: number;
+    /**
      * The constructor.
      *
      * @constructor
@@ -49,7 +54,7 @@ export declare class VoronoiCell {
      * @param {Vertex}     sharedVertex This is the 'center' of the voronoi cell; all triangles must share
      *                                  that vertex.
      **/
-    constructor(triangles: Array<Triangle>, sharedVertex: Vertex);
+    constructor(triangles: Array<Triangle>, sharedVertex: Vertex, sharedVertexIndex: number);
     /**
      * Check if the first and the last triangle in the path are NOT connected.
      *
@@ -71,6 +76,7 @@ export declare class VoronoiCell {
      * @return {Polygon}
      **/
     toPolygon(): Polygon;
+    getUmbrellaTriangles(): Array<Triangle>;
     /**
      * Convert the voronoi cell path data to an SVG polygon data string.
      *

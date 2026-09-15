@@ -4,7 +4,8 @@
  * @date     2018-04-07
  * @modified 2018-04-11 Using VoronoiCells now (was array before).
  * @modified 2020-08-15 Ported from vanilla JS to TypeScript.
- * @version  1.0.2
+ * @modified 2026-09-15 Added the `sharedVertexIndex` attribute to each Voronoi cell.
+ * @version  1.1.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.delaunay2voronoi = void 0;
@@ -22,13 +23,12 @@ var delaunay2voronoi = /** @class */ (function () {
         this.pointList = pointList;
         this.triangles = triangles;
     }
-    ;
     // +---------------------------------------------------------------------------------
     // | Convert the triangle set to the Voronoi diagram.
     // +-------------------------------
     delaunay2voronoi.prototype.build = function () {
         var voronoiDiagram = [];
-        for (var p in this.pointList) {
+        for (var p = 0; p < this.pointList.length; p++) {
             var point = this.pointList[p];
             // Find adjacent triangles for first point
             var adjacentSubset = [];
@@ -37,12 +37,12 @@ var delaunay2voronoi = /** @class */ (function () {
                     adjacentSubset.push(this.triangles[t]);
             }
             var path = this.subsetToPath(adjacentSubset);
-            if (path) // There may be errors
-                voronoiDiagram.push(new VoronoiCell_1.VoronoiCell(path, point));
+            if (path)
+                // There may be errors
+                voronoiDiagram.push(new VoronoiCell_1.VoronoiCell(path, point, p));
         }
         return voronoiDiagram;
     };
-    ;
     // +---------------------------------------------------------------------------------
     // | Re-order a tiangle subset so the triangle define a single path.
     // |
@@ -55,7 +55,7 @@ var delaunay2voronoi = /** @class */ (function () {
     delaunay2voronoi.prototype.subsetToPath = function (triangleSet, startPosition, tryOnce) {
         if (triangleSet.length == 0)
             return [];
-        if (typeof startPosition === 'undefined')
+        if (typeof startPosition === "undefined")
             startPosition = 0;
         var t = startPosition;
         var result = [triangleSet[t]];
@@ -96,9 +96,7 @@ var delaunay2voronoi = /** @class */ (function () {
             return result;
         }
     };
-    ;
     return delaunay2voronoi;
-}());
+}()); // END delaunay2voronoi
 exports.delaunay2voronoi = delaunay2voronoi;
-; // END delaunay2voronoi
 //# sourceMappingURL=delaunay2voronoi.js.map

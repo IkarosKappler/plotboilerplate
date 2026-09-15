@@ -90,6 +90,22 @@ export class PointSet {
   }
 
   /**
+   * Add random points and be sure they cover the whole viewport.
+   *
+   * I have no idea how tired I was when I wrote this function but it seems working pretty well.
+   */
+  randomFullCover(pointCount: number) {
+    this.clear();
+    this.randomPoints(pointCount - 4, 0.0, 0.0); //, true, true);
+    // Add 4 more points in the corners.
+    var viewport = this.pb.viewport();
+    this.addVertex(viewport.getNorthWestPoint());
+    this.addVertex(viewport.getNorthEastPoint());
+    this.addVertex(viewport.getSouthWestPoint());
+    this.addVertex(viewport.getSouthEastPoint());
+  }
+
+  /**
    * Call when the desired number of points changes.
    **/
   updatePointCount(newPointCount: number, horizontalSafeArea: number = 0, verticalSafeArea: number = 0) {

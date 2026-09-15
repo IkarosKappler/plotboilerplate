@@ -51,6 +51,12 @@ export declare class PointSet {
      */
     randomPoints(pointCount: number, horizontalSafeArea?: number, verticalSafeArea?: number): void;
     /**
+     * Add random points and be sure they cover the whole viewport.
+     *
+     * I have no idea how tired I was when I wrote this function but it seems working pretty well.
+     */
+    randomFullCover(pointCount: number): void;
+    /**
      * Call when the desired number of points changes.
      **/
     updatePointCount(newPointCount: number, horizontalSafeArea?: number, verticalSafeArea?: number): void;
