@@ -33,7 +33,7 @@
     var appContext = new AppContext(pb, {
       // colorCenterConnectLine: params.getString("colorCenterConnectLine", "#0048e0"),
       // colorRadiusConnectLine: params.getString("colorRadiusConnectLine", "#00e048"),
-      // isTwoCircles: params.getBoolean("isTwoCircles", false),
+      isClockwise: params.getBoolean("isClockwise", false),
       pointCount: params.getNumber("pointCount", 8),
       readme: function () {
         globalThis.displayDemoMeta();
@@ -42,7 +42,7 @@
     appContext.isMobile = isMobile;
     appContext.rebuild = function () {
       pb.remove(polygon, false, true, false);
-      polygon = randomPolygon(pb.viewport(), appContext.config.pointCount);
+      polygon = randomPolygon(pb.viewport(), appContext.config.pointCount, appContext.config.isClockwise);
       pb.add(polygon);
       appContext.pb.redraw();
     };
@@ -50,7 +50,7 @@
     // +---------------------------------------------------------------------------------
     // | Global vars
     // +-------------------------------
-    var polygon = randomPolygon(pb.viewport(), appContext.config.pointCount);
+    var polygon = randomPolygon(pb.viewport(), appContext.config.pointCount, appContext.config.isClockwise);
     pb.add(polygon);
 
     // +---------------------------------------------------------------------------------

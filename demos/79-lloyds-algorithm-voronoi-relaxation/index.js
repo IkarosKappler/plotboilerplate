@@ -65,8 +65,8 @@
           drawCircumCircles: params.getBoolean("drawCircumCircles", false),
           drawCubicCurves: params.getBoolean("drawCubicCurves", false),
           fillVoronoiCells: params.getBoolean("fillVoronoiCells", true),
-          voronoiOutlineColor: "#00a828", // "rgba(0,168,40,1.0)",
-          voronoiCellColor: "#0080c0", // "rgba(0,128,192, 0.5)",
+          voronoiOutlineColor: params.getString("voronoiOutlineColor", "#e5a50a"),
+          voronoiCellColor: params.getString("voronoiCellColor", "#0080c0"),
           voronoiCubicThreshold: 1.0,
           voronoiCellScale: 1.0,
           clipVoronoiCells: params.getBoolean("clipVoronoiCells", false),
@@ -77,6 +77,10 @@
           pointCount: 25,
           horizontalSafeArea: params.getNumber("horizontalSafeArea", 0.0),
           verticalSafeArea: params.getNumber("verticalSafeArea", 0.0),
+          // Lloyd algorithm setting
+          showCentroids: params.getBoolean("showCentroids", true),
+          runLloydAlgorithm: params.getBoolean("runLloydAlgorithm", false),
+          // Helper methods
           rebuild: function () {
             updateAnimator();
             rebuild();
@@ -111,13 +115,16 @@
       toggleAnimation();
     };
     appContext.updatePointCount = function () {
-      pointSet.updatePointCount(
+      appContext.pointSet.updatePointCount(
         appContext.config.pointCount,
         appContext.config.horizontalSafeArea,
         appContext.config.verticalSafeArea
       );
       updateAnimator();
       rebuild();
+    };
+    appContext.toggleLloydAlgorithm = function () {
+      toggleLloydAlgorithm();
     };
     appContext.isMobile = isMobile;
 
@@ -171,17 +178,35 @@
 
       // Draw cell centroids
       for (var i = 0; i < appContext.voronoiCells.length; i++) {
-        var cell = appContext.voronoiCells[i];
-        var centroid = cell.toPolygon().getCentroid();
-        drawLib.crosshair(centroid, 7, "red", 1.0);
-        drawLib.line(cell.sharedVertex, centroid, "red", 1.0);
+        // var cell = appContext.voronoiCells[i];
+        drawCellPolyWithCentroid(drawLib, fillLib, appContext.voronoiCells[i]);
       }
 
       // Draw voronoi diagram?
       if (appContext.config.makeVoronoiDiagram) {
-        // drawVoronoiDiagram(drawLib, fillLib);
-        voronoiRenderer.draw(drawLib, fillLib);
+        // voronoiRenderer.draw(drawLib, fillLib);
       }
+    };
+
+    var drawCellPolyWithCentroid = function (draw, fill, cell) {
+      if (cell.triangles.length <= 2) {
+        return;
+      }
+      var cellPoly = cell.toPolygon().clone();
+      console.log("cellPoly.vertices.length", cellPoly.vertices.length);
+      drawPolygonIndices(cellPoly, fill, null);
+      var centroid = cellPoly.getCentroid(true); // forceClockwise=true
+      draw.polygon(cellPoly, "orange", 2.0);
+      draw.crosshair(centroid, 7, "red", 1.0);
+      draw.line(cell.sharedVertex, centroid, "red", 1.0);
+
+      // Draw with offset
+      // var offset = { x: 400, y: 400 };
+      // var cellPoly2 = cellPoly.clone().move(offset);
+      // var centroid2 = cellPoly2.getCentroid(true); // forceClockwise=true
+      // draw.polygon(cellPoly2, "orange", 2.0);
+      // draw.crosshair(centroid2, 7, "red", 1.0);
+      // draw.line(cell.sharedVertex.clone().add(offset), centroid2, "red", 1.0);
     };
 
     /**
@@ -247,17 +272,51 @@
     // +-------------------------------
     var animator = null;
     var toggleAnimation = function () {
+      if (animator) {
+        animator.stop();
+      }
       if (appContext.config.animate) {
-        if (animator) animator.stop();
-        if (appContext.config.animationType == "radial")
+        if (appContext.config.animationType == "radial") {
           animator = new CircularVertexAnimator(appContext.pointSet.points, appContext.pb.viewport(), rebuild);
-        // 'linear'
-        else animator = new LinearVertexAnimator(appContext.pointSet.points, appContext.pb.viewport(), rebuild);
+        } else {
+          // 'linear'
+          animator = new LinearVertexAnimator(appContext.pointSet.points, appContext.pb.viewport(), rebuild);
+        }
         animator.start();
       } else {
-        if (animator) animator.stop();
         animator = null;
       }
+    };
+
+    var toggleLloydAlgorithm = function () {
+      if (!appContext.config.runLloydAlgorithm) {
+        return;
+      }
+      // Run next step
+      for (var i = 0; i < appContext.voronoiCells.length; i++) {
+        updateLloydStep(appContext.voronoiCells[i]);
+      }
+      rebuild();
+      window.requestAnimationFrame(toggleLloydAlgorithm);
+    };
+
+    var updateLloydStep = function (cell) {
+      if (cell.triangles.length <= 2) {
+        return;
+      }
+      if (cell.isOpen()) {
+        return;
+      }
+      var cellPoly = cell.toPolygon().clone();
+      // console.log("cellPoly.vertices.length", cellPoly.vertices.length);
+      // drawPolygonIndices(cellPoly, fill, null);
+      var centroid = cellPoly.getCentroid(true); // forceClockwise=true
+      // draw.polygon(cellPoly, "orange", 2.0);
+      // draw.crosshair(centroid, 7, "red", 1.0);
+      // draw.line(cell.sharedVertex, centroid, "red", 1.0);
+
+      // Move point 10% towards the centroid
+      cell.sharedVertex.lerp(centroid, 0.1);
     };
 
     // +---------------------------------------------------------------------------------
@@ -289,5 +348,7 @@
     updateAnimator();
     rebuild();
     appContext.pb.redraw();
+
+    humane.log('This is an enhanced version of the <a href="../07-voronoi-and-delaunay/">07-voronoi-and-delaunay demo</a>.');
   }); // END document.ready / window.onload
 })();

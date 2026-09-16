@@ -3,7 +3,8 @@
  * @date     2018-04-07
  * @modified 2018-04-11 Using VoronoiCells now (was array before).
  * @modified 2020-08-15 Ported from vanilla JS to TypeScript.
- * @version  1.0.2
+ * @modified 2026-09-15 Added the `sharedVertexIndex` attribute to each Voronoi cell.
+ * @version  1.1.0
  **/
 import { VoronoiCell } from "../datastructures/VoronoiCell";
 /**
@@ -19,13 +20,12 @@ export class delaunay2voronoi {
         this.pointList = pointList;
         this.triangles = triangles;
     }
-    ;
     // +---------------------------------------------------------------------------------
     // | Convert the triangle set to the Voronoi diagram.
     // +-------------------------------
     build() {
         const voronoiDiagram = [];
-        for (var p in this.pointList) {
+        for (var p = 0; p < this.pointList.length; p++) {
             var point = this.pointList[p];
             // Find adjacent triangles for first point
             var adjacentSubset = [];
@@ -34,12 +34,12 @@ export class delaunay2voronoi {
                     adjacentSubset.push(this.triangles[t]);
             }
             var path = this.subsetToPath(adjacentSubset);
-            if (path) // There may be errors
-                voronoiDiagram.push(new VoronoiCell(path, point));
+            if (path)
+                // There may be errors
+                voronoiDiagram.push(new VoronoiCell(path, point, p));
         }
         return voronoiDiagram;
     }
-    ;
     // +---------------------------------------------------------------------------------
     // | Re-order a tiangle subset so the triangle define a single path.
     // |
@@ -52,7 +52,7 @@ export class delaunay2voronoi {
     subsetToPath(triangleSet, startPosition, tryOnce) {
         if (triangleSet.length == 0)
             return [];
-        if (typeof startPosition === 'undefined')
+        if (typeof startPosition === "undefined")
             startPosition = 0;
         let t = startPosition;
         const result = [triangleSet[t]];
@@ -93,7 +93,5 @@ export class delaunay2voronoi {
             return result;
         }
     }
-    ;
-}
-; // END delaunay2voronoi
+} // END delaunay2voronoi
 //# sourceMappingURL=delaunay2voronoi.js.map

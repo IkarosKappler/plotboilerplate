@@ -76,6 +76,17 @@ export declare class VoronoiCell {
      * @return {Polygon}
      **/
     toPolygon(): Polygon;
+    /**
+     * Get all 'umbrella' triangles for this Voronoi cell.
+     *
+     * The 'umbrella' is that sequence of triangles that covers the whole Voronoi cell and
+     * meet in the cell's centroid.
+     *
+     * @method getUmbrellaTriangles
+     * @instance
+     * @memberof VoronoiCell
+     * @return {Array<Triangle>}
+     **/
     getUmbrellaTriangles(): Array<Triangle>;
     /**
      * Convert the voronoi cell path data to an SVG polygon data string.

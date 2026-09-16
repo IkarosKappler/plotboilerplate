@@ -16,7 +16,10 @@
       var fold = gui.addFolder("Polygon");
 
       // prettier-ignore
-      fold.add(appContext.config, "pointCount").min(3).max(24).title("How many vertices to use for the polyon?").onChange(function () { appContext.rebuild(); });
+      fold.add(appContext.config, "isClockwise").title("Winding left or right?").onChange(function () { appContext.rebuild(); });
+
+      // prettier-ignore
+      fold.add(appContext.config, "pointCount").min(3).max(24).step(1).title("How many vertices to use for the polyon?").onChange(function () { appContext.rebuild(); });
 
       // prettier-ignore
       gui.add(appContext.config, "readme").title("Show the readme.");

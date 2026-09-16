@@ -1,4 +1,3 @@
-"use strict";
 /**
  * Refactored all Voronoi helper functions for drawing the diagram (demo 07) into this class.
  *
@@ -7,15 +6,13 @@
  * @modified 2026-09-15 Ported to Typescript.
  * @version  1.0.1
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.VoronoiRenderer = void 0;
-var Bounds_1 = require("../../Bounds");
-var Polygon_1 = require("../../Polygon");
-var convexPolygonIncircle_1 = require("../algorithms/convexPolygonIncircle");
-var sutherlandHodgman_1 = require("../algorithms/sutherlandHodgman");
-var cloneVertexArray_1 = require("../cloneVertexArray");
-var VoronoiRenderer = /** @class */ (function () {
-    function VoronoiRenderer(voronoiContext) {
+import { Bounds } from "../../Bounds";
+import { Polygon } from "../../Polygon";
+import { convexPolygonIncircle } from "../algorithms/convexPolygonIncircle";
+import { sutherlandHodgman } from "../algorithms/sutherlandHodgman";
+import { cloneVertexArray } from "../cloneVertexArray";
+export class VoronoiRenderer {
+    constructor(voronoiContext) {
         this.voronoiContext = voronoiContext;
     }
     /**
@@ -29,13 +26,13 @@ var VoronoiRenderer = /** @class */ (function () {
      * @param {string} color
      * @return {void}
      */
-    VoronoiRenderer.prototype.draw = function (draw, fill) {
+    draw(draw, fill) {
         // Draw circumcircles
         if (this.voronoiContext.config.drawCircumCircles) {
             VoronoiRenderer.drawCircumCircles(draw, this.voronoiContext.triangles);
         }
         // An array of VoronoiCells.
-        var clipBoxPolygon = Bounds_1.Bounds.computeFromVertices(this.voronoiContext.pointSet.points).toPolygon();
+        var clipBoxPolygon = Bounds.computeFromVertices(this.voronoiContext.pointSet.points).toPolygon();
         if (this.voronoiContext.config.drawClipBox) {
             draw.polygon(clipBoxPolygon, "rgba(192,192,192,0.25)");
         }
@@ -43,8 +40,8 @@ var VoronoiRenderer = /** @class */ (function () {
             var cell = this.voronoiContext.voronoiCells[v];
             this._drawCell(draw, fill, clipBoxPolygon, cell);
         }
-    };
-    VoronoiRenderer.prototype._drawCell = function (draw, fill, clipBoxPolygon, cell) {
+    }
+    _drawCell(draw, fill, clipBoxPolygon, cell) {
         var polygon = cell.toPolygon();
         polygon.scale(this.voronoiContext.config.voronoiCellScale, cell.sharedVertex);
         // Draw large (unclipped) Voronoi cell
@@ -55,7 +52,7 @@ var VoronoiRenderer = /** @class */ (function () {
         // Apply clipping?
         if (this.voronoiContext.config.clipVoronoiCells) {
             // Clone the array here: convert Array<XYCoords> to Array<Vertex>
-            polygon = new Polygon_1.Polygon((0, cloneVertexArray_1.cloneVertexArray)((0, sutherlandHodgman_1.sutherlandHodgman)(polygon.vertices, clipBoxPolygon.vertices)), false);
+            polygon = new Polygon(cloneVertexArray(sutherlandHodgman(polygon.vertices, clipBoxPolygon.vertices)), false);
         }
         if (this.voronoiContext.config.drawVoronoiOutlines && this.voronoiContext.config.clipVoronoiCells) {
             draw.polygon(polygon, this.voronoiContext.config.voronoiOutlineColor);
@@ -71,7 +68,7 @@ var VoronoiRenderer = /** @class */ (function () {
                 }
             }
             if (this.voronoiContext.config.drawVoronoiIncircles) {
-                var result = (0, convexPolygonIncircle_1.convexPolygonIncircle)(polygon);
+                var result = convexPolygonIncircle(polygon);
                 var circle = result.circle;
                 var triangle = result.triangle;
                 // Here we should have found the best inlying circle (and the corresponding triangle)
@@ -79,18 +76,18 @@ var VoronoiRenderer = /** @class */ (function () {
                 draw.circle(circle.center, circle.radius, "rgba(255,192,0,1.0)", 2);
             }
         } // END cell is not open
-    };
+    }
     /**
      * A function for drawing the triangles.
      *
      * @static
      */
-    VoronoiRenderer.prototype.drawTriangles = function (draw) {
+    drawTriangles(draw) {
         for (var i in this.voronoiContext.triangles) {
             var t = this.voronoiContext.triangles[i];
             VoronoiRenderer.drawTriangle(draw, t, this.voronoiContext.config.makeVoronoiDiagram ? "rgba(0,128,224,0.33)" : "#0088d8");
         }
-    };
+    }
     /**
      * Draw the given triangle with the specified (CSS-) color.
      *
@@ -102,22 +99,20 @@ var VoronoiRenderer = /** @class */ (function () {
      * @param {string} color
      * @return {void}
      */
-    VoronoiRenderer.drawTriangle = function (draw, t, color) {
+    static drawTriangle(draw, t, color) {
         // draw.line(t.a, t.b, color);
         // draw.line(t.b, t.c, color);
         // draw.line(t.c, t.a, color);
         draw.polyline([t.a, t.b, t.c], false, color);
-    };
+    }
     /**
      * Draw the circumcircles of all triangles.
      */
-    VoronoiRenderer.drawCircumCircles = function (draw, triangles) {
+    static drawCircumCircles(draw, triangles) {
         for (var t in triangles) {
             var cc = triangles[t].getCircumcircle();
             draw.circle(cc.center, cc.radius, "#e86800");
         }
-    };
-    return VoronoiRenderer;
-}());
-exports.VoronoiRenderer = VoronoiRenderer;
+    }
+}
 //# sourceMappingURL=VoronoiRenderer.js.map

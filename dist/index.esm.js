@@ -1568,7 +1568,7 @@ const geomutils = {
  * @modified 2025-04-13 Adding the `Vertex.move(amount: XYCoords)` method (does the same as `add`, added by naming convention).
  * @modified 2025-05-07 Class `Vertex` is now implementing interface `IBounded` (to meet convention).
  * @modified 2026-06-10 Adding methods `Vertex.findClosestPoint` and `Vertex.findFarestPoint`.
- * @version  2.12.0
+ * @version  2.12.1
  *
  * @file Vertex
  * @public
@@ -2039,7 +2039,7 @@ class Vertex$1 {
      * around given center.
      *
      * @method rotate
-     * @param {number} angle - The angle to 'rotate' this vertex; 0.0 means no change.
+     * @param {number} angle - The angle in radians to 'rotate' this vertex; 0.0 means no change.
      * @param {XYCoords=} center - The center of rotation; default is (0,0).
      * @return {Vertex} this
      * @instance
@@ -3108,7 +3108,8 @@ class Line extends VertTuple {
  * @modified 2025-05-16 Class `Polygon` now implements `IBounded`.
  * @modified 2025-05-20 Tweaking `Polygon.getInnerAngleAt` and `Polygo.isAngleAcute` to handle indices out of array bounds as well.
  * @modified 2025-06-07 Adding `Polygon.closestLineIntersectionIndex` to determine line intersections plus detected edge index.
- * @version 1.16.0
+ * @modified 2026-09-16 Adding a `forceClockwise` parameter to the `Polygon.getCentroid()` method.
+ * @version 1.17.0
  *
  * @file Polygon
  * @public
@@ -3483,35 +3484,37 @@ class Polygon {
     }
     /**
      * Get centroid.
-     * Centroids define the barycenter of any non self-intersecting convex polygon.
+     * Centroids define the barycenter of any non self-intersecting convex clockwise polygon.
      *
-     * If the polygon is self intersecting or non konvex then the barycenter is not well defined.
+     * If the polygon is self intersecting or non convex or not clockwise then the barycenter is not well defined.
      *
      * https://mathworld.wolfram.com/PolygonCentroid.html
      *
      * @method getCentroid
      * @instance
+     * @param {boolean} forceClockwise - [optiona] If set to true then the centroid will be calculated for the clockwise polygon.
      * @memberof Polygon
      * @returns {Vertex|null}
      */
-    getCentroid() {
+    getCentroid(forceClockwise) {
         if (this.vertices.length === 0) {
             return null;
         }
-        const center = new Vertex$1(0.0, 0.0);
-        const n = this.vertices.length;
-        for (var i = 0; i < n; i++) {
-            // center.add(this.vertices[i]);
-            const cur = this.vertices[i];
-            const next = this.vertices[(i + 1) % n];
-            var factor = cur.x * next.y - next.x * cur.y;
-            center.x += (cur.x + next.x) * factor;
-            center.y += (cur.y + next.y) * factor;
-        }
-        const area = this.area();
-        center.x *= 1 / (6 * area);
-        center.y *= 1 / (6 * area);
-        return center;
+        // const centroid: Vertex = new Vertex(0.0, 0.0);
+        // const n = this.vertices.length;
+        // for (var i = 0; i < n; i++) {
+        //   // center.add(this.vertices[i]);
+        //   const cur: Vertex = this.vertices[i];
+        //   const next: Vertex = this.vertices[(i + 1) % n];
+        //   var factor: number = cur.x * next.y - next.x * cur.y;
+        //   centroid.x += (cur.x + next.x) * factor;
+        //   centroid.y += (cur.y + next.y) * factor;
+        // }
+        // const area = this.area();
+        // centroid.x *= 1 / (6 * area);
+        // centroid.y *= 1 / (6 * area);
+        // return centroid;
+        return Polygon.utils.calculateCentroid(this.vertices, forceClockwise);
     }
     //--- BEGIN --- Implement interface `Intersectable`
     /**
@@ -3935,6 +3938,26 @@ Polygon.utils = {
     },
     isClockwise(vertices) {
         return Polygon.utils.signedArea(vertices) < 0;
+    },
+    calculateCentroid(vertices, forceClockwise) {
+        const centroid = new Vertex$1(0.0, 0.0);
+        const n = vertices.length;
+        if (forceClockwise && !Polygon.utils.isClockwise(vertices)) {
+            return Polygon.utils.calculateCentroid(vertices.slice().reverse());
+        }
+        for (var i = 0; i < n; i++) {
+            // center.add(this.vertices[i]);
+            const cur = vertices[i];
+            const next = vertices[(i + 1) % n];
+            var factor = cur.x * next.y - next.x * cur.y;
+            centroid.x += (cur.x + next.x) * factor;
+            centroid.y += (cur.y + next.y) * factor;
+        }
+        // const area = this.area();
+        const area = Polygon.utils.area(vertices);
+        centroid.x *= 1 / (6 * area);
+        centroid.y *= 1 / (6 * area);
+        return centroid;
     },
     /**
      * Calulate the signed polyon area by interpreting the polygon as a matrix
@@ -19362,7 +19385,8 @@ class Delaunay {
  * @modified 2020-08-12 Ported this class from vanilla JS to TypeScript.
  * @modified 2020-08-17 Added some missing type declarations.
  * @modified 2021-01-20 Members `triangles` and `sharedVertex` are now public.
- * @version  1.1.3
+ * @modified 2026-09-15 Added the `VoronoiCell.sharedVertexIndex` attribute.
+ * @version  1.2.0
  *
  * @file VoronoiCell
  * @public
@@ -19378,15 +19402,15 @@ class VoronoiCell {
      * @param {Vertex}     sharedVertex This is the 'center' of the voronoi cell; all triangles must share
      *                                  that vertex.
      **/
-    constructor(triangles, sharedVertex) {
-        if (typeof triangles === 'undefined')
+    constructor(triangles, sharedVertex, sharedVertexIndex) {
+        if (typeof triangles === "undefined")
             triangles = [];
-        if (typeof sharedVertex === 'undefined')
+        if (typeof sharedVertex === "undefined")
             sharedVertex = new Vertex$1(0, 0);
         this.triangles = triangles;
         this.sharedVertex = sharedVertex;
+        this.sharedVertexIndex = sharedVertexIndex;
     }
-    ;
     /**
      * Check if the first and the last triangle in the path are NOT connected.
      *
@@ -19399,7 +19423,6 @@ class VoronoiCell {
         // There must be at least three triangles
         return this.triangles.length < 3 || !this.triangles[0].isAdjacent(this.triangles[this.triangles.length - 1]);
     }
-    ;
     /**
      * Convert this Voronoi cell to a path polygon, consisting of all Voronoi cell corner points.
      *
@@ -19414,7 +19437,32 @@ class VoronoiCell {
     toPolygon() {
         return new Polygon(this.toPathArray(), this.isOpen());
     }
-    ;
+    /**
+     * Get all 'umbrella' triangles for this Voronoi cell.
+     *
+     * The 'umbrella' is that sequence of triangles that covers the whole Voronoi cell and
+     * meet in the cell's centroid.
+     *
+     * @method getUmbrellaTriangles
+     * @instance
+     * @memberof VoronoiCell
+     * @return {Array<Triangle>}
+     **/
+    getUmbrellaTriangles() {
+        var tris = [];
+        // for (var i = 0; i < this.triangles.length; i++) {
+        //   var delaunayTri = this.triangles[i];
+        //   var tri = new Triangle(this.sharedVertex, delaunayTri.b, delaunayTri.c);
+        //   tris.push(tri);
+        // }
+        var vertices = this.toPathArray();
+        var n = vertices.length;
+        for (var i = 0; i < n; i++) {
+            var tri = new Triangle(this.sharedVertex, vertices[i], vertices[(i + 1) % n]);
+            tris.push(tri);
+        }
+        return tris;
+    }
     /**
      * Convert the voronoi cell path data to an SVG polygon data string.
      *
@@ -19429,9 +19477,12 @@ class VoronoiCell {
         if (this.triangles.length == 0)
             return "";
         const arr = this.toPathArray();
-        return arr.map((vert) => { return '' + vert.x + ',' + vert.y; }).join(' ');
+        return arr
+            .map((vert) => {
+            return "" + vert.x + "," + vert.y;
+        })
+            .join(" ");
     }
-    ;
     /**
      * Convert the voronoi cell path data to an array.
      *
@@ -19483,7 +19534,6 @@ class VoronoiCell {
         const openEdgePoint = new Vertex$1(perpendicular.x + (center.x - perpendicular.x) * 1000, perpendicular.y + (center.y - perpendicular.y) * 1000);
         return openEdgePoint;
     }
-    ;
     /**
      * A helper function.
      *
@@ -19507,13 +19557,12 @@ class VoronoiCell {
                 return tri.a;
         }
         // Here:
-        //    tri.c.equals(sharedVertex) 
+        //    tri.c.equals(sharedVertex)
         if (neighbour.a.equals(tri.a) || neighbour.b.equals(tri.a) || neighbour.c.equals(tri.a))
             return tri.b;
         else
             return tri.a;
     }
-    ;
 }
 
 /**
@@ -19521,7 +19570,8 @@ class VoronoiCell {
  * @date     2018-04-07
  * @modified 2018-04-11 Using VoronoiCells now (was array before).
  * @modified 2020-08-15 Ported from vanilla JS to TypeScript.
- * @version  1.0.2
+ * @modified 2026-09-15 Added the `sharedVertexIndex` attribute to each Voronoi cell.
+ * @version  1.1.0
  **/
 /**
  * @classdesc Create the voronoi diagram from the given delaunay triangulation (they are dual graphs).
@@ -19536,13 +19586,12 @@ class delaunay2voronoi {
         this.pointList = pointList;
         this.triangles = triangles;
     }
-    ;
     // +---------------------------------------------------------------------------------
     // | Convert the triangle set to the Voronoi diagram.
     // +-------------------------------
     build() {
         const voronoiDiagram = [];
-        for (var p in this.pointList) {
+        for (var p = 0; p < this.pointList.length; p++) {
             var point = this.pointList[p];
             // Find adjacent triangles for first point
             var adjacentSubset = [];
@@ -19551,12 +19600,12 @@ class delaunay2voronoi {
                     adjacentSubset.push(this.triangles[t]);
             }
             var path = this.subsetToPath(adjacentSubset);
-            if (path) // There may be errors
-                voronoiDiagram.push(new VoronoiCell(path, point));
+            if (path)
+                // There may be errors
+                voronoiDiagram.push(new VoronoiCell(path, point, p));
         }
         return voronoiDiagram;
     }
-    ;
     // +---------------------------------------------------------------------------------
     // | Re-order a tiangle subset so the triangle define a single path.
     // |
@@ -19569,7 +19618,7 @@ class delaunay2voronoi {
     subsetToPath(triangleSet, startPosition, tryOnce) {
         if (triangleSet.length == 0)
             return [];
-        if (typeof startPosition === 'undefined')
+        if (typeof startPosition === "undefined")
             startPosition = 0;
         let t = startPosition;
         const result = [triangleSet[t]];
@@ -19610,8 +19659,7 @@ class delaunay2voronoi {
             return result;
         }
     }
-    ;
-}
+} // END delaunay2voronoi
 
 /**
  * @requires Line

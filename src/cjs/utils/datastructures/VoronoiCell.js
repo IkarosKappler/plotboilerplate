@@ -75,6 +75,17 @@ var VoronoiCell = /** @class */ (function () {
     VoronoiCell.prototype.toPolygon = function () {
         return new Polygon_1.Polygon(this.toPathArray(), this.isOpen());
     };
+    /**
+     * Get all 'umbrella' triangles for this Voronoi cell.
+     *
+     * The 'umbrella' is that sequence of triangles that covers the whole Voronoi cell and
+     * meet in the cell's centroid.
+     *
+     * @method getUmbrellaTriangles
+     * @instance
+     * @memberof VoronoiCell
+     * @return {Array<Triangle>}
+     **/
     VoronoiCell.prototype.getUmbrellaTriangles = function () {
         var tris = [];
         // for (var i = 0; i < this.triangles.length; i++) {

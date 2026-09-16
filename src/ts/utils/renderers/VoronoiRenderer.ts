@@ -107,11 +107,6 @@ export class VoronoiRenderer {
       draw.polygon(polygon, this.voronoiContext.config.voronoiOutlineColor);
     }
 
-    // Draw cell triangles?
-    // cell.triangles.forEach(function (tri) {
-    //   draw.polyline([tri.a, tri.b, tri.c], false, "orange", 1.0);
-    // });
-
     if ((!cell.isOpen() || this.voronoiContext.config.clipVoronoiCells) && cell.triangles.length >= 3) {
       if (this.voronoiContext.config.drawCubicCurves) {
         var cbezier = polygon.toCubicBezierData(this.voronoiContext.config.voronoiCubicThreshold);

@@ -37,7 +37,7 @@
  * @modified 2025-04-13 Adding the `Vertex.move(amount: XYCoords)` method (does the same as `add`, added by naming convention).
  * @modified 2025-05-07 Class `Vertex` is now implementing interface `IBounded` (to meet convention).
  * @modified 2026-06-10 Adding methods `Vertex.findClosestPoint` and `Vertex.findFarestPoint`.
- * @version  2.12.0
+ * @version  2.12.1
  *
  * @file Vertex
  * @public
@@ -379,7 +379,7 @@ export declare class Vertex implements IBounded, XYCoords, SVGSerializable {
      * around given center.
      *
      * @method rotate
-     * @param {number} angle - The angle to 'rotate' this vertex; 0.0 means no change.
+     * @param {number} angle - The angle in radians to 'rotate' this vertex; 0.0 means no change.
      * @param {XYCoords=} center - The center of rotation; default is (0,0).
      * @return {Vertex} this
      * @instance

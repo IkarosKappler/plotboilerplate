@@ -1,5 +1,7 @@
 # Changelog
 
+- 2026-09-16
+  - Adding a `forceClockwise` parameter to the `Polygon.getCentroid()` method.
 - 2026-09-15
   - In `delaynay2voronoi`: Added the `sharedVertexIndex` attribute to each Voronoi cell.
   - Added the `VoronoiCell.sharedVertexIndex` attribute.

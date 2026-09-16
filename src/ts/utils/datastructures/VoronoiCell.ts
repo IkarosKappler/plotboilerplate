@@ -96,6 +96,17 @@ export class VoronoiCell {
     return new Polygon(this.toPathArray(), this.isOpen());
   }
 
+  /**
+   * Get all 'umbrella' triangles for this Voronoi cell.
+   *
+   * The 'umbrella' is that sequence of triangles that covers the whole Voronoi cell and
+   * meet in the cell's centroid.
+   *
+   * @method getUmbrellaTriangles
+   * @instance
+   * @memberof VoronoiCell
+   * @return {Array<Triangle>}
+   **/
   getUmbrellaTriangles(): Array<Triangle> {
     var tris: Array<Triangle> = [];
     // for (var i = 0; i < this.triangles.length; i++) {

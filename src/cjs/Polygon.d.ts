@@ -38,7 +38,8 @@
  * @modified 2025-05-16 Class `Polygon` now implements `IBounded`.
  * @modified 2025-05-20 Tweaking `Polygon.getInnerAngleAt` and `Polygo.isAngleAcute` to handle indices out of array bounds as well.
  * @modified 2025-06-07 Adding `Polygon.closestLineIntersectionIndex` to determine line intersections plus detected edge index.
- * @version 1.16.0
+ * @modified 2026-09-16 Adding a `forceClockwise` parameter to the `Polygon.getCentroid()` method.
+ * @version 1.17.0
  *
  * @file Polygon
  * @public
@@ -309,18 +310,19 @@ export declare class Polygon implements IBounded, Intersectable, SVGSerializable
     getMeanCenter(): Vertex | null;
     /**
      * Get centroid.
-     * Centroids define the barycenter of any non self-intersecting convex polygon.
+     * Centroids define the barycenter of any non self-intersecting convex clockwise polygon.
      *
-     * If the polygon is self intersecting or non konvex then the barycenter is not well defined.
+     * If the polygon is self intersecting or non convex or not clockwise then the barycenter is not well defined.
      *
      * https://mathworld.wolfram.com/PolygonCentroid.html
      *
      * @method getCentroid
      * @instance
+     * @param {boolean} forceClockwise - [optiona] If set to true then the centroid will be calculated for the clockwise polygon.
      * @memberof Polygon
      * @returns {Vertex|null}
      */
-    getCentroid(): Vertex | null;
+    getCentroid(forceClockwise?: boolean): Vertex | null;
     /**
      * Get all line intersections with this polygon.
      *
@@ -498,6 +500,7 @@ export declare class Polygon implements IBounded, Intersectable, SVGSerializable
          */
         area(vertices: Array<XYCoords>): number;
         isClockwise(vertices: Array<XYCoords>): boolean;
+        calculateCentroid(vertices: XYCoords[], forceClockwise?: boolean): Vertex;
         /**
          * Calulate the signed polyon area by interpreting the polygon as a matrix
          * and calculating its determinant.

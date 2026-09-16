@@ -48,6 +48,12 @@
         });
       f0.open();
 
+      var f3 = gui.addFolder("Lloyd's algorithm");
+      // prettier-ignore
+      f3.add(appContext.config, "showCentroids").onChange(appContext.rebuild).title("Show the centroids of the Voronoi cells.");
+      // prettier-ignore
+      f3.add(appContext.config, "runLloydAlgorithm").onChange(appContext.toggleLloydAlgorithm).title("Run the Lloyd algorithm?");
+
       var f1 = gui.addFolder("Delaunay");
       // prettier-ignore
       f1.add(appContext.config, "drawTriangles")
@@ -61,6 +67,7 @@
             appContext.pb.redraw();
           })
           .title("If checked the triangles circumcircles will be drawn.");
+      f1.close();
 
       var f2 = gui.addFolder("Voronoi");
       // prettier-ignore
@@ -111,6 +118,7 @@
             appContext.pb.redraw();
           })
           .title("Scale each voronoi cell before rendering.");
+      f2.close();
 
       if (appContext.config.animate) {
         appContext.toggleAnimation();
