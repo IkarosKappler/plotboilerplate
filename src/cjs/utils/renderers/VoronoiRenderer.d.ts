@@ -28,6 +28,7 @@ export interface IVoronoiConfig {
     pointCount: number;
     horizontalSafeArea: number;
     verticalSafeArea: number;
+    voronoiCellLineWidth: number;
 }
 export interface IVoronoiContext {
     pointSet: PointSet;

@@ -35,6 +35,7 @@ export interface IVoronoiConfig {
   pointCount: number;
   horizontalSafeArea: number;
   verticalSafeArea: number;
+  voronoiCellLineWidth: number;
 }
 
 export interface IVoronoiContext {
@@ -93,7 +94,8 @@ export class VoronoiRenderer {
       draw.polyline(
         polygon.vertices,
         false,
-        this.voronoiContext.config.clipVoronoiCells ? "rgba(128,128,128,0.333)" : this.voronoiContext.config.voronoiOutlineColor
+        this.voronoiContext.config.clipVoronoiCells ? "rgba(128,128,128,0.333)" : this.voronoiContext.config.voronoiOutlineColor,
+        this.voronoiContext.config.voronoiCellLineWidth ?? 2.0
       );
     }
 
@@ -104,7 +106,11 @@ export class VoronoiRenderer {
     }
 
     if (this.voronoiContext.config.drawVoronoiOutlines && this.voronoiContext.config.clipVoronoiCells) {
-      draw.polygon(polygon, this.voronoiContext.config.voronoiOutlineColor);
+      draw.polygon(
+        polygon,
+        this.voronoiContext.config.voronoiOutlineColor,
+        this.voronoiContext.config.voronoiCellLineWidth ?? 2.0
+      );
     }
 
     if ((!cell.isOpen() || this.voronoiContext.config.clipVoronoiCells) && cell.triangles.length >= 3) {

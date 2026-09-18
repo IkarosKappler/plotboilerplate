@@ -46,7 +46,7 @@ var PointSet = /** @class */ (function () {
      */
     PointSet.prototype.addVertex = function (vert) {
         this.points.push(vert);
-        this.pb.add(vert);
+        this.pb.add(vert, false); // redraw=false
         var _self = this;
         vert.listeners.addDragListener(function () {
             _self.fireDragEvent();

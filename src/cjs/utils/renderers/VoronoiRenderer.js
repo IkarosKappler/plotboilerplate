@@ -45,12 +45,13 @@ var VoronoiRenderer = /** @class */ (function () {
         }
     };
     VoronoiRenderer.prototype._drawCell = function (draw, fill, clipBoxPolygon, cell) {
+        var _a, _b;
         var polygon = cell.toPolygon();
         polygon.scale(this.voronoiContext.config.voronoiCellScale, cell.sharedVertex);
         // Draw large (unclipped) Voronoi cell
         if (this.voronoiContext.config.drawVoronoiOutlines &&
             (!this.voronoiContext.config.clipVoronoiCells || this.voronoiContext.config.drawUnclippedVoronoiCells)) {
-            draw.polyline(polygon.vertices, false, this.voronoiContext.config.clipVoronoiCells ? "rgba(128,128,128,0.333)" : this.voronoiContext.config.voronoiOutlineColor);
+            draw.polyline(polygon.vertices, false, this.voronoiContext.config.clipVoronoiCells ? "rgba(128,128,128,0.333)" : this.voronoiContext.config.voronoiOutlineColor, (_a = this.voronoiContext.config.voronoiCellLineWidth) !== null && _a !== void 0 ? _a : 2.0);
         }
         // Apply clipping?
         if (this.voronoiContext.config.clipVoronoiCells) {
@@ -58,7 +59,7 @@ var VoronoiRenderer = /** @class */ (function () {
             polygon = new Polygon_1.Polygon((0, cloneVertexArray_1.cloneVertexArray)((0, sutherlandHodgman_1.sutherlandHodgman)(polygon.vertices, clipBoxPolygon.vertices)), false);
         }
         if (this.voronoiContext.config.drawVoronoiOutlines && this.voronoiContext.config.clipVoronoiCells) {
-            draw.polygon(polygon, this.voronoiContext.config.voronoiOutlineColor);
+            draw.polygon(polygon, this.voronoiContext.config.voronoiOutlineColor, (_b = this.voronoiContext.config.voronoiCellLineWidth) !== null && _b !== void 0 ? _b : 2.0);
         }
         if ((!cell.isOpen() || this.voronoiContext.config.clipVoronoiCells) && cell.triangles.length >= 3) {
             if (this.voronoiContext.config.drawCubicCurves) {

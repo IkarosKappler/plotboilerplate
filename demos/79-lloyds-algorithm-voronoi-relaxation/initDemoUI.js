@@ -35,6 +35,9 @@
         .max(0.999)
         .onChange(function () { appContext.pb.redraw(); })
         .title("The vertical left and right safe area as a ratio.");
+      // prettier-ignore
+      f0.add(appContext.config, "voronoiCellLineWidth").min(1.0).max(16.0).onChange(function () { appContext.pb.redraw(); })
+          .title("(Experimental) Specifiy the cubic or cell coefficients.");
 
       // prettier-ignore
       f0.add(appContext.config, "randomize").name("Randomize").title("Randomize the point set.");
@@ -52,7 +55,13 @@
       // prettier-ignore
       f3.add(appContext.config, "showCentroids").onChange(appContext.rebuild).title("Show the centroids of the Voronoi cells.");
       // prettier-ignore
+      f3.add(appContext.config, "showLloydbox").onChange(appContext.rebuild).title("Show the limiting box for the Lloyd algorithm.");
+      // prettier-ignore
+      f3.add(appContext.config, "showUmbrellaTriangles").onChange(appContext.rebuild).title("Show each Voronoi cell's umbrella triangles.");
+      // prettier-ignore
       f3.add(appContext.config, "runLloydAlgorithm").onChange(appContext.toggleLloydAlgorithm).title("Run the Lloyd algorithm?");
+      // prettier-ignore
+      f3.add(appContext.config, "showPolygonCornerNumbers").onChange(appContext.rebuild).title("Draw polygon vertex numbers?");
 
       var f1 = gui.addFolder("Delaunay");
       // prettier-ignore

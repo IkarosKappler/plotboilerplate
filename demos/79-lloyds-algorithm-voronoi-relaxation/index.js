@@ -57,56 +57,53 @@
 
     var appContext = new AppContext(
       pb,
-      PlotBoilerplate.utils.safeMergeByKeys(
-        {
-          makeVoronoiDiagram: params.getBoolean("makeVoronoiDiagram", true),
-          drawPoints: params.getBoolean("drawPoints", true),
-          drawTriangles: params.getBoolean("drawTriangles", false),
-          drawCircumCircles: params.getBoolean("drawCircumCircles", false),
-          drawCubicCurves: params.getBoolean("drawCubicCurves", false),
-          fillVoronoiCells: params.getBoolean("fillVoronoiCells", true),
-          voronoiOutlineColor: params.getString("voronoiOutlineColor", "#e5a50a"),
-          voronoiCellColor: params.getString("voronoiCellColor", "#0080c0"),
-          voronoiCubicThreshold: 1.0,
-          voronoiCellScale: 1.0,
-          clipVoronoiCells: params.getBoolean("clipVoronoiCells", false),
-          drawClipBox: params.getBoolean("drawClipBox", false),
-          drawUnclippedVoronoiCells: params.getBoolean("drawUnclippedVoronoiCells", false),
-          drawVoronoiIncircles: params.getBoolean("drawVoronoiIncircles", false),
-          drawVoronoiOutlines: params.getBoolean("drawVoronoiOutlines", true),
-          pointCount: 25,
-          horizontalSafeArea: params.getNumber("horizontalSafeArea", 0.0),
-          verticalSafeArea: params.getNumber("verticalSafeArea", 0.0),
-          // Lloyd algorithm setting
-          showCentroids: params.getBoolean("showCentroids", true),
-          runLloydAlgorithm: params.getBoolean("runLloydAlgorithm", false),
-          // Helper methods
-          rebuild: function () {
-            updateAnimator();
-            rebuild();
-          },
-          randomize: function () {
-            appContext.pointSet.clear();
-            appContext.pointSet.randomPoints(
-              appContext.config.pointCount,
-              appContext.config.horizontalSafeArea,
-              appContext.config.verticalSafeArea
-            );
-            appContext.trianglesPointCount = -1;
-            updateAnimator();
-            rebuild();
-          },
-          fullCover: function () {
-            fullCover();
-          },
-          animate: params.getBoolean("animate", false),
-          animationType: "linear", // 'linear' or 'radial',
-          readme: function () {
-            globalThis.displayDemoMeta();
-          }
+      // PlotBoilerplate.utils.safeMergeByKeys(
+      {
+        makeVoronoiDiagram: params.getBoolean("makeVoronoiDiagram", true),
+        drawPoints: params.getBoolean("drawPoints", true),
+        drawTriangles: params.getBoolean("drawTriangles", false),
+        drawCircumCircles: params.getBoolean("drawCircumCircles", false),
+        drawCubicCurves: params.getBoolean("drawCubicCurves", false),
+        fillVoronoiCells: params.getBoolean("fillVoronoiCells", true),
+        voronoiOutlineColor: params.getString("voronoiOutlineColor", "#e5a50a"),
+        voronoiCellColor: params.getString("voronoiCellColor", "#0080c0"),
+        voronoiCubicThreshold: 1.0,
+        voronoiCellScale: 1.0,
+        voronoiCellLineWidth: params.getNumber("voronoiCellLineWidth", 2.0),
+        clipVoronoiCells: params.getBoolean("clipVoronoiCells", false),
+        drawClipBox: params.getBoolean("drawClipBox", false),
+        drawUnclippedVoronoiCells: params.getBoolean("drawUnclippedVoronoiCells", false),
+        drawVoronoiIncircles: params.getBoolean("drawVoronoiIncircles", false),
+        drawVoronoiOutlines: params.getBoolean("drawVoronoiOutlines", true),
+        pointCount: params.getNumber("pointCount", 50),
+        horizontalSafeArea: params.getNumber("horizontalSafeArea", 0.0),
+        verticalSafeArea: params.getNumber("verticalSafeArea", 0.0),
+        // Lloyd algorithm setting
+        showCentroids: params.getBoolean("showCentroids", true),
+        showLloydbox: params.getBoolean("showLloydbox", true),
+        showUmbrellaTriangles: params.getBoolean("showUmbrellaTriangles", true),
+        runLloydAlgorithm: params.getBoolean("runLloydAlgorithm", true),
+        showPolygonCornerNumbers: params.getBoolean("showPolygonCornerNumbers", false),
+
+        // Helper methods
+        rebuild: function () {
+          updateAnimator();
+          rebuild();
         },
-        GUP
-      )
+        randomize: function () {
+          randomize();
+        },
+        fullCover: function () {
+          fullCover();
+        },
+        animate: params.getBoolean("animate", false),
+        animationType: "linear", // 'linear' or 'radial',
+        readme: function () {
+          globalThis.displayDemoMeta();
+        }
+      }
+      // GUP
+      // )
     );
     appContext.rebuild = function () {
       rebuild();
@@ -115,13 +112,7 @@
       toggleAnimation();
     };
     appContext.updatePointCount = function () {
-      appContext.pointSet.updatePointCount(
-        appContext.config.pointCount,
-        appContext.config.horizontalSafeArea,
-        appContext.config.verticalSafeArea
-      );
-      updateAnimator();
-      rebuild();
+      updatePointCount();
     };
     appContext.toggleLloydAlgorithm = function () {
       toggleLloydAlgorithm();
@@ -131,6 +122,7 @@
     // These will be used by the VoronoiRenderer
     appContext.triangles = [];
     appContext.trianglesPointCount = -1; // Keep track of the number of points when the triangles were generated.
+    appContext.lloydBox = null; // A limiting bounding box to keep cells from diverging into infinity.
     appContext.voronoiCells = []; // An array of VoronoiCells.
 
     // A set of points.
@@ -139,10 +131,36 @@
       rebuild();
     });
 
+    var randomize = function () {
+      appContext.pointSet.clear();
+      appContext.pointSet.randomPoints(
+        appContext.config.pointCount,
+        appContext.config.horizontalSafeArea,
+        appContext.config.verticalSafeArea
+      );
+      appContext.trianglesPointCount = -1;
+      appContext.lloydBox = appContext.pb.viewport();
+      updateAnimator();
+      rebuild();
+    };
+
+    var updatePointCount = function () {
+      appContext.pointSet.updatePointCount(
+        appContext.config.pointCount,
+        appContext.config.horizontalSafeArea,
+        appContext.config.verticalSafeArea
+      );
+      appContext.trianglesPointCount = -1;
+      appContext.lloydBox = appContext.pb.viewport();
+      updateAnimator();
+      rebuild();
+    };
+
     var fullCover = function () {
       appContext.pointSet.clear();
-      appContext.pointSet.randomFullCover(appContext.config.pointCount);
+      appContext.pointSet.randomFullCover(appContext.config.pointCount, false);
       appContext.trianglesPointCount = -1;
+      appContext.lloydBox = appContext.pb.viewport();
       updateAnimator();
       rebuild();
     };
@@ -161,30 +179,37 @@
     /**
      * The re-drawing function.
      */
-    var redraw = function (drawLib, fillLib) {
+    var redraw = function (draw, fill) {
       // Draw triangles
       if (appContext.config.drawTriangles) {
-        voronoiRenderer.drawTriangles(drawLib);
+        voronoiRenderer.drawTriangles(draw);
       }
 
-      // Draw umbrella triangles
-      for (var i = 0; i < appContext.voronoiCells.length; i++) {
-        var cell = appContext.voronoiCells[i];
-        var umbrellaTris = cell.getUmbrellaTriangles();
-        umbrellaTris.forEach(function (tri) {
-          VoronoiRenderer.drawTriangle(drawLib, tri, "rgba(255,128,0,0.15)");
-        });
+      // Draw triangles
+      if (appContext.config.showLloydbox) {
+        draw.rect(appContext.lloydBox.min, appContext.lloydBox.width, appContext.lloydBox.height, "grey", 1.0);
+      }
+
+      if (appContext.config.showUmbrellaTriangles) {
+        // Draw umbrella triangles
+        for (var i = 0; i < appContext.voronoiCells.length; i++) {
+          var cell = appContext.voronoiCells[i];
+          var umbrellaTris = cell.getUmbrellaTriangles();
+          umbrellaTris.forEach(function (tri) {
+            VoronoiRenderer.drawTriangle(draw, tri, "rgba(255,128,0,0.15)");
+          });
+        }
       }
 
       // Draw cell centroids
       for (var i = 0; i < appContext.voronoiCells.length; i++) {
         // var cell = appContext.voronoiCells[i];
-        drawCellPolyWithCentroid(drawLib, fillLib, appContext.voronoiCells[i]);
+        drawCellPolyWithCentroid(draw, fill, appContext.voronoiCells[i]);
       }
 
       // Draw voronoi diagram?
       if (appContext.config.makeVoronoiDiagram) {
-        // voronoiRenderer.draw(drawLib, fillLib);
+        // voronoiRenderer.draw(draw, fill);
       }
     };
 
@@ -192,21 +217,21 @@
       if (cell.triangles.length <= 2) {
         return;
       }
-      var cellPoly = cell.toPolygon().clone();
-      console.log("cellPoly.vertices.length", cellPoly.vertices.length);
-      drawPolygonIndices(cellPoly, fill, null);
-      var centroid = cellPoly.getCentroid(true); // forceClockwise=true
-      draw.polygon(cellPoly, "orange", 2.0);
-      draw.crosshair(centroid, 7, "red", 1.0);
-      draw.line(cell.sharedVertex, centroid, "red", 1.0);
 
-      // Draw with offset
-      // var offset = { x: 400, y: 400 };
-      // var cellPoly2 = cellPoly.clone().move(offset);
-      // var centroid2 = cellPoly2.getCentroid(true); // forceClockwise=true
-      // draw.polygon(cellPoly2, "orange", 2.0);
-      // draw.crosshair(centroid2, 7, "red", 1.0);
-      // draw.line(cell.sharedVertex.clone().add(offset), centroid2, "red", 1.0);
+      var cellPoly = cell.toPolygon().clone();
+      // if( appContext.config.showUmbrellaTriangles ) { }
+      // console.log("cellPoly.vertices.length", cellPoly.vertices.length);
+      if (appContext.config.showPolygonCornerNumbers) {
+        drawPolygonIndices(cellPoly, fill, null);
+      }
+
+      draw.polygon(cellPoly, "orange", appContext.config.voronoiCellLineWidth);
+
+      if (appContext.config.showCentroids) {
+        var centroid = cellPoly.getCentroid(true); // forceClockwise=true
+        draw.crosshair(centroid, 7, "red", 1.0);
+        draw.line(cell.sharedVertex, centroid, "red", 1.0);
+      }
     };
 
     /**
@@ -288,6 +313,9 @@
       }
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Toggle Lloyd's algorithm.
+    // +-------------------------------
     var toggleLloydAlgorithm = function () {
       if (!appContext.config.runLloydAlgorithm) {
         return;
@@ -300,6 +328,9 @@
       window.requestAnimationFrame(toggleLloydAlgorithm);
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Perform the next step/iteration in Lloyd's algorithm.
+    // +-------------------------------
     var updateLloydStep = function (cell) {
       if (cell.triangles.length <= 2) {
         return;
@@ -317,6 +348,9 @@
 
       // Move point 10% towards the centroid
       cell.sharedVertex.lerp(centroid, 0.1);
+      // Wrap back into the limiting box if outside.
+      cell.sharedVertex.x = Math.max(Math.min(cell.sharedVertex.x, appContext.lloydBox.max.x), appContext.lloydBox.min.x);
+      cell.sharedVertex.y = Math.max(Math.min(cell.sharedVertex.y, appContext.lloydBox.max.y), appContext.lloydBox.min.y);
     };
 
     // +---------------------------------------------------------------------------------
@@ -347,6 +381,7 @@
     fullCover();
     updateAnimator();
     rebuild();
+    toggleLloydAlgorithm();
     appContext.pb.redraw();
 
     humane.log('This is an enhanced version of the <a href="../07-voronoi-and-delaunay/">07-voronoi-and-delaunay demo</a>.');
