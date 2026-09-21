@@ -57,6 +57,8 @@
       // prettier-ignore
       f3.add(appContext.config, "showLloydbox").onChange(appContext.rebuild).title("Show the limiting box for the Lloyd algorithm.");
       // prettier-ignore
+      f3.add(appContext.config, "isClipToLloydBox").onChange(appContext.rebuild).title("Clip all cell at the limit box (lloyd.-box)?");
+      // prettier-ignore
       f3.add(appContext.config, "showUmbrellaTriangles").onChange(appContext.rebuild).title("Show each Voronoi cell's umbrella triangles.");
       // prettier-ignore
       f3.add(appContext.config, "runLloydAlgorithm").onChange(appContext.toggleLloydAlgorithm).title("Run the Lloyd algorithm?");

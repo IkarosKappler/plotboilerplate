@@ -81,6 +81,8 @@
         // Lloyd algorithm setting
         showCentroids: params.getBoolean("showCentroids", true),
         showLloydbox: params.getBoolean("showLloydbox", true),
+        isClipToLloydBox: params.getBoolean("isClipToLloydBox", true),
+
         showUmbrellaTriangles: params.getBoolean("showUmbrellaTriangles", true),
         runLloydAlgorithm: params.getBoolean("runLloydAlgorithm", true),
         showPolygonCornerNumbers: params.getBoolean("showPolygonCornerNumbers", false),
@@ -123,6 +125,7 @@
     appContext.triangles = [];
     appContext.trianglesPointCount = -1; // Keep track of the number of points when the triangles were generated.
     appContext.lloydBox = null; // A limiting bounding box to keep cells from diverging into infinity.
+    appContext.lloydBoxPolygon = null; // The lloyd box as a polygon for clipping.
     appContext.voronoiCells = []; // An array of VoronoiCells.
 
     // A set of points.
@@ -140,6 +143,7 @@
       );
       appContext.trianglesPointCount = -1;
       appContext.lloydBox = appContext.pb.viewport();
+      appContext.lloydBoxPolygon = appContext.lloydBox.toPolygon();
       updateAnimator();
       rebuild();
     };
@@ -152,6 +156,7 @@
       );
       appContext.trianglesPointCount = -1;
       appContext.lloydBox = appContext.pb.viewport();
+      appContext.lloydBoxPolygon = appContext.lloydBox.toPolygon();
       updateAnimator();
       rebuild();
     };
@@ -161,6 +166,7 @@
       appContext.pointSet.randomFullCover(appContext.config.pointCount, false);
       appContext.trianglesPointCount = -1;
       appContext.lloydBox = appContext.pb.viewport();
+      appContext.lloydBoxPolygon = appContext.lloydBox.toPolygon();
       updateAnimator();
       rebuild();
     };
@@ -225,7 +231,12 @@
         drawPolygonIndices(cellPoly, fill, null);
       }
 
-      draw.polygon(cellPoly, "orange", appContext.config.voronoiCellLineWidth);
+      // Clip cell polygon?
+      if (appContext.config.isClipToLloydBox) {
+        cellPoly = VoronoiRenderer.clipVoronoiPolygon(cellPoly, appContext.lloydBoxPolygon);
+      }
+
+      draw.polygon(cellPoly, appContext.config.voronoiOutlineColor, appContext.config.voronoiCellLineWidth);
 
       if (appContext.config.showCentroids) {
         var centroid = cellPoly.getCentroid(true); // forceClockwise=true
@@ -338,7 +349,13 @@
       if (cell.isOpen()) {
         return;
       }
-      var cellPoly = cell.toPolygon().clone();
+      var cellPoly = cell.toPolygon(); // .clone();
+
+      // Clip cell polygon?
+      if (appContext.config.isClipToLloydBox) {
+        cellPoly = VoronoiRenderer.clipVoronoiPolygon(cellPoly, appContext.lloydBox.toPolygon());
+      }
+
       // console.log("cellPoly.vertices.length", cellPoly.vertices.length);
       // drawPolygonIndices(cellPoly, fill, null);
       var centroid = cellPoly.getCentroid(true); // forceClockwise=true
@@ -373,11 +390,6 @@
     initDemoUI(appContext);
 
     // Init
-    // appContext.pointSet.randomPoints(
-    //   appContext.config.pointCount,
-    //   appContext.config.horizontalSafeArea,
-    //   appContext.config.verticalSafeArea
-    // ); // , true, false); // clear ; no full cover
     fullCover();
     updateAnimator();
     rebuild();

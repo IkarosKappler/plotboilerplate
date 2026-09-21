@@ -33,7 +33,7 @@
     var appContext = new AppContext(pb, {
       // colorCenterConnectLine: params.getString("colorCenterConnectLine", "#0048e0"),
       // colorRadiusConnectLine: params.getString("colorRadiusConnectLine", "#00e048"),
-      isClockwise: params.getBoolean("isClockwise", false),
+      isCounterClockwise: params.getBoolean("isCounterClockwise", false),
       pointCount: params.getNumber("pointCount", 8),
       readme: function () {
         globalThis.displayDemoMeta();
@@ -44,6 +44,12 @@
       pb.remove(polygon, false, true, false);
       polygon = randomPolygon(pb.viewport(), appContext.config.pointCount, appContext.config.isClockwise);
       pb.add(polygon);
+      appContext.pb.redraw();
+    };
+    appContext.onClockwiseChanged = function () {
+      // pb.remove(polygon, false, true, false);
+      polygon.revert();
+      // pb.add(polygon);
       appContext.pb.redraw();
     };
 
@@ -58,6 +64,12 @@
     // +-------------------------------
     var postDraw = function (draw, fill) {
       var contrastColor = getContrastColor(pb.config.backgroundColor).cssRGB();
+
+      for (var i = 0; i < polygon.vertices.length; i++) {
+        var vector = polygon.getEdgeAt(i).clone().asVector();
+        vector.scale(0.5);
+        draw.arrowHead(vector.a, vector.b, "grey", 1.0, 8.0); // headLength=8.0
+      }
 
       var centroid = polygon.getCentroid();
       draw.crosshair(centroid, 7, "red", 1.0);

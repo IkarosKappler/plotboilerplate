@@ -2283,8 +2283,9 @@ Vertex$1.utils = {
  * @modified 2025-04-15 Changed param of `VertTuple.moveTo` method from `Vertex` to `XYCoords`.
  * @modified 2025-04-15 Added method `VertTuple.move` method.
  * @modified 2026-06-10 Adding helper function `VertTuple.utils.calcCircumcircle`.
- * @modified 2026-06-17 Adding method `VertTuple.asLine` for converting Vector to Line instances.
- * @version 1.6.0
+ * @modified 2026-06-17 Adding method `VertTuple.asLine` for converting TertTuples to Line instances.
+ * @modified 2026-09-21 Adding method `VertTuple.asVector` for converting TertTuples to Vector instances.
+ * @version 1.7.0
  */
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
@@ -2577,15 +2578,26 @@ class VertTuple {
         return this.factory(this.a.clone(), this.b.clone());
     }
     /**
-     * Converts this `Vector` to a `Line` (segment).
+     * Converts this `VertTuple` to a `Line` (segment).
      *
      * @method asLine
-     * @return {T} A type safe clone if this instance.
+     * @return {Line} This tuple as `Line` instance.
      * @instance
      * @memberof VertTuple
      **/
     asLine() {
         return new Line(this.a, this.b);
+    }
+    /**
+     * Converts this `VertTuple` to a `Vector` (arrow).
+     *
+     * @method asVector
+     * @return {Line} This tuple as `Vector` instance.
+     * @instance
+     * @memberof VertTuple
+     **/
+    asVector() {
+        return new Vector(this.a, this.b);
     }
     /**
      * Create a string representation of this line.
@@ -3109,6 +3121,7 @@ class Line extends VertTuple {
  * @modified 2025-05-20 Tweaking `Polygon.getInnerAngleAt` and `Polygo.isAngleAcute` to handle indices out of array bounds as well.
  * @modified 2025-06-07 Adding `Polygon.closestLineIntersectionIndex` to determine line intersections plus detected edge index.
  * @modified 2026-09-16 Adding a `forceClockwise` parameter to the `Polygon.getCentroid()` method.
+ * @modified 2026-09-21 Adding `Polygon.revert` method to change the winding order.
  * @version 1.17.0
  *
  * @file Polygon
@@ -3402,6 +3415,20 @@ class Polygon {
     isClockwise() {
         // return Polygon.utils.signedArea(this.vertices) < 0;
         return Polygon.utils.isClockwise(this.vertices);
+    }
+    /**
+     * Revert the order of this polygon's vertices to change the winding order.
+     * This operation is in-place.
+     *
+     * @method revert
+     * @instance
+     * @memberof Polygon
+     * @return {Polygon} This for chaining.
+     */
+    revert() {
+        // this.vertices.slice().reverse(); // Copy?
+        this.vertices.reverse();
+        return this;
     }
     /**
      * Get the perimeter of this polygon.

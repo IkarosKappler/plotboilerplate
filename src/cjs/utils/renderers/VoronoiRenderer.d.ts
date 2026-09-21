@@ -6,7 +6,9 @@
  * @modified 2026-09-15 Ported to Typescript.
  * @version  1.0.1
  */
+import { Polygon } from "../../Polygon";
 import { Triangle } from "../../Triangle";
+import { DrawLib } from "../../interfaces";
 import { PointSet } from "../datastructures/PointSet";
 import { VoronoiCell } from "../datastructures/VoronoiCell";
 export interface IVoronoiConfig {
@@ -50,7 +52,19 @@ export declare class VoronoiRenderer {
      * @param {string} color
      * @return {void}
      */
-    draw(draw: any, fill: any): void;
+    draw(draw: DrawLib<any>, fill: DrawLib<any>): void;
+    /**
+     * Draw the given triangle with the specified (CSS-) color.
+     *
+     * @name _drawCell
+     * @instance
+     * @private
+     * @memberof VoronoiRenderer
+     * @param {DrawLib} draw
+     * @param {Polygon} clipBoxPolygon
+     * @param {VoronoiCell} cell
+     * @return {void}
+     */
     private _drawCell;
     /**
      * A function for drawing the triangles.
@@ -65,13 +79,21 @@ export declare class VoronoiRenderer {
      * @name drawTriangle
      * @memberof VoronoiRenderer
      * @param {DrawLib} draw
-     * @param {Triangle} t
+     * @param {Triangle} tri
      * @param {string} color
      * @return {void}
      */
-    static drawTriangle(draw: any, t: any, color: any): void;
+    static drawTriangle(draw: DrawLib<any>, tri: Triangle, color: string): void;
     /**
      * Draw the circumcircles of all triangles.
      */
-    static drawCircumCircles(draw: any, triangles: any): void;
+    static drawCircumCircles(draw: DrawLib<any>, triangles: Array<Triangle>): void;
+    /**
+     * Clip the convex (!) cell polygon by the convex (!) clipping polygon.
+     *
+     * @param cellPolygon
+     * @param clipBoxPolygon
+     * @returns
+     */
+    static clipVoronoiPolygon(cellPolygon: Polygon, clipBoxPolygon: Polygon): Polygon;
 }

@@ -40,6 +40,7 @@
  * @modified 2025-05-20 Tweaking `Polygon.getInnerAngleAt` and `Polygo.isAngleAcute` to handle indices out of array bounds as well.
  * @modified 2025-06-07 Adding `Polygon.closestLineIntersectionIndex` to determine line intersections plus detected edge index.
  * @modified 2026-09-16 Adding a `forceClockwise` parameter to the `Polygon.getCentroid()` method.
+ * @modified 2026-09-21 Adding `Polygon.revert` method to change the winding order.
  * @version 1.17.0
  *
  * @file Polygon
@@ -344,6 +345,20 @@ var Polygon = /** @class */ (function () {
     Polygon.prototype.isClockwise = function () {
         // return Polygon.utils.signedArea(this.vertices) < 0;
         return Polygon.utils.isClockwise(this.vertices);
+    };
+    /**
+     * Revert the order of this polygon's vertices to change the winding order.
+     * This operation is in-place.
+     *
+     * @method revert
+     * @instance
+     * @memberof Polygon
+     * @return {Polygon} This for chaining.
+     */
+    Polygon.prototype.revert = function () {
+        // this.vertices.slice().reverse(); // Copy?
+        this.vertices.reverse();
+        return this;
     };
     /**
      * Get the perimeter of this polygon.

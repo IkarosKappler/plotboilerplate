@@ -41,26 +41,39 @@ export class VoronoiRenderer {
             this._drawCell(draw, fill, clipBoxPolygon, cell);
         }
     }
+    /**
+     * Draw the given triangle with the specified (CSS-) color.
+     *
+     * @name _drawCell
+     * @instance
+     * @private
+     * @memberof VoronoiRenderer
+     * @param {DrawLib} draw
+     * @param {Polygon} clipBoxPolygon
+     * @param {VoronoiCell} cell
+     * @return {void}
+     */
     _drawCell(draw, fill, clipBoxPolygon, cell) {
         var _a, _b;
-        var polygon = cell.toPolygon();
-        polygon.scale(this.voronoiContext.config.voronoiCellScale, cell.sharedVertex);
+        var cellPolygon = cell.toPolygon();
+        cellPolygon.scale(this.voronoiContext.config.voronoiCellScale, cell.sharedVertex);
         // Draw large (unclipped) Voronoi cell
         if (this.voronoiContext.config.drawVoronoiOutlines &&
             (!this.voronoiContext.config.clipVoronoiCells || this.voronoiContext.config.drawUnclippedVoronoiCells)) {
-            draw.polyline(polygon.vertices, false, this.voronoiContext.config.clipVoronoiCells ? "rgba(128,128,128,0.333)" : this.voronoiContext.config.voronoiOutlineColor, (_a = this.voronoiContext.config.voronoiCellLineWidth) !== null && _a !== void 0 ? _a : 2.0);
+            draw.polyline(cellPolygon.vertices, false, this.voronoiContext.config.clipVoronoiCells ? "rgba(128,128,128,0.333)" : this.voronoiContext.config.voronoiOutlineColor, (_a = this.voronoiContext.config.voronoiCellLineWidth) !== null && _a !== void 0 ? _a : 2.0);
         }
         // Apply clipping?
         if (this.voronoiContext.config.clipVoronoiCells) {
             // Clone the array here: convert Array<XYCoords> to Array<Vertex>
-            polygon = new Polygon(cloneVertexArray(sutherlandHodgman(polygon.vertices, clipBoxPolygon.vertices)), false);
+            // polygon = new Polygon(cloneVertexArray(sutherlandHodgman(polygon.vertices, clipBoxPolygon.vertices)), false);
+            cellPolygon = VoronoiRenderer.clipVoronoiPolygon(cellPolygon, clipBoxPolygon);
         }
         if (this.voronoiContext.config.drawVoronoiOutlines && this.voronoiContext.config.clipVoronoiCells) {
-            draw.polygon(polygon, this.voronoiContext.config.voronoiOutlineColor, (_b = this.voronoiContext.config.voronoiCellLineWidth) !== null && _b !== void 0 ? _b : 2.0);
+            draw.polygon(cellPolygon, this.voronoiContext.config.voronoiOutlineColor, (_b = this.voronoiContext.config.voronoiCellLineWidth) !== null && _b !== void 0 ? _b : 2.0);
         }
         if ((!cell.isOpen() || this.voronoiContext.config.clipVoronoiCells) && cell.triangles.length >= 3) {
             if (this.voronoiContext.config.drawCubicCurves) {
-                var cbezier = polygon.toCubicBezierData(this.voronoiContext.config.voronoiCubicThreshold);
+                var cbezier = cellPolygon.toCubicBezierData(this.voronoiContext.config.voronoiCubicThreshold);
                 if (this.voronoiContext.config.fillVoronoiCells) {
                     fill.cubicBezierPath(cbezier, this.voronoiContext.config.voronoiCellColor);
                 }
@@ -69,9 +82,9 @@ export class VoronoiRenderer {
                 }
             }
             if (this.voronoiContext.config.drawVoronoiIncircles) {
-                var result = convexPolygonIncircle(polygon);
+                var result = convexPolygonIncircle(cellPolygon);
                 var circle = result.circle;
-                var triangle = result.triangle;
+                // var triangle = result.triangle;
                 // Here we should have found the best inlying circle (and the corresponding triangle)
                 // inside the Voronoi cell.
                 draw.circle(circle.center, circle.radius, "rgba(255,192,0,1.0)", 2);
@@ -96,15 +109,15 @@ export class VoronoiRenderer {
      * @name drawTriangle
      * @memberof VoronoiRenderer
      * @param {DrawLib} draw
-     * @param {Triangle} t
+     * @param {Triangle} tri
      * @param {string} color
      * @return {void}
      */
-    static drawTriangle(draw, t, color) {
+    static drawTriangle(draw, tri, color) {
         // draw.line(t.a, t.b, color);
         // draw.line(t.b, t.c, color);
         // draw.line(t.c, t.a, color);
-        draw.polyline([t.a, t.b, t.c], false, color);
+        draw.polyline([tri.a, tri.b, tri.c], false, color);
     }
     /**
      * Draw the circumcircles of all triangles.
@@ -114,6 +127,16 @@ export class VoronoiRenderer {
             var cc = triangles[t].getCircumcircle();
             draw.circle(cc.center, cc.radius, "#e86800");
         }
+    }
+    /**
+     * Clip the convex (!) cell polygon by the convex (!) clipping polygon.
+     *
+     * @param cellPolygon
+     * @param clipBoxPolygon
+     * @returns
+     */
+    static clipVoronoiPolygon(cellPolygon, clipBoxPolygon) {
+        return new Polygon(cloneVertexArray(sutherlandHodgman(cellPolygon.vertices, clipBoxPolygon.vertices)), false);
     }
 }
 //# sourceMappingURL=VoronoiRenderer.js.map

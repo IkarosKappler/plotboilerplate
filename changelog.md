@@ -1,5 +1,8 @@
 # Changelog
 
+- 2026-09-21
+  - Adding `Polygon.revert` method to change the winding order.
+  - Adding method `VertTuple.asVector` for converting TertTuples to Vector instances.
 - 2026-09-16
   - Adding a `forceClockwise` parameter to the `Polygon.getCentroid()` method.
 - 2026-09-15
