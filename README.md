@@ -14,12 +14,15 @@ often use for the visualization of 2D geometries. Basic features are
 - adding elements like
   - vertices
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/vertex.html "Vertex class"),
-    [example](https://plotboilerplate.io/repo/demos/basic-Vertex "Vertex example"))
+    [example](https://plotboilerplate.io/repo/demos/basic-Vertex "Vertex example"),
+    [Codepen](https://codepen.io/editor/ikaroskappler/pen/01a0d500-3791-7489-9ac9-90a83ad53415 "Codepen"))
   - lines
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/line.html "Line class"),
-    [example](https://plotboilerplate.io/repo/demos/basic-Line "Line example"))
-  - vectors [docs](https://plotboilerplate.io/docs_typedoc/classes/vector.html "Vector class"),
-    [example](https://plotboilerplate.io/repo/demos/basic-Vector "Vector example"))
+    [example](https://plotboilerplate.io/repo/demos/basic-Line "Line example"),
+    [Codepen](https://codepen.io/ikaroskappler/pen/ZEjamVb "Codepen"))
+  - vectors ([docs](https://plotboilerplate.io/docs_typedoc/classes/vector.html "Vector class"),
+    [example](https://plotboilerplate.io/repo/demos/basic-Vector "Vector example"),
+    [Codepen](https://codepen.io/editor/ikaroskappler/pen/01a0d509-e4db-7664-a7a7-8232a26db80f "Codepen"))
   - triangles
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/triangle.html "Triangle class"),
     [example](https://plotboilerplate.io/repo/demos/basic-Triangle "Triangle example"))
