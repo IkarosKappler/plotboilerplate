@@ -1,7 +1,5 @@
 ## Todos
 
-++ Todos
-
 [ ] Bezier handle Line color aus der drawconfig is not in use!
 [ ] Website: demos, add #anchors
 [X] replace lib/Color.min.js by proper color class.
@@ -10,12 +8,12 @@
 [X] Remove duplicate script tags for 'detectDarkMode'.
 [ ] Create a helper for triangles.
 [ ] Resize/bestfit seems to fail in Firefoxe's dark mode (plugin).
-[ ] Extend demo 07[ ]voronoi: "randomize" could be a smooth transition :)
+[X] Extend demo 07-voronoi: "randomize" as smooth transition -> implemented in `79-lloyds-algorithm-voronoi-relaxation`.
 [ ] Todo: Bounding box of PBText
 [ ] Todo: Bounding box of PBImage
 [ ] Todo: think about if Vector should implement `Intersectable` as well.
 [ ] Todo: PBText should implement Bounds.
-[ ] Todo: TBImage should implement Bounds.
+[ ] Todo: PBImage should implement Bounds.
 [ ] Todo: check if BezierPathInteractionHelper can work without every possible redraw (event mouseIsOver)
 [ ] Removed `getAvailableContainerSpace` from main class. Is in dom[ ]utils now.
 [ ] Removed `getFProp` from main class. Is in dom[ ]utils now.
@@ -25,7 +23,7 @@
 [ ] The Color.parse(string) function does only recognize HEX, RGB and RGBA strings. HSL is still missing. Required?
 [ ] Replace all color params: replace type string by color. (tinycolor?)
 [ ] Measure the canvas' border when applying fitToParent! Currently a 1px border is expected.
-[ ] Implement snap[ ]to[ ]grid.
+[ ] Implement snap-to-grid.
 [ ] Add image flipping.
 [ ] Add image/svg support (adding SVG images).
 [ ] Add a demo that draws a proper mathematical xy[ ]grid.
@@ -34,14 +32,14 @@
 [ ] Change the behavior of Vector.intersection(...). The intersection should be on both vectors, not only on their line intersection!
 [ ] Rename drawutils class to Drawutils or DrawUtils. Repective name DrawUtilsGL.
 [ ] Use the new Bounds class in the RectSelector helper (use min:Vertex and max:Vertex).
-[ ] Build a feature for line[ ]styles; each 'color' param could also be gradient or a pattern (stroked, dotted, dashed, ... ).
+[ ] Build a feature for line-styles; each 'color' param could also be gradient or a pattern (stroked, dotted, dashed, ... ).
 See ctx.setLineDash(...).
 [ ] Add an internal mapping to remember vertices and their installed listeners (for removing them later).
 [ ] Destroy installed vertex listeners from vertices after removing them (like the Bézier auto[ ]adjuster).
 [ ] Port all demos from vanilla JS to TypeScript.
 [ ] Add a TouchHandler (such as the MouseHandler) to wrap AlloyFinger? Add this to the main demo to keep track of touch positions?
 [ ] Add a removeVertices() function (and use it in the threejs demo).
-[ ] Replace drawables[ ]to[ ]svg.js by the new svg[ ]draw library.
+[ ] Replace drawables-to-svg.js by the new svg-draw library.
 [ ] Remove all 'info' blocks and replace by uistats.
 [ ] For convenience add an "Info" button to the UI of all demos with a short explanation about what's happening here.
 [ ] Remove all <div id="dialog[ ]wrapper" ...> from the demos. They are deprecated. Where needed use the 'modal.js' instead.
@@ -51,9 +49,9 @@ See ctx.setLineDash(...).
 [ ] Add `BezierResizeHelper` (from ndgd project).
 [ ] Validate if the `./demos/detectDarkMode.js` or the `./demos/darkModeHandler.js` is better.
 [ ] Draw a helper function to draw scaled and shifted textures with a clip polygon (think of the Girih demo).
-[ ] Change drawutilssvg.copyPathData(...); this is a simple array[ ]copy, nothing more, use a global generic helper function for this (re[ ]usability).
-[ ] Fix a bug in the textured[ ]polygon demo (mouse coordinates in canvas demo do not match coordinates in svg demo).
-[ ] Since refactoring the Girih demo does not respect the `Bevel` setting any more. Re[ ]implement.
+[ ] Change drawutilssvg.copyPathData(...); this is a simple array-copy, nothing more, use a global generic helper function for this (re-usability).
+[ ] Fix a bug in the textured-polygon demo (mouse coordinates in canvas demo do not match coordinates in svg demo).
+[ ] Since refactoring the Girih demo does not respect the `Bevel` setting any more. Re-implement.
 [ ] Add a function to create a Cubic Bézier Curve from quadratic parameters. Use this in the `parseSVGPath` function.
 
 ### Todos for future Version 2
