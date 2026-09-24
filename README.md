@@ -25,7 +25,8 @@ often use for the visualization of 2D geometries. Basic features are
     [Codepen](https://codepen.io/editor/ikaroskappler/pen/01a0d509-e4db-7664-a7a7-8232a26db80f "Codepen"))
   - triangles
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/triangle.html "Triangle class"),
-    [example](https://plotboilerplate.io/repo/demos/basic-Triangle "Triangle example"))
+    [example](https://plotboilerplate.io/repo/demos/basic-Triangle "Triangle example"),
+    [Codepen](https://codepen.io/editor/ikaroskappler/pen/01a0d50e-90ae-7a46-b7c8-a0a50ef7b558 "Codepen"))
   - curves
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/cubicbeziercurve.html "CubicBezierCurve class"),
     [example](https://plotboilerplate.io/repo/demos/basic-BezierPath "BezierPath example"))
