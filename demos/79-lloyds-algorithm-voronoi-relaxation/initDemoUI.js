@@ -131,9 +131,8 @@
           .title("Scale each voronoi cell before rendering.");
       f2.close();
 
-      if (appContext.config.animate) {
-        appContext.toggleAnimation();
-      }
+      // prettier-ignore
+      gui.add(appContext.config, "readme").title("Show the readme.");
     }
   };
 })(globalThis);

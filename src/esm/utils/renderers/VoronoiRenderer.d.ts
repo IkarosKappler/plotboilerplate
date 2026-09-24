@@ -40,7 +40,7 @@ export interface IVoronoiContext {
 }
 export declare class VoronoiRenderer {
     voronoiContext: IVoronoiContext;
-    constructor(voronoiContext: any);
+    constructor(voronoiContext: IVoronoiContext);
     /**
      * Draw the given triangle with the specified (CSS-) color.
      *
@@ -71,7 +71,7 @@ export declare class VoronoiRenderer {
      *
      * @static
      */
-    drawTriangles(draw: any): void;
+    drawTriangles(draw: DrawLib<any>): void;
     /**
      * Draw the given triangle with the specified (CSS-) color.
      *

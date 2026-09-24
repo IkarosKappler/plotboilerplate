@@ -50,7 +50,7 @@ export interface IVoronoiContext {
 export class VoronoiRenderer {
   voronoiContext: IVoronoiContext;
 
-  constructor(voronoiContext) {
+  constructor(voronoiContext: IVoronoiContext) {
     this.voronoiContext = voronoiContext;
   }
 
@@ -152,7 +152,7 @@ export class VoronoiRenderer {
    *
    * @static
    */
-  drawTriangles(draw) {
+  drawTriangles(draw: DrawLib<any>) {
     for (var i in this.voronoiContext.triangles) {
       var t = this.voronoiContext.triangles[i];
       VoronoiRenderer.drawTriangle(draw, t, this.voronoiContext.config.makeVoronoiDiagram ? "rgba(0,128,224,0.33)" : "#0088d8");

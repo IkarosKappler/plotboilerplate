@@ -1,5 +1,5 @@
 /**
- * A simple 2d point set and image triangulation (color fill).
+ * Implementing Lloyd'd algorithm (uses base code from demo 07-voronoi).
  *
  * @requires Vertex, Triangle, Polygon, VoronoiCell, delaunay, delaunay2voronoi, saveAs
  *
@@ -55,58 +55,55 @@
       )
     );
 
-    var appContext = new AppContext(
-      pb,
-      // PlotBoilerplate.utils.safeMergeByKeys(
-      {
-        makeVoronoiDiagram: params.getBoolean("makeVoronoiDiagram", true),
-        drawPoints: params.getBoolean("drawPoints", true),
-        drawTriangles: params.getBoolean("drawTriangles", false),
-        drawCircumCircles: params.getBoolean("drawCircumCircles", false),
-        drawCubicCurves: params.getBoolean("drawCubicCurves", false),
-        fillVoronoiCells: params.getBoolean("fillVoronoiCells", true),
-        voronoiOutlineColor: params.getString("voronoiOutlineColor", "#e5a50a"),
-        voronoiCellColor: params.getString("voronoiCellColor", "#0080c0"),
-        voronoiCubicThreshold: 1.0,
-        voronoiCellScale: 1.0,
-        voronoiCellLineWidth: params.getNumber("voronoiCellLineWidth", 2.0),
-        clipVoronoiCells: params.getBoolean("clipVoronoiCells", false),
-        drawClipBox: params.getBoolean("drawClipBox", false),
-        drawUnclippedVoronoiCells: params.getBoolean("drawUnclippedVoronoiCells", false),
-        drawVoronoiIncircles: params.getBoolean("drawVoronoiIncircles", false),
-        drawVoronoiOutlines: params.getBoolean("drawVoronoiOutlines", true),
-        pointCount: params.getNumber("pointCount", 50),
-        horizontalSafeArea: params.getNumber("horizontalSafeArea", 0.0),
-        verticalSafeArea: params.getNumber("verticalSafeArea", 0.0),
-        // Lloyd algorithm setting
-        showCentroids: params.getBoolean("showCentroids", true),
-        showLloydbox: params.getBoolean("showLloydbox", true),
-        isClipToLloydBox: params.getBoolean("isClipToLloydBox", true),
+    // +---------------------------------------------------------------------------------
+    // | Add n random points to the viewport. Will respect the safe area.
+    // +-------------------------------
+    var appContext = new AppContext(pb, {
+      makeVoronoiDiagram: params.getBoolean("makeVoronoiDiagram", true),
+      drawPoints: params.getBoolean("drawPoints", true),
+      drawTriangles: params.getBoolean("drawTriangles", false),
+      drawCircumCircles: params.getBoolean("drawCircumCircles", false),
+      drawCubicCurves: params.getBoolean("drawCubicCurves", false),
+      fillVoronoiCells: params.getBoolean("fillVoronoiCells", true),
+      voronoiOutlineColor: params.getString("voronoiOutlineColor", "#e5a50a"),
+      voronoiCellColor: params.getString("voronoiCellColor", "#0080c0"),
+      voronoiCubicThreshold: 1.0,
+      voronoiCellScale: 1.0,
+      voronoiCellLineWidth: params.getNumber("voronoiCellLineWidth", 2.0),
+      clipVoronoiCells: params.getBoolean("clipVoronoiCells", false),
+      drawClipBox: params.getBoolean("drawClipBox", false),
+      drawUnclippedVoronoiCells: params.getBoolean("drawUnclippedVoronoiCells", false),
+      drawVoronoiIncircles: params.getBoolean("drawVoronoiIncircles", false),
+      drawVoronoiOutlines: params.getBoolean("drawVoronoiOutlines", true),
+      pointCount: params.getNumber("pointCount", 50),
+      horizontalSafeArea: params.getNumber("horizontalSafeArea", 0.0),
+      verticalSafeArea: params.getNumber("verticalSafeArea", 0.0),
+      // Lloyd algorithm setting
+      showCentroids: params.getBoolean("showCentroids", true),
+      showLloydbox: params.getBoolean("showLloydbox", true),
+      isClipToLloydBox: params.getBoolean("isClipToLloydBox", true),
 
-        showUmbrellaTriangles: params.getBoolean("showUmbrellaTriangles", true),
-        runLloydAlgorithm: params.getBoolean("runLloydAlgorithm", true),
-        showPolygonCornerNumbers: params.getBoolean("showPolygonCornerNumbers", false),
+      showUmbrellaTriangles: params.getBoolean("showUmbrellaTriangles", true),
+      runLloydAlgorithm: params.getBoolean("runLloydAlgorithm", true),
+      showPolygonCornerNumbers: params.getBoolean("showPolygonCornerNumbers", false),
 
-        // Helper methods
-        rebuild: function () {
-          updateAnimator();
-          rebuild();
-        },
-        randomize: function () {
-          randomize();
-        },
-        fullCover: function () {
-          fullCover();
-        },
-        animate: params.getBoolean("animate", false),
-        animationType: "linear", // 'linear' or 'radial',
-        readme: function () {
-          globalThis.displayDemoMeta();
-        }
+      // Helper methods
+      rebuild: function () {
+        updateAnimator();
+        rebuild();
+      },
+      randomize: function () {
+        randomize();
+      },
+      fullCover: function () {
+        fullCover();
+      },
+      animate: params.getBoolean("animate", false),
+      animationType: "linear", // 'linear' or 'radial',
+      readme: function () {
+        globalThis.displayDemoMeta();
       }
-      // GUP
-      // )
-    );
+    });
     appContext.rebuild = function () {
       rebuild();
     };
@@ -134,6 +131,9 @@
       rebuild();
     });
 
+    // +---------------------------------------------------------------------------------
+    // | Add n random points to the viewport. Will respect the safe area.
+    // +-------------------------------
     var randomize = function () {
       appContext.pointSet.clear();
       appContext.pointSet.randomPoints(
@@ -148,6 +148,9 @@
       rebuild();
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Add/remove n points to match the new point count. Will respect the safe areas.
+    // +-------------------------------
     var updatePointCount = function () {
       appContext.pointSet.updatePointCount(
         appContext.config.pointCount,
@@ -161,6 +164,9 @@
       rebuild();
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Randomize the point set: fill the whole viewport (no safe area).
+    // +-------------------------------
     var fullCover = function () {
       appContext.pointSet.clear();
       appContext.pointSet.randomFullCover(appContext.config.pointCount, false);
@@ -359,9 +365,6 @@
       // console.log("cellPoly.vertices.length", cellPoly.vertices.length);
       // drawPolygonIndices(cellPoly, fill, null);
       var centroid = cellPoly.getCentroid(true); // forceClockwise=true
-      // draw.polygon(cellPoly, "orange", 2.0);
-      // draw.crosshair(centroid, 7, "red", 1.0);
-      // draw.line(cell.sharedVertex, centroid, "red", 1.0);
 
       // Move point 10% towards the centroid
       cell.sharedVertex.lerp(centroid, 0.1);
@@ -395,6 +398,10 @@
     rebuild();
     toggleLloydAlgorithm();
     appContext.pb.redraw();
+
+    if (appContext.config.animate) {
+      appContext.toggleAnimation();
+    }
 
     humane.log('This is an enhanced version of the <a href="../07-voronoi-and-delaunay/">07-voronoi-and-delaunay demo</a>.');
   }); // END document.ready / window.onload
