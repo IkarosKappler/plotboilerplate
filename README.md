@@ -14,39 +14,51 @@ often use for the visualization of 2D geometries. Basic features are
 - adding elements like
   - vertices
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/vertex.html "Vertex class"),
-    [example](https://plotboilerplate.io/repo/demos/basic-Vertex "Vertex example"))
+    [example](https://plotboilerplate.io/repo/demos/basic-Vertex "Vertex example"),
+    [Codepen](https://codepen.io/editor/ikaroskappler/pen/01a0d500-3791-7489-9ac9-90a83ad53415 "Codepen"))
   - lines
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/line.html "Line class"),
-    [example](https://plotboilerplate.io/repo/demos/basic-Line "Line example"))
-  - vectors [docs](https://plotboilerplate.io/docs_typedoc/classes/vector.html "Vector class"),
-    [example](https://plotboilerplate.io/repo/demos/basic-Vector "Vector example"))
+    [example](https://plotboilerplate.io/repo/demos/basic-Line "Line example"),
+    [Codepen](https://codepen.io/ikaroskappler/pen/ZEjamVb "Codepen"))
+  - vectors ([docs](https://plotboilerplate.io/docs_typedoc/classes/vector.html "Vector class"),
+    [example](https://plotboilerplate.io/repo/demos/basic-Vector "Vector example"),
+    [Codepen](https://codepen.io/editor/ikaroskappler/pen/01a0d509-e4db-7664-a7a7-8232a26db80f "Codepen"))
   - triangles
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/triangle.html "Triangle class"),
-    [example](https://plotboilerplate.io/repo/demos/basic-Triangle "Triangle example"))
+    [example](https://plotboilerplate.io/repo/demos/basic-Triangle "Triangle example"),
+    [Codepen](https://codepen.io/editor/ikaroskappler/pen/01a0d50e-90ae-7a46-b7c8-a0a50ef7b558 "Codepen"))
   - curves
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/cubicbeziercurve.html "CubicBezierCurve class"),
-    [example](https://plotboilerplate.io/repo/demos/basic-BezierPath "BezierPath example"))
+    [example](https://plotboilerplate.io/repo/demos/basic-BezierPath "BezierPath example"),
+    [Codepen](https://codepen.io/editor/ikaroskappler/pen/01a0e3f0-d703-7ba8-87c4-44eb1d9f0b6c "Codepen"))
   - circles
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/circle.html "Circle class"),
-    [example](https://plotboilerplate.io/repo/demos/basic-Circle "Circle example"))
+    [example](https://plotboilerplate.io/repo/demos/basic-Circle "Circle example"),
+    [Codepen](https://codepen.io/editor/ikaroskappler/pen/01a0e3f9-9df0-7b70-b885-55652dbc6609 "Codepen"))
   - circle sectors
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/circlesector.html "CircleSector class"),
-    [example](https://plotboilerplate.io/repo/demos/basic-CircleSector "CircleSector example"))
+    [example](https://plotboilerplate.io/repo/demos/basic-CircleSector "CircleSector example"),
+    [Codepen](https://codepen.io/editor/ikaroskappler/pen/01a0e41e-655d-73e8-8ea6-b6bca91bc468 "CircleSector"))
   - polygons
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/polygon.html "Polygon class"),
-    [example](https://plotboilerplate.io/repo/demos/basic-Polygon "Polygon example"))
+    [example](https://plotboilerplate.io/repo/demos/basic-Polygon "Polygon example"),
+    [Codepen](https://codepen.io/editor/ikaroskappler/pen/01a0e421-2f06-7594-8b52-de18613870b5 "Codepen"))
   - ellipses
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/vellipse.html "VEllipse class"),
-    [example](https://plotboilerplate.io/repo/demos/basic-VEllipse "VEllipse example"))
+    [example](https://plotboilerplate.io/repo/demos/basic-VEllipse "VEllipse example"),
+    [Codepen](https://codepen.io/editor/ikaroskappler/pen/01a0e423-1b14-75d4-b297-e7d9a47f5abd "Codepen"))
   - ellipse sectors
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/vellipsesector.html "VEllipseSector class"),
-    [example](https://plotboilerplate.io/repo/demos/basic-VEllipseSector "VEllipseSector example"))
+    [example](https://plotboilerplate.io/repo/demos/basic-VEllipseSector "VEllipseSector example"),
+    [Codepen](https://codepen.io/editor/ikaroskappler/pen/01a0e425-813b-7557-8527-1b95bd56212b "Codepen"))
   - images
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/pbimage.html "PBImage class"),
-    [example](https://plotboilerplate.io/repo/demos/basic-PBImage "PBImage example"))
+    [example](https://plotboilerplate.io/repo/demos/basic-PBImage "PBImage example"),
+    [Codepen](https://codepen.io/editor/ikaroskappler/pen/01a0e428-4a64-78b3-8bf8-08a1bf706cfa "Codepen"))
   - text
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/pbtext.html "PBText class"),
-    [example](https://plotboilerplate.io/repo/demos/basic-PBText "PBText example"))
+    [example](https://plotboilerplate.io/repo/demos/basic-PBText "PBText example"),
+    [Codepen](https://codepen.io/editor/ikaroskappler/pen/01a0e42a-8937-7788-b8ca-c66a8de53cc4 "Codepen"))
 - configuration of the canvas behavior
   - fullsize and auto-resizing
   - enable/disable mouse, touch or keyboard interaction
@@ -587,6 +599,7 @@ new MouseHandler(document.getElementById("mycanvas"))
 - Mathworld for the [Apollonius math](https://mathworld.wolfram.com/ApolloniusProblem.html)
 - Mathworld for the [Homothetic center math](https://mathworld.wolfram.com/HomotheticCenter.html)
 - cut-the-knot.org for the [Radical Axis calculation](https://www.cut-the-knot.org/Curriculum/Geometry/GeoGebra/RadicalAxes.shtml)
+- bitbanging.space with the excellent explanation for [Lloyd's algorithm](https://www.bitbanging.space/posts/lloyds-algorithm)
 
 ## Todos
 

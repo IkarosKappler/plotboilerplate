@@ -31,17 +31,9 @@
 
     // Create a config: we want to have control about the arrow head size in this demo
     // `AppContext`: this is an experimental approach to make future event handling easier.
-    // var SPIRAL_TYPES = ["Ulam", "Round Equidistant"];
     var appContext = new AppContext(pb, {
       startAngleDeg: params.getNumber("startAngleDeg", 0.0),
       sectorLength: params.getNumber("sectorLength", 60.0),
-      // radiusep: params.getNumber("radiusStep", 5.0),
-      // radiusStep: params.getNumber("radiusStep", 5.0),
-      // circleRadius: params.getNumber("circleRadius", 8.0),
-      // iterations: params.getNumber("iterations", 100),
-      // arcThreshold: params.getNumber("arcThreshold", 0.666),
-      // showSpiralTangents: params.getBoolean("showSpiralTangents", false),
-      // spiralType: params.getString("spiralType", SPIRAL_TYPES[1]),
       readme: function () {
         globalThis.displayDemoMeta();
       }

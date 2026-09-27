@@ -16,13 +16,15 @@
  * @modified 2020-08-12 Ported this class from vanilla JS to TypeScript.
  * @modified 2020-08-17 Added some missing type declarations.
  * @modified 2021-01-20 Members `triangles` and `sharedVertex` are now public.
- * @version  1.1.3
+ * @modified 2026-09-15 Added the `VoronoiCell.sharedVertexIndex` attribute.
+ * @version  1.2.0
  *
  * @file VoronoiCell
  * @public
  **/
 import { Line } from "../../Line";
 import { Polygon } from "../../Polygon";
+import { Triangle } from "../../Triangle";
 import { Vertex } from "../../Vertex";
 export class VoronoiCell {
     /**
@@ -35,15 +37,15 @@ export class VoronoiCell {
      * @param {Vertex}     sharedVertex This is the 'center' of the voronoi cell; all triangles must share
      *                                  that vertex.
      **/
-    constructor(triangles, sharedVertex) {
-        if (typeof triangles === 'undefined')
+    constructor(triangles, sharedVertex, sharedVertexIndex) {
+        if (typeof triangles === "undefined")
             triangles = [];
-        if (typeof sharedVertex === 'undefined')
+        if (typeof sharedVertex === "undefined")
             sharedVertex = new Vertex(0, 0);
         this.triangles = triangles;
         this.sharedVertex = sharedVertex;
+        this.sharedVertexIndex = sharedVertexIndex;
     }
-    ;
     /**
      * Check if the first and the last triangle in the path are NOT connected.
      *
@@ -56,7 +58,6 @@ export class VoronoiCell {
         // There must be at least three triangles
         return this.triangles.length < 3 || !this.triangles[0].isAdjacent(this.triangles[this.triangles.length - 1]);
     }
-    ;
     /**
      * Convert this Voronoi cell to a path polygon, consisting of all Voronoi cell corner points.
      *
@@ -71,7 +72,32 @@ export class VoronoiCell {
     toPolygon() {
         return new Polygon(this.toPathArray(), this.isOpen());
     }
-    ;
+    /**
+     * Get all 'umbrella' triangles for this Voronoi cell.
+     *
+     * The 'umbrella' is that sequence of triangles that covers the whole Voronoi cell and
+     * meet in the cell's centroid.
+     *
+     * @method getUmbrellaTriangles
+     * @instance
+     * @memberof VoronoiCell
+     * @return {Array<Triangle>}
+     **/
+    getUmbrellaTriangles() {
+        var tris = [];
+        // for (var i = 0; i < this.triangles.length; i++) {
+        //   var delaunayTri = this.triangles[i];
+        //   var tri = new Triangle(this.sharedVertex, delaunayTri.b, delaunayTri.c);
+        //   tris.push(tri);
+        // }
+        var vertices = this.toPathArray();
+        var n = vertices.length;
+        for (var i = 0; i < n; i++) {
+            var tri = new Triangle(this.sharedVertex, vertices[i], vertices[(i + 1) % n]);
+            tris.push(tri);
+        }
+        return tris;
+    }
     /**
      * Convert the voronoi cell path data to an SVG polygon data string.
      *
@@ -86,9 +112,12 @@ export class VoronoiCell {
         if (this.triangles.length == 0)
             return "";
         const arr = this.toPathArray();
-        return arr.map((vert) => { return '' + vert.x + ',' + vert.y; }).join(' ');
+        return arr
+            .map((vert) => {
+            return "" + vert.x + "," + vert.y;
+        })
+            .join(" ");
     }
-    ;
     /**
      * Convert the voronoi cell path data to an array.
      *
@@ -143,7 +172,6 @@ export class VoronoiCell {
         const openEdgePoint = new Vertex(perpendicular.x + (center.x - perpendicular.x) * 1000, perpendicular.y + (center.y - perpendicular.y) * 1000);
         return openEdgePoint;
     }
-    ;
     /**
      * A helper function.
      *
@@ -167,12 +195,11 @@ export class VoronoiCell {
                 return tri.a;
         }
         // Here:
-        //    tri.c.equals(sharedVertex) 
+        //    tri.c.equals(sharedVertex)
         if (neighbour.a.equals(tri.a) || neighbour.b.equals(tri.a) || neighbour.c.equals(tri.a))
             return tri.b;
         else
             return tri.a;
     }
-    ;
 }
 //# sourceMappingURL=VoronoiCell.js.map

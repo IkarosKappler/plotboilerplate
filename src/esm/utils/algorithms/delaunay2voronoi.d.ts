@@ -3,7 +3,8 @@
  * @date     2018-04-07
  * @modified 2018-04-11 Using VoronoiCells now (was array before).
  * @modified 2020-08-15 Ported from vanilla JS to TypeScript.
- * @version  1.0.2
+ * @modified 2026-09-15 Added the `sharedVertexIndex` attribute to each Voronoi cell.
+ * @version  1.1.0
  **/
 import { Triangle } from "../../Triangle";
 import { Vertex } from "../../Vertex";

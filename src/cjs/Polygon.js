@@ -39,7 +39,9 @@
  * @modified 2025-05-16 Class `Polygon` now implements `IBounded`.
  * @modified 2025-05-20 Tweaking `Polygon.getInnerAngleAt` and `Polygo.isAngleAcute` to handle indices out of array bounds as well.
  * @modified 2025-06-07 Adding `Polygon.closestLineIntersectionIndex` to determine line intersections plus detected edge index.
- * @version 1.16.0
+ * @modified 2026-09-16 Adding a `forceClockwise` parameter to the `Polygon.getCentroid()` method.
+ * @modified 2026-09-21 Adding `Polygon.revert` method to change the winding order.
+ * @version 1.17.0
  *
  * @file Polygon
  * @public
@@ -345,6 +347,20 @@ var Polygon = /** @class */ (function () {
         return Polygon.utils.isClockwise(this.vertices);
     };
     /**
+     * Revert the order of this polygon's vertices to change the winding order.
+     * This operation is in-place.
+     *
+     * @method revert
+     * @instance
+     * @memberof Polygon
+     * @return {Polygon} This for chaining.
+     */
+    Polygon.prototype.revert = function () {
+        // this.vertices.slice().reverse(); // Copy?
+        this.vertices.reverse();
+        return this;
+    };
+    /**
      * Get the perimeter of this polygon.
      * The perimeter is the absolute length of the outline.
      *
@@ -425,35 +441,37 @@ var Polygon = /** @class */ (function () {
     };
     /**
      * Get centroid.
-     * Centroids define the barycenter of any non self-intersecting convex polygon.
+     * Centroids define the barycenter of any non self-intersecting convex clockwise polygon.
      *
-     * If the polygon is self intersecting or non konvex then the barycenter is not well defined.
+     * If the polygon is self intersecting or non convex or not clockwise then the barycenter is not well defined.
      *
      * https://mathworld.wolfram.com/PolygonCentroid.html
      *
      * @method getCentroid
      * @instance
+     * @param {boolean} forceClockwise - [optiona] If set to true then the centroid will be calculated for the clockwise polygon.
      * @memberof Polygon
      * @returns {Vertex|null}
      */
-    Polygon.prototype.getCentroid = function () {
+    Polygon.prototype.getCentroid = function (forceClockwise) {
         if (this.vertices.length === 0) {
             return null;
         }
-        var center = new Vertex_1.Vertex(0.0, 0.0);
-        var n = this.vertices.length;
-        for (var i = 0; i < n; i++) {
-            // center.add(this.vertices[i]);
-            var cur = this.vertices[i];
-            var next = this.vertices[(i + 1) % n];
-            var factor = cur.x * next.y - next.x * cur.y;
-            center.x += (cur.x + next.x) * factor;
-            center.y += (cur.y + next.y) * factor;
-        }
-        var area = this.area();
-        center.x *= 1 / (6 * area);
-        center.y *= 1 / (6 * area);
-        return center;
+        // const centroid: Vertex = new Vertex(0.0, 0.0);
+        // const n = this.vertices.length;
+        // for (var i = 0; i < n; i++) {
+        //   // center.add(this.vertices[i]);
+        //   const cur: Vertex = this.vertices[i];
+        //   const next: Vertex = this.vertices[(i + 1) % n];
+        //   var factor: number = cur.x * next.y - next.x * cur.y;
+        //   centroid.x += (cur.x + next.x) * factor;
+        //   centroid.y += (cur.y + next.y) * factor;
+        // }
+        // const area = this.area();
+        // centroid.x *= 1 / (6 * area);
+        // centroid.y *= 1 / (6 * area);
+        // return centroid;
+        return Polygon.utils.calculateCentroid(this.vertices, forceClockwise);
     };
     //--- BEGIN --- Implement interface `Intersectable`
     /**
@@ -883,6 +901,26 @@ var Polygon = /** @class */ (function () {
         },
         isClockwise: function (vertices) {
             return Polygon.utils.signedArea(vertices) < 0;
+        },
+        calculateCentroid: function (vertices, forceClockwise) {
+            var centroid = new Vertex_1.Vertex(0.0, 0.0);
+            var n = vertices.length;
+            if (forceClockwise && !Polygon.utils.isClockwise(vertices)) {
+                return Polygon.utils.calculateCentroid(vertices.slice().reverse());
+            }
+            for (var i = 0; i < n; i++) {
+                // center.add(this.vertices[i]);
+                var cur = vertices[i];
+                var next = vertices[(i + 1) % n];
+                var factor = cur.x * next.y - next.x * cur.y;
+                centroid.x += (cur.x + next.x) * factor;
+                centroid.y += (cur.y + next.y) * factor;
+            }
+            // const area = this.area();
+            var area = Polygon.utils.area(vertices);
+            centroid.x *= 1 / (6 * area);
+            centroid.y *= 1 / (6 * area);
+            return centroid;
         },
         /**
          * Calulate the signed polyon area by interpreting the polygon as a matrix

@@ -38,7 +38,9 @@
  * @modified 2025-05-16 Class `Polygon` now implements `IBounded`.
  * @modified 2025-05-20 Tweaking `Polygon.getInnerAngleAt` and `Polygo.isAngleAcute` to handle indices out of array bounds as well.
  * @modified 2025-06-07 Adding `Polygon.closestLineIntersectionIndex` to determine line intersections plus detected edge index.
- * @version 1.16.0
+ * @modified 2026-09-16 Adding a `forceClockwise` parameter to the `Polygon.getCentroid()` method.
+ * @modified 2026-09-21 Adding `Polygon.revert` method to change the winding order.
+ * @version 1.17.0
  *
  * @file Polygon
  * @public
@@ -401,6 +403,21 @@ export class Polygon implements IBounded, Intersectable, SVGSerializable {
   }
 
   /**
+   * Revert the order of this polygon's vertices to change the winding order.
+   * This operation is in-place.
+   *
+   * @method revert
+   * @instance
+   * @memberof Polygon
+   * @return {Polygon} This for chaining.
+   */
+  revert(): Polygon {
+    // this.vertices.slice().reverse(); // Copy?
+    this.vertices.reverse();
+    return this;
+  }
+
+  /**
    * Get the perimeter of this polygon.
    * The perimeter is the absolute length of the outline.
    *
@@ -483,35 +500,37 @@ export class Polygon implements IBounded, Intersectable, SVGSerializable {
 
   /**
    * Get centroid.
-   * Centroids define the barycenter of any non self-intersecting convex polygon.
+   * Centroids define the barycenter of any non self-intersecting convex clockwise polygon.
    *
-   * If the polygon is self intersecting or non konvex then the barycenter is not well defined.
+   * If the polygon is self intersecting or non convex or not clockwise then the barycenter is not well defined.
    *
    * https://mathworld.wolfram.com/PolygonCentroid.html
    *
    * @method getCentroid
    * @instance
+   * @param {boolean} forceClockwise - [optiona] If set to true then the centroid will be calculated for the clockwise polygon.
    * @memberof Polygon
    * @returns {Vertex|null}
    */
-  getCentroid(): Vertex | null {
+  getCentroid(forceClockwise?: boolean): Vertex | null {
     if (this.vertices.length === 0) {
       return null;
     }
-    const center: Vertex = new Vertex(0.0, 0.0);
-    const n = this.vertices.length;
-    for (var i = 0; i < n; i++) {
-      // center.add(this.vertices[i]);
-      const cur: Vertex = this.vertices[i];
-      const next: Vertex = this.vertices[(i + 1) % n];
-      var factor: number = cur.x * next.y - next.x * cur.y;
-      center.x += (cur.x + next.x) * factor;
-      center.y += (cur.y + next.y) * factor;
-    }
-    const area = this.area();
-    center.x *= 1 / (6 * area);
-    center.y *= 1 / (6 * area);
-    return center;
+    // const centroid: Vertex = new Vertex(0.0, 0.0);
+    // const n = this.vertices.length;
+    // for (var i = 0; i < n; i++) {
+    //   // center.add(this.vertices[i]);
+    //   const cur: Vertex = this.vertices[i];
+    //   const next: Vertex = this.vertices[(i + 1) % n];
+    //   var factor: number = cur.x * next.y - next.x * cur.y;
+    //   centroid.x += (cur.x + next.x) * factor;
+    //   centroid.y += (cur.y + next.y) * factor;
+    // }
+    // const area = this.area();
+    // centroid.x *= 1 / (6 * area);
+    // centroid.y *= 1 / (6 * area);
+    // return centroid;
+    return Polygon.utils.calculateCentroid(this.vertices, forceClockwise);
   }
 
   //--- BEGIN --- Implement interface `Intersectable`
@@ -970,6 +989,27 @@ export class Polygon implements IBounded, Intersectable, SVGSerializable {
 
     isClockwise(vertices: Array<XYCoords>): boolean {
       return Polygon.utils.signedArea(vertices) < 0;
+    },
+
+    calculateCentroid(vertices: XYCoords[], forceClockwise?: boolean): Vertex {
+      const centroid: Vertex = new Vertex(0.0, 0.0);
+      const n = vertices.length;
+      if (forceClockwise && !Polygon.utils.isClockwise(vertices)) {
+        return Polygon.utils.calculateCentroid(vertices.slice().reverse());
+      }
+      for (var i = 0; i < n; i++) {
+        // center.add(this.vertices[i]);
+        const cur: XYCoords = vertices[i];
+        const next: XYCoords = vertices[(i + 1) % n];
+        var factor: number = cur.x * next.y - next.x * cur.y;
+        centroid.x += (cur.x + next.x) * factor;
+        centroid.y += (cur.y + next.y) * factor;
+      }
+      // const area = this.area();
+      const area = Polygon.utils.area(vertices);
+      centroid.x *= 1 / (6 * area);
+      centroid.y *= 1 / (6 * area);
+      return centroid;
     },
 
     /**

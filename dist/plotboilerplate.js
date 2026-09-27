@@ -8298,14 +8298,16 @@ exports["default"] = PlotBoilerplate;
  * @modified 2025-04-15 Changed param of `VertTuple.moveTo` method from `Vertex` to `XYCoords`.
  * @modified 2025-04-15 Added method `VertTuple.move` method.
  * @modified 2026-06-10 Adding helper function `VertTuple.utils.calcCircumcircle`.
- * @modified 2026-06-17 Adding method `VertTuple.asLine` for converting Vector to Line instances.
- * @version 1.6.0
+ * @modified 2026-06-17 Adding method `VertTuple.asLine` for converting TertTuples to Line instances.
+ * @modified 2026-09-21 Adding method `VertTuple.asVector` for converting TertTuples to Vector instances.
+ * @version 1.7.0
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VertTuple = void 0;
 var Vertex_1 = __webpack_require__(787);
 var UIDGenerator_1 = __webpack_require__(938);
 var Line_1 = __webpack_require__(939);
+var Vector_1 = __webpack_require__(30);
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
  * @abstract
@@ -8597,15 +8599,26 @@ var VertTuple = /** @class */ (function () {
         return this.factory(this.a.clone(), this.b.clone());
     };
     /**
-     * Converts this `Vector` to a `Line` (segment).
+     * Converts this `VertTuple` to a `Line` (segment).
      *
      * @method asLine
-     * @return {T} A type safe clone if this instance.
+     * @return {Line} This tuple as `Line` instance.
      * @instance
      * @memberof VertTuple
      **/
     VertTuple.prototype.asLine = function () {
         return new Line_1.Line(this.a, this.b);
+    };
+    /**
+     * Converts this `VertTuple` to a `Vector` (arrow).
+     *
+     * @method asVector
+     * @return {Line} This tuple as `Vector` instance.
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.asVector = function () {
+        return new Vector_1.Vector(this.a, this.b);
     };
     /**
      * Create a string representation of this line.
@@ -9177,7 +9190,9 @@ exports.PBText = PBText;
  * @modified 2025-05-16 Class `Polygon` now implements `IBounded`.
  * @modified 2025-05-20 Tweaking `Polygon.getInnerAngleAt` and `Polygo.isAngleAcute` to handle indices out of array bounds as well.
  * @modified 2025-06-07 Adding `Polygon.closestLineIntersectionIndex` to determine line intersections plus detected edge index.
- * @version 1.16.0
+ * @modified 2026-09-16 Adding a `forceClockwise` parameter to the `Polygon.getCentroid()` method.
+ * @modified 2026-09-21 Adding `Polygon.revert` method to change the winding order.
+ * @version 1.17.0
  *
  * @file Polygon
  * @public
@@ -9483,6 +9498,20 @@ var Polygon = /** @class */ (function () {
         return Polygon.utils.isClockwise(this.vertices);
     };
     /**
+     * Revert the order of this polygon's vertices to change the winding order.
+     * This operation is in-place.
+     *
+     * @method revert
+     * @instance
+     * @memberof Polygon
+     * @return {Polygon} This for chaining.
+     */
+    Polygon.prototype.revert = function () {
+        // this.vertices.slice().reverse(); // Copy?
+        this.vertices.reverse();
+        return this;
+    };
+    /**
      * Get the perimeter of this polygon.
      * The perimeter is the absolute length of the outline.
      *
@@ -9563,35 +9592,37 @@ var Polygon = /** @class */ (function () {
     };
     /**
      * Get centroid.
-     * Centroids define the barycenter of any non self-intersecting convex polygon.
+     * Centroids define the barycenter of any non self-intersecting convex clockwise polygon.
      *
-     * If the polygon is self intersecting or non konvex then the barycenter is not well defined.
+     * If the polygon is self intersecting or non convex or not clockwise then the barycenter is not well defined.
      *
      * https://mathworld.wolfram.com/PolygonCentroid.html
      *
      * @method getCentroid
      * @instance
+     * @param {boolean} forceClockwise - [optiona] If set to true then the centroid will be calculated for the clockwise polygon.
      * @memberof Polygon
      * @returns {Vertex|null}
      */
-    Polygon.prototype.getCentroid = function () {
+    Polygon.prototype.getCentroid = function (forceClockwise) {
         if (this.vertices.length === 0) {
             return null;
         }
-        var center = new Vertex_1.Vertex(0.0, 0.0);
-        var n = this.vertices.length;
-        for (var i = 0; i < n; i++) {
-            // center.add(this.vertices[i]);
-            var cur = this.vertices[i];
-            var next = this.vertices[(i + 1) % n];
-            var factor = cur.x * next.y - next.x * cur.y;
-            center.x += (cur.x + next.x) * factor;
-            center.y += (cur.y + next.y) * factor;
-        }
-        var area = this.area();
-        center.x *= 1 / (6 * area);
-        center.y *= 1 / (6 * area);
-        return center;
+        // const centroid: Vertex = new Vertex(0.0, 0.0);
+        // const n = this.vertices.length;
+        // for (var i = 0; i < n; i++) {
+        //   // center.add(this.vertices[i]);
+        //   const cur: Vertex = this.vertices[i];
+        //   const next: Vertex = this.vertices[(i + 1) % n];
+        //   var factor: number = cur.x * next.y - next.x * cur.y;
+        //   centroid.x += (cur.x + next.x) * factor;
+        //   centroid.y += (cur.y + next.y) * factor;
+        // }
+        // const area = this.area();
+        // centroid.x *= 1 / (6 * area);
+        // centroid.y *= 1 / (6 * area);
+        // return centroid;
+        return Polygon.utils.calculateCentroid(this.vertices, forceClockwise);
     };
     //--- BEGIN --- Implement interface `Intersectable`
     /**
@@ -10021,6 +10052,26 @@ var Polygon = /** @class */ (function () {
         },
         isClockwise: function (vertices) {
             return Polygon.utils.signedArea(vertices) < 0;
+        },
+        calculateCentroid: function (vertices, forceClockwise) {
+            var centroid = new Vertex_1.Vertex(0.0, 0.0);
+            var n = vertices.length;
+            if (forceClockwise && !Polygon.utils.isClockwise(vertices)) {
+                return Polygon.utils.calculateCentroid(vertices.slice().reverse());
+            }
+            for (var i = 0; i < n; i++) {
+                // center.add(this.vertices[i]);
+                var cur = vertices[i];
+                var next = vertices[(i + 1) % n];
+                var factor = cur.x * next.y - next.x * cur.y;
+                centroid.x += (cur.x + next.x) * factor;
+                centroid.y += (cur.y + next.y) * factor;
+            }
+            // const area = this.area();
+            var area = Polygon.utils.area(vertices);
+            centroid.x *= 1 / (6 * area);
+            centroid.y *= 1 / (6 * area);
+            return centroid;
         },
         /**
          * Calulate the signed polyon area by interpreting the polygon as a matrix
@@ -12281,7 +12332,7 @@ exports.Triangle = Triangle;
  * @modified 2025-04-13 Adding the `Vertex.move(amount: XYCoords)` method (does the same as `add`, added by naming convention).
  * @modified 2025-05-07 Class `Vertex` is now implementing interface `IBounded` (to meet convention).
  * @modified 2026-06-10 Adding methods `Vertex.findClosestPoint` and `Vertex.findFarestPoint`.
- * @version  2.12.0
+ * @version  2.12.1
  *
  * @file Vertex
  * @public
@@ -12759,7 +12810,7 @@ var Vertex = /** @class */ (function () {
      * around given center.
      *
      * @method rotate
-     * @param {number} angle - The angle to 'rotate' this vertex; 0.0 means no change.
+     * @param {number} angle - The angle in radians to 'rotate' this vertex; 0.0 means no change.
      * @param {XYCoords=} center - The center of rotation; default is (0,0).
      * @return {Vertex} this
      * @instance
