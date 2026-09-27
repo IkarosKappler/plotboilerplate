@@ -42,7 +42,7 @@
           autoAdjustOffset: true,
           offsetAdjustXPercent: 50,
           offsetAdjustYPercent: 50,
-          backgroundColor: "#000000",
+          backgroundColor: isDarkmode ? "#000000" : "#ffffff",
           drawHandleLines: false,
           drawHandlePoints: false,
           enableMouse: true,
