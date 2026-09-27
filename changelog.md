@@ -1,6 +1,6 @@
 # Changelog
 
-- 2026-09-21
+- 2026-09-21 [v1.31.0]
   - Adding `Polygon.revert` method to change the winding order.
   - Adding method `VertTuple.asVector` for converting TertTuples to Vector instances.
 - 2026-09-16
