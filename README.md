@@ -600,6 +600,7 @@ new MouseHandler(document.getElementById("mycanvas"))
 - Mathworld for the [Homothetic center math](https://mathworld.wolfram.com/HomotheticCenter.html)
 - cut-the-knot.org for the [Radical Axis calculation](https://www.cut-the-knot.org/Curriculum/Geometry/GeoGebra/RadicalAxes.shtml)
 - bitbanging.space with the excellent explanation for [Lloyd's algorithm](https://www.bitbanging.space/posts/lloyds-algorithm)
+- Thanks to [@coolrobotics](https://www.youtube.com/@coolrobotics) for the inspirational ellipse-from-three-points video https://www.youtube.com/watch?v=BAxaB1o3s6k
 
 ## Todos
 

@@ -18,12 +18,24 @@
  * @modified 2025-10-18 Added method `Bounds.containsVert(XYCoords)`.
  * @modified 2025-10-28 Added the `Bounds.getWidth()` and `Bounds.getHeight()`.
  * @modified 2025-11-12 Added the `Bounds.getMoved()` method.
+ * @modified 2026-10-11 Adding methods `Bounds.getWestBound`, `Bounds.getNorthBound`, `Bounds.getEastBound`, `Bounds.getSouthBound`.
+ * @modified 2026-10-12 Adding method `Bounds.expandLine`.
  * @version  1.11.0
  **/
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Bounds = void 0;
 var Polygon_1 = require("./Polygon");
 var Vertex_1 = require("./Vertex");
+var Line_1 = require("./Line");
 /**
  * @classdesc A bounds class with min and max values. Implementing IBounds.
  *
@@ -163,6 +175,18 @@ var Bounds = /** @class */ (function () {
     Bounds.prototype.getSouthWestPoint = function () {
         return new Vertex_1.Vertex(this.min.x, this.max.y);
     };
+    Bounds.prototype.getWestBound = function () {
+        return new Line_1.Line(this.getSouthWestPoint(), this.getNorthWestPoint());
+    };
+    Bounds.prototype.getNorthBound = function () {
+        return new Line_1.Line(this.getNorthWestPoint(), this.getNorthEastPoint());
+    };
+    Bounds.prototype.getEastBound = function () {
+        return new Line_1.Line(this.getNorthEastPoint(), this.getSouthEastPoint());
+    };
+    Bounds.prototype.getSouthBound = function () {
+        return new Line_1.Line(this.getSouthEastPoint(), this.getSouthWestPoint());
+    };
     /**
      * Convert this rectangular bounding box to a polygon with four vertices.
      *
@@ -219,6 +243,51 @@ var Bounds = /** @class */ (function () {
         var absHorizontalSafeArea = horizontalSafeArea > 0 && horizontalSafeArea < 1 ? this.width * horizontalSafeArea : horizontalSafeArea;
         var absVerticalSafeArea = verticalSafeArea > 0 && verticalSafeArea < 1 ? this.height * verticalSafeArea : verticalSafeArea;
         return new Vertex_1.Vertex(this.min.x + absHorizontalSafeArea + Math.random() * (this.width - 2 * absHorizontalSafeArea), this.min.y + absVerticalSafeArea + Math.random() * (this.height - 2 * absVerticalSafeArea));
+    };
+    /**
+     * Get an 'infinite' line that touches the bounds of this bounded box.
+     *
+     * @method expandLine
+     * @instance
+     * @memberof Bounds
+     * @param {Vertex} pA - The first point of the line.
+     * @param {Vertex} pB - The second point of the line.
+     * @returns {ine} A new line covering the whole box.
+     */
+    Bounds.prototype.expandLine = function (line) {
+        var _a, _b;
+        // There is an easier way: just extend the line 2x the viewport size – but that's not accurate.
+        var north = this.getNorthBound();
+        var east = this.getEastBound();
+        var west = this.getWestBound();
+        var south = this.getSouthBound();
+        // var intersections: [Vertex | null, Vertex | null, Vertex | null, Vertex | null] = [
+        var intersections = [
+            north.intersection(line, true),
+            east.intersection(line, true),
+            south.intersection(line, true),
+            west.intersection(line, true)
+        ].filter(function (vert) { return Boolean(vert); });
+        // console.log("intersections", intersections);
+        // intersections = intersections.filter((vert: Vertex | null) => Boolean(vert));
+        var first = intersections[0];
+        var second = intersections[1];
+        // console.log("first", first, "second", second);
+        intersections.splice(0, 2);
+        var resultA = (_a = line.a).findClosestPoint.apply(_a, __spreadArray([first, second], intersections, false));
+        // var resultA = line.a.findClosestPoint(intersections[0], intersections[1], intersections[2], intersections[3]);
+        // var resultB = line.a.findFarestPoint(intersections[0], intersections[1], intersections[2], intersections[3]);
+        var resultB = (_b = line.a).findFarestPoint.apply(_b, __spreadArray([first, second], intersections, false));
+        return new Line_1.Line(resultA, resultB);
+        // // var scale = Math.max( this.getMaxDimension() /
+        // // var resultA = line.a.scale(this.width / line.getBounds().width, line.b);
+        // // var resultB = line.b.scale(this.width / line.getBounds().width, line.a);
+        // // var middle = line.vertAt(0.5);
+        // // var diff = middle.difference(line.a);
+        // // var resultA = middle.
+        // // return new Line(resultA, resultB);
+        // var diff = line.a.difference(line.b);
+        // var factors = { x: this.width / diff.x, y: this.height / diff.y };
     };
     /**
      * Convert these bounds to a human readable form.

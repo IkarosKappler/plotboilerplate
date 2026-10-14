@@ -17,11 +17,14 @@
  * @modified 2025-10-18 Added method `Bounds.containsVert(XYCoords)`.
  * @modified 2025-10-28 Added the `Bounds.getWidth()` and `Bounds.getHeight()`.
  * @modified 2025-11-12 Added the `Bounds.getMoved()` method.
+ * @modified 2026-10-11 Adding methods `Bounds.getWestBound`, `Bounds.getNorthBound`, `Bounds.getEastBound`, `Bounds.getSouthBound`.
+ * @modified 2026-10-12 Adding method `Bounds.expandLine`.
  * @version  1.11.0
  **/
 import { Polygon } from "./Polygon";
 import { XYCoords, IBounds, XYDimension } from "./interfaces";
 import { Vertex } from "./Vertex";
+import { Line } from "./Line";
 /**
  * @classdesc A bounds class with min and max values. Implementing IBounds.
  *
@@ -153,6 +156,10 @@ export declare class Bounds implements IBounds, XYDimension {
      * @return {Vertex} The "southwestmost" point of this bounding box.
      */
     getSouthWestPoint(): Vertex;
+    getWestBound(): Line;
+    getNorthBound(): Line;
+    getEastBound(): Line;
+    getSouthBound(): Line;
     /**
      * Convert this rectangular bounding box to a polygon with four vertices.
      *
@@ -195,6 +202,17 @@ export declare class Bounds implements IBounds, XYDimension {
      * @returns {Vertex} A pseudo random point inside these bounds.
      */
     randomPoint(horizontalSafeArea?: number, verticalSafeArea?: number): Vertex;
+    /**
+     * Get an 'infinite' line that touches the bounds of this bounded box.
+     *
+     * @method expandLine
+     * @instance
+     * @memberof Bounds
+     * @param {Vertex} pA - The first point of the line.
+     * @param {Vertex} pB - The second point of the line.
+     * @returns {ine} A new line covering the whole box.
+     */
+    expandLine(line: Line): Line;
     /**
      * Convert these bounds to a human readable form.
      *

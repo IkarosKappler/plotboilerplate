@@ -17,12 +17,15 @@
  * @modified 2025-10-18 Added method `Bounds.containsVert(XYCoords)`.
  * @modified 2025-10-28 Added the `Bounds.getWidth()` and `Bounds.getHeight()`.
  * @modified 2025-11-12 Added the `Bounds.getMoved()` method.
+ * @modified 2026-10-11 Adding methods `Bounds.getWestBound`, `Bounds.getNorthBound`, `Bounds.getEastBound`, `Bounds.getSouthBound`.
+ * @modified 2026-10-12 Adding method `Bounds.expandLine`.
  * @version  1.11.0
  **/
 
 import { Polygon } from "./Polygon";
 import { XYCoords, IBounds, XYDimension } from "./interfaces";
 import { Vertex } from "./Vertex";
+import { Line } from "./Line";
 
 /**
  * @classdesc A bounds class with min and max values. Implementing IBounds.
@@ -209,6 +212,22 @@ export class Bounds implements IBounds, XYDimension {
     return new Vertex(this.min.x, this.max.y);
   }
 
+  getWestBound(): Line {
+    return new Line(this.getSouthWestPoint(), this.getNorthWestPoint());
+  }
+
+  getNorthBound(): Line {
+    return new Line(this.getNorthWestPoint(), this.getNorthEastPoint());
+  }
+
+  getEastBound(): Line {
+    return new Line(this.getNorthEastPoint(), this.getSouthEastPoint());
+  }
+
+  getSouthBound(): Line {
+    return new Line(this.getSouthEastPoint(), this.getSouthWestPoint());
+  }
+
   /**
    * Convert this rectangular bounding box to a polygon with four vertices.
    *
@@ -274,6 +293,52 @@ export class Bounds implements IBounds, XYDimension {
       this.min.x + absHorizontalSafeArea + Math.random() * (this.width - 2 * absHorizontalSafeArea),
       this.min.y + absVerticalSafeArea + Math.random() * (this.height - 2 * absVerticalSafeArea)
     );
+  }
+
+  /**
+   * Get an 'infinite' line that touches the bounds of this bounded box.
+   *
+   * @method expandLine
+   * @instance
+   * @memberof Bounds
+   * @param {Vertex} pA - The first point of the line.
+   * @param {Vertex} pB - The second point of the line.
+   * @returns {ine} A new line covering the whole box.
+   */
+  expandLine(line: Line): Line {
+    // There is an easier way: just extend the line 2x the viewport size – but that's not accurate.
+    var north = this.getNorthBound();
+    var east = this.getEastBound();
+    var west = this.getWestBound();
+    var south = this.getSouthBound();
+    // var intersections: [Vertex | null, Vertex | null, Vertex | null, Vertex | null] = [
+    var intersections: Vertex[] = [
+      north.intersection(line, true),
+      east.intersection(line, true),
+      south.intersection(line, true),
+      west.intersection(line, true)
+    ].filter((vert: Vertex | null) => Boolean(vert));
+    // console.log("intersections", intersections);
+    // intersections = intersections.filter((vert: Vertex | null) => Boolean(vert));
+    var first = intersections[0];
+    var second = intersections[1];
+    // console.log("first", first, "second", second);
+    intersections.splice(0, 2);
+    var resultA = line.a.findClosestPoint(first, second, ...intersections);
+    // var resultA = line.a.findClosestPoint(intersections[0], intersections[1], intersections[2], intersections[3]);
+    // var resultB = line.a.findFarestPoint(intersections[0], intersections[1], intersections[2], intersections[3]);
+    var resultB = line.a.findFarestPoint(first, second, ...intersections);
+
+    return new Line(resultA, resultB);
+    // // var scale = Math.max( this.getMaxDimension() /
+    // // var resultA = line.a.scale(this.width / line.getBounds().width, line.b);
+    // // var resultB = line.b.scale(this.width / line.getBounds().width, line.a);
+    // // var middle = line.vertAt(0.5);
+    // // var diff = middle.difference(line.a);
+    // // var resultA = middle.
+    // // return new Line(resultA, resultB);
+    // var diff = line.a.difference(line.b);
+    // var factors = { x: this.width / diff.x, y: this.height / diff.y };
   }
 
   /**

@@ -19,7 +19,9 @@
  * @modified 2025-04-15 Class `Line` now implements interface `Intersectable`.
  * @modified 2025-04-16 Class `Line` now implements interface `IBounded`.
  * @modified 2026-08-16 Adding methods `Line.trimStart` and `Line.trimEnd`. Adding methods `Line.trimStartAt` and `Line.trimEndAt`.
- * @version  2.5.0
+ * @modified 2026-10-11 Adding method `Line.perpBisector` to get perpendicular bisectors.
+ * @modified 2026-10-12 Adding optional parameter `inVectorBounds` to the `Line.intersection` method.
+ * @version  2.6.0
  *
  * @file Line
  * @public
@@ -58,16 +60,38 @@ export class Line extends VertTuple<Line> implements IBounded, Intersectable, Pa
   }
 
   /**
+   * Get the perpendicular bisector at the middle of both line vertices.
+   *
+   * @method perpBisector
+   * @instance
+   * @memberof Line
+   * @return {Line} A new Line instance sitting perpendicular to this line in the middle of this line.
+   **/
+  perpBisector(): Line {
+    var perp: Line = this.clone();
+    var center = this.vertAt(0.5);
+    perp.sub(this.a);
+    perp = new Line(new Vertex(), new Vertex(-perp.b.y, perp.b.x));
+    perp.a.add(center);
+    perp.b.add(center);
+    var diffPerp = perp.a.difference(perp.b).scale(0.5); // , perp.a);
+    perp.a.sub(diffPerp);
+    perp.b.sub(diffPerp);
+    return perp;
+  }
+
+  /**
    * Get the intersection if this line and the specified line.
    *
    * @method intersection
    * @param {Line} line The second line.
+   * @param {boolean} inVectorBoundsOnly [optional] If set to true only insections in this 'vector's bounds are recognized.
    * @return {Vertex|undefined} The intersection (may lie outside the end-points) or `undefined` if both lines are parallel.
    * @instance
    * @memberof Line
    **/
   // !!! DO NOT MOVE TO VertTuple
-  intersection(line: VertTuple<any>): Vertex | null {
+  intersection(line: VertTuple<any>, inVectorBoundsOnly: boolean = false): Vertex | null {
     const denominator: number = this.denominator(line);
     if (denominator == 0) {
       return null;
@@ -88,8 +112,12 @@ export class Line extends VertTuple<Line> implements IBounded, Intersectable, Pa
       return null;
     }
 
+    const intersection = new Vertex(x, y);
+    if (inVectorBoundsOnly && !this.hasPoint(intersection, true)) {
+      return null;
+    }
     // if we cast these lines infinitely in both directions, they intersect here:
-    return new Vertex(x, y);
+    return intersection;
   }
 
   //--- BEGIN --- Implement interface `IBounded`

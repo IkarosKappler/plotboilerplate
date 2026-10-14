@@ -19,7 +19,9 @@
  * @modified 2025-04-15 Class `Line` now implements interface `Intersectable`.
  * @modified 2025-04-16 Class `Line` now implements interface `IBounded`.
  * @modified 2026-08-16 Adding methods `Line.trimStart` and `Line.trimEnd`. Adding methods `Line.trimStartAt` and `Line.trimEndAt`.
- * @version  2.5.0
+ * @modified 2026-10-11 Adding method `Line.perpBisector` to get perpendicular bisectors.
+ * @modified 2026-10-12 Adding optional parameter `inVectorBounds` to the `Line.intersection` method.
+ * @version  2.6.0
  *
  * @file Line
  * @public
@@ -52,15 +54,25 @@ export declare class Line extends VertTuple<Line> implements IBounded, Intersect
      **/
     constructor(a: Vertex, b: Vertex);
     /**
+     * Get the perpendicular bisector at the middle of both line vertices.
+     *
+     * @method perpBisector
+     * @instance
+     * @memberof Line
+     * @return {Line} A new Line instance sitting perpendicular to this line in the middle of this line.
+     **/
+    perpBisector(): Line;
+    /**
      * Get the intersection if this line and the specified line.
      *
      * @method intersection
      * @param {Line} line The second line.
+     * @param {boolean} inVectorBoundsOnly [optional] If set to true only insections in this 'vector's bounds are recognized.
      * @return {Vertex|undefined} The intersection (may lie outside the end-points) or `undefined` if both lines are parallel.
      * @instance
      * @memberof Line
      **/
-    intersection(line: VertTuple<any>): Vertex | null;
+    intersection(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Vertex | null;
     /**
      * Get the bounding box (bounds) of this Line.
      *

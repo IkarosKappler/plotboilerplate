@@ -1,5 +1,11 @@
 # Changelog
 
+- 2026-10-12
+  - Adding optional parameter `inVectorBounds` to the `Line.intersection` method.
+  - Adding method `Bounds.expandLine`.
+- 2026-10-11
+  - Adding method `Line.perpBisector` to get perpendicular bisectors.
+  - Adding methods `Bounds.getWestBound`, `Bounds.getNorthBound`, `Bounds.getEastBound`, `Bounds.getSouthBound`.
 - 2026-09-21 [v1.31.0]
   - Adding `Polygon.revert` method to change the winding order.
   - Adding method `VertTuple.asVector` for converting TertTuples to Vector instances.
