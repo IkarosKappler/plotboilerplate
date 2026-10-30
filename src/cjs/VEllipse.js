@@ -63,6 +63,22 @@ var VEllipse = /** @class */ (function () {
         this.rotation = rotation || 0.0;
     }
     /**
+     * Check if a given point is inside thie ellipse.
+     *
+     * @method containsPoint
+     * @instance
+     * @memberof VEllipse
+     * @return {boolean} Returns `true` if the passed coordinates are inside this ellipse - `false` otherwise.
+     */
+    VEllipse.prototype.containsPoint = function (vert) {
+        // https://math.stackexchange.com/questions/76457/check-if-a-point-is-within-an-ellipse
+        // First rotate point in direction of ellipse to align with normalized ellipse form.
+        var rotatedVert = new Vertex_1.Vertex(vert).rotate(this.rotation, this.center);
+        return (Math.pow(this.center.x - rotatedVert.x, 2) / Math.pow(this.radiusH(), 2) +
+            Math.pow(this.center.y - rotatedVert.y, 2) / Math.pow(this.radiusV(), 2) <
+            1);
+    };
+    /**
      * Clone this ellipse (deep clone).
      *
      * @return {VEllipse} A copy of this ellipse.s

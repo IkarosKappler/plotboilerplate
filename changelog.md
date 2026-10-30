@@ -1,5 +1,9 @@
 # Changelog
 
+- 2026-10-30
+  - Adding the `VEllipse.containsPoint()` method.
+  - Adding demo `82-ellipse-contains-point`.
+  - Adding helper function (demos) `randomEllipse`.
 - 2026-10-18
   - Adding methods `Triangle.isClockwise()` and static `Triangle.utils.isClockwise()`.
   - Adding method `VertTuple.getColinear` for getting parallel/colinear lines.

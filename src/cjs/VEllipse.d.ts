@@ -88,6 +88,15 @@ export declare class VEllipse implements IBounded, Intersectable, SVGSerializabl
      **/
     constructor(center: Vertex, axis: Vertex, rotation?: number);
     /**
+     * Check if a given point is inside thie ellipse.
+     *
+     * @method containsPoint
+     * @instance
+     * @memberof VEllipse
+     * @return {boolean} Returns `true` if the passed coordinates are inside this ellipse - `false` otherwise.
+     */
+    containsPoint(vert: XYCoords): boolean;
+    /**
      * Clone this ellipse (deep clone).
      *
      * @return {VEllipse} A copy of this ellipse.s
