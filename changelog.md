@@ -1,5 +1,8 @@
 # Changelog
 
+- 2026-10-18
+  - Adding methods `Triangle.isClockwise()` and static `Triangle.utils.isClockwise()`.
+  - Adding method `VertTuple.getColinear` for getting parallel/colinear lines.
 - 2026-10-12
   - Adding optional parameter `inVectorBounds` to the `Line.intersection` method.
   - Adding method `Bounds.expandLine`.

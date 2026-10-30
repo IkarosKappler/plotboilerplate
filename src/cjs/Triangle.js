@@ -31,7 +31,8 @@
  * @modified  2026-06-10 Refactoring the `Trianble.bounds` method and added a plain `Triangle.utils.bounds` method.
  * @modified  2026-06-10 Refactoring the `Trianble.calcCircumCircle` method and added a plain `Triangle.utils.calcCircumCircle` method.
  * @modified  2026-06-13 Adding `Triangle.getVertices()`.
- * @version   2.11.0
+ * @modified  2026-10-18 Adding methods `Triangle.isClockwise()` and static `Triangle.utils.isClockwise()`.
+ * @version   2.12.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -405,6 +406,17 @@ var Triangle = /** @class */ (function () {
         return new Polygon_1.Polygon([this.a, this.b, this.c]);
     };
     /**
+     * Get the winding order of this triangle: clockwise or counterclockwise.
+     *
+     * @method isClockwise
+     * @instance
+     * @memberof Triangle
+     * @return {boolean}
+     */
+    Triangle.prototype.isClockwise = function () {
+        return Triangle.utils.isClockwise(this.a, this.b, this.c);
+    };
+    /**
      * Get the determinant of this triangle.
      *
      * @method determinant
@@ -533,12 +545,23 @@ var Triangle = /** @class */ (function () {
         /**
          * Calculate the determinant of the three vertices a, b and c (in this order).
          * @param {XYCords} a - The first vertex.
-         * @param {XYCords} b - The first vertex.
-         * @param {XYCords} c - The first vertex.
+         * @param {XYCords} b - The second vertex.
+         * @param {XYCords} c - The thrird vertex.
          * @returns {nmber}
          */
         determinant: function (a, b, c) {
             return (b.y - a.y) * (c.x - b.x) - (c.y - b.y) * (b.x - a.x);
+        },
+        /**
+         * Determine if the passed triangle (a,b,c) is in clockwise winding order.
+         *
+         * @param {XYCords} a - The first vertex.
+         * @param {XYCords} b - The second vertex.
+         * @param {XYCords} c - The third vertex.
+         * @returns {nmber}
+         */
+        isClockwise: function (a, b, c) {
+            return Triangle.utils.determinant(a, b, c) < 0;
         },
         bounds: function (a, b, c) {
             return new Bounds_1.Bounds(new Vertex_1.Vertex(Triangle.utils.min3(a.x, b.x, c.x), Triangle.utils.min3(a.y, b.y, c.y)), new Vertex_1.Vertex(Triangle.utils.max3(a.x, b.x, c.x), Triangle.utils.max3(a.y, b.y, c.y)));

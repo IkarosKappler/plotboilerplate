@@ -31,7 +31,10 @@
     // Create a config: we want to have control about the arrow head size in this demo
     // `AppContext`: this is an experimental approach to make future event handling easier.
     var appContext = new AppContext(pb, {
-      focalControlAngle: params.getNumber("focalControlAngle", 45.0), // In Degrees!
+      focalControlAngle: params.getNumber("focalControlAngle", 0.0), // In Degrees!
+      findCorrectAngle: function () {
+        appContext.findCorrectAngle();
+      },
       readme: function () {
         globalThis.displayDemoMeta();
       }
@@ -51,6 +54,9 @@
       circleSector.endAngle = lineAB.angle() + Math.PI;
     };
     appContext.updatePoints = function () {
+      // We define folliwing two conditions to the three points:
+      //  (a) The line A→B must be the longest one from the triangle.
+      //  (b) The trinangle (A,B,C) must be in clockwise winding order.
       var lengthAB = inputPointA.distance(inputPointB);
       var lengthBC = inputPointB.distance(inputPointC);
       var lengthCA = inputPointC.distance(inputPointA);
@@ -68,6 +74,25 @@
         pointB.set(inputPointA);
         pointC.set(inputPointB);
       }
+
+      // Triangle must be clockwise.
+      if (!Triangle.utils.isClockwise(pointA, pointB, pointC)) {
+        // Swap A and B
+        var tmp = pointA.clone();
+        pointA.set(pointB);
+        pointB.set(tmp);
+      }
+    };
+    appContext.findCorrectAngle = function () {
+      var zeroPointOnCircle = circle.vertAt(circleSector.startAngle + Math.PI / 2.0);
+      var lineAFocal = new Line(pointA, zeroPointOnCircle);
+      appContext.config.focalControlAngle = lineAFocal.angle();
+      appContext.updatePoints();
+      appContext.updateHelperCircle();
+      appContext.updateFocalControlPoint();
+
+      // calculateApproximation();
+      pb.redraw();
     };
 
     // +---------------------------------------------------------------------------------
@@ -87,6 +112,8 @@
     var pointB = inputPointB.clone();
     var pointC = inputPointC.clone();
     var lineAB = new Line(pointA, pointB);
+
+    // var finalEllipse = null;
 
     // +---------------------------------------------------------------------------------
     // | Install listeners
@@ -118,9 +145,12 @@
       draw.line(bisector.a, bisector.b, "orange", 1.0);
 
       var viewport = pb.viewport();
-      var extendedLine = viewport.expandLine(bisector);
+      var extendedBisectorLine = viewport.expandLine(bisector);
       // console.log("extendedLine", extendedLine);
-      draw.line(extendedLine.a, extendedLine.b, "grey", 1.0);
+      if (extendedBisectorLine) {
+        // If the line moved out of the viewport there will be no extended line.
+        draw.line(extendedBisectorLine.a, extendedBisectorLine.b, "grey", 1.0);
+      }
 
       testDrawExpandedIntersection(draw, fill);
 
@@ -135,7 +165,8 @@
       // var axisControlPoint = new Vertex(focalControlPoint.x - pointA.x, focalControlPoint.y - pointA.y);
       var axisControlPoint = focalControlPoint.clone().scale(-1.0, circle.center);
 
-      var ellipse = new VEllipse(focalControlPoint, axisControlPoint, axis1.angle());
+      // var ellipse = new VEllipse(focalControlPoint, axisControlPoint, axis1.angle());
+      var ellipse = calculateNextStep(bisector, appContext.config.focalControlAngle);
       draw.ellipse(
         ellipse.center,
         ellipse.radiusH(), // radiusX: number,
@@ -145,6 +176,126 @@
         ellipse.rotation,
         { dashArray: [5, 5] } // strokeOptions?: StrokeOptions
       );
+
+      // Find intersection of line through C and the current ellipse
+      var colinearLine = bisector.getColinear(pointC);
+      var extendedcolinearLine = viewport.expandLine(colinearLine);
+      if (extendedcolinearLine) {
+        // If the line moved out of the viewport there will be no extended line.
+        draw.line(extendedcolinearLine.a, extendedcolinearLine.b, "grey", 1.0, { dashArray: [5, 5] });
+      }
+
+      var finalEllipse = calculateApproximation(draw, fill);
+
+      // Draw final ellipse
+      if (finalEllipse) {
+        draw.ellipse(
+          finalEllipse.center,
+          finalEllipse.radiusH(), // radiusX: number,
+          finalEllipse.radiusV(), // radiusY: number,
+          "orange",
+          1.0,
+          finalEllipse.rotation,
+          { dashArray: [5, 5] } // strokeOptions?: StrokeOptions
+        );
+      }
+    };
+
+    var calculateApproximation = function (draw, fill) {
+      var ellipse = null;
+
+      var bisector = lineAB.perpBisector();
+      var viewport = pb.viewport();
+      // var extendedBisectorLine = viewport.expandLine(bisector);
+      var colinearLine = bisector.getColinear(pointC);
+      // var extendedcolinearLine = viewport.expandLine(colinearLine);
+      var stepNo = 0;
+      var stepSize = Math.PI / 2.0;
+      var currentFocalControlAngle = appContext.config.focalControlAngle;
+      var maxStep = 100;
+      var recentIntersectionDists = null;
+      var stop = false;
+      var finalEllipse;
+      var lastEllipse;
+      var finalFocalControlAngle = 0;
+      while (stepNo++ < maxStep && !stop) {
+        ellipse = calculateNextStep(currentFocalControlAngle);
+        // Find intersection of colinear line and ellipse
+        var intersections = ellipse.lineIntersections(colinearLine);
+        draw.crosshair(intersections[0], 6, "red");
+        draw.crosshair(intersections[1], 6, "red");
+
+        // Direction?
+        var direction = 1; // right (1) or left (-1)
+        var distAlpha = pointC.distance(intersections[0]);
+        var distBeta = pointC.distance(intersections[1]);
+        currentFocalControlAngle += direction * stepSize;
+        // stepSize /= 2.0;
+
+        // ellipse = calculateNextStep(extendedBisectorLine, currentFocalControlAngle);
+        draw.ellipse(
+          ellipse.center,
+          ellipse.radiusH(), // radiusX: number,
+          ellipse.radiusV(), // radiusY: number,
+          "rgba(128,192,0,0.2)",
+          1.0,
+          ellipse.rotation,
+          { dashArray: [5, 5] } // strokeOptions?: StrokeOptions
+        );
+
+        // if (Math.abs(distAlpha, distBeta) < 1.0) {
+        //   stop = true;
+        // }
+        if (distAlpha < 1.0 || distBeta < 1.0) {
+          stop = true;
+          finalEllipse = ellipse;
+          finalFocalControlAngle = currentFocalControlAngle;
+        }
+        if (recentIntersectionDists && (recentIntersectionDists[0] < distAlpha || recentIntersectionDists[1] < distBeta)) {
+          // stop = true;
+          stepSize * 0.9;
+          direction *= -1;
+        }
+        console.log(
+          "[stepNo=" + stepNo + "] currentFocalControlAngle",
+          currentFocalControlAngle,
+          "stepSize",
+          stepSize,
+          "distAlpha",
+          distAlpha,
+          "distBeta",
+          distBeta
+        );
+
+        recentIntersectionDists = [distAlpha, distBeta];
+        lastEllipse = ellipse;
+      } // END while
+
+      console.log("finalFocalControlAngle", finalFocalControlAngle);
+      // appContext.config.focalControlAngle = finalFocalControlAngle;
+      return finalEllipse;
+    };
+
+    var calculateNextStep = function (focalControlAngle) {
+      // Create ellipse
+      var localFocalControlPoint = circle.vertAt(circleSector.startAngle + Math.PI / 2.0 - focalControlAngle * DEG_TO_RAD);
+      var axis1 = new Line(pointA, localFocalControlPoint);
+      var axis2 = new Line(pointB, localFocalControlPoint);
+      // var axisControlPoint = new Vertex(focalControlPoint.x - pointA.x, focalControlPoint.y - pointA.y);
+      var axisControlPoint = localFocalControlPoint.clone().scale(-1.0, circle.center);
+
+      var ellipse = new VEllipse(localFocalControlPoint, axisControlPoint, axis1.angle());
+      //  draw.ellipse(
+      //    ellipse.center,
+      //    ellipse.radiusH(), // radiusX: number,
+      //    ellipse.radiusV(), // radiusY: number,
+      //    "yellow",
+      //    1.0,
+      //    ellipse.rotation,
+      //    { dashArray: [5, 5] } // strokeOptions?: StrokeOptions
+      //  );
+
+      return ellipse;
     };
 
     var testDrawExpandedIntersection = function (draw, fill) {
@@ -207,6 +358,7 @@
     appContext.updatePoints();
     appContext.updateHelperCircle();
     appContext.updateFocalControlPoint();
+    // calculateApproximation();
     // pb.redraw();
     humane.log("Move the three vertices around.");
   });

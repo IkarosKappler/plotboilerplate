@@ -210,9 +210,9 @@ export declare class Bounds implements IBounds, XYDimension {
      * @memberof Bounds
      * @param {Vertex} pA - The first point of the line.
      * @param {Vertex} pB - The second point of the line.
-     * @returns {ine} A new line covering the whole box.
+     * @returns {Line | null} A new line covering the whole box, or null if the given line has no visible intersection with the box.
      */
-    expandLine(line: Line): Line;
+    expandLine(line: Line): Line | null;
     /**
      * Convert these bounds to a human readable form.
      *

@@ -19,7 +19,10 @@
       // fold.add(appContext.config, "isCounterClockwise").title("Winding left or right?").onChange(function () { appContext.onClockwiseChanged(); });
 
       // prettier-ignore
-      fold.add(appContext.config, "focalControlAngle").min(-90).max(90).step(0.1).title("How titled should the control focal axis be?").onChange(function () { appContext.updateFocalControlPoint(); });
+      fold.add(appContext.config, "focalControlAngle").listen().min(-90).max(90).step(0.1).title("How titled should the control focal axis be?").onChange(function () { appContext.updateFocalControlPoint(); });
+
+      // prettier-ignore
+      gui.add(appContext.config, "findCorrectAngle").title("Find correct angle?");
 
       // prettier-ignore
       gui.add(appContext.config, "readme").title("Show the readme.");

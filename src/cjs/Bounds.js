@@ -252,7 +252,7 @@ var Bounds = /** @class */ (function () {
      * @memberof Bounds
      * @param {Vertex} pA - The first point of the line.
      * @param {Vertex} pB - The second point of the line.
-     * @returns {ine} A new line covering the whole box.
+     * @returns {Line | null} A new line covering the whole box, or null if the given line has no visible intersection with the box.
      */
     Bounds.prototype.expandLine = function (line) {
         var _a, _b;
@@ -270,6 +270,9 @@ var Bounds = /** @class */ (function () {
         ].filter(function (vert) { return Boolean(vert); });
         // console.log("intersections", intersections);
         // intersections = intersections.filter((vert: Vertex | null) => Boolean(vert));
+        if (intersections.length < 2) {
+            return null;
+        }
         var first = intersections[0];
         var second = intersections[1];
         // console.log("first", first, "second", second);
