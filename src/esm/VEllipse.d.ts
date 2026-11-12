@@ -19,7 +19,8 @@
  * @modified 2025-03-31 Adding the `VEllipse.move(amount: XYCoords)` method.
  * @modified 2025-04-19 Adding the `VEllipse.getBounds()` method.
  * @modified 2025-04-24 Adding the `VEllipse.getExtremePoints()` method for calculating minima and maxima.
- * @version  1.4.0
+ * @modified 2026-10-30 Adding the `VEllipse.containsPoint()` method.
+ * @version  1.5.0
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
@@ -87,6 +88,15 @@ export declare class VEllipse implements IBounded, Intersectable, SVGSerializabl
      * @name VEllipse
      **/
     constructor(center: Vertex, axis: Vertex, rotation?: number);
+    /**
+     * Check if a given point is inside thie ellipse.
+     *
+     * @method containsPoint
+     * @instance
+     * @memberof VEllipse
+     * @return {boolean} Returns `true` if the passed coordinates are inside this ellipse - `false` otherwise.
+     */
+    containsPoint(vert: XYCoords): boolean;
     /**
      * Clone this ellipse (deep clone).
      *

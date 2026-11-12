@@ -20,7 +20,8 @@
  * @modified 2025-03-31 Adding the `VEllipse.move(amount: XYCoords)` method.
  * @modified 2025-04-19 Adding the `VEllipse.getBounds()` method.
  * @modified 2025-04-24 Adding the `VEllipse.getExtremePoints()` method for calculating minima and maxima.
- * @version  1.4.0
+ * @modified 2026-10-30 Adding the `VEllipse.containsPoint()` method.
+ * @version  1.5.0
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
@@ -73,7 +74,7 @@ var VEllipse = /** @class */ (function () {
     VEllipse.prototype.containsPoint = function (vert) {
         // https://math.stackexchange.com/questions/76457/check-if-a-point-is-within-an-ellipse
         // First rotate point in direction of ellipse to align with normalized ellipse form.
-        var rotatedVert = new Vertex_1.Vertex(vert).rotate(this.rotation, this.center);
+        var rotatedVert = new Vertex_1.Vertex(vert).rotate(-this.rotation, this.center);
         return (Math.pow(this.center.x - rotatedVert.x, 2) / Math.pow(this.radiusH(), 2) +
             Math.pow(this.center.y - rotatedVert.y, 2) / Math.pow(this.radiusV(), 2) <
             1);

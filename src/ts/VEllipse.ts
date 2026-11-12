@@ -116,7 +116,7 @@ export class VEllipse implements IBounded, Intersectable, SVGSerializable {
   containsPoint(vert: XYCoords): boolean {
     // https://math.stackexchange.com/questions/76457/check-if-a-point-is-within-an-ellipse
     // First rotate point in direction of ellipse to align with normalized ellipse form.
-    var rotatedVert = new Vertex(vert).rotate(this.rotation, this.center);
+    var rotatedVert = new Vertex(vert).rotate(-this.rotation, this.center);
     return (
       Math.pow(this.center.x - rotatedVert.x, 2) / Math.pow(this.radiusH(), 2) +
         Math.pow(this.center.y - rotatedVert.y, 2) / Math.pow(this.radiusV(), 2) <

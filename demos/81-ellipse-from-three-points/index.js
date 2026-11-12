@@ -31,7 +31,7 @@
     // Create a config: we want to have control about the arrow head size in this demo
     // `AppContext`: this is an experimental approach to make future event handling easier.
     var appContext = new AppContext(pb, {
-      focalControlAngle: params.getNumber("focalControlAngle", 0.0), // In Degrees!
+      focalControlAngleDeg: params.getNumber("focalControlAngleDeg", 0.0), // In Degrees!
       findCorrectAngle: function () {
         appContext.findCorrectAngle();
       },
@@ -42,7 +42,7 @@
     appContext.isMobile = isMobileDevice();
     appContext.updateFocalControlPoint = function () {
       focalControlPoint.set(
-        circle.vertAt(circleSector.startAngle + Math.PI / 2.0 - appContext.config.focalControlAngle * DEG_TO_RAD)
+        circle.vertAt(circleSector.startAngle + Math.PI / 2.0 - appContext.config.focalControlAngleDeg * DEG_TO_RAD)
       );
       pb.redraw();
     };
@@ -86,7 +86,7 @@
     appContext.findCorrectAngle = function () {
       var zeroPointOnCircle = circle.vertAt(circleSector.startAngle + Math.PI / 2.0);
       var lineAFocal = new Line(pointA, zeroPointOnCircle);
-      appContext.config.focalControlAngle = lineAFocal.angle();
+      appContext.config.focalControlAngleDeg = lineAFocal.angle();
       appContext.updatePoints();
       appContext.updateHelperCircle();
       appContext.updateFocalControlPoint();
@@ -166,7 +166,7 @@
       var axisControlPoint = focalControlPoint.clone().scale(-1.0, circle.center);
 
       // var ellipse = new VEllipse(focalControlPoint, axisControlPoint, axis1.angle());
-      var ellipse = calculateNextStep(bisector, appContext.config.focalControlAngle);
+      var ellipse = calculateNextStep(bisector, appContext.config.focalControlAngleDeg);
       draw.ellipse(
         ellipse.center,
         ellipse.radiusH(), // radiusX: number,
@@ -185,8 +185,9 @@
         draw.line(extendedcolinearLine.a, extendedcolinearLine.b, "grey", 1.0, { dashArray: [5, 5] });
       }
 
-      // var finalEllipse = calculateApproximation(draw, fill, appContext.config.focalControlAngle);
-      var finalEllipse = calculateApproximation(draw, fill, 0.0, Math.PI / 2.0, 0, 10);
+      // var finalEllipse = calculateApproximation(draw, fill, appContext.config.focalControlAngleDeg);
+      // var finalEllipse = calculateApproximation(draw, fill, 0.0, Math.PI / 2.0, 0, 10);
+      var finalEllipse = _calculateApproximation(draw, fill);
 
       // Draw final ellipse
       if (finalEllipse) {
@@ -212,7 +213,7 @@
       // var extendedcolinearLine = viewport.expandLine(colinearLine);
       var stepNo = 0;
       var stepSize = Math.PI / 2.0;
-      // var currentFocalControlAngle = appContext.config.focalControlAngle;
+      // var currentFocalControlAngle = appContext.config.focalControlAngleDeg;
       var maxStep = 100;
       var recentIntersectionDists = null;
       var stop = false;
@@ -248,7 +249,7 @@
       // );
 
       console.log("finalFocalControlAngle", finalFocalControlAngle);
-      // appContext.config.focalControlAngle = finalFocalControlAngle;
+      // appContext.config.focalControlAngleDeg = finalFocalControlAngle;
       return finalEllipse;
     };
 
@@ -262,7 +263,7 @@
       // var extendedcolinearLine = viewport.expandLine(colinearLine);
       var stepNo = 0;
       var stepSize = Math.PI / 2.0;
-      var currentFocalControlAngle = appContext.config.focalControlAngle;
+      var currentFocalControlAngle = appContext.config.focalControlAngleDeg;
       var maxStep = 100;
       var recentIntersectionDists = null;
       var stop = false;
@@ -323,7 +324,7 @@
       } // END while
 
       console.log("finalFocalControlAngle", finalFocalControlAngle);
-      // appContext.config.focalControlAngle = finalFocalControlAngle;
+      // appContext.config.focalControlAngleDeg = finalFocalControlAngle;
       return finalEllipse;
     };
 

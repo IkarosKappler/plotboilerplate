@@ -31,10 +31,6 @@
     // Create a config: we want to have control about the arrow head size in this demo
     // `AppContext`: this is an experimental approach to make future event handling easier.
     var appContext = new AppContext(pb, {
-      focalControlAngle: params.getNumber("focalControlAngle", 0.0), // In Degrees!
-      findCorrectAngle: function () {
-        appContext.findCorrectAngle();
-      },
       readme: function () {
         globalThis.displayDemoMeta();
       }
@@ -56,6 +52,20 @@
       // var bisector = lineAB.perpBisector();
       // draw.line(bisector.a, bisector.b, "orange", 1.0);
 
+      // console.log("{ x: uiStats.mouseX, y: uiStats.mouseY }", { x: stats.mouseX, y: stats.mouseY });
+      var point = { x: stats.mouseX, y: stats.mouseY };
+      var isContained = ellipse.containsPoint(point);
+
+      fill.ellipse(
+        ellipse.center,
+        ellipse.radiusH(), // radiusX: number,
+        ellipse.radiusV(), // radiusY: number,
+        isContained ? "rgba(192,92,0,0.5)" : "rgba(92,192,0,0.5)",
+        2.0,
+        ellipse.rotation,
+        { dashArray: [5, 5] } // strokeOptions?: StrokeOptions
+      );
+
       draw.ellipse(
         ellipse.center,
         ellipse.radiusH(), // radiusX: number,
@@ -66,9 +76,7 @@
         { dashArray: [5, 5] } // strokeOptions?: StrokeOptions
       );
 
-      // console.log("{ x: uiStats.mouseX, y: uiStats.mouseY }", { x: stats.mouseX, y: stats.mouseY });
-      var point = { x: stats.mouseX, y: stats.mouseY };
-      draw.crosshair(point, 12, ellipse.containsPoint(point) ? "red" : "green");
+      draw.crosshair(point, 12, isContained ? "red" : "green");
     };
 
     // +---------------------------------------------------------------------------------
