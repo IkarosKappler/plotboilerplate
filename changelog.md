@@ -1,5 +1,7 @@
 # Changelog
 
+- 2026-11-24
+  - Adding `CircleSector.vertAt` method.
 - 2026-10-30
   - Adding the `VEllipse.containsPoint()` method.
   - Adding demo `82-ellipse-contains-point`.
