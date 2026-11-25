@@ -3,19 +3,30 @@
  * @date 2026-11-25
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EllipseFromThreePoints = void 0;
+exports.EllipseFromThreePointsApproximation = void 0;
+var Circle_1 = require("../../Circle");
+var CircleSector_1 = require("../../CircleSector");
 var Line_1 = require("../../Line");
 var Triangle_1 = require("../../Triangle");
 var VEllipse_1 = require("../../VEllipse");
+var Vertex_1 = require("../../Vertex");
 var DEG_TO_RAD = Math.PI / 180;
 var RAD_TO_DEG = 180.0 / Math.PI;
-var EllipseFromThreePoints = /** @class */ (function () {
-    function EllipseFromThreePoints(inputPointA, inputPointB, inputPointC) {
+var EllipseFromThreePointsApproximation = /** @class */ (function () {
+    function EllipseFromThreePointsApproximation(inputPointA, inputPointB, inputPointC) {
         this.inputPointA = inputPointA;
         this.inputPointB = inputPointB;
         this.inputPointC = inputPointC;
+        this.pointA = this.inputPointA.clone();
+        this.pointB = this.inputPointB.clone();
+        this.pointC = this.inputPointC.clone();
+        this.lineAB = new Line_1.Line(this.pointA, this.pointB);
+        // Init helper circle and circleSector with random start values.
+        this.circle = new Circle_1.Circle(new Vertex_1.Vertex(0.0), 100.0);
+        this.circleSector = new CircleSector_1.CircleSector(this.circle, -Math.PI / 2.0, Math.PI / 2.0);
+        this.focalControlPoint = new Vertex_1.Vertex(0.0);
     }
-    EllipseFromThreePoints.prototype.arrangeInputPoints = function () {
+    EllipseFromThreePointsApproximation.prototype.arrangeInputPoints = function () {
         // We define folliwing two conditions to the three points:
         //  (a) The line A→B must be the longest one from the triangle.
         //  (b) The trinangle (A,B,C) must be in clockwise winding order.
@@ -46,19 +57,31 @@ var EllipseFromThreePoints = /** @class */ (function () {
             this.pointB.set(tmp);
         }
     };
+    EllipseFromThreePointsApproximation.prototype.updateFocalControlPoint = function (focalControlAngleRad) {
+        this.focalControlPoint.set(this.circle.vertAt(this.circleSector.startAngle + Math.PI / 2.0 - focalControlAngleRad //  appContext.config.focalControlAngleDeg * DEG_TO_RAD
+        ));
+    };
+    EllipseFromThreePointsApproximation.prototype.updateHelperCircle = function () {
+        this.circle.center.set(this.lineAB.vertAt(0.5));
+        this.circle.radius = this.lineAB.length() / 2.0;
+        // cirleSector = new CircleSector(circle, lineAB.angle(), lineAB.angle() + Math.PI);
+        this.circleSector.startAngle = this.lineAB.angle();
+        this.circleSector.endAngle = this.lineAB.angle() + Math.PI;
+    };
     // +---------------------------------------------------------------------------------
     // | Calculate the next iteration step.
     // +-------------------------------
-    EllipseFromThreePoints.prototype.calculateNextStep = function (focalControlAngleDeg) {
+    EllipseFromThreePointsApproximation.prototype.calculateNextStep = function (focalControlAngleRad) {
         // Create ellipse
-        var localFocalControlPoint = this.circle.vertAt(this.circleSector.startAngle + Math.PI / 2.0 - focalControlAngleDeg * DEG_TO_RAD);
+        var localFocalControlPoint = this.circle.vertAt(this.circleSector.startAngle + Math.PI / 2.0 - focalControlAngleRad //  focalControlAngleDeg * DEG_TO_RAD
+        );
         var axis1 = new Line_1.Line(this.pointA, localFocalControlPoint);
         var axis2 = new Line_1.Line(this.pointB, localFocalControlPoint);
         var axisControlPoint = localFocalControlPoint.clone().scale(-1.0, this.circle.center);
         var ellipse = new VEllipse_1.VEllipse(localFocalControlPoint, axisControlPoint, axis1.angle());
         return ellipse;
     };
-    return EllipseFromThreePoints;
+    return EllipseFromThreePointsApproximation;
 }());
-exports.EllipseFromThreePoints = EllipseFromThreePoints;
-//# sourceMappingURL=EllipseFromThreePoints.js.map
+exports.EllipseFromThreePointsApproximation = EllipseFromThreePointsApproximation;
+//# sourceMappingURL=EllipseFromThreePointsApproximation.js.map
