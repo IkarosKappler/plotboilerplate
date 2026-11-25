@@ -64,7 +64,12 @@
       // var beginAngleRad = 0.0; // Math.PI / 2.0;
       // var endAngleRad = Math.PI / 2.0; // 0.0;
       cachedEllipses = [];
-      var newFocalControlAngleDeg = findCorrectAngleRecursive(beginAngleRad, endAngleRad, appContext.config.numMaxIterations);
+      var newFocalControlAngleDeg = ellipseApproximation.findCorrectAngleRecursive(
+        beginAngleRad,
+        endAngleRad,
+        appContext.config.numMaxIterations,
+        cachedEllipses
+      );
       appContext.config.focalControlAngleDeg = newFocalControlAngleDeg * RAD_TO_DEG; // lineAFocal.angle() * RAD_TO_DEG;
       appContext.updatePoints();
       appContext.updateHelperCircle();
@@ -75,27 +80,27 @@
       cachedEllipses = [];
     };
 
-    // +---------------------------------------------------------------------------------
-    // | Find angle recursively.
-    // +-------------------------------
-    var findCorrectAngleRecursive = function (beginAngleRad, endAngleRad, iterCount) {
-      // var newFocalControlAngleDeg = Math.PI / 4.0;
-      // Bisect the begin- and end-angle
-      var newFocalControlAngleRad = beginAngleRad + (endAngleRad - beginAngleRad) / 2.0;
-      if (iterCount <= 0) {
-        return newFocalControlAngleRad;
-      }
-      var nextEllipse = ellipseApproximation.calculateNextStep(newFocalControlAngleRad); // TODO TEST * RAD_TO_DEG);
-      var focalAngleDeg = newFocalControlAngleRad * RAD_TO_DEG;
-      cachedEllipses.push({ ellipse: nextEllipse, focalAngle: focalAngleDeg });
-      // Why is this not working
-      if (nextEllipse.containsPoint(ellipseApproximation.pointC)) {
-        // ...
-        return findCorrectAngleRecursive(newFocalControlAngleRad, endAngleRad, iterCount - 1);
-      } else {
-        return findCorrectAngleRecursive(beginAngleRad, newFocalControlAngleRad, iterCount - 1);
-      }
-    };
+    // // +---------------------------------------------------------------------------------
+    // // | Find angle recursively.
+    // // +-------------------------------
+    // var findCorrectAngleRecursive = function (beginAngleRad, endAngleRad, iterCount) {
+    //   // var newFocalControlAngleDeg = Math.PI / 4.0;
+    //   // Bisect the begin- and end-angle
+    //   var newFocalControlAngleRad = beginAngleRad + (endAngleRad - beginAngleRad) / 2.0;
+    //   if (iterCount <= 0) {
+    //     return newFocalControlAngleRad;
+    //   }
+    //   var nextEllipse = ellipseApproximation.calculateNextStep(newFocalControlAngleRad); // TODO TEST * RAD_TO_DEG);
+    //   var focalAngleDeg = newFocalControlAngleRad * RAD_TO_DEG;
+    //   cachedEllipses.push({ ellipse: nextEllipse, focalAngle: focalAngleDeg });
+    //   // Why is this not working
+    //   if (nextEllipse.containsPoint(ellipseApproximation.pointC)) {
+    //     // ...
+    //     return findCorrectAngleRecursive(newFocalControlAngleRad, endAngleRad, iterCount - 1);
+    //   } else {
+    //     return findCorrectAngleRecursive(beginAngleRad, newFocalControlAngleRad, iterCount - 1);
+    //   }
+    // };
 
     // +---------------------------------------------------------------------------------
     // | Global vars
@@ -168,7 +173,7 @@
         1.0
       );
       fill.text(
-        "Start: " + ellipseApproximation.circleSector.startAngle * RAD_TO_DEG.toFixed(1),
+        "Start: " + (ellipseApproximation.circleSector.startAngle * RAD_TO_DEG).toFixed(1),
         circleArcStartPoint.x,
         circleArcStartPoint.y,
         {
@@ -176,7 +181,7 @@
         }
       );
       fill.text(
-        "End: " + ellipseApproximation.circleSector.endAngle * RAD_TO_DEG.toFixed(1),
+        "End: " + (ellipseApproximation.circleSector.endAngle * RAD_TO_DEG).toFixed(1),
         circleArcEndPoint.x,
         circleArcEndPoint.y,
         {
@@ -187,18 +192,16 @@
       draw.line(ellipseApproximation.pointA, ellipseApproximation.focalControlPoint, "rgba(0,192,192,0.5)", 2.0);
       draw.line(ellipseApproximation.pointB, ellipseApproximation.focalControlPoint, "rgba(0,192,192,0.5)", 2.0);
 
-      // Create ellipse
-      // var ellipse = new VEllipse(focalControlPoint, axisControlPoint, axis1.angle());
-      // var ellipse = ellipseApproximation.calculateNextStep(bisector, appContext.config.focalControlAngleDeg);
-      var ellipse = ellipseApproximation.calculateNextStep(appContext.config.focalControlAngleDeg * DEG_TO_RAD);
+      // Create ellipse from currently configured focal angle.
+      var configuredEllipse = ellipseApproximation.calculateNextStep(appContext.config.focalControlAngleDeg * DEG_TO_RAD);
       draw.ellipse(
-        ellipse.center,
-        ellipse.radiusH(), // radiusX: number,
-        ellipse.radiusV(), // radiusY: number,
+        configuredEllipse.center,
+        configuredEllipse.radiusH(),
+        configuredEllipse.radiusV(),
         "yellow",
         1.0,
-        ellipse.rotation,
-        { dashArray: [5, 5] } // strokeOptions?: StrokeOptions
+        configuredEllipse.rotation,
+        { dashArray: [5, 5] } // StrokeOptions
       );
 
       // Find intersection of line through C and the current ellipse

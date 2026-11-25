@@ -76,7 +76,7 @@ export class EllipseFromThreePointsApproximation {
     }
   }
 
-  updateFocalControlPoint(focalControlAngleRad) {
+  updateFocalControlPoint(focalControlAngleRad: number) {
     this.focalControlPoint.set(
       this.circle.vertAt(
         this.circleSector.startAngle + Math.PI / 2.0 - focalControlAngleRad //  appContext.config.focalControlAngleDeg * DEG_TO_RAD
@@ -90,6 +90,35 @@ export class EllipseFromThreePointsApproximation {
     // cirleSector = new CircleSector(circle, lineAB.angle(), lineAB.angle() + Math.PI);
     this.circleSector.startAngle = this.lineAB.angle();
     this.circleSector.endAngle = this.lineAB.angle() + Math.PI;
+  }
+
+  // +---------------------------------------------------------------------------------
+  // | Find angle recursively.
+  // +-------------------------------
+  findCorrectAngleRecursive(
+    beginAngleRad: number,
+    endAngleRad: number,
+    iterCount: number,
+    cachedEllipses?: Array<{ ellipse: VEllipse; focalAngle: number }>
+  ) {
+    // var newFocalControlAngleDeg = Math.PI / 4.0;
+    // Bisect the begin- and end-angle
+    var newFocalControlAngleRad = beginAngleRad + (endAngleRad - beginAngleRad) / 2.0;
+    if (iterCount <= 0) {
+      return newFocalControlAngleRad;
+    }
+    var nextEllipse = this.calculateNextStep(newFocalControlAngleRad); // TODO TEST * RAD_TO_DEG);
+    var focalAngleDeg = newFocalControlAngleRad * RAD_TO_DEG;
+    if (cachedEllipses) {
+      cachedEllipses.push({ ellipse: nextEllipse, focalAngle: focalAngleDeg });
+    }
+    // Why is this not working
+    if (nextEllipse.containsPoint(this.pointC)) {
+      // ...
+      return this.findCorrectAngleRecursive(newFocalControlAngleRad, endAngleRad, iterCount - 1, cachedEllipses);
+    } else {
+      return this.findCorrectAngleRecursive(beginAngleRad, newFocalControlAngleRad, iterCount - 1, cachedEllipses);
+    }
   }
 
   // +---------------------------------------------------------------------------------

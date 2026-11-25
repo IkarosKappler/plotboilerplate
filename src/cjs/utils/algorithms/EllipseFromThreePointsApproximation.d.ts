@@ -17,7 +17,11 @@ export declare class EllipseFromThreePointsApproximation {
     focalControlPoint: Vertex;
     constructor(inputPointA: Vertex, inputPointB: Vertex, inputPointC: Vertex);
     arrangeInputPoints(): void;
-    updateFocalControlPoint(focalControlAngleRad: any): void;
+    updateFocalControlPoint(focalControlAngleRad: number): void;
     updateHelperCircle(): void;
+    findCorrectAngleRecursive(beginAngleRad: number, endAngleRad: number, iterCount: number, cachedEllipses?: Array<{
+        ellipse: VEllipse;
+        focalAngle: number;
+    }>): any;
     calculateNextStep(focalControlAngleRad: number): VEllipse;
 }

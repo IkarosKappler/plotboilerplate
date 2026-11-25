@@ -69,6 +69,30 @@ var EllipseFromThreePointsApproximation = /** @class */ (function () {
         this.circleSector.endAngle = this.lineAB.angle() + Math.PI;
     };
     // +---------------------------------------------------------------------------------
+    // | Find angle recursively.
+    // +-------------------------------
+    EllipseFromThreePointsApproximation.prototype.findCorrectAngleRecursive = function (beginAngleRad, endAngleRad, iterCount, cachedEllipses) {
+        // var newFocalControlAngleDeg = Math.PI / 4.0;
+        // Bisect the begin- and end-angle
+        var newFocalControlAngleRad = beginAngleRad + (endAngleRad - beginAngleRad) / 2.0;
+        if (iterCount <= 0) {
+            return newFocalControlAngleRad;
+        }
+        var nextEllipse = this.calculateNextStep(newFocalControlAngleRad); // TODO TEST * RAD_TO_DEG);
+        var focalAngleDeg = newFocalControlAngleRad * RAD_TO_DEG;
+        if (cachedEllipses) {
+            cachedEllipses.push({ ellipse: nextEllipse, focalAngle: focalAngleDeg });
+        }
+        // Why is this not working
+        if (nextEllipse.containsPoint(this.pointC)) {
+            // ...
+            return this.findCorrectAngleRecursive(newFocalControlAngleRad, endAngleRad, iterCount - 1, cachedEllipses);
+        }
+        else {
+            return this.findCorrectAngleRecursive(beginAngleRad, newFocalControlAngleRad, iterCount - 1, cachedEllipses);
+        }
+    };
+    // +---------------------------------------------------------------------------------
     // | Calculate the next iteration step.
     // +-------------------------------
     EllipseFromThreePointsApproximation.prototype.calculateNextStep = function (focalControlAngleRad) {
