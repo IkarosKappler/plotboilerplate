@@ -35,8 +35,12 @@
       // Must be in -PI/2 ... +PI/2
       focalControlAngleDeg: params.getNumber("focalControlAngleDeg", 0.0), // In Degrees!
       numMaxIterations: params.getNumber("numMaxIterations", 100),
-      findCorrectAngle: function () {
-        appContext.findCorrectAngle();
+      showLinearApproximation: params.getBoolean("showLinearApproximation", false),
+      findFirstCorrectAngle: function () {
+        appContext.findCorrectAngle(0.0, Math.PI / 2.0);
+      },
+      findSecondCorrectAngle: function () {
+        appContext.findCorrectAngle(0.0, -Math.PI / 2.0);
       },
       readme: function () {
         globalThis.displayDemoMeta();
@@ -86,10 +90,10 @@
         pointB.set(tmp);
       }
     };
-    appContext.findCorrectAngle = function () {
-      var beginAngleRad = 0.0; // Math.PI / 2.0;
-      var endAngleRad = Math.PI / 2.0; // 0.0;
-      tempEllipses = [];
+    appContext.findCorrectAngle = function (beginAngleRad, endAngleRad) {
+      // var beginAngleRad = 0.0; // Math.PI / 2.0;
+      // var endAngleRad = Math.PI / 2.0; // 0.0;
+      cachedEllipses = [];
       var newFocalControlAngleDeg = findCorrectAngleRecursive(beginAngleRad, endAngleRad, appContext.config.numMaxIterations);
       appContext.config.focalControlAngleDeg = newFocalControlAngleDeg * RAD_TO_DEG; // lineAFocal.angle() * RAD_TO_DEG;
       appContext.updatePoints();
@@ -98,7 +102,7 @@
       pb.redraw();
     };
     appContext.clearCachedIterations = function () {
-      tempEllipses = [];
+      cachedEllipses = [];
     };
 
     // +---------------------------------------------------------------------------------
@@ -113,7 +117,7 @@
       }
       var focalAngle = newFocalControlAngleDeg * RAD_TO_DEG;
       var nextEllipse = calculateNextStep(newFocalControlAngleDeg * RAD_TO_DEG);
-      tempEllipses.push({ ellipse: nextEllipse, focalAngle: focalAngle });
+      cachedEllipses.push({ ellipse: nextEllipse, focalAngle: focalAngle });
       // Why is this not working
       if (nextEllipse.containsPoint(pointC)) {
         // ...
@@ -142,7 +146,7 @@
     var lineAB = new Line(pointA, pointB);
 
     // Array<{ellipse,focalAngle}>
-    var tempEllipses = [];
+    var cachedEllipses = [];
 
     // var finalEllipse = null;
 
@@ -228,8 +232,18 @@
         draw.line(extendedcolinearLine.a, extendedcolinearLine.b, "grey", 1.0, { dashArray: [5, 5] });
       }
 
-      var finalEllipse = calculateApproximation(draw, fill);
+      if (appContext.config.showLinearApproximation) {
+        drawLinearApproximation(draw, fill);
+      }
 
+      drawCachedEllipses(draw, fill);
+    };
+
+    // +---------------------------------------------------------------------------------
+    // |Just a helper draw function.
+    // +-------------------------------
+    var drawLinearApproximation = function (draw, fill) {
+      var finalEllipse = calculateLinearApproximation(draw, fill);
       // Draw final ellipse
       if (finalEllipse) {
         draw.ellipse(
@@ -242,41 +256,44 @@
           { dashArray: [5, 5] } // strokeOptions?: StrokeOptions
         );
       }
-
-      drawTempEllipses(draw, fill);
     };
 
     // +---------------------------------------------------------------------------------
     // |Just a helper draw function.
     // +-------------------------------
-    var drawTempEllipses = function (draw, fill) {
-      console.log("tempEllipses", tempEllipses);
+    var drawCachedEllipses = function (draw, fill) {
+      console.log("cachedEllipses", cachedEllipses);
       var startColor = Color.parse("violet");
       var endColor = Color.parse("cyan");
       console.log("startColor", startColor, "endColor", endColor);
-      for (var i = 0; i < tempEllipses.length; i++) {
-        var curColor = startColor.clone().interpolate(endColor, i / (tempEllipses.length - 1));
+      for (var i = 0; i < cachedEllipses.length; i++) {
+        var isFinalEllipse = i + 1 >= cachedEllipses.length;
+        var curColor = startColor.clone().interpolate(endColor, i / (cachedEllipses.length - 1));
         var colorStr = curColor.setAlpha(0.25).cssRGBA();
         console.log("colorStr", colorStr);
-        var ellipse = tempEllipses[i].ellipse;
-        var focalAngle = tempEllipses[i].focalAngle;
+        var ellipse = cachedEllipses[i].ellipse;
+        var focalAngle = cachedEllipses[i].focalAngle;
         draw.ellipse(
           ellipse.center,
           ellipse.radiusH(), // radiusX: number,
           ellipse.radiusV(), // radiusY: number,
-          colorStr, // "violet",
-          1.0,
+          isFinalEllipse ? "orange" : colorStr, // "violet",
+          isFinalEllipse ? 2.0 : 1.0,
           ellipse.rotation,
           { dashArray: [2, 2] } // strokeOptions?: StrokeOptions
         );
         var tmpFocalAnglePoint = circleSector.vertAt(focalAngle);
+        // var tmpFocalAnglePoint = circleSector.vertAt(focalAngle - circleSector.startAngle);
         // console.log("tmpFocalAnglePoint", tmpFocalAnglePoint);
         draw.polyline([pointA, tmpFocalAnglePoint, pointB], true, colorStr, 1.0);
         fill.text("" + i, tmpFocalAnglePoint.x, tmpFocalAnglePoint.y, { color: colorStr });
       }
     };
 
-    var calculateApproximation = function (draw, fill) {
+    // +---------------------------------------------------------------------------------
+    // | Test calculate the linear approximation (no good results but looks fancy).
+    // +-------------------------------
+    var calculateLinearApproximation = function (draw, fill) {
       var ellipse = null;
 
       var bisector = lineAB.perpBisector();
@@ -351,28 +368,22 @@
       return finalEllipse;
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Calculate the next iteration step.
+    // +-------------------------------
     var calculateNextStep = function (focalControlAngleDeg) {
       // Create ellipse
       var localFocalControlPoint = circle.vertAt(circleSector.startAngle + Math.PI / 2.0 - focalControlAngleDeg * DEG_TO_RAD);
       var axis1 = new Line(pointA, localFocalControlPoint);
       var axis2 = new Line(pointB, localFocalControlPoint);
-      // var axisControlPoint = new Vertex(focalControlPoint.x - pointA.x, focalControlPoint.y - pointA.y);
       var axisControlPoint = localFocalControlPoint.clone().scale(-1.0, circle.center);
-
       var ellipse = new VEllipse(localFocalControlPoint, axisControlPoint, axis1.angle());
-      //  draw.ellipse(
-      //    ellipse.center,
-      //    ellipse.radiusH(), // radiusX: number,
-      //    ellipse.radiusV(), // radiusY: number,
-      //    "yellow",
-      //    1.0,
-      //    ellipse.rotation,
-      //    { dashArray: [5, 5] } // strokeOptions?: StrokeOptions
-      //  );
-
       return ellipse;
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Approach to find and draw the third point's perpendicular bisector.
+    // +-------------------------------
     var testDrawExpandedIntersection = function (draw, fill) {
       var bisector = new Line(inputPointA, inputPointB).perpBisector();
       var viewport = pb.viewport();

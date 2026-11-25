@@ -25,7 +25,11 @@
       fold.add(appContext.config, "numMaxIterations").listen().min(1).max(100).step(1).title("How many maximal iterations to use for elliptic detection?").onChange(function () { appContext.updateFocalControlPoint(); });
 
       // prettier-ignore
-      gui.add(appContext.config, "findCorrectAngle").title("Find correct angle?");
+      gui.add(appContext.config, "findFirstCorrectAngle").title("Find first correct angle.");
+      // prettier-ignore
+      gui.add(appContext.config, "findSecondCorrectAngle").title("Find second correct angle.");
+      // prettier-ignore
+      gui.add(appContext.config, "showLinearApproximation").title("Draw a simple linear (unstable) approach to find a matching ellipse.").onChange( function() { appContext.pb.redraw(); } );
 
       // prettier-ignore
       gui.add(appContext.config, "readme").title("Show the readme.");
