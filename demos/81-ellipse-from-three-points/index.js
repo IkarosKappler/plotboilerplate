@@ -52,6 +52,10 @@
       firstCachedEllipses = [];
       secondCachedEllipses = [];
     };
+    appContext.updateFocalControlPoint = function () {
+      ellipseApproximation.updateFocalControlPoint(appContext.config.focalControlAngleDeg * DEG_TO_RAD);
+      appContext.pb.redraw();
+    };
     var findCorrectAngle = function (beginAngleRad, endAngleRad, cachedEllipses) {
       cachedEllipses.splice(); // Empty buffer
       var newFocalControlAngleDeg = ellipseApproximation.findCorrectAngleRecursive(
@@ -99,7 +103,6 @@
       appContext.clearCachedIterations();
       ellipseApproximation.arrangeInputPoints();
       ellipseApproximation.updateHelperCircle();
-      ellipseApproximation.updateFocalControlPoint(appContext.config.focalControlAngleDeg * DEG_TO_RAD);
       approximate();
       appContext.pb.redraw();
     };
@@ -207,7 +210,13 @@
     // |Just a helper draw function.
     // +-------------------------------
     var drawLinearApproximation = function (draw, fill) {
-      var finalEllipse = calculateLinearApproximation(draw, fill);
+      var finalEllipse = calculateLinearApproximation(
+        draw,
+        fill,
+        ellipseApproximation,
+        appContext.config.numMaxIterations,
+        appContext.config.focalControlAngleDeg * DEG_TO_RAD
+      );
       // Draw final ellipse
       if (finalEllipse) {
         draw.ellipse(
@@ -253,78 +262,6 @@
         draw.polyline([ellipseApproximation.pointA, tmpFocalAnglePoint, ellipseApproximation.pointB], true, colorStr, 1.0);
         fill.text("" + i, tmpFocalAnglePoint.x, tmpFocalAnglePoint.y, { color: colorStr });
       }
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | Test calculate the linear approximation (no good results but looks fancy).
-    // +-------------------------------
-    var calculateLinearApproximation = function (draw, fill) {
-      var ellipse = null;
-
-      var bisector = ellipseApproximation.lineAB.perpBisector();
-      var viewport = pb.viewport();
-      // var extendedBisectorLine = viewport.expandLine(bisector);
-      var colinearLine = bisector.getColinear(ellipseApproximation.pointC);
-      // var extendedcolinearLine = viewport.expandLine(colinearLine);
-      var stepNo = 0;
-      var stepSize = Math.PI / 2.0;
-      var currentFocalControlAngleDeg = appContext.config.focalControlAngleDeg;
-      var maxStep = 100;
-      var recentIntersectionDists = null;
-      var stop = false;
-      var finalEllipse;
-      var lastEllipse;
-      var finalFocalControlAngle = 0;
-      while (stepNo++ < maxStep && !stop) {
-        ellipse = ellipseApproximation.calculateNextStep(currentFocalControlAngleDeg * DEG_TO_RAD);
-        // Find intersection of colinear line and ellipse
-        var intersections = ellipse.lineIntersections(colinearLine);
-        draw.crosshair(intersections[0], 6, "red");
-        draw.crosshair(intersections[1], 6, "red");
-
-        // Direction?
-        var direction = 1; // right (1) or left (-1)
-        var distAlpha = ellipseApproximation.pointC.distance(intersections[0]);
-        var distBeta = ellipseApproximation.pointC.distance(intersections[1]);
-        currentFocalControlAngleDeg += direction * stepSize;
-        draw.ellipse(
-          ellipse.center,
-          ellipse.radiusH(), // radiusX: number,
-          ellipse.radiusV(), // radiusY: number,
-          "rgba(128,192,0,0.2)",
-          1.0,
-          ellipse.rotation,
-          { dashArray: [5, 5] } // strokeOptions?: StrokeOptions
-        );
-
-        if (distAlpha < 1.0 || distBeta < 1.0) {
-          stop = true;
-          finalEllipse = ellipse;
-          finalFocalControlAngle = currentFocalControlAngleDeg;
-        }
-        if (recentIntersectionDists && (recentIntersectionDists[0] < distAlpha || recentIntersectionDists[1] < distBeta)) {
-          // stop = true;
-          stepSize * 0.9;
-          direction *= -1;
-        }
-        console.log(
-          "[stepNo=" + stepNo + "] currentFocalControlAngle",
-          currentFocalControlAngleDeg,
-          "stepSize",
-          stepSize,
-          "distAlpha",
-          distAlpha,
-          "distBeta",
-          distBeta
-        );
-
-        recentIntersectionDists = [distAlpha, distBeta];
-        lastEllipse = ellipse;
-      } // END while
-
-      console.log("finalFocalControlAngle", finalFocalControlAngle);
-      // appContext.config.focalControlAngleDeg = finalFocalControlAngle;
-      return finalEllipse;
     };
 
     // +---------------------------------------------------------------------------------
@@ -388,6 +325,7 @@
     pb.config.postDraw = postDraw;
 
     handlePointMoved();
+    appContext.updateFocalControlPoint();
     humane.log("Move the three vertices around.");
   });
 })(globalThis);
