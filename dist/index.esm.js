@@ -6765,7 +6765,8 @@ BezierPath.END_POINT = 3;
  * @modified 2025-04-09 Adding the `CircleSector.move()` method.
  * @modified 2025-04-19 Tweaking the `CircleSector.containsAngle` method: all values (input angle, start- and end- angle) are wrapped into [0,2*PI) now.
  * @modified 2025-04-19 Class `CircleSector` implements interface `Bounded` now (method `getBounds` added).
- * @version  1.2.0
+ * @modified 2026-11-24 Adding `CircleSector.vertAt` method.
+ * @version  1.3.0
  **/
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
@@ -6886,6 +6887,19 @@ class CircleSector {
             const angleAtRatio = this.startAngle + (Math.PI * 2 - this.startAngle + this.endAngle) * t;
             return angleAtRatio % (Math.PI * 2.0);
         }
+    }
+    /**
+     * Get the angle inside this sector for a given ratio. 0.0 means startAngle, and 1.0 means endAngle.
+     * The given angle should be inside this sector's angle bounds.
+     *
+     * @param {number} angle - The relative (to `this.startAngle`) angle in radians.
+     * @method vertAt
+     * @instance
+     * @memberof CircleSector
+     * @return {Vertex} The Vertex on the circle sector at the relative given angle.
+     */
+    vertAt(angle) {
+        return this.circle.vertAt(this.startAngle + angle);
     }
     /**
      * Get the sectors starting point (on the underlying circle, located at the start angle).
