@@ -35,28 +35,15 @@
       // Must be in -PI/2 ... +PI/2
       focalControlAngleDeg: params.getNumber("focalControlAngleDeg", 0.0), // In Degrees!
       numMaxIterations: params.getNumber("numMaxIterations", 100),
-      showLinearApproximation: params.getBoolean("showLinearApproximation", true),
       approxFirstCorrectAngle: params.getBoolean("approxFirstCorrectAngle", true),
       approxSecondCorrectAngle: params.getBoolean("approxSecondCorrectAngle", false),
+      showLinearApproximation: params.getBoolean("showLinearApproximation", false),
       drawCachedEllipsed: params.getBoolean("drawCachedEllipsed", false),
       readme: function () {
         globalThis.displayDemoMeta();
       }
     });
     appContext.isMobile = isMobileDevice();
-    appContext.updateFocalControlPoint = function () {
-      ellipseApproximation.updateFocalControlPoint(appContext.config.focalControlAngleDeg * DEG_TO_RAD);
-      pb.redraw();
-    };
-    appContext.updateHelperCircle = function () {
-      ellipseApproximation.updateHelperCircle();
-    };
-    appContext.updatePoints = function () {
-      // We define folliwing two conditions to the three points:
-      //  (a) The line A→B must be the longest one from the triangle.
-      //  (b) The trinangle (A,B,C) must be in clockwise winding order.
-      ellipseApproximation.arrangeInputPoints();
-    };
     appContext.handleApproximationSettingsChanged = function () {
       approximate();
       appContext.pb.redraw();
@@ -110,10 +97,11 @@
 
     var handlePointMoved = function () {
       appContext.clearCachedIterations();
-      appContext.updatePoints();
-      appContext.updateHelperCircle();
-      appContext.updateFocalControlPoint();
+      ellipseApproximation.arrangeInputPoints();
+      ellipseApproximation.updateHelperCircle();
+      ellipseApproximation.updateFocalControlPoint(appContext.config.focalControlAngleDeg * DEG_TO_RAD);
       approximate();
+      appContext.pb.redraw();
     };
 
     // +---------------------------------------------------------------------------------
@@ -132,6 +120,8 @@
       draw.line(ellipseApproximation.pointA, ellipseApproximation.pointB, "orange", 2.0);
       var bisector = ellipseApproximation.lineAB.perpBisector();
       draw.line(bisector.a, bisector.b, "orange", 1.0);
+
+      drawEllipseFromFocalAngle(draw, fill, appContext.config.focalControlAngleDeg * DEG_TO_RAD, "rgba(192,128,0,0.5)");
 
       var viewport = pb.viewport();
       var extendedBisectorLine = viewport.expandLine(bisector);
@@ -191,22 +181,22 @@
 
       // Draw?
       if (appContext.config.approxFirstCorrectAngle) {
-        drawEllipseFromFocalAngle(draw, fill, firstResultFocalAngle);
         drawCachedEllipses(draw, fill, firstCachedEllipses);
+        drawEllipseFromFocalAngle(draw, fill, firstResultFocalAngle, "rgba(192,128,0,1.0)");
       }
       if (appContext.config.approxSecondCorrectAngle) {
         drawCachedEllipses(draw, fill, secondCachedEllipses);
-        drawEllipseFromFocalAngle(draw, fill, secondResultFocalAngle);
+        drawEllipseFromFocalAngle(draw, fill, secondResultFocalAngle, "rgba(192,128,0,1.0)");
       }
     };
 
-    var drawEllipseFromFocalAngle = function (draw, fill, focalAngle) {
+    var drawEllipseFromFocalAngle = function (draw, fill, focalAngle, color) {
       var configuredEllipse = ellipseApproximation.calculateNextStep(focalAngle); // appContext.config.focalControlAngleDeg * DEG_TO_RAD);
       draw.ellipse(
         configuredEllipse.center,
         configuredEllipse.radiusH(),
         configuredEllipse.radiusV(),
-        "yellow",
+        color,
         1.0,
         configuredEllipse.rotation,
         { dashArray: [5, 5] } // StrokeOptions
@@ -252,16 +242,14 @@
         var focalAngle = cachedEllipses[i].focalAngle;
         draw.ellipse(
           ellipse.center,
-          ellipse.radiusH(), // radiusX: number,
-          ellipse.radiusV(), // radiusY: number,
-          isFinalEllipse ? "orange" : colorStr, // "violet",
+          ellipse.radiusH(), // radiusX
+          ellipse.radiusV(), // radiusY
+          isFinalEllipse ? "orange" : colorStr,
           isFinalEllipse ? 2.0 : 1.0,
           ellipse.rotation,
           { dashArray: [2, 2] } // strokeOptions?: StrokeOptions
         );
         var tmpFocalAnglePoint = ellipseApproximation.circleSector.vertAt(focalAngle);
-        // var tmpFocalAnglePoint = circleSector.vertAt(focalAngle - circleSector.startAngle);
-        // console.log("tmpFocalAnglePoint", tmpFocalAnglePoint);
         draw.polyline([ellipseApproximation.pointA, tmpFocalAnglePoint, ellipseApproximation.pointB], true, colorStr, 1.0);
         fill.text("" + i, tmpFocalAnglePoint.x, tmpFocalAnglePoint.y, { color: colorStr });
       }
@@ -399,10 +387,7 @@
     pb.config.preDraw = preDraw;
     pb.config.postDraw = postDraw;
 
-    appContext.updatePoints();
-    appContext.updateHelperCircle();
-    appContext.updateFocalControlPoint();
-    // pb.redraw();
+    handlePointMoved();
     humane.log("Move the three vertices around.");
   });
 })(globalThis);
