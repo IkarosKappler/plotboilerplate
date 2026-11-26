@@ -18,7 +18,14 @@
   window.addEventListener("load", function () {
     // All config params except the canvas are optional.
     var pb = new PlotBoilerplate(
-      PlotBoilerplate.utils.safeMergeByKeys({ canvas: document.getElementById("my-canvas"), fullSize: true }, GUP)
+      PlotBoilerplate.utils.safeMergeByKeys(
+        {
+          canvas: document.getElementById("my-canvas"),
+          backgroundColor: isDarkmode ? "#000000" : "#ffffff",
+          fullSize: true
+        },
+        GUP
+      )
     );
     pb.drawConfig.drawHandleLines = false; // We want the helper to draw the helper lines
 

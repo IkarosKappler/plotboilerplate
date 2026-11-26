@@ -1,5 +1,23 @@
 # Changelog
 
+- 2026-11-25
+  - Refactoring the `81-ellipse-from-three-points` demo.
+  - Adding and cleaning up the `utils/algorithms/EllipseFromThreePointsApproximation` helper class.
+- 2026-11-24
+  - Adding `CircleSector.vertAt` method.
+- 2026-10-30
+  - Adding the `VEllipse.containsPoint()` method.
+  - Adding demo `82-ellipse-contains-point`.
+  - Adding helper function (demos) `randomEllipse`.
+- 2026-10-18
+  - Adding methods `Triangle.isClockwise()` and static `Triangle.utils.isClockwise()`.
+  - Adding method `VertTuple.getColinear` for getting parallel/colinear lines.
+- 2026-10-12
+  - Adding optional parameter `inVectorBounds` to the `Line.intersection` method.
+  - Adding method `Bounds.expandLine`.
+- 2026-10-11
+  - Adding method `Line.perpBisector` to get perpendicular bisectors.
+  - Adding methods `Bounds.getWestBound`, `Bounds.getNorthBound`, `Bounds.getEastBound`, `Bounds.getSouthBound`.
 - 2026-09-21 [v1.31.0]
   - Adding `Polygon.revert` method to change the winding order.
   - Adding method `VertTuple.asVector` for converting TertTuples to Vector instances.

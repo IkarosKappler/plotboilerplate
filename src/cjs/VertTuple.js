@@ -20,7 +20,8 @@
  * @modified 2026-06-10 Adding helper function `VertTuple.utils.calcCircumcircle`.
  * @modified 2026-06-17 Adding method `VertTuple.asLine` for converting TertTuples to Line instances.
  * @modified 2026-09-21 Adding method `VertTuple.asVector` for converting TertTuples to Vector instances.
- * @version 1.7.0
+ * @modified 2026-10-18 Adding method `VertTuple.getColinear` for getting parallel/colinear lines.
+ * @version 1.8.0
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VertTuple = void 0;
@@ -230,10 +231,27 @@ var VertTuple = /** @class */ (function () {
      * @param {epsilon?=1.0e-6} epsilon - The epsilon to use (default is 1.0e-6).
      * @instance
      * @memberof VertTuple
-     * @return true if both lines are co-linear.
+     * @return {boolean} true if both lines are co-linear.
      */
     VertTuple.prototype.colinear = function (line, epsilon) {
         return Math.abs(this.denominator(line)) < (typeof epsilon === "undefined" ? Vertex_1.Vertex.EPSILON : epsilon);
+    };
+    /**
+     * Creates a new VertTuple<T> thats parallel (co-linear) to this one and that is going through the given point.
+     *
+     * @method getColinear
+     * @param {XYCoords} vertex - A vertex on the desired colinear line.
+     * @instance
+     * @memberof VertTuple
+     * @return {T} A new instance of T that's colinear to this one (and on the given vertex).
+     */
+    VertTuple.prototype.getColinear = function (vertex) {
+        // var diffA = this.a.difference(vertex);
+        // const newA = this.a.clone().sub(diffA);
+        // const newB = this.b.clone().sub(diffA);
+        var clone = this.factory(this.a.clone(), this.b.clone());
+        clone.moveTo(vertex);
+        return clone;
     };
     /**
      * Get the closest position T from this line to the specified point.

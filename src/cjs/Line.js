@@ -20,7 +20,9 @@
  * @modified 2025-04-15 Class `Line` now implements interface `Intersectable`.
  * @modified 2025-04-16 Class `Line` now implements interface `IBounded`.
  * @modified 2026-08-16 Adding methods `Line.trimStart` and `Line.trimEnd`. Adding methods `Line.trimStartAt` and `Line.trimEndAt`.
- * @version  2.5.0
+ * @modified 2026-10-11 Adding method `Line.perpBisector` to get perpendicular bisectors.
+ * @modified 2026-10-12 Adding optional parameter `inVectorBounds` to the `Line.intersection` method.
+ * @version  2.6.0
  *
  * @file Line
  * @public
@@ -73,16 +75,38 @@ var Line = /** @class */ (function (_super) {
         return _this;
     }
     /**
+     * Get the perpendicular bisector at the middle of both line vertices.
+     *
+     * @method perpBisector
+     * @instance
+     * @memberof Line
+     * @return {Line} A new Line instance sitting perpendicular to this line in the middle of this line.
+     **/
+    Line.prototype.perpBisector = function () {
+        var perp = this.clone();
+        var center = this.vertAt(0.5);
+        perp.sub(this.a);
+        perp = new Line(new Vertex_1.Vertex(), new Vertex_1.Vertex(-perp.b.y, perp.b.x));
+        perp.a.add(center);
+        perp.b.add(center);
+        var diffPerp = perp.a.difference(perp.b).scale(0.5); // , perp.a);
+        perp.a.sub(diffPerp);
+        perp.b.sub(diffPerp);
+        return perp;
+    };
+    /**
      * Get the intersection if this line and the specified line.
      *
      * @method intersection
      * @param {Line} line The second line.
+     * @param {boolean} inVectorBoundsOnly [optional] If set to true only insections in this 'vector's bounds are recognized.
      * @return {Vertex|undefined} The intersection (may lie outside the end-points) or `undefined` if both lines are parallel.
      * @instance
      * @memberof Line
      **/
     // !!! DO NOT MOVE TO VertTuple
-    Line.prototype.intersection = function (line) {
+    Line.prototype.intersection = function (line, inVectorBoundsOnly) {
+        if (inVectorBoundsOnly === void 0) { inVectorBoundsOnly = false; }
         var denominator = this.denominator(line);
         if (denominator == 0) {
             return null;
@@ -99,8 +123,12 @@ var Line = /** @class */ (function (_super) {
         if (isNaN(a) || isNaN(x) || isNaN(y)) {
             return null;
         }
+        var intersection = new Vertex_1.Vertex(x, y);
+        if (inVectorBoundsOnly && !this.hasPoint(intersection, true)) {
+            return null;
+        }
         // if we cast these lines infinitely in both directions, they intersect here:
-        return new Vertex_1.Vertex(x, y);
+        return intersection;
     };
     //--- BEGIN --- Implement interface `IBounded`
     /**

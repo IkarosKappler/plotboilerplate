@@ -30,7 +30,8 @@
  * @modified  2026-06-10 Refactoring the `Trianble.bounds` method and added a plain `Triangle.utils.bounds` method.
  * @modified  2026-06-10 Refactoring the `Trianble.calcCircumCircle` method and added a plain `Triangle.utils.calcCircumCircle` method.
  * @modified  2026-06-13 Adding `Triangle.getVertices()`.
- * @version   2.11.0
+ * @modified  2026-10-18 Adding methods `Triangle.isClockwise()` and static `Triangle.utils.isClockwise()`.
+ * @version   2.12.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -333,6 +334,15 @@ export declare class Triangle implements IBounded, SVGSerializable, Intersectabl
      **/
     toPolygon(): Polygon;
     /**
+     * Get the winding order of this triangle: clockwise or counterclockwise.
+     *
+     * @method isClockwise
+     * @instance
+     * @memberof Triangle
+     * @return {boolean}
+     */
+    isClockwise(): boolean;
+    /**
      * Get the determinant of this triangle.
      *
      * @method determinant
@@ -405,11 +415,20 @@ export declare class Triangle implements IBounded, SVGSerializable, Intersectabl
         /**
          * Calculate the determinant of the three vertices a, b and c (in this order).
          * @param {XYCords} a - The first vertex.
-         * @param {XYCords} b - The first vertex.
-         * @param {XYCords} c - The first vertex.
+         * @param {XYCords} b - The second vertex.
+         * @param {XYCords} c - The thrird vertex.
          * @returns {nmber}
          */
         determinant: (a: XYCoords, b: XYCoords, c: XYCoords) => number;
+        /**
+         * Determine if the passed triangle (a,b,c) is in clockwise winding order.
+         *
+         * @param {XYCords} a - The first vertex.
+         * @param {XYCords} b - The second vertex.
+         * @param {XYCords} c - The third vertex.
+         * @returns {nmber}
+         */
+        isClockwise: (a: XYCoords, b: XYCoords, c: XYCoords) => boolean;
         bounds: (a: XYCoords, b: XYCoords, c: XYCoords) => Bounds;
         /**
          * Re-compute the circumcircle of this triangle (if the vertices

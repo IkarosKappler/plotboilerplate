@@ -864,7 +864,8 @@ Circle.circleUtils = {
  * @modified  2026-06-10 Refactoring the `Trianble.bounds` method and added a plain `Triangle.utils.bounds` method.
  * @modified  2026-06-10 Refactoring the `Trianble.calcCircumCircle` method and added a plain `Triangle.utils.calcCircumCircle` method.
  * @modified  2026-06-13 Adding `Triangle.getVertices()`.
- * @version   2.11.0
+ * @modified  2026-10-18 Adding methods `Triangle.isClockwise()` and static `Triangle.utils.isClockwise()`.
+ * @version   2.12.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -1224,6 +1225,17 @@ class Triangle {
         return new Polygon([this.a, this.b, this.c]);
     }
     /**
+     * Get the winding order of this triangle: clockwise or counterclockwise.
+     *
+     * @method isClockwise
+     * @instance
+     * @memberof Triangle
+     * @return {boolean}
+     */
+    isClockwise() {
+        return Triangle.utils.isClockwise(this.a, this.b, this.c);
+    }
+    /**
      * Get the determinant of this triangle.
      *
      * @method determinant
@@ -1353,12 +1365,23 @@ Triangle.utils = {
     /**
      * Calculate the determinant of the three vertices a, b and c (in this order).
      * @param {XYCords} a - The first vertex.
-     * @param {XYCords} b - The first vertex.
-     * @param {XYCords} c - The first vertex.
+     * @param {XYCords} b - The second vertex.
+     * @param {XYCords} c - The thrird vertex.
      * @returns {nmber}
      */
     determinant: (a, b, c) => {
         return (b.y - a.y) * (c.x - b.x) - (c.y - b.y) * (b.x - a.x);
+    },
+    /**
+     * Determine if the passed triangle (a,b,c) is in clockwise winding order.
+     *
+     * @param {XYCords} a - The first vertex.
+     * @param {XYCords} b - The second vertex.
+     * @param {XYCords} c - The third vertex.
+     * @returns {nmber}
+     */
+    isClockwise: (a, b, c) => {
+        return Triangle.utils.determinant(a, b, c) < 0;
     },
     bounds: (a, b, c) => {
         return new Bounds(new Vertex$1(Triangle.utils.min3(a.x, b.x, c.x), Triangle.utils.min3(a.y, b.y, c.y)), new Vertex$1(Triangle.utils.max3(a.x, b.x, c.x), Triangle.utils.max3(a.y, b.y, c.y)));
@@ -1568,7 +1591,8 @@ const geomutils = {
  * @modified 2025-04-13 Adding the `Vertex.move(amount: XYCoords)` method (does the same as `add`, added by naming convention).
  * @modified 2025-05-07 Class `Vertex` is now implementing interface `IBounded` (to meet convention).
  * @modified 2026-06-10 Adding methods `Vertex.findClosestPoint` and `Vertex.findFarestPoint`.
- * @version  2.12.1
+ * @modified 2026-10-11 Changing `Vertex.findClosestPoint` work with arrays (any number of params).
+ * @version  2.12.2
  *
  * @file Vertex
  * @public
@@ -2138,36 +2162,84 @@ class Vertex$1 {
      * @param {XYCoords | Vertex} pointB
      * @returns  {XYCoords | Vertex}
      */
-    findClosestPoint(pointA, pointB) {
+    // findClosestPoint<T extends XYCoords | Vertex>(pointA: T, pointB: T): T {
+    //   // TODO: put this implementation to geomutils?
+    //   var distA = this.distance(pointA);
+    //   var distB = this.distance(pointB);
+    //   if (distA < distB) {
+    //     return pointA;
+    //   } else {
+    //     return pointB;
+    //   }
+    // }
+    findClosestPoint(...args) {
         // TODO: put this implementation to geomutils?
-        var distA = this.distance(pointA);
-        var distB = this.distance(pointB);
-        if (distA < distB) {
-            return pointA;
+        var pointA = args[0];
+        // var pointB = args[1];
+        var distance = this.distance(pointA);
+        var result = pointA;
+        for (var i = 0; i < args.length; i++) {
+            if (!args[i]) {
+                continue;
+            }
+            var newDist = this.distance(args[i]);
+            if (newDist < distance) {
+                distance = newDist;
+                result = args[i];
+            }
         }
-        else {
-            return pointB;
-        }
+        return result;
+        // var distA = this.distance(pointA);
+        // var distB = this.distance(pointB);
+        // if (distA < distB) {
+        //   return pointA;
+        // } else {
+        //   return pointB;
+        // }
     }
-    /**
-     * Find the one of two given points that's farest from this point.
-     *
-     * @method findFarestPoint
-     * @instance
-     * @memberof Vertex
-     * @param {XYCoords | Vertex} pointA
-     * @param {XYCoords | Vertex} pointB
-     * @returns  {XYCoords | Vertex}
-     */
-    findFarestPoint(pointA, pointB) {
-        var distA = this.distance(pointA);
-        var distB = this.distance(pointB);
-        if (distA > distB) {
-            return pointA;
+    // /**
+    //  * Find the one of two given points that's farest from this point.
+    //  *
+    //  * @method findFarestPoint
+    //  * @instance
+    //  * @memberof Vertex
+    //  * @param {XYCoords | Vertex} pointA
+    //  * @param {XYCoords | Vertex} pointB
+    //  * @returns  {XYCoords | Vertex}
+    //  */
+    // findFarestPoint<T extends XYCoords | Vertex>(pointA: T, pointB: T): T {
+    //   var distA = this.distance(pointA);
+    //   var distB = this.distance(pointB);
+    //   if (distA > distB) {
+    //     return pointA;
+    //   } else {
+    //     return pointB;
+    //   }
+    // }
+    findFarestPoint(...args) {
+        // TODO: put this implementation to geomutils?
+        var pointA = args[0];
+        // var pointB = args[1];
+        var distance = this.distance(pointA);
+        var result = pointA;
+        for (var i = 0; i < args.length; i++) {
+            if (!args[i]) {
+                continue;
+            }
+            var newDist = this.distance(args[i]);
+            if (newDist > distance) {
+                distance = newDist;
+                result = args[i];
+            }
         }
-        else {
-            return pointB;
-        }
+        return result;
+        // var distA = this.distance(pointA);
+        // var distB = this.distance(pointB);
+        // if (distA < distB) {
+        //   return pointA;
+        // } else {
+        //   return pointB;
+        // }
     }
     /**
      * Get a string representation of this vertex.
@@ -2285,7 +2357,8 @@ Vertex$1.utils = {
  * @modified 2026-06-10 Adding helper function `VertTuple.utils.calcCircumcircle`.
  * @modified 2026-06-17 Adding method `VertTuple.asLine` for converting TertTuples to Line instances.
  * @modified 2026-09-21 Adding method `VertTuple.asVector` for converting TertTuples to Vector instances.
- * @version 1.7.0
+ * @modified 2026-10-18 Adding method `VertTuple.getColinear` for getting parallel/colinear lines.
+ * @version 1.8.0
  */
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
@@ -2489,10 +2562,27 @@ class VertTuple {
      * @param {epsilon?=1.0e-6} epsilon - The epsilon to use (default is 1.0e-6).
      * @instance
      * @memberof VertTuple
-     * @return true if both lines are co-linear.
+     * @return {boolean} true if both lines are co-linear.
      */
     colinear(line, epsilon) {
         return Math.abs(this.denominator(line)) < (typeof epsilon === "undefined" ? Vertex$1.EPSILON : epsilon);
+    }
+    /**
+     * Creates a new VertTuple<T> thats parallel (co-linear) to this one and that is going through the given point.
+     *
+     * @method getColinear
+     * @param {XYCoords} vertex - A vertex on the desired colinear line.
+     * @instance
+     * @memberof VertTuple
+     * @return {T} A new instance of T that's colinear to this one (and on the given vertex).
+     */
+    getColinear(vertex) {
+        // var diffA = this.a.difference(vertex);
+        // const newA = this.a.clone().sub(diffA);
+        // const newB = this.b.clone().sub(diffA);
+        var clone = this.factory(this.a.clone(), this.b.clone());
+        clone.moveTo(vertex);
+        return clone;
     }
     /**
      * Get the closest position T from this line to the specified point.
@@ -2830,7 +2920,9 @@ Vector.utils = {
  * @modified 2025-04-15 Class `Line` now implements interface `Intersectable`.
  * @modified 2025-04-16 Class `Line` now implements interface `IBounded`.
  * @modified 2026-08-16 Adding methods `Line.trimStart` and `Line.trimEnd`. Adding methods `Line.trimStartAt` and `Line.trimEndAt`.
- * @version  2.5.0
+ * @modified 2026-10-11 Adding method `Line.perpBisector` to get perpendicular bisectors.
+ * @modified 2026-10-12 Adding optional parameter `inVectorBounds` to the `Line.intersection` method.
+ * @version  2.6.0
  *
  * @file Line
  * @public
@@ -2860,16 +2952,37 @@ class Line extends VertTuple {
         this.className = "Line";
     }
     /**
+     * Get the perpendicular bisector at the middle of both line vertices.
+     *
+     * @method perpBisector
+     * @instance
+     * @memberof Line
+     * @return {Line} A new Line instance sitting perpendicular to this line in the middle of this line.
+     **/
+    perpBisector() {
+        var perp = this.clone();
+        var center = this.vertAt(0.5);
+        perp.sub(this.a);
+        perp = new Line(new Vertex$1(), new Vertex$1(-perp.b.y, perp.b.x));
+        perp.a.add(center);
+        perp.b.add(center);
+        var diffPerp = perp.a.difference(perp.b).scale(0.5); // , perp.a);
+        perp.a.sub(diffPerp);
+        perp.b.sub(diffPerp);
+        return perp;
+    }
+    /**
      * Get the intersection if this line and the specified line.
      *
      * @method intersection
      * @param {Line} line The second line.
+     * @param {boolean} inVectorBoundsOnly [optional] If set to true only insections in this 'vector's bounds are recognized.
      * @return {Vertex|undefined} The intersection (may lie outside the end-points) or `undefined` if both lines are parallel.
      * @instance
      * @memberof Line
      **/
     // !!! DO NOT MOVE TO VertTuple
-    intersection(line) {
+    intersection(line, inVectorBoundsOnly = false) {
         const denominator = this.denominator(line);
         if (denominator == 0) {
             return null;
@@ -2886,8 +2999,12 @@ class Line extends VertTuple {
         if (isNaN(a) || isNaN(x) || isNaN(y)) {
             return null;
         }
+        const intersection = new Vertex$1(x, y);
+        if (inVectorBoundsOnly && !this.hasPoint(intersection, true)) {
+            return null;
+        }
         // if we cast these lines infinitely in both directions, they intersect here:
-        return new Vertex$1(x, y);
+        return intersection;
     }
     //--- BEGIN --- Implement interface `IBounded`
     /**
@@ -4049,6 +4166,8 @@ Polygon.utils = {
  * @modified 2025-10-18 Added method `Bounds.containsVert(XYCoords)`.
  * @modified 2025-10-28 Added the `Bounds.getWidth()` and `Bounds.getHeight()`.
  * @modified 2025-11-12 Added the `Bounds.getMoved()` method.
+ * @modified 2026-10-11 Adding methods `Bounds.getWestBound`, `Bounds.getNorthBound`, `Bounds.getEastBound`, `Bounds.getSouthBound`.
+ * @modified 2026-10-12 Adding method `Bounds.expandLine`.
  * @version  1.11.0
  **/
 /**
@@ -4190,6 +4309,18 @@ class Bounds {
     getSouthWestPoint() {
         return new Vertex$1(this.min.x, this.max.y);
     }
+    getWestBound() {
+        return new Line(this.getSouthWestPoint(), this.getNorthWestPoint());
+    }
+    getNorthBound() {
+        return new Line(this.getNorthWestPoint(), this.getNorthEastPoint());
+    }
+    getEastBound() {
+        return new Line(this.getNorthEastPoint(), this.getSouthEastPoint());
+    }
+    getSouthBound() {
+        return new Line(this.getSouthEastPoint(), this.getSouthWestPoint());
+    }
     /**
      * Convert this rectangular bounding box to a polygon with four vertices.
      *
@@ -4244,6 +4375,53 @@ class Bounds {
         const absHorizontalSafeArea = horizontalSafeArea > 0 && horizontalSafeArea < 1 ? this.width * horizontalSafeArea : horizontalSafeArea;
         const absVerticalSafeArea = verticalSafeArea > 0 && verticalSafeArea < 1 ? this.height * verticalSafeArea : verticalSafeArea;
         return new Vertex$1(this.min.x + absHorizontalSafeArea + Math.random() * (this.width - 2 * absHorizontalSafeArea), this.min.y + absVerticalSafeArea + Math.random() * (this.height - 2 * absVerticalSafeArea));
+    }
+    /**
+     * Get an 'infinite' line that touches the bounds of this bounded box.
+     *
+     * @method expandLine
+     * @instance
+     * @memberof Bounds
+     * @param {Vertex} pA - The first point of the line.
+     * @param {Vertex} pB - The second point of the line.
+     * @returns {Line | null} A new line covering the whole box, or null if the given line has no visible intersection with the box.
+     */
+    expandLine(line) {
+        // There is an easier way: just extend the line 2x the viewport size – but that's not accurate.
+        var north = this.getNorthBound();
+        var east = this.getEastBound();
+        var west = this.getWestBound();
+        var south = this.getSouthBound();
+        // var intersections: [Vertex | null, Vertex | null, Vertex | null, Vertex | null] = [
+        var intersections = [
+            north.intersection(line, true),
+            east.intersection(line, true),
+            south.intersection(line, true),
+            west.intersection(line, true)
+        ].filter((vert) => Boolean(vert));
+        // console.log("intersections", intersections);
+        // intersections = intersections.filter((vert: Vertex | null) => Boolean(vert));
+        if (intersections.length < 2) {
+            return null;
+        }
+        var first = intersections[0];
+        var second = intersections[1];
+        // console.log("first", first, "second", second);
+        intersections.splice(0, 2);
+        var resultA = line.a.findClosestPoint(first, second, ...intersections);
+        // var resultA = line.a.findClosestPoint(intersections[0], intersections[1], intersections[2], intersections[3]);
+        // var resultB = line.a.findFarestPoint(intersections[0], intersections[1], intersections[2], intersections[3]);
+        var resultB = line.a.findFarestPoint(first, second, ...intersections);
+        return new Line(resultA, resultB);
+        // // var scale = Math.max( this.getMaxDimension() /
+        // // var resultA = line.a.scale(this.width / line.getBounds().width, line.b);
+        // // var resultB = line.b.scale(this.width / line.getBounds().width, line.a);
+        // // var middle = line.vertAt(0.5);
+        // // var diff = middle.difference(line.a);
+        // // var resultA = middle.
+        // // return new Line(resultA, resultB);
+        // var diff = line.a.difference(line.b);
+        // var factors = { x: this.width / diff.x, y: this.height / diff.y };
     }
     /**
      * Convert these bounds to a human readable form.
@@ -12057,7 +12235,8 @@ class AlloyFinger {
  * @modified 2025-03-31 Adding the `VEllipse.move(amount: XYCoords)` method.
  * @modified 2025-04-19 Adding the `VEllipse.getBounds()` method.
  * @modified 2025-04-24 Adding the `VEllipse.getExtremePoints()` method for calculating minima and maxima.
- * @version  1.4.0
+ * @modified 2026-10-30 Adding the `VEllipse.containsPoint()` method.
+ * @version  1.5.0
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
@@ -12089,6 +12268,22 @@ class VEllipse {
         this.center = center;
         this.axis = axis;
         this.rotation = rotation || 0.0;
+    }
+    /**
+     * Check if a given point is inside thie ellipse.
+     *
+     * @method containsPoint
+     * @instance
+     * @memberof VEllipse
+     * @return {boolean} Returns `true` if the passed coordinates are inside this ellipse - `false` otherwise.
+     */
+    containsPoint(vert) {
+        // https://math.stackexchange.com/questions/76457/check-if-a-point-is-within-an-ellipse
+        // First rotate point in direction of ellipse to align with normalized ellipse form.
+        var rotatedVert = new Vertex$1(vert).rotate(-this.rotation, this.center);
+        return (Math.pow(this.center.x - rotatedVert.x, 2) / Math.pow(this.radiusH(), 2) +
+            Math.pow(this.center.y - rotatedVert.y, 2) / Math.pow(this.radiusV(), 2) <
+            1);
     }
     /**
      * Clone this ellipse (deep clone).

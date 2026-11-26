@@ -37,7 +37,8 @@
  * @modified 2025-04-13 Adding the `Vertex.move(amount: XYCoords)` method (does the same as `add`, added by naming convention).
  * @modified 2025-05-07 Class `Vertex` is now implementing interface `IBounded` (to meet convention).
  * @modified 2026-06-10 Adding methods `Vertex.findClosestPoint` and `Vertex.findFarestPoint`.
- * @version  2.12.1
+ * @modified 2026-10-11 Changing `Vertex.findClosestPoint` work with arrays (any number of params).
+ * @version  2.12.2
  *
  * @file Vertex
  * @public
@@ -674,35 +675,89 @@ export class Vertex implements IBounded, XYCoords, SVGSerializable {
    * @param {XYCoords | Vertex} pointB
    * @returns  {XYCoords | Vertex}
    */
-  findClosestPoint<T extends XYCoords | Vertex>(pointA: T, pointB: T): T {
+  // findClosestPoint<T extends XYCoords | Vertex>(pointA: T, pointB: T): T {
+  //   // TODO: put this implementation to geomutils?
+  //   var distA = this.distance(pointA);
+  //   var distB = this.distance(pointB);
+  //   if (distA < distB) {
+  //     return pointA;
+  //   } else {
+  //     return pointB;
+  //   }
+  // }
+
+  findClosestPoint<T extends XYCoords | Vertex>(...args: [T, T, ...Array<T | null>]): T {
     // TODO: put this implementation to geomutils?
-    var distA = this.distance(pointA);
-    var distB = this.distance(pointB);
-    if (distA < distB) {
-      return pointA;
-    } else {
-      return pointB;
+    var pointA = args[0];
+    // var pointB = args[1];
+    var distance = this.distance(pointA);
+    var result: T = pointA;
+    for (var i = 0; i < args.length; i++) {
+      if (!args[i]) {
+        continue;
+      }
+      var newDist = this.distance(args[i]);
+
+      if (newDist < distance) {
+        distance = newDist;
+        result = args[i];
+      }
     }
+    return result;
+    // var distA = this.distance(pointA);
+    // var distB = this.distance(pointB);
+    // if (distA < distB) {
+    //   return pointA;
+    // } else {
+    //   return pointB;
+    // }
   }
 
-  /**
-   * Find the one of two given points that's farest from this point.
-   *
-   * @method findFarestPoint
-   * @instance
-   * @memberof Vertex
-   * @param {XYCoords | Vertex} pointA
-   * @param {XYCoords | Vertex} pointB
-   * @returns  {XYCoords | Vertex}
-   */
-  findFarestPoint<T extends XYCoords | Vertex>(pointA: T, pointB: T): T {
-    var distA = this.distance(pointA);
-    var distB = this.distance(pointB);
-    if (distA > distB) {
-      return pointA;
-    } else {
-      return pointB;
+  // /**
+  //  * Find the one of two given points that's farest from this point.
+  //  *
+  //  * @method findFarestPoint
+  //  * @instance
+  //  * @memberof Vertex
+  //  * @param {XYCoords | Vertex} pointA
+  //  * @param {XYCoords | Vertex} pointB
+  //  * @returns  {XYCoords | Vertex}
+  //  */
+  // findFarestPoint<T extends XYCoords | Vertex>(pointA: T, pointB: T): T {
+  //   var distA = this.distance(pointA);
+  //   var distB = this.distance(pointB);
+  //   if (distA > distB) {
+  //     return pointA;
+  //   } else {
+  //     return pointB;
+  //   }
+  // }
+
+  findFarestPoint<T extends XYCoords | Vertex>(...args: [T, T, ...Array<T | null>]): T {
+    // TODO: put this implementation to geomutils?
+    var pointA = args[0];
+    // var pointB = args[1];
+    var distance = this.distance(pointA);
+    var result: T = pointA;
+    for (var i = 0; i < args.length; i++) {
+      if (!args[i]) {
+        continue;
+      }
+      var newDist = this.distance(args[i]);
+
+      if (newDist > distance) {
+        distance = newDist;
+        result = args[i];
+      }
     }
+    return result;
+    // var distA = this.distance(pointA);
+    // var distB = this.distance(pointB);
+    // if (distA < distB) {
+    //   return pointA;
+    // } else {
+    //   return pointB;
+    // }
   }
 
   /**

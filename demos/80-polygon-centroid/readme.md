@@ -1,3 +1,3 @@
-# Homothetic centers (or Ähnlichkeitspunkte)
+# Calculate the centroid of any convex (!) polygon
 
---- todo ---
+Note that the polygon vertices must be arranged clockwise.
