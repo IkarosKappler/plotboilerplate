@@ -16,7 +16,11 @@
       var fold = gui.addFolder("Elliptic Detection");
 
       // prettier-ignore
-      fold.add(appContext.config, "focalControlAngleDeg").listen().min(-90).max(90).step(0.1).title("How titled should the control focal axis be?").onChange(function () { appContext.updateFocalControlPoint(); });
+      fold.add(appContext.config, "focalControlAngleDeg").listen().min(-90*2).max(90*2).step(0.1).title("How titled should the control focal axis be?").onChange(function () { appContext.updateFocalControlPoint(); });
+
+      // prettier-ignore
+      gui.add(appContext.config, "showFocalControlEllipse").title("Draw the test ellipse at the control angle.").onChange( function() { appContext.pb.redraw(); } );
+
       // prettier-ignore
       fold.add(appContext.config, "numMaxIterations").listen().min(1).max(100).step(1).title("How many maximal iterations to use for elliptic detection?").onChange(function () { appContext.handleApproximationSettingsChanged(); });
       // prettier-ignore

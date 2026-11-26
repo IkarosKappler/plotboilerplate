@@ -1,5 +1,8 @@
 # Changelog
 
+- 2026-11-25
+  - Refactoring the `81-ellipse-from-three-points` demo.
+  - Adding and cleaning up the `utils/algorithms/EllipseFromThreePointsApproximation` helper class.
 - 2026-11-24
   - Adding `CircleSector.vertAt` method.
 - 2026-10-30

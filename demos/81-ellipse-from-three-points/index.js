@@ -34,6 +34,7 @@
     var appContext = new AppContext(pb, {
       // Must be in -PI/2 ... +PI/2
       focalControlAngleDeg: params.getNumber("focalControlAngleDeg", 0.0), // In Degrees!
+      showFocalControlEllipse: params.getBoolean("showFocalControlEllipse", true),
       numMaxIterations: params.getNumber("numMaxIterations", 100),
       approxFirstCorrectAngle: params.getBoolean("approxFirstCorrectAngle", true),
       approxSecondCorrectAngle: params.getBoolean("approxSecondCorrectAngle", false),
@@ -103,6 +104,7 @@
       appContext.clearCachedIterations();
       ellipseApproximation.arrangeInputPoints();
       ellipseApproximation.updateHelperCircle();
+      appContext.updateFocalControlPoint();
       approximate();
       appContext.pb.redraw();
     };
@@ -124,7 +126,9 @@
       var bisector = ellipseApproximation.lineAB.perpBisector();
       draw.line(bisector.a, bisector.b, "orange", 1.0);
 
-      drawEllipseFromFocalAngle(draw, fill, appContext.config.focalControlAngleDeg * DEG_TO_RAD, "rgba(192,128,0,0.5)");
+      if (appContext.config.showFocalControlEllipse) {
+        drawEllipseFromFocalAngle(draw, fill, appContext.config.focalControlAngleDeg * DEG_TO_RAD, "rgba(192,128,0,0.5)");
+      }
 
       var viewport = pb.viewport();
       var extendedBisectorLine = viewport.expandLine(bisector);
@@ -191,10 +195,14 @@
         drawCachedEllipses(draw, fill, secondCachedEllipses);
         drawEllipseFromFocalAngle(draw, fill, secondResultFocalAngle, "rgba(192,128,0,1.0)");
       }
+
+      draw4Arrows(draw, fill, inputPointA);
+      draw4Arrows(draw, fill, inputPointB);
+      draw4Arrows(draw, fill, inputPointC);
     };
 
     var drawEllipseFromFocalAngle = function (draw, fill, focalAngle, color) {
-      var configuredEllipse = ellipseApproximation.calculateNextStep(focalAngle); // appContext.config.focalControlAngleDeg * DEG_TO_RAD);
+      var configuredEllipse = ellipseApproximation.calculateEllipseFromFocalAngle(focalAngle); // appContext.config.focalControlAngleDeg * DEG_TO_RAD);
       draw.ellipse(
         configuredEllipse.center,
         configuredEllipse.radiusH(),
@@ -297,6 +305,59 @@
       if (intersections[3]) {
         draw.crosshair(intersections[3], 6, "red");
       }
+    };
+
+    var draw4Arrows = function (draw, fill, position) {
+      var arrowSize = 10;
+      var arrowHeight = 8;
+      var offset = 7;
+      var pathdata = [
+        // Up arrow
+        "M",
+        position.x - arrowSize / 2.0,
+        position.y - offset,
+        "L",
+        position.x,
+        position.y - offset - arrowHeight,
+        "L",
+        position.x + arrowSize / 2.0,
+        position.y - offset,
+        "z",
+        // Right arrow
+        "M",
+        position.x + offset,
+        position.y - arrowSize / 2.0,
+        "L",
+        position.x + offset + arrowHeight,
+        position.y,
+        "L",
+        position.x + offset,
+        position.y + arrowSize / 2.0,
+        "z",
+        // Down arrow
+        "M",
+        position.x + arrowSize / 2.0,
+        position.y + offset,
+        "L",
+        position.x,
+        position.y + offset + arrowHeight,
+        "L",
+        position.x - arrowSize / 2.0,
+        position.y + offset,
+        "Z",
+        // Left arrow
+        "M",
+        position.x - offset,
+        position.y + arrowSize / 2.0,
+        "L",
+        position.x - offset - arrowHeight,
+        position.y,
+        "L",
+        position.x - offset,
+        position.y - arrowSize / 2.0,
+        "Z"
+      ];
+      draw.path(pathdata, "green", 1.0);
     };
 
     // +---------------------------------------------------------------------------------
