@@ -208,7 +208,7 @@
         configuredEllipse.radiusH(),
         configuredEllipse.radiusV(),
         color,
-        1.0,
+        2.0,
         configuredEllipse.rotation,
         { dashArray: [5, 5] } // StrokeOptions
       );
