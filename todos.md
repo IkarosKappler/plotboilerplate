@@ -1,5 +1,6 @@
 ## Todos
 
+[ ] Website darkmode for demo images.
 [ ] Bezier handle Line color aus der drawconfig is not in use!
 [ ] Website: demos, add #anchors
 [X] replace lib/Color.min.js by proper color class.
